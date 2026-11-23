@@ -1,0 +1,127 @@
+name: Android release
+
+# The only way a release APK is made: push a tag android-v<versionName>, e.g. android-v0.1.0.
+# Builds the unsigned release APK from that commit, runs the policy checks, signs it, and attaches it
+# to a DRAFT GitHub Release with its SHA-256 and signing-certificate digest. A person reviews and
+# publishes the draft. Setup and verification: docs/RELEASING.md and SECURITY.md.
+
+on:
+  push:
+    tags: ['android-v*']
+
+permissions:
+  contents: write # create the draft release
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BUILD_TOOLS: 37.0.0
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          # Release builds start clean: nothing cached by earlier runs goes into a release.
+          cache-disabled: true
+
+      - name: Install build-tools ${{ env.BUILD_TOOLS }}
+        run: |
+          if [ ! -d "$ANDROID_HOME/build-tools/$BUILD_TOOLS" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;$BUILD_TOOLS" > /dev/null
+          fi
+
+      - name: Check the tag matches versionName
+        run: |
+          version="$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app/build.gradle.kts)"
+          if [ "$GITHUB_REF_NAME" != "android-v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match versionName $version in android/app/build.gradle.kts"
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Build the unsigned release APK
+        run: ./gradlew --no-daemon --no-build-cache assembleRelease
+
+      - name: Policy checks
+        run: ../.github/scripts/android-policy-check.sh app/build/outputs/apk/release/app-release-unsigned.apk release
+
+      - name: Sign
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ]; then
+            echo "::error::Signing secrets are missing. See docs/RELEASING.md, 'One-time setup'."
+            exit 1
+          fi
+          bt="$ANDROID_HOME/build-tools/$BUILD_TOOLS"
+          ks="$RUNNER_TEMP/release.p12"
+          trap 'rm -f "$ks"' EXIT
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$ks"
+          "$bt/zipalign" -P 16 -f 4 app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/aligned.apk"
+          "$bt/apksigner" sign \
+            --ks "$ks" --ks-type PKCS12 --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:KEYSTORE_PASSWORD \
+            --out "$RUNNER_TEMP/pairline-bridge-$VERSION.apk" "$RUNNER_TEMP/aligned.apk"
+
+      - name: Verify and write release notes
+        run: |
+          bt="$ANDROID_HOME/build-tools/$BUILD_TOOLS"
+          apk="$RUNNER_TEMP/pairline-bridge-$VERSION.apk"
+          "$bt/apksigner" verify --verbose --print-certs "$apk" | tee "$RUNNER_TEMP/certs.txt"
+          # e.g. "V3.0 Signer: certificate SHA-256 digest: 52d7..." (format varies by build-tools version)
+          cert="$(sed -n 's/^.*Signer.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/certs.txt" | head -1)"
+          if [ -z "$cert" ]; then echo "::error::Couldn't read the signing certificate digest"; exit 1; fi
+          sum="$(sha256sum "$apk" | cut -d' ' -f1)"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          {
+            echo "## Pairline Bridge $VERSION (Android)"
+            echo
+            echo "Built by [this GitHub Actions run]($run_url) from commit \`$GITHUB_SHA\`."
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| APK SHA-256 | \`$sum\` |"
+            echo "| Signing certificate SHA-256 | \`$cert\` |"
+            echo "| Toolchain | Temurin JDK 17, Gradle wrapper, build-tools $BUILD_TOOLS, ubuntu-24.04 |"
+            echo
+            echo "How to verify: [SECURITY.md](../../blob/$GITHUB_SHA/SECURITY.md#verifying-a-release)."
+          } > "$RUNNER_TEMP/notes.md"
+          cat "$RUNNER_TEMP/notes.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          prerelease=""
+          case "$VERSION" in 0.*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/pairline-bridge-$VERSION.apk" \
+            --draft $prerelease --verify-tag \
+            --title "Pairline Bridge $VERSION (Android)" \
+            --notes-file "$RUNNER_TEMP/notes.md"
+
+      - name: Keep the APK as an artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pairline-bridge-${{ env.VERSION }}
+          path: ${{ runner.temp }}/pairline-bridge-${{ env.VERSION }}.apk
+          retention-days: 90
