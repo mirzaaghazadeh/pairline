@@ -1,0 +1,122 @@
+# XcodeGen spec for the Pairline iPhone app. Generate the project with `xcodegen generate`;
+# the .xcodeproj is not committed (see ../.gitignore).
+name: Pairline
+
+options:
+  bundleIdPrefix: app.pairline
+  deploymentTarget:
+    iOS: "16.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: false
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # Set your own team to run on a device; CI builds without signing.
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+    SUPPORTS_MACCATALYST: NO
+    SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
+    STRING_CATALOG_GENERATE_SYMBOLS: NO
+  configs:
+    Debug:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+    Release:
+      SWIFT_COMPILATION_MODE: wholemodule
+
+targets:
+  Pairline:
+    type: application
+    platform: iOS
+    sources:
+      - path: Pairline
+        excludes:
+          - "Store/Pairline.storekit"
+      - path: Pairline/Store/Pairline.storekit
+        buildPhase: none
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios
+        PRODUCT_NAME: Pairline
+        INFOPLIST_FILE: Pairline/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Pairline/Pairline.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: NO
+    dependencies:
+      - target: PairlineWidget
+        embed: true
+        codeSign: true
+      - sdk: CallKit.framework
+      - sdk: CoreBluetooth.framework
+      - sdk: StoreKit.framework
+      - sdk: VisionKit.framework
+      - sdk: libsqlite3.tbd
+
+  PairlineWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PairlineWidget
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios.widget
+        PRODUCT_NAME: PairlineWidget
+        INFOPLIST_FILE: PairlineWidget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: PairlineWidget/PairlineWidget.entitlements
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME: WidgetBackground
+        SKIP_INSTALL: YES
+    dependencies:
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+
+  PairlineTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: PairlineTests
+      - path: ../protocol/test-vectors/v0.json
+        buildPhase: resources
+      - path: Pairline/Store/Pairline.storekit
+        buildPhase: resources
+    dependencies:
+      - target: Pairline
+      - sdk: StoreKitTest.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Pairline:
+    build:
+      targets:
+        Pairline: all
+        PairlineTests: [test]
+    run:
+      config: Debug
+      storeKitConfiguration: Pairline/Store/Pairline.storekit
+    test:
+      config: Debug
+      targets:
+        - PairlineTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

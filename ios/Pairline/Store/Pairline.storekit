@@ -1,0 +1,64 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : "https://pairline.navid.tr/privacy"
+      }
+    ]
+  },
+  "identifier" : "5B0F3C2A",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "0.0",
+      "familyShareable" : false,
+      "internalID" : "6739000001",
+      "localizations" : [
+        {
+          "description" : "Use every Pairline feature free for 3 days.",
+          "displayName" : "3-day Trial",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "app.pairline.ios.trial3day",
+      "referenceName" : "3-day Trial",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "11.99",
+      "familyShareable" : true,
+      "internalID" : "6739000002",
+      "localizations" : [
+        {
+          "description" : "Unlock Pairline for good. One-time purchase, no subscription.",
+          "displayName" : "Pairline Full Access",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "app.pairline.ios.full",
+      "referenceName" : "Pairline Full Access",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6739000000",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}
