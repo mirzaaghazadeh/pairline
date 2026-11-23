@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- We ship APKs from GitHub Releases, not app bundles, so every language is always in the APK. -->
+    <issue id="AppBundleLocaleChanges" severity="ignore" />
+    <!-- Library and Gradle updates are reviewed by hand (each needs a DECISIONS.md check). -->
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="NewerVersionAvailable" severity="ignore" />
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+    <!-- targetSdk 36 is a deliberate choice (D-016). -->
+    <issue id="OldTargetApi" severity="ignore" />
+</lint>

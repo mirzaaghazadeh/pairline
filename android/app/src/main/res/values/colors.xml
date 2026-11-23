@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand colors shared with the iPhone app and the website. -->
+    <color name="brand_blue">#1F5FBF</color>
+    <color name="brand_blue_dark_mode">#9DC1FF</color>
+    <color name="brand_green">#12B886</color>
+    <color name="brand_amber">#F59F00</color>
+    <color name="brand_red">#E03131</color>
     <color name="ic_launcher_background">#1F5FBF</color>
 </resources>

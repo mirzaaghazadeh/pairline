@@ -4,4 +4,19 @@
     <string name="app_name" translatable="false">Pairline</string>
     <string name="bridge_tagline">Use this phone\'s SIM from your iPhone</string>
     <string name="status_not_paired">This phone isn\'t paired with an iPhone yet.</string>
+    <string name="generic_iphone">your iPhone</string>
+
+    <!-- Persistent notification of the link service -->
+    <string name="notif_channel_link">Link status</string>
+    <string name="notif_channel_link_desc">Shows whether your iPhone is connected. Android requires this notification to keep Pairline running.</string>
+    <string name="notif_connected_title">Connected to %1$s</string>
+    <string name="notif_connected_text">Calls and messages are being relayed to your iPhone.</string>
+    <string name="notif_waiting_title">Waiting for your iPhone</string>
+    <string name="notif_waiting_text">Pairline reconnects automatically when your iPhone is nearby with Bluetooth on.</string>
+    <string name="notif_not_paired_title">Not paired yet</string>
+    <string name="notif_not_paired_text">Open Pairline and scan the code with your iPhone.</string>
+    <string name="notif_bt_off_title">Bluetooth is off</string>
+    <string name="notif_bt_off_text">Turn on Bluetooth so your iPhone can connect.</string>
+    <string name="notif_permission_title">Permission needed</string>
+    <string name="notif_permission_text">Open Pairline to allow Nearby devices, so your iPhone can connect.</string>
 </resources>

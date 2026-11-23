@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bridge_tagline">استخدم شريحة هذا الهاتف من آيفونك</string>
+    <string name="status_not_paired">هذا الهاتف غير مقترن بأي آيفون بعد.</string>
+    <string name="generic_iphone">آيفونك</string>
+
+    <string name="notif_channel_link">حالة الاتصال</string>
+    <string name="notif_channel_link_desc">يُظهر ما إذا كان آيفونك متصلًا. يتطلب أندرويد هذا الإشعار لإبقاء Pairline قيد التشغيل.</string>
+    <string name="notif_connected_title">متصل بـ %1$s</string>
+    <string name="notif_connected_text">تُحوَّل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="notif_waiting_title">بانتظار آيفونك</string>
+    <string name="notif_waiting_text">يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا والبلوتوث مفعّلًا.</string>
+    <string name="notif_not_paired_title">لم يتم الاقتران بعد</string>
+    <string name="notif_not_paired_text">افتح Pairline وامسح الرمز باستخدام آيفونك.</string>
+    <string name="notif_bt_off_title">البلوتوث متوقف</string>
+    <string name="notif_bt_off_text">شغّل البلوتوث ليتمكن آيفونك من الاتصال.</string>
+    <string name="notif_permission_title">مطلوب إذن</string>
+    <string name="notif_permission_text">افتح Pairline واسمح بإذن «الأجهزة المجاورة» ليتمكن آيفونك من الاتصال.</string>
+</resources>

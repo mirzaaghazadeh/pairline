@@ -1,0 +1,55 @@
+package app.pairline.android
+
+import android.app.Application
+import app.pairline.android.link.IdentityStore
+import app.pairline.android.link.LinkManager
+import app.pairline.android.link.MessageRouter
+import app.pairline.android.link.PairingManager
+import app.pairline.android.link.PrefsPeerKeyStore
+import app.pairline.android.telephony.CallTracker
+import app.pairline.android.telephony.ContactsSync
+import app.pairline.android.telephony.SimDirectory
+import app.pairline.android.telephony.SmsSender
+import app.pairline.android.telephony.SmsStore
+import app.pairline.android.telephony.StatusMonitor
+import app.pairline.android.telephony.UssdRunner
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+/** Hand-written service locator: one instance of each component per process (D-023: no DI library). */
+object AppGraph {
+    lateinit var app: Application
+        private set
+
+    fun init(application: Application) {
+        app = application
+    }
+
+    /** Short background jobs from broadcast receivers. */
+    val io: ExecutorService by lazy { Executors.newCachedThreadPool { r -> Thread(r, "pairline-io") } }
+
+    val prefs by lazy { AppPrefs(app) }
+    val identity by lazy { IdentityStore(app) }
+    val peers by lazy { PrefsPeerKeyStore(app) }
+    val pairing by lazy {
+        PairingManager(
+            deviceId = { identity.deviceId },
+            identityPublicKey = { identity.identity().publicKey },
+            peers = peers,
+        )
+    }
+    val link by lazy { LinkManager({ identity.identity() }, pairing, peers, prefs) }
+
+    val sims: SimDirectory by lazy { SimDirectory(app) }
+    val smsStore: SmsStore by lazy { SmsStore(app, sims) }
+    val smsSender: SmsSender by lazy { SmsSender(app, sims, smsStore, link::send) }
+    val calls: CallTracker by lazy { CallTracker(app, sims, prefs, link::send) { router.statusChanged() } }
+    val contacts: ContactsSync by lazy { ContactsSync(app, sims) }
+    val ussd: UssdRunner by lazy { UssdRunner(app, sims, link::send) }
+    val status: StatusMonitor by lazy {
+        StatusMonitor(app, sims, prefs, BuildConfig.VERSION_NAME) { calls.inCallServiceAvailable }
+    }
+    val router: MessageRouter by lazy {
+        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd)
+    }
+}
