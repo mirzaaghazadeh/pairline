@@ -5,9 +5,21 @@
       "comment" : "Bundle display name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Pairline"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Pairline"
           }
         }
@@ -17,9 +29,21 @@
       "comment" : "Bundle name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Pairline"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Pairline"
           }
         }
@@ -29,10 +53,22 @@
       "comment" : "Privacy - Bluetooth Always Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم Pairline البلوتوث للاتصال بهاتفك الوسيط الذي يعمل بنظام أندرويد، لتتمكن من استخدام شريحة SIM الموجودة فيه على هذا الآيفون."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Pairline uses Bluetooth to connect to your Android bridge phone, so you can use its SIM card on this iPhone."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline از بلوتوث برای اتصال به گوشی پل اندرویدی شما استفاده می‌کند تا بتوانید از سیم‌کارت آن روی این آیفون استفاده کنید."
           }
         }
       }
@@ -41,10 +77,22 @@
       "comment" : "Privacy - Camera Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم Pairline الكاميرا فقط لمسح رمز الإقران الظاهر على هاتفك الوسيط الذي يعمل بنظام أندرويد."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Pairline uses the camera only to scan the pairing code shown on your Android bridge phone."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline فقط برای اسکن کد جفت‌سازی‌ای که روی گوشی پل اندرویدی شما نمایش داده می‌شود، از دوربین استفاده می‌کند."
           }
         }
       }

@@ -254,9 +254,7 @@ enum TrialText {
         formatter.unitsStyle = .full
         formatter.allowedUnits = left.days > 0 ? [.day, .hour] : [.hour]
         formatter.maximumUnitCount = 2
-        var calendar = Calendar.current
-        calendar.locale = Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en")
-        formatter.calendar = calendar
+        formatter.calendar = Formatters.appCalendar
         let duration = formatter.string(from: DateComponents(day: left.days, hour: left.hours)) ?? ""
         return Text("Free trial: \(duration) left")
     }

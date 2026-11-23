@@ -55,6 +55,7 @@ struct CallLogView: View {
     @EnvironmentObject private var calls: CallCenter
     @State private var items: [CallLogItem] = []
     @State private var filter: Filter = .all
+    @State private var detail: Contact?
 
     private var shown: [CallLogItem] {
         filter == .all ? items : items.filter { $0.type == .missed || $0.type == .rejected }
@@ -83,13 +84,16 @@ struct CallLogView: View {
                     .listRowSeparator(.hidden)
             } else {
                 ForEach(shown) { item in
-                    CallLogRow(item: item) {
+                    CallLogRow(item: item, showContact: { detail = $0 }) {
                         calls.startCall(number: item.number, sim: item.sim ?? bridge.defaultSim(forSMS: false))
                     }
                 }
             }
         }
         .listStyle(.plain)
+        .navigationDestination(isPresented: Binding(get: { detail != nil }, set: { if !$0 { detail = nil } })) {
+            if let detail { ContactDetailView(contact: detail) }
+        }
         .refreshable { await bridge.sync() }
         .onAppear { items = db.calls() }
         .onValueChange(db.revision) { _ in items = db.calls() }
@@ -111,6 +115,7 @@ struct CallLogView: View {
 
 struct CallLogRow: View {
     let item: CallLogItem
+    var showContact: ((Contact) -> Void)?
     let call: () -> Void
     @EnvironmentObject private var db: AppDatabase
     @EnvironmentObject private var bridge: BridgeController
@@ -150,9 +155,9 @@ struct CallLogRow: View {
             Text(Formatters.listTime(item.time))
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            if let contact = db.contact(forNumber: item.number) {
-                NavigationLink {
-                    ContactDetailView(contact: contact)
+            if let showContact, let contact = db.contact(forNumber: item.number) {
+                Button {
+                    showContact(contact)
                 } label: {
                     Image(systemName: "info.circle").foregroundStyle(Color.brandBlue)
                 }

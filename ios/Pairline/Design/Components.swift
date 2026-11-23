@@ -47,6 +47,10 @@ struct Avatar: View {
             return .symbol("building.2.fill")
         }
         let words = trimmed.split(separator: " ").filter { $0.first?.isLetter == true }
+        // Arabic-script letters join into ligatures, so those names get a single letter.
+        if let first = words.first?.first, TextDirection.isRightToLeft(String(first)) {
+            return .initials(String(first))
+        }
         let initials = words.prefix(2).compactMap { $0.first }.map(String.init).joined()
         return .initials(initials.isEmpty ? String(trimmed.prefix(1)) : initials.uppercased())
     }
@@ -84,6 +88,8 @@ struct SignalBars: View {
                     .frame(width: 4, height: CGFloat(5 + index * 3))
             }
         }
+        // Signal bars always rise to the right, as in the iOS status bar.
+        .environment(\.layoutDirection, .leftToRight)
         .accessibilityElement()
         .accessibilityLabel(Text("Signal \(level) of 4"))
     }
@@ -130,7 +136,7 @@ struct SIMBadge: View {
             .font(.system(size: 10, weight: .bold, design: .rounded))
             .foregroundStyle(.white)
             .frame(width: 15, height: 15)
-            .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(slot == 0 ? Color.brandBlue : Color.brandGreen))
+            .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(slot == 0 ? Color.brandFill : Color.brandGreen))
             .accessibilityLabel(Text("SIM \(slot + 1)"))
     }
 }

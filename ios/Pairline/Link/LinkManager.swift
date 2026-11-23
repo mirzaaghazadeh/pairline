@@ -32,7 +32,7 @@ enum LinkError: LocalizedError, Equatable {
             switch reply.code {
             case "unsupported": return String(localized: "The bridge app doesn't support this yet. Update it on your Android phone.")
             case "permission": return String(localized: "The bridge app is missing a permission for this. Open Pairline Bridge on your Android phone to allow it.")
-            case "invalid": return String(localized: "The bridge phone couldn't use that request.")
+            case "invalid": return String(localized: "The bridge phone couldn't handle that request.")
             case "busy": return String(localized: "The bridge phone is busy. Try again in a moment.")
             default: return String(localized: "The bridge phone couldn't do that.")
             }

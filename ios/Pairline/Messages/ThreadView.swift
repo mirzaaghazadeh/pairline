@@ -191,7 +191,7 @@ struct MessageBubble: View {
     }
 
     private var bubbleColor: Color {
-        message.state == .failed ? Color.brandRed.opacity(0.85) : Color.brandBlue
+        message.state == .failed ? Color.brandRed.opacity(0.85) : Color.brandFill
     }
 
     private var bubbleShape: some Shape {

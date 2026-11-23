@@ -2,6 +2,8 @@ import SwiftUI
 
 extension Color {
     static let brandBlue = Color("BrandBlue")
+    /// Blue for filled surfaces behind white text and glyphs (stays deep in dark mode).
+    static let brandFill = Color("BrandFill")
     static let brandGreen = Color("BrandGreen")
     static let brandAmber = Color("BrandAmber")
     static let brandRed = Color("BrandRed")
@@ -17,7 +19,7 @@ enum Metrics {
 
 /// The large, filled call-to-action button.
 struct PrimaryButtonStyle: ButtonStyle {
-    var tint: Color = .brandBlue
+    var tint: Color = .brandFill
     @Environment(\.isEnabled) private var isEnabled
 
     func makeBody(configuration: Configuration) -> some View {
@@ -108,8 +110,16 @@ enum Formatters {
         return date.formatted(.dateTime.weekday(.wide).day().month(.wide))
     }
 
+    /// A calendar in the app's own language, so formatted durations match the UI language.
+    static var appCalendar: Calendar {
+        var calendar = Calendar.current
+        calendar.locale = Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en")
+        return calendar
+    }
+
     static func duration(_ seconds: Int) -> String {
         let formatter = DateComponentsFormatter()
+        formatter.calendar = appCalendar
         formatter.unitsStyle = .abbreviated
         formatter.allowedUnits = seconds >= 3600 ? [.hour, .minute] : [.minute, .second]
         formatter.zeroFormattingBehavior = .dropAll

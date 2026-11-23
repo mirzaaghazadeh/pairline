@@ -8,7 +8,7 @@ struct HelpCenterView: View {
                 NavigationLink {
                     HelpArticleView(article: .setup)
                 } label: {
-                    ToolRow(symbol: "1.circle.fill", tint: .brandBlue, title: Text("Set up the Android phone"),
+                    ToolRow(symbol: "1.circle.fill", tint: .brandFill, title: Text("Set up the Android phone"),
                             subtitle: Text("Install Pairline Bridge and pair"))
                 }
                 NavigationLink {
@@ -26,7 +26,7 @@ struct HelpCenterView: View {
                 NavigationLink {
                     HelpArticleView(article: .calls)
                 } label: {
-                    ToolRow(symbol: "phone.fill", tint: .brandBlue, title: Text("How calls work"),
+                    ToolRow(symbol: "phone.fill", tint: .brandFill, title: Text("How calls work"),
                             subtitle: Text("Answer on iPhone, talk on Android for now"))
                 }
             } header: {
@@ -182,7 +182,7 @@ private struct Step: View {
                 .font(.headline)
                 .foregroundStyle(.white)
                 .frame(width: 30, height: 30)
-                .background(Circle().fill(Color.brandBlue))
+                .background(Circle().fill(Color.brandFill))
             VStack(alignment: .leading, spacing: 4) {
                 title.font(.headline)
                 text.font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
@@ -230,7 +230,7 @@ struct FAQ: Identifiable {
             answer: "After 3 days, sending messages, calls, syncing and USSD stop until you buy Pairline once. Messages already on this iPhone stay readable, and demo mode, help and settings keep working."),
         FAQ(id: 6, question: "Is it a subscription?",
             answer: "No. Pairline is a one-time purchase. The Android app is free."),
-        FAQ(id: 7, question: "Can I see the code?",
+        FAQ(id: 7, question: "Can I see the source code?",
             answer: "Yes. Pairline's source code is public so anyone can check what it does."),
         FAQ(id: 8, question: "Does Pairline work with group messages or MMS?",
             answer: "Not yet. Pairline handles SMS text messages. Picture messages (MMS) are planned."),
@@ -245,7 +245,7 @@ struct Troubleshooting: Identifiable {
 
     static let all: [Troubleshooting] = [
         Troubleshooting(id: 1, symbol: "antenna.radiowaves.left.and.right.slash", problem: "The iPhone can't find the bridge", steps: [
-            "Check that Bluetooth is on on both phones.",
+            "Make sure both phones have Bluetooth turned on.",
             "Open Pairline Bridge on the Android phone and make sure it says it's running.",
             "Bring the phones closer together.",
             "Turn Bluetooth off and on again on the Android phone.",

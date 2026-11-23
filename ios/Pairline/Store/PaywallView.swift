@@ -10,14 +10,22 @@ struct PaywallView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 22) {
                     hero
+                    if !purchases.access.isPurchased { priceCard }
                     features
-                    offer
                     footer
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 24)
+                .padding(.bottom, 16)
+            }
+            .safeAreaInset(edge: .bottom) {
+                // The offer stays visible without scrolling.
+                offer
+                    .padding(.horizontal, 20)
+                    .padding(.top, 14)
+                    .padding(.bottom, 6)
+                    .background(.regularMaterial)
             }
             .background(
                 LinearGradient(colors: [Color.brandBlue.opacity(0.16), Color(.systemBackground)], startPoint: .top,
@@ -53,15 +61,14 @@ struct PaywallView: View {
     }
 
     private var hero: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             Image("BrandMark")
                 .resizable()
-                .frame(width: 84, height: 84)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .frame(width: 72, height: 72)
+                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
                 .shadow(color: Color.brandBlue.opacity(0.35), radius: 16, y: 8)
-                .padding(.top, 8)
             Text("Pairline Full Access")
-                .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                .font(.system(.title, design: .rounded).weight(.bold))
                 .multilineTextAlignment(.center)
             Text("Your Android SIM on your iPhone. Pay once, keep it for good.")
                 .font(.headline.weight(.regular))
@@ -72,13 +79,13 @@ struct PaywallView: View {
 
     private var features: some View {
         VStack(alignment: .leading, spacing: 14) {
-            FeatureRow(symbol: "message.fill", tint: .brandBlue, title: Text("Messages and one-time codes"),
-                       text: Text("Read, reply and copy codes straight from notifications."))
+            FeatureRow(symbol: "message.fill", tint: .brandFill, title: Text("Messages and one-time codes"),
+                       text: Text("Read and send SMS, and copy codes straight from the notification."))
             FeatureRow(symbol: "phone.fill", tint: .brandGreen, title: Text("Calls on your iPhone"),
                        text: Text("Ring, answer, decline and dial with the iPhone call screen."))
             FeatureRow(symbol: "person.2.fill", tint: .brandAmber, title: Text("Contacts and call history"),
                        text: Text("Synced from the Android phone and kept on this iPhone only."))
-            FeatureRow(symbol: "simcard.2.fill", tint: .brandBlue, title: Text("Dual SIM, USSD and widget"),
+            FeatureRow(symbol: "simcard.2.fill", tint: .brandFill, title: Text("Dual SIM, USSD and widget"),
                        text: Text("Pick a SIM, check your balance, see battery and signal at a glance."))
             FeatureRow(symbol: "lock.shield.fill", tint: .brandGreen, title: Text("Private by design"),
                        text: Text("End-to-end encrypted between your phones. No servers, no accounts, no tracking."))
@@ -101,8 +108,7 @@ struct PaywallView: View {
             }
             .card(padding: 20)
         case .notStarted, .loading:
-            VStack(spacing: 14) {
-                priceCard
+            VStack(spacing: 10) {
                 Button {
                     Task {
                         if await purchases.startTrial() { finish() }
@@ -112,11 +118,6 @@ struct PaywallView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(purchases.busy)
-                Text("Free for 3 days, then \(purchases.priceText) once to keep using Pairline. If you don't buy, sending messages, calls, syncing and USSD stop after the trial; your synced messages stay readable. Nothing is charged automatically.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
                 Button {
                     Task {
                         if await purchases.buyFull() { finish() }
@@ -126,9 +127,14 @@ struct PaywallView: View {
                 }
                 .buttonStyle(SecondaryButtonStyle())
                 .disabled(purchases.busy)
+                Text("Free for 3 days, then \(purchases.priceText) once to keep using Pairline. If you don't buy, sending messages, calls, syncing and USSD stop after the trial; your synced messages stay readable. Nothing is charged automatically.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         case .trial(let end):
-            VStack(spacing: 14) {
+            VStack(spacing: 10) {
                 Label {
                     TrialText.remaining(TrialPolicy.remaining(until: end, now: purchases.trustedNow))
                 } icon: {
@@ -136,15 +142,13 @@ struct PaywallView: View {
                 }
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.brandAmber)
-                priceCard
                 buyButton
             }
         case .expired:
-            VStack(spacing: 14) {
+            VStack(spacing: 10) {
                 Label("Your free trial has ended", systemImage: "hourglass.bottomhalf.filled")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.brandAmber)
-                priceCard
                 buyButton
                 Text("Your synced messages stay readable without buying. Demo mode and help always work.")
                     .font(.footnote)

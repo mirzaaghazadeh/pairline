@@ -134,7 +134,7 @@ struct BridgeStatusTab: View {
             .frame(width: 64, height: 64)
             VStack(alignment: .leading, spacing: 4) {
                 Text("Battery").font(.subheadline).foregroundStyle(.secondary)
-                Text(level.map { "\($0)%" } ?? "–")
+                Text(level.map { (Double($0) / 100).formatted(.percent.precision(.fractionLength(0))) } ?? "–")
                     .font(.system(.title, design: .rounded).weight(.bold))
                     .monospacedDigit()
                 Text(charging ? "Charging" : (level ?? 100) <= 20 ? "Charge soon to stay connected" : "On battery")
@@ -233,7 +233,7 @@ struct BridgeStatusTab: View {
                 NavigationLink {
                     USSDView()
                 } label: {
-                    ToolRow(symbol: "number.square.fill", tint: .brandBlue, title: Text("USSD codes"),
+                    ToolRow(symbol: "number.square.fill", tint: .brandFill, title: Text("USSD codes"),
                             subtitle: Text("Balance, packages and carrier services"))
                 }
                 Divider().padding(.leading, 52)

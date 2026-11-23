@@ -94,8 +94,7 @@ struct SettingsTab: View {
                 HStack {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(verbatim: bridge.isDemo ? String(localized: "Demo bridge")
-                                 : (app.real.deviceInfo?.name ?? String(localized: "Bridge phone")))
+                            Text(verbatim: app.real.deviceInfo?.name ?? String(localized: "Bridge phone"))
                             Text("Paired \(peer.pairedAt.formatted(date: .abbreviated, time: .omitted))")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)

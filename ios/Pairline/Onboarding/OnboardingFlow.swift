@@ -126,7 +126,7 @@ private struct HowItWorksPage: View {
             VStack(spacing: 8) {
                 Text("Two phones, one line")
                     .font(.system(.title, design: .rounded).weight(.bold))
-                Text("Your Android phone keeps the SIM. Your iPhone does the talking.")
+                Text("Your Android phone keeps the SIM. Your iPhone shows the messages and calls.")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -205,7 +205,7 @@ private struct ChoicePage: View {
                         onPair()
                     }
                 default:
-                    OptionCard(symbol: "gift.fill", tint: .brandBlue, title: Text("Try free for 3 days"),
+                    OptionCard(symbol: "gift.fill", tint: .brandFill, title: Text("Try free for 3 days"),
                                text: Text("Everything works. Then \(purchases.priceText) once to keep it, or it stops connecting.")) {
                         Task {
                             if await purchases.startTrial() { onPair() }

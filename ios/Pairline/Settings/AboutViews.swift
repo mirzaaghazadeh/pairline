@@ -26,7 +26,7 @@ struct PrivacySummaryView: View {
                 PrivacyRow(symbol: "key.fill", title: Text("Keys stay in secure hardware"),
                            text: Text("This iPhone's pairing key lives in the Secure Enclave when available, otherwise in the Keychain, and never leaves the device."))
                 PrivacyRow(symbol: "bag", title: Text("Apple handles purchases"),
-                           text: Text("Buying Pairline goes through the App Store. The app checks Apple-signed receipts on the device."))
+                           text: Text("Buying Pairline goes through the App Store. The app checks Apple-signed transactions on the device."))
                 PrivacyRow(symbol: "doc.text.magnifyingglass", title: Text("Readable logs"),
                            text: Text("The diagnostic log is stored here, has personal details removed, and is shared only if you choose to, after you've seen it."))
             } header: {
@@ -103,14 +103,14 @@ struct AboutView: View {
                     Label("Source code on GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                 }
             } header: {
-                Text("Open source")
+                Text("Source code")
             }
             Section {
                 Link(destination: AppInfo.privacyURL) {
-                    Label("Privacy policy", systemImage: "hand.raised")
+                    Label("Privacy Policy", systemImage: "hand.raised")
                 }
                 Link(destination: AppInfo.termsURL) {
-                    Label("Terms of use", systemImage: "doc.text")
+                    Label("Terms of Use", systemImage: "doc.text")
                 }
                 Link(destination: AppInfo.website) {
                     Label {
