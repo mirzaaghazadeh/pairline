@@ -103,6 +103,12 @@ LICENSE.md      FSL-1.1-ALv2
 - Everything CI runs: `./gradlew assembleDebug assembleRelease test lint`, then
   `../.github/scripts/android-policy-check.sh app/build/outputs/apk/release/app-release-unsigned.apk release`
   (fails on `INTERNET` permission, forbidden SDKs or a debuggable release)
+- End to end on the emulator against the fake iPhone (debug builds only, D-018): install the debug APK, then
+  `adb forward tcp:47800 tcp:47800`, read the pairing link with
+  `adb shell content query --uri content://app.pairline.android.debug.devtools/pairing`, and run
+  `python3 -I protocol/tools/fake_remote.py pair --pair-uri '<link>' status threads listen --seconds 30`.
+  Inject events with `adb emu sms send 5551234 "Your code is 4821"` and `adb emu gsm call 5551234`.
+  Details: `android/README.md`.
 
 Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RELEASING.md`.
 
