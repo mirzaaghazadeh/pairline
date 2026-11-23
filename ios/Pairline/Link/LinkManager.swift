@@ -184,6 +184,9 @@ final class LinkManager: BridgeLink {
 
     private func availabilityChanged() {
         guard let connector else { return }
+        if pairingAttempt != nil, [.poweredOff, .unauthorized, .unsupported].contains(connector.availability) {
+            return finishPairing(.failure(PairingError.bluetoothUnavailable))
+        }
         if connector.availability == .poweredOn {
             if session == nil, pairingAttempt == nil {
                 connecting = false

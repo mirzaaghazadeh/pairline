@@ -7310,6 +7310,22 @@
         }
       }
     },
+    "Unknown caller" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متصل غير معروف"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تماس‌گیرنده ناشناس"
+          }
+        }
+      }
+    },
     "Unlock" : {
       "localizations" : {
         "ar" : {

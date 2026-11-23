@@ -138,6 +138,13 @@ final class BluetoothCentral: NSObject, LinkConnector {
         candidateTimers[id] = nil
         candidates[id] = nil
         if reject { rejected[id] = Date() }
+        if peripheral == chosen, peripheral != transport?.peripheral {
+            // It was identified but never became ready: look again.
+            chosen = nil
+            if target != nil, availability == .poweredOn, !manager.isScanning {
+                manager.scanForPeripherals(withServices: [PairlineGATT.service], options: nil)
+            }
+        }
         if peripheral != transport?.peripheral { manager.cancelPeripheralConnection(peripheral) }
     }
 
