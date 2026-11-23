@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand name; not translated (D-001). -->
+    <string name="app_name" translatable="false">Pairline</string>
+    <string name="bridge_tagline">Use this phone\'s SIM from your iPhone</string>
+    <string name="status_not_paired">This phone isn\'t paired with an iPhone yet.</string>
+</resources>

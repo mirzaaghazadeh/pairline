@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bridge_tagline">از سیم‌کارت این گوشی در آیفون خود استفاده کنید</string>
+    <string name="status_not_paired">این گوشی هنوز با هیچ آیفونی جفت نشده است.</string>
+</resources>
