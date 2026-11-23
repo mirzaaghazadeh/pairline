@@ -76,10 +76,13 @@ final class AppModel: ObservableObject {
         applyLaunchArguments()
     }
 
+    /// When the app hosts unit tests, its own link stays idle so it can't touch a real or emulated bridge.
+    static let isTestHost = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
     private func accessChanged(_ access: AccessState) {
         guard access != .loading else { return }
         real.canUseLink = access.allowsLink
-        link.setAllowed(access.allowsLink)
+        link.setAllowed(access.allowsLink && !Self.isTestHost)
         switch access {
         case .trial(let end):
             Notifier.shared.scheduleTrialReminder(trialEnd: end, price: purchases.priceText)

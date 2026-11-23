@@ -337,8 +337,9 @@ final class LinkManager: BridgeLink {
             // Give the frame a moment to leave before closing.
             let closing = session
             self.session = nil
-            Timer.scheduledTimer(withTimeInterval: 0.6, repeats: false) { _ in
-                Task { @MainActor in closing.close() }
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 600_000_000)
+                closing.close()
             }
         }
         teardown()

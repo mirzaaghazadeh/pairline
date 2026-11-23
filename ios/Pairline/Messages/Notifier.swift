@@ -1,6 +1,6 @@
 import Foundation
 import UIKit
-import UserNotifications
+@preconcurrency import UserNotifications
 
 /// Local notifications only (no push, no server): new SMS, one-time codes with a "Copy code" action, bridge
 /// battery alerts and the trial reminder. Notification content stays on this iPhone (and, per iOS settings,
@@ -160,7 +160,7 @@ extension Notifier: UNUserNotificationCenterDelegate {
             switch action {
             case Notifier.copyCodeAction:
                 if let code {
-                    UIPasteboard.general.string = code
+                    Clipboard.copy(code, isCode: true)
                     log.info("notify", "Copied a one-time code from a notification")
                 }
             case Notifier.markReadAction:

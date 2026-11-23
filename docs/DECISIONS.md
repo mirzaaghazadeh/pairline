@@ -238,3 +238,69 @@ compiler plugin, and it ignores unknown fields as PROTOCOL.md requires.
 **Icons:** drawn as our own vector drawables instead of adding `material-icons-extended`.
 **No navigation or DI library:** a small state-based navigator and a hand-written service locator are enough for
 one activity and one service.
+
+### D-024 — iOS app: Apple frameworks only, SQLite, Swift 5 language mode (2026-11-24)
+
+**No third-party dependencies.** The iPhone app uses only Apple frameworks: SwiftUI, CoreBluetooth, CryptoKit,
+CallKit, StoreKit 2, VisionKit/AVFoundation (QR scanning), CoreImage (drawing the download-link QR code), WidgetKit,
+UserNotifications, Network (debug TCP only) and the system `libsqlite3`. Tests use XCTest and StoreKitTest. CI checks
+that no package manager or analytics/ads/crash SDK appears (`.github/scripts/ios-policy-check.sh`).
+**Storage:** SQLite through a ~150-line wrapper instead of Core Data: explicit schema, file protection set when the
+file is opened, an in-memory database for demo mode and tests, no model file to keep in sync.
+**Minimum iOS 16 kept** (D-004): Xcode 27.2 still targets iOS 15+, so no change. iOS 16 rules out `@Observable`,
+SwiftData, TipKit and `ContentUnavailableView`; the app uses `ObservableObject` and its own equivalents.
+**Swift 5 language mode on the Swift 6.4 toolchain**, with minimal concurrency checking. CoreBluetooth, CallKit and
+UserNotifications delegates are main-queue callbacks; UI state is `@MainActor`. Strict Swift 6 mode is a later
+cleanup, not a v1 blocker.
+**App icon** is drawn by `ios/tools/make_icon.swift` (CoreGraphics), so it can be regenerated and reviewed as code.
+
+### D-025 — iOS access rules in practice (clarifies D-017) (2026-11-24)
+
+- **Pairing needs the trial or a purchase.** The onboarding choice (start 3 free days / buy / demo) comes before
+  pairing, so the trial clock starts when the user decides, not at first launch.
+- **When locked** (trial not started or ended), the iPhone doesn't connect at all: no SMS, calls, sync, USSD or
+  status. Synced messages stay readable; demo mode, help, settings, Restore Purchases and unpair always work. Unpairing
+  while locked forgets the bridge on the iPhone and tells the user to unpair on Android too.
+- **Trial clock:** the Keychain high-water mark holds the latest of the device time and every Apple-signed date seen,
+  and never goes down. A clock that was wrong in the future can end the trial early; that only affects the 3 days.
+- **Refunds** (revoked transactions) lock again; family-shared entitlements are accepted.
+- Paywall wording: the duration, what stops working, and the one-time price are stated before the trial starts.
+
+### D-026 — iPhone privacy hardening beyond the rules (2026-11-24)
+
+- The SQLite database and logs are excluded from iCloud and computer backups (`isExcludedFromBackup`), so user content
+  stays on the two phones even through backups. The cost: a restored iPhone resyncs from the bridge.
+- Copied codes and text go to the local clipboard only (no Universal Clipboard), and codes expire after 3 minutes.
+- A "Show message text" setting hides SMS text from notifications.
+- Drafts aren't persisted; the outbox keeps only messages the user already sent.
+- The widget gets link state, battery, signal and carrier name only.
+
+### D-027 — Calls on iOS before call audio (M6) (2026-11-24)
+
+- No `voip` or `audio` background modes until M6: there's no PushKit and no audio on the iPhone. iOS wakes the app for
+  Bluetooth events (`bluetooth-central`), and the app reports incoming calls to CallKit from there.
+- When CallKit declines a call (Focus, the Simulator), the in-app call screen shows it while the app is open.
+- A call answered on the Android phone ends the iPhone's ringing screen as "answered elsewhere" and stays visible in
+  the app with an End button.
+- Mute, speaker and keypad tones are sent only when the bridge lists `call.audio` / `call.dtmf`; otherwise the app
+  explains that audio is on the Android phone.
+- **App Store:** apps that use CallKit can't be offered in mainland China. Remove the China storefront from the
+  app's availability in App Store Connect.
+
+### D-028 — iOS localization workflow (2026-11-24)
+
+String Catalogs (`Localizable.xcstrings`, `InfoPlist.xcstrings`, the widget's own catalog), with Persian and Arabic
+translations imported through Apple's XLIFF round trip (`xcodebuild -exportLocalizations` / `-importLocalizations`),
+so no script edits the catalogs. Durations ("2 days, 5 hours") come from `DateComponentsFormatter` in the app's
+language instead of hand-written plurals; real plural variants are used where a count is in a sentence. Phone numbers
+and codes are wrapped in Unicode left-to-right isolates; dialers and keypads keep their left-to-right layout. As D-019
+says, the translations need a native-speaker review before release.
+
+### D-029 — Debug-only test hooks in the iPhone app (extends D-018) (2026-11-24)
+
+Debug builds accept launch arguments for Simulator testing: `-PairlineAccess purchased|trial|expired|none` (fake
+access state, because the Simulator can't run sandbox purchases outside Xcode), `-PairlineTCPPort` (pick a port, for
+example next to an Android emulator's `adb forward`), `-PairlinePairLink` (the URL-scheme pairing path without the
+system alert), `-PairlineDemo`, `-PairlineTab`, `-PairlineThread`, `-PairlineDemoCall`, `-PairlinePaywall` and
+`-PairlineOnboardingPage` (screenshots). All of it is behind `#if DEBUG`; CI fails if any of these names or the TCP
+transport appear in the Release binary.

@@ -79,12 +79,21 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 
 | Group | Responsibility |
 |-------|----------------|
-| `Link` | CoreBluetooth central, session handshake, AEAD records, Wi-Fi transport (M5) |
-| `Calls` | CallKit `CXProvider` / `CXCallController`, mapped to link messages; audio session (M6) |
-| `Messages` | SMS inbox, local store, notifications |
-| `Store` | StoreKit 2 products, entitlements, paywall |
-| `Protocol` | Message models and crypto (CryptoKit), tested against `protocol/test-vectors/` |
+| `Protocol` | Frames, hello, records, pairing MACs, BLE fragmenting, TCP framing, JSON message catalog (CryptoKit), tested against `protocol/test-vectors/` |
+| `Identity` | Identity key (Secure Enclave or Keychain), pinned peer, Keychain helpers |
+| `Link` | `LinkSession` (pairing + handshake + records per connection), `LinkManager` (requests with ids and timeouts, events, reconnection with backoff, idle watchdog), `BluetoothCentral` (CoreBluetooth central with restoration), `TCPTransport` (debug only); Wi-Fi transport (M5) |
+| `Bridge` | `BridgeLink` interface, `BridgeController` (sync engine, outbox, status, widget snapshot), status dashboard |
+| `Data` | SQLite store for messages, threads, contacts, call log and sync cursors |
+| `Messages` | Conversation list, thread, composer, new message, OTP detection, local notifications |
+| `Calls` | `CallCenter`: CallKit `CXProvider` / `CXCallController` mapped to `call.*` messages, in-app call screen, dialer, recents, USSD; audio session (M6) |
+| `Contacts`, `Settings`, `Onboarding`, `Pairing` | Screens; QR scanner (VisionKit `DataScannerViewController`, AVFoundation fallback) |
+| `Store` | StoreKit 2 products, trial state machine (D-017, D-025), paywall |
+| `Demo` | `DemoBridge`: the same `BridgeLink` interface with localized sample data, in-memory only (D-020) |
+| `PairlineWidget` | WidgetKit extension: bridge battery, signal and link state from the app group |
 | Share extension (M5) | "Send to bridge phone" from any iPhone app |
+
+Everything above `BridgeLink` is shared by the real link and demo mode. The transport is behind `FrameTransport`
+/ `LinkConnector`, so BLE, the debug TCP link and (M5) Wi-Fi plug in under the same session code.
 
 **Link in the background**
 - Uses the `bluetooth-central` background mode with state preservation and restoration, so iOS wakes or relaunches the app for Bluetooth events.

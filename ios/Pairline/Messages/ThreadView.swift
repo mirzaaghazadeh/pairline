@@ -161,7 +161,7 @@ struct MessageBubble: View {
                     .background(bubbleShape.fill(message.isOutgoing ? bubbleColor : Color.bubbleIncoming))
                     .textSelection(.enabled)
                 if let code {
-                    CopyChip(label: Text("Copy code \(PhoneNumber.ltr(code))"), value: code)
+                    CopyChip(label: Text("Copy code \(PhoneNumber.ltr(code))"), value: code, isCode: true)
                 }
                 if isLastInGroup || message.state == .failed || message.state == .pending {
                     footer
@@ -169,11 +169,11 @@ struct MessageBubble: View {
             }
             .contextMenu {
                 Button {
-                    UIPasteboard.general.string = message.body
+                    Clipboard.copy(message.body)
                 } label: { Label("Copy", systemImage: "doc.on.doc") }
                 if let code {
                     Button {
-                        UIPasteboard.general.string = code
+                        Clipboard.copy(code, isCode: true)
                     } label: { Label("Copy code", systemImage: "number") }
                 }
                 if message.state == .failed {

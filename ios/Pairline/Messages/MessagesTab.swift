@@ -171,7 +171,7 @@ struct ConversationRow: View {
                         .lineLimit(2)
                 }
                 if let code {
-                    CopyChip(label: Text("Copy code \(PhoneNumber.ltr(code))"), value: code)
+                    CopyChip(label: Text("Copy code \(PhoneNumber.ltr(code))"), value: code, isCode: true)
                         .buttonStyle(.borderless)
                         .padding(.top, 4)
                 }

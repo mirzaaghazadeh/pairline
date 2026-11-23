@@ -30,7 +30,11 @@ struct SettingsTab: View {
                     Haptics.success()
                 }
             } message: {
-                Text("This iPhone forgets the bridge phone and removes the messages, contacts and call history synced from it. Nothing is deleted on the Android phone.")
+                if app.real.phase.isConnected {
+                    Text("This iPhone forgets the bridge phone and removes the messages, contacts and call history synced from it. Nothing is deleted on the Android phone.")
+                } else {
+                    Text("This iPhone forgets the bridge phone and removes what was synced from it. The bridge phone isn't connected, so also unpair in Pairline Bridge on the Android phone.")
+                }
             }
         }
     }

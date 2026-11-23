@@ -33,6 +33,22 @@ Any change that adds or changes a data flow or permission must update this file 
 | App logs | Only if you choose to share them | Wherever you send them | On the device, last 7 days, readable by you | Rolling |
 | Backups of the Android app's data | No | — | The Android app opts out of Google cloud backup and of copying to a new phone | — |
 
+### On the iPhone
+
+| Data | Leaves the iPhone? | Stored where | How long |
+|------|--------------------|--------------|----------|
+| Synced SMS, contacts and call log | No | Pairline's SQLite database in the app's Application Support folder, file protection `completeUntilFirstUserAuthentication` (readable after the first unlock, so messages that arrive while locked can be saved), **excluded from iCloud and computer backups** | Until unpair (unpairing deletes it) |
+| Messages you write before the bridge confirms them | Yes, encrypted, to your bridge phone only | Same database (an outbox), sent when the link is up | Until sent; then like any message |
+| New-message and code notifications | No (iOS may mirror notifications to your own Apple Watch) | iOS Notification Center. Sender name or number and, if "Show message text" is on, the text | Until you clear them; unpairing clears them |
+| One-time codes | No | Detected on the iPhone only. "Copy code" puts the code on **this iPhone's** clipboard: never on Universal Clipboard, and it expires after 3 minutes. Other copied text is also local-only | 3 minutes |
+| Widget status (link state, bridge battery, signal, carrier name) | No | The app group container shared with Pairline's own widget. No messages, numbers or contacts | Overwritten on every status update; deleted on unpair |
+| Identity key and pinned bridge key | No | Secure Enclave key (or Keychain key on devices without one) and Keychain items, `AfterFirstUnlockThisDeviceOnly`, never synced or migrated | Until unpair (the bridge key) / app removal (the identity key) |
+| Trial clock | No | The latest trusted time seen (D-017), in the Keychain, so turning the clock back doesn't extend the trial | Until app removal |
+| Preferences and saved USSD codes | No | iOS user defaults (no message content) | Until app removal |
+| Demo mode data | No | Made-up sample data in memory only, never mixed with real data | Until you leave demo mode |
+| App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids or message text) | Last 7 days |
+| Pairing link (QR code) | No | Read from the camera and used once; the secret is never stored or logged | Until pairing ends |
+
 ## Network connections
 
 | App | Connects to | Why |
@@ -49,6 +65,12 @@ inside the phone or emulator, so developers can connect a test iPhone app throug
 reachable from any network. After that, it only connects to addresses on your local network, except when you turn on
 internet sharing (M8). Setup videos, routing lists and the known-device list ship inside the app,
 so nothing is downloaded.
+
+**iPhone app:** it makes no network requests of its own; the only outside party is Apple (StoreKit, App Store
+purchases and restores). Links you tap — the bridge download page `pairline.navid.tr`, the privacy policy, the terms,
+the source code, or a link inside a message — open in Safari, only when you tap them. **Debug builds only** (never
+release builds, checked by CI with `ios-policy-check.sh`): the app can connect to a test bridge on `127.0.0.1`
+(loopback, D-018) instead of Bluetooth.
 
 ## Permissions
 
@@ -77,14 +99,18 @@ so nothing is downloaded.
 
 ### iOS
 
-| Permission | Why |
-|------------|-----|
-| Bluetooth | The link |
-| Camera | Scan the pairing QR code |
-| Notifications | New SMS and status alerts |
-| Local Network (M5) | The Wi-Fi link |
-| Microphone (M6) | Call audio |
-| Contacts (optional, off by default) | Save a contact from the bridge into iPhone Contacts |
+| Permission | Why | Asked |
+|------------|-----|-------|
+| Bluetooth (`NSBluetoothAlwaysUsageDescription`) | The link | When you first pair (or at launch once paired) |
+| Camera (`NSCameraUsageDescription`) | Scan the pairing QR code; frames are processed on the device and never recorded | When you open the scanner |
+| Notifications | New SMS, one-time codes, bridge battery alerts and the trial reminder (all local; no push) | After pairing, or from Settings |
+| Background mode `bluetooth-central` | iOS wakes Pairline for Bluetooth events from the bridge phone | No prompt |
+| CallKit (no prompt) | Shows calls on the iPhone call screen. Calls are added to iPhone Recents only if you turn that on | — |
+| In-App Purchase (no prompt) | The free 3-day trial and the one-time purchase (D-017) | — |
+| App Group `group.app.pairline.ios` (no prompt) | Shares the bridge status with Pairline's widget | — |
+| Local Network (M5) | The Wi-Fi link | Not yet requested |
+| Microphone (M6) | Call audio | Not yet requested |
+| Contacts (optional, off by default; not yet used) | Save a contact from the bridge into iPhone Contacts | Not yet requested |
 
 ## Things Pairline will never do
 

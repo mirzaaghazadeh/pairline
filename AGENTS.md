@@ -106,11 +106,29 @@ LICENSE.md      FSL-1.1-ALv2
 
 Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RELEASING.md`.
 
-**iOS** (expected until the project exists): `cd ios && xcodegen generate`, then
-`xcodebuild -scheme Pairline -destination 'generic/platform=iOS Simulator' build`
-(for tests pick an installed simulator from `xcrun simctl list devices available`).
+**iOS** (run in `ios/`; Xcode 27.2, XcodeGen; the generated `Pairline.xcodeproj` isn't committed):
+
+- Generate the project: `xcodegen generate`
+- Build: `xcodebuild -scheme Pairline -destination 'generic/platform=iOS Simulator' build`
+- Unit tests (protocol vectors, session, link, data, OTP, trial, StoreKit):
+  `xcodebuild -scheme Pairline -destination 'platform=iOS Simulator,name=iPhone 18 Pro' test`
+  (any installed iPhone simulator from `xcrun simctl list devices available`)
+- Everything CI runs: the tests, a Release build
+  (`xcodebuild -scheme Pairline -configuration Release -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`),
+  then `../.github/scripts/ios-policy-check.sh <path>/Release-iphonesimulator/Pairline.app`
+  (fails on third-party SDKs or debug-only code in the Release binary)
+- Running from Xcode uses `Pairline/Store/Pairline.storekit`, so the trial and purchase work without Apple's servers.
+- End to end on the Simulator against the fake bridge (no Android device needed), debug builds only (D-029):
+  `python3 -I protocol/tools/fake_bridge.py --port 47810 --control-port 47811`, then
+  `xcrun simctl launch booted app.pairline.ios -PairlineAccess purchased -PairlineTCPPort 47810 -PairlinePairLink "<printed link>"`,
+  and inject events with `echo otp | nc 127.0.0.1 47811` (`help` lists commands). Use port 47800 (the default) to
+  reach the Android emulator through `adb forward` instead.
+- Translations: `xcodebuild -exportLocalizations -project Pairline.xcodeproj -localizationPath <dir> -exportLanguage fa -exportLanguage ar`,
+  translate the XLIFF files, then `xcodebuild -importLocalizations -project Pairline.xcodeproj -localizationPath <file>.xliff` (D-028).
+- App icon: `swift tools/make_icon.swift Pairline/Resources/Assets.xcassets`
 
 **CI:** `.github/workflows/android.yml` runs on every push and pull request that touches `android/` or `protocol/`.
+`.github/workflows/ios.yml` runs on pull requests that touch `ios/` or `protocol/`, and manually (D-022).
 
 ## Development machine
 

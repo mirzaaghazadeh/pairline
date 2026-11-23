@@ -216,7 +216,7 @@ struct ContactDetailView: View {
                     }
                     .contextMenu {
                         Button {
-                            UIPasteboard.general.string = number.n
+                            Clipboard.copy(number.n)
                         } label: { Label("Copy", systemImage: "doc.on.doc") }
                     }
                 }
@@ -227,7 +227,7 @@ struct ContactDetailView: View {
                     }
                     .contextMenu {
                         Button {
-                            UIPasteboard.general.string = email
+                            Clipboard.copy(email)
                         } label: { Label("Copy", systemImage: "doc.on.doc") }
                     }
                 }

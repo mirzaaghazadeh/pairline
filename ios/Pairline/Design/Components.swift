@@ -286,11 +286,12 @@ struct SectionTitle: View {
 struct CopyChip: View {
     let label: Text
     let value: String
+    var isCode = false
     @State private var copied = false
 
     var body: some View {
         Button {
-            UIPasteboard.general.string = value
+            Clipboard.copy(value, isCode: isCode)
             Haptics.success()
             withAnimation(.spring(response: 0.3)) { copied = true }
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
