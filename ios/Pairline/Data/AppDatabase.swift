@@ -246,7 +246,9 @@ final class AppDatabase: ObservableObject {
 
     func conversations() -> [Conversation] {
         let rows = (try? db.query("""
-            SELECT t.thread, t.addrs, t.snippet, t.time, t.unread, t.has_older,
+            SELECT t.thread, t.addrs, t.snippet, t.time, t.unread,
+              (t.has_older = 1 AND (t.count IS NULL OR
+                (SELECT COUNT(*) FROM messages m WHERE m.thread = t.thread) < t.count)) AS has_older,
               (SELECT box FROM messages m WHERE m.thread = t.thread ORDER BY time DESC LIMIT 1) AS last_box,
               (SELECT state FROM messages m WHERE m.thread = t.thread ORDER BY time DESC LIMIT 1) AS last_state
             FROM threads t ORDER BY t.time DESC
@@ -322,6 +324,12 @@ final class AppDatabase: ObservableObject {
 
     var unreadCount: Int {
         (try? db.query("SELECT COALESCE(SUM(unread), 0) AS n FROM threads"))?.first?.int("n") ?? 0
+    }
+
+    /// After a history sync that reached the beginning, every conversation is complete.
+    func markAllThreadsComplete() {
+        try? db.execute("UPDATE threads SET has_older = 0")
+        changed()
     }
 
     func setHasOlder(thread: Int64, _ hasOlder: Bool) {
@@ -434,6 +442,17 @@ final class AppDatabase: ObservableObject {
     func calls(matching number: String, limit: Int = 20) -> [CallLogItem] {
         guard let key = PhoneNumber.matchKey(number) else { return [] }
         return calls(limit: 1000).filter { PhoneNumber.matchKey($0.number) == key }.prefix(limit).map { $0 }
+    }
+
+    func clearContacts() {
+        try? db.execute("DELETE FROM contacts")
+        rebuildContactIndex()
+        changed()
+    }
+
+    func clearCalls() {
+        try? db.execute("DELETE FROM calls")
+        changed()
     }
 
     // MARK: - Wipe
