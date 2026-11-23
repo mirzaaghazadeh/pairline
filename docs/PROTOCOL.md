@@ -220,6 +220,12 @@ Gaps found while implementing the iPhone app (2026-11-24). Both apps follow thes
     `time > after`, oldest first. `limit` defaults to 50, at most 100. With `thread: null` it covers all threads.
   - A page may hold fewer than `limit` items and still say `more: true` (the 30 KB page limit). R continues from the
     oldest (`before`) or newest (`after`) time in the page and de-duplicates by `key`.
+  - B never splits messages (or threads) that share the same `time` across two pages; a page may go over `limit` to
+    keep such a group together, so the strict `<` / `>` cursors can't skip any.
+- **Sync cursors B no longer knows** (for example after its data was cleared): B answers with a full sync from the
+  start and sets `"reset": true` on the first page. R then drops its cached contacts (or call log) before applying it.
+- **Malformed `PAIR_HELLO`** (bad JSON, wrong `v`, wrong lengths, invalid point) is answered with `bad_mac`.
+- **`ussd.run`** gets no `ok`; the `ussd.result` itself carries the request's `id`.
 - **`sms.send`.** `to` is one address (no group messages in v0); `cid` is unique per R install. B answers `ok` once
   the message is handed to the radio queue, then sends `sms.state` events with the same `cid`. Long messages are
   split by B (multipart SMS); R sends the whole text.
