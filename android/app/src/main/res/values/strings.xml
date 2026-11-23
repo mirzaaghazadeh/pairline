@@ -2,9 +2,28 @@
 <resources>
     <!-- Brand name; not translated (D-001). -->
     <string name="app_name" translatable="false">Pairline</string>
-    <string name="bridge_tagline">Use this phone\'s SIM from your iPhone</string>
-    <string name="status_not_paired">This phone isn\'t paired with an iPhone yet.</string>
+    <!-- Used inside sentences: "Connected to your iPhone". -->
     <string name="generic_iphone">your iPhone</string>
+    <!-- Used as a name on its own, when the iPhone hasn't told us its model yet. -->
+    <string name="generic_iphone_name">iPhone</string>
+
+    <!-- Common actions -->
+    <string name="action_back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_done">Done</string>
+    <string name="action_done_continue">I\'ve done this, continue</string>
+    <string name="action_allow">Allow</string>
+    <string name="action_fix">Fix</string>
+    <string name="action_get_started">Get started</string>
+    <string name="action_not_now">Not now</string>
+    <string name="action_skip_for_now">Skip for now</string>
+    <string name="action_try_again">Try again</string>
+    <string name="action_open_app_info">Open App info</string>
+    <string name="action_open_settings">Open settings</string>
+    <string name="action_open_pairline">Open Pairline</string>
+    <string name="action_turn_on_bt">Turn on Bluetooth</string>
+    <string name="action_understood">I understand</string>
 
     <!-- Persistent notification of the link service -->
     <string name="notif_channel_link">Link status</string>
@@ -19,4 +38,285 @@
     <string name="notif_bt_off_text">Turn on Bluetooth so your iPhone can connect.</string>
     <string name="notif_permission_title">Permission needed</string>
     <string name="notif_permission_text">Open Pairline to allow Nearby devices, so your iPhone can connect.</string>
+
+    <!-- Setup: welcome -->
+    <string name="welcome_title">Your Android SIM, on your iPhone</string>
+    <string name="welcome_body">Pairline turns this phone into a bridge. Keep it nearby, and use its SIM from your iPhone.</string>
+    <string name="welcome_point_calls">See, answer and make calls</string>
+    <string name="welcome_point_sms">Read and send text messages</string>
+    <string name="welcome_point_contacts">Bring contacts and call history along</string>
+    <string name="welcome_point_ussd">Check balance and run USSD codes</string>
+
+    <!-- Setup: privacy promise -->
+    <string name="privacy_title">Your data stays between your two phones</string>
+    <string name="privacy_body">Pairline has no servers. Your messages, calls and contacts go directly from this phone to your iPhone, and nowhere else.</string>
+    <string name="privacy_point_e2e">Everything is end-to-end encrypted with keys only your phones hold</string>
+    <string name="privacy_point_accounts">No account, no sign-up, no phone-number check</string>
+    <string name="privacy_point_tracking">No ads, analytics or tracking of any kind</string>
+    <string name="privacy_point_source">The source code is public, so anyone can check it</string>
+
+    <!-- Setup: Android 11 notice -->
+    <string name="android11_title">This phone runs Android 11</string>
+    <string name="android11_body">Pairline works here, but Android 11 no longer gets security updates. A phone that keeps your SIM and relays your messages should be as safe as possible.</string>
+    <string name="android11_tip">Best choice: a spare phone that you use only as a bridge, with no other apps on it.</string>
+
+    <!-- Setup and Settings: permissions -->
+    <string name="perm_bt_title">Find and connect to your iPhone</string>
+    <string name="perm_bt_why">Pairline talks to your iPhone over Bluetooth. Android calls this permission \"Nearby devices\".</string>
+    <string name="perm_bt_detail">It only lets Pairline announce itself to your paired iPhone. It doesn\'t use your location.</string>
+    <string name="perm_sms_title">Text messages</string>
+    <string name="perm_sms_why">To show new messages on your iPhone, send replies from it, and load your message history.</string>
+    <string name="perm_sms_detail">Your messages stay in Android\'s own messaging app as usual. Pairline doesn\'t keep copies.</string>
+    <string name="perm_phone_title">Phone calls and SIM cards</string>
+    <string name="perm_phone_why">To tell your iPhone when a call comes in, answer or end it from there, make calls and run USSD codes.</string>
+    <string name="perm_phone_detail">This also lets your iPhone show your carrier, signal and which SIM to use.</string>
+    <string name="perm_calllog_title">Call history</string>
+    <string name="perm_calllog_why">To show who is calling, and your call history, on your iPhone.</string>
+    <string name="perm_calllog_detail">On Android 12 and later, the caller\'s number is only available with this permission.</string>
+    <string name="perm_contacts_title">Contacts</string>
+    <string name="perm_contacts_why">To show caller names and your contacts on your iPhone.</string>
+    <string name="perm_contacts_detail">Pairline only reads them. Adding contacts from the iPhone is a separate option, off by default.</string>
+    <string name="perm_notif_title">Status notification</string>
+    <string name="perm_notif_why">Android needs a notification to keep Pairline running in the background. It shows whether your iPhone is connected.</string>
+    <string name="perm_notif_detail">Pairline doesn\'t show message text or numbers in notifications.</string>
+    <string name="perm_granted_note">Allowed. Thank you!</string>
+    <string name="perm_denied_note">Without this, some features won\'t work on your iPhone. You can allow it later in Settings → Permissions.</string>
+    <string name="perm_optional_note">Optional. Everything else works without it.</string>
+    <string name="perm_blocked_note">Android won\'t ask again. Open App info → Permissions and allow it there.</string>
+    <string name="perm_blocked_note_13">Android won\'t ask again. Open App info → Permissions and allow it there. If Android says it\'s a \"restricted setting\", first tap ⋮ in App info and choose \"Allow restricted settings\".</string>
+    <string name="perm_state_granted">Allowed</string>
+    <string name="perm_state_needed">Needed</string>
+    <string name="perm_state_optional">Optional</string>
+    <string name="perm_state_blocked">Blocked</string>
+    <string name="permissions_title">Permissions</string>
+    <string name="permissions_intro">What Pairline may do on this phone, and why. Tap one that isn\'t allowed to fix it.</string>
+
+    <!-- Setup: background running -->
+    <string name="battery_title">Keep Pairline running</string>
+    <string name="battery_body">Android pauses apps in the background to save battery. Pairline needs to stay awake so calls and messages reach your iPhone right away.</string>
+    <string name="battery_allow">Allow in background</string>
+    <string name="battery_note">Android will ask you in its own window. Pairline uses very little battery while it waits.</string>
+    <string name="battery_done_note">Pairline is allowed to run in the background.</string>
+
+    <!-- Setup: maker-specific background settings -->
+    <string name="autostart_title">One more setting on %1$s phones</string>
+    <string name="autostart_body">Your phone\'s maker adds its own battery manager that can stop Pairline. Here\'s how to let it run.</string>
+    <string name="maker_xiaomi">Xiaomi, Redmi and POCO</string>
+    <string name="maker_samsung">Samsung</string>
+    <string name="maker_oppo">Oppo, Realme and OnePlus</string>
+    <string name="maker_vivo">Vivo and iQOO</string>
+    <string name="maker_huawei">Huawei and Honor</string>
+    <string name="maker_other">your phone</string>
+    <string name="maker_xiaomi_steps">1. Tap \"Open settings\" and turn on Autostart for Pairline.\n2. In Settings → Apps → Pairline → Battery saver, choose \"No restrictions\".\n3. Open recent apps, long-press Pairline and tap the lock icon.</string>
+    <string name="maker_samsung_steps">1. In Settings → Apps → Pairline → Battery, choose \"Unrestricted\".\n2. In Settings → Battery → Background usage limits, make sure Pairline isn\'t in \"Sleeping apps\" or \"Deep sleeping apps\". You can add it to \"Never sleeping apps\".</string>
+    <string name="maker_oppo_steps">1. Tap \"Open settings\" and allow Auto launch for Pairline.\n2. In Settings → Battery → Pairline, allow background activity, or choose \"Don\'t optimize\".\n3. Open recent apps and lock Pairline.</string>
+    <string name="maker_vivo_steps">1. Tap \"Open settings\" and allow Pairline to start in the background.\n2. In Settings → Battery → Background power consumption, allow high background power use for Pairline.</string>
+    <string name="maker_huawei_steps">1. Tap \"Open settings\" (App launch), switch Pairline to \"Manage manually\" and turn on Auto-launch, Secondary launch and Run in background.\n2. Open recent apps and lock Pairline.</string>
+    <string name="maker_other_steps">Android\'s own battery exemption is usually enough. If the link still drops when the screen is off, look in Settings → Apps → Pairline → Battery for an option like \"Unrestricted\" or \"Allow background activity\".</string>
+
+    <!-- Pairing -->
+    <string name="pair_title">Pair your iPhone</string>
+    <string name="pair_step_1">Install Pairline on your iPhone and open it.</string>
+    <string name="pair_step_2">Tap \"Pair with Android phone\".</string>
+    <string name="pair_step_3">Point your iPhone\'s camera at this code.</string>
+    <string name="pair_expires">Code expires in %1$s</string>
+    <string name="pair_new_code">New code</string>
+    <string name="pair_keep_open">Keep this screen open until your iPhone says it\'s paired. The code works once, for 5 minutes, and only someone who can see this screen can use it.</string>
+    <string name="pair_replaces">Pairing a new iPhone replaces %1$s.</string>
+    <string name="pair_success_title">Paired!</string>
+    <string name="pair_success_text">Your iPhone and this phone now trust each other. Only they can read what goes between them.</string>
+    <string name="pair_connecting">Connecting…</string>
+    <string name="pair_connected">Connected. Your iPhone can use this phone\'s SIM now.</string>
+    <string name="pair_too_many">Someone tried wrong codes several times, so this code was cancelled. Make a new one when your iPhone is ready.</string>
+    <string name="pair_need_bt">Bluetooth is off. Turn it on so your iPhone can find this phone.</string>
+    <string name="pair_need_bt_perm">Allow Nearby devices so your iPhone can find this phone.</string>
+    <string name="pair_bt_problem">This phone can\'t offer a Bluetooth connection right now. Try turning Bluetooth off and on again, or restart the phone.</string>
+    <string name="pair_qr_desc">Pairing code. Scan it with Pairline on your iPhone.</string>
+    <string name="pair_later">Pair later</string>
+
+    <!-- Setup: done -->
+    <string name="done_title">You\'re all set</string>
+    <string name="done_body_paired">Keep this phone charged and near your iPhone. You can put it away now; Pairline keeps working in the background.</string>
+    <string name="done_body_unpaired">Pairline is ready. Pair your iPhone from the home screen whenever you like.</string>
+    <string name="done_note">A small notification shows that Pairline is running. You can tap it anytime to see the link status.</string>
+
+    <!-- Home -->
+    <string name="state_connected">Connected</string>
+    <string name="state_searching">Waiting</string>
+    <string name="state_not_paired">Not paired</string>
+    <string name="state_problem">Needs attention</string>
+    <string name="home_connected_title">Connected to %1$s</string>
+    <string name="home_connected_body">Over Bluetooth. Calls and messages are being relayed to your iPhone.</string>
+    <string name="home_connected_body_tcp">Over the debug test link. Calls and messages are being relayed.</string>
+    <string name="home_waiting_title">Waiting for %1$s</string>
+    <string name="home_waiting_body">Last connected %1$s. Pairline reconnects by itself when your iPhone is nearby with Pairline open or in the background.</string>
+    <string name="home_waiting_never">Your iPhone hasn\'t connected yet. Open Pairline on it, nearby, with Bluetooth on.</string>
+    <string name="home_not_paired_body">Pair your iPhone to start using this phone\'s SIM from it.</string>
+    <string name="home_bt_off_body">Your iPhone can\'t reach this phone while Bluetooth is off.</string>
+    <string name="home_bt_perm_title">Nearby devices not allowed</string>
+    <string name="home_bt_perm_body">Pairline needs this permission to talk to your iPhone over Bluetooth.</string>
+    <string name="home_bt_unsupported_title">Bluetooth isn\'t available</string>
+    <string name="home_bt_unsupported_body">This phone can\'t act as a Bluetooth accessory, which Pairline needs.</string>
+    <string name="home_this_phone">This phone</string>
+    <string name="home_battery">Battery</string>
+    <string name="home_battery_level">%1$d%%</string>
+    <string name="home_battery_charging">%1$d%%, charging</string>
+    <string name="home_sim_slot">SIM %1$d</string>
+    <string name="home_no_service">No service</string>
+    <string name="home_roaming">Roaming</string>
+    <string name="home_default_both">Default</string>
+    <string name="home_default_sms">Default for SMS</string>
+    <string name="home_default_calls">Default for calls</string>
+    <string name="home_no_sims">No SIM found</string>
+    <string name="home_no_sims_sub">Insert a SIM, or allow \"Phone calls and SIM cards\" so Pairline can see it.</string>
+    <string name="home_supports">What your iPhone can do</string>
+    <string name="home_keep_running">Keep running</string>
+    <string name="home_battery_ok">Allowed to run in the background</string>
+    <string name="home_battery_ok_sub">Android won\'t pause Pairline to save battery.</string>
+    <string name="home_battery_restricted">Battery optimization is on</string>
+    <string name="home_battery_restricted_sub">Android may pause Pairline when the screen is off, and calls or messages could arrive late.</string>
+    <string name="home_notifications_off">Notifications are off</string>
+    <string name="home_notifications_off_sub">Android may stop Pairline without its status notification.</string>
+    <string name="home_keepalive_sub">Tips for %1$s</string>
+    <string name="home_actions">More</string>
+    <string name="home_pair">Pair iPhone</string>
+    <string name="home_pair_new">Pair a new iPhone</string>
+    <string name="home_pair_sub">Show the pairing code</string>
+    <string name="home_unpair">Unpair iPhone</string>
+    <string name="home_unpair_sub">Both phones forget each other</string>
+    <string name="home_diag_sub">A readable report for troubleshooting</string>
+    <string name="home_debug_tcp_on">Debug build: the test link on 127.0.0.1:47800 is listening.</string>
+    <string name="home_debug_tcp_off">Debug build: the test link isn\'t listening.</string>
+
+    <!-- Capabilities -->
+    <string name="cap_sms_receive">Receive text messages</string>
+    <string name="cap_sms_send">Send text messages</string>
+    <string name="cap_sms_history">Message history</string>
+    <string name="cap_call_observe">See incoming calls</string>
+    <string name="cap_call_control">Answer, decline and end calls</string>
+    <string name="cap_call_dial">Make calls</string>
+    <string name="cap_call_dtmf">Keypad, mute and speaker during calls</string>
+    <string name="cap_contacts">Contacts</string>
+    <string name="cap_calllog">Call history</string>
+    <string name="cap_contacts_add">Add contacts from iPhone</string>
+    <string name="cap_ussd">USSD codes</string>
+    <string name="cap_dualsim">Choose between two SIMs</string>
+    <string name="cap_missing_sms">Needs the Text messages permission.</string>
+    <string name="cap_missing_phone">Needs the Phone calls permission.</string>
+    <string name="cap_missing_calllog">Needs the Call history permission.</string>
+    <string name="cap_missing_contacts">Needs the Contacts permission.</string>
+    <string name="cap_missing_contacts_add">Off. Turn it on in Settings if you want it.</string>
+    <string name="cap_missing_companion">Most phones don\'t let apps control a call\'s audio yet. Use the Android phone for these.</string>
+    <string name="cap_missing_dualsim">Only one SIM is active.</string>
+
+    <!-- Unpair dialog -->
+    <string name="unpair_title">Unpair your iPhone?</string>
+    <string name="unpair_body">This phone forgets your iPhone\'s key, and your iPhone is told to forget this phone if it\'s connected. To use Pairline again, you\'ll need to scan a new code.</string>
+    <string name="unpair_confirm">Unpair</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_general">General</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System default</string>
+    <string name="settings_iphone">Your iPhone</string>
+    <string name="settings_ios_version">iOS %1$s</string>
+    <string name="settings_app_version">Pairline %1$s</string>
+    <string name="settings_paired_since">Paired since %1$s</string>
+    <string name="settings_contacts_add">Add contacts from iPhone</string>
+    <string name="settings_contacts_add_sub">Lets your iPhone save new contacts on this phone. Off by default.</string>
+    <string name="settings_background">Background running</string>
+    <string name="settings_permissions_sub">See and change what Pairline may do</string>
+    <string name="settings_support">Help</string>
+    <string name="settings_help_sub">Setup, battery, troubleshooting, permissions</string>
+    <string name="settings_rerun_setup">Run setup again</string>
+    <string name="settings_rerun_setup_body">Go through the setup steps again. Your pairing and settings stay as they are.</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_license">License: FSL-1.1-ALv2</string>
+    <string name="settings_license_sub">Free to use. The code is public so anyone can check what it does; each release becomes Apache-2.0 two years after it\'s published.</string>
+    <string name="settings_source">Source code</string>
+    <string name="settings_source_sub">github.com/mirzaaghazadeh/pairline</string>
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_privacy_body">Pairline has no servers, accounts, ads or analytics. Your messages, calls and contacts go only to your paired iPhone, encrypted end to end. The bridge app doesn\'t even have permission to use the internet. Logs stay on this phone and are shared only if you choose to, after you\'ve seen them.</string>
+
+    <!-- Keep running -->
+    <string name="keepalive_title">Keep Pairline running</string>
+    <string name="keepalive_intro">Android and phone makers stop background apps to save battery. These settings let Pairline stay connected to your iPhone.</string>
+    <string name="keepalive_step_battery">Step 1: Android\'s battery optimization</string>
+    <string name="keepalive_step_maker">Step 2: %1$s</string>
+    <string name="keepalive_other_makers">Other phone makers</string>
+    <string name="keepalive_general">Also helpful: keep the phone charging when you can, don\'t force-stop Pairline, and leave Bluetooth on.</string>
+    <string name="keepalive_never_changes">Pairline never changes these settings by itself. It only opens the right screen for you.</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_title">Diagnostics</string>
+    <string name="diag_intro">This is the whole report, exactly as it would be shared. It has no phone numbers, names, messages or keys. Nothing is sent unless you tap Share.</string>
+    <string name="diag_copy">Copy</string>
+    <string name="diag_copied">Report copied</string>
+    <string name="diag_share">Share</string>
+    <string name="diag_clear">Clear log</string>
+    <string name="diag_clear_body">Delete the log saved on this phone? The report will start fresh.</string>
+    <string name="diag_clear_confirm">Clear</string>
+
+    <!-- Help -->
+    <string name="help_title">Help</string>
+    <string name="help_section_setup">Getting started</string>
+    <string name="help_section_battery">Battery and staying connected</string>
+    <string name="help_section_trouble">Troubleshooting</string>
+    <string name="help_section_permissions">Why these permissions?</string>
+    <string name="help_section_privacy">Privacy</string>
+
+    <string name="help_q_what">What does Pairline do?</string>
+    <string name="help_a_what">It lets your iPhone use this Android phone\'s SIM card. Incoming calls and messages show up on your iPhone, and you can answer, reply, make calls and run USSD codes from there. This phone stays nearby and does the actual calling and texting.</string>
+    <string name="help_q_iphone">What do I need on the iPhone?</string>
+    <string name="help_a_iphone">The Pairline app for iPhone (iOS 16 or later) and Bluetooth turned on. The two phones need to be within Bluetooth range, usually the same room or a few rooms apart.</string>
+    <string name="help_q_pair">How do I pair?</string>
+    <string name="help_a_pair">On this phone, open Pair iPhone to show a code. On your iPhone, open Pairline, tap \"Pair with Android phone\" and scan the code. The code works once and expires after 5 minutes.</string>
+    <string name="help_q_spare">Can I use my everyday Android phone?</string>
+    <string name="help_a_spare">Yes. A spare phone that only serves as the bridge is simplest, though: it can stay on the charger, and nothing else on it competes for battery or permissions.</string>
+    <string name="help_q_default_sms">Do I have to make Pairline my SMS app?</string>
+    <string name="help_a_default_sms">No. Android\'s own messaging app keeps working as usual and keeps all your messages. Pairline only relays them.</string>
+
+    <string name="help_q_disconnects">Why does the link sometimes drop?</string>
+    <string name="help_a_disconnects">Usually because Android or the phone\'s maker paused Pairline to save battery, or the phones were out of Bluetooth range. Allow background running in Keep Pairline running, and follow the tips for your phone.</string>
+    <string name="help_q_battery_use">Does Pairline drain the battery?</string>
+    <string name="help_a_battery_use">Not much. Bluetooth Low Energy is designed for this, and Pairline sleeps until something happens.</string>
+    <string name="help_q_notification">Why is there always a notification?</string>
+    <string name="help_a_notification">Android requires apps that run in the background to show one. It tells you whether your iPhone is connected, and it never shows message text or numbers.</string>
+    <string name="help_q_distance">How far apart can the phones be?</string>
+    <string name="help_a_distance">About as far as a Bluetooth headset works: typically 10 to 30 meters indoors, less through thick walls.</string>
+
+    <string name="help_q_not_found">My iPhone can\'t find this phone</string>
+    <string name="help_a_not_found">Make sure both phones have Bluetooth turned on, that this app shows \"Waiting\" or \"Not paired\" without warnings, and that Pairline is open on the iPhone. If it still doesn\'t connect, turn Bluetooth off and on again on both phones.</string>
+    <string name="help_q_no_sms">Messages don\'t reach my iPhone</string>
+    <string name="help_a_no_sms">Make sure Text messages is allowed in Permissions and that the home screen says Connected. Messages that arrive while the link is down appear on the iPhone when it reconnects.</string>
+    <string name="help_q_call_audio">Where do I talk during a call?</string>
+    <string name="help_a_call_audio">For now, on this Android phone. You can answer, decline and end calls from your iPhone, but the call audio stays on the Android phone. Audio on the iPhone is planned.</string>
+    <string name="help_q_dtmf">Why can\'t I use the keypad or mute from my iPhone?</string>
+    <string name="help_a_dtmf">Android only lets a few apps control a call in progress. On most phones Pairline can answer and end calls, but not send keypad tones or mute. When your phone allows it, Pairline uses it automatically.</string>
+    <string name="help_q_restricted">Android says \"Restricted setting\"</string>
+    <string name="help_a_restricted">Android 13 and later limit some permissions for apps installed outside an app store. Open App info for Pairline, tap ⋮ at the top and choose \"Allow restricted settings\", then allow the permission again.</string>
+
+    <string name="help_q_perm_nearby">Nearby devices (Bluetooth)</string>
+    <string name="help_a_perm_nearby">The link to your iPhone. Pairline announces itself only with an anonymous id, never your name or number, and doesn\'t use your location.</string>
+    <string name="help_q_perm_sms">Text messages</string>
+    <string name="help_a_perm_sms">To relay incoming messages to your iPhone, send the ones you write there, and load your history when the iPhone asks.</string>
+    <string name="help_q_perm_phone">Phone calls and SIM cards</string>
+    <string name="help_a_perm_phone">To notice calls, answer, decline, end and make them for your iPhone, run USSD codes, and show your SIMs and signal.</string>
+    <string name="help_q_perm_calllog">Call history</string>
+    <string name="help_a_perm_calllog">To show the caller\'s number (Android 12 and later only share it with this permission), your call history, and whether a call was missed or declined.</string>
+    <string name="help_q_perm_contacts">Contacts</string>
+    <string name="help_a_perm_contacts">To show caller names and your contacts on the iPhone. Writing contacts is a separate option, off unless you turn it on.</string>
+    <string name="help_q_perm_notif">Notifications</string>
+    <string name="help_a_perm_notif">For the status notification that Android requires for apps running in the background.</string>
+    <string name="help_q_perm_battery">Battery optimization</string>
+    <string name="help_a_perm_battery">Pairline asks Android, in Android\'s own window, not to pause it. You can change this anytime in Android\'s settings.</string>
+
+    <string name="help_q_data">Where does my data go?</string>
+    <string name="help_a_data">Only to your paired iPhone, end-to-end encrypted. Pairline has no servers, and the bridge app has no permission to use the internet.</string>
+    <string name="help_q_logs">What\'s in the diagnostics report?</string>
+    <string name="help_a_logs">Technical details such as versions, permissions and connection events. Phone numbers, emails, names, message text and keys are removed. You see the whole report before you choose to share it.</string>
+    <string name="help_q_unpair">What happens when I unpair?</string>
+    <string name="help_a_unpair">Both phones delete each other\'s key, so they can\'t talk to each other anymore. Your messages and contacts stay where they are on this phone.</string>
 </resources>

@@ -1,0 +1,384 @@
+package app.pairline.android.ui.settings
+
+import android.Manifest
+import android.os.Build
+import android.text.format.DateFormat
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
+import app.pairline.android.AppGraph
+import app.pairline.android.BuildConfig
+import app.pairline.android.R
+import app.pairline.android.link.LinkService
+import app.pairline.android.telephony.Perms
+import app.pairline.android.ui.GrantState
+import app.pairline.android.ui.LocaleHelper
+import app.pairline.android.ui.Maker
+import app.pairline.android.ui.PIcons
+import app.pairline.android.ui.PermissionGroup
+import app.pairline.android.ui.Route
+import app.pairline.android.ui.SystemActions
+import app.pairline.android.ui.UiEvents
+import app.pairline.android.ui.components.ListRow
+import app.pairline.android.ui.components.LtrText
+import app.pairline.android.ui.components.NoteBox
+import app.pairline.android.ui.components.PairlineTopBar
+import app.pairline.android.ui.components.SectionCard
+import app.pairline.android.ui.components.StatusPill
+import app.pairline.android.ui.components.Tone
+import app.pairline.android.ui.components.ltr
+import app.pairline.android.ui.grantState
+import app.pairline.android.ui.home.UnpairDialog
+import app.pairline.android.ui.refreshTick
+import app.pairline.android.ui.rememberPermissionRequester
+import java.util.Date
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
+    val context = LocalContext.current
+    val activity = LocalActivity.current
+    val prefsTick by AppGraph.prefs.changes.collectAsState()
+    val paired by AppGraph.peers.paired.collectAsState()
+    val tick = refreshTick()
+    val prefs = AppGraph.prefs
+    var languageDialog by remember { mutableStateOf(false) }
+    var confirmUnpair by remember { mutableStateOf(false) }
+    var confirmSetup by remember { mutableStateOf(false) }
+    val contactsAdd = remember(prefsTick, tick) { prefs.contactsAddEnabled && Perms.allGranted(context, Perms.WRITE_CONTACTS) }
+    val writeContacts = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        prefs.contactsAddEnabled = granted
+        UiEvents.bump()
+        LinkService.refresh(context)
+    }
+    val exempt = remember(tick) { SystemActions.isIgnoringBatteryOptimizations(context) }
+    val scroll = TopAppBarDefaults.pinnedScrollBehavior()
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
+        topBar = { PairlineTopBar(stringResource(R.string.settings_title), onBack = back, scrollBehavior = scroll) },
+    ) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(padding)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
+            SectionCard(title = stringResource(R.string.settings_general)) {
+                ListRow(
+                    title = stringResource(R.string.settings_language),
+                    subtitle = languageName(LocaleHelper.current(context)),
+                    icon = PIcons.Language,
+                    onClick = { languageDialog = true },
+                )
+            }
+
+            SectionCard(title = stringResource(R.string.settings_iphone)) {
+                if (paired) {
+                    val since = prefs.pairedAt.takeIf { it > 0 }?.let { DateFormat.getMediumDateFormat(context).format(Date(it)) }
+                    ListRow(
+                        title = prefs.peerName ?: stringResource(R.string.generic_iphone_name),
+                        subtitle = listOfNotNull(
+                            prefs.peerOs?.let { stringResource(R.string.settings_ios_version, ltr(it)) },
+                            prefs.peerApp?.let { stringResource(R.string.settings_app_version, ltr(it)) },
+                            since?.let { stringResource(R.string.settings_paired_since, it) },
+                        ).joinToString("\n").ifEmpty { null },
+                        icon = PIcons.Phone,
+                        iconTone = Tone.GOOD,
+                    )
+                } else {
+                    ListRow(
+                        title = stringResource(R.string.notif_not_paired_title),
+                        subtitle = stringResource(R.string.home_not_paired_body),
+                        icon = PIcons.Phone,
+                        iconTone = Tone.NEUTRAL,
+                    )
+                }
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
+                    title = stringResource(R.string.settings_contacts_add),
+                    subtitle = stringResource(R.string.settings_contacts_add_sub),
+                    icon = PIcons.PersonAdd,
+                    onClick = {
+                        if (contactsAdd) {
+                            prefs.contactsAddEnabled = false
+                            LinkService.refresh(context)
+                        } else if (Perms.allGranted(context, Perms.WRITE_CONTACTS)) {
+                            prefs.contactsAddEnabled = true
+                            LinkService.refresh(context)
+                        } else {
+                            prefs.markRequested(Perms.WRITE_CONTACTS)
+                            writeContacts.launch(Manifest.permission.WRITE_CONTACTS)
+                        }
+                    },
+                    trailing = { Switch(checked = contactsAdd, onCheckedChange = null) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
+                    title = stringResource(if (paired) R.string.home_pair_new else R.string.home_pair),
+                    icon = PIcons.Qr,
+                    onClick = { navigate(Route.Pairing) },
+                )
+                if (paired) {
+                    HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                    ListRow(
+                        title = stringResource(R.string.home_unpair),
+                        subtitle = stringResource(R.string.home_unpair_sub),
+                        icon = PIcons.LinkOff,
+                        iconTone = Tone.BAD,
+                        titleColor = MaterialTheme.colorScheme.error,
+                        onClick = { confirmUnpair = true },
+                    )
+                }
+            }
+
+            SectionCard(title = stringResource(R.string.home_keep_running)) {
+                ListRow(
+                    title = stringResource(R.string.settings_background),
+                    subtitle = stringResource(if (exempt) R.string.home_battery_ok else R.string.home_battery_restricted),
+                    icon = PIcons.Battery,
+                    iconTone = if (exempt) Tone.GOOD else Tone.WARN,
+                    onClick = { SystemActions.requestIgnoreBatteryOptimizations(context) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
+                    title = stringResource(R.string.keepalive_title),
+                    subtitle = stringResource(R.string.home_keepalive_sub, stringResource(Maker.detect().label)),
+                    icon = PIcons.Bolt,
+                    onClick = { navigate(Route.KeepAlive) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
+                    title = stringResource(R.string.permissions_title),
+                    subtitle = stringResource(R.string.settings_permissions_sub),
+                    icon = PIcons.Lock,
+                    onClick = { navigate(Route.Permissions) },
+                )
+            }
+
+            SectionCard(title = stringResource(R.string.settings_support)) {
+                ListRow(
+                    title = stringResource(R.string.help_title),
+                    subtitle = stringResource(R.string.settings_help_sub),
+                    icon = PIcons.Help,
+                    onClick = { navigate(Route.Help) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
+                    title = stringResource(R.string.diag_title),
+                    subtitle = stringResource(R.string.home_diag_sub),
+                    icon = PIcons.Report,
+                    onClick = { navigate(Route.Diagnostics) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
+                    title = stringResource(R.string.settings_rerun_setup),
+                    icon = PIcons.Refresh,
+                    onClick = { confirmSetup = true },
+                )
+            }
+
+            SectionCard(title = stringResource(R.string.settings_about)) {
+                ListRow(
+                    title = stringResource(R.string.settings_version),
+                    icon = PIcons.Info,
+                    showChevron = false,
+                    trailing = { LtrText("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})") },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
+                    title = stringResource(R.string.settings_license),
+                    subtitle = stringResource(R.string.settings_license_sub),
+                    icon = PIcons.Report,
+                    showChevron = false,
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
+                    title = stringResource(R.string.settings_source),
+                    subtitle = stringResource(R.string.settings_source_sub),
+                    icon = PIcons.Code,
+                    onClick = { SystemActions.openUrl(context, SystemActions.SOURCE_URL) },
+                    trailing = { androidx.compose.material3.Icon(PIcons.OpenExternal, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.settings_privacy), style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        stringResource(R.string.settings_privacy_body),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+
+    if (languageDialog) {
+        LanguageDialog(
+            current = LocaleHelper.current(context),
+            onDismiss = { languageDialog = false },
+        ) { tag ->
+            languageDialog = false
+            LocaleHelper.set(context, tag)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                // Android 11–12 has no per-app language: restart the screens ourselves.
+                LinkService.stop(context)
+                LinkService.start(context, "language changed")
+                activity?.recreate()
+            }
+        }
+    }
+    if (confirmUnpair) {
+        UnpairDialog(onDismiss = { confirmUnpair = false }) {
+            confirmUnpair = false
+            AppGraph.link.unpairLocally()
+        }
+    }
+    if (confirmSetup) {
+        AlertDialog(
+            onDismissRequest = { confirmSetup = false },
+            title = { Text(stringResource(R.string.settings_rerun_setup)) },
+            text = { Text(stringResource(R.string.settings_rerun_setup_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmSetup = false
+                    prefs.setupDone = false
+                }) { Text(stringResource(R.string.action_continue)) }
+            },
+            dismissButton = { TextButton(onClick = { confirmSetup = false }) { Text(stringResource(R.string.action_cancel)) } },
+        )
+    }
+}
+
+/** Language names are shown in their own language, so anyone can find theirs. */
+@Composable
+private fun languageName(tag: String): String = when (tag) {
+    "en" -> "English"
+    "fa" -> "فارسی"
+    "ar" -> "العربية"
+    else -> stringResource(R.string.settings_language_system)
+}
+
+@Composable
+private fun LanguageDialog(current: String, onDismiss: () -> Unit, onPick: (String) -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_language)) },
+        text = {
+            Column {
+                for (tag in LocaleHelper.SUPPORTED) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(selected = tag == current, onClick = { onPick(tag) }, role = Role.RadioButton)
+                            .padding(vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(selected = tag == current, onClick = null)
+                        Spacer(Modifier.width(12.dp))
+                        Text(languageName(tag), style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+    )
+}
+
+/** Every permission group with its state and a way to fix it. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PermissionsScreen(back: () -> Unit) {
+    val context = LocalContext.current
+    val activity = LocalActivity.current ?: return
+    val tick = refreshTick()
+    val request = rememberPermissionRequester()
+    Scaffold(topBar = { PairlineTopBar(stringResource(R.string.permissions_title), onBack = back) }) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(padding)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text(
+                stringResource(R.string.permissions_intro),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 4.dp),
+            )
+            SectionCard {
+                PermissionGroup.wizard.forEachIndexed { i, g ->
+                    if (i > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                    val state = remember(tick, g) { grantState(activity, g) }
+                    ListRow(
+                        title = stringResource(g.title),
+                        subtitle = stringResource(g.why),
+                        icon = g.icon,
+                        iconTone = if (state == GrantState.GRANTED) Tone.GOOD else if (g.required) Tone.WARN else Tone.NEUTRAL,
+                        onClick = if (state == GrantState.GRANTED) null else ({ request(g) }),
+                        trailing = {
+                            when (state) {
+                                GrantState.GRANTED -> StatusPill(stringResource(R.string.perm_state_granted), Tone.GOOD)
+                                GrantState.BLOCKED -> StatusPill(stringResource(R.string.perm_state_blocked), Tone.WARN)
+                                else -> StatusPill(stringResource(if (g.required) R.string.perm_state_needed else R.string.perm_state_optional), if (g.required) Tone.WARN else Tone.NEUTRAL)
+                            }
+                        },
+                    )
+                }
+            }
+            NoteBox(
+                stringResource(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) R.string.perm_blocked_note_13 else R.string.perm_blocked_note),
+                Tone.NEUTRAL,
+                PIcons.Info,
+                modifier = Modifier.clickable { SystemActions.openAppSettings(context) },
+            )
+            app.pairline.android.ui.components.SecondaryButton(
+                stringResource(R.string.action_open_app_info),
+                { SystemActions.openAppSettings(context) },
+                icon = PIcons.OpenExternal,
+            )
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+}

@@ -7,7 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import app.pairline.android.link.LinkService
 import app.pairline.android.ui.LocaleHelper
-import app.pairline.android.ui.StatusScreen
+import app.pairline.android.ui.PairlineAppUi
+import app.pairline.android.ui.UiEvents
 import app.pairline.android.ui.theme.PairlineTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,13 +21,18 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PairlineTheme {
-                StatusScreen()
+                PairlineAppUi()
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (AppGraph.prefs.setupDone) LinkService.start(this, "app opened")
+        // Permissions and battery settings may have changed in Android's settings.
+        UiEvents.bump()
+        if (AppGraph.prefs.setupDone) {
+            LinkService.start(this, "app opened")
+            LinkService.refresh(this)
+        }
     }
 }

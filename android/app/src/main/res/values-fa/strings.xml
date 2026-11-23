@@ -1,19 +1,322 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bridge_tagline">از سیم‌کارت این گوشی در آیفون خود استفاده کنید</string>
-    <string name="status_not_paired">این گوشی هنوز با هیچ آیفونی جفت نشده است.</string>
+    <!-- app_name is not translated (D-001); it comes from values/strings.xml. -->
+    <!-- Used inside sentences: "Connected to your iPhone". -->
     <string name="generic_iphone">آیفون شما</string>
+    <!-- Used as a name on its own, when the iPhone hasn't told us its model yet. -->
+    <string name="generic_iphone_name">آیفون</string>
 
+    <!-- Common actions -->
+    <string name="action_back">بازگشت</string>
+    <string name="action_cancel">لغو</string>
+    <string name="action_continue">ادامه</string>
+    <string name="action_done">تمام</string>
+    <string name="action_done_continue">انجام دادم، ادامه</string>
+    <string name="action_allow">اجازه دادن</string>
+    <string name="action_fix">رفع مشکل</string>
+    <string name="action_get_started">شروع کنیم</string>
+    <string name="action_not_now">فعلاً نه</string>
+    <string name="action_skip_for_now">بعداً</string>
+    <string name="action_try_again">دوباره امتحان کنید</string>
+    <string name="action_open_app_info">باز کردن اطلاعات برنامه</string>
+    <string name="action_open_settings">باز کردن تنظیمات</string>
+    <string name="action_open_pairline">باز کردن Pairline</string>
+    <string name="action_turn_on_bt">روشن کردن بلوتوث</string>
+    <string name="action_understood">متوجه شدم</string>
+
+    <!-- Persistent notification of the link service -->
     <string name="notif_channel_link">وضعیت اتصال</string>
-    <string name="notif_channel_link_desc">نشان می‌دهد آیفون شما وصل است یا نه. اندروید برای روشن ماندن Pairline به این اعلان نیاز دارد.</string>
+    <string name="notif_channel_link_desc">نشان می‌دهد آیفون شما وصل است یا نه. اندروید برای اینکه Pairline در حال اجرا بماند، به این اعلان نیاز دارد.</string>
     <string name="notif_connected_title">به %1$s وصل است</string>
-    <string name="notif_connected_text">تماس‌ها و پیامک‌ها به آیفون شما فرستاده می‌شوند.</string>
+    <string name="notif_connected_text">تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
     <string name="notif_waiting_title">در انتظار آیفون شما</string>
-    <string name="notif_waiting_text">وقتی آیفون شما نزدیک باشد و بلوتوثش روشن باشد، Pairline خودکار دوباره وصل می‌شود.</string>
-    <string name="notif_not_paired_title">هنوز جفت نشده</string>
-    <string name="notif_not_paired_text">‏Pairline را باز کنید و کد را با آیفون خود اسکن کنید.</string>
+    <string name="notif_waiting_text">هر وقت آیفون شما نزدیک باشد و بلوتوثش روشن باشد، Pairline خودش دوباره وصل می‌شود.</string>
+    <string name="notif_not_paired_title">هنوز جفت نشده است</string>
+    <string name="notif_not_paired_text">برنامهٔ Pairline را باز کنید و کد را با آیفون خود اسکن کنید.</string>
     <string name="notif_bt_off_title">بلوتوث خاموش است</string>
     <string name="notif_bt_off_text">بلوتوث را روشن کنید تا آیفون شما بتواند وصل شود.</string>
-    <string name="notif_permission_title">به اجازه نیاز است</string>
-    <string name="notif_permission_text">‏Pairline را باز کنید و اجازهٔ «دستگاه‌های اطراف» را بدهید تا آیفون شما بتواند وصل شود.</string>
+    <string name="notif_permission_title">به یک مجوز نیاز است</string>
+    <string name="notif_permission_text">برنامهٔ Pairline را باز کنید و مجوز «دستگاه‌های اطراف» را بدهید تا آیفون شما بتواند وصل شود.</string>
+
+    <!-- Setup: welcome -->
+    <string name="welcome_title">سیم‌کارت گوشی اندرویدتان، روی آیفونتان</string>
+    <string name="welcome_body">با Pairline این گوشی به یک پل تبدیل می‌شود. نزدیک خودتان نگهش دارید و از طریق آیفون، از سیم‌کارتش استفاده کنید.</string>
+    <string name="welcome_point_calls">دیدن تماس‌ها، جواب دادن و تماس گرفتن</string>
+    <string name="welcome_point_sms">خواندن و فرستادن پیامک</string>
+    <string name="welcome_point_contacts">دسترسی به مخاطبین و سابقهٔ تماس‌ها</string>
+    <string name="welcome_point_ussd">دیدن موجودی و اجرای کدهای USSD</string>
+
+    <!-- Setup: privacy promise -->
+    <string name="privacy_title">اطلاعات شما فقط بین دو گوشی خودتان می‌ماند</string>
+    <string name="privacy_body">در Pairline هیچ سروری وجود ندارد. پیام‌ها، تماس‌ها و مخاطبین شما مستقیم از این گوشی به آیفونتان می‌روند و به هیچ جای دیگری نمی‌روند.</string>
+    <string name="privacy_point_e2e">همه‌چیز رمزگذاری سرتاسری می‌شود، با کلیدهایی که فقط در گوشی‌های خود شما هستند</string>
+    <string name="privacy_point_accounts">بدون حساب کاربری، بدون ثبت‌نام، بدون تأیید شمارهٔ تلفن</string>
+    <string name="privacy_point_tracking">بدون تبلیغات، آمارگیری یا هر نوع ردیابی</string>
+    <string name="privacy_point_source">کد منبع عمومی است، پس هر کسی می‌تواند آن را بررسی کند</string>
+
+    <!-- Setup: Android 11 notice -->
+    <string name="android11_title">این گوشی اندروید ۱۱ دارد</string>
+    <string name="android11_body">برنامهٔ Pairline روی این گوشی کار می‌کند، اما اندروید ۱۱ دیگر به‌روزرسانی امنیتی دریافت نمی‌کند. گوشی‌ای که سیم‌کارت شما در آن است و پیام‌هایتان را منتقل می‌کند، باید تا جای ممکن امن باشد.</string>
+    <string name="android11_tip">بهترین انتخاب: یک گوشی اضافه که فقط به‌عنوان پل از آن استفاده می‌کنید و هیچ برنامهٔ دیگری روی آن نیست.</string>
+
+    <!-- Setup and Settings: permissions -->
+    <string name="perm_bt_title">پیدا کردن آیفون و وصل شدن به آن</string>
+    <string name="perm_bt_why">ارتباط Pairline با آیفون شما از طریق بلوتوث است. اندروید به این مجوز «دستگاه‌های اطراف» می‌گوید.</string>
+    <string name="perm_bt_detail">این مجوز فقط به Pairline اجازه می‌دهد خودش را به آیفونِ جفت‌شدهٔ شما معرفی کند. از موقعیت مکانی شما استفاده نمی‌کند.</string>
+    <string name="perm_sms_title">پیامک‌ها</string>
+    <string name="perm_sms_why">برای اینکه پیامک‌های جدید روی آیفونتان نمایش داده شوند، از همان‌جا جواب بدهید و سابقهٔ پیامک‌هایتان را هم ببینید.</string>
+    <string name="perm_sms_detail">پیامک‌های شما مثل همیشه در برنامهٔ پیامک خود اندروید می‌مانند. Pairline هیچ نسخه‌ای از آن‌ها نگه نمی‌دارد.</string>
+    <string name="perm_phone_title">تماس‌ها و سیم‌کارت‌ها</string>
+    <string name="perm_phone_why">برای اینکه آیفون شما از تماس ورودی باخبر شود، از همان‌جا تماس را جواب بدهید یا قطع کنید، تماس بگیرید و کدهای USSD را اجرا کنید.</string>
+    <string name="perm_phone_detail">با این مجوز، آیفون شما می‌تواند اپراتور و قدرت آنتن را هم نشان دهد و بداند از کدام سیم‌کارت استفاده کند.</string>
+    <string name="perm_calllog_title">سابقهٔ تماس‌ها</string>
+    <string name="perm_calllog_why">برای اینکه روی آیفون، هم ببینید چه کسی تماس می‌گیرد و هم سابقهٔ تماس‌هایتان را.</string>
+    <string name="perm_calllog_detail">در اندروید ۱۲ و بالاتر، شمارهٔ تماس‌گیرنده فقط با این مجوز در دسترس است.</string>
+    <string name="perm_contacts_title">مخاطبین</string>
+    <string name="perm_contacts_why">برای نمایش نام تماس‌گیرنده و مخاطبین شما روی آیفون.</string>
+    <string name="perm_contacts_detail">برنامهٔ Pairline فقط مخاطبین را می‌خواند. افزودن مخاطب از آیفون یک گزینهٔ جداگانه است که به‌طور پیش‌فرض خاموش است.</string>
+    <string name="perm_notif_title">اعلان وضعیت</string>
+    <string name="perm_notif_why">اندروید برای اینکه Pairline در پس‌زمینه کار کند، به یک اعلان نیاز دارد. این اعلان نشان می‌دهد آیفون شما وصل است یا نه.</string>
+    <string name="perm_notif_detail">اعلان‌های Pairline متن پیام یا شماره‌ای را نشان نمی‌دهند.</string>
+    <string name="perm_granted_note">اجازه داده شد. ممنونیم!</string>
+    <string name="perm_denied_note">بدون این مجوز، بعضی امکانات روی آیفون شما کار نمی‌کنند. بعداً هم می‌توانید از «تنظیمات ← مجوزها» آن را بدهید.</string>
+    <string name="perm_optional_note">اختیاری است. بقیهٔ امکانات بدون آن هم کار می‌کنند.</string>
+    <string name="perm_blocked_note">اندروید دیگر این را نمی‌پرسد. «اطلاعات برنامه ← مجوزها» را باز کنید و از آنجا اجازه بدهید.</string>
+    <string name="perm_blocked_note_13">اندروید دیگر این را نمی‌پرسد. «اطلاعات برنامه ← مجوزها» را باز کنید و از آنجا اجازه بدهید. اگر اندروید گفت این یک «تنظیم محدودشده» است، اول در «اطلاعات برنامه» روی ⋮ بزنید و «اجازه دادن به تنظیمات محدودشده» را انتخاب کنید.</string>
+    <string name="perm_state_granted">مجاز</string>
+    <string name="perm_state_needed">لازم</string>
+    <string name="perm_state_optional">اختیاری</string>
+    <string name="perm_state_blocked">مسدود</string>
+    <string name="permissions_title">مجوزها</string>
+    <string name="permissions_intro">کارهایی که Pairline اجازه دارد روی این گوشی انجام دهد، و دلیل هر کدام. روی هر موردی که مجاز نیست بزنید تا درستش کنید.</string>
+
+    <!-- Setup: background running -->
+    <string name="battery_title">فعال نگه داشتن Pairline</string>
+    <string name="battery_body">اندروید برای صرفه‌جویی در باتری، برنامه‌های پس‌زمینه را متوقف می‌کند. Pairline باید بیدار بماند تا تماس‌ها و پیامک‌ها فوراً به آیفون شما برسند.</string>
+    <string name="battery_allow">اجازهٔ کار در پس‌زمینه</string>
+    <string name="battery_note">اندروید در پنجرهٔ خودش از شما می‌پرسد. Pairline در حالت انتظار باتری بسیار کمی مصرف می‌کند.</string>
+    <string name="battery_done_note">اجازهٔ کار در پس‌زمینه به Pairline داده شده است.</string>
+
+    <!-- Setup: maker-specific background settings -->
+    <string name="autostart_title">یک تنظیم دیگر در گوشی‌های %1$s</string>
+    <string name="autostart_body">سازندهٔ گوشی شما مدیر باتری مخصوص خودش را اضافه کرده که ممکن است Pairline را متوقف کند. در ادامه می‌بینید چطور اجازه دهید کار کند.</string>
+    <string name="maker_xiaomi">شیائومی، ردمی و پوکو</string>
+    <string name="maker_samsung">سامسونگ</string>
+    <string name="maker_oppo">اوپو، ریلمی و وان‌پلاس</string>
+    <string name="maker_vivo">ویوو و iQOO</string>
+    <string name="maker_huawei">هواوی و آنر</string>
+    <string name="maker_other">گوشی شما</string>
+    <string name="maker_xiaomi_steps">۱. روی «باز کردن تنظیمات» بزنید و «شروع خودکار» را برای Pairline روشن کنید.\n۲. در «تنظیمات ← برنامه‌ها ← Pairline ← صرفه‌جویی باتری»، گزینهٔ «بدون محدودیت» را انتخاب کنید.\n۳. صفحهٔ برنامه‌های اخیر را باز کنید، انگشتتان را روی Pairline نگه دارید و روی نماد قفل بزنید.</string>
+    <string name="maker_samsung_steps">۱. در «تنظیمات ← برنامه‌ها ← Pairline ← باتری»، گزینهٔ «نامحدود» را انتخاب کنید.\n۲. در «تنظیمات ← باتری ← محدودیت‌های استفاده در پس‌زمینه» مطمئن شوید Pairline در فهرست «برنامه‌های در حالت خواب» یا «برنامه‌های در حالت خواب عمیق» نیست. می‌توانید آن را به «برنامه‌هایی که هرگز به خواب نمی‌روند» اضافه کنید.</string>
+    <string name="maker_oppo_steps">۱. روی «باز کردن تنظیمات» بزنید و اجازهٔ «راه‌اندازی خودکار» را به Pairline بدهید.\n۲. در «تنظیمات ← باتری ← Pairline»، اجازهٔ فعالیت در پس‌زمینه را بدهید یا «بهینه‌سازی نشود» را انتخاب کنید.\n۳. صفحهٔ برنامه‌های اخیر را باز کنید و Pairline را قفل کنید.</string>
+    <string name="maker_vivo_steps">۱. روی «باز کردن تنظیمات» بزنید و اجازه دهید Pairline در پس‌زمینه شروع به کار کند.\n۲. در «تنظیمات ← باتری ← مصرف انرژی در پس‌زمینه»، اجازهٔ مصرف زیاد انرژی در پس‌زمینه را به Pairline بدهید.</string>
+    <string name="maker_huawei_steps">۱. روی «باز کردن تنظیمات» بزنید (بخش «راه‌اندازی برنامه»)، Pairline را روی «مدیریت دستی» بگذارید و «راه‌اندازی خودکار»، «راه‌اندازی ثانویه» و «اجرا در پس‌زمینه» را روشن کنید.\n۲. صفحهٔ برنامه‌های اخیر را باز کنید و Pairline را قفل کنید.</string>
+    <string name="maker_other_steps">معمولاً همان معافیت باتری خود اندروید کافی است. اگر وقتی صفحه خاموش است اتصال باز هم قطع می‌شود، در «تنظیمات ← برنامه‌ها ← Pairline ← باتری» دنبال گزینه‌ای مثل «نامحدود» یا «اجازهٔ فعالیت در پس‌زمینه» بگردید.</string>
+
+    <!-- Pairing -->
+    <string name="pair_title">جفت کردن آیفون</string>
+    <string name="pair_step_1">برنامهٔ Pairline را روی آیفون نصب کنید و بازش کنید.</string>
+    <string name="pair_step_2">روی «جفت شدن با گوشی اندروید» بزنید.</string>
+    <string name="pair_step_3">دوربین آیفون را رو به این کد بگیرید.</string>
+    <string name="pair_expires">کد تا %1$s دیگر معتبر است</string>
+    <string name="pair_new_code">کد جدید</string>
+    <string name="pair_keep_open">تا وقتی آیفون شما نشان نداده که جفت شده، این صفحه را باز نگه دارید. این کد فقط یک بار و به مدت ۵ دقیقه کار می‌کند و فقط کسی می‌تواند از آن استفاده کند که این صفحه را می‌بیند.</string>
+    <string name="pair_replaces">اگر آیفون جدیدی را جفت کنید، جایگزین %1$s می‌شود.</string>
+    <string name="pair_success_title">جفت شد!</string>
+    <string name="pair_success_text">حالا آیفون شما و این گوشی به هم اعتماد دارند. فقط خودشان می‌توانند چیزهایی را که بینشان رد و بدل می‌شود بخوانند.</string>
+    <string name="pair_connecting">در حال اتصال…</string>
+    <string name="pair_connected">وصل شد. حالا آیفون شما می‌تواند از سیم‌کارت این گوشی استفاده کند.</string>
+    <string name="pair_too_many">کسی چند بار کد اشتباه را امتحان کرد، برای همین این کد لغو شد. وقتی آیفون شما آماده بود، یک کد جدید بسازید.</string>
+    <string name="pair_need_bt">بلوتوث خاموش است. روشنش کنید تا آیفون شما بتواند این گوشی را پیدا کند.</string>
+    <string name="pair_need_bt_perm">مجوز «دستگاه‌های اطراف» را بدهید تا آیفون شما بتواند این گوشی را پیدا کند.</string>
+    <string name="pair_bt_problem">این گوشی فعلاً نمی‌تواند اتصال بلوتوث برقرار کند. بلوتوث را یک بار خاموش و روشن کنید، یا گوشی را دوباره راه‌اندازی کنید.</string>
+    <string name="pair_qr_desc">کد جفت‌سازی. آن را با Pairline روی آیفون اسکن کنید.</string>
+    <string name="pair_later">بعداً جفت می‌کنم</string>
+
+    <!-- Setup: done -->
+    <string name="done_title">همه‌چیز آماده است</string>
+    <string name="done_body_paired">این گوشی را شارژشده و نزدیک آیفونتان نگه دارید. حالا می‌توانید کنارش بگذارید؛ Pairline در پس‌زمینه به کارش ادامه می‌دهد.</string>
+    <string name="done_body_unpaired">برنامهٔ Pairline آماده است. هر وقت خواستید، آیفونتان را از صفحهٔ اصلی جفت کنید.</string>
+    <string name="done_note">یک اعلان کوچک نشان می‌دهد که Pairline در حال کار است. هر وقت خواستید، روی آن بزنید تا وضعیت اتصال را ببینید.</string>
+
+    <!-- Home -->
+    <string name="state_connected">وصل</string>
+    <string name="state_searching">در انتظار</string>
+    <string name="state_not_paired">جفت نشده</string>
+    <string name="state_problem">نیاز به بررسی</string>
+    <string name="home_connected_title">به %1$s وصل است</string>
+    <string name="home_connected_body">از طریق بلوتوث. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
+    <string name="home_connected_body_tcp">از طریق اتصال آزمایشی دیباگ. تماس‌ها و پیامک‌ها منتقل می‌شوند.</string>
+    <string name="home_waiting_title">در انتظار %1$s</string>
+    <string name="home_waiting_body">آخرین اتصال: %1$s. وقتی آیفون شما نزدیک باشد و Pairline روی آن باز یا در پس‌زمینه باشد، خودش دوباره وصل می‌شود.</string>
+    <string name="home_waiting_never">آیفون شما هنوز وصل نشده است. برنامهٔ Pairline را روی آن، نزدیک این گوشی و با بلوتوث روشن، باز کنید.</string>
+    <string name="home_not_paired_body">آیفونتان را جفت کنید تا از طریق آن، از سیم‌کارت این گوشی استفاده کنید.</string>
+    <string name="home_bt_off_body">تا وقتی بلوتوث خاموش است، آیفون شما نمی‌تواند به این گوشی وصل شود.</string>
+    <string name="home_bt_perm_title">مجوز «دستگاه‌های اطراف» داده نشده</string>
+    <string name="home_bt_perm_body">برای ارتباط با آیفون شما از طریق بلوتوث، Pairline به این مجوز نیاز دارد.</string>
+    <string name="home_bt_unsupported_title">بلوتوث در دسترس نیست</string>
+    <string name="home_bt_unsupported_body">این گوشی نمی‌تواند به‌عنوان دستگاه جانبی بلوتوث کار کند، و Pairline به این قابلیت نیاز دارد.</string>
+    <string name="home_this_phone">این گوشی</string>
+    <string name="home_battery">باتری</string>
+    <string name="home_battery_level">%1$d٪</string>
+    <string name="home_battery_charging">%1$d٪، در حال شارژ</string>
+    <string name="home_sim_slot">سیم‌کارت %1$d</string>
+    <string name="home_no_service">بدون آنتن</string>
+    <string name="home_roaming">رومینگ</string>
+    <string name="home_default_both">پیش‌فرض</string>
+    <string name="home_default_sms">پیش‌فرض پیامک</string>
+    <string name="home_default_calls">پیش‌فرض تماس</string>
+    <string name="home_no_sims">سیم‌کارتی پیدا نشد</string>
+    <string name="home_no_sims_sub">سیم‌کارت را در گوشی بگذارید، یا مجوز «تماس‌ها و سیم‌کارت‌ها» را بدهید تا Pairline بتواند آن را ببیند.</string>
+    <string name="home_supports">کارهایی که آیفون شما می‌تواند انجام دهد</string>
+    <string name="home_keep_running">فعال ماندن</string>
+    <string name="home_battery_ok">اجازهٔ کار در پس‌زمینه دارد</string>
+    <string name="home_battery_ok_sub">اندروید برای صرفه‌جویی در باتری، Pairline را متوقف نمی‌کند.</string>
+    <string name="home_battery_restricted">بهینه‌سازی باتری روشن است</string>
+    <string name="home_battery_restricted_sub">ممکن است اندروید وقتی صفحه خاموش است Pairline را متوقف کند و تماس‌ها یا پیامک‌ها دیر برسند.</string>
+    <string name="home_notifications_off">اعلان‌ها خاموش‌اند</string>
+    <string name="home_notifications_off_sub">بدون اعلان وضعیت، ممکن است اندروید Pairline را متوقف کند.</string>
+    <string name="home_keepalive_sub">نکته‌های مخصوص %1$s</string>
+    <string name="home_actions">بیشتر</string>
+    <string name="home_pair">جفت کردن آیفون</string>
+    <string name="home_pair_new">جفت کردن آیفون جدید</string>
+    <string name="home_pair_sub">نمایش کد جفت‌سازی</string>
+    <string name="home_unpair">لغو جفت‌سازی آیفون</string>
+    <string name="home_unpair_sub">هر دو گوشی یکدیگر را فراموش می‌کنند</string>
+    <string name="home_diag_sub">گزارشی خوانا برای رفع مشکل</string>
+    <string name="home_debug_tcp_on">نسخهٔ دیباگ: اتصال آزمایشی روی 127.0.0.1:47800 منتظر اتصال است.</string>
+    <string name="home_debug_tcp_off">نسخهٔ دیباگ: اتصال آزمایشی فعال نیست.</string>
+
+    <!-- Capabilities -->
+    <string name="cap_sms_receive">دریافت پیامک</string>
+    <string name="cap_sms_send">فرستادن پیامک</string>
+    <string name="cap_sms_history">سابقهٔ پیامک‌ها</string>
+    <string name="cap_call_observe">دیدن تماس‌های ورودی</string>
+    <string name="cap_call_control">جواب دادن، رد کردن و قطع تماس</string>
+    <string name="cap_call_dial">تماس گرفتن</string>
+    <string name="cap_call_dtmf">صفحه‌کلید، بی‌صدا و بلندگو هنگام تماس</string>
+    <string name="cap_contacts">مخاطبین</string>
+    <string name="cap_calllog">سابقهٔ تماس‌ها</string>
+    <string name="cap_contacts_add">افزودن مخاطب از آیفون</string>
+    <string name="cap_ussd">کدهای USSD</string>
+    <string name="cap_dualsim">انتخاب بین دو سیم‌کارت</string>
+    <string name="cap_missing_sms">به مجوز «پیامک‌ها» نیاز دارد.</string>
+    <string name="cap_missing_phone">به مجوز «تماس‌ها و سیم‌کارت‌ها» نیاز دارد.</string>
+    <string name="cap_missing_calllog">به مجوز «سابقهٔ تماس‌ها» نیاز دارد.</string>
+    <string name="cap_missing_contacts">به مجوز «مخاطبین» نیاز دارد.</string>
+    <string name="cap_missing_contacts_add">خاموش است. اگر می‌خواهید، از تنظیمات روشنش کنید.</string>
+    <string name="cap_missing_companion">بیشتر گوشی‌ها هنوز به برنامه‌ها اجازه نمی‌دهند صدای تماس را کنترل کنند. برای این کارها از خود گوشی اندروید استفاده کنید.</string>
+    <string name="cap_missing_dualsim">فقط یک سیم‌کارت فعال است.</string>
+
+    <!-- Unpair dialog -->
+    <string name="unpair_title">جفت‌سازی با آیفون لغو شود؟</string>
+    <string name="unpair_body">این گوشی کلید آیفون شما را فراموش می‌کند، و اگر آیفون وصل باشد، به آن هم گفته می‌شود این گوشی را فراموش کند. برای استفادهٔ دوباره از Pairline باید یک کد جدید اسکن کنید.</string>
+    <string name="unpair_confirm">لغو جفت‌سازی</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="settings_general">عمومی</string>
+    <string name="settings_language">زبان</string>
+    <string name="settings_language_system">پیش‌فرض سیستم</string>
+    <string name="settings_iphone">آیفون شما</string>
+    <string name="settings_ios_version">نسخهٔ iOS: %1$s</string>
+    <string name="settings_app_version">نسخهٔ Pairline: %1$s</string>
+    <string name="settings_paired_since">جفت‌شده از %1$s</string>
+    <string name="settings_contacts_add">افزودن مخاطب از آیفون</string>
+    <string name="settings_contacts_add_sub">به آیفون شما اجازه می‌دهد مخاطب‌های جدید را روی این گوشی ذخیره کند. به‌طور پیش‌فرض خاموش است.</string>
+    <string name="settings_background">کار در پس‌زمینه</string>
+    <string name="settings_permissions_sub">دیدن و تغییر کارهایی که Pairline اجازه دارد انجام دهد</string>
+    <string name="settings_support">راهنما</string>
+    <string name="settings_help_sub">راه‌اندازی، باتری، رفع مشکل، مجوزها</string>
+    <string name="settings_rerun_setup">اجرای دوبارهٔ راه‌اندازی</string>
+    <string name="settings_rerun_setup_body">مراحل راه‌اندازی را دوباره طی کنید. جفت‌سازی و تنظیمات شما دست‌نخورده می‌مانند.</string>
+    <string name="settings_about">درباره</string>
+    <string name="settings_version">نسخه</string>
+    <string name="settings_license">لایسنس: FSL-1.1-ALv2</string>
+    <string name="settings_license_sub">استفاده از آن رایگان است. کد عمومی است تا هر کسی بتواند ببیند برنامه چه می‌کند؛ لایسنس هر نسخه دو سال پس از انتشارش به Apache-2.0 تغییر می‌کند.</string>
+    <string name="settings_source">کد منبع</string>
+    <!-- Starts with U+200F (right-to-left mark) so the URL lines up with the RTL layout. -->
+    <string name="settings_source_sub">‏github.com/mirzaaghazadeh/pairline</string>
+    <string name="settings_privacy">حریم خصوصی</string>
+    <string name="settings_privacy_body">در Pairline خبری از سرور، حساب کاربری، تبلیغات یا آمارگیری نیست. پیام‌ها، تماس‌ها و مخاطبین شما فقط به آیفونِ جفت‌شدهٔ شما می‌روند، آن هم با رمزگذاری سرتاسری. این برنامه حتی مجوز استفاده از اینترنت را ندارد. گزارش‌ها روی همین گوشی می‌مانند و فقط اگر خودتان بخواهید، آن هم بعد از اینکه آن‌ها را دیدید، با کسی به اشتراک گذاشته می‌شوند.</string>
+
+    <!-- Keep running -->
+    <string name="keepalive_title">فعال نگه داشتن Pairline</string>
+    <string name="keepalive_intro">اندروید و سازندگان گوشی برای صرفه‌جویی در باتری، برنامه‌های پس‌زمینه را متوقف می‌کنند. با این تنظیمات، Pairline به آیفون شما وصل می‌ماند.</string>
+    <string name="keepalive_step_battery">مرحلهٔ ۱: بهینه‌سازی باتری اندروید</string>
+    <string name="keepalive_step_maker">مرحلهٔ ۲: %1$s</string>
+    <string name="keepalive_other_makers">برندهای دیگر گوشی</string>
+    <string name="keepalive_general">این‌ها هم کمک می‌کنند: هر وقت می‌توانید گوشی را به شارژ بزنید، Pairline را به‌اجبار متوقف نکنید و بلوتوث را روشن بگذارید.</string>
+    <string name="keepalive_never_changes">این تنظیمات را هیچ‌وقت خود Pairline تغییر نمی‌دهد؛ فقط صفحهٔ مربوط را برایتان باز می‌کند.</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_title">عیب‌یابی</string>
+    <string name="diag_intro">این کل گزارش است، دقیقاً همان‌طور که به اشتراک گذاشته می‌شود. هیچ شماره تلفن، نام، پیام یا کلیدی در آن نیست. تا وقتی روی «اشتراک‌گذاری» نزنید، چیزی فرستاده نمی‌شود.</string>
+    <string name="diag_copy">کپی</string>
+    <string name="diag_copied">گزارش کپی شد</string>
+    <string name="diag_share">اشتراک‌گذاری</string>
+    <string name="diag_clear">پاک کردن گزارش‌ها</string>
+    <string name="diag_clear_body">گزارش‌های ذخیره‌شده روی این گوشی پاک شود؟ گزارش از نو شروع می‌شود.</string>
+    <string name="diag_clear_confirm">پاک کردن</string>
+
+    <!-- Help -->
+    <string name="help_title">راهنما</string>
+    <string name="help_section_setup">شروع کار</string>
+    <string name="help_section_battery">باتری و وصل ماندن</string>
+    <string name="help_section_trouble">رفع مشکل</string>
+    <string name="help_section_permissions">چرا این مجوزها؟</string>
+    <string name="help_section_privacy">حریم خصوصی</string>
+
+    <string name="help_q_what">کار Pairline چیست؟</string>
+    <string name="help_a_what">به آیفون شما امکان می‌دهد از سیم‌کارت این گوشی اندروید استفاده کند. تماس‌ها و پیامک‌های ورودی روی آیفونتان نمایش داده می‌شوند و می‌توانید از همان‌جا جواب بدهید، پیامک بفرستید، تماس بگیرید و کدهای USSD را اجرا کنید. این گوشی نزدیک شما می‌ماند و تماس و پیامک را در عمل خودش انجام می‌دهد.</string>
+    <string name="help_q_iphone">روی آیفون به چه چیزی نیاز دارم؟</string>
+    <string name="help_a_iphone">برنامهٔ Pairline برای آیفون (iOS ۱۶ یا جدیدتر) و بلوتوث روشن. دو گوشی باید در محدودهٔ بلوتوث هم باشند؛ معمولاً در یک اتاق یا چند اتاق آن‌طرف‌تر.</string>
+    <string name="help_q_pair">چطور دو گوشی را جفت کنم؟</string>
+    <string name="help_a_pair">در این گوشی، «جفت کردن آیفون» را باز کنید تا کدی نمایش داده شود. در آیفون، Pairline را باز کنید، روی «جفت شدن با گوشی اندروید» بزنید و کد را اسکن کنید. کد فقط یک بار کار می‌کند و بعد از ۵ دقیقه باطل می‌شود.</string>
+    <string name="help_q_spare">می‌توانم از گوشی اندروید اصلی‌ام استفاده کنم؟</string>
+    <string name="help_a_spare">بله. البته ساده‌ترین حالت یک گوشی اضافه است که فقط نقش پل را دارد: می‌تواند همیشه به شارژ باشد و هیچ برنامهٔ دیگری روی آن نیست که سر باتری یا مجوزها با Pairline رقابت کند.</string>
+    <string name="help_q_default_sms">باید Pairline را برنامهٔ پیش‌فرض پیامک کنم؟</string>
+    <string name="help_a_default_sms">نه. برنامهٔ پیامک خود اندروید مثل همیشه کار می‌کند و همهٔ پیامک‌هایتان را نگه می‌دارد. Pairline فقط آن‌ها را منتقل می‌کند.</string>
+
+    <string name="help_q_disconnects">چرا اتصال گاهی قطع می‌شود؟</string>
+    <string name="help_a_disconnects">معمولاً چون اندروید یا سازندهٔ گوشی برای صرفه‌جویی در باتری Pairline را متوقف کرده، یا دو گوشی از محدودهٔ بلوتوث خارج شده‌اند. در بخش «فعال نگه داشتن Pairline» اجازهٔ کار در پس‌زمینه را بدهید و نکته‌های مخصوص گوشی‌تان را انجام دهید.</string>
+    <string name="help_q_battery_use">آیا Pairline باتری را خالی می‌کند؟</string>
+    <string name="help_a_battery_use">نه چندان. بلوتوث کم‌مصرف دقیقاً برای همین کار طراحی شده و Pairline تا وقتی اتفاقی نیفتد، در حالت خواب می‌ماند.</string>
+    <string name="help_q_notification">چرا همیشه یک اعلان هست؟</string>
+    <string name="help_a_notification">اندروید از برنامه‌هایی که در پس‌زمینه کار می‌کنند می‌خواهد که یک اعلان نشان دهند. این اعلان به شما می‌گوید آیفونتان وصل است یا نه، و هیچ‌وقت متن پیام یا شماره‌ای را نشان نمی‌دهد.</string>
+    <string name="help_q_distance">دو گوشی چقدر می‌توانند از هم دور باشند؟</string>
+    <string name="help_a_distance">تقریباً به اندازهٔ برد یک هدست بلوتوثی: معمولاً ۱۰ تا ۳۰ متر در فضای بسته، و از پشت دیوارهای ضخیم کمتر.</string>
+
+    <string name="help_q_not_found">آیفونم این گوشی را پیدا نمی‌کند</string>
+    <string name="help_a_not_found">بررسی کنید که بلوتوث هر دو گوشی روشن باشد، این برنامه بدون هیچ هشداری «در انتظار» یا «جفت نشده» را نشان دهد، و Pairline روی آیفون باز باشد. اگر باز هم وصل نشد، بلوتوث هر دو گوشی را یک بار خاموش و روشن کنید.</string>
+    <string name="help_q_no_sms">پیامک‌ها به آیفونم نمی‌رسند</string>
+    <string name="help_a_no_sms">مطمئن شوید مجوز «پیامک‌ها» در بخش «مجوزها» داده شده و صفحهٔ اصلی «وصل» را نشان می‌دهد. پیامک‌هایی که در زمان قطع بودن اتصال می‌رسند، بعد از وصل شدن دوباره روی آیفون نمایش داده می‌شوند.</string>
+    <string name="help_q_call_audio">هنگام تماس، کجا صحبت کنم؟</string>
+    <string name="help_a_call_audio">فعلاً با همین گوشی اندروید. می‌توانید از آیفون تماس را جواب بدهید، رد کنید یا قطع کنید، اما صدای تماس روی گوشی اندروید می‌ماند. انتقال صدا به آیفون در برنامه‌های آیندهٔ ماست.</string>
+    <string name="help_q_dtmf">چرا از روی آیفون نمی‌توانم صفحه‌کلید را بزنم یا تماس را بی‌صدا کنم؟</string>
+    <string name="help_a_dtmf">اندروید فقط به چند برنامهٔ محدود اجازه می‌دهد تماسِ در جریان را کنترل کنند. در بیشتر گوشی‌ها Pairline می‌تواند تماس را جواب دهد یا قطع کند، اما نمی‌تواند صدای دکمه‌های صفحه‌کلید را بفرستد یا تماس را بی‌صدا کند. هر وقت گوشی شما اجازه دهد، Pairline خودکار از این امکان استفاده می‌کند.</string>
+    <string name="help_q_restricted">اندروید می‌گوید «تنظیم محدودشده»</string>
+    <string name="help_a_restricted">اندروید ۱۳ و بالاتر، بعضی مجوزها را برای برنامه‌هایی که بیرون از فروشگاه برنامه نصب شده‌اند محدود می‌کند. صفحهٔ «اطلاعات برنامه» را برای Pairline باز کنید، بالای صفحه روی ⋮ بزنید و «اجازه دادن به تنظیمات محدودشده» را انتخاب کنید، بعد دوباره مجوز را بدهید.</string>
+
+    <string name="help_q_perm_nearby">دستگاه‌های اطراف (بلوتوث)</string>
+    <string name="help_a_perm_nearby">اتصال به آیفون شما از همین راه است. Pairline خودش را فقط با یک شناسهٔ ناشناس معرفی می‌کند، هرگز با نام یا شمارهٔ شما، و از موقعیت مکانی شما استفاده نمی‌کند.</string>
+    <string name="help_q_perm_sms">پیامک‌ها</string>
+    <string name="help_a_perm_sms">برای اینکه پیامک‌های ورودی به آیفون شما منتقل شوند، پیامک‌هایی که آنجا می‌نویسید فرستاده شوند، و هر وقت آیفون درخواست کند، سابقهٔ پیامک‌ها برایش فرستاده شود.</string>
+    <string name="help_q_perm_phone">تماس‌ها و سیم‌کارت‌ها</string>
+    <string name="help_a_perm_phone">برای اینکه Pairline از طرف آیفون شما تماس‌ها را تشخیص دهد، جواب دهد، رد کند، قطع کند و تماس بگیرد، کدهای USSD را اجرا کند، و سیم‌کارت‌ها و آنتن شما را نشان دهد.</string>
+    <string name="help_q_perm_calllog">سابقهٔ تماس‌ها</string>
+    <string name="help_a_perm_calllog">برای نمایش شمارهٔ تماس‌گیرنده (اندروید ۱۲ و بالاتر آن را فقط با این مجوز در اختیار برنامه می‌گذارد)، سابقهٔ تماس‌ها، و اینکه تماسی بی‌پاسخ مانده یا رد شده است.</string>
+    <string name="help_q_perm_contacts">مخاطبین</string>
+    <string name="help_a_perm_contacts">برای نمایش نام تماس‌گیرنده و مخاطبین شما روی آیفون. نوشتن مخاطب یک گزینهٔ جداگانه است و تا خودتان روشنش نکنید، خاموش می‌ماند.</string>
+    <string name="help_q_perm_notif">اعلان‌ها</string>
+    <string name="help_a_perm_notif">برای اعلان وضعیت، که اندروید برای برنامه‌هایی که در پس‌زمینه کار می‌کنند الزامی کرده است.</string>
+    <string name="help_q_perm_battery">بهینه‌سازی باتری</string>
+    <string name="help_a_perm_battery">در پنجرهٔ خود اندروید، Pairline از اندروید می‌خواهد که آن را متوقف نکند. هر وقت بخواهید می‌توانید این را در تنظیمات اندروید تغییر دهید.</string>
+
+    <string name="help_q_data">اطلاعات من کجا می‌رود؟</string>
+    <string name="help_a_data">فقط به آیفونِ جفت‌شدهٔ شما، با رمزگذاری سرتاسری. Pairline هیچ سروری ندارد و این برنامه مجوز استفاده از اینترنت را ندارد.</string>
+    <string name="help_q_logs">در گزارش عیب‌یابی چه چیزهایی هست؟</string>
+    <string name="help_a_logs">جزئیات فنی مثل نسخه‌ها، مجوزها و رویدادهای اتصال. شماره تلفن‌ها، ایمیل‌ها، نام‌ها، متن پیام‌ها و کلیدها حذف می‌شوند. پیش از اینکه تصمیم بگیرید آن را به اشتراک بگذارید، کل گزارش را می‌بینید.</string>
+    <string name="help_q_unpair">وقتی جفت‌سازی را لغو کنم چه می‌شود؟</string>
+    <string name="help_a_unpair">هر دو گوشی کلید یکدیگر را پاک می‌کنند و دیگر نمی‌توانند با هم ارتباط داشته باشند. پیامک‌ها و مخاطبین شما همان‌جا که هستند، روی این گوشی می‌مانند.</string>
 </resources>

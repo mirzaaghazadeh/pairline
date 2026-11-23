@@ -47,6 +47,13 @@ class RedactorTest {
     }
 
     @Test
+    fun ourTimestampsStay() {
+        assertEquals("2026-11-24 01:52:22.443 I/link: connected", r("2026-11-24 01:52:22.443 I/link: connected"))
+        assertEquals("Paired: yes, since 2026-11-24 10:22", r("Paired: yes, since 2026-11-24 10:22"))
+        assertEquals("[number] called", r("0912-123-4567 called"))
+    }
+
+    @Test
     fun ordinaryWordsStay() {
         val s = "BridgeSessionCallbacksImplementation closed: handshake timed out"
         assertEquals(s, r(s))

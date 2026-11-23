@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand colors shared with the iPhone app and the website. -->
+    <!-- Brand blue, shared with the iPhone app and the website (notification accent).
+         The full palette is in ui/theme/Theme.kt; the launcher icon gradient in drawable/ic_launcher_background.xml. -->
     <color name="brand_blue">#1F5FBF</color>
-    <color name="brand_blue_dark_mode">#9DC1FF</color>
-    <color name="brand_green">#12B886</color>
-    <color name="brand_amber">#F59F00</color>
-    <color name="brand_red">#E03131</color>
-    <color name="ic_launcher_background">#1F5FBF</color>
 </resources>

@@ -1,19 +1,322 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bridge_tagline">استخدم شريحة هذا الهاتف من آيفونك</string>
-    <string name="status_not_paired">هذا الهاتف غير مقترن بأي آيفون بعد.</string>
+    <!-- Arabic (Modern Standard Arabic). app_name is not translated (D-001).
+         &#x200F; is an invisible RIGHT-TO-LEFT MARK, used where a string has to start with a Latin word. -->
+    <!-- Used inside sentences: "Connected to your iPhone". -->
     <string name="generic_iphone">آيفونك</string>
+    <!-- Used as a name on its own, when the iPhone hasn't told us its model yet. -->
+    <string name="generic_iphone_name">آيفون</string>
 
+    <!-- Common actions -->
+    <string name="action_back">رجوع</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_continue">متابعة</string>
+    <string name="action_done">تم</string>
+    <string name="action_done_continue">انتهيت من ذلك، متابعة</string>
+    <string name="action_allow">السماح</string>
+    <string name="action_fix">إصلاح</string>
+    <string name="action_get_started">لنبدأ</string>
+    <string name="action_not_now">ليس الآن</string>
+    <string name="action_skip_for_now">التخطي الآن</string>
+    <string name="action_try_again">إعادة المحاولة</string>
+    <string name="action_open_app_info">فتح معلومات التطبيق</string>
+    <string name="action_open_settings">فتح الإعدادات</string>
+    <string name="action_open_pairline">فتح Pairline</string>
+    <string name="action_turn_on_bt">تشغيل البلوتوث</string>
+    <string name="action_understood">فهمت</string>
+
+    <!-- Persistent notification of the link service -->
     <string name="notif_channel_link">حالة الاتصال</string>
     <string name="notif_channel_link_desc">يُظهر ما إذا كان آيفونك متصلًا. يتطلب أندرويد هذا الإشعار لإبقاء Pairline قيد التشغيل.</string>
     <string name="notif_connected_title">متصل بـ %1$s</string>
-    <string name="notif_connected_text">تُحوَّل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="notif_connected_text">يتم نقل المكالمات والرسائل إلى آيفونك.</string>
     <string name="notif_waiting_title">بانتظار آيفونك</string>
-    <string name="notif_waiting_text">يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا والبلوتوث مفعّلًا.</string>
-    <string name="notif_not_paired_title">لم يتم الاقتران بعد</string>
-    <string name="notif_not_paired_text">افتح Pairline وامسح الرمز باستخدام آيفونك.</string>
+    <string name="notif_waiting_text">يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا والبلوتوث مفعّلًا فيه.</string>
+    <string name="notif_not_paired_title">لم يتم الإقران بعد</string>
+    <string name="notif_not_paired_text">افتح Pairline وامسح الرمز بآيفونك.</string>
     <string name="notif_bt_off_title">البلوتوث متوقف</string>
     <string name="notif_bt_off_text">شغّل البلوتوث ليتمكن آيفونك من الاتصال.</string>
     <string name="notif_permission_title">مطلوب إذن</string>
     <string name="notif_permission_text">افتح Pairline واسمح بإذن «الأجهزة المجاورة» ليتمكن آيفونك من الاتصال.</string>
+
+    <!-- Setup: welcome -->
+    <string name="welcome_title">شريحة هاتفك الأندرويد على آيفونك</string>
+    <string name="welcome_body">يحوّل Pairline هذا الهاتف إلى جسر. أبقِه قريبًا منك، واستخدم شريحته من آيفونك.</string>
+    <string name="welcome_point_calls">عرض المكالمات والرد عليها وإجراؤها</string>
+    <string name="welcome_point_sms">قراءة الرسائل النصية وإرسالها</string>
+    <string name="welcome_point_contacts">الوصول إلى جهات الاتصال وسجل المكالمات</string>
+    <string name="welcome_point_ussd">الاستعلام عن الرصيد وتنفيذ رموز USSD</string>
+
+    <!-- Setup: privacy promise -->
+    <string name="privacy_title">تبقى بياناتك بين هاتفيك</string>
+    <string name="privacy_body">لا يملك Pairline أي خوادم. تنتقل رسائلك ومكالماتك وجهات اتصالك مباشرةً من هذا الهاتف إلى آيفونك، ولا تذهب إلى أي مكان آخر.</string>
+    <string name="privacy_point_e2e">كل شيء مشفّر تشفيرًا تامًا بين الطرفين بمفاتيح لا يملكها سوى هاتفيك</string>
+    <string name="privacy_point_accounts">لا حساب ولا تسجيل ولا تحقق من رقم الهاتف</string>
+    <string name="privacy_point_tracking">لا إعلانات ولا تحليلات ولا تتبّع من أي نوع</string>
+    <string name="privacy_point_source">الشيفرة المصدرية منشورة علنًا، ليتمكن أي شخص من التحقق منها</string>
+
+    <!-- Setup: Android 11 notice -->
+    <string name="android11_title">يعمل هذا الهاتف بنظام أندرويد ١١</string>
+    <string name="android11_body">يعمل Pairline على هذا الهاتف، لكن أندرويد ١١ لم يعد يتلقى تحديثات أمنية. والهاتف الذي يحمل شريحتك وينقل رسائلك ينبغي أن يكون آمنًا قدر الإمكان.</string>
+    <string name="android11_tip">الخيار الأفضل: هاتف احتياطي تستخدمه جسرًا فقط، دون أي تطبيقات أخرى عليه.</string>
+
+    <!-- Setup and Settings: permissions -->
+    <string name="perm_bt_title">العثور على آيفونك والاتصال به</string>
+    <string name="perm_bt_why">يتواصل Pairline مع آيفونك عبر البلوتوث. ويسمّي أندرويد هذا الإذن «الأجهزة المجاورة».</string>
+    <string name="perm_bt_detail">لا يسمح هذا الإذن إلا بأن يُعلن Pairline عن نفسه لآيفونك المقترن، ولا يستخدم موقعك.</string>
+    <string name="perm_sms_title">الرسائل النصية</string>
+    <string name="perm_sms_why">لعرض الرسائل الجديدة على آيفونك، وإرسال الردود منه، وتحميل سجل رسائلك.</string>
+    <string name="perm_sms_detail">تبقى رسائلك كالمعتاد في تطبيق الرسائل الأصلي في أندرويد، ولا يحتفظ Pairline بنسخ منها.</string>
+    <string name="perm_phone_title">المكالمات الهاتفية وشرائح SIM</string>
+    <string name="perm_phone_why">لإعلام آيفونك بالمكالمات الواردة، والرد عليها أو إنهائها من هناك، وإجراء المكالمات، وتنفيذ رموز USSD.</string>
+    <string name="perm_phone_detail">يتيح هذا أيضًا لآيفونك أن يعرض مشغّل شبكتك وقوة الإشارة، وأي شريحة تُستخدم.</string>
+    <string name="perm_calllog_title">سجل المكالمات</string>
+    <string name="perm_calllog_why">لعرض هوية المتصل وسجل مكالماتك على آيفونك.</string>
+    <string name="perm_calllog_detail">في أندرويد ١٢ والإصدارات الأحدث، لا يتوفر رقم المتصل إلا بهذا الإذن.</string>
+    <string name="perm_contacts_title">جهات الاتصال</string>
+    <string name="perm_contacts_why">لعرض أسماء المتصلين وجهات اتصالك على آيفونك.</string>
+    <string name="perm_contacts_detail">يكتفي Pairline بقراءتها. أما إضافة جهات اتصال من الآيفون فهي خيار منفصل، ومتوقف افتراضيًا.</string>
+    <string name="perm_notif_title">إشعار الحالة</string>
+    <string name="perm_notif_why">يحتاج أندرويد إلى إشعار لإبقاء Pairline قيد التشغيل في الخلفية. ويُظهر الإشعار ما إذا كان آيفونك متصلًا.</string>
+    <string name="perm_notif_detail">لا يعرض Pairline نصوص الرسائل أو الأرقام في الإشعارات.</string>
+    <string name="perm_granted_note">تم السماح. شكرًا لك!</string>
+    <string name="perm_denied_note">بدون هذا الإذن، لن تعمل بعض الميزات على آيفونك. يمكنك السماح به لاحقًا من الإعدادات ← الأذونات.</string>
+    <string name="perm_optional_note">اختياري. كل شيء آخر يعمل بدونه.</string>
+    <string name="perm_blocked_note">لن يطلب أندرويد الإذن مرة أخرى. افتح معلومات التطبيق ← الأذونات واسمح به من هناك.</string>
+    <string name="perm_blocked_note_13">لن يطلب أندرويد الإذن مرة أخرى. افتح معلومات التطبيق ← الأذونات واسمح به من هناك. وإذا أشار أندرويد إلى أنه «إعداد مقيّد»، فاضغط أولًا على ⋮ في معلومات التطبيق واختر «السماح بالإعدادات المقيّدة».</string>
+    <string name="perm_state_granted">مسموح</string>
+    <string name="perm_state_needed">مطلوب</string>
+    <string name="perm_state_optional">اختياري</string>
+    <string name="perm_state_blocked">محظور</string>
+    <string name="permissions_title">الأذونات</string>
+    <string name="permissions_intro">ما يُسمح لتطبيق Pairline بفعله على هذا الهاتف، ولماذا. اضغط على أي إذن غير مسموح به لإصلاحه.</string>
+
+    <!-- Setup: background running -->
+    <string name="battery_title">إبقاء Pairline قيد التشغيل</string>
+    <string name="battery_body">يوقف أندرويد التطبيقات العاملة في الخلفية مؤقتًا لتوفير البطارية. ويحتاج Pairline إلى البقاء نشطًا لكي تصل المكالمات والرسائل إلى آيفونك فورًا.</string>
+    <string name="battery_allow">السماح بالعمل في الخلفية</string>
+    <string name="battery_note">سيسألك أندرويد في نافذته الخاصة. ويستهلك Pairline القليل جدًا من البطارية أثناء الانتظار.</string>
+    <string name="battery_done_note">تم السماح لتطبيق Pairline بالعمل في الخلفية.</string>
+
+    <!-- Setup: maker-specific background settings -->
+    <string name="autostart_title">إعداد إضافي على هواتف %1$s</string>
+    <string name="autostart_body">تضيف الشركة المصنّعة لهاتفك مدير بطارية خاصًا بها قد يوقف Pairline. إليك كيفية السماح له بالعمل.</string>
+    <string name="maker_xiaomi">&#x200F;Xiaomi وRedmi وPOCO</string>
+    <string name="maker_samsung">&#x200F;Samsung</string>
+    <string name="maker_oppo">&#x200F;Oppo وRealme وOnePlus</string>
+    <string name="maker_vivo">&#x200F;Vivo وiQOO</string>
+    <string name="maker_huawei">&#x200F;Huawei وHonor</string>
+    <string name="maker_other">هاتفك</string>
+    <string name="maker_xiaomi_steps">١. اضغط على «فتح الإعدادات» وفعّل «التشغيل التلقائي» لتطبيق Pairline.\n٢. من الإعدادات ← التطبيقات ← Pairline ← توفير البطارية، اختر «بلا قيود».\n٣. افتح التطبيقات الحديثة، ثم اضغط مطولًا على Pairline واضغط على رمز القفل.</string>
+    <string name="maker_samsung_steps">١. من الإعدادات ← التطبيقات ← Pairline ← البطارية، اختر «غير مقيّد».\n٢. من الإعدادات ← البطارية ← حدود الاستخدام في الخلفية، تأكد من أن Pairline ليس ضمن «التطبيقات في وضع السكون» أو «التطبيقات في وضع السكون العميق». ويمكنك إضافته إلى «التطبيقات التي لا تخلد إلى السكون أبدًا».</string>
+    <string name="maker_oppo_steps">١. اضغط على «فتح الإعدادات» واسمح بـ«التشغيل التلقائي» لتطبيق Pairline.\n٢. من الإعدادات ← البطارية ← Pairline، اسمح بالنشاط في الخلفية، أو اختر «عدم التحسين».\n٣. افتح التطبيقات الحديثة وقم بقفل Pairline.</string>
+    <string name="maker_vivo_steps">١. اضغط على «فتح الإعدادات» واسمح لتطبيق Pairline بالبدء في الخلفية.\n٢. من الإعدادات ← البطارية ← استهلاك الطاقة في الخلفية، اسمح لتطبيق Pairline باستهلاك مرتفع للطاقة في الخلفية.</string>
+    <string name="maker_huawei_steps">١. اضغط على «فتح الإعدادات» (تشغيل التطبيقات)، وحوّل Pairline إلى «إدارة يدويًا»، ثم فعّل «التشغيل التلقائي» و«التشغيل الثانوي» و«التشغيل في الخلفية».\n٢. افتح التطبيقات الحديثة وقم بقفل Pairline.</string>
+    <string name="maker_other_steps">يكفي عادةً استثناء التطبيق من تحسين البطارية في أندرويد. وإذا ظل الاتصال ينقطع عند إطفاء الشاشة، فابحث في الإعدادات ← التطبيقات ← Pairline ← البطارية عن خيار مثل «غير مقيّد» أو «السماح بالنشاط في الخلفية».</string>
+
+    <!-- Pairing -->
+    <string name="pair_title">إقران آيفونك</string>
+    <string name="pair_step_1">ثبّت Pairline على آيفونك وافتحه.</string>
+    <string name="pair_step_2">اضغط على «الإقران مع هاتف أندرويد».</string>
+    <string name="pair_step_3">وجّه كاميرا آيفونك نحو هذا الرمز.</string>
+    <string name="pair_expires">تنتهي صلاحية الرمز خلال %1$s</string>
+    <string name="pair_new_code">رمز جديد</string>
+    <string name="pair_keep_open">أبقِ هذه الشاشة مفتوحة حتى يُظهر آيفونك أنه تم الإقران. يعمل الرمز مرة واحدة فقط خلال ٥ دقائق، ولا يمكن أن يستخدمه إلا من يستطيع رؤية هذه الشاشة.</string>
+    <string name="pair_replaces">عند إقران آيفون جديد، سيحلّ محلّ %1$s.</string>
+    <string name="pair_success_title">تم الإقران!</string>
+    <string name="pair_success_text">أصبح آيفونك وهذا الهاتف يثق كلٌّ منهما بالآخر، ولا يمكن لأحد غيرهما قراءة ما يتبادلانه.</string>
+    <string name="pair_connecting">جارٍ الاتصال…</string>
+    <string name="pair_connected">تم الاتصال. يمكن لآيفونك الآن استخدام شريحة هذا الهاتف.</string>
+    <string name="pair_too_many">حاول أحدهم إدخال رموز خاطئة عدة مرات، لذا أُلغي هذا الرمز. أنشئ رمزًا جديدًا عندما يصبح آيفونك جاهزًا.</string>
+    <string name="pair_need_bt">البلوتوث متوقف. شغّله ليتمكن آيفونك من العثور على هذا الهاتف.</string>
+    <string name="pair_need_bt_perm">اسمح بإذن «الأجهزة المجاورة» ليتمكن آيفونك من العثور على هذا الهاتف.</string>
+    <string name="pair_bt_problem">لا يستطيع هذا الهاتف توفير اتصال بلوتوث حاليًا. جرّب إيقاف البلوتوث ثم تشغيله مجددًا، أو أعد تشغيل الهاتف.</string>
+    <string name="pair_qr_desc">رمز الإقران. امسحه باستخدام Pairline على آيفونك.</string>
+    <string name="pair_later">الإقران لاحقًا</string>
+
+    <!-- Setup: done -->
+    <string name="done_title">كل شيء جاهز</string>
+    <string name="done_body_paired">أبقِ هذا الهاتف مشحونًا وقريبًا من آيفونك. يمكنك وضعه جانبًا الآن، إذ يواصل Pairline العمل في الخلفية.</string>
+    <string name="done_body_unpaired">أصبح Pairline جاهزًا. يمكنك إقران آيفونك من الشاشة الرئيسية للتطبيق متى شئت.</string>
+    <string name="done_note">يُظهر إشعار صغير أن Pairline قيد التشغيل. ويمكنك الضغط عليه في أي وقت لمعرفة حالة الاتصال.</string>
+
+    <!-- Home -->
+    <string name="state_connected">متصل</string>
+    <string name="state_searching">في الانتظار</string>
+    <string name="state_not_paired">غير مقترن</string>
+    <string name="state_problem">يحتاج إلى انتباهك</string>
+    <string name="home_connected_title">متصل بـ %1$s</string>
+    <string name="home_connected_body">عبر البلوتوث. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="home_connected_body_tcp">عبر رابط الاختبار الخاص بالتصحيح. يتم نقل المكالمات والرسائل.</string>
+    <string name="home_waiting_title">بانتظار %1$s</string>
+    <string name="home_waiting_body">آخر اتصال %1$s. يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا وتطبيق Pairline مفتوحًا عليه أو يعمل في الخلفية.</string>
+    <string name="home_waiting_never">لم يتصل آيفونك بعد. افتح Pairline عليه وهو بالقرب من هذا الهاتف، مع تشغيل البلوتوث.</string>
+    <string name="home_not_paired_body">قم بإقران آيفونك لتبدأ استخدام شريحة هذا الهاتف منه.</string>
+    <string name="home_bt_off_body">لا يمكن لآيفونك الوصول إلى هذا الهاتف ما دام البلوتوث متوقفًا.</string>
+    <string name="home_bt_perm_title">لم يُسمح بإذن «الأجهزة المجاورة»</string>
+    <string name="home_bt_perm_body">يحتاج Pairline إلى هذا الإذن للتواصل مع آيفونك عبر البلوتوث.</string>
+    <string name="home_bt_unsupported_title">البلوتوث غير متاح</string>
+    <string name="home_bt_unsupported_body">لا يمكن لهذا الهاتف العمل كملحق بلوتوث، وهو ما يحتاجه Pairline.</string>
+    <string name="home_this_phone">هذا الهاتف</string>
+    <string name="home_battery">البطارية</string>
+    <string name="home_battery_level">%1$d٪</string>
+    <string name="home_battery_charging">%1$d٪، قيد الشحن</string>
+    <string name="home_sim_slot">الشريحة %1$d</string>
+    <string name="home_no_service">لا تتوفر خدمة</string>
+    <string name="home_roaming">تجوال</string>
+    <string name="home_default_both">افتراضية</string>
+    <string name="home_default_sms">افتراضية للرسائل النصية</string>
+    <string name="home_default_calls">افتراضية للمكالمات</string>
+    <string name="home_no_sims">لم يتم العثور على شريحة SIM</string>
+    <string name="home_no_sims_sub">أدخل شريحة SIM، أو اسمح بإذن «المكالمات الهاتفية وشرائح SIM» ليتمكن Pairline من رؤيتها.</string>
+    <string name="home_supports">ما يمكن لآيفونك فعله</string>
+    <string name="home_keep_running">البقاء قيد التشغيل</string>
+    <string name="home_battery_ok">مسموح بالعمل في الخلفية</string>
+    <string name="home_battery_ok_sub">لن يوقف أندرويد Pairline مؤقتًا لتوفير البطارية.</string>
+    <string name="home_battery_restricted">تحسين البطارية مفعّل</string>
+    <string name="home_battery_restricted_sub">قد يوقف أندرويد Pairline مؤقتًا عند إطفاء الشاشة، وقد تتأخر المكالمات أو الرسائل في الوصول.</string>
+    <string name="home_notifications_off">الإشعارات متوقفة</string>
+    <string name="home_notifications_off_sub">قد يوقف أندرويد Pairline إذا لم يكن إشعار الحالة الخاص به ظاهرًا.</string>
+    <string name="home_keepalive_sub">نصائح تخص %1$s</string>
+    <string name="home_actions">المزيد</string>
+    <string name="home_pair">إقران آيفون</string>
+    <string name="home_pair_new">إقران آيفون جديد</string>
+    <string name="home_pair_sub">عرض رمز الإقران</string>
+    <string name="home_unpair">إلغاء إقران الآيفون</string>
+    <string name="home_unpair_sub">سينسى كلٌّ من الهاتفين الآخر</string>
+    <string name="home_diag_sub">تقرير مقروء للمساعدة في حل المشكلات</string>
+    <string name="home_debug_tcp_on">إصدار تصحيح: رابط الاختبار على 127.0.0.1:47800 في وضع الاستماع.</string>
+    <string name="home_debug_tcp_off">إصدار تصحيح: رابط الاختبار ليس في وضع الاستماع.</string>
+
+    <!-- Capabilities -->
+    <string name="cap_sms_receive">استلام الرسائل النصية</string>
+    <string name="cap_sms_send">إرسال الرسائل النصية</string>
+    <string name="cap_sms_history">سجل الرسائل</string>
+    <string name="cap_call_observe">رؤية المكالمات الواردة</string>
+    <string name="cap_call_control">الرد على المكالمات ورفضها وإنهاؤها</string>
+    <string name="cap_call_dial">إجراء المكالمات</string>
+    <string name="cap_call_dtmf">لوحة الأرقام وكتم الصوت ومكبّر الصوت أثناء المكالمات</string>
+    <string name="cap_contacts">جهات الاتصال</string>
+    <string name="cap_calllog">سجل المكالمات</string>
+    <string name="cap_contacts_add">إضافة جهات اتصال من الآيفون</string>
+    <string name="cap_ussd">رموز USSD</string>
+    <string name="cap_dualsim">الاختيار بين شريحتين</string>
+    <string name="cap_missing_sms">يحتاج إلى إذن «الرسائل النصية».</string>
+    <string name="cap_missing_phone">يحتاج إلى إذن «المكالمات الهاتفية».</string>
+    <string name="cap_missing_calllog">يحتاج إلى إذن «سجل المكالمات».</string>
+    <string name="cap_missing_contacts">يحتاج إلى إذن «جهات الاتصال».</string>
+    <string name="cap_missing_contacts_add">متوقف. فعّله من الإعدادات إذا أردت ذلك.</string>
+    <string name="cap_missing_companion">معظم الهواتف لا تسمح للتطبيقات بعد بالتحكم في صوت المكالمة. استخدم هاتف أندرويد لهذه الوظائف.</string>
+    <string name="cap_missing_dualsim">شريحة واحدة فقط نشطة.</string>
+
+    <!-- Unpair dialog -->
+    <string name="unpair_title">إلغاء إقران آيفونك؟</string>
+    <string name="unpair_body">سينسى هذا الهاتف مفتاح آيفونك، وسيُطلب من آيفونك أن ينسى هذا الهاتف إن كان متصلًا. ولاستخدام Pairline مجددًا، ستحتاج إلى مسح رمز جديد.</string>
+    <string name="unpair_confirm">إلغاء الإقران</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_general">عام</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_language_system">لغة النظام الافتراضية</string>
+    <string name="settings_iphone">آيفونك</string>
+    <string name="settings_ios_version">نظام iOS %1$s</string>
+    <string name="settings_app_version">تطبيق Pairline %1$s</string>
+    <string name="settings_paired_since">مقترن منذ %1$s</string>
+    <string name="settings_contacts_add">إضافة جهات اتصال من الآيفون</string>
+    <string name="settings_contacts_add_sub">يتيح لآيفونك حفظ جهات اتصال جديدة على هذا الهاتف. متوقف افتراضيًا.</string>
+    <string name="settings_background">العمل في الخلفية</string>
+    <string name="settings_permissions_sub">عرض ما يُسمح لتطبيق Pairline بفعله وتغييره</string>
+    <string name="settings_support">المساعدة</string>
+    <string name="settings_help_sub">الإعداد، البطارية، حل المشكلات، الأذونات</string>
+    <string name="settings_rerun_setup">تشغيل الإعداد مجددًا</string>
+    <string name="settings_rerun_setup_body">استعرض خطوات الإعداد مرة أخرى. يبقى الإقران والإعدادات كما هي دون تغيير.</string>
+    <string name="settings_about">حول التطبيق</string>
+    <string name="settings_version">الإصدار</string>
+    <string name="settings_license">الترخيص: FSL-1.1-ALv2</string>
+    <string name="settings_license_sub">مجاني الاستخدام. الشيفرة منشورة علنًا ليتمكن أي شخص من التحقق مما تفعله، ويصبح كل إصدار مرخّصًا بموجب Apache-2.0 بعد عامين من نشره.</string>
+    <string name="settings_source">الشيفرة المصدرية</string>
+    <string name="settings_source_sub">&#x200F;github.com/mirzaaghazadeh/pairline</string>
+    <string name="settings_privacy">الخصوصية</string>
+    <string name="settings_privacy_body">لا يملك Pairline خوادم أو حسابات أو إعلانات أو تحليلات. تذهب رسائلك ومكالماتك وجهات اتصالك إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. بل إن تطبيق الجسر لا يملك حتى إذنًا باستخدام الإنترنت. تبقى السجلات على هذا الهاتف، ولا تُشارَك إلا إذا اخترت ذلك، بعد أن تطّلع عليها.</string>
+
+    <!-- Keep running -->
+    <string name="keepalive_title">إبقاء Pairline قيد التشغيل</string>
+    <string name="keepalive_intro">يوقف أندرويد والشركات المصنّعة للهواتف التطبيقات العاملة في الخلفية لتوفير البطارية. تتيح هذه الإعدادات لتطبيق Pairline البقاء متصلًا بآيفونك.</string>
+    <string name="keepalive_step_battery">الخطوة ١: تحسين البطارية في أندرويد</string>
+    <string name="keepalive_step_maker">الخطوة ٢: %1$s</string>
+    <string name="keepalive_other_makers">شركات هواتف أخرى</string>
+    <string name="keepalive_general">من المفيد أيضًا: إبقاء الهاتف على الشاحن متى أمكن، وعدم فرض إيقاف Pairline، وترك البلوتوث مفعّلًا.</string>
+    <string name="keepalive_never_changes">لا يغيّر Pairline هذه الإعدادات من تلقاء نفسه أبدًا، بل يكتفي بفتح الشاشة المناسبة لك.</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_title">التشخيص</string>
+    <string name="diag_intro">هذا هو التقرير كاملًا، تمامًا كما ستتم مشاركته. لا يحتوي على أرقام هواتف أو أسماء أو رسائل أو مفاتيح. لن يُرسَل أي شيء ما لم تضغط على «مشاركة».</string>
+    <string name="diag_copy">نسخ</string>
+    <string name="diag_copied">تم نسخ التقرير</string>
+    <string name="diag_share">مشاركة</string>
+    <string name="diag_clear">مسح السجل</string>
+    <string name="diag_clear_body">هل تريد حذف السجل المحفوظ على هذا الهاتف؟ سيبدأ التقرير من جديد.</string>
+    <string name="diag_clear_confirm">مسح</string>
+
+    <!-- Help -->
+    <string name="help_title">المساعدة</string>
+    <string name="help_section_setup">البدء</string>
+    <string name="help_section_battery">البطارية والبقاء متصلًا</string>
+    <string name="help_section_trouble">حل المشكلات</string>
+    <string name="help_section_permissions">لماذا هذه الأذونات؟</string>
+    <string name="help_section_privacy">الخصوصية</string>
+
+    <string name="help_q_what">ماذا يفعل Pairline؟</string>
+    <string name="help_a_what">يتيح لآيفونك استخدام شريحة SIM الموجودة في هاتف أندرويد هذا. تظهر المكالمات والرسائل الواردة على آيفونك، ويمكنك من خلاله الرد على المكالمات والرسائل، وإجراء المكالمات، وتنفيذ رموز USSD. ويبقى هذا الهاتف قريبًا ويتولى فعليًا إجراء المكالمات وإرسال الرسائل.</string>
+    <string name="help_q_iphone">ما الذي أحتاجه على الآيفون؟</string>
+    <string name="help_a_iphone">تطبيق Pairline للآيفون (iOS ١٦ أو أحدث)، مع تشغيل البلوتوث. ويجب أن يكون الهاتفان ضمن نطاق البلوتوث، أي عادةً في الغرفة نفسها أو على بُعد بضع غرف.</string>
+    <string name="help_q_pair">كيف أُجري الإقران؟</string>
+    <string name="help_a_pair">على هذا الهاتف، افتح «إقران آيفون» لعرض رمز. وعلى آيفونك، افتح Pairline واضغط على «الإقران مع هاتف أندرويد» ثم امسح الرمز. يعمل الرمز مرة واحدة وتنتهي صلاحيته بعد ٥ دقائق.</string>
+    <string name="help_q_spare">هل يمكنني استخدام هاتف أندرويد الذي أستخدمه يوميًا؟</string>
+    <string name="help_a_spare">نعم. لكن الأسهل هو هاتف احتياطي يعمل جسرًا فقط: إذ يمكن أن يبقى على الشاحن، ولا ينافسه أي تطبيق آخر عليه على البطارية أو الأذونات.</string>
+    <string name="help_q_default_sms">هل يجب أن أجعل Pairline تطبيق الرسائل الافتراضي؟</string>
+    <string name="help_a_default_sms">لا. يواصل تطبيق الرسائل الأصلي في أندرويد العمل كالمعتاد ويحتفظ بجميع رسائلك. ويقتصر دور Pairline على نقلها.</string>
+
+    <string name="help_q_disconnects">لماذا ينقطع الاتصال أحيانًا؟</string>
+    <string name="help_a_disconnects">يحدث ذلك عادةً لأن أندرويد أو الشركة المصنّعة للهاتف أوقف Pairline مؤقتًا لتوفير البطارية، أو لأن الهاتفين كانا خارج نطاق البلوتوث. اسمح بالعمل في الخلفية من «إبقاء Pairline قيد التشغيل»، واتبع النصائح الخاصة بهاتفك.</string>
+    <string name="help_q_battery_use">هل يستنزف Pairline البطارية؟</string>
+    <string name="help_a_battery_use">ليس كثيرًا. فتقنية البلوتوث منخفض الطاقة مصممة لهذا الغرض، ويبقى Pairline في وضع السكون حتى يحدث شيء ما.</string>
+    <string name="help_q_notification">لماذا يظهر إشعار دائمًا؟</string>
+    <string name="help_a_notification">يفرض أندرويد على التطبيقات التي تعمل في الخلفية إظهار إشعار. ويُعلمك هذا الإشعار ما إذا كان آيفونك متصلًا، ولا يعرض أبدًا نصوص الرسائل أو الأرقام.</string>
+    <string name="help_q_distance">ما أقصى مسافة ممكنة بين الهاتفين؟</string>
+    <string name="help_a_distance">تقريبًا المسافة نفسها التي تعمل فيها سماعة بلوتوث: من ١٠ إلى ٣٠ مترًا عادةً داخل المباني، وأقل عبر الجدران السميكة.</string>
+
+    <string name="help_q_not_found">لا يستطيع آيفوني العثور على هذا الهاتف</string>
+    <string name="help_a_not_found">تأكد من تشغيل البلوتوث على كلا الهاتفين، ومن أن هذا التطبيق يعرض «في الانتظار» أو «غير مقترن» دون تحذيرات، ومن أن Pairline مفتوح على الآيفون. وإذا لم يتم الاتصال بعد ذلك، فأوقف البلوتوث ثم شغّله مجددًا على كلا الهاتفين.</string>
+    <string name="help_q_no_sms">لا تصل الرسائل إلى آيفوني</string>
+    <string name="help_a_no_sms">تأكد من السماح بإذن «الرسائل النصية» في «الأذونات»، ومن أن الشاشة الرئيسية تعرض «متصل». والرسائل التي تصل أثناء انقطاع الاتصال تظهر على الآيفون عند إعادة الاتصال.</string>
+    <string name="help_q_call_audio">أين أتحدث أثناء المكالمة؟</string>
+    <string name="help_a_call_audio">حاليًا، على هاتف أندرويد هذا. يمكنك الرد على المكالمات ورفضها وإنهاؤها من آيفونك، لكن صوت المكالمة يبقى على هاتف أندرويد. أما الصوت على الآيفون فهو ضمن خططنا.</string>
+    <string name="help_q_dtmf">لماذا لا يمكنني استخدام لوحة الأرقام أو كتم الصوت من آيفوني؟</string>
+    <string name="help_a_dtmf">لا يسمح أندرويد إلا لعدد قليل من التطبيقات بالتحكم في المكالمة الجارية. في معظم الهواتف، يستطيع Pairline الرد على المكالمات وإنهاءها، لكنه لا يستطيع إرسال نغمات لوحة الأرقام أو كتم الصوت. وعندما يسمح هاتفك بذلك، يستخدمه Pairline تلقائيًا.</string>
+    <string name="help_q_restricted">يعرض أندرويد رسالة «إعداد مقيّد»</string>
+    <string name="help_a_restricted">يقيّد أندرويد ١٣ والإصدارات الأحدث بعض الأذونات للتطبيقات المثبّتة من خارج متاجر التطبيقات. افتح معلومات تطبيق Pairline، واضغط على ⋮ في الأعلى واختر «السماح بالإعدادات المقيّدة»، ثم اسمح بالإذن مرة أخرى.</string>
+
+    <string name="help_q_perm_nearby">الأجهزة المجاورة (البلوتوث)</string>
+    <string name="help_a_perm_nearby">الاتصال بآيفونك. يُعلن Pairline عن نفسه بمعرّف مجهول فقط، وليس باسمك أو رقمك أبدًا، ولا يستخدم موقعك.</string>
+    <string name="help_q_perm_sms">الرسائل النصية</string>
+    <string name="help_a_perm_sms">لنقل الرسائل الواردة إلى آيفونك، وإرسال الرسائل التي تكتبها عليه، وتحميل سجل رسائلك عندما يطلبه الآيفون.</string>
+    <string name="help_q_perm_phone">المكالمات الهاتفية وشرائح SIM</string>
+    <string name="help_a_perm_phone">لرصد المكالمات، والرد عليها ورفضها وإنهائها وإجرائها نيابةً عن آيفونك، وتنفيذ رموز USSD، وعرض شرائحك وقوة الإشارة.</string>
+    <string name="help_q_perm_calllog">سجل المكالمات</string>
+    <string name="help_a_perm_calllog">لعرض رقم المتصل (في أندرويد ١٢ والإصدارات الأحدث لا يُتاح الرقم إلا بهذا الإذن)، وسجل مكالماتك، وما إذا كانت المكالمة فائتة أو مرفوضة.</string>
+    <string name="help_q_perm_contacts">جهات الاتصال</string>
+    <string name="help_a_perm_contacts">لعرض أسماء المتصلين وجهات اتصالك على الآيفون. أما كتابة جهات الاتصال فهي خيار منفصل، ويبقى متوقفًا ما لم تفعّله.</string>
+    <string name="help_q_perm_notif">الإشعارات</string>
+    <string name="help_a_perm_notif">لإشعار الحالة الذي يفرضه أندرويد على التطبيقات العاملة في الخلفية.</string>
+    <string name="help_q_perm_battery">تحسين البطارية</string>
+    <string name="help_a_perm_battery">يطلب Pairline من أندرويد، عبر نافذة أندرويد نفسها، ألا يوقفه مؤقتًا. ويمكنك تغيير ذلك في أي وقت من إعدادات أندرويد.</string>
+
+    <string name="help_q_data">إلى أين تذهب بياناتي؟</string>
+    <string name="help_a_data">إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. لا يملك Pairline أي خوادم، ولا يملك تطبيق الجسر إذنًا باستخدام الإنترنت.</string>
+    <string name="help_q_logs">ماذا يتضمن تقرير التشخيص؟</string>
+    <string name="help_a_logs">تفاصيل تقنية مثل الإصدارات والأذونات وأحداث الاتصال. وتُحذف منه أرقام الهواتف وعناوين البريد الإلكتروني والأسماء ونصوص الرسائل والمفاتيح. وترى التقرير كاملًا قبل أن تقرر مشاركته.</string>
+    <string name="help_q_unpair">ماذا يحدث عند إلغاء الإقران؟</string>
+    <string name="help_a_unpair">يحذف كل هاتف مفتاح الآخر، فلا يعود بإمكانهما التواصل. وتبقى رسائلك وجهات اتصالك في مكانها على هذا الهاتف.</string>
 </resources>

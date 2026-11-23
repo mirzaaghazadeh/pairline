@@ -84,11 +84,9 @@ class LinkService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_REFRESH) {
-            // Permissions or settings changed: re-check Bluetooth and the status.
-            ble?.let {
-                it.stop()
-                it.start()
-            }
+            // Permissions or settings may have changed. start() is a no-op while the GATT server runs, so a
+            // live connection isn't disturbed; it retries if Bluetooth wasn't usable before.
+            ble?.start()
             graph.status.refresh()
         }
         return START_STICKY

@@ -16,6 +16,9 @@ object Redactor {
     // Digit runs, in any script, that may be separated by spaces, dashes, dots or brackets.
     private val digits = Regex("""\+?\(?\p{Nd}[\p{Nd}\s\-.()/]*\p{Nd}""")
 
+    /** Our own timestamps ("2026-11-24 10:22"), which the digit rule would otherwise take for a number. */
+    private val timestamp = Regex("""^20\d{2}-[01]\d-[0-3]\d( [0-2]\d)?$""")
+
     /** Number sequences with at least this many digits are treated as phone numbers. */
     private const val MIN_PHONE_DIGITS = 6
 
@@ -25,8 +28,13 @@ object Redactor {
         out = mac.replace(out, "[mac]")
         out = token.replace(out, "[key]")
         out = digits.replace(out) { m ->
-            val count = m.value.count { Character.isDigit(it) }
-            if (count >= MIN_PHONE_DIGITS) "[number]" else m.value
+            val value = m.value.trimEnd()
+            val count = value.count { Character.isDigit(it) }
+            when {
+                count < MIN_PHONE_DIGITS -> m.value
+                timestamp.matches(value) -> m.value
+                else -> "[number]" + m.value.substring(value.length)
+            }
         }
         return out
     }
