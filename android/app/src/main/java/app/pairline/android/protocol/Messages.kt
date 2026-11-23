@@ -160,6 +160,53 @@ object JsonPager {
         return JsonPage(array, taken.size, more, taken.size - 1) to taken
     }
 
+    /**
+     * Pages a list sorted by time (either direction) whose cursor is a strict time bound (`before` / `after`).
+     * Items sharing one time are never split across pages: a page may go over [limit] to finish such a group,
+     * and if the byte budget would cut a group, the whole group moves to the next page (PROTOCOL.md
+     * clarifications). [sourceExhausted] says whether [items] holds everything that's left.
+     */
+    fun <T> pageByTime(
+        items: List<T>,
+        limit: Int,
+        sourceExhausted: Boolean,
+        time: (T) -> Long,
+        budgetBytes: Int = Proto.PAGE_BUDGET_BYTES,
+        encode: (T) -> JSONObject,
+    ): Pair<JsonPage, List<T>> {
+        class Taken<T>(val index: Int, val item: T, val json: JSONObject)
+        val taken = ArrayList<Taken<T>>()
+        var used = ENVELOPE_RESERVE
+        var i = 0
+        while (i < items.size) {
+            val item = items[i]
+            val lastTime = taken.lastOrNull()?.let { time(it.item) }
+            if (taken.size >= limit && time(item) != lastTime) break
+            val json = encode(item)
+            val size = utf8Length(json.toString()) + 1
+            if (size + ENVELOPE_RESERVE > budgetBytes) {
+                i++ // can never be sent; skip it
+                continue
+            }
+            if (used + size > budgetBytes) {
+                if (lastTime != null && time(item) == lastTime) {
+                    val groupStart = taken.indexOfFirst { time(it.item) == lastTime }
+                    if (groupStart > 0) {
+                        while (taken.size > groupStart) taken.removeAt(taken.lastIndex)
+                    }
+                }
+                break
+            }
+            taken += Taken(i, item, json)
+            used += size
+            i++
+        }
+        val consumed = taken.lastOrNull()?.let { it.index + 1 } ?: i
+        val more = consumed < items.size || !sourceExhausted
+        val array = JSONArray().apply { taken.forEach { put(it.json) } }
+        return JsonPage(array, taken.size, more, taken.size - 1) to taken.map { it.item }
+    }
+
     fun utf8Length(s: String): Int {
         var n = 0
         var i = 0

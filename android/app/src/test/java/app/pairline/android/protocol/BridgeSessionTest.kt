@@ -198,12 +198,21 @@ class BridgeSessionTest {
     }
 
     @Test
-    fun malformedPairHelloCloses() {
-        val rec = Recorder(null)
-        session(Gate(hex("pairing.pairing_secret")), rec)
-            .onFrame(frame(FrameType.PAIR_HELLO, "{\"t\":\"pair_hello\",\"v\":0}".toByteArray()))
-        assertNotNull(rec.closedReason)
-        assertTrue(rec.frames.isEmpty())
+    fun malformedPairHelloGetsBadMac() {
+        val badPoint = JSONObject(TestVectors.json.getJSONObject("pairing").getJSONObject("pair_hello_json").toString())
+            .put("k", B64u.encode(ByteArray(65).also { it[0] = 4 }))
+        for (body in listOf(
+            "{\"t\":\"pair_hello\",\"v\":0}",
+            "not json",
+            "{\"t\":\"pair_hello\",\"v\":1,\"k\":\"\",\"n\":\"\",\"mac\":\"\"}",
+            badPoint.toString(),
+        )) {
+            val gate = Gate(hex("pairing.pairing_secret"))
+            val rec = Recorder(null)
+            session(gate, rec).onFrame(frame(FrameType.PAIR_HELLO, body.toByteArray()))
+            assertPairFail(rec, "bad_mac")
+            assertEquals(0, gate.badMacs) // a malformed message doesn't count against the code
+        }
     }
 
     private fun assertPairFail(rec: Recorder, reason: String) {

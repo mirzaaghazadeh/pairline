@@ -159,6 +159,43 @@ class FramingAndMessagesTest {
         assertFalse(page.more)
     }
 
+    private data class Msg(val id: Int, val time: Long, val body: String = "x")
+
+    private fun page(items: List<Msg>, limit: Int, exhausted: Boolean = true, budget: Int = Proto.PAGE_BUDGET_BYTES) =
+        JsonPager.pageByTime(items, limit, exhausted, { it.time }, budget) { JSONObject().put("id", it.id).put("b", it.body) }
+
+    @Test
+    fun timePagerKeepsSameTimeGroupsTogetherOverTheLimit() {
+        val items = listOf(Msg(1, 50), Msg(2, 40), Msg(3, 30), Msg(4, 30), Msg(5, 30), Msg(6, 20))
+        val (p, taken) = page(items, limit = 3)
+        assertEquals(listOf(1, 2, 3, 4, 5), taken.map { it.id })
+        assertTrue(p.more)
+        val (p2, all) = page(items, limit = 10)
+        assertEquals(6, all.size)
+        assertFalse(p2.more)
+    }
+
+    @Test
+    fun timePagerMovesAGroupCutByTheBudgetToTheNextPage() {
+        val big = "y".repeat(900)
+        val items = listOf(Msg(1, 50, big), Msg(2, 40, big), Msg(3, 30, big), Msg(4, 30, big), Msg(5, 30, big))
+        // Room for about 3 items: the 30-group would be split, so the page ends after item 2.
+        val (p, taken) = page(items, limit = 100, budget = JsonPager.ENVELOPE_RESERVE + 3 * 930)
+        assertEquals(listOf(1, 2), taken.map { it.id })
+        assertTrue(p.more)
+        // Next page: "before = 40" gives the group, which now fits.
+        val (_, rest) = page(items.filter { it.time < 40 }, limit = 100, budget = JsonPager.ENVELOPE_RESERVE + 3 * 930)
+        assertEquals(listOf(3, 4, 5), rest.map { it.id })
+    }
+
+    @Test
+    fun timePagerReportsMoreWhenTheSourceWasCutShort() {
+        val items = listOf(Msg(1, 50), Msg(2, 40))
+        assertTrue(page(items, limit = 10, exhausted = false).first.more)
+        assertFalse(page(items, limit = 10, exhausted = true).first.more)
+        assertFalse(page(emptyList(), limit = 10).first.more)
+    }
+
     @Test
     fun utf8LengthCountsMultibyte() {
         assertEquals(1, JsonPager.utf8Length("a"))

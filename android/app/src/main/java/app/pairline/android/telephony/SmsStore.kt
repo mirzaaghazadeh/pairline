@@ -103,8 +103,10 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
         }
         val order = if (after != null) "${Telephony.Sms.DATE} ASC" else "${Telephony.Sms.DATE} DESC"
         val slots = slotMap()
-        val rows = query(where.toString(), args.toTypedArray(), "$order LIMIT ${limit + 1}")
-        val (page, _) = JsonPager.page(rows.iterator(), limit) { it.toJson(slots[it.subId]) }
+        // Extra rows so a group of messages with the same time can be kept together on one page.
+        val fetch = limit + SAME_TIME_SLACK
+        val rows = query(where.toString(), args.toTypedArray(), "$order, ${Telephony.Sms._ID} ASC LIMIT $fetch")
+        val (page, _) = JsonPager.pageByTime(rows, limit, rows.size < fetch, { it.time }) { it.toJson(slots[it.subId]) }
         return JSONObject()
             .put("t", Msg.SMS_HISTORY)
             .put("id", id)
@@ -132,8 +134,8 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
                 c.getString(1)?.takeIf { it.isNotBlank() }?.let { if (agg.addrs.size < 10) agg.addrs += it }
             }
         }
-        val candidates = all.values.asSequence().filter { before == null || it.time < before }.iterator()
-        val (page, _) = JsonPager.page(candidates, limit) { it.toJson() }
+        val candidates = all.values.filter { before == null || it.time < before }
+        val (page, _) = JsonPager.pageByTime(candidates, limit, sourceExhausted = true, time = { it.time }) { it.toJson() }
         return JSONObject()
             .put("t", Msg.SMS_THREADS)
             .put("id", id)
@@ -183,6 +185,10 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
         status = if (c.isNull(6)) Telephony.Sms.STATUS_NONE else c.getInt(6),
         subId = if (c.isNull(7)) -1 else c.getInt(7),
     )
+
+    private companion object {
+        const val SAME_TIME_SLACK = 200
+    }
 
     private class ThreadAgg(val thread: Long, val snippet: String, val time: Long) {
         val addrs = LinkedHashSet<String>()

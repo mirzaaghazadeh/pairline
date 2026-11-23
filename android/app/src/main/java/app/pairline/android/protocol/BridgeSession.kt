@@ -96,13 +96,18 @@ class BridgeSession(
 
     private fun onPairHello(body: ByteArray) {
         if (state != State.AWAIT_FIRST) throw ProtocolException("pair_hello in the wrong state")
-        val hello = PairHello.parse(body)
+        // Malformed pair_hello (bad JSON, version, lengths or a point off the curve) gets bad_mac
+        // (PROTOCOL.md clarifications), without touching the code on screen.
+        val hello = try {
+            PairHello.parse(body).also { P256.decodePublicKey(it.remotePublicKey) }
+        } catch (_: ProtocolException) {
+            return refusePairing(PairFailReason.BAD_MAC)
+        }
         val secret = when (val claim = pairing.claim()) {
             is PairingClaim.Refused -> return refusePairing(claim.reason)
             is PairingClaim.Granted -> claim.secret
         }
         try {
-            P256.decodePublicKey(hello.remotePublicKey) // reject keys that aren't on the curve
             val t = PairingCrypto.transcript(identity.publicKey, hello.remotePublicKey, hello.nonce)
             if (!constantTimeEquals(PairingCrypto.remoteMac(secret, t), hello.mac)) {
                 pairing.onBadMac()
