@@ -207,6 +207,8 @@ class LinkManager(
         override fun onPaired() {
             prefs.clearPeer()
             prefs.pairedAt = clock()
+            // A new iPhone replaces the old one: drop every other connection, including an established one.
+            entries.filterKeys { it != connection }.values.toList().forEach { it.session.close("another iPhone paired") }
         }
 
         override fun onEstablished() {

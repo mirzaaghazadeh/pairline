@@ -98,8 +98,9 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
             resolver.query(
                 ContactsContract.DeletedContacts.CONTENT_URI,
                 arrayOf(ContactsContract.DeletedContacts.CONTACT_ID, ContactsContract.DeletedContacts.CONTACT_DELETED_TIMESTAMP),
-                "${ContactsContract.DeletedContacts.CONTACT_DELETED_TIMESTAMP} > ?",
-                arrayOf(start.deletedAt.toString()),
+                // Numbers inline (they're Longs): a "?" argument is text, and provider views may compare it as text.
+                "${ContactsContract.DeletedContacts.CONTACT_DELETED_TIMESTAMP} > ${start.deletedAt}",
+                null,
                 "${ContactsContract.DeletedContacts.CONTACT_DELETED_TIMESTAMP} ASC",
             )?.use { c ->
                 while (c.moveToNext() && deleted.length() < MAX_DELETED) {
@@ -119,9 +120,10 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
                 ContactsContract.Contacts.STARRED,
                 ContactsContract.Contacts.CONTACT_LAST_UPDATED_TIMESTAMP,
             ),
-            "(${ContactsContract.Contacts.CONTACT_LAST_UPDATED_TIMESTAMP} > ?) OR " +
-                "(${ContactsContract.Contacts.CONTACT_LAST_UPDATED_TIMESTAMP} = ? AND ${ContactsContract.Contacts._ID} > ?)",
-            arrayOf(start.updatedAt.toString(), start.updatedAt.toString(), start.contactId.toString()),
+            "(${ContactsContract.Contacts.CONTACT_LAST_UPDATED_TIMESTAMP} > ${start.updatedAt}) OR " +
+                "(${ContactsContract.Contacts.CONTACT_LAST_UPDATED_TIMESTAMP} = ${start.updatedAt} AND " +
+                "${ContactsContract.Contacts._ID} > ${start.contactId})",
+            null,
             "${ContactsContract.Contacts.CONTACT_LAST_UPDATED_TIMESTAMP} ASC, ${ContactsContract.Contacts._ID} ASC",
         )?.use { c ->
             while (c.moveToNext() && rows.size <= CHUNK) {
@@ -211,8 +213,8 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
                 CallLog.Calls.DURATION,
                 CallLog.Calls.PHONE_ACCOUNT_ID,
             ),
-            "${CallLog.Calls._ID} > ?",
-            arrayOf(after.toString()),
+            "${CallLog.Calls._ID} > $after",
+            null,
             "${CallLog.Calls._ID} ASC",
         )?.use { c ->
             while (c.moveToNext() && rows.size <= CHUNK) {

@@ -87,25 +87,16 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
     fun history(id: Long, thread: Long?, before: Long?, after: Long?, limit: Int): JSONObject {
         requireRead()
         if (before != null && after != null) throw RequestException(ErrorCode.INVALID, "use before or after, not both")
+        // Numbers are inlined (they're Longs): "?" arguments are text, which some providers compare as text.
         val where = StringBuilder("${Telephony.Sms.TYPE} != ${Telephony.Sms.MESSAGE_TYPE_DRAFT}")
-        val args = ArrayList<String>()
-        if (thread != null) {
-            where.append(" AND ${Telephony.Sms.THREAD_ID} = ?")
-            args += thread.toString()
-        }
-        if (before != null) {
-            where.append(" AND ${Telephony.Sms.DATE} < ?")
-            args += before.toString()
-        }
-        if (after != null) {
-            where.append(" AND ${Telephony.Sms.DATE} > ?")
-            args += after.toString()
-        }
+        if (thread != null) where.append(" AND ${Telephony.Sms.THREAD_ID} = $thread")
+        if (before != null) where.append(" AND ${Telephony.Sms.DATE} < $before")
+        if (after != null) where.append(" AND ${Telephony.Sms.DATE} > $after")
         val order = if (after != null) "${Telephony.Sms.DATE} ASC" else "${Telephony.Sms.DATE} DESC"
         val slots = slotMap()
         // Extra rows so a group of messages with the same time can be kept together on one page.
         val fetch = limit + SAME_TIME_SLACK
-        val rows = query(where.toString(), args.toTypedArray(), "$order, ${Telephony.Sms._ID} ASC LIMIT $fetch")
+        val rows = query(where.toString(), "$order, ${Telephony.Sms._ID} ASC LIMIT $fetch")
         val (page, _) = JsonPager.pageByTime(rows, limit, rows.size < fetch, { it.time }) { it.toJson(slots[it.subId]) }
         return JSONObject()
             .put("t", Msg.SMS_HISTORY)
@@ -147,8 +138,7 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
     fun findIncoming(address: String, body: String, notBefore: Long): SmsRow? {
         if (!Perms.granted(context, Manifest.permission.READ_SMS)) return null
         val rows = query(
-            "${Telephony.Sms.TYPE} = ${Telephony.Sms.MESSAGE_TYPE_INBOX} AND ${Telephony.Sms.DATE} >= ?",
-            arrayOf(notBefore.toString()),
+            "${Telephony.Sms.TYPE} = ${Telephony.Sms.MESSAGE_TYPE_INBOX} AND ${Telephony.Sms.DATE} >= $notBefore",
             "${Telephony.Sms.DATE} DESC LIMIT 20",
         )
         return rows.firstOrNull { it.body == body && PhoneNumbers.sameNumber(it.address, address) }
@@ -158,8 +148,7 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
     fun findSent(address: String, body: String, notBefore: Long): SmsRow? {
         if (!Perms.granted(context, Manifest.permission.READ_SMS)) return null
         val rows = query(
-            "${Telephony.Sms.TYPE} != ${Telephony.Sms.MESSAGE_TYPE_INBOX} AND ${Telephony.Sms.DATE} >= ?",
-            arrayOf(notBefore.toString()),
+            "${Telephony.Sms.TYPE} != ${Telephony.Sms.MESSAGE_TYPE_INBOX} AND ${Telephony.Sms.DATE} >= $notBefore",
             "${Telephony.Sms.DATE} DESC LIMIT 20",
         )
         return rows.firstOrNull { it.body == body && PhoneNumbers.sameNumber(it.address, address) }
@@ -167,9 +156,9 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
 
     fun slotMap(): Map<Int, Int> = sims.activeSubscriptions().associate { it.subscriptionId to it.simSlotIndex }
 
-    private fun query(selection: String, args: Array<String>, order: String): List<SmsRow> {
+    private fun query(selection: String, order: String): List<SmsRow> {
         val out = ArrayList<SmsRow>()
-        context.contentResolver.query(Telephony.Sms.CONTENT_URI, projection, selection, args, order)?.use { c ->
+        context.contentResolver.query(Telephony.Sms.CONTENT_URI, projection, selection, null, order)?.use { c ->
             while (c.moveToNext()) out += row(c)
         }
         return out

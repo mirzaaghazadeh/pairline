@@ -304,3 +304,31 @@ example next to an Android emulator's `adb forward`), `-PairlinePairLink` (the U
 system alert), `-PairlineDemo`, `-PairlineTab`, `-PairlineThread`, `-PairlineDemoCall`, `-PairlinePaywall` and
 `-PairlineOnboardingPage` (screenshots). All of it is behind `#if DEBUG`; CI fails if any of these names or the TCP
 transport appear in the Release binary.
+
+### D-030 — Android call control without the companion call role (2026-11-24)
+
+**Finding (M3 spike, API 36 emulator):** Telecom finds Pairline's companion `InCallService` but skips binding it
+("control: false") unless the app holds `MANAGE_ONGOING_CALLS`, a signature|appop|role permission. iTell grants
+that app-op through shell (`itell-lessons.md`). With the app-op allowed by hand, the service binds and answer,
+decline, end, DTMF, mute and speaker all work.
+**What the bridge does now:** it watches calls through per-SIM telephony callbacks (the caller's number comes from
+the `PHONE_STATE` broadcast with `READ_CALL_LOG` on Android 12+), answers with `TelecomManager.acceptRingingCall` and
+declines/ends with `TelecomManager.endCall` (`ANSWER_PHONE_CALLS`). DTMF, mute and speaker answer `unsupported`, and
+`call.dtmf` / `call.audio` stay out of `status.caps` until the companion service has been bound once on that phone.
+The release manifest doesn't declare `MANAGE_ONGOING_CALLS`; the debug manifest does, for testing.
+**Open for the maintainer:** whether release builds should declare it and offer an opt-in way to grant it (the
+Shizuku module, D-009, with the user's explicit action, AGENTS.md rules 5 and 7), or wait for M6. Real phones from
+several makers still need testing.
+
+### D-031 — Android bridge UI choices (2026-11-24)
+
+- **Brand palette, not wallpaper colors:** Material 3 with the shared brand colors in light and dark, so the bridge
+  looks like the iPhone app and the website.
+- **Animated illustrations instead of setup videos (for now):** each wizard step has a Compose-drawn, animated
+  illustration. The bundled picture-in-picture videos (ROADMAP M1) still need to be recorded.
+- **Persian dates use the Solar Hijri calendar;** Arabic uses the locale's default. Phone numbers, codes, versions and
+  the diagnostics report stay left to right in every language.
+- **Pairing QR:** release builds set `FLAG_SECURE` on the pairing screen, so the code can't be captured by screen
+  recording or appear in the recent-apps preview; debug builds allow screenshots for docs.
+- **Maker tips only open screens:** the Xiaomi, Oppo/Realme/OnePlus, Vivo and Huawei/Honor settings screens are opened
+  by component name when they exist, otherwise App info. Pairline never changes those settings (AGENTS.md rule 5).
