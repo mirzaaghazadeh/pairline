@@ -57,7 +57,8 @@ one, stop and ask the maintainer instead of working around it.
 - The Android app is free: no license checks, paywalls, accounts or purchase code.
 - All payments happen in the iOS app via **StoreKit 2**. Entitlements are verified on the device
   from Apple-signed transactions; there is no receipt server.
-- The free/paid feature split is an open decision: `docs/DECISIONS.md` (D-008).
+- iOS pricing: 3 free days through a free "3-day Trial" item, then a one-time $11.99 purchase (D-017).
+  Demo mode is always free (D-020).
 
 ## Tech stack
 
@@ -115,7 +116,10 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 
 - macOS with Xcode 27.2, JDK 17, Gradle and XcodeGen (Homebrew)
 - Android SDK at `~/Library/Android/sdk` (platforms 33 and 36; build-tools 33.0.1, 35.0.0, 36.0.0)
-- Telephony, Bluetooth and calls need **real devices**; simulators and emulators can't test them.
+- Bluetooth, real carrier SMS/calls and CallKit need **real devices**. Everything above the transport can be
+  tested on the Android emulator and the iOS Simulator through the debug-only TCP link (D-018):
+  `adb forward tcp:47800 tcp:47800`, then fake SMS and calls with `adb emu sms send <number> <text>` and
+  `adb emu gsm call <number>`.
 
 ## Working agreements
 
@@ -124,9 +128,16 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 - Record decisions in `docs/DECISIONS.md` (append-only, dated). Don't silently reverse one; add a
   new entry that supersedes it.
 - Both apps implement `docs/PROTOCOL.md`; shared test vectors in `protocol/` must pass on both.
-- User-visible strings in English and Persian (RTL) from the start.
+- User-visible strings in English, Persian and Arabic from the start (D-019). Persian and Arabic are
+  right-to-left; check every screen mirrored, with phone numbers and codes kept left-to-right.
 - Small, reviewable commits. Never commit secrets, signing keys, keystores, `.env` files or
   provisioning profiles.
+- **Commit and push as you go.** After each finished, building piece of work, commit it and push to
+  `origin` (`github.com/mirzaaghazadeh/pairline`, private until D-014's conditions are met). Don't
+  hold a long session's work back for one big commit at the end. Check that the build and tests pass
+  before each push; CI (`.github/workflows/`) runs on every push to `main`.
+- The website and its backend (`pairline.navid.tr`) live in a separate private repo, `pairline-web`,
+  never in this one. The apps never call it (rule 2).
 
 ## Open items before the first public release
 

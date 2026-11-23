@@ -68,7 +68,7 @@ updates, so decide before M7.
 - **Paid:** call audio on the iPhone, USSD, contacts and call-log sync, widgets; later remote mode and the Mac app.
 
 **Pricing model:** one-time purchase vs subscription is undecided. A subscription fits only if there's an ongoing cost, such as a relay.
-**Status:** open — decide in M7.
+**Status:** superseded by D-017 (2026-11-24).
 
 ### D-009 — Privileged access through Shizuku; root optional (2026-11-24)
 
@@ -152,3 +152,70 @@ CI uses the GitHub Actions `actions/checkout`, `actions/setup-java`, `actions/up
 `gradle/actions/setup-gradle` (all MIT), pinned to commit SHAs.
 
 `compileSdk` is 37 because current AndroidX requires it. `targetSdk` stays 36 and `minSdk` stays 30 (D-004).
+
+### D-017 — iOS pricing: 3 free days, then a one-time $11.99 purchase (2026-11-24)
+
+**Supersedes D-008** and the M7 roadmap item "free trial through a StoreKit introductory offer" (introductory offers
+exist only for subscriptions).
+
+**Model:** the whole app is free to use for 3 days. After that the user buys Pairline once for **$11.99** (no
+subscription) to keep using it. The Android bridge app stays free (D-005).
+
+**How, within App Review guideline 3.1.1:** non-subscription apps offer a time-based trial through a free
+non-consumable in-app purchase named "XX-day Trial". Two non-consumable products:
+
+| Product ID (provisional, D-007) | Reference name | Price |
+|---|---|---|
+| `app.pairline.ios.trial3day` | 3-day Trial | Free (Tier 0) |
+| `app.pairline.ios.full` | Pairline Full Access | $11.99 |
+
+- **Before the trial starts,** the paywall states the duration, what stops working afterwards, and the price.
+- **Trial clock:** starts at the trial transaction's Apple-signed `originalPurchaseDate`, so it's verified on the
+  device, survives reinstalling, and needs no server. To resist turning the clock back, the app uses the later of
+  the device time and the newest Apple-signed date it has seen, stored in the Keychain.
+- **During the trial:** everything works. The app shows the days left and sends a local reminder about 24 hours
+  before the end.
+- **After the trial without a purchase:** the link features stop (sending SMS, calls, sync, USSD). Already-synced
+  messages stay readable. Demo mode, help, settings, Restore Purchases and unpair always work.
+- **Full purchase:** unlocks everything for good, verified from `Transaction.currentEntitlements`. Family Sharing
+  can be turned on in App Store Connect; the code accepts family-shared entitlements.
+- **Local testing:** `ios/Pairline/Store/Pairline.storekit` (StoreKit configuration file), no Apple servers.
+
+### D-018 — Debug-only TCP transport for simulator and emulator testing (2026-11-24)
+
+The iOS Simulator has no Bluetooth, so both apps get a TCP transport that exists **only in debug builds**
+(PROTOCOL.md, "TCP"). The Android debug build listens on `127.0.0.1:47800` in the emulator; `adb forward` connects
+it to the iOS Simulator. Pairing, handshake and records are identical to BLE, so everything above the transport is
+tested for real.
+- Android: the TCP code and the `INTERNET` permission live only in the `debug` source set. The release APK still
+  has no `INTERNET` permission, and CI checks this on every build (`android-policy-check.sh`).
+- iOS: the TCP code is behind `#if DEBUG`.
+- The iPhone debug build accepts a pasted or opened `pairline://pair` link, since the Simulator has no camera.
+  Release builds pair only by scanning.
+- The Android debug build exposes test helpers (current pairing link, fake data) through a debug-only content
+  provider, never in release.
+
+### D-019 — Languages at launch: English, Persian, Arabic (2026-11-24)
+
+Both apps ship in English, Persian and Arabic. Persian and Arabic are right-to-left: layouts mirror, and phone
+numbers and codes stay left-to-right. Translations are written in-house and need a native-speaker review before
+release. Later candidates: Turkish, Urdu, Chinese, Indonesian.
+
+### D-020 — Demo mode on the iPhone (2026-11-24)
+
+Anyone can explore the iPhone app without a bridge phone and without paying: a simulated bridge with sample
+conversations, calls, contacts and status, in the user's language. Demo data never mixes with real data, is clearly
+labeled, and can be left at any time. It also lets App Review see the app working without two phones.
+
+### D-021 — Website and its backend live in a separate private repo (2026-11-24)
+
+`pairline.navid.tr` hosts the landing page (what Pairline is, screenshots, why it exists, how to use it, download
+buttons), the privacy policy and support pages the App Store requires, and a small Node.js + PostgreSQL backend,
+deployed with Docker Compose on Coolify. It lives in the private repo `pairline-web`, not in this one.
+**The apps never call it** (AGENTS.md rule 2): no update checks, accounts or telemetry. The site itself uses no
+third-party trackers.
+
+### D-022 — iOS CI runs on demand while the repo is private (2026-11-24)
+
+GitHub bills macOS runner minutes at 10× on private repos. Until the repo is public (D-014), `ios.yml` runs on pull
+requests and manually (`workflow_dispatch`), not on every push. Switch it to every push when the repo goes public.
