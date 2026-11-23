@@ -239,6 +239,38 @@ Gaps found while implementing the iPhone app (2026-11-24). Both apps follow thes
   progress, a length mismatch, or more than 65,535 bytes) close the connection.
 - **Debug TCP** accepts one connection at a time; a new connection replaces the old one.
 
+Found while implementing the Android bridge (2026-11-24). Additive only; the wire format is unchanged.
+
+- **Frames** of length 0 (no type byte) close the connection, on both transports.
+- **Ids in each direction are separate.** B numbers its own `ping` requests independently of R's request ids. A
+  `ping` is never a reply, so the two spaces can't be confused. R answers every `ping` from B with `pong`.
+- **Keep-alive on B:** B sends `ping` after 60 s without receiving anything and closes the link after 180 s of
+  silence. B also closes a connection that hasn't finished the handshake within 30 s.
+- **Debug TCP has no `id` characteristic,** so R can't check the device id there before pairing (debug builds only).
+- **`device.info` from B:** `name` is the generic model, `"<maker> <model>"` (for example `"Google Pixel 7"`), never
+  the user-chosen device name.
+- **`status.sims[]`:** `number` is null when Android doesn't know it; `label` falls back to `"SIM <slot + 1>"`;
+  `signal` is 0 and `net` is `"none"` when the SIM has no service.
+- **`error.msg`** is short English text for developers. It never contains user content; R shouldn't show it as is.
+- **`sms.new` keys:** `msg.key` is `"sms:<id>"` once Android's messaging app has stored the message (B waits up to
+  3 s). If it isn't stored by then, or `READ_SMS` is missing, B sends `"rx:<time>"` with `thread: null`, and R
+  should treat a later history entry with the same `addr` and `body` within ±60 s as the same message.
+- **`sms.state`:** `key` is the stored message's key once known, else null; `error` is a short English reason on
+  `failed`, else null. A multipart SMS is `sent` once every part is sent and `delivered` once every part is.
+- **`ussd.run`:** the reply is `ussd.result` with the request's `id` (no `ok` first). Problems found before the code
+  reaches the network (permission, invalid code, no SIM in that slot) are answered with `error` instead. B gives up
+  after 55 s with `{"ok": false, "error": "timeout"}`.
+- **`call.*` events:** call ids are strings chosen by B (like `"c7uekrq-3"`), unique across bridge app restarts.
+  `call.incoming` is always followed by `call.state` `ringing` for the same call. `call.state` also carries `sim`.
+  After a reconnect, B re-sends `call.incoming` / `call.state` for calls still in progress. Without the companion
+  InCallService (most phones, see ROADMAP M3), an outgoing call stays `dialing` until it ends, and `call.dtmf` /
+  `call.audio` answer `error` / `unsupported`.
+- **`contacts.sync` / `calllog.sync` replies** also carry `full` (boolean). `full: true` starts a full sync: R
+  replaces its copy with this page and the ones that follow until `more: false`. B starts a full sync when `since`
+  is null or older than Android's 30-day deletion log. `deleted` holds contact keys (`"c:<id>"`). Cursors are
+  opaque strings.
+- **`contacts.add`** answers `error` / `permission` while the user hasn't turned the option on in the bridge app.
+
 ## Test vectors
 
 `protocol/test-vectors/v0.json` holds fixed keys and inputs with the expected ECDH results, HKDF outputs, pairing
