@@ -194,6 +194,45 @@ version supports it. The iPhone hides or explains anything missing instead of gu
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
 `call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`
 
+### Clarifications (v0)
+
+Gaps found while implementing the iPhone app (2026-11-24). Both apps follow these; they don't change the wire format.
+
+- **Handshake order.** Each side sends its confirm as soon as it has both hellos. A side sends application messages
+  (counter ≥ 1) only after it has received and verified the peer's confirm. After a successful pairing, R sends its
+  `HELLO` on the same connection right after it has verified `PAIR_OK`.
+- **Hello checks.** A hello whose length isn't 99, whose version isn't 0, whose role isn't the expected peer role, or
+  whose public key isn't a valid P-256 point closes the connection.
+- **Absent = null.** An optional field may be left out; a missing field means `null`. Senders still write `"sim": null`
+  explicitly for "default SIM".
+- **Opaque ids.** `call` ids and the `contacts.sync` / `calllog.sync` `cursor` are opaque JSON values (string or
+  number). R stores them and sends them back unchanged.
+- **Unknown requests.** B ignores unknown event types, but answers a message with an unknown `t` that carries an `id`
+  with `error` / `unsupported`, so R doesn't wait for a timeout.
+- **`ping` from B.** Either side may send `ping` with an `id`; the receiver answers `pong` with the same `id`.
+  `unpair` is `{"t":"unpair"}` with no `id`; the sender closes the link right after sending it.
+- **Timeouts.** R gives up on a request after 15 s (`ussd.run`: 60 s) and keeps the connection. R treats a link on which
+  nothing arrived for 180 s (three missed `status` intervals) as dead and reconnects.
+- **Paging.** Times are the cursors:
+  - `sms.threads`: threads whose newest message is older than `before` (or all, when `before` is null), newest first,
+    at most `limit` (default 50).
+  - `sms.history` with `before`: messages with `time < before`, newest first. With `after`: messages with
+    `time > after`, oldest first. `limit` defaults to 50, at most 100. With `thread: null` it covers all threads.
+  - A page may hold fewer than `limit` items and still say `more: true` (the 30 KB page limit). R continues from the
+    oldest (`before`) or newest (`after`) time in the page and de-duplicates by `key`.
+- **`sms.send`.** `to` is one address (no group messages in v0); `cid` is unique per R install. B answers `ok` once
+  the message is handed to the radio queue, then sends `sms.state` events with the same `cid`. Long messages are
+  split by B (multipart SMS); R sends the whole text.
+- **`sms.threads` items.** `addrs` is an array of address strings, `snippet` the newest message's text, `time` its
+  time, `count` the number of messages in the thread.
+- **`contacts.add`.** `numbers` uses the Contact shape: `[{"n": "+1555…", "label": "mobile"}]`.
+- **`call.state` `since`** is when the call entered that state (ms). `call.dial` replies `ok` once the call is placed;
+  the new call's id arrives in the following `call.state` (`dir: "out"`).
+- **`device.info` from R:** `name` is the generic device model ("iPhone"), never the user-chosen device name.
+- **BLE reassembly errors** (a non-first fragment without a frame in progress, a first fragment while one is in
+  progress, a length mismatch, or more than 65,535 bytes) close the connection.
+- **Debug TCP** accepts one connection at a time; a new connection replaces the old one.
+
 ## Test vectors
 
 `protocol/test-vectors/v0.json` holds fixed keys and inputs with the expected ECDH results, HKDF outputs, pairing
