@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+// Shared protocol test vectors (docs/PROTOCOL.md). Unit tests must reproduce every value.
+val protocolVectors: File = file("../../protocol/test-vectors/v0.json")
+
 android {
     namespace = "app.pairline.android"
     // AndroidX now needs compileSdk 37. This only sets the APIs we compile against;
@@ -18,6 +21,12 @@ android {
         // Raise versionCode for every release.
         versionCode = 1
         versionName = "0.1.0"
+    }
+
+    androidResources {
+        // The app ships in English, Persian and Arabic (D-019). Dropping the other languages that
+        // libraries bring along keeps every screen in one language.
+        localeFilters += listOf("en", "fa", "ar")
     }
 
     buildTypes {
@@ -45,6 +54,14 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    testOptions {
+        unitTests.all {
+            it.systemProperty("pairline.vectors", protocolVectors.absolutePath)
+            it.inputs.file(protocolVectors).withPropertyName("protocolVectors")
+        }
     }
 
     // Don't embed Google's encrypted dependency report in the APK: users can't read it.
@@ -61,5 +78,11 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.zxing.core)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.org.json)
 }

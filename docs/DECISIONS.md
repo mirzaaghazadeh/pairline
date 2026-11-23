@@ -219,3 +219,22 @@ third-party trackers.
 
 GitHub bills macOS runner minutes at 10× on private repos. Until the repo is public (D-014), `ios.yml` runs on pull
 requests and manually (`workflow_dispatch`), not on every push. Switch it to every push when the repo goes public.
+
+### D-023 — Android dependencies for M1–M4 (2026-11-24)
+
+Added to `android/gradle/libs.versions.toml`. None of them makes network calls of its own, and the release APK
+still has no `INTERNET` permission (checked by CI).
+
+| Library | Why | License |
+|---------|-----|---------|
+| `com.google.zxing:core` 3.5.4 | Draws the pairing QR code. Only the `core` encoder; not the camera/Android parts | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-coroutines-android` 1.9.0 | Background work in the link service and telephony code. Was already on the classpath through Compose; now declared | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-runtime-compose` 2.10.0 | Lifecycle-aware state collection in Compose screens. Also already pulled in by Compose | Apache-2.0 |
+| `junit:junit` 4.13.2 (tests only) | Unit tests | EPL-1.0 |
+| `org.json:json` (tests only) | JVM unit tests need a real `org.json`; Android's `android.jar` only has stubs. The app itself uses the platform's built-in `org.json` | Public domain |
+
+**JSON:** messages use the platform's `org.json` instead of kotlinx.serialization: no extra runtime library, no
+compiler plugin, and it ignores unknown fields as PROTOCOL.md requires.
+**Icons:** drawn as our own vector drawables instead of adding `material-icons-extended`.
+**No navigation or DI library:** a small state-based navigator and a hand-written service locator are enough for
+one activity and one service.
