@@ -1086,18 +1086,16 @@ class Bridge:
     def req_contacts_sync(self, link, msg):
         since = msg.get("since")
         contacts, deleted, cursor, more = self.store.contacts_page(since)
-        reply = {"t": "contacts.sync", "contacts": contacts, "deleted": deleted, "cursor": cursor, "more": more}
-        if since is not None and self.store.parse_cursor("c", since) is None:
-            reply["reset"] = True  # PROTOCOL.md: an unknown cursor restarts with a full sync
-        return reply
+        # PROTOCOL.md: a null or unknown cursor restarts with a full sync, marked "full".
+        full = since is None or self.store.parse_cursor("c", since) is None
+        return {"t": "contacts.sync", "contacts": contacts, "deleted": deleted, "cursor": cursor, "more": more,
+                "full": full}
 
     def req_calllog_sync(self, link, msg):
         since = msg.get("since")
         calls, cursor, more = self.store.calllog_page(since)
-        reply = {"t": "calllog.sync", "calls": calls, "cursor": cursor, "more": more}
-        if since is not None and self.store.parse_cursor("l", since) is None:
-            reply["reset"] = True
-        return reply
+        full = since is None or self.store.parse_cursor("l", since) is None
+        return {"t": "calllog.sync", "calls": calls, "cursor": cursor, "more": more, "full": full}
 
     def req_contacts_add(self, link, msg):
         name, numbers = arg_str(msg, "name").strip(), msg.get("numbers") or []

@@ -70,7 +70,10 @@ enum OpaqueValue: Codable, Hashable, CustomStringConvertible {
 struct LossyList<Element: Decodable>: Decodable {
     let elements: [Element]
 
-    private struct Skip: Decodable {}
+    /// Accepts any JSON value, so the container moves past an element that didn't decode.
+    private struct Skip: Decodable {
+        init(from decoder: Decoder) throws {}
+    }
 
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
@@ -78,8 +81,8 @@ struct LossyList<Element: Decodable>: Decodable {
         while !container.isAtEnd {
             if let element = try? container.decode(Element.self) {
                 out.append(element)
-            } else {
-                _ = try? container.decode(Skip.self)
+            } else if (try? container.decode(Skip.self)) == nil {
+                break
             }
         }
         elements = out
@@ -207,15 +210,15 @@ struct ContactsSyncReply {
     var deleted: [String]
     var cursor: OpaqueValue?
     var more: Bool
-    /// The bridge didn't know our cursor and restarts from the beginning: drop the cache first.
-    var reset = false
+    /// A full sync from the beginning (`full: true`): replace the cached copy, once per sync run.
+    var full = false
 }
 
 struct CallLogSyncReply {
     var calls: [CallLogRecord]
     var cursor: OpaqueValue?
     var more: Bool
-    var reset = false
+    var full = false
 }
 
 // MARK: - Inbound
@@ -275,13 +278,13 @@ struct Inbound {
         var deleted: LossyList<String>?
         var cursor: OpaqueValue?
         var more: Bool?
-        var reset: Bool?
+        var full: Bool?
     }
     private struct CallLogBody: Decodable {
         var calls: LossyList<CallLogRecord>?
         var cursor: OpaqueValue?
         var more: Bool?
-        var reset: Bool?
+        var full: Bool?
     }
     private struct USSDBody: Decodable { var ok: Bool?; var text: String?; var error: String? }
 
@@ -320,11 +323,11 @@ struct Inbound {
             let b = try body(ContactsBody.self)
             message = .contactsSync(ContactsSyncReply(contacts: b.contacts?.elements ?? [],
                                                       deleted: b.deleted?.elements ?? [],
-                                                      cursor: b.cursor, more: b.more ?? false, reset: b.reset ?? false))
+                                                      cursor: b.cursor, more: b.more ?? false, full: b.full ?? false))
         case "calllog.sync":
             let b = try body(CallLogBody.self)
             message = .calllogSync(CallLogSyncReply(calls: b.calls?.elements ?? [], cursor: b.cursor,
-                                                    more: b.more ?? false, reset: b.reset ?? false))
+                                                    more: b.more ?? false, full: b.full ?? false))
         case "ussd.result":
             let b = try body(USSDBody.self)
             message = .ussdResult(USSDResult(ok: b.ok ?? false, text: b.text, error: b.error))

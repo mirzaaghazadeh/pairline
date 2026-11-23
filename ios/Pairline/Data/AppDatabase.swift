@@ -109,6 +109,17 @@ final class AppDatabase: ObservableObject {
             if thread >= 0 { try adoptSyntheticThread(for: m.addr, into: thread) }
             return false
         }
+        // An incoming SMS announced before Android stored it ("rx:<time>", PROTOCOL.md) and its stored copy are the
+        // same message when address and text match within 60 s.
+        if m.box == "in", let twin = try sameIncoming(m) {
+            if m.key.hasPrefix("rx:") { return false }
+            if twin.hasPrefix("rx:") {
+                try db.execute("UPDATE messages SET key = ?, thread = ?, time = ? WHERE key = ?",
+                               [.text(m.key), .int(thread), .int(m.time), .text(twin)])
+                if thread >= 0 { try adoptSyntheticThread(for: m.addr, into: thread) }
+                return false
+            }
+        }
         // A message we sent that the bridge stored before telling us its key: replace the local copy.
         if m.box == "out", let local = try db.query("""
             SELECT key FROM messages WHERE key LIKE 'local:%' AND body = ? AND box = 'out'
@@ -125,17 +136,33 @@ final class AppDatabase: ObservableObject {
             """, [.text(m.key), .int(thread), .text(m.addr), .text(m.body), .int(m.time), .text(m.box),
                   .from(m.sim), .text(state)])
         if thread >= 0 { try adoptSyntheticThread(for: m.addr, into: thread) }
-        try touchThread(thread, addr: m.addr, body: m.body, time: m.time, newMessage: true,
+        try touchThread(thread, addr: m.addr, body: m.body, time: m.time, newMessage: countUnread,
                         unread: countUnread && m.box == "in")
         return true
+    }
+
+    /// The key of an incoming message with the same text from the same address within ±60 s, if one is stored.
+    private func sameIncoming(_ m: SMSMessage) throws -> String? {
+        let rows = try db.query("""
+            SELECT key, addr FROM messages WHERE box = 'in' AND body = ? AND ABS(time - ?) <= 60000 AND key != ?
+            """, [.text(m.body), .int(m.time), .text(m.key)])
+        let wanted = PhoneNumber.matchKey(m.addr)
+        return rows.first { PhoneNumber.matchKey($0.string("addr") ?? "") == wanted }?.string("key")
     }
 
     /// Moves a conversation started on the iPhone (synthetic id) into the bridge's real thread.
     private func adoptSyntheticThread(for address: String, into thread: Int64) throws {
         let synthetic = PhoneNumber.syntheticThreadID(for: address)
-        guard try !db.query("SELECT thread FROM threads WHERE thread = ?", [.int(synthetic)]).isEmpty else { return }
+        guard synthetic != thread,
+              try !db.query("SELECT thread FROM threads WHERE thread = ?", [.int(synthetic)]).isEmpty else { return }
         try db.execute("UPDATE messages SET thread = ? WHERE thread = ?", [.int(thread), .int(synthetic)])
-        try db.execute("DELETE FROM threads WHERE thread = ?", [.int(synthetic)])
+        if try db.query("SELECT thread FROM threads WHERE thread = ?", [.int(thread)]).isEmpty {
+            try db.execute("UPDATE threads SET thread = ?, has_older = 1 WHERE thread = ?", [.int(thread), .int(synthetic)])
+        } else {
+            try db.execute("UPDATE threads SET unread = unread + (SELECT unread FROM threads WHERE thread = ?) WHERE thread = ?",
+                           [.int(synthetic), .int(thread)])
+            try db.execute("DELETE FROM threads WHERE thread = ?", [.int(synthetic)])
+        }
         try refreshThreadSummary(thread)
     }
 
@@ -149,14 +176,17 @@ final class AppDatabase: ObservableObject {
                                [.text(body), .int(time), .text(encodeList(addrs)), .int(thread)])
             }
             if newMessage {
-                try db.execute("UPDATE threads SET count = COALESCE(count, 0) + 1 WHERE thread = ?", [.int(thread)])
+                // The bridge's count (from sms.threads) grows with live messages; history pages were already in it.
+                try db.execute("UPDATE threads SET count = count + 1 WHERE thread = ? AND count IS NOT NULL",
+                               [.int(thread)])
             }
             if unread {
                 try db.execute("UPDATE threads SET unread = unread + 1 WHERE thread = ?", [.int(thread)])
             }
         } else {
+            // Count unknown until the bridge reports it.
             try db.execute("""
-                INSERT INTO threads(thread, addrs, snippet, time, count, unread, has_older) VALUES(?, ?, ?, ?, 1, ?, ?)
+                INSERT INTO threads(thread, addrs, snippet, time, count, unread, has_older) VALUES(?, ?, ?, ?, NULL, ?, ?)
                 """, [.int(thread), .text(encodeList([addr])), .text(body), .int(time), .int(unread ? 1 : 0),
                       .int(thread >= 0 ? 1 : 0)])
         }
@@ -338,7 +368,8 @@ final class AppDatabase: ObservableObject {
     }
 
     var newestMessageTime: Int64? {
-        (try? db.query("SELECT MAX(time) AS t FROM messages WHERE key NOT LIKE 'local:%'"))?.first?.int64("t")
+        (try? db.query("SELECT MAX(time) AS t FROM messages WHERE key NOT LIKE 'local:%' AND key NOT LIKE 'rx:%'"))?
+            .first?.int64("t")
     }
 
     func oldestMessageTime(thread: Int64) -> Int64? {

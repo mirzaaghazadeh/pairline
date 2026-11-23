@@ -10,10 +10,16 @@ final class IdentityStore {
         case keychain
     }
 
-    private let kindAccount = "identity.kind"
-    private let keyAccount = "identity.key"
+    private let kindAccount: String
+    private let keyAccount: String
     private var cached: KeyAgreementPrivateKey?
     private(set) var kind: Kind?
+
+    /// `prefix` keeps test keys apart from the app's own.
+    init(prefix: String = "") {
+        kindAccount = prefix + "identity.kind"
+        keyAccount = prefix + "identity.key"
+    }
 
     func identity() throws -> KeyAgreementPrivateKey {
         if let cached { return cached }
@@ -88,10 +94,11 @@ struct PairedPeer: Codable, Equatable {
 }
 
 final class PeerStore {
-    private let account = "peer"
+    private let account: String
     private(set) var peer: PairedPeer?
 
-    init() {
+    init(prefix: String = "") {
+        account = prefix + "peer"
         if let data = Keychain.get(account: account) {
             peer = try? JSONDecoder().decode(PairedPeer.self, from: data)
         }

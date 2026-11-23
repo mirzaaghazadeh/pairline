@@ -296,11 +296,15 @@ final class BridgeController: ObservableObject {
 
     private func syncContacts() async {
         var cursor = db.value("contacts.cursor").flatMap(OpaqueValue.init(storageString:))
+        var replaced = false
         do {
             for _ in 0..<50 {
                 let reply = try await link.request(.contactsSync(since: cursor))
                 guard case .contactsSync(let page) = reply.message else { break }
-                if page.reset { db.clearContacts() }
+                if page.full && !replaced {
+                    db.clearContacts()
+                    replaced = true
+                }
                 db.upsertContacts(page.contacts, deleted: page.deleted)
                 if let next = page.cursor { cursor = next }
                 db.setValue(cursor?.storageString, for: "contacts.cursor")
@@ -313,11 +317,15 @@ final class BridgeController: ObservableObject {
 
     private func syncCallLog() async {
         var cursor = db.value("calllog.cursor").flatMap(OpaqueValue.init(storageString:))
+        var replaced = false
         do {
             for _ in 0..<50 {
                 let reply = try await link.request(.calllogSync(since: cursor))
                 guard case .calllogSync(let page) = reply.message else { break }
-                if page.reset { db.clearCalls() }
+                if page.full && !replaced {
+                    db.clearCalls()
+                    replaced = true
+                }
                 db.upsertCalls(page.calls)
                 if let next = page.cursor { cursor = next }
                 db.setValue(cursor?.storageString, for: "calllog.cursor")

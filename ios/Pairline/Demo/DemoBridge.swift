@@ -128,13 +128,12 @@ final class DemoBridge: BridgeLink {
         case "sms.send":
             return sendSMS(fields: f, id: id)
         case "contacts.sync":
-            if f["since"] is NSNull {
-                return ["t": "contacts.sync", "id": id, "contacts": contacts.map(encode), "deleted": [], "cursor": "demo-1",
-                        "more": false]
-            }
-            return ["t": "contacts.sync", "id": id, "contacts": [], "deleted": [], "cursor": "demo-1", "more": false]
+            // The demo is small, so every sync is a full one.
+            return ["t": "contacts.sync", "id": id, "contacts": contacts.map(encode), "deleted": [],
+                    "cursor": "demo-\(contacts.count)", "more": false, "full": true]
         case "calllog.sync":
-            return ["t": "calllog.sync", "id": id, "calls": calls.map(encode), "cursor": "demo-\(calls.count)", "more": false]
+            return ["t": "calllog.sync", "id": id, "calls": calls.map(encode), "cursor": "demo-\(calls.count)",
+                    "more": false, "full": true]
         case "contacts.add":
             let name = f["name"] as? String ?? ""
             let numbers = (f["numbers"] as? [[String: Any]] ?? []).compactMap { n -> ContactNumber? in

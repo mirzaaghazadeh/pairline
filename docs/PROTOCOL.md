@@ -223,7 +223,9 @@ Gaps found while implementing the iPhone app (2026-11-24). Both apps follow thes
   - B never splits messages (or threads) that share the same `time` across two pages; a page may go over `limit` to
     keep such a group together, so the strict `<` / `>` cursors can't skip any.
 - **Sync cursors B no longer knows** (for example after its data was cleared): B answers with a full sync from the
-  start and sets `"reset": true` on the first page. R then drops its cached contacts (or call log) before applying it.
+  start, marked with `full: true` (see the bridge notes below; this replaces an earlier `reset` flag). R drops its
+  cached contacts (or call log) once, at the first `full` page of a sync run, so B may repeat `full: true` on the
+  following pages.
 - **Malformed `PAIR_HELLO`** (bad JSON, wrong `v`, wrong lengths, invalid point) is answered with `bad_mac`.
 - **`ussd.run`** gets no `ok`; the `ussd.result` itself carries the request's `id`.
 - **`sms.send`.** `to` is one address (no group messages in v0); `cid` is unique per R install. B answers `ok` once

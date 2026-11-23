@@ -1,0 +1,139 @@
+import XCTest
+@testable import Pairline
+
+/// Trial clock (D-017), redaction (rule 9), SMS segments, phone numbers and versions.
+final class TrialPolicyTests: XCTestCase {
+    private let start = Date(timeIntervalSince1970: 1_764_000_000)
+
+    func testStates() {
+        XCTAssertEqual(TrialPolicy.state(purchased: false, trialStart: nil, now: start), .notStarted)
+        XCTAssertEqual(TrialPolicy.state(purchased: false, trialStart: start, now: start.addingTimeInterval(3600)),
+                       .trial(endsAt: start.addingTimeInterval(TrialPolicy.duration)))
+        XCTAssertEqual(TrialPolicy.state(purchased: false, trialStart: start, now: start.addingTimeInterval(TrialPolicy.duration)),
+                       .expired(endedAt: start.addingTimeInterval(TrialPolicy.duration)))
+        XCTAssertEqual(TrialPolicy.state(purchased: true, trialStart: start, now: start.addingTimeInterval(99 * 86400)),
+                       .purchased)
+        XCTAssertEqual(TrialPolicy.state(purchased: true, trialStart: nil, now: start), .purchased)
+    }
+
+    func testAccessGates() {
+        XCTAssertTrue(AccessState.purchased.allowsLink)
+        XCTAssertTrue(AccessState.trial(endsAt: start).allowsLink)
+        XCTAssertFalse(AccessState.expired(endedAt: start).allowsLink)
+        XCTAssertFalse(AccessState.notStarted.allowsLink)
+        XCTAssertFalse(AccessState.loading.allowsLink)
+    }
+
+    func testTurningTheClockBackDoesNotExtendTheTrial() {
+        let store = MemoryTimeStore()
+        // Day 4: the trial has ended, and the app saw that time.
+        let day4 = start.addingTimeInterval(4 * 86400)
+        let seen = TrialPolicy.trustedNow(deviceNow: day4, highWater: store.highWater, signedDates: [start])
+        store.save(seen)
+        // The user sets the clock back to day 1.
+        let rewound = start.addingTimeInterval(86400)
+        let now = TrialPolicy.trustedNow(deviceNow: rewound, highWater: store.highWater, signedDates: [start])
+        XCTAssertEqual(now, day4)
+        XCTAssertEqual(TrialPolicy.state(purchased: false, trialStart: start, now: now),
+                       .expired(endedAt: start.addingTimeInterval(TrialPolicy.duration)))
+    }
+
+    func testAppleSignedDateBeatsAnEarlyDeviceClock() {
+        let signed = start.addingTimeInterval(5 * 86400)
+        let now = TrialPolicy.trustedNow(deviceNow: start, highWater: nil, signedDates: [start, signed])
+        XCTAssertEqual(now, signed)
+    }
+
+    func testHighWaterNeverDecreases() {
+        let store = MemoryTimeStore()
+        store.save(start.addingTimeInterval(100))
+        store.save(start)
+        XCTAssertEqual(store.highWater, start.addingTimeInterval(100))
+    }
+
+    func testRemainingAndReminder() {
+        let end = start.addingTimeInterval(TrialPolicy.duration)
+        XCTAssertEqual(TrialPolicy.remaining(until: end, now: start).days, 3)
+        let left = TrialPolicy.remaining(until: end, now: end.addingTimeInterval(-(26 * 3600 + 60)))
+        XCTAssertEqual(left.days, 1)
+        XCTAssertEqual(left.hours, 3)
+        XCTAssertEqual(TrialPolicy.remaining(until: end, now: end.addingTimeInterval(10)).hours, 0)
+        XCTAssertEqual(TrialPolicy.reminderDate(trialEnd: end), end.addingTimeInterval(-86400))
+    }
+}
+
+final class RedactorTests: XCTestCase {
+    func testRemovesPersonalData() {
+        let text = "Sent to +98 912 123 4567 and 0912-123-4567; mail ada@example.com; MAC A1:B2:C3:D4:E5:F6; " +
+            "peripheral 8CC09D09-4084-4E91-A358-A153EB79D422; code ۴۸۲۹۱۳"
+        let out = Redactor.redact(text)
+        for leaked in ["912", "4567", "ada@", "A1:B2", "8CC09D09", "۴۸۲"] {
+            XCTAssertFalse(out.contains(leaked), "\(leaked) leaked: \(out)")
+        }
+        XCTAssertTrue(out.contains("[number]"))
+        XCTAssertTrue(out.contains("[email]"))
+        XCTAssertTrue(out.contains("[mac]"))
+        XCTAssertTrue(out.contains("[id]"))
+    }
+
+    func testKeepsUsefulText() {
+        let line = "2026-11-24T01:00:00Z INFO [link] Session established over ble (v0, 3 caps)"
+        XCTAssertEqual(Redactor.redact("Session established over ble (v0, 3 caps)"), "Session established over ble (v0, 3 caps)")
+        XCTAssertTrue(Redactor.redact(line).contains("[link] Session established"))
+    }
+
+    func testLogWritesRedactedLinesAndClears() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let log = AppLog(directory: dir)
+        log.info("test", "Called +1 415 555 0182")
+        let text = log.text()
+        XCTAssertTrue(text.contains("[test] Called [number]"), text)
+        XCTAssertFalse(text.contains("555"))
+        log.clear()
+        XCTAssertEqual(log.text(), "")
+    }
+}
+
+final class TextHelpersTests: XCTestCase {
+    func testSMSSegments() {
+        XCTAssertEqual(SMSSegments.info(for: "").parts, 0)
+        XCTAssertEqual(SMSSegments.info(for: String(repeating: "a", count: 160)), .init(parts: 1, remaining: 0, isUnicode: false))
+        XCTAssertEqual(SMSSegments.info(for: String(repeating: "a", count: 161)).parts, 2)
+        XCTAssertEqual(SMSSegments.info(for: String(repeating: "{", count: 80)).parts, 1, "extended chars count twice")
+        XCTAssertEqual(SMSSegments.info(for: String(repeating: "س", count: 70)), .init(parts: 1, remaining: 0, isUnicode: true))
+        XCTAssertEqual(SMSSegments.info(for: String(repeating: "س", count: 71)).parts, 2)
+        XCTAssertTrue(SMSSegments.info(for: "hi 👋").isUnicode)
+    }
+
+    func testPhoneNumbers() {
+        XCTAssertEqual(PhoneNumber.asciiDigits("۰۹۱۲ ٤٥٦"), "0912 456")
+        XCTAssertEqual(PhoneNumber.matchKey("+98 912 123 4567"), PhoneNumber.matchKey("09121234567"))
+        XCTAssertNotEqual(PhoneNumber.matchKey("+98 912 123 4567"), PhoneNumber.matchKey("+98 912 123 4568"))
+        XCTAssertEqual(PhoneNumber.matchKey("BANK"), PhoneNumber.matchKey("bank"))
+        XCTAssertTrue(PhoneNumber.isUSSD("*140#"))
+        XCTAssertTrue(PhoneNumber.isUSSD("*#06#"))
+        XCTAssertFalse(PhoneNumber.isUSSD("+15551234"))
+        XCTAssertEqual(PhoneNumber.dialable("+1 (415) 555-0182"), "+14155550182")
+        XCTAssertTrue(PhoneNumber.isPhoneNumber("+1 415 555 0182"))
+        XCTAssertFalse(PhoneNumber.isPhoneNumber("NWBANK"))
+        XCTAssertLessThan(PhoneNumber.syntheticThreadID(for: "+1 415 555 0182"), 0)
+        XCTAssertEqual(PhoneNumber.syntheticThreadID(for: "+1 415 555 0182"), PhoneNumber.syntheticThreadID(for: "4155550182"))
+        XCTAssertEqual(PhoneNumber.ltr("+1"), "\u{2066}+1\u{2069}")
+    }
+
+    func testVersionsAndDirection() {
+        XCTAssertLessThan(Version("0.1.9"), Version("0.1.10"))
+        XCTAssertLessThan(Version("0.9"), Version("1.0.0"))
+        XCTAssertEqual(Version("1.0"), Version("1.0.0"))
+        XCTAssertFalse(Version("0.2.0-debug") < Version("0.1.0"))
+        XCTAssertTrue(TextDirection.isRightToLeft("سلام world"))
+        XCTAssertTrue(TextDirection.isRightToLeft("123 مرحبا"))
+        XCTAssertFalse(TextDirection.isRightToLeft("Hello سلام"))
+    }
+
+    func testLinkDetection() {
+        let attributed = LinkDetector.attributed("Track: https://example.com/t/8K2Q today")
+        XCTAssertTrue(attributed.runs.contains { $0.link?.host == "example.com" })
+    }
+}
