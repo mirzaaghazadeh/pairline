@@ -156,7 +156,9 @@ struct BridgeBanners: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            if bridge.isDemo {
+            if bridge.isDemo && DebugSettings.marketingScreenshots {
+                EmptyView()
+            } else if bridge.isDemo {
                 InfoBanner(symbol: "sparkles", tint: .brandAmber, text: Text("Demo mode · sample data")) {
                     Menu {
                         Button {

@@ -77,6 +77,7 @@ struct BridgeStatusTab: View {
     }
 
     private var transportSymbol: String {
+        if DebugSettings.marketingScreenshots { return "dot.radiowaves.left.and.right" }
         switch bridge.link.transportKind {
         case .bluetooth: return "dot.radiowaves.left.and.right"
         case .tcp: return "cable.connector"
@@ -85,6 +86,7 @@ struct BridgeStatusTab: View {
     }
 
     private var transportName: Text {
+        if DebugSettings.marketingScreenshots { return Text("Bluetooth") }
         switch bridge.link.transportKind {
         case .bluetooth: return Text("Bluetooth")
         case .tcp: return Text("Debug TCP")

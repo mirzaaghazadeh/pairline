@@ -538,6 +538,15 @@ final class LinkManager: BridgeLink {
 enum DebugSettings {
     static let transportKey = "debug.transport"
 
+    /// Debug builds only: `-PairlineMarketing` hides demo labels for website and App Store screenshots.
+    static var marketingScreenshots: Bool {
+        #if DEBUG
+        return ProcessInfo.processInfo.arguments.contains("-PairlineMarketing")
+        #else
+        return false
+        #endif
+    }
+
     static var pairingTransport: TransportKind {
         #if DEBUG
         if let raw = UserDefaults.standard.string(forKey: transportKey), let kind = TransportKind(rawValue: raw) {

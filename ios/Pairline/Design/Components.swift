@@ -222,7 +222,7 @@ struct LinkStatusPill: View {
     }
 
     var label: Text {
-        if isDemo, phase == .connected { return Text("Demo bridge") }
+        if isDemo, phase == .connected, !DebugSettings.marketingScreenshots { return Text("Demo bridge") }
         return LinkStatusPill.title(for: phase)
     }
 

@@ -35,7 +35,7 @@ struct CallScreen: View {
                 .accessibilityLabel(Text("Hide call screen"))
                 Spacer()
                 HStack(spacing: 6) {
-                    if bridge.isDemo {
+                    if bridge.isDemo && !DebugSettings.marketingScreenshots {
                         Text("Demo").font(.caption.weight(.bold)).foregroundStyle(Color.brandAmber)
                     }
                     if let sim = call.sim, bridge.isDualSIM {
@@ -192,6 +192,8 @@ struct CallScreen: View {
                     calls.answer()
                 }
             }
+            // Decline stays on the left and Accept on the right in every language, like the iPhone call screen.
+            .environment(\.layoutDirection, .leftToRight)
         } else if case .ended = call.state {
             RoundCallButton(symbol: "phone.down.fill", color: .gray, title: Text("Ended")) {}
                 .disabled(true)
