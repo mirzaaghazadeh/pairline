@@ -2,7 +2,6 @@ package app.pairline.android.ui.settings
 
 import android.Manifest
 import android.os.Build
-import android.text.format.DateFormat
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -113,7 +112,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
 
             SectionCard(title = stringResource(R.string.settings_iphone)) {
                 if (paired) {
-                    val since = prefs.pairedAt.takeIf { it > 0 }?.let { DateFormat.getMediumDateFormat(context).format(Date(it)) }
+                    val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
+                    val since = prefs.pairedAt.takeIf { it > 0 }?.let { localDate(it, locale) }
                     ListRow(
                         title = prefs.peerName ?: stringResource(R.string.generic_iphone_name),
                         subtitle = listOfNotNull(
@@ -287,6 +287,16 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
             dismissButton = { TextButton(onClick = { confirmSetup = false }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
+}
+
+/** A medium date in the user's language; Persian uses the Solar Hijri calendar, as Iranian users expect. */
+private fun localDate(ms: Long, locale: java.util.Locale): String {
+    val uLocale = if (locale.language == "fa") {
+        android.icu.util.ULocale("fa_IR@calendar=persian")
+    } else {
+        android.icu.util.ULocale.forLocale(locale)
+    }
+    return android.icu.text.DateFormat.getDateInstance(android.icu.text.DateFormat.MEDIUM, uLocale).format(Date(ms))
 }
 
 /** Language names are shown in their own language, so anyone can find theirs. */

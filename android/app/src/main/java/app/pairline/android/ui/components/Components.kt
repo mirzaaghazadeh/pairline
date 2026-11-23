@@ -197,7 +197,12 @@ fun StatusPill(text: String, tone: Tone, icon: ImageVector? = null) {
 @Composable
 fun NoteBox(text: String, tone: Tone = Tone.NEUTRAL, icon: ImageVector = PIcons.Info, modifier: Modifier = Modifier) {
     val c = toneColors(tone)
-    Surface(shape = MaterialTheme.shapes.medium, color = c.container, contentColor = c.onContainer, modifier = modifier) {
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = c.container,
+        contentColor = c.onContainer,
+        modifier = modifier.fillMaxWidth(),
+    ) {
         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.Top) {
             Icon(icon, null, tint = c.content, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(12.dp))

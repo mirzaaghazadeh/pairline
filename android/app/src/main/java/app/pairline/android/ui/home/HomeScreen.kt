@@ -41,9 +41,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
@@ -311,18 +309,17 @@ private fun SimRow(sim: SimSnapshot) {
     }
 }
 
-/** Four signal bars; they grow from the start edge, so they mirror in RTL like the system's. */
+/** Four signal bars, growing left to right in every language, like Android's own signal icon. */
 @Composable
 private fun SignalBars(level: Int) {
     val on = MaterialTheme.colorScheme.primary
     val off = MaterialTheme.colorScheme.outlineVariant
-    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     Canvas(Modifier.size(28.dp, 20.dp)) {
         val gap = 3.dp.toPx()
         val w = (size.width - gap * 3) / 4
         for (i in 0 until 4) {
             val h = size.height * (i + 1) / 4
-            val x = if (rtl) size.width - (i + 1) * w - i * gap else i * (w + gap)
+            val x = i * (w + gap)
             drawRoundRect(if (i < level) on else off, Offset(x, size.height - h), Size(w, h), CornerRadius(2.dp.toPx()))
         }
     }
