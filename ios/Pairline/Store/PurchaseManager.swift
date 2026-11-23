@@ -91,12 +91,31 @@ final class PurchaseManager: ObservableObject {
         let now = TrialPolicy.trustedNow(deviceNow: clock(), highWater: timeStore.highWater, signedDates: signedDates)
         timeStore.save(now)
         trustedNow = now
-        let new = TrialPolicy.state(purchased: purchased, trialStart: trialStart, now: now)
+        var new = TrialPolicy.state(purchased: purchased, trialStart: trialStart, now: now)
+        #if DEBUG
+        new = Self.debugAccessOverride(now: now) ?? new
+        #endif
         if new != access {
             log.info("store", "Access: \(new)")
             access = new
         }
     }
+
+    #if DEBUG
+    /// Debug builds only: `-PairlineAccess purchased|trial|expired|none` fakes the access state, so the Simulator can
+    /// be tested end to end without App Store sandbox purchases.
+    private static func debugAccessOverride(now: Date) -> AccessState? {
+        let args = ProcessInfo.processInfo.arguments
+        guard let index = args.firstIndex(of: "-PairlineAccess"), index + 1 < args.count else { return nil }
+        switch args[index + 1] {
+        case "purchased": return .purchased
+        case "trial": return .trial(endsAt: now.addingTimeInterval(26 * 3600))
+        case "expired": return .expired(endedAt: now.addingTimeInterval(-3600))
+        case "none": return .notStarted
+        default: return nil
+        }
+    }
+    #endif
 
     @discardableResult
     func startTrial() async -> Bool {

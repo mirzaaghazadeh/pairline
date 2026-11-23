@@ -1,0 +1,52 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "–" : {
+
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "Battery, signal and link state of your bridge phone." : {
+
+    },
+    "Bridge phone" : {
+
+    },
+    "Connected" : {
+
+    },
+    "Connecting…" : {
+
+    },
+    "Demo" : {
+
+    },
+    "Locked" : {
+
+    },
+    "Not connected" : {
+
+    },
+    "Not paired" : {
+
+    },
+    "Open Pairline to connect" : {
+
+    },
+    "Signal %lld of 4" : {
+
+    }
+  },
+  "version" : "1.0"
+}

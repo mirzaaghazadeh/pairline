@@ -85,7 +85,9 @@ final class CallCenter: ObservableObject {
                 // Do Not Disturb, Focus or a blocked number: CallKit declined to show it.
                 log.warning("calls", "CallKit didn't show the call: \(error.localizedDescription)")
                 if self.current?.id == call.id {
+                    // Fall back to the in-app call screen (also the case in the Simulator, which has no CallKit UI).
                     self.current?.inCallKit = false
+                    if UIApplication.shared.applicationState == .active { self.showCallScreen = true }
                 }
             }
         } else {

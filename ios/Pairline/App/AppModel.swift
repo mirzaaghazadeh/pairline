@@ -196,6 +196,13 @@ final class AppModel: ObservableObject {
             }
         }
         if args.contains("-PairlinePaywall") { showPaywall = true }
+        // Same path as opening the pairing link through the URL scheme, without the system's confirmation alert.
+        if let index = args.firstIndex(of: "-PairlinePairLink"), index + 1 < args.count, let url = URL(string: args[index + 1]) {
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                self.handleURL(url)
+            }
+        }
         if let index = args.firstIndex(of: "-PairlineThread"), index + 1 < args.count, let thread = Int64(args[index + 1]) {
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 1_500_000_000)

@@ -247,10 +247,17 @@ struct OfflineBanner: View {
 }
 
 enum TrialText {
+    /// "Free trial: 2 days, 5 hours left", with the duration written by the system in the app's language
+    /// (correct plurals and digits).
     static func remaining(_ left: (days: Int, hours: Int)) -> Text {
-        if left.days >= 1 {
-            return Text("\(left.days) days \(left.hours) hours left in your free trial")
-        }
-        return Text("\(left.hours) hours left in your free trial")
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = left.days > 0 ? [.day, .hour] : [.hour]
+        formatter.maximumUnitCount = 2
+        var calendar = Calendar.current
+        calendar.locale = Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en")
+        formatter.calendar = calendar
+        let duration = formatter.string(from: DateComponents(day: left.days, hour: left.hours)) ?? ""
+        return Text("Free trial: \(duration) left")
     }
 }

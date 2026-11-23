@@ -79,9 +79,21 @@ final class TCPConnector: LinkConnector {
     private var timer: Timer?
     private var completion: ((Result<(FrameTransport, UUID?), Error>) -> Void)?
 
-    init(host: String = TCPConnector.defaultHost, port: UInt16 = TCPConnector.defaultPort) {
+    /// `-PairlineTCPPort <port>` (or the `debug.tcpPort` default) picks another port, e.g. to run a fake bridge next
+    /// to an Android emulator's `adb forward`.
+    init(host: String = TCPConnector.defaultHost, port: UInt16? = nil) {
         self.host = host
-        self.port = port
+        let args = ProcessInfo.processInfo.arguments
+        if let port {
+            self.port = port
+        } else if let index = args.firstIndex(of: "-PairlineTCPPort"), index + 1 < args.count,
+                  let value = UInt16(args[index + 1]) {
+            self.port = value
+        } else if let value = UInt16(exactly: UserDefaults.standard.integer(forKey: "debug.tcpPort")), value > 0 {
+            self.port = value
+        } else {
+            self.port = TCPConnector.defaultPort
+        }
     }
 
     func connect(_ target: ConnectTarget, completion: @escaping (Result<(FrameTransport, UUID?), Error>) -> Void) {

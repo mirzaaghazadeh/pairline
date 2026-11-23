@@ -1,0 +1,1560 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "–" : {
+
+    },
+    "%@ declined the call." : {
+
+    },
+    "%@ didn't answer." : {
+
+    },
+    "%@ is busy." : {
+
+    },
+    "%lld ms" : {
+
+    },
+    "%lld new messages arrived while you were away." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new message arrived while you were away."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new messages arrived while you were away."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+
+    },
+    "A newer Pairline Bridge is needed for everything to work. Install the latest version on your Android phone." : {
+
+    },
+    "A private link" : {
+
+    },
+    "About" : {
+
+    },
+    "About Pairline" : {
+
+    },
+    "Accept" : {
+
+    },
+    "Acknowledgements" : {
+
+    },
+    "Add contact" : {
+
+    },
+    "Add contacts from iPhone" : {
+
+    },
+    "Add number" : {
+
+    },
+    "After 3 days, sending messages, calls, syncing and USSD stop until you buy Pairline once. Messages already on this iPhone stay readable, and demo mode, help and settings keep working." : {
+
+    },
+    "After a restart" : {
+
+    },
+    "After you restart the iPhone, unlock it once. Pairline reconnects on its own." : {
+
+    },
+    "All" : {
+
+    },
+    "Allow camera" : {
+
+    },
+    "Allow it to run without battery restrictions when Android asks. Some phones have extra autostart settings; the bridge app shows where they are." : {
+
+    },
+    "Allow notifications" : {
+
+    },
+    "Allow notifications for Pairline in iPhone Settings." : {
+
+    },
+    "Allow sending SMS in Pairline Bridge on your Android phone." : {
+
+    },
+    "Allow SMS access in Pairline Bridge on your Android phone." : {
+
+    },
+    "Allow the permissions it asks for: SMS, phone and Bluetooth." : {
+
+    },
+    "Allow the phone permission in Pairline Bridge on your Android phone." : {
+
+    },
+    "Allow what it asks for" : {
+
+    },
+    "An iOS rule" : {
+
+    },
+    "Android" : {
+
+    },
+    "Android may stop apps in the background to save battery. These settings keep Pairline Bridge connected all day." : {
+
+    },
+    "Answer and end calls" : {
+
+    },
+    "Answer on iPhone, talk on Android for now" : {
+
+    },
+    "Apple handles purchases" : {
+
+    },
+    "Audio is on the Android phone for now" : {
+
+    },
+    "Audio plays on your Android phone" : {
+
+    },
+    "Autostart (Xiaomi, Oppo, Vivo, Huawei)" : {
+
+    },
+    "Available" : {
+
+    },
+    "Back" : {
+
+    },
+    "Balance and package codes differ by carrier. Save the ones your carrier uses with the star in the result." : {
+
+    },
+    "Balance, packages and carrier services" : {
+
+    },
+    "Battery" : {
+
+    },
+    "Battery %lld percent" : {
+
+    },
+    "Battery optimization" : {
+
+    },
+    "Battery settings that matter" : {
+
+    },
+    "Battery unknown" : {
+
+    },
+    "Blocked" : {
+
+    },
+    "Bluetooth" : {
+
+    },
+    "Bluetooth is off" : {
+
+    },
+    "Bluetooth isn't allowed" : {
+
+    },
+    "Bluetooth not allowed" : {
+
+    },
+    "Bluetooth on both phones" : {
+
+    },
+    "Bluetooth unavailable" : {
+
+    },
+    "Bridge" : {
+
+    },
+    "Bridge battery alerts" : {
+
+    },
+    "Bridge default" : {
+
+    },
+    "Bridge phone" : {
+
+    },
+    "Bridge phone battery low" : {
+
+    },
+    "Bridged calls stay out of iPhone Recents unless you turn that on in Settings, because Recents can sync to iCloud." : {
+
+    },
+    "Bring the phones closer together." : {
+
+    },
+    "Busy" : {
+
+    },
+    "Buy now for %@" : {
+
+    },
+    "Buy once · %@" : {
+
+    },
+    "Buy Pairline for %@" : {
+
+    },
+    "Buying Pairline goes through the App Store. The app checks Apple-signed receipts on the device." : {
+
+    },
+    "Call" : {
+
+    },
+    "Call audio is on your Android phone for now, so mute it there." : {
+
+    },
+    "Call audio is on your Android phone for now, so use its speaker button." : {
+
+    },
+    "Call audio on iPhone" : {
+
+    },
+    "Call ended" : {
+
+    },
+    "Call failed" : {
+
+    },
+    "Call forwarding status" : {
+
+    },
+    "Call from the keypad, contacts or recents. Choose the SIM on dual-SIM phones." : {
+
+    },
+    "Call history" : {
+
+    },
+    "Call history is off" : {
+
+    },
+    "Call waiting status" : {
+
+    },
+    "Caller ID status" : {
+
+    },
+    "Calling…" : {
+
+    },
+    "Calls" : {
+
+    },
+    "Calls back" : {
+
+    },
+    "Calls don't ring on the iPhone" : {
+
+    },
+    "Calls on your Android phone's SIM will be listed here." : {
+
+    },
+    "Calls on your iPhone" : {
+
+    },
+    "Calls to your Android number ring on this iPhone with the normal iPhone call screen, even when it's locked. Answer or decline here." : {
+
+    },
+    "Camera" : {
+
+    },
+    "Camera access is off. Pairline only uses the camera to scan the pairing code." : {
+
+    },
+    "Can I see the code?" : {
+
+    },
+    "Can I talk on the iPhone during calls?" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Carrier reply" : {
+
+    },
+    "Charge soon to stay connected" : {
+
+    },
+    "Charge the bridge phone" : {
+
+    },
+    "Charging" : {
+
+    },
+    "Check that Bluetooth is on on both phones." : {
+
+    },
+    "Check that call control is on in Pairline Bridge." : {
+
+    },
+    "Check the Bridge tab: Incoming call alerts should show a check mark." : {
+
+    },
+    "Checking your purchase…" : {
+
+    },
+    "Choose SIM" : {
+
+    },
+    "Clear log" : {
+
+    },
+    "Clear the log?" : {
+
+    },
+    "Close" : {
+
+    },
+    "Code didn't run" : {
+
+    },
+    "Code, for example *140#" : {
+
+    },
+    "Codes run on your Android phone's SIM. Carrier replies appear here and aren't stored." : {
+
+    },
+    "Coming in a later update. Until then, talk on the Android phone." : {
+
+    },
+    "Common codes" : {
+
+    },
+    "Connected" : {
+
+    },
+    "Contact details" : {
+
+    },
+    "Contacts" : {
+
+    },
+    "Contacts and call history" : {
+
+    },
+    "Contacts from your Android phone appear here after they sync. They stay on this iPhone only." : {
+
+    },
+    "Contacts sync is off" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Copied" : {
+
+    },
+    "Copy" : {
+
+    },
+    "Copy code" : {
+
+    },
+    "Copy code %@" : {
+
+    },
+    "Copy link" : {
+
+    },
+    "Copy reply" : {
+
+    },
+    "Couldn't find the bridge phone. Keep both phones close together with Bluetooth on, and keep Pairline Bridge open." : {
+
+    },
+    "Debug TCP" : {
+
+    },
+    "Decline" : {
+
+    },
+    "Declined" : {
+
+    },
+    "Default SIM" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delivered" : {
+
+    },
+    "Demo" : {
+
+    },
+    "Demo bridge" : {
+
+    },
+    "Demo mode · sample data" : {
+
+    },
+    "Diagnostics" : {
+
+    },
+    "Do I need both phones nearby?" : {
+
+    },
+    "Does my data go through a server?" : {
+
+    },
+    "Does Pairline work with group messages or MMS?" : {
+
+    },
+    "Don't swipe Pairline away" : {
+
+    },
+    "Don't swipe Pairline away in the iPhone's app switcher." : {
+
+    },
+    "Done" : {
+
+    },
+    "Dual SIM" : {
+
+    },
+    "Dual SIM, USSD and widget" : {
+
+    },
+    "email" : {
+
+    },
+    "End" : {
+
+    },
+    "End-to-end encrypted between your phones. No servers, no accounts, no tracking." : {
+
+    },
+    "Ended" : {
+
+    },
+    "Everything works. Then %@ once to keep it, or it stops connecting." : {
+
+    },
+    "Exclude Pairline Bridge from battery optimization on the Android phone." : {
+
+    },
+    "Exit demo" : {
+
+    },
+    "Exit demo mode" : {
+
+    },
+    "Explore demo mode" : {
+
+    },
+    "Explore the demo" : {
+
+    },
+    "Favorite" : {
+
+    },
+    "Favorites" : {
+
+    },
+    "For new messages, codes and bridge alerts." : {
+
+    },
+    "Forwarding when busy" : {
+
+    },
+    "Forwarding when unreachable" : {
+
+    },
+    "Free for 3 days, then %@ once to keep using Pairline. If you don't buy, sending messages, calls, syncing and USSD stop after the trial; your synced messages stay readable. Nothing is charged automatically." : {
+
+    },
+    "Free trial ended" : {
+
+    },
+    "Free trial not started" : {
+
+    },
+    "Free trial: %@ left" : {
+
+    },
+    "Full access · Thank you!" : {
+
+    },
+    "Full privacy policy" : {
+
+    },
+    "Get messages, codes and calls from your Android phone's SIM right here, on the iPhone you carry." : {
+
+    },
+    "Get started" : {
+
+    },
+    "Guides" : {
+
+    },
+    "Help" : {
+
+    },
+    "Help center" : {
+
+    },
+    "Hide call screen" : {
+
+    },
+    "Hide keypad" : {
+
+    },
+    "home" : {
+
+    },
+    "How calls work" : {
+
+    },
+    "How it works" : {
+
+    },
+    "How would you like to start?" : {
+
+    },
+    "I've installed it" : {
+
+    },
+    "If you paired with another iPhone before, pairing again replaces it." : {
+
+    },
+    "If you swipe Pairline up in the app switcher, iOS stops it and won't wake it for Bluetooth until you open it again. Messages and calls wait until then." : {
+
+    },
+    "In Pairline Bridge, tap Battery and choose Allow so Android doesn't stop it." : {
+
+    },
+    "Incoming" : {
+
+    },
+    "Incoming call" : {
+
+    },
+    "Incoming call alerts" : {
+
+    },
+    "Incoming calls" : {
+
+    },
+    "Install Pairline Bridge" : {
+
+    },
+    "Install Pairline Bridge and pair" : {
+
+    },
+    "Install Pairline Bridge on the Android phone that holds your SIM, then scan its pairing code." : {
+
+    },
+    "Install Pairline Bridge on your Android phone" : {
+
+    },
+    "iPhone" : {
+
+    },
+    "iPhone Recents" : {
+
+    },
+    "iPhone Recents can sync to iCloud, so this is off by default. Calls are always listed in Pairline." : {
+
+    },
+    "Is it a subscription?" : {
+
+    },
+    "It says the bridge doesn't recognize this iPhone" : {
+
+    },
+    "It's free. It runs on the Android phone that holds your SIM card." : {
+
+    },
+    "Just leave Pairline in the background. iOS wakes it when the bridge phone has something new, without draining your battery." : {
+
+    },
+    "Keep Bluetooth on and the phones within about 10 meters. Walls and bags shorten the range." : {
+
+    },
+    "Keep both phones close together, with Pairline Bridge open." : {
+
+    },
+    "Keep both phones within Bluetooth range, about 10 meters." : {
+
+    },
+    "Keep it running" : {
+
+    },
+    "Keep Pairline Bridge open on the screen while you scan." : {
+
+    },
+    "Keep the link alive" : {
+
+    },
+    "Keypad" : {
+
+    },
+    "Keypad tones during calls" : {
+
+    },
+    "Keys stay in secure hardware" : {
+
+    },
+    "Language" : {
+
+    },
+    "Last update %@ ago" : {
+
+    },
+    "Later" : {
+
+    },
+    "Let it run without battery restrictions so the link stays up." : {
+
+    },
+    "Link paused" : {
+
+    },
+    "Load earlier messages" : {
+
+    },
+    "Lock it in recent apps" : {
+
+    },
+    "Looking for a Pairline code…" : {
+
+    },
+    "Looking for your bridge phone" : {
+
+    },
+    "Looking for your bridge…" : {
+
+    },
+    "main" : {
+
+    },
+    "Make sure Pairline Bridge is running on the Android phone and Bluetooth is on there." : {
+
+    },
+    "Making calls" : {
+
+    },
+    "Mark as read" : {
+
+    },
+    "Message" : {
+
+    },
+    "Message history" : {
+
+    },
+    "Messages" : {
+
+    },
+    "Messages and calls from your Android phone's SIM now come to this iPhone." : {
+
+    },
+    "Messages and one-time codes" : {
+
+    },
+    "Messages arrive late or not at all" : {
+
+    },
+    "Messages from your Android phone's SIM will appear here once it's paired." : {
+
+    },
+    "Messages, calls, contacts and USSD codes appear here, with notifications." : {
+
+    },
+    "Missed" : {
+
+    },
+    "mobile" : {
+
+    },
+    "Mute" : {
+
+    },
+    "Name" : {
+
+    },
+    "Name or number" : {
+
+    },
+    "New Contact" : {
+
+    },
+    "New message" : {
+
+    },
+    "New Message" : {
+
+    },
+    "New one-time code" : {
+
+    },
+    "New SMS to your Android phone's number will show up here." : {
+
+    },
+    "Next, pair your Android phone." : {
+
+    },
+    "No analytics or ads" : {
+
+    },
+    "No analytics, ads or crash reporters. Ever." : {
+
+    },
+    "No answer" : {
+
+    },
+    "No bridge phone yet" : {
+
+    },
+    "No contacts match “%@”." : {
+
+    },
+    "No contacts match." : {
+
+    },
+    "No contacts yet" : {
+
+    },
+    "No messages or people match “%@”." : {
+
+    },
+    "No messages yet" : {
+
+    },
+    "No missed calls" : {
+
+    },
+    "No purchase was found for this Apple Account." : {
+
+    },
+    "No recent calls" : {
+
+    },
+    "No results" : {
+
+    },
+    "No servers, no accounts" : {
+
+    },
+    "No SIM information yet." : {
+
+    },
+    "No subscription, no account." : {
+
+    },
+    "No subscription. Yours for good." : {
+
+    },
+    "No tracking" : {
+
+    },
+    "No tracking, crash-reporting or advertising code is in the app." : {
+
+    },
+    "No. Pairline is a one-time purchase. The Android app is free." : {
+
+    },
+    "No. The phones talk directly over Bluetooth, encrypted end to end. Pairline has no servers and no accounts, and it contains no analytics or ads." : {
+
+    },
+    "Not available" : {
+
+    },
+    "Not now" : {
+
+    },
+    "Not paired" : {
+
+    },
+    "Not sent · Try again" : {
+
+    },
+    "Not yet. Pairline handles SMS text messages. Picture messages (MMS) are planned." : {
+
+    },
+    "Not yet. You answer, decline and place calls from the iPhone, and the audio stays on the Android phone. iPhone call audio is planned." : {
+
+    },
+    "Nothing leaves your two phones" : {
+
+    },
+    "Notifications" : {
+
+    },
+    "Notifications are off. Turn them on in Settings" : {
+
+    },
+    "Number hidden" : {
+
+    },
+    "Off" : {
+
+    },
+    "OK" : {
+
+    },
+    "On" : {
+
+    },
+    "On battery" : {
+
+    },
+    "On hold" : {
+
+    },
+    "On many Android phones you can lock Pairline Bridge in the recent-apps screen so cleanups skip it." : {
+
+    },
+    "On the Android phone that holds your SIM, open pairline.navid.tr and download Pairline Bridge. It's free." : {
+
+    },
+    "One-time codes get a Copy code button in the notification." : {
+
+    },
+    "One-time purchase" : {
+
+    },
+    "Only to scan the pairing code." : {
+
+    },
+    "Open for inspection" : {
+
+    },
+    "Open Pairline Bridge on the Android phone and make sure it says it's running." : {
+
+    },
+    "Open Pairline Bridge on the Android phone, tap Pair and point this iPhone at the code." : {
+
+    },
+    "Open Settings" : {
+
+    },
+    "Open source" : {
+
+    },
+    "Open the conversation" : {
+
+    },
+    "other" : {
+
+    },
+    "Outgoing" : {
+
+    },
+    "Page %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Page %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Pair a bridge phone" : {
+
+    },
+    "Pair a different bridge phone" : {
+
+    },
+    "Pair now" : {
+
+    },
+    "Pair your bridge phone" : {
+
+    },
+    "Paired %@" : {
+
+    },
+    "Pairing and the link need an active trial or a purchase." : {
+
+    },
+    "Pairing fails" : {
+
+    },
+    "Pairing with your bridge phone…" : {
+
+    },
+    "Pairing…" : {
+
+    },
+    "Pairline" : {
+
+    },
+    "Pairline Bridge asks for SMS, phone, Bluetooth and notification access so it can relay messages and calls. Each permission is explained in the app." : {
+
+    },
+    "Pairline Full Access" : {
+
+    },
+    "Pairline has no backend. You never sign up." : {
+
+    },
+    "Pairline is built so your messages and calls stay yours." : {
+
+    },
+    "Pairline lets this iPhone use the SIM card in your Android phone: messages, calls, contacts, call history and USSD codes, over an encrypted link between your two phones." : {
+
+    },
+    "Pairline needs Bluetooth to talk to your bridge phone. Allow it in Settings." : {
+
+    },
+    "Pairline speaks English, فارسی and العربية. Change it in iPhone Settings › Pairline › Language." : {
+
+    },
+    "Pairline uses only Apple's frameworks: no third-party code." : {
+
+    },
+    "Pairline warns you when the bridge phone's battery runs low." : {
+
+    },
+    "Pairline's source code is public so you can check what it does. Under the Functional Source License you may read, build and change it for any non-competing use. Each release becomes Apache 2.0 two years after it's published." : {
+
+    },
+    "Paste" : {
+
+    },
+    "Permissions" : {
+
+    },
+    "Phone number" : {
+
+    },
+    "Pick a SIM, check your balance, see battery and signal at a glance." : {
+
+    },
+    "Place calls" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Privacy policy" : {
+
+    },
+    "Privacy Policy" : {
+
+    },
+    "Private by design" : {
+
+    },
+    "Pull down in Messages to sync." : {
+
+    },
+    "QR code for %@" : {
+
+    },
+    "Questions" : {
+
+    },
+    "Read" : {
+
+    },
+    "Read, reply and copy codes straight from notifications." : {
+
+    },
+    "Readable logs" : {
+
+    },
+    "Receive a call" : {
+
+    },
+    "Receive a code" : {
+
+    },
+    "Receive a message" : {
+
+    },
+    "Receive messages" : {
+
+    },
+    "Recent calls" : {
+
+    },
+    "Recents" : {
+
+    },
+    "Reconnecting soon…" : {
+
+    },
+    "Remove from saved codes" : {
+
+    },
+    "Remove recipient" : {
+
+    },
+    "Restore Purchases" : {
+
+    },
+    "Ring, answer, decline and dial with the iPhone call screen." : {
+
+    },
+    "Ringing…" : {
+
+    },
+    "Roaming" : {
+
+    },
+    "Run code" : {
+
+    },
+    "Save" : {
+
+    },
+    "Save code" : {
+
+    },
+    "Saved codes" : {
+
+    },
+    "Scan the pairing code" : {
+
+    },
+    "Scan this with the Android phone's camera, or open:" : {
+
+    },
+    "Search contacts" : {
+
+    },
+    "Search messages and people" : {
+
+    },
+    "Securing the link…" : {
+
+    },
+    "See options" : {
+
+    },
+    "See Pairline with sample data. No Android phone needed, free." : {
+
+    },
+    "Send" : {
+
+    },
+    "Send messages" : {
+
+    },
+    "Send to %@" : {
+
+    },
+    "Sending…" : {
+
+    },
+    "Sent" : {
+
+    },
+    "Set up the Android phone" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Share" : {
+
+    },
+    "Share report" : {
+
+    },
+    "Show" : {
+
+    },
+    "Show a fresh code in Pairline Bridge; each code works once, for 5 minutes." : {
+
+    },
+    "Show a new pairing code on the Android phone and scan it again." : {
+
+    },
+    "Show calls in iPhone Recents" : {
+
+    },
+    "Show IMEI" : {
+
+    },
+    "Show message text" : {
+
+    },
+    "Signal %lld of 4" : {
+
+    },
+    "SIM" : {
+
+    },
+    "SIM %lld" : {
+
+    },
+    "SIM cards" : {
+
+    },
+    "SIM for calls" : {
+
+    },
+    "SIM for messages" : {
+
+    },
+    "SMS parts: %lld · left: %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SMS parts: %1$lld · left: %2$lld"
+          }
+        }
+      }
+    },
+    "So you hear about new messages, codes and calls." : {
+
+    },
+    "Source code" : {
+
+    },
+    "Source code on GitHub" : {
+
+    },
+    "Speaker" : {
+
+    },
+    "Start" : {
+
+    },
+    "Start 3-day free trial" : {
+
+    },
+    "Start your 3 free days to connect." : {
+
+    },
+    "Start your free trial or unlock Pairline to pair a bridge phone." : {
+
+    },
+    "Start your free trial to pair" : {
+
+    },
+    "Step %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Step %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Still stuck? The website has more help. Opening it is the only time Pairline sends you online, and only when you tap." : {
+
+    },
+    "Stored on this iPhone only" : {
+
+    },
+    "Synced from the Android phone and kept on this iPhone only." : {
+
+    },
+    "Synced from your bridge phone. Kept only on this iPhone." : {
+
+    },
+    "Synced messages, contacts and call history are kept in a protected database that's excluded from backups. Unpairing deletes them." : {
+
+    },
+    "Syncing messages…" : {
+
+    },
+    "Tap Pair in Pairline Bridge to show a QR code, then scan it from this iPhone. The code works once, for 5 minutes." : {
+
+    },
+    "Tap Pair in the bridge app to show a pairing code." : {
+
+    },
+    "Terms" : {
+
+    },
+    "Terms of use" : {
+
+    },
+    "Terms of Use" : {
+
+    },
+    "Text message" : {
+
+    },
+    "Thank you for supporting independent, private software." : {
+
+    },
+    "That didn't work. Try again on the Android phone." : {
+
+    },
+    "That isn't a Pairline pairing code." : {
+
+    },
+    "The 3-day trial is free. When it ends, sending messages, calls, syncing and USSD stop until you buy Pairline for %@ once. Messages already synced stay readable. Nothing is charged automatically." : {
+
+    },
+    "The Android app's data was probably cleared, or it was paired with another iPhone." : {
+
+    },
+    "The Android bridge app is free. Payment is handled by Apple." : {
+
+    },
+    "The App Store isn't available right now. Check your connection and try again." : {
+
+    },
+    "The bridge" : {
+
+    },
+    "The bridge app doesn't support this yet. Update it on your Android phone." : {
+
+    },
+    "The bridge app is missing a permission for this. Open Pairline Bridge on your Android phone to allow it." : {
+
+    },
+    "The bridge phone couldn't do that." : {
+
+    },
+    "The bridge phone couldn't prove it showed this code. Pairing was stopped to keep you safe." : {
+
+    },
+    "The bridge phone couldn't use that request." : {
+
+    },
+    "The bridge phone didn't accept this iPhone. Show a new code and scan it again." : {
+
+    },
+    "The bridge phone didn't answer in time." : {
+
+    },
+    "The bridge phone is busy pairing with another device. Try again in a moment." : {
+
+    },
+    "The bridge phone is busy. Try again in a moment." : {
+
+    },
+    "The call couldn't be completed." : {
+
+    },
+    "The code works once and only for this pairing. Only someone who can see your Android screen can pair." : {
+
+    },
+    "The connection dropped while pairing. Try again." : {
+
+    },
+    "The contact is saved in the Android phone's contacts." : {
+
+    },
+    "The diagnostic log is stored here, has personal details removed, and is shared only if you choose to, after you've seen it." : {
+
+    },
+    "The free Pairline Bridge app runs on the Android phone with your SIM." : {
+
+    },
+    "The iPhone can't find the bridge" : {
+
+    },
+    "The phones connect directly over Bluetooth, encrypted end to end." : {
+
+    },
+    "The purchase couldn't be verified." : {
+
+    },
+    "The source code is public, so anyone can check these promises." : {
+
+    },
+    "There's already a call in progress." : {
+
+    },
+    "There's no Pairline cloud. You never sign up." : {
+
+    },
+    "This bridge phone can't send keypad tones yet. Use the Android phone's keypad." : {
+
+    },
+    "This bridge phone has one active SIM." : {
+
+    },
+    "This device has no camera. Use a physical iPhone to scan the pairing code." : {
+
+    },
+    "This iPhone forgets the bridge phone and removes the messages, contacts and call history synced from it. Nothing is deleted on the Android phone." : {
+
+    },
+    "This iPhone's pairing key lives in the Secure Enclave when available, otherwise in the Keychain, and never leaves the device." : {
+
+    },
+    "This is the exact text that is shared if you tap Share. Phone numbers, emails and device addresses are removed, and message text is never logged." : {
+
+    },
+    "This pairing code has expired. Show a new code on the bridge phone and scan it again." : {
+
+    },
+    "This pairing code was already used. Show a new code on the bridge phone." : {
+
+    },
+    "Tips for a connection that lasts all day" : {
+
+    },
+    "To connect to your bridge phone." : {
+
+    },
+    "To:" : {
+
+    },
+    "Today" : {
+
+    },
+    "Tools" : {
+
+    },
+    "Trial ended" : {
+
+    },
+    "Trial reminder" : {
+
+    },
+    "Troubleshooting" : {
+
+    },
+    "Try again" : {
+
+    },
+    "Try free for 3 days" : {
+
+    },
+    "Try it" : {
+
+    },
+    "Try now" : {
+
+    },
+    "Turn Bluetooth off and on again on the Android phone." : {
+
+    },
+    "Turn off Focus or Do Not Disturb, which can silence calls." : {
+
+    },
+    "Turn on \"Add contacts from iPhone\" in Pairline Bridge on your Android phone." : {
+
+    },
+    "Turn on Autostart for Pairline Bridge in the phone's security or battery app." : {
+
+    },
+    "Turn on Bluetooth and allow Pairline to use it, then try again." : {
+
+    },
+    "Turn on Bluetooth in Control Center or Settings to reach your bridge phone." : {
+
+    },
+    "Turn on call control in Pairline Bridge on your Android phone." : {
+
+    },
+    "Turn on call-history sync in Pairline Bridge on your Android phone." : {
+
+    },
+    "Turn on contacts sync in Pairline Bridge on your Android phone." : {
+
+    },
+    "Two phones, one line" : {
+
+    },
+    "Type a phone number. Contacts appear here once they sync from the bridge phone." : {
+
+    },
+    "Unknown" : {
+
+    },
+    "Unlock" : {
+
+    },
+    "Unlock Pairline" : {
+
+    },
+    "Unlock Pairline · %@" : {
+
+    },
+    "Unlock Pairline for a one-time %@ to keep using your Android SIM on this iPhone. Your synced messages stay readable either way." : {
+
+    },
+    "Unlock Pairline to send messages" : {
+
+    },
+    "Unpair" : {
+
+    },
+    "Unpair this bridge phone?" : {
+
+    },
+    "Unpaired. Your synced messages were removed from this iPhone." : {
+
+    },
+    "Unread" : {
+
+    },
+    "Update your bridge app" : {
+
+    },
+    "USSD code" : {
+
+    },
+    "USSD codes" : {
+
+    },
+    "USSD Codes" : {
+
+    },
+    "Version %@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Version %1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "Version %@ (%@) · Link protocol v%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Version %1$@ (%2$@) · Link protocol v%3$lld"
+          }
+        }
+      }
+    },
+    "Voicemail" : {
+
+    },
+    "Waiting for bridge" : {
+
+    },
+    "What happens after the free trial?" : {
+
+    },
+    "What is Pairline?" : {
+
+    },
+    "What this bridge can do" : {
+
+    },
+    "What to do" : {
+
+    },
+    "Why the iPhone app must stay open in the background" : {
+
+    },
+    "work" : {
+
+    },
+    "Yes. Pairline's source code is public so anyone can check what it does." : {
+
+    },
+    "Yes. The link uses Bluetooth, so keep the phones within about 10 meters. Leaving the Android phone at home while you're out isn't supported yet." : {
+
+    },
+    "Yesterday" : {
+
+    },
+    "You" : {
+
+    },
+    "You control calls from the iPhone, but you talk on the Android phone. Call audio on the iPhone is coming in a later update." : {
+
+    },
+    "You own Pairline" : {
+
+    },
+    "You're all caught up." : {
+
+    },
+    "You're paired!" : {
+
+    },
+    "Your Android phone and iPhone, linked" : {
+
+    },
+    "Your Android phone keeps the SIM. Your iPhone does the talking." : {
+
+    },
+    "Your Android SIM on your iPhone. Pay once, keep it for good." : {
+
+    },
+    "Your Android SIM, on your iPhone." : {
+
+    },
+    "Your bridge app can't answer calls yet. Answer on the Android phone." : {
+
+    },
+    "Your bridge app can't place calls yet. Allow the phone permission in Pairline Bridge." : {
+
+    },
+    "Your bridge app can't send keypad tones yet. Use the keypad on the Android phone." : {
+
+    },
+    "Your bridge app speaks a different link version. Update Pairline Bridge on your Android phone to keep everything working." : {
+
+    },
+    "Your bridge phone is at %lld%%. Charge it to keep calls and messages coming to this iPhone." : {
+
+    },
+    "Your bridge phone isn't connected right now." : {
+
+    },
+    "Your conversations are on their way from the bridge phone." : {
+
+    },
+    "Your free trial has ended" : {
+
+    },
+    "Your free trial has ended, so this iPhone stopped connecting to the bridge phone. Your synced messages are still here." : {
+
+    },
+    "Your free trial has ended. Synced messages stay readable." : {
+
+    },
+    "Your free trial has ended. Unlock Pairline to keep using your bridge phone." : {
+
+    },
+    "Your free trial is on" : {
+
+    },
+    "Your iPhone" : {
+
+    },
+    "Your message will be sent when the bridge phone reconnects." : {
+
+    },
+    "Your messages, contacts, call history and codes travel only between your Android phone and this iPhone, encrypted end to end." : {
+
+    },
+    "Your Pairline trial ends tomorrow" : {
+
+    },
+    "Your purchase is waiting for approval." : {
+
+    },
+    "Your purchase was restored." : {
+
+    },
+    "Your synced messages stay readable without buying. Demo mode and help always work." : {
+
+    }
+  },
+  "version" : "1.0"
+}

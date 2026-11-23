@@ -288,7 +288,7 @@ struct Composer: View {
                     .accessibilityLabel(Text("Send"))
                 }
                 if segments.parts > 1 || (segments.parts == 1 && segments.remaining < 20) {
-                    Text("\(segments.parts) SMS · \(segments.remaining) characters left")
+                    Text("SMS parts: \(segments.parts) · left: \(segments.remaining)")
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .trailing)
