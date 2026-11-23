@@ -218,12 +218,26 @@ final class AppModel: ObservableObject {
                 self.demoBridge?.simulateIncomingCall()
             }
         }
-        if args.contains("-PairlineDemoOutgoingCall") {
+        // Sends one SMS through the link once connected (end-to-end tests against a bridge).
+        if let index = args.firstIndex(of: "-PairlineSendSMS"), index + 2 < args.count {
+            let to = args[index + 1]
+            let body = args[index + 2]
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 2_500_000_000)
-                if let number = self.demoBridge?.content.people.first?.number {
-                    self.active.calls.startCall(number: number, sim: 0)
+                for _ in 0..<30 where !self.active.phase.isConnected {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
                 }
+                let message = try? self.active.sendSMS(to: to, body: body, sim: nil, thread: nil)
+                if let message { self.openThread = message.thread }
+            }
+        }
+        // Places one call through the link once connected.
+        if let index = args.firstIndex(of: "-PairlineDial"), index + 1 < args.count {
+            let number = args[index + 1]
+            Task { @MainActor in
+                for _ in 0..<30 where !self.active.phase.isConnected || self.active.status == nil {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                }
+                self.active.calls.startCall(number: number, sim: nil)
             }
         }
         #endif

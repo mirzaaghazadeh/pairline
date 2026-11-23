@@ -38,7 +38,7 @@ fi
 echo "== Binary: $app"
 binary="$app/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Info.plist")"
 symbols="$(strings -a "$binary"; nm -U "$binary" 2>/dev/null || true)"
-for marker in TCPConnector TCPTransport PairlinePairLink PairlineAccess PairlineTCPPort PairlineMarketing 127.0.0.1; do
+for marker in TCPConnector TCPTransport PairlinePairLink PairlineAccess PairlineTCPPort PairlineMarketing PairlineSendSMS PairlineDial 127.0.0.1; do
   if grep -q "$marker" <<<"$symbols"; then
     echo "::error::The Release binary contains debug-only code: $marker (keep it behind #if DEBUG, D-018)."
     fail=1

@@ -59,6 +59,8 @@ struct CallScreen: View {
             Group {
                 if let name = call.name, !name.isEmpty {
                     Text(verbatim: name)
+                } else if call.number.isEmpty {
+                    Text("Unknown caller")
                 } else {
                     LTRText(call.number)
                 }
@@ -69,7 +71,7 @@ struct CallScreen: View {
             .minimumScaleFactor(0.6)
             .padding(.horizontal, 24)
             .padding(.top, 18)
-            if call.name != nil {
+            if call.name != nil, !call.number.isEmpty {
                 LTRText(call.number)
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.65))

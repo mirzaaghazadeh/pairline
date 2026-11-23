@@ -190,6 +190,7 @@ struct CallStateEvent: Codable, Equatable {
     var name: String?
     var since: Int64?
     var reason: String?
+    var sim: Int?
 }
 
 struct USSDResult: Equatable {

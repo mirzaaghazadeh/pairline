@@ -26,7 +26,10 @@ struct ActiveCall: Identifiable, Equatable {
     var inCallKit: Bool
     var answeredHere = false
 
-    var displayName: String { name?.isEmpty == false ? name! : number }
+    var displayName: String {
+        if let name, !name.isEmpty { return name }
+        return number.isEmpty ? String(localized: "Unknown caller") : number
+    }
 }
 
 /// Maps bridge call events to CallKit (real link) or to the in-app call screen (demo mode), and CallKit actions to
@@ -52,7 +55,12 @@ final class CallCenter: ObservableObject {
             adapter.onStart = { [weak self] id, action in self?.performStart(id, action) }
             adapter.onMute = { [weak self] id, muted, action in self?.performMute(id, muted, action) }
             adapter.onDTMF = { [weak self] id, digits, action in self?.performDTMF(id, digits, action) }
-            adapter.onReset = { [weak self] in self?.current = nil }
+            adapter.onReset = { [weak self] in
+                // CallKit dropped its calls; the call on the Android phone goes on, so keep it in the app.
+                guard let self, self.current != nil else { return }
+                self.current?.inCallKit = false
+                if UIApplication.shared.applicationState == .active { self.showCallScreen = true }
+            }
         }
     }
 
@@ -101,13 +109,13 @@ final class CallCenter: ObservableObject {
         }
         if current == nil {
             if event.state == "ringing", event.dir != "out" {
-                return handleIncoming(CallIncomingEvent(call: event.call, sim: nil, from: event.number, name: event.name))
+                return handleIncoming(CallIncomingEvent(call: event.call, sim: event.sim, from: event.number, name: event.name))
             }
             // A call placed or answered on the Android phone itself: show it in the app, without CallKit.
             let number = event.number ?? ""
             current = ActiveCall(id: UUID(), bridgeID: event.call, number: number,
                                  name: event.name ?? bridge?.db.knownName(for: number), isOutgoing: event.dir == "out",
-                                 state: mapState(event.state), sim: nil,
+                                 state: mapState(event.state), sim: event.sim,
                                  connectedAt: event.state == "active" ? Date(milliseconds: event.since ?? Date().milliseconds) : nil,
                                  inCallKit: false)
             return
@@ -133,6 +141,13 @@ final class CallCenter: ObservableObject {
         }
         call.state = newState
         if let name = event.name, call.name == nil { call.name = name }
+        if let sim = event.sim, call.sim == nil { call.sim = sim }
+        // The number can arrive after call.incoming (Android reads it from a later broadcast).
+        if call.number.isEmpty, let number = event.number, !number.isEmpty {
+            call.number = number
+            if call.name == nil { call.name = bridge?.db.knownName(for: number) }
+            if call.inCallKit { adapter?.updateCaller(call) }
+        }
         current = call
     }
 
@@ -274,18 +289,35 @@ final class CallCenter: ObservableObject {
             let handle = CXHandle(type: .phoneNumber, value: dialable)
             let action = CXStartCallAction(call: call.id, handle: handle)
             action.contactIdentifier = call.name
-            request(action)
+            request(action) { [weak self] in
+                // CallKit refused (the Simulator has none): place the call without it.
+                guard let self, self.current?.id == call.id else { return }
+                self.current?.inCallKit = false
+                Task { await self.sendDial(call) }
+            }
         } else {
             Task { await sendDial(call) }
         }
     }
 
-    private func request(_ action: CXCallAction) {
+    private func request(_ action: CXCallAction, fallback: (() -> Void)? = nil) {
         controller.request(CXTransaction(action: action)) { [weak self] error in
             guard let error else { return }
             Task { @MainActor in
                 log.warning("calls", "CallKit transaction failed: \(error.localizedDescription)")
-                self?.notice = String(localized: "That didn't work. Try again on the Android phone.")
+                if let fallback {
+                    fallback()
+                } else if let self, let call = self.current, call.inCallKit {
+                    // Run the action without CallKit.
+                    self.current?.inCallKit = false
+                    if action is CXAnswerCallAction { Task { await self.sendAnswer() } }
+                    if action is CXEndCallAction { Task { await self.sendEnd(call) } }
+                    if let mute = action as? CXSetMutedCallAction {
+                        Task { await self.sendAudio(mute: mute.isMuted, speaker: nil) }
+                    }
+                } else {
+                    self?.notice = String(localized: "That didn't work. Try again on the Android phone.")
+                }
             }
         }
     }
@@ -448,6 +480,14 @@ final class CallKitAdapter: NSObject, CXProviderDelegate {
         provider.reportNewIncomingCall(with: call.id, update: update) { error in
             DispatchQueue.main.async { completion(error) }
         }
+    }
+
+    func updateCaller(_ call: ActiveCall) {
+        let update = CXCallUpdate()
+        update.remoteHandle = CXHandle(type: PhoneNumber.isPhoneNumber(call.number) ? .phoneNumber : .generic,
+                                       value: call.number)
+        update.localizedCallerName = call.name
+        provider.reportCall(with: call.id, updated: update)
     }
 
     func reportConnecting(_ id: UUID) {

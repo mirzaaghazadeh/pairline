@@ -188,7 +188,7 @@ final class AppDatabase: ObservableObject {
             try db.execute("""
                 INSERT INTO threads(thread, addrs, snippet, time, count, unread, has_older) VALUES(?, ?, ?, ?, NULL, ?, ?)
                 """, [.int(thread), .text(encodeList([addr])), .text(body), .int(time), .int(unread ? 1 : 0),
-                      .int(thread >= 0 ? 1 : 0)])
+                      .int(thread >= 0 && !historyComplete ? 1 : 0)])
         }
     }
 
@@ -356,11 +356,14 @@ final class AppDatabase: ObservableObject {
         (try? db.query("SELECT COALESCE(SUM(unread), 0) AS n FROM threads"))?.first?.int("n") ?? 0
     }
 
-    /// After a history sync that reached the beginning, every conversation is complete.
+    /// After a history sync that reached the beginning, every conversation is complete, and so is any new one.
     func markAllThreadsComplete() {
         try? db.execute("UPDATE threads SET has_older = 0")
+        setValue("1", for: "history.complete")
         changed()
     }
+
+    private var historyComplete: Bool { value("history.complete") == "1" }
 
     func setHasOlder(thread: Int64, _ hasOlder: Bool) {
         try? db.execute("UPDATE threads SET has_older = ? WHERE thread = ?", [.from(hasOlder), .int(thread)])

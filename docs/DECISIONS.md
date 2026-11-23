@@ -301,7 +301,8 @@ says, the translations need a native-speaker review before release.
 Debug builds accept launch arguments for Simulator testing: `-PairlineAccess purchased|trial|expired|none` (fake
 access state, because the Simulator can't run sandbox purchases outside Xcode), `-PairlineTCPPort` (pick a port, for
 example next to an Android emulator's `adb forward`), `-PairlinePairLink` (the URL-scheme pairing path without the
-system alert), `-PairlineDemo`, `-PairlineTab`, `-PairlineThread`, `-PairlineDemoCall`, `-PairlinePaywall` and
+system alert), `-PairlineSendSMS <to> <text>` and `-PairlineDial <number>` (exercise sending and dialing end to end
+without tapping), `-PairlineDemo`, `-PairlineTab`, `-PairlineThread`, `-PairlineDemoCall`, `-PairlinePaywall` and
 `-PairlineOnboardingPage` (screenshots), and `-PairlineMarketing` (hides the demo labels for the website screenshots
 in `docs/screenshots/ios/`, which show demo data). All of it is behind `#if DEBUG`; CI fails if any of these names or
 the TCP transport appear in the Release binary.
