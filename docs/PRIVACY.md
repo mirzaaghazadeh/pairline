@@ -111,6 +111,8 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | Camera (`NSCameraUsageDescription`) | Scan the pairing QR code; frames are processed on the device and never recorded | When you open the scanner |
 | Notifications | New SMS, one-time codes, bridge battery alerts and the trial reminder (all local; no push) | After pairing, or from Settings |
 | Background mode `bluetooth-central` | iOS wakes Pairline for Bluetooth events from the bridge phone | No prompt |
+| Microphone (`NSMicrophoneUsageDescription`) | Only during a call you take on the iPhone with "Talk on iPhone": your voice goes to the bridge phone and into the call. Never recorded or stored (M6, D-047) | When the bridge first offers Talk on iPhone |
+| Background mode `audio` | Keeps a relayed call's audio running while the iPhone is locked or another app is open | No prompt |
 | CallKit (no prompt) | Shows calls on the iPhone call screen. Calls are added to iPhone Recents only if you turn that on | — |
 | In-App Purchase (no prompt) | The free 7-day trial and the one-time purchase (D-017, D-036) | — |
 | App Group `group.app.pairline.ios` (no prompt) | Shares the bridge status with Pairline's widget | — |

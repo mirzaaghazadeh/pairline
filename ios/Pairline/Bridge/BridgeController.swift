@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import UIKit
 import WidgetKit
@@ -156,6 +157,8 @@ final class BridgeController: ObservableObject {
             calls.handleIncoming(event)
         case .callState(let event):
             calls.handleState(event)
+        case .callMediaState(let event):
+            calls.handleMediaState(event)
         default:
             break
         }
@@ -173,6 +176,19 @@ final class BridgeController: ObservableObject {
             }
         }
         saveWidget()
+        requestMicrophoneIfNeeded(s)
+    }
+
+    /// The bridge just offered "Talk on iPhone": ask for the microphone now, while the app is open, rather than in
+    /// the middle of the first call. iOS asks only once; the answer is kept in Settings › Pairline.
+    private func requestMicrophoneIfNeeded(_ s: BridgeStatus) {
+        guard mode == .real, s.caps?.contains(Capability.callMediaTalk.rawValue) == true,
+              UIApplication.shared.applicationState == .active else { return }
+        let session = AVAudioSession.sharedInstance()
+        guard session.recordPermission == .undetermined else { return }
+        session.requestRecordPermission { granted in
+            log.info("audio", "Microphone \(granted ? "allowed" : "denied") for calls")
+        }
     }
 
     private func notify(_ message: StoredMessage) {

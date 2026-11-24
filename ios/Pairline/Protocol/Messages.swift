@@ -182,6 +182,15 @@ struct CallIncomingEvent: Codable, Equatable {
     var name: String?
 }
 
+/// `call.media.state`: the bridge started, stopped or failed to relay call audio (M6, D-047).
+struct CallMediaStateEvent: Codable, Equatable {
+    var call: OpaqueValue
+    var state: String
+    var listen: Bool?
+    var talk: Bool?
+    var reason: String?
+}
+
 struct CallStateEvent: Codable, Equatable {
     var call: OpaqueValue
     var state: String
@@ -238,6 +247,7 @@ enum InboundMessage {
     case smsHistory(SMSHistoryReply)
     case callIncoming(CallIncomingEvent)
     case callState(CallStateEvent)
+    case callMediaState(CallMediaStateEvent)
     case contactsSync(ContactsSyncReply)
     case calllogSync(CallLogSyncReply)
     case ussdResult(USSDResult)
@@ -320,6 +330,7 @@ struct Inbound {
             message = .smsHistory(SMSHistoryReply(msgs: b.msgs?.elements ?? [], more: b.more ?? false))
         case "call.incoming": message = .callIncoming(try body(CallIncomingEvent.self))
         case "call.state": message = .callState(try body(CallStateEvent.self))
+        case "call.media.state": message = .callMediaState(try body(CallMediaStateEvent.self))
         case "contacts.sync":
             let b = try body(ContactsBody.self)
             message = .contactsSync(ContactsSyncReply(contacts: b.contacts?.elements ?? [],
@@ -411,6 +422,20 @@ struct Outbound {
         return Outbound("call.audio", fields)
     }
 
+    /// Asks the bridge to relay this call's audio over the Wi-Fi media channel (PROTOCOL.md "Call audio").
+    static func callMediaStart(_ call: OpaqueValue, talk: Bool) -> Outbound {
+        Outbound("call.media.start", ["call": call.jsonObject, "talk": talk])
+    }
+
+    static func callMediaStop(_ call: OpaqueValue) -> Outbound {
+        Outbound("call.media.stop", ["call": call.jsonObject])
+    }
+
+    /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
+    static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {
+        Outbound("call.media.feedback", ["heard": optional(heard), "heardMe": optional(heardMe)])
+    }
+
     static func contactsSync(since: OpaqueValue?) -> Outbound {
         Outbound("contacts.sync", ["since": optional(since?.jsonObject)])
     }
@@ -444,6 +469,10 @@ enum Capability: String, CaseIterable, Identifiable {
     case contactsAdd = "contacts.add"
     case ussd = "ussd"
     case dualSIM = "dualsim"
+    /// The bridge can relay call audio to this iPhone ("Talk on iPhone", M6).
+    case callMedia = "call.media"
+    /// …and can feed this iPhone's microphone into the call.
+    case callMediaTalk = "call.media.talk"
 
     var id: String { rawValue }
 }

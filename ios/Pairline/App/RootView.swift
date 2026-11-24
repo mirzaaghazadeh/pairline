@@ -69,6 +69,7 @@ struct MainView: View {
                 .environmentObject(bridge.calls)
                 .environmentObject(bridge.db)
         }
+        .modifier(CallAudioFeedbackModifier(calls: calls))
         .overlay(alignment: .bottom) {
             // Keyed on what's actually on screen, so a dropped presentation never leaves a call without controls.
             if let call = calls.current, !calls.callScreenVisible {

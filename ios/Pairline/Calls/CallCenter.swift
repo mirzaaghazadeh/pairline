@@ -1,3 +1,4 @@
+import AVFoundation
 import CallKit
 import Foundation
 import UIKit
@@ -33,10 +34,21 @@ struct ActiveCall: Identifiable, Equatable {
 }
 
 /// Maps bridge call events to CallKit (real link) or to the in-app call screen (demo mode), and CallKit actions to
-/// link requests. Audio stays on the Android phone until M6.
+/// link requests. Call audio stays on the Android phone unless the bridge can relay it ("Talk on iPhone", D-047).
 @MainActor
 final class CallCenter: ObservableObject {
+    /// Where the call's audio is.
+    enum AudioRoute: Equatable {
+        case bridge
+        case connecting
+        /// On this iPhone; `talk` false means listen here, talk on the Android phone.
+        case iphone(talk: Bool)
+    }
+
     @Published private(set) var current: ActiveCall?
+    @Published private(set) var audioRoute: AudioRoute = .bridge
+    /// Set after a call whose audio was on this iPhone, so the app can ask how it sounded.
+    @Published var askAudioFeedback = false
     @Published var showCallScreen = false
     /// True only while the call screen is actually on screen. `showCallScreen` can be true while SwiftUI drops the
     /// presentation (another presentation or a transition in progress), so the call bar and the retry use this.
@@ -44,9 +56,16 @@ final class CallCenter: ObservableObject {
     @Published var notice: String?
 
     weak var bridge: BridgeController?
+    /// The Wi-Fi media channel while one is open (M5); nil without a Wi-Fi link.
+    var mediaTransport: (() -> AudioPacketTransport?)?
     private let useCallKit: Bool
     private var adapter: CallKitAdapter?
     private let controller = CXCallController()
+    private var audioEngine: CallAudioEngine?
+    private var audioSessionActive = false
+    private var relayAccepted = false
+    private var relayTalk = false
+    private var relayStartedAt: Date?
 
     init(useCallKit: Bool) {
         self.useCallKit = useCallKit
@@ -58,6 +77,14 @@ final class CallCenter: ObservableObject {
             adapter.onStart = { [weak self] id, action in self?.performStart(id, action) }
             adapter.onMute = { [weak self] id, muted, action in self?.performMute(id, muted, action) }
             adapter.onDTMF = { [weak self] id, digits, action in self?.performDTMF(id, digits, action) }
+            adapter.onAudioActivated = { [weak self] in
+                self?.audioSessionActive = true
+                self?.startEngineIfReady()
+            }
+            adapter.onAudioDeactivated = { [weak self] in
+                self?.audioSessionActive = false
+                self?.stopEngine()
+            }
             adapter.onReset = { [weak self] in
                 // CallKit dropped its calls; the call on the Android phone goes on, so keep it in the app.
                 guard let self, self.current != nil else { return }
@@ -73,7 +100,11 @@ final class CallCenter: ObservableObject {
 
     private var canControl: Bool { bridge?.has(.callControl) ?? false }
     var canDTMF: Bool { bridge?.has(.callDTMF) ?? false }
-    var canAudio: Bool { bridge?.has(.callAudio) ?? false }
+    /// Mute and speaker work: locally while the audio is on this iPhone, or on the bridge through `call.audio`.
+    var canAudio: Bool { audioOnIPhone || (bridge?.has(.callAudio) ?? false) }
+    var audioOnIPhone: Bool { if case .iphone = audioRoute { return true } else { return false } }
+    /// The bridge can relay this call's audio and the Wi-Fi media channel is open.
+    var canRelayAudio: Bool { bridge?.has(.callMedia) == true && (mediaTransport?()?.isOpen ?? false) }
 
     // MARK: - Bridge events
 
@@ -152,6 +183,9 @@ final class CallCenter: ObservableObject {
             if call.inCallKit { adapter?.updateCaller(call) }
         }
         current = call
+        // Taken on this iPhone (answered here, or dialed from here): bring the audio over if the bridge can. The
+        // bridge's own "active" event is the cue, since it only relays a call it sees in progress.
+        if newState == .active, call.answeredHere { startRelayIfPossible() }
     }
 
     private func handleEnded(_ event: CallStateEvent) {
@@ -162,6 +196,7 @@ final class CallCenter: ObservableObject {
         }
         if let message = endNotice(event.reason, call: call) { notice = message }
         current = call
+        stopRelay(callEnded: true)
         log.info("calls", "Call ended: \(event.reason ?? "-")")
         let id = call.id
         Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { [weak self] _ in
@@ -207,10 +242,120 @@ final class CallCenter: ObservableObject {
 
     /// The link dropped: CallKit can't control a call we can't reach.
     func linkLost() {
+        stopRelay(callEnded: false)
         guard let call = current else { return }
         if call.inCallKit { adapter?.reportEnded(call.id, reason: .failed) }
         current = nil
         showCallScreen = false
+    }
+
+    // MARK: - Call audio on this iPhone (D-047)
+
+    /// `call.media.state` from the bridge.
+    func handleMediaState(_ event: CallMediaStateEvent) {
+        guard let call = current, call.bridgeID == event.call else { return }
+        switch event.state {
+        case "active":
+            relayTalk = event.talk ?? false
+            if audioOnIPhone { audioRoute = .iphone(talk: relayTalk) }
+        case "failed", "stopped":
+            guard audioRoute != .bridge else { return }
+            log.info("audio", "Bridge stopped relaying call audio: \(event.reason ?? "-")")
+            if event.state == "failed" || call.state == .active {
+                notice = String(localized: "The call's audio went back to your Android phone.", table: "CallAudio")
+            }
+            stopRelay(callEnded: false)
+        default:
+            break
+        }
+    }
+
+    private func startRelayIfPossible() {
+        guard audioRoute == .bridge, !relayAccepted, canRelayAudio,
+              let bridge, let bridgeID = current?.bridgeID else { return }
+        audioRoute = .connecting
+        let talk = bridge.has(.callMediaTalk)
+        if !useCallKit || current?.inCallKit == false { activateOwnAudioSession() }
+        Task {
+            do {
+                _ = try await bridge.link.request(.callMediaStart(bridgeID, talk: talk))
+                guard self.current?.bridgeID == bridgeID else { return }
+                self.relayAccepted = true
+                self.relayTalk = talk
+                self.startEngineIfReady()
+            } catch {
+                log.warning("audio", "Bridge didn't start call audio: \(error.localizedDescription)")
+                if self.audioRoute == .connecting { self.audioRoute = .bridge }
+            }
+        }
+    }
+
+    /// CallKit activates the audio session for a call it shows; the engine starts once both the bridge has accepted
+    /// and the session is active.
+    private func startEngineIfReady() {
+        guard relayAccepted, audioSessionActive, audioEngine == nil,
+              let transport = mediaTransport?(), transport.isOpen else { return }
+        let engine = CallAudioEngine(transport: transport)
+        do {
+            try engine.start()
+            engine.muted = current?.muted ?? false
+            if current?.speaker == true { engine.setSpeaker(true) }
+            audioEngine = engine
+            relayStartedAt = Date()
+            audioRoute = .iphone(talk: relayTalk)
+        } catch {
+            log.warning("audio", "Couldn't start call audio here: \(error.localizedDescription)")
+            notice = error.localizedDescription
+            stopRelay(callEnded: false)
+        }
+    }
+
+    private func stopEngine() {
+        audioEngine?.stop()
+        audioEngine = nil
+    }
+
+    private func stopRelay(callEnded: Bool) {
+        let wasRelaying = audioOnIPhone
+        let relayedFor = relayStartedAt.map { Date().timeIntervalSince($0) } ?? 0
+        stopEngine()
+        if relayAccepted, !callEnded, let bridgeID = current?.bridgeID, let bridge {
+            Task { _ = try? await bridge.link.request(.callMediaStop(bridgeID)) }
+        }
+        relayAccepted = false
+        relayStartedAt = nil
+        audioRoute = .bridge
+        if !useCallKit || current?.inCallKit == false {
+            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+            audioSessionActive = false
+        }
+        // Ask how it sounded after a real conversation, so the bridge can settle on what works on that phone.
+        if callEnded, wasRelaying, relayedFor >= 8 { askAudioFeedback = true }
+    }
+
+    /// The in-app call screen (no CallKit, e.g. the Simulator) needs its own voice-chat audio session.
+    private func activateOwnAudioSession() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth])
+            try session.setActive(true)
+            audioSessionActive = true
+        } catch {
+            log.warning("audio", "Couldn't activate the audio session: \(error.localizedDescription)")
+        }
+    }
+
+    /// Prepares the session CallKit is about to activate, so it comes up as a voice chat.
+    private func prepareCallKitAudioSession() {
+        guard canRelayAudio else { return }
+        try? AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth])
+    }
+
+    /// The answers to "How did the call sound?".
+    func sendAudioFeedback(heard: Bool?, heardMe: Bool?) {
+        askAudioFeedback = false
+        guard let bridge else { return }
+        Task { _ = try? await bridge.link.request(.callMediaFeedback(heard: heard, heardMe: heardMe)) }
     }
 
     // MARK: - User actions (in-app UI)
@@ -235,6 +380,11 @@ final class CallCenter: ObservableObject {
 
     func setMuted(_ muted: Bool) {
         guard let call = current else { return }
+        if audioOnIPhone, !call.inCallKit {
+            audioEngine?.muted = muted
+            current?.muted = muted
+            return
+        }
         guard canAudio else {
             notice = String(localized: "Call audio is on your Android phone for now, so mute it there.")
             return
@@ -247,6 +397,11 @@ final class CallCenter: ObservableObject {
     }
 
     func setSpeaker(_ on: Bool) {
+        if audioOnIPhone {
+            audioEngine?.setSpeaker(on)
+            current?.speaker = on
+            return
+        }
         guard canAudio else {
             notice = String(localized: "Call audio is on your Android phone for now, so use its speaker button.")
             return
@@ -284,8 +439,9 @@ final class CallCenter: ObservableObject {
         }
         let dialable = PhoneNumber.dialable(number)
         guard !dialable.isEmpty else { return }
-        let call = ActiveCall(id: UUID(), bridgeID: nil, number: dialable, name: bridge.db.knownName(for: dialable),
+        var call = ActiveCall(id: UUID(), bridgeID: nil, number: dialable, name: bridge.db.knownName(for: dialable),
                               isOutgoing: true, state: .dialing, sim: sim, inCallKit: useCallKit)
+        call.answeredHere = true // placed from this iPhone, so its audio belongs here too
         current = call
         showCallScreen = true
         if useCallKit {
@@ -329,6 +485,7 @@ final class CallCenter: ObservableObject {
 
     private func performAnswer(_ id: UUID, _ action: CXAnswerCallAction) {
         guard current?.id == id else { return action.fail() }
+        prepareCallKitAudioSession()
         Task {
             if await sendAnswer() { action.fulfill() } else { action.fail() }
         }
@@ -343,6 +500,7 @@ final class CallCenter: ObservableObject {
 
     private func performStart(_ id: UUID, _ action: CXStartCallAction) {
         guard let call = current, call.id == id else { return action.fail() }
+        prepareCallKitAudioSession()
         Task {
             if await sendDial(call) {
                 action.fulfill()
@@ -354,6 +512,12 @@ final class CallCenter: ObservableObject {
     }
 
     private func performMute(_ id: UUID, _ muted: Bool, _ action: CXSetMutedCallAction) {
+        if audioOnIPhone {
+            // The microphone is this iPhone's: mute it here (the bridge then gets silence).
+            audioEngine?.muted = muted
+            current?.muted = muted
+            return action.fulfill()
+        }
         guard canAudio else { return action.fail() }
         Task {
             if await sendAudio(mute: muted, speaker: nil) { action.fulfill() } else { action.fail() }
@@ -446,6 +610,8 @@ final class CallKitAdapter: NSObject, CXProviderDelegate {
     var onMute: ((UUID, Bool, CXSetMutedCallAction) -> Void)?
     var onDTMF: ((UUID, String, CXPlayDTMFCallAction) -> Void)?
     var onReset: (() -> Void)?
+    var onAudioActivated: (() -> Void)?
+    var onAudioDeactivated: (() -> Void)?
 
     init(includeInRecents: Bool) {
         provider = CXProvider(configuration: CallKitAdapter.configuration(includeInRecents: includeInRecents))
@@ -517,4 +683,6 @@ final class CallKitAdapter: NSObject, CXProviderDelegate {
         onDTMF?(action.callUUID, action.digits, action)
     }
     func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) { action.fail() }
+    func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) { onAudioActivated?() }
+    func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) { onAudioDeactivated?() }
 }

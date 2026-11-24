@@ -120,6 +120,36 @@
           }
         }
       }
+    },
+    "NSMicrophoneUsageDescription" : {
+      "comment" : "Privacy - Microphone Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أثناء مكالمة تردّ عليها على هذا الآيفون، يرسل Pairline صوتك إلى هاتفك الوسيط الذي يعمل بنظام أندرويد ليسمعك الطرف الآخر. لا يُسجَّل شيء."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "During a call you take on this iPhone, Pairline sends your voice to your Android bridge phone so the other person can hear you. Nothing is recorded."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "در تماسی که روی این آیفون جواب می‌دهید، Pairline صدای شما را به گوشی پل اندرویدی‌تان می‌فرستد تا طرف مقابل صدایتان را بشنود. چیزی ضبط نمی‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu iPhone'da yanıtladığınız bir aramada Pairline, karşı tarafın sizi duyabilmesi için sesinizi Android köprü telefonunuza gönderir. Hiçbir şey kaydedilmez."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
