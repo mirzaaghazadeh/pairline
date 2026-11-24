@@ -12,9 +12,14 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.pairline.android.R
 
 /** Brand colors shared with the iPhone app and the website. */
 object Brand {
@@ -152,6 +157,37 @@ private val PairlineTypography = Typography().run {
     )
 }
 
+/** Persian text uses the bundled Estedad typeface (D-032, `res/font`); other languages keep the system font. */
+private val Estedad = FontFamily(
+    Font(R.font.estedad_regular, FontWeight.Normal),
+    Font(R.font.estedad_medium, FontWeight.Medium),
+    Font(R.font.estedad_semibold, FontWeight.SemiBold),
+    Font(R.font.estedad_bold, FontWeight.Bold),
+)
+
+private fun Typography.withFontFamily(family: FontFamily): Typography {
+    fun TextStyle.withFamily() = copy(fontFamily = family)
+    return copy(
+        displayLarge = displayLarge.withFamily(),
+        displayMedium = displayMedium.withFamily(),
+        displaySmall = displaySmall.withFamily(),
+        headlineLarge = headlineLarge.withFamily(),
+        headlineMedium = headlineMedium.withFamily(),
+        headlineSmall = headlineSmall.withFamily(),
+        titleLarge = titleLarge.withFamily(),
+        titleMedium = titleMedium.withFamily(),
+        titleSmall = titleSmall.withFamily(),
+        bodyLarge = bodyLarge.withFamily(),
+        bodyMedium = bodyMedium.withFamily(),
+        bodySmall = bodySmall.withFamily(),
+        labelLarge = labelLarge.withFamily(),
+        labelMedium = labelMedium.withFamily(),
+        labelSmall = labelSmall.withFamily(),
+    )
+}
+
+private val PersianTypography = PairlineTypography.withFontFamily(Estedad)
+
 /**
  * The brand palette in light and dark. Wallpaper colors (Android 12+) are deliberately not used, so the app
  * looks the same as the iPhone app and the website.
@@ -161,10 +197,11 @@ fun PairlineTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
+    val persian = LocalConfiguration.current.locales[0].language == "fa"
     CompositionLocalProvider(LocalStatusColors provides if (darkTheme) DarkStatus else LightStatus) {
         MaterialTheme(
             colorScheme = if (darkTheme) DarkColors else LightColors,
-            typography = PairlineTypography,
+            typography = if (persian) PersianTypography else PairlineTypography,
             shapes = PairlineShapes,
             content = content,
         )
