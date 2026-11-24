@@ -22,7 +22,9 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 | Package | Responsibility |
 |---------|----------------|
 | `ui` | Compose screens: setup wizard (permissions, battery optimization, OEM autostart tips, pairing QR), status |
-| `link` | `LinkService` foreground service (type `connectedDevice`), BLE advertiser + GATT server, Wi-Fi transport (M5), session state |
+| `link` | `LinkService` foreground service (type `connectedDevice`), BLE advertiser + GATT server, `LinkManager` (one session per transport, event/reply routing, `MediaChannel`), session state |
+| `link.wifi` | The Wi-Fi link (M5): listeners on local addresses only, DNS-SD, the UDP media socket, the local-only hotspot. With `update` and `netshare`, the only code allowed to open sockets (`network-code-check.sh`) |
+| `files` | File transfer over the Wi-Fi session (M5): queue, `BULK` data, Downloads/Pairline, notifications, the "Send to iPhone" share target |
 | `protocol` | Message models, handshake, AEAD records. Pure Kotlin, unit-tested against `protocol/test-vectors/` |
 | `telephony` | SMS, calls, contacts, call log, USSD, SIM info |
 | `privileged` | Optional Shizuku-backed operations, behind an allowlist |
@@ -73,10 +75,26 @@ Start as one `:app` module with these packages; split into Gradle modules only w
   the iOS Simulator; an adb-only content provider hands out the pairing link. `protocol/tools/fake_remote.py` plays
   the iPhone in end-to-end tests (`android/README.md`). None of this is in the release APK.
 
-**Sharing files (M5)**
-- Android: a share target, "Send to iPhone", appears in every app's share sheet.
-- iOS: a Share extension, "Send to bridge phone".
-- Files go over the encrypted bulk channel on Wi-Fi; `file.offer` and `file.answer` travel over BLE.
+**Wi-Fi link (M5, D-044)**
+- `WifiTransport` binds one listening socket (TCP 47820) per local address of the Wi-Fi and hotspot interfaces —
+  never mobile data or VPN interfaces — re-binds on network changes, and closes connections from non-local peers.
+- Each Wi-Fi connection is a full session (pairing, handshake, control records), so a phone whose Bluetooth can't
+  reach an iPhone (D-040) works over Wi-Fi alone. With Bluetooth also up, `LinkManager` keeps both sessions: events
+  go to Bluetooth, replies to the session that asked; when Bluetooth drops, events move to Wi-Fi.
+- Discovery: DNS-SD `_pairline._tcp` with a random name, the addresses in the pairing QR code, and `wifi.offer` over
+  Bluetooth.
+- Media: after each Wi-Fi handshake a UDP socket is bound to that session's local address and its network, and the
+  port goes to the iPhone in `wifi.media`. `LinkManager.media` (a `StateFlow<MediaChannel?>`) publishes it once the
+  first authentic datagram arrives; call audio (M6) uses it.
+- Hotspot: Android's local-only hotspot, started by the user from Settings (Android starts one only for an app in
+  the foreground); band choice on Android 16+.
+
+**Sharing files (M5, D-045)**
+- Android: a share target, "Send to iPhone", appears in every app's share sheet; Home also has "Send a file to
+  iPhone". Received files go to Downloads/Pairline (Android 10+) or Pairline's own folder (Android 9).
+- iOS: a Share extension, "Send to bridge phone", and a "Send a file" button; received files appear in the Files app.
+- `file.offer` / `file.answer` / `file.done` / `file.cancel` and the data (`BULK` frames) all travel on the Wi-Fi
+  session; there's no file transfer over Bluetooth.
 
 **Internet sharing (M8, opt-in)**
 - The iPhone joins the bridge hotspot. `netshare` runs a SOCKS5 proxy and an HTTP proxy (with a PAC file for
@@ -92,7 +110,7 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 |-------|----------------|
 | `Protocol` | Frames, hello, records, pairing MACs, BLE fragmenting, TCP framing, JSON message catalog (CryptoKit), tested against `protocol/test-vectors/` |
 | `Identity` | Identity key (Secure Enclave or Keychain), pinned peer, Keychain helpers |
-| `Link` | `LinkSession` (pairing + handshake + records per connection), `LinkManager` (requests with ids and timeouts, events, reconnection with backoff, idle watchdog), `BluetoothCentral` (CoreBluetooth central with restoration), `TCPTransport` (debug only); Wi-Fi transport (M5) |
+| `Link` | `LinkSession` (pairing + handshake + records per connection), `LinkManager` (requests with ids and timeouts, events, reconnection with backoff, idle watchdog), `BluetoothCentral` (CoreBluetooth central with restoration), `TCPTransport` (debug only); M5: `WiFiTransport` / `WiFiConnector` (Network.framework TCP, DNS-SD browsing, address candidates), `MediaSocket` (the UDP `MediaChannel`), `FileTransferManager`, `HotspotJoiner` (`NEHotspotConfiguration`). `LinkManager` runs a Bluetooth session and a Wi-Fi session side by side and routes each request |
 | `Bridge` | `BridgeLink` interface, `BridgeController` (sync engine, outbox, status, widget snapshot), status dashboard |
 | `Data` | SQLite store for messages, threads, contacts, call log and sync cursors |
 | `Messages` | Conversation list, thread, composer, new message, OTP detection, local notifications |
@@ -101,7 +119,7 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 | `Store` | StoreKit 2 products, trial state machine (D-017, D-025), paywall |
 | `Demo` | `DemoBridge`: the same `BridgeLink` interface with localized sample data, in-memory only (D-020) |
 | `PairlineWidget` | WidgetKit extension: bridge battery, signal and link state from the app group |
-| Share extension (M5) | "Send to bridge phone" from any iPhone app |
+| `PairlineShare` (M5) | Share extension "Send to bridge phone": copies what you share into the app group's outbox; the app sends it over the Wi-Fi link |
 
 Everything above `BridgeLink` is shared by the real link and demo mode. The transport is behind `FrameTransport`
 / `LinkConnector`, so BLE, the debug TCP link and (M5) Wi-Fi plug in under the same session code.
@@ -123,19 +141,27 @@ Everything above `BridgeLink` is shared by the real link and demo mode. The tran
 - Verified on the device; no server.
 
 **Wi-Fi (M5)**
-- Join the bridge's hotspot with `NEHotspotConfiguration` (Hotspot Configuration capability), or use a shared network.
-- Needs the Local Network permission.
+- Same Wi-Fi network as the bridge, or the bridge's hotspot, joined with `NEHotspotConfiguration` (Hotspot
+  Configuration capability; iOS asks the user) when a `wifi.offer` carries its name and passphrase.
+- Needs the Local Network permission (`NSLocalNetworkUsageDescription`, `NSBonjourServices` = `_pairline._tcp`).
+- Pairing tries Bluetooth and the QR code's Wi-Fi addresses at once; whichever reaches the bridge first pairs.
 
 ## Transports
 
 | Channel | Carries | Notes |
 |---------|---------|-------|
-| Bluetooth LE GATT | control, SMS, call signaling, contacts, status | Always on, low bandwidth. Android is the peripheral (advertiser + GATT server); iPhone is the central. |
-| Local Wi-Fi (M5) | call audio, files, bulk sync | Android hotspot or shared network. Address and keys are sent over the BLE link. |
+| Bluetooth LE GATT | control, SMS, call signaling, contacts, status | Low bandwidth; wakes the iPhone app in the background. Android is the peripheral (advertiser + GATT server); iPhone is the central. |
+| Local Wi-Fi (M5) | everything above when Bluetooth is down; call audio (UDP media channel), files and bulk sync (TCP) | Shared network or the bridge's hotspot. A full session of its own, with its own keys; addresses come from DNS-SD, the QR code or `wifi.offer` over Bluetooth. |
 | Internet relay (later, paid, opt-in) | everything, when the phones are far apart | End-to-end encrypted; the relay sees only ciphertext. Must be added to `PRIVACY.md` before it ships. |
 
-The Android app declares no `INTERNET` permission until M5. After that, CI checks that it only opens sockets to
-local addresses. The one exception is the opt-in `netshare` package (M8), which forwards only the iPhone's own traffic.
+The Android app declares `INTERNET` since D-041. CI (`network-code-check.sh`) confines socket code to `link/wifi/`
+(local addresses only, checked at run time on every bind and accept), `update/` (GitHub only) and the opt-in
+`netshare` package (M8), which forwards only the iPhone's own traffic.
+
+**The Wi-Fi link and iOS background.** iOS keeps Bluetooth sessions alive in the background (the app is woken for
+Bluetooth events) but suspends apps with only a socket open. So with both links up, events stay on Bluetooth; over
+Wi-Fi alone, the iPhone gets new messages and calls while Pairline is open or recently used. Apple's Local Push
+Connectivity (`NEAppPushProvider`, a separate entitlement) could close that gap later without a server.
 
 ## Call audio options (M6)
 
