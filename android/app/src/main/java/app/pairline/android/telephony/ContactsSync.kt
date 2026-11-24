@@ -44,6 +44,11 @@ data class CallLogCursor(val lastId: Long) {
     }
 }
 
+/** Call-log keys on the wire are `"cl:<row id>"`. */
+object CallLogKeys {
+    fun id(key: String): Long? = key.removePrefix("cl:").takeIf { key.startsWith("cl:") }?.toLongOrNull()?.takeIf { it > 0 }
+}
+
 /** Phone-number labels on the wire are fixed English words, not localized UI text. */
 object ContactLabels {
     fun phone(type: Int, custom: String?): String = when (type) {
@@ -69,8 +74,15 @@ object ContactLabels {
     }
 }
 
-/** Contacts and call log for the iPhone (`contacts.sync`, `calllog.sync`, `contacts.add`). */
-class ContactsSync(private val context: Context, private val sims: SimDirectory) {
+/**
+ * Contacts and call log for the iPhone (`contacts.sync`, `calllog.sync`, `contacts.add`, `calllog.delete`). Calls
+ * from blocked numbers ([isBlocked], D-043) are left out of the call log the iPhone gets.
+ */
+class ContactsSync(
+    private val context: Context,
+    private val sims: SimDirectory,
+    private val isBlocked: (String?) -> Boolean = { false },
+) {
 
     private val resolver get() = context.contentResolver
 
@@ -203,6 +215,7 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
         val slotBySub = sims.activeSubscriptions().associate { it.subscriptionId.toString() to it.simSlotIndex }
         val rows = ArrayList<JSONObject>()
         val ids = ArrayList<Long>()
+        var lastScanned = after
         resolver.query(
             CallLog.Calls.CONTENT_URI,
             arrayOf(
@@ -219,12 +232,17 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
             "${CallLog.Calls._ID} ASC",
         )?.use { c ->
             while (c.moveToNext() && rows.size <= CHUNK) {
+                val type = CallMapping.callLogType(c.getInt(3))
+                val number = c.getString(1).orEmpty()
+                if (rows.size < CHUNK) lastScanned = c.getLong(0)
+                // Calls from a blocked number aren't shown on the iPhone (D-043); calls to it still are.
+                if (type != "out" && isBlocked(number)) continue
                 ids += c.getLong(0)
                 rows += JSONObject()
                     .put("key", "cl:${c.getLong(0)}")
-                    .put("number", c.getString(1).orEmpty())
+                    .put("number", number)
                     .putNullable("name", c.getString(2)?.takeIf { it.isNotBlank() })
-                    .put("type", CallMapping.callLogType(c.getInt(3)))
+                    .put("type", type)
                     .put("time", c.getLong(4))
                     .put("dur", c.getLong(5))
                     .putNullable("sim", c.getString(6)?.let { slotBySub[it] })
@@ -233,7 +251,9 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
         val hasMoreRows = rows.size > CHUNK
         val indexed = rows.take(CHUNK).withIndex().toList()
         val (page, taken) = JsonPager.page(indexed.iterator(), CHUNK, budget()) { it.value }
-        val lastId = taken.lastOrNull()?.let { ids[it.index] } ?: after
+        // Continue after the last entry sent; when every row was sent, also skip the blocked ones scanned after it.
+        val lastId = if (!page.more && !hasMoreRows) maxOf(lastScanned, taken.lastOrNull()?.let { ids[it.index] } ?: after)
+        else taken.lastOrNull()?.let { ids[it.index] } ?: after
         return JSONObject()
             .put("t", Msg.CALLLOG_SYNC)
             .put("id", id)
@@ -241,6 +261,24 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
             .put("cursor", CallLogCursor(lastId).encode())
             .put("more", page.more || hasMoreRows)
             .put("full", parsed == null)
+    }
+
+    /**
+     * `calllog.delete` (WRITE_CALL_LOG): deletes the entries with these keys (`"cl:<id>"`), or the whole call log when
+     * [all] is true. Only ever on the user's request from the iPhone. Returns how many rows Android deleted.
+     */
+    fun deleteCalls(keys: List<String>, all: Boolean): Int {
+        require(Manifest.permission.READ_CALL_LOG)
+        require(Manifest.permission.WRITE_CALL_LOG)
+        if (all) return resolver.delete(CallLog.Calls.CONTENT_URI, null, null)
+        val ids = keys.mapNotNull(CallLogKeys::id).distinct()
+        if (ids.isEmpty()) throw RequestException(ErrorCode.INVALID, "no call-log keys")
+        var deleted = 0
+        // Numbers inline (they're Longs), in batches so the statement stays small.
+        for (batch in ids.chunked(100)) {
+            deleted += resolver.delete(CallLog.Calls.CONTENT_URI, "${CallLog.Calls._ID} IN (${batch.joinToString(",")})", null)
+        }
+        return deleted
     }
 
     /** The call-log provider rejects LIMIT in the sort order, so read the first row of a sorted query. */

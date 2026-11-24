@@ -6,6 +6,7 @@ import app.pairline.android.link.LinkManager
 import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
 import app.pairline.android.link.PrefsPeerKeyStore
+import app.pairline.android.telephony.BlockList
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
 import app.pairline.android.telephony.SimDirectory
@@ -42,16 +43,21 @@ object AppGraph {
     val link by lazy { LinkManager({ identity.identity() }, pairing, peers, prefs) }
 
     val sims: SimDirectory by lazy { SimDirectory(app) }
-    val smsStore: SmsStore by lazy { SmsStore(app, sims) }
+
+    /** Numbers whose texts and calls don't reach the iPhone (D-043). */
+    val blockList: BlockList by lazy { BlockList(app) }
+    val smsStore: SmsStore by lazy { SmsStore(app, sims, blockList::isBlocked) }
     val smsSender: SmsSender by lazy { SmsSender(app, sims, smsStore, link::send) }
-    val calls: CallTracker by lazy { CallTracker(app, sims, prefs, link::send) { router.statusChanged() } }
-    val contacts: ContactsSync by lazy { ContactsSync(app, sims) }
+    val calls: CallTracker by lazy {
+        CallTracker(app, sims, prefs, link::send) { router.statusChanged() }.also { it.isBlocked = blockList::isBlocked }
+    }
+    val contacts: ContactsSync by lazy { ContactsSync(app, sims, blockList::isBlocked) }
     val ussd: UssdRunner by lazy { UssdRunner(app, sims) }
     val status: StatusMonitor by lazy {
         StatusMonitor(app, sims, prefs, BuildConfig.VERSION_NAME) { calls.inCallServiceAvailable }
     }
     val router: MessageRouter by lazy {
-        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd)
+        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, blockList)
     }
 
     /** The daily GitHub update check and the verified update (D-042). */

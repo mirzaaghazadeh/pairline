@@ -350,6 +350,7 @@ private val features = listOf(
     Feature(Caps.CALL_DTMF, R.string.cap_call_dtmf, R.string.cap_missing_companion, null),
     Feature(Caps.CONTACTS, R.string.cap_contacts, R.string.cap_missing_contacts, Fix.Permission(PermissionGroup.CONTACTS)),
     Feature(Caps.CALLLOG, R.string.cap_calllog, R.string.cap_missing_calllog, Fix.Permission(PermissionGroup.CALL_LOG)),
+    Feature(Caps.CALLLOG_DELETE, R.string.cap_calllog_delete, R.string.cap_missing_calllog, Fix.Permission(PermissionGroup.CALL_LOG)),
     Feature(Caps.CONTACTS_ADD, R.string.cap_contacts_add, R.string.cap_missing_contacts_add, Fix.Settings),
     Feature(Caps.USSD, R.string.cap_ussd, R.string.cap_missing_phone, Fix.Permission(PermissionGroup.PHONE)),
     Feature(Caps.DUALSIM, R.string.cap_dualsim, R.string.cap_missing_dualsim, null),

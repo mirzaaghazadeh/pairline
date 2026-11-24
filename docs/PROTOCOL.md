@@ -182,6 +182,9 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
 | `ussd.run` | R→B | M4 | `id`, `sim`, `code` |
 | `ussd.result` | B→R | M4 | `id`, `ok`, `text`, `error` |
+| `calllog.delete` | R→B | M4 | `id`, `keys` [call-log key] or `all: true` → `ok` / `error` (needs capability `calllog.delete`) |
+| `block.list` | R→B, B→R | M4 | request: `id` / reply: `id`, `numbers` [`{n, time}`]. Also sent by B without `id` when the list changes on the bridge (needs `block`) |
+| `block.set` | R→B | M4 | `id`, `add` [number], `remove` [number] → `block.list` with the same `id` (needs `block`) |
 | `wifi.offer` | B→R | M5 | ssid, password, band, ip, port |
 | `link.switch` | either | M5 | move bulk traffic to Wi-Fi / back to BLE |
 | `file.offer`, `file.answer` | either | M5 | name, size, type / accept or decline (data goes over the bulk channel) |
@@ -193,7 +196,8 @@ The bridge lists only what this phone can do right now: the permission is grante
 version supports it. The iPhone hides or explains anything missing instead of guessing from the Android version.
 
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
-`call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`
+`call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `calllog.delete` (delete
+call-log entries on the bridge), `block` (the bridge keeps a block list)
 
 ### Clarifications (v0)
 
@@ -273,6 +277,31 @@ Found while implementing the Android bridge (2026-11-24). Additive only; the wir
   is null or older than Android's 30-day deletion log. `deleted` holds contact keys (`"c:<id>"`). Cursors are
   opaque strings.
 - **`contacts.add`** answers `error` / `permission` while the user hasn't turned the option on in the bridge app.
+
+Added for deleting and blocking (D-043, 2026-11-24). New messages only; receivers ignore unknown types, and B answers
+an unknown request with `error` / `unsupported`, so the wire version stays 0.
+
+- **`calllog.delete`:** `keys` holds keys from `calllog.sync` (`"cl:<id>"`, at most 500 per request); `all: true`
+  deletes the bridge's whole call log. B answers `ok` once Android has deleted them (keys it no longer has are
+  ignored), `error` / `permission` without `WRITE_CALL_LOG`, `error` / `invalid` without keys. B lists
+  `calllog.delete` only while it holds both `READ_CALL_LOG` and `WRITE_CALL_LOG`. Deleting the newest entries can make
+  R's next `calllog.sync` cursor point past the newest entry, which starts a full sync (`full: true`) as before.
+- **SMS can't be deleted on the bridge:** Android lets only the default SMS app delete from its SMS store, and
+  Pairline isn't one, so there is no `sms.delete`. R deletes conversations and messages on its side only and keeps
+  tombstones so `sms.threads` / `sms.history` / `sms.new` don't bring them back.
+- **`block.list` / `block.set`:** B holds the authoritative list, so blocking works while R is away. A `numbers`
+  entry is `{"n": "+15551234567", "time": <ms added>}`; `n` is a phone number (normalized like a dialable number) or
+  a sender name such as `"BANK"` (1–64 characters). `block.set` takes up to 100 `add` and 100 `remove` strings; an
+  `add` that isn't a number or sender name answers `error` / `invalid`. B keeps at most 500 entries, so a reply stays
+  under the 30 KB page size.
+- **Matching** (both apps): with 7 or more digits on both sides, two numbers match when their last digits agree, as
+  many as the shorter has, up to 9 (`+98 912 123 4567` = `0912 123 4567`, `+354 555 1234` = `555 1234`). Shorter
+  numbers and sender names match exactly (case-insensitive). `remove` removes every entry that matches.
+- **Effect on B:** an `sms.new` from a blocked number isn't sent; received texts from it are left out of
+  `sms.threads` (a thread of only those disappears; counts and snippets ignore them) and `sms.history`; texts sent to
+  it stay. An incoming call from it gets no `call.incoming` / `call.state`, and B declines it when it can (companion
+  `InCallService`, or `ANSWER_PHONE_CALLS`); incoming, missed, declined and blocked entries from it are left out of
+  `calllog.sync`. A call R already shows when the number arrives late is left alone.
 
 ## Test vectors
 

@@ -15,9 +15,10 @@ Any change that adds or changes a data flow or permission must update this file 
 
 | Data | Leaves the device? | Goes to | Stored where | How long |
 |------|--------------------|---------|--------------|----------|
-| SMS (text, numbers, time) | Yes, encrypted | Your paired iPhone only | Android's own SMS store, as usual; on iPhone, Pairline's local database | Until you delete it or unpair |
+| SMS (text, numbers, time) | Yes, encrypted | Your paired iPhone only | Android's own SMS store, as usual; on iPhone, Pairline's local database | Until you delete it or unpair. Deleting on the iPhone removes it there only: Android lets only its default messaging app delete texts |
 | Contacts | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until unpair |
-| Call log | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until unpair |
+| Call log | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until you delete it or unpair. Deleting on the iPhone also deletes it on the bridge phone when Pairline Bridge has the call-history permission |
+| Block list (numbers and sender names you block) | Yes, encrypted | Between your two phones only | Bridge app's private storage (excluded from backups); iPhone: Pairline's local database | Until you unblock them; unpairing removes the iPhone's copy (D-043) |
 | Contacts you add on the iPhone (opt-in, off until you turn it on in the bridge app) | Yes, encrypted | Your bridge phone only | Android Contacts | Until you delete them |
 | Files you send (M5) | Yes, encrypted | The other paired phone only | Where you save them | Until you delete them |
 | Your iPhone's internet traffic, only while internet sharing is on (M8) | Yes | Through your bridge phone (and its VPN, if one is on) to the sites your iPhone visits | Not stored, not logged | — |
@@ -39,6 +40,8 @@ Any change that adds or changes a data flow or permission must update this file 
 |------|--------------------|--------------|----------|
 | Synced SMS, contacts and call log | No | Pairline's SQLite database in the app's Application Support folder, file protection `completeUntilFirstUserAuthentication` (readable after the first unlock, so messages that arrive while locked can be saved), **excluded from iCloud and computer backups** | Until unpair (unpairing deletes it) |
 | Messages you write before the bridge confirms them | Yes, encrypted, to your bridge phone only | Same database (an outbox), sent when the link is up | Until sent; then like any message |
+| What you deleted (so a later sync doesn't bring it back) | No | Same database: the deleted message's or call's id and time, and for a deleted conversation its id and the other party's number. Never the text (D-043) | Until unpair |
+| Block list | Yes, encrypted, to your bridge phone only (it keeps the list that counts) | Same database, a copy of the bridge's list | Until you unblock or unpair |
 | New-message and code notifications | No (iOS may mirror notifications to your own Apple Watch) | iOS Notification Center. Sender name or number and, if "Show message text" is on, the text | Until you clear them; unpairing clears them |
 | One-time codes | No | Detected on the iPhone only. "Copy code" puts the code on **this iPhone's** clipboard: never on Universal Clipboard, and it expires after 3 minutes. Other copied text is also local-only | 3 minutes |
 | Widget status (link state, bridge battery, signal, carrier name) | No | The app group container shared with Pairline's own widget. No messages, numbers or contacts | Overwritten on every status update; deleted on unpair |
@@ -84,6 +87,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | `ANSWER_PHONE_CALLS` | Answer, decline and end calls from the iPhone | Setup |
 | `CALL_COMPANION_APP` | Receive call events as a companion app | Install |
 | `READ_CALL_LOG` | The caller's number on Android 12+, call history on the iPhone, missed vs declined | Setup, optional |
+| `WRITE_CALL_LOG` | Delete call-history entries you delete on the iPhone, and nothing else (D-043) | Setup, optional, together with `READ_CALL_LOG` (one Android dialog); or from "What your iPhone can do" |
 | `READ_CONTACTS` | Caller names and contacts on the iPhone | Setup, optional |
 | `WRITE_CONTACTS` | Add contacts from the iPhone | Only when you turn on "Add contacts from iPhone" in Settings (off by default) |
 | `ACCESS_WIFI_STATE`, `CHANGE_WIFI_STATE`; `NEARBY_WIFI_DEVICES` (Android 13+) (M5) | Create the hotspot the iPhone joins | When you turn on the Wi-Fi link |

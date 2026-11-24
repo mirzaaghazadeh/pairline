@@ -31,6 +31,9 @@ object Msg {
     const val CONTACTS_ADD = "contacts.add"
     const val USSD_RUN = "ussd.run"
     const val USSD_RESULT = "ussd.result"
+    const val CALLLOG_DELETE = "calllog.delete"
+    const val BLOCK_LIST = "block.list"
+    const val BLOCK_SET = "block.set"
 }
 
 /** Capabilities in `status.caps` (PROTOCOL.md, "Capabilities"). */
@@ -48,11 +51,13 @@ object Caps {
     const val CONTACTS_ADD = "contacts.add"
     const val USSD = "ussd"
     const val DUALSIM = "dualsim"
+    const val CALLLOG_DELETE = "calllog.delete"
+    const val BLOCK = "block"
 
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM,
+        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, CALLLOG_DELETE, BLOCK,
     )
 }
 

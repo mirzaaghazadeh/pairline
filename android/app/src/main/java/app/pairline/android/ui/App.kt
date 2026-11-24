@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import app.pairline.android.AppGraph
 import app.pairline.android.R
+import app.pairline.android.ui.block.BlockListScreen
 import app.pairline.android.ui.components.PairlineTopBar
 import app.pairline.android.ui.diagnostics.DiagnosticsScreen
 import app.pairline.android.ui.help.HelpScreen
@@ -48,6 +49,7 @@ sealed interface Route {
     data object KeepAlive : Route
     data object Diagnostics : Route
     data object Help : Route
+    data object BlockList : Route
 }
 
 @Composable
@@ -63,6 +65,7 @@ fun PairlineAppUi() {
 
 private val allRoutes: List<Route> = listOf(
     Route.Home, Route.Pairing, Route.Settings, Route.Permissions, Route.KeepAlive, Route.Diagnostics, Route.Help,
+    Route.BlockList,
 )
 
 /** Keeps the back stack across activity recreation (e.g. a language change on Android 11–12). */
@@ -96,6 +99,7 @@ private fun MainNavigation() {
             Route.KeepAlive -> KeepAliveScreen(back)
             Route.Diagnostics -> DiagnosticsScreen(back)
             Route.Help -> HelpScreen(back)
+            Route.BlockList -> BlockListScreen(back)
         }
     }
     UpdateFlowDialog()

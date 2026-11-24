@@ -64,6 +64,8 @@ adb emu sms send 5551234 "Your code is 4821"     # → sms.new
 adb emu gsm call 5551234                         # → call.incoming, call.state …
 adb emu gsm cancel 5551234
 python3 -I ../protocol/tools/fake_remote.py session send-sms --to 5550001111 --body "hi" contacts calllog
+python3 -I ../protocol/tools/fake_remote.py session block --number 5551234 blocks   # D-043; `unblock` undoes it
+python3 -I ../protocol/tools/fake_remote.py session calllog-delete --keys cl:1      # deletes on the emulator!
 adb shell content query --uri content://app.pairline.android.debug.devtools/state
 ```
 

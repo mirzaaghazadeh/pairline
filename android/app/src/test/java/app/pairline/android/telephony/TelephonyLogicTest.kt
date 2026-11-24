@@ -19,7 +19,7 @@ class TelephonyLogicTest {
         Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS,
         Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_PHONE_NUMBERS, Manifest.permission.CALL_PHONE,
         Manifest.permission.ANSWER_PHONE_CALLS, Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_CONTACTS,
-        Manifest.permission.WRITE_CONTACTS,
+        Manifest.permission.WRITE_CONTACTS, Manifest.permission.WRITE_CALL_LOG,
     )
 
     private fun caps(
@@ -36,7 +36,7 @@ class TelephonyLogicTest {
         assertEquals(
             listOf(
                 Caps.SMS_RECEIVE, Caps.SMS_SEND, Caps.SMS_HISTORY, Caps.CALL_OBSERVE, Caps.CALL_CONTROL, Caps.CALL_DIAL,
-                Caps.CONTACTS, Caps.CALLLOG, Caps.USSD,
+                Caps.CONTACTS, Caps.CALLLOG, Caps.USSD, Caps.CALLLOG_DELETE, Caps.BLOCK,
             ),
             caps(),
         )
@@ -49,7 +49,15 @@ class TelephonyLogicTest {
 
     @Test
     fun nothingGranted() {
-        assertEquals(emptyList<String>(), caps(granted = emptySet()))
+        // The block list needs no permission.
+        assertEquals(listOf(Caps.BLOCK), caps(granted = emptySet()))
+    }
+
+    @Test
+    fun deletingCallsNeedsReadAndWrite() {
+        assertEquals(false, Caps.CALLLOG_DELETE in caps(granted = everything - Manifest.permission.WRITE_CALL_LOG))
+        assertEquals(false, Caps.CALLLOG_DELETE in caps(granted = everything - Manifest.permission.READ_CALL_LOG))
+        assertEquals(true, Caps.CALLLOG_DELETE in caps())
     }
 
     @Test
@@ -61,13 +69,88 @@ class TelephonyLogicTest {
 
     @Test
     fun noTelephonyHardware() {
-        assertEquals(listOf(Caps.CONTACTS, Caps.CALLLOG), caps(messaging = false, calling = false))
+        assertEquals(
+            listOf(Caps.CONTACTS, Caps.CALLLOG, Caps.CALLLOG_DELETE, Caps.BLOCK),
+            caps(messaging = false, calling = false),
+        )
     }
 
     @Test
     fun callControlNeedsPhoneStateToo() {
         val c = caps(granted = setOf(Manifest.permission.ANSWER_PHONE_CALLS))
-        assertEquals(emptyList<String>(), c)
+        assertEquals(listOf(Caps.BLOCK), c)
+    }
+
+    // ---- Block list (D-043) ----
+
+    @Test
+    fun matchKeysIgnoreFormatting() {
+        assertEquals(PhoneNumbers.matchKey("+98 912 123 4567"), PhoneNumbers.matchKey("09121234567"))
+        assertEquals(PhoneNumbers.matchKey("+1 (555) 010-0200"), PhoneNumbers.matchKey("555-010-0200"))
+        assertEquals(PhoneNumbers.matchKey("۰۹۱۲۱۲۳۴۵۶۷"), PhoneNumbers.matchKey("+989121234567"))
+        assertEquals("t:bank", PhoneNumbers.matchKey(" BANK "))
+        assertEquals("t:1234", PhoneNumbers.matchKey("1234"))
+        assertEquals("12345", PhoneNumbers.matchKey("12345"))
+        assertNull(PhoneNumbers.matchKey("  "))
+        assertNull(PhoneNumbers.matchKey(null))
+        assertEquals(false, PhoneNumbers.matchKey("+15550100") == PhoneNumbers.matchKey("+15550101"))
+    }
+
+    @Test
+    fun blockedNumbersMatchOtherSpellings() {
+        val cases = listOf(
+            Triple("+98 912 123 4567", "09121234567", true),
+            Triple("+1 555 1234", "5551234", true), // 7-digit local form of a number saved with its country code
+            Triple("+354 555 1234", "555 1234", true),
+            Triple("+1 (555) 010-0200", "+15550100201", false),
+            Triple("5551234", "5551235", false),
+            Triple("12345", "12345", true), // short codes match exactly
+            Triple("12345", "912345", false),
+            Triple("BANK", "bank", true),
+            Triple("BANK", "BANKX", false),
+            Triple("5551234", null, false),
+        )
+        for ((blocked, number, expected) in cases) {
+            assertEquals("$blocked vs $number", expected, PhoneNumbers.blockMatches(blocked, number))
+            val matcher = BlockRules.Matcher(listOf(BlockedNumber(blocked, 0)))
+            assertEquals("matcher: $blocked vs $number", expected, matcher.matches(number))
+        }
+        assertEquals(false, BlockRules.Matcher(emptyList()).matches("5551234"))
+    }
+
+    @Test
+    fun blockableNumbersAndSenderNames() {
+        assertEquals("+15551234567", PhoneNumbers.normalizeBlockable("⁦+1 555 123 4567⁩"))
+        assertEquals("PROMO", PhoneNumbers.normalizeBlockable(" PROMO "))
+        assertNull(PhoneNumbers.normalizeBlockable(""))
+        assertNull(PhoneNumbers.normalizeBlockable("   "))
+        assertNull(PhoneNumbers.normalizeBlockable("a\nb"))
+        assertNull(PhoneNumbers.normalizeBlockable("x".repeat(65)))
+    }
+
+    @Test
+    fun blockRulesAddRemoveAndDeduplicate() {
+        val start = BlockRules.apply(emptyList(), listOf("+98 912 123 4567", "09121234567", "BANK"), emptyList(), 100)
+        assertEquals(listOf("+989121234567", "BANK"), start.map { it.number })
+        assertEquals(100L, start.first().addedAt)
+        // Removing by another spelling of the same number works.
+        val removed = BlockRules.apply(start, emptyList(), listOf("0912 123 4567"), 200)
+        assertEquals(listOf("BANK"), removed.map { it.number })
+        // Adding and removing the same number in one request leaves it off.
+        assertEquals(listOf("BANK"), BlockRules.apply(removed, listOf("+15550100"), listOf("15550100"), 300).map { it.number })
+        assertEquals(start, BlockRules.parse(BlockRules.encode(start)))
+        assertEquals(emptyList<BlockedNumber>(), BlockRules.parse("not json"))
+        val full = BlockRules.apply(emptyList(), (0 until 600).map { "+1555${1000000 + it}" }, emptyList(), 1)
+        assertEquals(BlockRules.MAX_ENTRIES, full.size)
+    }
+
+    @Test
+    fun callLogKeys() {
+        assertEquals(99L, CallLogKeys.id("cl:99"))
+        assertNull(CallLogKeys.id("c:99"))
+        assertNull(CallLogKeys.id("cl:x"))
+        assertNull(CallLogKeys.id("cl:-4"))
+        assertNull(CallLogKeys.id("99"))
     }
 
     // ---- Phone numbers ----

@@ -31,6 +31,8 @@
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <uses-permission android:name="android.permission.CALL_COMPANION_APP" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <!-- Only to delete call-log entries the user deletes on the iPhone (calllog.delete, D-043). -->
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
 
     <!-- Contacts: read for caller names and sync; write only when the user turns on "Add contacts from iPhone". -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />

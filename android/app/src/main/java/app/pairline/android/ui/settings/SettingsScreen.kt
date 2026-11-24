@@ -154,6 +154,13 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(
+                    title = stringResource(R.string.block_title),
+                    subtitle = stringResource(R.string.block_settings_sub),
+                    icon = PIcons.Block,
+                    onClick = { navigate(Route.BlockList) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
                     title = stringResource(if (paired) R.string.home_pair_new else R.string.home_pair),
                     icon = PIcons.Qr,
                     onClick = { navigate(Route.Pairing) },
