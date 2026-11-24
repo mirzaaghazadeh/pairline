@@ -7,6 +7,7 @@ struct SettingsTab: View {
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var bridge: BridgeController
     @ObservedObject private var notifier = Notifier.shared
+    @ObservedObject private var liveActivity = BridgeLiveActivity.shared
     @State private var confirmUnpair = false
 
     var body: some View {
@@ -14,6 +15,7 @@ struct SettingsTab: View {
             List {
                 purchaseSection
                 bridgeSection
+                liveActivitySection
                 notificationSection
                 callsSection
                 languageSection
@@ -155,6 +157,37 @@ struct SettingsTab: View {
             Text("Bridge phone")
         }
     }
+
+    /// The bridge's signal, network and battery on the Lock Screen and in the Dynamic Island (D-053).
+    @ViewBuilder private var liveActivitySection: some View {
+        if BridgeLiveActivity.isSupported {
+            Section {
+                Toggle(isOn: $settings.bridgeLiveActivity) {
+                    Label {
+                        liveText("Bridge status on Lock Screen")
+                    } icon: {
+                        Image(systemName: "antenna.radiowaves.left.and.right")
+                    }
+                }
+                .onValueChange(settings.bridgeLiveActivity) { _ in liveActivity.settingChanged() }
+                if settings.bridgeLiveActivity && !liveActivity.systemEnabled {
+                    Button {
+                        openSystemSettings()
+                    } label: {
+                        Label {
+                            liveText("Live Activities are off for Pairline. Turn them on in Settings")
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle")
+                        }
+                    }
+                }
+            } footer: {
+                liveText("Shows the bridge phone's signal, network and battery on the Lock Screen and in the Dynamic Island. iOS ends it after 8 hours; opening Pairline starts it again.")
+            }
+        }
+    }
+
+    private func liveText(_ key: String) -> Text { Text(LocalizedStringKey(key), tableName: "LiveActivity") }
 
     private var notificationSection: some View {
         Section {

@@ -12,7 +12,7 @@ struct WidgetSnapshot: Codable, Equatable {
         case locked
     }
 
-    struct SIM: Codable, Equatable, Identifiable {
+    struct SIM: Codable, Hashable, Identifiable {
         var slot: Int
         var carrier: String?
         var signal: Int?

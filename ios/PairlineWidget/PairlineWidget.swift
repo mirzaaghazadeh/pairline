@@ -5,6 +5,9 @@ import WidgetKit
 struct PairlineWidgetBundle: WidgetBundle {
     var body: some Widget {
         BridgeStatusWidget()
+        if #available(iOSApplicationExtension 16.2, *) {
+            BridgeLiveActivityWidget()
+        }
     }
 }
 

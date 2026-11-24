@@ -232,8 +232,8 @@ final class BridgeController: ObservableObject {
 
     // MARK: - Widget
 
-    func saveWidget() {
-        guard mode == .real else { return }
+    /// The status the widget and the Live Activity show: link state, battery and each SIM's carrier, network and signal.
+    func statusSnapshot() -> WidgetSnapshot {
         let link: WidgetSnapshot.Link
         switch phase {
         case .connected: link = .connected
@@ -242,10 +242,15 @@ final class BridgeController: ObservableObject {
         case .locked: link = .locked
         default: link = .offline
         }
-        let snapshot = WidgetSnapshot(link: link, batteryLevel: status?.battery?.level, charging: status?.battery?.charging,
-                                      sims: sims.map { .init(slot: $0.slot, carrier: $0.carrier ?? $0.label,
-                                                             signal: $0.signal, net: $0.net) },
-                                      updated: statusUpdatedAt ?? Date(), isDemo: false)
+        return WidgetSnapshot(link: link, batteryLevel: status?.battery?.level, charging: status?.battery?.charging,
+                              sims: sims.map { .init(slot: $0.slot, carrier: $0.carrier ?? $0.label,
+                                                     signal: $0.signal, net: $0.net) },
+                              updated: statusUpdatedAt ?? Date(), isDemo: isDemo)
+    }
+
+    func saveWidget() {
+        guard mode == .real else { return }
+        let snapshot = statusSnapshot()
         var comparable = snapshot
         comparable.updated = lastWidgetSave?.updated ?? snapshot.updated
         guard comparable != lastWidgetSave else { return }

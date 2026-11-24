@@ -772,3 +772,25 @@ with build 6 and the two in-app purchases (7-day Trial, Full Access).
 Demo mode now reports every capability: the Bridge tab ticks them all, an answered demo call shows "Audio on this
 iPhone" (no audio is played), and Internet sharing shows sample proxy details. Before, the demo deliberately left call
 audio out to show how a missing capability is explained; seeing everything ready is what people trying the app expect.
+
+### D-053 — Bridge status as an always-on Live Activity (Lock Screen and Dynamic Island) (2026-11-24)
+
+No app can change the iPhone's own status-bar signal bars, so the bridge SIM's signal goes where iOS allows it: a Live
+Activity. The compact Dynamic Island shows the first SIM's bars and network type ("5G"), like the status bar, or a
+crossed-out antenna while the bridge is unreachable; the expanded island and the Lock Screen add the bridge's name,
+link state, battery and the second SIM. Tapping it opens the Bridge tab. The maintainer chose the always-on version
+over one shown only during calls, and asked for an on/off switch: Settings › "Bridge status on Lock Screen", **on by
+default**. It follows whichever bridge is on screen, so demo mode shows its sample bridge (marked "Demo").
+
+iOS limits shape how it works: an app can start a Live Activity only while it's in the foreground unless a server sends
+a push, and Pairline has no server (rule 2), so it starts when Pairline is opened; iOS ends every Live Activity after 8
+hours at most, so each app open renews an activity older than 30 minutes and the 8 hours count from the latest open;
+updates come from the app itself in the background as bridge status arrives over Bluetooth or Wi-Fi. When iOS has
+ended it, it stays off until Pairline is next opened. The content is status only, the same as the widget (link state,
+name, battery, carrier, network type, signal), and it is ended immediately when the switch is turned off or the bridge
+is unpaired. It needs iOS 16.2; on 16.0 and 16.1 the switch isn't shown, and ActivityKit is weak-linked so those
+versions still launch. Its relevance score is the lowest, so calls, timers and other apps take the Dynamic Island first.
+
+Review risk, accepted by the maintainer: Apple's guidelines describe Live Activities as tasks with a start and an end; a
+reviewer could object to a status display that's always there. If that happens, the fallback is to show it only
+during calls (the same views, started when a call begins).

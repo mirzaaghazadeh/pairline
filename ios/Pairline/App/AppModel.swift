@@ -73,6 +73,14 @@ final class AppModel: ObservableObject {
         }
         notifier.onOpenStatus = { [weak self] in self?.tab = .bridge }
 
+        // The bridge status on the Lock Screen and in the Dynamic Island follows the bridge on screen (D-053).
+        $demo
+            .sink { [weak self] demo in
+                guard let self, !Self.isTestHost else { return }
+                BridgeLiveActivity.shared.follow(demo ?? self.real)
+            }
+            .store(in: &cancellables)
+
         link.files.onReceived = { [weak self] _ in
             self?.toast = String(localized: "File received. Find it in the Files app under Pairline › Received.")
         }
@@ -185,6 +193,7 @@ final class AppModel: ObservableObject {
     func didBecomeActive() {
         link.reconnectNow()
         link.files.collectOutbox()
+        if !Self.isTestHost { BridgeLiveActivity.shared.appBecameActive() }
         Task {
             await purchases.refresh()
             await Notifier.shared.refreshAuthorization()

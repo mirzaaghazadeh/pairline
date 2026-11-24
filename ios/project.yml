@@ -48,6 +48,7 @@ targets:
       - path: Pairline/Store/Pairline.storekit
         buildPhase: none
       - path: Shared
+      - path: LiveActivity
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios
@@ -64,6 +65,9 @@ targets:
       - target: PairlineShare
         embed: true
         codeSign: true
+      # Live Activities (D-053) need iOS 16.1+; weak so the app still launches on iOS 16.0.
+      - sdk: ActivityKit.framework
+        weak: true
       - sdk: CallKit.framework
       - sdk: CoreBluetooth.framework
       - sdk: StoreKit.framework
@@ -76,6 +80,7 @@ targets:
     sources:
       - path: PairlineWidget
       - path: Shared
+      - path: LiveActivity
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios.widget
@@ -88,6 +93,8 @@ targets:
     dependencies:
       - sdk: WidgetKit.framework
       - sdk: SwiftUI.framework
+      - sdk: ActivityKit.framework
+        weak: true
 
   # "Send to bridge phone" in the share sheet (M5, D-045). It only copies the shared files into the app group's
   # outbox; the app sends them over the Wi-Fi link.

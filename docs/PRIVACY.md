@@ -51,6 +51,7 @@ Any change that adds or changes a data flow or permission must update this file 
 | New-message and code notifications | No (iOS may mirror notifications to your own Apple Watch) | iOS Notification Center. Sender name or number and, if "Show message text" is on, the text | Until you clear them; unpairing clears them |
 | One-time codes | No | Detected on the iPhone only. "Copy code" puts the code on **this iPhone's** clipboard: never on Universal Clipboard, and it expires after 3 minutes. Other copied text is also local-only | 3 minutes |
 | Widget status (link state, bridge battery, signal, carrier name) | No | The app group container shared with Pairline's own widget. No messages, numbers or contacts | Overwritten on every status update; deleted on unpair |
+| Lock Screen / Dynamic Island status (Live Activity, D-053): link state, bridge name, battery, each SIM's carrier, network type and signal | No. Started and updated on the iPhone only; Pairline has no push server, so nothing goes through Apple's push service | iOS shows it on the Lock Screen and in the Dynamic Island while Settings › "Bridge status on Lock Screen" is on (the default). No messages, numbers or contacts | Ended when you turn the setting off or unpair; iOS ends it after 8 hours at most |
 | Identity key and pinned bridge key | No | Secure Enclave key (or Keychain key on devices without one) and Keychain items, `AfterFirstUnlockThisDeviceOnly`, never synced or migrated | Until unpair (the bridge key) / app removal (the identity key) |
 | Trial clock | No | The latest trusted time seen (D-017), in the Keychain, so turning the clock back doesn't extend the trial | Until app removal |
 | Preferences and saved USSD codes | No | iOS user defaults (no message content) | Until app removal |
@@ -132,6 +133,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | CallKit (no prompt) | Shows calls on the iPhone call screen. Calls are added to iPhone Recents only if you turn that on | — |
 | In-App Purchase (no prompt) | The free 7-day trial and the one-time purchase (D-017, D-036) | — |
 | App Group `group.app.pairline.ios` (no prompt) | Shares the bridge status with Pairline's widget | — |
+| Live Activities (`NSSupportsLiveActivities`, no prompt) | The bridge status on the Lock Screen and in the Dynamic Island (D-053). You can turn it off in Pairline's Settings or for Pairline in iOS Settings | — |
 | Local Network (`NSLocalNetworkUsageDescription`, Bonjour service `_pairline._tcp`) (M5) | The Wi-Fi link: find the bridge phone on your Wi-Fi network and connect to it. Only local addresses, only your paired bridge | The first time Pairline looks for the bridge on Wi-Fi |
 | Hotspot Configuration (M5, no permission prompt of its own) | Join the bridge's hotspot when it offers one. iOS asks "Join Wi-Fi network …?" every time | When the bridge offers its hotspot |
 | Files app folder (`UIFileSharingEnabled`) (M5) | Files you receive from the bridge phone appear under Pairline in the Files app | No prompt |

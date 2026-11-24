@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Bridge status on Lock Screen" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حالة الهاتف الوسيط على شاشة القفل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bridge status on Lock Screen" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وضعیت گوشی پل روی صفحهٔ قفل" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kilit Ekranı'nda köprü telefon durumu" } }
+      }
+    },
+    "Live Activities are off for Pairline. Turn them on in Settings" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الأنشطة المباشرة متوقفة لتطبيق Pairline. فعّلها من الإعدادات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Live Activities are off for Pairline. Turn them on in Settings" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فعالیت‌های زندهٔ Pairline خاموش است. آن را در تنظیمات روشن کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline için Canlı Etkinlikler kapalı. Ayarlar'dan açın" } }
+      }
+    },
+    "Shows the bridge phone's signal, network and battery on the Lock Screen and in the Dynamic Island. iOS ends it after 8 hours; opening Pairline starts it again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يعرض إشارة الهاتف الوسيط ونوع الشبكة والبطارية على شاشة القفل وفي Dynamic Island. يُنهيه iOS بعد ثماني ساعات، ويبدأ من جديد عند فتح Pairline." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Shows the bridge phone's signal, network and battery on the Lock Screen and in the Dynamic Island. iOS ends it after 8 hours; opening Pairline starts it again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آنتن، نوع شبکه و باتری گوشی پل را روی صفحهٔ قفل و در Dynamic Island نشان می‌دهد. iOS آن را بعد از ۸ ساعت می‌بندد؛ با باز کردن Pairline دوباره شروع می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonun sinyalini, ağ türünü ve pilini Kilit Ekranı'nda ve Dynamic Island'da gösterir. iOS bunu 8 saat sonra kapatır; Pairline'ı açınca yeniden başlar." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
