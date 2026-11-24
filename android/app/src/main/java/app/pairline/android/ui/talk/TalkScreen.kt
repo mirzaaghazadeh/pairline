@@ -101,7 +101,6 @@ fun talkSummary(): String {
             State.READY, State.IDLE -> if (on) R.string.talk_summary_on else R.string.talk_summary_off
             State.STARTING -> R.string.talk_summary_starting
             State.FAILED -> R.string.talk_summary_failed
-            State.NEEDS_COMPUTER -> if (on) R.string.talk_summary_needs_computer else R.string.talk_summary_not_set_up
             State.NEEDS_WIRELESS_DEBUGGING ->
                 if (AppGraph.privileged.paired) R.string.talk_summary_needs_wireless else R.string.talk_summary_not_set_up
             State.NEEDS_DEVELOPER_OPTIONS, State.NEEDS_PAIRING -> R.string.talk_summary_not_set_up
@@ -133,7 +132,7 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
         NoteBox(stringResource(R.string.talk_android_too_old, Build.VERSION.RELEASE ?: "9"), Tone.WARN, PIcons.Warning)
         return
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) WirelessSteps(state, pairing, tick) else ComputerSteps(state)
+    WirelessSteps(state, pairing, tick)
 
     if (state == State.READY) {
         val p = probe
@@ -260,34 +259,7 @@ private fun WirelessSteps(state: State, pairing: Pairing, tick: Int) {
     }
 }
 
-/** Android 10 has no Wireless debugging: USB debugging and one command from a computer after each restart. */
-@Composable
-private fun ComputerSteps(state: State) {
-    val context = LocalContext.current
-    val ready = state == State.READY
-    val maker = remember { Maker.detect() }
-    val command = remember { HelperCommand.computerCommand(context) }
-    SectionCard(title = stringResource(R.string.talk_steps)) {
-        StepRow(
-            done = ready,
-            title = stringResource(R.string.talk_q_step_usb),
-            subtitle = stringResource(devSteps(maker)) + "\n" + stringResource(R.string.talk_q_step_usb_sub),
-            action = if (!ready) stringResource(R.string.talk_open_developer) else null,
-            onAction = { start(context, Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)) },
-        )
-        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
-        StepRow(
-            done = ready,
-            title = stringResource(R.string.talk_q_step_run),
-            subtitle = stringResource(if (ready) R.string.talk_start_running else R.string.talk_q_step_run_sub),
-            action = null,
-            onAction = {},
-        )
-        if (!ready && command != null) CommandBox(command)
-    }
-}
-
-/** Android 11+ fallback: the same computer command, for phones without Wi-Fi or when pairing doesn't work. */
+/** Fallback: the computer command, for phones without Wi-Fi (no Wireless debugging) or when pairing doesn't work. */
 @Composable
 private fun ComputerAlternative() {
     val context = LocalContext.current

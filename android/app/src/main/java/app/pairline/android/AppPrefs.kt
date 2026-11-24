@@ -78,6 +78,14 @@ class AppPrefs(context: Context) {
         set(value) = edit { putBoolean(ADB_PAIRED, value) }
 
     /**
+     * The user stopped Pairline (Settings › Stop Pairline): the link service and the helper stay off, also after a
+     * reboot or an update, until the user starts it again.
+     */
+    var bridgeStopped: Boolean
+        get() = prefs.getBoolean(BRIDGE_STOPPED, false)
+        set(value) = edit { putBoolean(BRIDGE_STOPPED, value) }
+
+    /**
      * Which capture source relays the caller's voice: VOICE_DOWNLINK (3, default) or VOICE_CALL (4). Switches when
      * the iPhone reports it couldn't hear the caller.
      */
@@ -139,6 +147,7 @@ class AppPrefs(context: Context) {
         const val COMPANION_BOUND = "companion_bound_at"
         const val TALK_ON_IPHONE = "talk_on_iphone"
         const val ADB_PAIRED = "adb_paired"
+        const val BRIDGE_STOPPED = "bridge_stopped"
         const val AUDIO_SOURCE = "audio_capture_source"
         const val AUDIO_MUTE_MIC = "audio_mute_bridge_mic"
         const val AUDIO_TALK_FAILURES = "audio_talk_failures"

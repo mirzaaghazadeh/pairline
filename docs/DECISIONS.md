@@ -854,3 +854,28 @@ joined. Nothing explained this. Now:
 - Not done: starting a tethering hotspot from Pairline (it would need the helper's shell rights for a system
   setting) and internet sharing (M8) over the local-only hotspot, whose random name means the iPhone's proxy setting
   would have to be entered again each time.
+
+### D-056 — Talk on iPhone needs Android 11; a Stop switch on the bridge; audio failures explained (2026-11-25)
+
+Testing on a Galaxy Note 3 running Android 10 and reports from a tester's Samsung showed:
+- **Android 10 can't relay call audio.** Its shell user holds neither `CAPTURE_AUDIO_OUTPUT` nor `RECORD_AUDIO`, so
+  the helper could start (from a computer, since Android 10 has no Wireless debugging) and still capture nothing.
+  Talk on iPhone is now offered only on Android 11+; on Android 10 the bridge says why instead of a computer setup
+  that ends in silence. This supersedes D-054's "computer command on Android 10". The computer command stays as an
+  alternative for Android 11+ phones whose Wireless debugging can't be used. Both apps and the help texts say
+  Android 11.
+- **Crash when background activity is restricted.** Android takes the link service out of the foreground and then
+  crashes the app if a later `startForegroundService` isn't answered with `startForeground`. Every start is now
+  answered, and the home screen warns (with a Fix button to the app's settings) while background activity is
+  restricted. Receivers for protected system broadcasts (battery, hotspot/tethering) are registered exported: on
+  Android 12 and older AndroidX's not-exported flag adds a permission that system broadcasts don't carry.
+- **"Moving audio to this iPhone…" then back to the Android phone.** The bridge accepted `call.media.start` but its
+  capture failed. Some phones open only one of `VOICE_DOWNLINK` and `VOICE_CALL`, so the bridge now tries the other
+  one before failing and remembers whichever opened. When it still fails, the iPhone shows an alert on the call
+  screen with the bridge's reason and how to send a diagnostics report; before, a notice appeared behind the call
+  screen, where nobody saw it.
+- **Stop Pairline.** Users asked for a way to turn the bridge off without uninstalling it. Settings › Keep running ›
+  Stop Pairline (after a confirmation) ends the link service, the Wi-Fi link, the bridge's hotspot, internet sharing
+  and the helper, and keeps them off across reboots and updates (`bridge_stopped`). The home screen then says
+  Pairline is stopped, with Start. Starting it again from Settings or the home screen, showing a pairing code or
+  finishing setup clears the flag. No new data flow or permission.

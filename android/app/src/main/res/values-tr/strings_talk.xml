@@ -8,11 +8,10 @@
     <string name="talk_summary_off">Kapalı</string>
     <string name="talk_summary_not_set_up">Kurulmadı</string>
     <string name="talk_summary_needs_wireless">Kablosuz hata ayıklamayı açın</string>
-    <string name="talk_summary_needs_computer">Bilgisayardan başlatın</string>
     <string name="talk_summary_starting">Başlatılıyor…</string>
     <string name="talk_summary_failed">Başlamadı</string>
-    <string name="talk_summary_unsupported">Android 10 veya üstü gerekli</string>
-    <string name="talk_android_too_old">Bu telefonda Android %1$s var. iPhone’da arama sesi için Android 10 veya üstü gerekir. Aramalar yine iPhone’da çalar, konuşmayı bu telefondan yaparsınız.</string>
+    <string name="talk_summary_unsupported">Android 11 veya üstü gerekli</string>
+    <string name="talk_android_too_old">Bu telefonda Android %1$s var. iPhone’da arama sesi için Android 11 veya üstü gerekir: daha önceki sürümlerde Android hiçbir uygulamanın (bilgisayarla veya Shizuku ile bile) arama sesini almasına izin vermez. Aramalar yine iPhone’da çalar, konuşmayı bu telefondan yaparsınız.</string>
     <string name="talk_steps">Kurulum</string>
 
     <string name="talk_step_dev">Geliştirici seçenekleri’ni açın</string>
@@ -48,10 +47,6 @@
     <string name="dev_steps_vivo">Ayarlar → Telefon hakkında → Yazılım sürümü: 7 kez dokunun. Geliştirici seçenekleri Ayarlar → Sistem yönetimi altındadır.</string>
     <string name="dev_steps_other">Ayarlar → Telefon hakkında: “Derleme numarası”na 7 kez dokunun, ardından kilit kodunuzu girin. Geliştirici seçenekleri Ayarlar → Sistem altındadır.</string>
 
-    <string name="talk_q_step_usb">USB hata ayıklamayı açın</string>
-    <string name="talk_q_step_usb_sub">Geliştirici seçenekleri’nde USB hata ayıklamayı açın. Bu telefonu, Android’in adb aracı olan bir bilgisayara bağlayın ve telefonda İzin ver’e dokunun.</string>
-    <string name="talk_q_step_run">Bunu bilgisayarda çalıştırın</string>
-    <string name="talk_q_step_run_sub">Bu telefon her yeniden başladıktan sonra bir kez. Ardından Pairline’ın yardımcısı bir sonraki yeniden başlatmaya kadar çalışır.</string>
     <string name="talk_computer_title">Bunun yerine bilgisayardan başlatın</string>
     <string name="talk_computer_sub">Wi-Fi yoksa veya eşleme işe yaramazsa: USB hata ayıklamayı açın, adb olan bir bilgisayar bağlayın ve her yeniden başlatmadan sonra bu komutu bir kez çalıştırın.</string>
     <string name="talk_copy_command">Komutu kopyala</string>
@@ -105,8 +100,6 @@
     <string name="talk_reminder_channel">iPhone’dan konuşma</string>
     <string name="talk_reminder_title">Kablosuz hata ayıklamayı açın</string>
     <string name="talk_reminder_text">Telefon yeniden başladı, bu yüzden arama sesi bu telefona döndü. Dokunun ve Kablosuz hata ayıklamayı açın: Pairline yardımcısını kendiliğinden başlatır. Bu arada aramalar yine iPhone’da çalar.</string>
-    <string name="talk_reminder_title_q">Pairline’ın yardımcısını başlatın</string>
-    <string name="talk_reminder_text_q">Telefon yeniden başladı, bu yüzden arama sesi bu telefona döndü. iPhone’dan konuşma ekranındaki komutu bilgisayarda bir kez çalıştırın. Bu arada aramalar yine iPhone’da çalar.</string>
 
     <string name="help_section_talk">iPhone’dan konuşma</string>
     <string name="help_q_shizuku">Kablosuz hata ayıklama burada ne işe yarıyor? Root gerekir mi?</string>

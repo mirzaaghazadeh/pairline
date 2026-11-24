@@ -123,7 +123,7 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
       MANAGE_ONGOING_CALLS for Pairline itself, call capture (`VOICE_DOWNLINK`/`VOICE_CALL`), injection through the
       telephony output; caller-uid check, argument allowlists (D-046). Hosted by Shizuku until 1.1; from 1.2 by
       Pairline's own helper, started through Wireless debugging (pairing in a notification, automatic restart
-      once Wireless debugging is back on, computer command on Android 10) — D-054. Verified on Android 11 and 16
+      once Wireless debugging is back on; Android 11+, D-056) — D-054. Verified on Android 11 and 16
       emulators: pairing, start, restart after the helper dies or Pairline restarts, helper surviving Wireless
       debugging turned off. Real phones still to test
 - [x] Audio streaming over the Wi-Fi link: 16 kHz PCM in 20 ms packets on the media channel (no codec needed on a

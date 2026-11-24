@@ -8,11 +8,10 @@
     <string name="talk_summary_off">متوقف</string>
     <string name="talk_summary_not_set_up">غير مُعدّ</string>
     <string name="talk_summary_needs_wireless">فعّل «تصحيح الأخطاء اللاسلكي»</string>
-    <string name="talk_summary_needs_computer">شغّله من كمبيوتر</string>
     <string name="talk_summary_starting">جارٍ التشغيل…</string>
     <string name="talk_summary_failed">لم يبدأ</string>
-    <string name="talk_summary_unsupported">يحتاج إلى أندرويد 10 أو أحدث</string>
-    <string name="talk_android_too_old">يعمل هذا الهاتف بأندرويد %1$s. صوت المكالمات على الآيفون يحتاج إلى أندرويد 10 أو أحدث. ستظل المكالمات ترنّ على الآيفون، وتتحدث من هذا الهاتف.</string>
+    <string name="talk_summary_unsupported">يحتاج إلى أندرويد 11 أو أحدث</string>
+    <string name="talk_android_too_old">يعمل هذا الهاتف بأندرويد %1$s. صوت المكالمات على الآيفون يحتاج إلى أندرويد 11 أو أحدث: فقبله لا يسمح أندرويد لأي تطبيق (ولا حتى عبر كمبيوتر أو Shizuku) بالتقاط صوت المكالمة. ستظل المكالمات ترنّ على الآيفون، وتتحدث من هذا الهاتف.</string>
     <string name="talk_steps">الإعداد</string>
 
     <string name="talk_step_dev">فعّل «خيارات المطوّرين»</string>
@@ -48,10 +47,6 @@
     <string name="dev_steps_vivo">الإعدادات ← حول الهاتف ← إصدار البرنامج: اضغطه ٧ مرات. «خيارات المطوّرين» في الإعدادات ← إدارة النظام.</string>
     <string name="dev_steps_other">الإعدادات ← لمحة عن الهاتف: اضغط «رقم الإصدار» ٧ مرات ثم أدخل رمز القفل. «خيارات المطوّرين» في الإعدادات ← النظام.</string>
 
-    <string name="talk_q_step_usb">فعّل «تصحيح أخطاء USB»</string>
-    <string name="talk_q_step_usb_sub">فعّل «تصحيح أخطاء USB» في «خيارات المطوّرين». صِل هذا الهاتف بكمبيوتر فيه أداة adb الخاصة بأندرويد واضغط «سماح» على الهاتف.</string>
-    <string name="talk_q_step_run">شغّل هذا على الكمبيوتر</string>
-    <string name="talk_q_step_run_sub">مرة واحدة بعد كل إعادة تشغيل لهذا الهاتف. ثم يبقى مساعد Pairline يعمل حتى إعادة التشغيل التالية.</string>
     <string name="talk_computer_title">شغّله من كمبيوتر بدلًا من ذلك</string>
     <string name="talk_computer_sub">بلا واي فاي، أو إن لم ينجح الإقران: فعّل «تصحيح أخطاء USB»، وصِل كمبيوترًا فيه adb، وشغّل هذا الأمر مرة بعد كل إعادة تشغيل.</string>
     <string name="talk_copy_command">نسخ الأمر</string>
@@ -105,8 +100,6 @@
     <string name="talk_reminder_channel">التحدث عبر الآيفون</string>
     <string name="talk_reminder_title">فعّل «تصحيح الأخطاء اللاسلكي»</string>
     <string name="talk_reminder_text">أُعيد تشغيل الهاتف، فعاد صوت المكالمات إلى هذا الهاتف. اضغط وفعّل «تصحيح الأخطاء اللاسلكي»: يشغّل Pairline مساعده تلقائيًا. وفي الأثناء تظل المكالمات ترنّ على الآيفون.</string>
-    <string name="talk_reminder_title_q">شغّل مساعد Pairline</string>
-    <string name="talk_reminder_text_q">أُعيد تشغيل الهاتف، فعاد صوت المكالمات إلى هذا الهاتف. شغّل الأمر الموجود في «التحدث عبر الآيفون» على الكمبيوتر مرة واحدة. وفي الأثناء تظل المكالمات ترنّ على الآيفون.</string>
 
     <string name="help_section_talk">التحدث عبر الآيفون</string>
     <string name="help_q_shizuku">ما دور «تصحيح الأخطاء اللاسلكي» هنا؟ هل يحتاج إلى روت؟</string>

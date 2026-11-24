@@ -34,11 +34,11 @@ import org.json.JSONObject
 class PrivilegedManager(private val context: Context, private val prefs: AppPrefs) {
 
     enum class State {
-        /** Android 9: the shell user has no call-audio rights there. */
+        /**
+         * Android 9 and 10: the shell user may not capture call audio there (CAPTURE_AUDIO_OUTPUT, even RECORD_AUDIO,
+         * arrived for it in Android 11; checked on an Android 10 phone), so the helper couldn't carry calls (D-056).
+         */
         UNSUPPORTED,
-
-        /** Android 10 has no Wireless debugging: the helper is started from a computer, once per restart. */
-        NEEDS_COMPUTER,
         NEEDS_DEVELOPER_OPTIONS,
 
         /** Off, which is also how Android leaves it after every restart. */
@@ -74,7 +74,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
 
     private val main = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-helper-start") }
-    private val _state = MutableStateFlow(if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) State.UNSUPPORTED else State.NEEDS_PAIRING)
+    private val _state = MutableStateFlow(if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) State.UNSUPPORTED else State.NEEDS_PAIRING)
     private val _probe = MutableStateFlow<Probe?>(null)
     private val _pairing = MutableStateFlow(Pairing.IDLE)
     private var started = false
@@ -106,12 +106,12 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
             main.post { refresh() }
         }
 
-    private val wanted: Boolean get() = prefs.talkOnIphone || setupOpen
+    private val wanted: Boolean get() = (prefs.talkOnIphone && !prefs.bridgeStopped) || setupOpen
 
     fun start() {
         if (started) return
         started = true
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
         HelperInbox.listen(::attach)
         val observer = object : ContentObserver(main) {
             // A setting changed (e.g. Wireless debugging came back on after a restart): try again from scratch.
@@ -129,11 +129,12 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
 
     /** Re-reads the settings and starts or stops the helper as needed. Main thread. */
     fun refresh() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return set(State.UNSUPPORTED)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return set(State.UNSUPPORTED)
         val s = service
         if (s != null && s.asBinder().pingBinder()) {
-            // Not needed any more: stop it, but only if Pairline can start it again by itself.
-            if (!wanted && canRestart()) {
+            // Not needed any more: stop it, but only if Pairline can start it again by itself, or if the user
+            // stopped Pairline (then everything stops, even if Talk on iPhone needs Wireless debugging again later).
+            if (!wanted && (canRestart() || prefs.bridgeStopped)) {
                 stopHelper()
                 return set(nextWithoutHelper())
             }
@@ -144,7 +145,6 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
     }
 
     private fun nextWithoutHelper(): State = when {
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.R -> State.NEEDS_COMPUTER
         !developerOptionsOn() -> State.NEEDS_DEVELOPER_OPTIONS
         wirelessDebuggingOn() == false -> State.NEEDS_WIRELESS_DEBUGGING
         !paired -> State.NEEDS_PAIRING

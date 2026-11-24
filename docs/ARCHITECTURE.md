@@ -53,7 +53,12 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 - `TelephonyManager.sendUssdRequest` (needs `CALL_PHONE`).
 
 **Staying alive**
-- `LinkService` restarts after boot and after app updates.
+- `LinkService` restarts after boot and after app updates, unless the user stopped Pairline (Settings › Stop
+  Pairline, D-056): then the link, the hotspot, internet sharing and the helper stay off until the user starts it
+  again from Settings, the home screen, pairing or setup.
+- `LinkService` answers every start with `startForeground` (Android takes it out of the foreground when the user
+  restricts background activity, and crashes an unanswered start); the home screen warns when background activity
+  is restricted.
 - The setup wizard asks the user, through Android's own dialog, to exempt Pairline from battery optimization, and shows autostart tips for Xiaomi, Oppo/Realme, Vivo, Huawei and Samsung.
 - Settings are never changed without the user (AGENTS.md rule 5).
 
@@ -68,7 +73,8 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 - The helper runs only while Talk on iPhone is on (or its setup screen is open), survives Wireless debugging being
   turned off and Pairline's process restarting, and ends at every reboot, when Pairline is updated, or after 10
   minutes without Pairline. After a reboot Pairline starts it again by itself once the user turns Wireless
-  debugging back on. Android 10 has no Wireless debugging: the user starts it from a computer with one command.
+  debugging back on. Talk on iPhone needs Android 11+ (D-056): Android 10's shell user may neither capture nor
+  record call audio. A computer command remains for phones whose Wireless debugging can't be used.
 - Allowlisted operations only:
   - call-audio capture and injection (M6)
   - hotspot start/stop and band choice (M5)

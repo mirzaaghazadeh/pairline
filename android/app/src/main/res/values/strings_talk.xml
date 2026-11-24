@@ -8,11 +8,10 @@
     <string name="talk_summary_off">Off</string>
     <string name="talk_summary_not_set_up">Not set up</string>
     <string name="talk_summary_needs_wireless">Turn on Wireless debugging</string>
-    <string name="talk_summary_needs_computer">Start it from a computer</string>
     <string name="talk_summary_starting">Starting…</string>
     <string name="talk_summary_failed">Didn’t start</string>
-    <string name="talk_summary_unsupported">Needs Android 10 or later</string>
-    <string name="talk_android_too_old">This phone runs Android %1$s. Call audio on the iPhone needs Android 10 or later. Calls still ring on the iPhone, and you talk on this phone.</string>
+    <string name="talk_summary_unsupported">Needs Android 11 or later</string>
+    <string name="talk_android_too_old">This phone runs Android %1$s. Call audio on the iPhone needs Android 11 or later: before that, Android lets no app (not even with a computer or Shizuku) capture a call’s audio. Calls still ring on the iPhone, and you talk on this phone.</string>
     <string name="talk_steps">Set up</string>
 
     <!-- Android 11+: Wireless debugging -->
@@ -50,11 +49,7 @@
     <string name="dev_steps_vivo">Settings → About phone → Software version: tap it 7 times. Developer options are under Settings → System management.</string>
     <string name="dev_steps_other">Settings → About phone: tap “Build number” 7 times, then enter your PIN. Developer options are under Settings → System.</string>
 
-    <!-- Android 10, or without Wi-Fi: from a computer -->
-    <string name="talk_q_step_usb">Turn on USB debugging</string>
-    <string name="talk_q_step_usb_sub">In Developer options, turn on USB debugging. Connect this phone to a computer that has Android’s adb tool and tap Allow on the phone.</string>
-    <string name="talk_q_step_run">Run this on the computer</string>
-    <string name="talk_q_step_run_sub">Once after every restart of this phone. Pairline’s helper then keeps running until the next restart.</string>
+    <!-- Without Wi-Fi: from a computer -->
     <string name="talk_computer_title">Start from a computer instead</string>
     <string name="talk_computer_sub">Without Wi-Fi, or if pairing doesn’t work: turn on USB debugging, connect a computer with adb and run this command once after each restart.</string>
     <string name="talk_copy_command">Copy command</string>
@@ -111,8 +106,6 @@
     <string name="talk_reminder_channel">Talk on iPhone</string>
     <string name="talk_reminder_title">Turn on Wireless debugging</string>
     <string name="talk_reminder_text">The phone restarted, so call audio is back on this phone. Tap and turn on Wireless debugging: Pairline then starts its helper by itself. Calls still ring on the iPhone meanwhile.</string>
-    <string name="talk_reminder_title_q">Start Pairline’s helper</string>
-    <string name="talk_reminder_text_q">The phone restarted, so call audio is back on this phone. Run the command from Talk on iPhone on your computer once. Calls still ring on the iPhone meanwhile.</string>
 
     <!-- Help -->
     <string name="help_section_talk">Talk on iPhone</string>

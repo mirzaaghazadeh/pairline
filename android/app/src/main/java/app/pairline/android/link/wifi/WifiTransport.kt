@@ -119,8 +119,9 @@ class WifiTransport(
                     addAction(ACTION_WIFI_AP_STATE_CHANGED)
                     addAction(ACTION_TETHER_STATE_CHANGED)
                 }
-                // System broadcasts still arrive at a receiver that isn't exported.
-                ContextCompat.registerReceiver(app, tetherReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+                // Protected system broadcasts (only Android sends them). "Not exported" would block them on Android 12
+                // and older, where AndroidX implements it with a permission the system's broadcasts don't carry.
+                ContextCompat.registerReceiver(app, tetherReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
             }
             periodic = control.scheduleWithFixedDelay({ rescan() }, RESCAN_EVERY_S, RESCAN_EVERY_S, TimeUnit.SECONDS)
             rescan()

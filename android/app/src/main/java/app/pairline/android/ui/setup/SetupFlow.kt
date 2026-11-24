@@ -81,7 +81,7 @@ sealed interface SetupStep {
     data class Autostart(val maker: Maker) : SetupStep
     data object Pair : SetupStep
 
-    /** Optional: call audio on the iPhone through Pairline's helper (D-047, D-054). Android 10+ only. */
+    /** Optional: call audio on the iPhone through Pairline's helper (D-047, D-054). Android 11+ only (D-056). */
     data object Talk : SetupStep
     data object Done : SetupStep
 
@@ -94,7 +94,8 @@ sealed interface SetupStep {
             add(Battery)
             if (maker != Maker.OTHER) add(Autostart(maker))
             add(Pair)
-            if (sdk >= Build.VERSION_CODES.Q) add(Talk)
+            // Call audio needs Android 11+ (D-056).
+            if (sdk >= Build.VERSION_CODES.R) add(Talk)
             add(Done)
         }
     }
@@ -414,7 +415,7 @@ private fun DoneStep(onFinished: () -> Unit) {
         buttons = {
             PrimaryButton(stringResource(R.string.action_open_pairline), {
                 AppGraph.prefs.setupDone = true
-                LinkService.start(context, "setup finished")
+                LinkService.start(context, "setup finished", byUser = true)
                 onFinished()
             })
         },

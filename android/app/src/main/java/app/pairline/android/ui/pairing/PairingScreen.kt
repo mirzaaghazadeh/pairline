@@ -98,7 +98,8 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
 
     val view = LocalView.current
     DisposableEffect(Unit) {
-        LinkService.start(context, "pairing screen")
+        // Pairing needs the link: showing a code means the user wants Pairline running, even if they stopped it.
+        LinkService.start(context, "pairing screen", byUser = true)
         if (!started) {
             // Opened now, not recreated: start over with a fresh code.
             pairing.resetOutcome()

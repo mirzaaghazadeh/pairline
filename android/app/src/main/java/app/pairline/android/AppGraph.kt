@@ -107,8 +107,7 @@ object AppGraph {
                     // The helper is gone (usually a restart turned Wireless debugging off): tell the user once per
                     // boot how to get call audio back.
                     PrivilegedManager.State.NEEDS_WIRELESS_DEBUGGING ->
-                        if (prefs.talkOnIphone && manager.paired) TalkReminder.maybeShow(app)
-                    PrivilegedManager.State.NEEDS_COMPUTER -> if (prefs.talkOnIphone) TalkReminder.maybeShow(app)
+                        if (prefs.talkOnIphone && manager.paired && !prefs.bridgeStopped) TalkReminder.maybeShow(app)
                     else -> Unit
                 }
             }

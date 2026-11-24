@@ -48,7 +48,7 @@ class LinkService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        if (!enterForeground()) {
+        if (!enterForeground() || graph.prefs.bridgeStopped) {
             stopSelf()
             return
         }
@@ -116,6 +116,18 @@ class LinkService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Every startForegroundService() needs a startForeground() answer, not only the first one: Android may have
+        // taken the service out of the foreground meanwhile ("Restrict background activity" does), and then
+        // crashes the app if a new start isn't answered. Repeating it only refreshes the notification.
+        if (!enterForeground()) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+        if (graph.prefs.bridgeStopped) {
+            // A start that slipped past start()'s check (e.g. Android restarting a sticky service): stay stopped.
+            stopSelf()
+            return START_NOT_STICKY
+        }
         if (intent?.action == ACTION_REFRESH) {
             // Permissions or settings may have changed. start() is a no-op while the GATT server runs, so a
             // live connection isn't disturbed; it retries if Bluetooth wasn't usable before.
@@ -209,7 +221,18 @@ class LinkService : Service() {
         private const val UPDATE_LOOK_MS = 3600_000L
         const val ACTION_REFRESH = "app.pairline.android.action.REFRESH"
 
-        fun start(context: Context, reason: String) {
+        /** Starts the link unless the user stopped Pairline; [byUser] (Start, pairing, setup) clears that first. */
+        fun start(context: Context, reason: String, byUser: Boolean = false) {
+            val prefs = AppGraph.prefs
+            if (byUser && prefs.bridgeStopped) {
+                prefs.bridgeStopped = false
+                Log.i(TAG, "started again by the user ($reason)")
+                AppGraph.privileged.refresh()
+            }
+            if (prefs.bridgeStopped) {
+                Log.d(TAG, "not starting ($reason): stopped by the user")
+                return
+            }
             try {
                 ContextCompat.startForegroundService(context, Intent(context, LinkService::class.java))
                 Log.d(TAG, "start requested ($reason)")
@@ -221,6 +244,7 @@ class LinkService : Service() {
 
         /** Re-checks permissions, Bluetooth and status after the user changed something. */
         fun refresh(context: Context) {
+            if (AppGraph.prefs.bridgeStopped) return
             try {
                 ContextCompat.startForegroundService(
                     context,
@@ -233,6 +257,19 @@ class LinkService : Service() {
 
         fun stop(context: Context) {
             context.stopService(Intent(context, LinkService::class.java))
+        }
+
+        /**
+         * Settings › Stop Pairline: ends the link, the hotspot, internet sharing and the helper, and keeps them off
+         * (also after a reboot or an update) until the user starts Pairline again. Main thread.
+         */
+        fun stopByUser(context: Context) {
+            Log.i(TAG, "stopped by the user")
+            AppGraph.prefs.bridgeStopped = true
+            AppGraph.netShare.stop("Pairline stopped")
+            AppGraph.hotspot.stop()
+            stop(context)
+            AppGraph.privileged.refresh()
         }
     }
 }

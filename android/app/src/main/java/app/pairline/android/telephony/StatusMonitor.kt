@@ -80,11 +80,13 @@ class StatusMonitor(
     fun start() {
         if (started) return
         started = true
+        // A protected system broadcast (only Android sends it). "Not exported" would block it on Android 12 and older,
+        // where AndroidX implements that with a permission the system's broadcast doesn't carry.
         ContextCompat.registerReceiver(
             context,
             batteryReceiver,
             IntentFilter(Intent.ACTION_BATTERY_CHANGED),
-            ContextCompat.RECEIVER_NOT_EXPORTED,
+            ContextCompat.RECEIVER_EXPORTED,
         )
         executor.execute {
             val listener = object : SubscriptionManager.OnSubscriptionsChangedListener() {

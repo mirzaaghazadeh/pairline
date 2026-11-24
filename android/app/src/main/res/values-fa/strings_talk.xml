@@ -8,11 +8,10 @@
     <string name="talk_summary_off">خاموش</string>
     <string name="talk_summary_not_set_up">راه‌اندازی نشده</string>
     <string name="talk_summary_needs_wireless">اشکال‌زدایی بی‌سیم را روشن کنید</string>
-    <string name="talk_summary_needs_computer">از کامپیوتر اجرایش کنید</string>
     <string name="talk_summary_starting">در حال اجرا…</string>
     <string name="talk_summary_failed">اجرا نشد</string>
-    <string name="talk_summary_unsupported">به اندروید ۱۰ یا جدیدتر نیاز دارد</string>
-    <string name="talk_android_too_old">این گوشی اندروید %1$s دارد. صدای تماس روی آیفون به اندروید ۱۰ یا جدیدتر نیاز دارد. تماس‌ها همچنان روی آیفون زنگ می‌خورند و شما با همین گوشی صحبت می‌کنید.</string>
+    <string name="talk_summary_unsupported">به اندروید ۱۱ یا جدیدتر نیاز دارد</string>
+    <string name="talk_android_too_old">این گوشی اندروید %1$s دارد. صدای تماس روی آیفون به اندروید ۱۱ یا جدیدتر نیاز دارد: پیش از آن، اندروید به هیچ برنامه‌ای (حتی با کامپیوتر یا Shizuku) اجازهٔ گرفتن صدای تماس را نمی‌دهد. تماس‌ها همچنان روی آیفون زنگ می‌خورند و شما با همین گوشی صحبت می‌کنید.</string>
     <string name="talk_steps">راه‌اندازی</string>
 
     <string name="talk_step_dev">«گزینه‌های برنامه‌نویس» را روشن کنید</string>
@@ -48,10 +47,6 @@
     <string name="dev_steps_vivo">«تنظیمات ← درباره تلفن ← نسخهٔ نرم‌افزار»: ۷ بار رویش بزنید. «گزینه‌های برنامه‌نویس» در «تنظیمات ← مدیریت سیستم» است.</string>
     <string name="dev_steps_other">«تنظیمات ← درباره تلفن»: ۷ بار روی «شماره ساخت» بزنید و رمز قفل را وارد کنید. «گزینه‌های برنامه‌نویس» در «تنظیمات ← سیستم» است.</string>
 
-    <string name="talk_q_step_usb">«اشکال‌زدایی USB» را روشن کنید</string>
-    <string name="talk_q_step_usb_sub">در «گزینه‌های برنامه‌نویس»، «اشکال‌زدایی USB» را روشن کنید. این گوشی را به کامپیوتری که ابزار adb اندروید را دارد وصل کنید و روی گوشی «اجازه دادن» را بزنید.</string>
-    <string name="talk_q_step_run">این را روی کامپیوتر اجرا کنید</string>
-    <string name="talk_q_step_run_sub">بعد از هر بار روشن‌شدن دوبارهٔ این گوشی، یک بار. بعد دستیار Pairline تا روشن‌شدن بعدی اجرا می‌ماند.</string>
     <string name="talk_computer_title">به‌جایش از کامپیوتر اجرا کنید</string>
     <string name="talk_computer_sub">بدون وای‌فای، یا اگر مرتبط‌سازی جواب نداد: «اشکال‌زدایی USB» را روشن کنید، کامپیوتری با adb وصل کنید و بعد از هر بار روشن‌شدن گوشی این فرمان را یک بار اجرا کنید.</string>
     <string name="talk_copy_command">کپی فرمان</string>
@@ -105,8 +100,6 @@
     <string name="talk_reminder_channel">مکالمه با آیفون</string>
     <string name="talk_reminder_title">«اشکال‌زدایی بی‌سیم» را روشن کنید</string>
     <string name="talk_reminder_text">گوشی دوباره روشن شد و صدای تماس به این گوشی برگشت. بزنید و «اشکال‌زدایی بی‌سیم» را روشن کنید: Pairline دستیارش را خودش اجرا می‌کند. در این فاصله تماس‌ها همچنان روی آیفون زنگ می‌خورند.</string>
-    <string name="talk_reminder_title_q">دستیار Pairline را اجرا کنید</string>
-    <string name="talk_reminder_text_q">گوشی دوباره روشن شد و صدای تماس به این گوشی برگشت. فرمانِ صفحهٔ «مکالمه با آیفون» را یک بار روی کامپیوتر اجرا کنید. در این فاصله تماس‌ها همچنان روی آیفون زنگ می‌خورند.</string>
 
     <string name="help_section_talk">مکالمه با آیفون</string>
     <string name="help_q_shizuku">«اشکال‌زدایی بی‌سیم» اینجا چه کار می‌کند؟ به روت نیاز دارد؟</string>

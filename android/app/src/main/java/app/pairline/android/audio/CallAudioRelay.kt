@@ -159,19 +159,30 @@ class CallAudioRelay(
             private set
 
         fun open() {
-            val source = prefs.audioCaptureSource
+            // The learned source first, then the other one: some phones (Samsung among them) open only one of the
+            // two. Whichever opens is remembered for the next call.
+            val preferred = prefs.audioCaptureSource
+            val sources = listOf(preferred, if (preferred == SOURCE_DOWNLINK) SOURCE_CALL else SOURCE_DOWNLINK)
             var problem: String? = null
-            for (rate in CAPTURE_RATES) {
-                try {
-                    captureFd = service.startCapture(source, rate)
-                    captureRate = rate
-                    break
-                } catch (e: RuntimeException) {
-                    problem = e.message
+            var opened = preferred
+            capture@ for (source in sources) {
+                for (rate in CAPTURE_RATES) {
+                    try {
+                        captureFd = service.startCapture(source, rate)
+                        captureRate = rate
+                        opened = source
+                        if (source != preferred) {
+                            prefs.audioCaptureSource = source
+                            Log.i(TAG, "capture source $preferred didn't open; using $source from now on")
+                        }
+                        break@capture
+                    } catch (e: RuntimeException) {
+                        problem = e.message
+                    }
                 }
             }
             if (captureFd == null) {
-                Log.w(TAG, "call audio capture failed (source $source): $problem")
+                Log.w(TAG, "call audio capture failed (sources $sources): $problem")
                 throw RequestException(ErrorCode.FAILED, "couldn't capture call audio: $problem")
             }
             if (wantTalk) {
@@ -189,7 +200,7 @@ class CallAudioRelay(
                     jitter.put(sequence, frame)
                 }
             }
-            Log.i(TAG, "relaying call audio: capture $captureRate Hz from source $source, talk $talking")
+            Log.i(TAG, "relaying call audio: capture $captureRate Hz from source $opened, talk $talking")
             Thread(::captureLoop, "pairline-audio-up").apply { isDaemon = true }.start()
             if (talking) Thread(::playoutLoop, "pairline-audio-down").apply { isDaemon = true }.start()
         }

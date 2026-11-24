@@ -52,6 +52,7 @@ import app.pairline.android.R
 import app.pairline.android.files.TransferItem
 import app.pairline.android.files.TransferPhase
 import app.pairline.android.link.BluetoothStatus
+import app.pairline.android.link.LinkService
 import app.pairline.android.link.LinkSnapshot
 import app.pairline.android.link.TransportKind
 import app.pairline.android.link.WifiLinkStatus
@@ -224,6 +225,11 @@ private fun LinkCard(
         link.bluetooth == BluetoothStatus.UNSUPPORTED
     // With the Wi-Fi link listening, a Bluetooth problem isn't a dead end: the iPhone can still come over Wi-Fi.
     val wifiReady = link.wifi == WifiLinkStatus.LISTENING
+    // The user stopped Pairline in Settings: say so, and offer Start, instead of the (stale) link state.
+    if (prefs.bridgeStopped) {
+        StoppedCard()
+        return
+    }
     val (visual, tone, pill) = when {
         link.connected -> Triple(LinkVisual.CONNECTED, Tone.GOOD, R.string.state_connected)
         btProblem && !link.debugTcpListening && !wifiReady -> Triple(LinkVisual.PROBLEM, Tone.BAD, R.string.state_problem)
@@ -263,6 +269,32 @@ private fun LinkCard(
                 link.bluetooth == BluetoothStatus.NO_PERMISSION -> PrimaryButton(stringResource(R.string.action_allow), onAllowBluetooth, icon = PIcons.Bluetooth)
                 !paired && !link.connected -> PrimaryButton(stringResource(R.string.home_pair), { navigate(Route.Pairing) }, icon = PIcons.Qr)
             }
+        }
+    }
+}
+
+@Composable
+private fun StoppedCard() {
+    val context = LocalContext.current
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = toneColors(Tone.NEUTRAL).container.copy(alpha = 0.55f)),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            LinkIllustration(LinkVisual.NOT_PAIRED, Modifier.padding(horizontal = 8.dp))
+            StatusPill(stringResource(R.string.state_stopped), Tone.NEUTRAL)
+            Text(stringResource(R.string.home_stopped_title), style = MaterialTheme.typography.titleLarge)
+            Text(
+                stringResource(R.string.home_stopped_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            PrimaryButton(
+                stringResource(R.string.settings_start_bridge),
+                { LinkService.start(context, "started on the home screen", byUser = true) },
+                icon = PIcons.Power,
+            )
         }
     }
 }
@@ -436,8 +468,8 @@ sealed interface Fix {
 
 private data class Feature(val cap: String, @StringRes val title: Int, @StringRes val missing: Int, val fix: Fix?)
 
-/** Call audio on the iPhone needs Android 10 or later (D-047). */
-private val talkSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+/** Call audio on the iPhone needs Android 11 or later (D-047, D-056). */
+private val talkSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
 private val features = listOf(
     Feature(Caps.SMS_RECEIVE, R.string.cap_sms_receive, R.string.cap_missing_sms, Fix.Permission(PermissionGroup.SMS)),
@@ -510,8 +542,23 @@ private fun KeepRunningCard(tick: Int, navigate: (Route) -> Unit) {
     val context = LocalContext.current
     val exempt = remember(tick) { SystemActions.isIgnoringBatteryOptimizations(context) }
     val notifications = remember(tick) { Perms.allGranted(context, Perms.NOTIFICATIONS) }
+    // App info › Battery › "Restrict background activity": Android then stops Pairline's link in the background.
+    val restricted = remember(tick) {
+        context.getSystemService(android.app.ActivityManager::class.java)?.isBackgroundRestricted == true
+    }
     val maker = remember { Maker.detect() }
     SectionCard(title = stringResource(R.string.home_keep_running)) {
+        if (restricted) {
+            ListRow(
+                title = stringResource(R.string.home_background_restricted),
+                subtitle = stringResource(R.string.home_background_restricted_sub),
+                icon = PIcons.Warning,
+                iconTone = Tone.WARN,
+                showChevron = false,
+                trailing = { TextButton(onClick = { SystemActions.openAppSettings(context) }) { Text(stringResource(R.string.action_fix)) } },
+            )
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        }
         ListRow(
             title = stringResource(if (exempt) R.string.home_battery_ok else R.string.home_battery_restricted),
             subtitle = stringResource(if (exempt) R.string.home_battery_ok_sub else R.string.home_battery_restricted_sub),

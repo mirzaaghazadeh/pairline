@@ -150,6 +150,16 @@
     <string name="state_searching">Bekleniyor</string>
     <string name="state_not_paired">Eşleştirilmedi</string>
     <string name="state_problem">İşlem gerekiyor</string>
+    <string name="state_stopped">Durduruldu</string>
+    <string name="home_stopped_title">Pairline durduruldu</string>
+    <string name="home_stopped_body">iPhone’unuz bu telefona ulaşamıyor; aramalar, mesajlar ve kodlar burada kalır. Pairline, siz yeniden başlatana kadar telefon yeniden başlasa bile kapalı kalır.</string>
+    <string name="settings_stop_bridge">Pairline’ı durdur</string>
+    <string name="settings_stop_bridge_sub">Siz yeniden başlatana kadar iPhone bağlantısını ve arka plan hizmetini kapatır.</string>
+    <string name="settings_start_bridge">Pairline’ı başlat</string>
+    <string name="settings_start_bridge_sub">Pairline durduruldu. iPhone’unuzun yeniden bağlanabilmesi için başlatın.</string>
+    <string name="settings_stop_bridge_confirm_title">Pairline durdurulsun mu?</string>
+    <string name="settings_stop_bridge_confirm_body">iPhone bağlantıyı kaybeder; aramalar, mesajlar ve kodlar bu telefonda kalır. Wi-Fi bağlantısı, erişim noktası, internet paylaşımı ve iPhone’dan konuşma yardımcısı da durur. Pairline, burada veya ana ekranda Pairline’ı başlat’a dokunana kadar telefon yeniden başlasa bile kapalı kalır.</string>
+    <string name="action_stop">Durdur</string>
     <string name="home_connected_title">%1$s bağlı</string>
     <string name="home_connected_body">Bluetooth üzerinden. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
     <string name="home_connected_body_tcp">Hata ayıklama test bağlantısı üzerinden. Aramalar ve mesajlar aktarılıyor.</string>
@@ -180,6 +190,8 @@
     <string name="home_battery_ok_sub">Android, pil tasarrufu için Pairline\'ı duraklatmaz.</string>
     <string name="home_battery_restricted">Pil optimizasyonu açık</string>
     <string name="home_battery_restricted_sub">Android, ekran kapalıyken Pairline\'ı duraklatabilir; aramalar veya mesajlar geç gelebilir.</string>
+    <string name="home_background_restricted">Arka plan etkinliği kısıtlı</string>
+    <string name="home_background_restricted_sub">Android, Pairline’dan çıkar çıkmaz onu durdurur ve iPhone bağlantıyı kaybeder. Düzelt’e dokunun, ardından Pil bölümünde “Arka plan etkinliğini kısıtla”yı kapatın (veya “Kısıtlanmamış”ı seçin).</string>
     <string name="home_notifications_off">Bildirimler kapalı</string>
     <string name="home_notifications_off_sub">Durum bildirimi olmadan Android, Pairline\'ı durdurabilir.</string>
     <string name="home_keepalive_sub">%1$s için ipuçları</string>
@@ -403,7 +415,7 @@
     <string name="help_q_no_sms">Mesajlar iPhone\'uma ulaşmıyor</string>
     <string name="help_a_no_sms">İzinler bölümünde \"SMS mesajları\" izninin verildiğinden ve ana ekranda \"Bağlı\" yazdığından emin olun. Bağlantı kesikken gelen mesajlar, yeniden bağlanıldığında iPhone\'da görünür.</string>
     <string name="help_q_call_audio">Arama sırasında nereden konuşurum?</string>
-    <string name="help_a_call_audio">iPhone’dan konuşmayı kurmadıysanız bu Android telefondan (Ayarlar › iPhone’dan konuşma). Kurduğunuzda iPhone’da yanıtladığınız veya başlattığınız aramalar iPhone’un mikrofonunu ve hoparlörünü kullanır. Android 10 veya üstü, Kablosuz hata ayıklama (birkaç adımda bir kez kurulur, ek uygulama gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir.</string>
+    <string name="help_a_call_audio">iPhone’dan konuşmayı kurmadıysanız bu Android telefondan (Ayarlar › iPhone’dan konuşma). Kurduğunuzda iPhone’da yanıtladığınız veya başlattığınız aramalar iPhone’un mikrofonunu ve hoparlörünü kullanır. Android 11 veya üstü, Kablosuz hata ayıklama (birkaç adımda bir kez kurulur, ek uygulama gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir.</string>
     <string name="help_q_dtmf">Neden iPhone\'umdan tuş takımını kullanamıyor veya sesi kapatamıyorum?</string>
     <string name="help_a_dtmf">Android, devam eden bir aramayı yalnızca birkaç uygulamanın kontrol etmesine izin verir. Yardım olmadan Pairline aramaları yanıtlayıp sonlandırabilir, ancak tuş sesleri gönderemez veya sesi kapatamaz. iPhone’dan konuşmayı kurun (Ayarlar › iPhone’dan konuşma, Android 12 veya üstü), Pairline ikisini de yapabilsin.</string>
     <string name="help_q_restricted">Android \"Kısıtlanmış ayar\" diyor</string>

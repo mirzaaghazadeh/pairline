@@ -84,6 +84,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
     var languageDialog by remember { mutableStateOf(false) }
     var confirmUnpair by remember { mutableStateOf(false) }
     var confirmSetup by remember { mutableStateOf(false) }
+    var confirmStop by remember { mutableStateOf(false) }
+    val stopped = remember(prefsTick) { prefs.bridgeStopped }
     val contactsAdd = remember(prefsTick, tick) { prefs.contactsAddEnabled && Perms.allGranted(context, Perms.WRITE_CONTACTS) }
     val writeContacts = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         prefs.contactsAddEnabled = granted
@@ -214,6 +216,25 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     icon = PIcons.Lock,
                     onClick = { navigate(Route.Permissions) },
                 )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                if (stopped) {
+                    ListRow(
+                        title = stringResource(R.string.settings_start_bridge),
+                        subtitle = stringResource(R.string.settings_start_bridge_sub),
+                        icon = PIcons.Power,
+                        iconTone = Tone.WARN,
+                        onClick = { LinkService.start(context, "started in Settings", byUser = true) },
+                    )
+                } else {
+                    ListRow(
+                        title = stringResource(R.string.settings_stop_bridge),
+                        subtitle = stringResource(R.string.settings_stop_bridge_sub),
+                        icon = PIcons.Power,
+                        iconTone = Tone.BAD,
+                        titleColor = MaterialTheme.colorScheme.error,
+                        onClick = { confirmStop = true },
+                    )
+                }
             }
 
             UpdatesSection()
@@ -315,6 +336,20 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
             confirmUnpair = false
             AppGraph.link.unpairLocally()
         }
+    }
+    if (confirmStop) {
+        AlertDialog(
+            onDismissRequest = { confirmStop = false },
+            title = { Text(stringResource(R.string.settings_stop_bridge_confirm_title)) },
+            text = { Text(stringResource(R.string.settings_stop_bridge_confirm_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmStop = false
+                    LinkService.stopByUser(context)
+                }) { Text(stringResource(R.string.action_stop), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { confirmStop = false }) { Text(stringResource(R.string.action_cancel)) } },
+        )
     }
     if (confirmSetup) {
         AlertDialog(

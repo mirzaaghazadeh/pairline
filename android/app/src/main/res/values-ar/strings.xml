@@ -150,6 +150,16 @@
     <string name="state_searching">في الانتظار</string>
     <string name="state_not_paired">غير مقترن</string>
     <string name="state_problem">يحتاج إلى انتباهك</string>
+    <string name="state_stopped">متوقف</string>
+    <string name="home_stopped_title">Pairline متوقف</string>
+    <string name="home_stopped_body">لا يستطيع الآيفون الوصول إلى هذا الهاتف، لذا تبقى المكالمات والرسائل والرموز هنا. يبقى Pairline متوقفًا، حتى بعد إعادة التشغيل، إلى أن تشغّله من جديد.</string>
+    <string name="settings_stop_bridge">إيقاف Pairline</string>
+    <string name="settings_stop_bridge_sub">ينهي الاتصال بالآيفون والخدمة في الخلفية إلى أن تشغّله من جديد.</string>
+    <string name="settings_start_bridge">تشغيل Pairline</string>
+    <string name="settings_start_bridge_sub">Pairline متوقف. شغّله ليتمكن الآيفون من الاتصال مجددًا.</string>
+    <string name="settings_stop_bridge_confirm_title">إيقاف Pairline؟</string>
+    <string name="settings_stop_bridge_confirm_body">يفقد الآيفون الاتصال، وتبقى المكالمات والرسائل والرموز على هذا الهاتف. ويتوقف أيضًا رابط الواي فاي ونقطة الاتصال ومشاركة الإنترنت ومساعد «التحدث عبر الآيفون». يبقى Pairline متوقفًا، حتى بعد إعادة التشغيل، إلى أن تضغط «تشغيل Pairline» هنا أو في الشاشة الرئيسية.</string>
+    <string name="action_stop">إيقاف</string>
     <string name="home_connected_title">متصل بـ %1$s</string>
     <string name="home_connected_body">عبر البلوتوث. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
     <string name="home_connected_body_tcp">عبر رابط الاختبار الخاص بالتصحيح. يتم نقل المكالمات والرسائل.</string>
@@ -180,6 +190,8 @@
     <string name="home_battery_ok_sub">لن يوقف أندرويد Pairline مؤقتًا لتوفير البطارية.</string>
     <string name="home_battery_restricted">تحسين البطارية مفعّل</string>
     <string name="home_battery_restricted_sub">قد يوقف أندرويد Pairline مؤقتًا عند إطفاء الشاشة، وقد تتأخر المكالمات أو الرسائل في الوصول.</string>
+    <string name="home_background_restricted">النشاط في الخلفية مقيّد</string>
+    <string name="home_background_restricted_sub">يوقف أندرويد Pairline بمجرد مغادرته، فيفقد الآيفون الاتصال. اضغط «إصلاح»، ثم من قسم البطارية أوقف «تقييد النشاط في الخلفية» (أو اختر «غير مقيّد»).</string>
     <string name="home_notifications_off">الإشعارات متوقفة</string>
     <string name="home_notifications_off_sub">قد يوقف أندرويد Pairline إذا لم يكن إشعار الحالة الخاص به ظاهرًا.</string>
     <string name="home_keepalive_sub">نصائح تخص %1$s</string>
@@ -404,7 +416,7 @@
     <string name="help_q_no_sms">لا تصل الرسائل إلى آيفوني</string>
     <string name="help_a_no_sms">تأكد من السماح بإذن «الرسائل النصية» في «الأذونات»، ومن أن الشاشة الرئيسية تعرض «متصل». والرسائل التي تصل أثناء انقطاع الاتصال تظهر على الآيفون عند إعادة الاتصال.</string>
     <string name="help_q_call_audio">أين أتحدث أثناء المكالمة؟</string>
-    <string name="help_a_call_audio">على هاتف أندرويد هذا، إلا إذا أعددت «التحدث عبر الآيفون» (الإعدادات › التحدث عبر الآيفون). عندها تستخدم المكالمات التي تردّ عليها أو تجريها من الآيفون ميكروفون الآيفون ومكبّر صوته. يحتاج إلى أندرويد 10 أو أحدث، و«تصحيح الأخطاء اللاسلكي» (يُعدّ مرة واحدة في خطوات قليلة، بلا تطبيق إضافي)، وأن يكون الهاتفان على شبكة الواي فاي نفسها.</string>
+    <string name="help_a_call_audio">على هاتف أندرويد هذا، إلا إذا أعددت «التحدث عبر الآيفون» (الإعدادات › التحدث عبر الآيفون). عندها تستخدم المكالمات التي تردّ عليها أو تجريها من الآيفون ميكروفون الآيفون ومكبّر صوته. يحتاج إلى أندرويد 11 أو أحدث، و«تصحيح الأخطاء اللاسلكي» (يُعدّ مرة واحدة في خطوات قليلة، بلا تطبيق إضافي)، وأن يكون الهاتفان على شبكة الواي فاي نفسها.</string>
     <string name="help_q_dtmf">لماذا لا يمكنني استخدام لوحة الأرقام أو كتم الصوت من آيفوني؟</string>
     <string name="help_a_dtmf">لا يسمح أندرويد إلا لعدد قليل من التطبيقات بالتحكم في المكالمة الجارية. من دون مساعدة، يستطيع Pairline الرد على المكالمات وإنهاءها، لكنه لا يستطيع إرسال نغمات لوحة الأرقام أو كتم الصوت. أعدّ «التحدث عبر الآيفون» (الإعدادات › التحدث عبر الآيفون، أندرويد 12 أو أحدث) ليستطيع Pairline فعل الأمرين.</string>
     <string name="help_q_restricted">يعرض أندرويد رسالة «إعداد مقيّد»</string>

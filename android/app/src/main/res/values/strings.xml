@@ -150,6 +150,16 @@
     <string name="state_searching">Waiting</string>
     <string name="state_not_paired">Not paired</string>
     <string name="state_problem">Needs attention</string>
+    <string name="state_stopped">Stopped</string>
+    <string name="home_stopped_title">Pairline is stopped</string>
+    <string name="home_stopped_body">Your iPhone can\'t reach this phone, so calls, messages and codes stay here. Pairline stays off, even after a restart, until you start it again.</string>
+    <string name="settings_stop_bridge">Stop Pairline</string>
+    <string name="settings_stop_bridge_sub">Ends the link to your iPhone and the background service until you start it again.</string>
+    <string name="settings_start_bridge">Start Pairline</string>
+    <string name="settings_start_bridge_sub">Pairline is stopped. Start it so your iPhone can connect again.</string>
+    <string name="settings_stop_bridge_confirm_title">Stop Pairline?</string>
+    <string name="settings_stop_bridge_confirm_body">Your iPhone loses the link, and calls, messages and codes stay on this phone. The Wi-Fi link, the hotspot, internet sharing and Talk on iPhone\'s helper stop too. Pairline stays off, even after a restart, until you tap Start Pairline here or on the home screen.</string>
+    <string name="action_stop">Stop</string>
     <string name="home_connected_title">Connected to %1$s</string>
     <string name="home_connected_body">Over Bluetooth. Calls and messages are being relayed to your iPhone.</string>
     <string name="home_connected_body_tcp">Over the debug test link. Calls and messages are being relayed.</string>
@@ -180,6 +190,8 @@
     <string name="home_battery_ok_sub">Android won\'t pause Pairline to save battery.</string>
     <string name="home_battery_restricted">Battery optimization is on</string>
     <string name="home_battery_restricted_sub">Android may pause Pairline when the screen is off, and calls or messages could arrive late.</string>
+    <string name="home_background_restricted">Background activity is restricted</string>
+    <string name="home_background_restricted_sub">Android stops Pairline as soon as you leave it, so the iPhone loses the link. Tap Fix, then under Battery turn off “Restrict background activity” (or choose “Unrestricted”).</string>
     <string name="home_notifications_off">Notifications are off</string>
     <string name="home_notifications_off_sub">Android may stop Pairline without its status notification.</string>
     <string name="home_keepalive_sub">Tips for %1$s</string>
@@ -405,7 +417,7 @@
     <string name="help_q_no_sms">Messages don\'t reach my iPhone</string>
     <string name="help_a_no_sms">Make sure Text messages is allowed in Permissions and that the home screen says Connected. Messages that arrive while the link is down appear on the iPhone when it reconnects.</string>
     <string name="help_q_call_audio">Where do I talk during a call?</string>
-    <string name="help_a_call_audio">On this Android phone, unless you set up Talk on iPhone (Settings › Talk on iPhone). Then calls you answer or place on the iPhone use the iPhone\'s microphone and speaker. It needs Android 10 or later, Wireless debugging (set up once in a few steps, no extra app) and both phones on the same Wi-Fi.</string>
+    <string name="help_a_call_audio">On this Android phone, unless you set up Talk on iPhone (Settings › Talk on iPhone). Then calls you answer or place on the iPhone use the iPhone\'s microphone and speaker. It needs Android 11 or later, Wireless debugging (set up once in a few steps, no extra app) and both phones on the same Wi-Fi.</string>
     <string name="help_q_dtmf">Why can\'t I use the keypad or mute from my iPhone?</string>
     <string name="help_a_dtmf">Android only lets a few apps control a call in progress. Without help, Pairline can answer and end calls but not send keypad tones or mute. Set up Talk on iPhone (Settings › Talk on iPhone, Android 12 or later) and Pairline can do both.</string>
     <string name="help_q_restricted">Android says \"Restricted setting\"</string>
