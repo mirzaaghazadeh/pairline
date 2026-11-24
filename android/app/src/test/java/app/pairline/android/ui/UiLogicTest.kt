@@ -46,8 +46,11 @@ class UiLogicTest {
         val steps = SetupStep.all(sdk = 36, maker = Maker.SAMSUNG)
         assertEquals(SetupStep.Welcome, steps.first())
         assertEquals(SetupStep.Privacy, steps[1])
-        assertEquals(SetupStep.Pair, steps[steps.size - 2])
+        assertEquals(SetupStep.Pair, steps[steps.size - 3])
+        assertEquals(SetupStep.Talk, steps[steps.size - 2])
         assertEquals(SetupStep.Done, steps.last())
+        // Android 9 can't relay call audio, so the optional Talk step is skipped there.
+        assertFalse(SetupStep.Talk in SetupStep.all(sdk = 28, maker = Maker.OTHER))
         val battery = steps.indexOf(SetupStep.Battery)
         assertTrue(steps.subList(0, battery).any { it is SetupStep.Permission } || steps.none { it is SetupStep.Permission })
     }

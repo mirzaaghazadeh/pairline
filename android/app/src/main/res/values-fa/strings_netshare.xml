@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="netshare_title">اشتراک اینترنت</string>
+    <string name="netshare_allow">آیفون از اینترنت این گوشی استفاده کند</string>
+    <string name="netshare_allow_sub">فقط وقتی از روی آیفون روشنش کنید. آن‌وقت ترافیک آیفون از طریق اتصال و VPN این گوشی، روی وای‌فای شما یا هات‌اسپات این گوشی، خارج می‌شود.</string>
+    <string name="netshare_active">در حال اشتراک</string>
+    <string name="netshare_idle">الان اشتراکی در کار نیست</string>
+    <string name="netshare_vpn_on">یک VPN روشن است: ترافیک آیفون از آن عبور می‌کند. برای توقف اشتراک بزنید.</string>
+    <string name="netshare_vpn_off">روی این گوشی VPN روشن نیست: ترافیک آیفون از اتصال خودِ این گوشی خارج می‌شود.</string>
+    <string name="netshare_direct_iran">سایت‌های ایرانی (‎.ir) مستقیم</string>
+    <string name="netshare_direct_iran_sub">سایت‌هایی که به ‎.ir ختم می‌شوند از این گوشی و VPN آن عبور نمی‌کنند.</string>
+</resources>

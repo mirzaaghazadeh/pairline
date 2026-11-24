@@ -67,6 +67,39 @@ class AppPrefs(context: Context) {
         get() = prefs.getLong(COMPANION_BOUND, 0)
         set(value) = edit { putLong(COMPANION_BOUND, value) }
 
+    /** "Talk on iPhone" is turned on: relay call audio through Shizuku when the iPhone asks (D-047). */
+    var talkOnIphone: Boolean
+        get() = prefs.getBoolean(TALK_ON_IPHONE, false)
+        set(value) = edit { putBoolean(TALK_ON_IPHONE, value) }
+
+    /**
+     * Which capture source relays the caller's voice: VOICE_DOWNLINK (3, default) or VOICE_CALL (4). Switches when
+     * the iPhone reports it couldn't hear the caller.
+     */
+    var audioCaptureSource: Int
+        get() = prefs.getInt(AUDIO_SOURCE, 3)
+        set(value) = edit { putInt(AUDIO_SOURCE, value) }
+
+    /** Mute this phone's own microphone while the iPhone's voice is fed into the call. Flips on "they couldn't hear me". */
+    var audioMuteBridgeMic: Boolean
+        get() = prefs.getBoolean(AUDIO_MUTE_MIC, true)
+        set(value) = edit { putBoolean(AUDIO_MUTE_MIC, value) }
+
+    /** Consecutive calls where the other side couldn't hear the iPhone. After two, talking is reported as unsupported. */
+    var audioTalkFailures: Int
+        get() = prefs.getInt(AUDIO_TALK_FAILURES, 0)
+        set(value) = edit { putInt(AUDIO_TALK_FAILURES, value) }
+
+    /** The user lets the paired iPhone use this phone's internet (M8, D-048). Off by default. */
+    var netShareAllowed: Boolean
+        get() = prefs.getBoolean(NET_SHARE_ALLOWED, false)
+        set(value) = edit { putBoolean(NET_SHARE_ALLOWED, value) }
+
+    /** While sharing, Iranian (.ir) sites go direct instead of through this phone's VPN. */
+    var netShareDirectIran: Boolean
+        get() = prefs.getBoolean(NET_SHARE_DIRECT_IR, false)
+        set(value) = edit { putBoolean(NET_SHARE_DIRECT_IR, value) }
+
     /** Permissions we've asked for at least once, to tell "never asked" from "don't ask again". */
     fun wasRequested(permission: String): Boolean = prefs.getBoolean("asked:$permission", false)
 
@@ -99,5 +132,11 @@ class AppPrefs(context: Context) {
         const val PAIRED_AT = "paired_at"
         const val LAST_SEEN = "last_seen"
         const val COMPANION_BOUND = "companion_bound_at"
+        const val TALK_ON_IPHONE = "talk_on_iphone"
+        const val AUDIO_SOURCE = "audio_capture_source"
+        const val AUDIO_MUTE_MIC = "audio_mute_bridge_mic"
+        const val AUDIO_TALK_FAILURES = "audio_talk_failures"
+        const val NET_SHARE_ALLOWED = "net_share_allowed"
+        const val NET_SHARE_DIRECT_IR = "net_share_direct_ir"
     }
 }

@@ -120,8 +120,10 @@ class LinkManager(
 
     private val entries = HashMap<LinkConnection, Entry>()
 
-    /** The established session on each lane. */
+    /** The established session on each lane. Written on the link thread only. */
     private var radio: Entry? = null
+
+    @Volatile
     private var wifi: Entry? = null
 
     /** The session events go to: [radio] when up, else [wifi]. */
@@ -245,6 +247,9 @@ class LinkManager(
     @Volatile
     var wifiToken: Long? = null
         private set
+
+    /** The paired iPhone's address on the established Wi-Fi session (authenticated by the handshake), or null. */
+    val wifiPeerAddress: java.net.InetAddress? get() = wifi?.connection?.peerAddress
 
     val isConnected: Boolean get() = _state.value.connected
 

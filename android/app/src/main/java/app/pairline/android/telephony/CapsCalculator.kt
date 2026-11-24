@@ -12,6 +12,12 @@ data class CapsInput(
     /** The companion InCallService is bound now, or has been bound on this phone before. */
     val inCallService: Boolean,
     val contactsAddEnabled: Boolean,
+    /** Call audio can be relayed to the iPhone ("Talk on iPhone" ready, D-047). */
+    val mediaListen: Boolean = false,
+    /** …and the iPhone's voice can be fed into the call. */
+    val mediaTalk: Boolean = false,
+    /** The user allows internet sharing (M8). */
+    val netShare: Boolean = false,
     /** The Wi-Fi link is switched on (M5): files can go both ways over a Wi-Fi session. */
     val wifiLink: Boolean = false,
 )
@@ -39,11 +45,16 @@ object CapsCalculator {
                 caps += Caps.CALL_AUDIO
             }
             if (has(Manifest.permission.CALL_PHONE) && phoneState) caps += Caps.USSD
+            if (input.mediaListen && phoneState) {
+                caps += Caps.CALL_MEDIA
+                if (input.mediaTalk) caps += Caps.CALL_MEDIA_TALK
+            }
         }
         if (has(Manifest.permission.READ_CONTACTS)) caps += Caps.CONTACTS
         if (has(Manifest.permission.READ_CALL_LOG)) caps += Caps.CALLLOG
         if (input.contactsAddEnabled && has(Manifest.permission.WRITE_CONTACTS)) caps += Caps.CONTACTS_ADD
         if (input.activeSims >= 2) caps += Caps.DUALSIM
+        if (input.netShare) caps += Caps.NET_SHARE
         if (input.wifiLink) {
             caps += Caps.WIFI
             caps += Caps.FILES

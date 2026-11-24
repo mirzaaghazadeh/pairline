@@ -5,7 +5,8 @@ check; then M8 and M9.** The maintainer asked to finish every milestone.
 
 M0–M4 are built and tested on the emulator and Simulator, and M1–M3 now on real phones too: pairing, SMS and
 call control work between an iPhone and an Android 15 bridge (Pairline Bridge 1.0.2). The Galaxy Note 8 can't
-hold a Bluetooth link with Apple devices (D-040); the Wi-Fi link is its way in.
+hold a Bluetooth link with Apple devices (D-040); the Wi-Fi link is its way in. M5 is built and tested against the
+emulator and Simulator (D-044, D-045); its real-phone tests come next.
 
 Agents: tick checkboxes as work lands, and move the "Current milestone" line when a milestone is done.
 
@@ -65,8 +66,8 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [ ] Spike: companion `InCallService` binding on Android 9–16 and major makers — first finding (API 36 emulator):
       Telecom skips binding a companion `InCallService` unless the app holds `MANAGE_ONGOING_CALLS`
       (signature|appop|role). With the app-op allowed through adb it binds, and DTMF, mute and speaker work. Without
-      it the bridge falls back to telephony callbacks plus `TelecomManager` answer/end. Real phones still to test;
-      how to grant it for users (Shizuku, companion-device role) is an open decision
+      it the bridge falls back to telephony callbacks plus `TelecomManager` answer/end. Real phones still to test.
+      Granting it: through Shizuku when the user turns on "Talk on iPhone" (D-046)
 - [x] Incoming call → CallKit on the iPhone; answer, reject and end from the iPhone (emulator-verified on Android;
       real-device test pending)
 - [x] Dial from the iPhone, choosing the SIM
@@ -90,56 +91,81 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 
 ## M5 — Local Wi-Fi link and file transfer
 
-- [ ] Bridge hotspot or shared network; iPhone joins with `NEHotspotConfiguration`
-- [ ] Hotspot band choice (2.4 / 5 GHz)
-- [ ] Media and bulk channel keys and records per PROTOCOL.md
-- [ ] Automatic switch: bulk traffic moves to Wi-Fi when available, back to BLE when not
-- [ ] File transfer both ways
-- [ ] "Send to iPhone" in Android's share sheet; iOS Share extension "Send to bridge phone"
-- [ ] Add Android `INTERNET` permission; CI check that sockets only target local addresses (the opt-in
-      `netshare` package in M8 is the only exception)
+- [x] Wi-Fi as a full link without Bluetooth (D-044): pairing, control and sync over Wi-Fi; DNS-SD
+      `_pairline._tcp` with a random name; local addresses in the pairing QR code; reconnects on its own — tested
+      emulator ↔ `fake_remote.py` and Simulator ↔ `fake_bridge.py`; **real phones pending** (the Note 8 first)
+- [x] Bridge hotspot or shared network; iPhone joins with `NEHotspotConfiguration` — best effort: Android's
+      local-only hotspot from Settings, offered in `wifi.offer` and the QR code; the Simulator can't join networks,
+      so the join is untested, and the App ID needs the Hotspot Configuration capability before the next archive
+- [x] Hotspot band choice (2.4 / 5 GHz) — on Android 16+ only (`startLocalOnlyHotspotWithConfiguration`, public since
+      API 36); older versions let Android choose
+- [x] Media and bulk channel keys and records per PROTOCOL.md: UDP media channel (`MediaChannel` on both sides, 64-record
+      replay window, shared vectors), `BULK` frames
+- [x] Automatic switch: bulk traffic moves to Wi-Fi when available, back to BLE when not — per-request routing, events
+      on Bluetooth while it's up, Wi-Fi keep-alive 15/45 s (`link.switch` not needed, D-044)
+- [x] File transfer both ways (D-045): up to 1 GiB, progress and cancel; Android Downloads/Pairline, iPhone Files app
+- [x] "Send to iPhone" in Android's share sheet; iOS Share extension "Send to bridge phone" — the extension's own
+      sheet still needs a run from a real share sheet
+- [x] Add Android `INTERNET` permission; CI check that sockets only target local addresses (the opt-in
+      `netshare` package in M8 is the only exception) — `INTERNET` and `network-code-check.sh` came with D-041; the
+      Wi-Fi link checks every bound and accepted address at run time
 
 ## M6 — Call audio on the iPhone
 
 - [ ] Spike: Shizuku-based capture and injection on 3–5 devices (Qualcomm, MediaTek, Samsung Exynos);
-      compatibility matrix in `docs/`
-- [ ] `privileged` package with allowlisted operations (AGENTS.md rule 7)
-- [ ] Audio streaming over the Wi-Fi link; choose a codec (Opus vs AAC-ELD)
-- [ ] Packet-loss concealment (fill short gaps instead of silence) and an echo self-test
-- [ ] Test call with "Did you hear it?" feedback; automatic choice of the audio method; known-device list
+      compatibility matrix in `docs/` — first tester: an Android 15 phone; the shell user holds
+      `CAPTURE_AUDIO_OUTPUT`, `MODIFY_AUDIO_ROUTING` and `MODIFY_PHONE_STATE` on Android 16 (emulator) but not on
+      Android 9 (Galaxy Note 8), so Android 10+ only
+- [x] `privileged` package with allowlisted operations (AGENTS.md rule 7): `PrivilegedService` behind Shizuku —
+      probe, MANAGE_ONGOING_CALLS for Pairline itself, call capture (`VOICE_DOWNLINK`/`VOICE_CALL`), injection
+      through the telephony output; caller-uid check, argument allowlists (D-046)
+- [x] Audio streaming over the Wi-Fi link: 16 kHz PCM in 20 ms packets on the media channel (no codec needed on a
+      local network; PROTOCOL.md "Call audio", D-047) — wired to the M5 media channel on both sides (bridge relay
+      `setTransport`, iPhone `CallCenter.mediaTransport`); a real relayed call is still to be tested
+- [x] Packet-loss concealment (jitter buffer, repeat-and-fade) — echo self-test still open
+- [ ] Test call with "Did you hear it?" feedback; automatic choice of the audio method (`call.media.feedback`
+      flips capture source and bridge-mic muting — bridge side done, iPhone prompt pending); known-device list
       shipped inside the app (never fetched)
-- [ ] Root mode (option C) for devices where Shizuku isn't enough
-- [ ] Clean fallback to "audio on the Android phone" when a device isn't supported
+- [ ] Root mode (option C) for devices where Shizuku isn't enough — Shizuku started with root (or Sui) already runs
+      the same service as root
+- [x] Clean fallback to "audio on the Android phone" when a device isn't supported: caps `call.media` /
+      `call.media.talk` say exactly what works; "listen only" when injection isn't possible
+- [x] Android setup: optional "Talk on iPhone" step after pairing and a Settings page (Shizuku install, start,
+      permission, what this phone supports, switch)
 
 ## M7 — Payments and first release
 
-- [x] Decide the pricing: 3 free days, then one-time $11.99 (D-017, supersedes D-008)
+- [x] Decide the pricing: 7 free days, then one-time $9.99 (D-036, supersedes D-017 and D-008)
 - [x] StoreKit 2 products and paywall; on-device entitlement checks; Restore Purchases
 - [x] 3-day trial through a free "3-day Trial" non-consumable (D-017, D-025); both products created in App Store
       Connect (`docs/app-store/api/iap.py`)
 - [x] Demo mode with sample data (D-020), in English, Persian, Arabic and Turkish
 - [x] Website at pairline.navid.tr with privacy policy and support pages (separate repo, D-021), deployed on Coolify
-- [ ] Android release signing; reproducible-build instructions; publish hash and certificate fingerprint
+- [x] Android release signing; reproducible-build instructions; publish hash and certificate fingerprint (D-037;
+      `android-release.yml`, SECURITY.md; 1.0.0–1.0.2 published with VirusTotal reports, D-039)
 - [x] Privacy policy page generated from PRIVACY.md; App Store privacy label "Data Not Collected" (published)
 - [x] App Store listing (EN/AR/TR text, screenshots for iPhone and iPad, header and search images) — `docs/app-store/`
 - [x] App Store submission: version 1.0 (build 1) and both in-app purchases submitted 2026-11-24, **manual release**
       (D-034): release only after the Android APK is downloadable and the real-device tests pass
-- [ ] Android APK on the website (needs the release signing above)
+- [x] Android APK on the website: pairline.navid.tr mirrors each GitHub release after checking its hash and
+      certificate (pairline-web)
 - [ ] External review of PROTOCOL.md
 
 ## M8 — Internet sharing (opt-in)
 
 After the first release so it doesn't delay it; move it earlier if it matters more (D-013).
 
-- [ ] Proxy on the bridge hotspot so the iPhone can use the Android phone's connection, including its VPN
+- [x] Proxy on the bridge's Wi-Fi/hotspot address so the iPhone can use the Android phone's connection, including
+      its VPN (`netshare/ShareProxy`, D-048) — real-network test pending (needs the M5 Wi-Fi link)
   - SOCKS5 for apps like Telegram (one-tap `tg://socks` link)
   - HTTP proxy plus a PAC file for iOS Wi-Fi proxy settings
-- [ ] Listens only on the hotspot interface, with credentials generated per session
-- [ ] Split routing: chosen domains and IP ranges go direct, the rest through the VPN. Lists ship inside the
-      app and update only with app releases
-- [ ] Shows which VPN app is active on the bridge phone, read locally (no IP lookups)
-- [ ] `netshare` package is the only code allowed to open non-local connections, and only for the iPhone's
-      own traffic; CI and PRIVACY.md updated
+- [x] Listens only on a local Wi-Fi/hotspot address, accepts only local clients, credentials generated per session
+- [x] Split routing: local addresses always direct; `.ir` sites direct on request; the rest through the bridge, with
+      no silent direct fallback. Lists ship inside the app — more lists can follow
+- [x] Shows whether a VPN is active on the bridge phone, read locally (no IP lookups). Which VPN app: Android
+      doesn't tell other apps
+- [x] `netshare` package is allowed to open non-local connections (network-code-check.sh), only for the iPhone's
+      own traffic; PRIVACY.md updated
 
 ## M9 — Android client mode (two Android phones)
 

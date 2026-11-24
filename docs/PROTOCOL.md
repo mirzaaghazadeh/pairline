@@ -48,7 +48,7 @@ optional; a receiver that doesn't know them ignores them, so older links keep wo
 
 | Parameter | Value |
 |-----------|-------|
-| `ip` | Comma-separated addresses of B on its Wi-Fi and hotspot interfaces: IPv4 dotted quads, or IPv6 without brackets or zone. Only private (RFC 1918), link-local IPv4 (169.254/16) and unique-local IPv6 (fc00::/7) addresses; at most 4 |
+| `ip` | Comma-separated addresses of B on its Wi-Fi and hotspot interfaces: IPv4 as four dotted decimal parts (shorthand like `192.168.1` is refused), or IPv6 without brackets or zone. Only private (RFC 1918), link-local IPv4 (169.254/16) and unique-local IPv6 (fc00::/7) addresses; at most 4 |
 | `port` | B's Wi-Fi TCP port (decimal) |
 | `ssid`, `pw` | Only while B's own hotspot is on: its network name and passphrase, base64url of the UTF-8 text |
 
@@ -181,6 +181,9 @@ bulk channels.
   match (someone else's bridge) is skipped for 10 minutes. R only connects to private, link-local or unique-local
   addresses, retries with backoff (1, 2, 4 … 30 s) while paired, and tries again at once when its own network changes
   or a `wifi.offer` arrives.
+- R starts looking on Wi-Fi only once B has mentioned Wi-Fi: Wi-Fi parameters in the pair link, a `wifi.offer`, or
+  `wifi` in `status.caps`. An older bridge therefore never causes the iPhone's Local Network prompt.
+- Like B, R closes a connection that hasn't finished the handshake within 30 s.
 
 **Two sessions at once.**
 - With BLE (or the debug TCP link) and Wi-Fi both up there are two independent sessions with the same pinned peer.
@@ -214,15 +217,19 @@ bulk channels.
   datagram from R, and ignores datagrams from any IP other than its Wi-Fi TCP peer's.
 - The channel is **open** on a side once that side has received an authentic datagram from the other, and closes with
   its Wi-Fi session. Nothing is retransmitted, and senders never block: a datagram the socket can't take is dropped.
+  Apart from probes, neither side sends before its channel is open.
 
 **Hotspot.** The user can start Android's local-only hotspot on the bridge. While it runs, B lists the hotspot
 interface's address in `wifi.offer` `ip` and adds `ssid` and `password` (and `ssid`/`pw` in the pair link). R asks
-iOS to join it (`NEHotspotConfiguration`; iOS asks the user first), then connects as on any Wi-Fi network.
+iOS to join it (`NEHotspotConfiguration`; iOS asks the user first) when its Wi-Fi session isn't up 5 s after such a
+`wifi.offer` (4 s into pairing with such a link), at most once per network name while the app runs, then connects as
+on any Wi-Fi network.
 
 **Debug builds only:** the Android emulator's own NAT forwards `adb emu redir add tcp:47820:47820` and
 `udp:47820:47820` to its emulated *cellular* interface, so a debug build accepts that interface when it runs on an
 emulator (never on a phone, never in release). The iPhone debug build can be pointed at a fixed address with
-`-PairlineWiFiHost 127.0.0.1 -PairlineWiFiPort 47820`.
+`-PairlineWiFiHost 127.0.0.1 -PairlineWiFiPort 47820`. R sends its UDP datagrams to the address of its TCP connection,
+so through such a redirect the host's UDP port must equal the `wifi.media` port (47820 on both sides).
 
 ## Messages
 
@@ -279,6 +286,10 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events |
 | `call.dtmf` | R→B | M3 | `id`, `call`, `digit` (needs capability `call.dtmf`) |
 | `call.audio` | R→B | M3 | `id`, `call`, `mute`, `speaker` (either optional; needs `call.audio`) |
+| `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true) → `ok` once audio flows, or `error` (`unsupported`: not set up, no Shizuku or no Wi-Fi link; `failed`: capture didn't start). Needs `call.media` |
+| `call.media.stop` | R→B | M6 | `id`, `call` → `ok`. The relay also stops by itself when the call ends or the Wi-Fi link drops |
+| `call.media.state` | B→R | M6 | `call`, `state` (`active` / `stopped` / `failed`), `listen`, `talk`, `reason` (English, for diagnostics) |
+| `call.media.feedback` | R→B | M6 | `id`, `heard` (the iPhone heard the caller), `heardMe` (the caller heard the iPhone); either may be null → `ok`. The bridge uses it to pick the capture source and mic handling that work on this phone |
 | `contacts.sync` | R→B, B→R | M4 | request: `id`, `since` (cursor or null) / reply: `id`, `contacts` [Contact], `deleted` [key], `cursor`, `more` |
 | `calllog.sync` | R→B, B→R | M4 | request: `id`, `since` / reply: `id`, `calls` [Call-log entry], `cursor`, `more` |
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
@@ -291,7 +302,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `file.answer` | either | M5 | `fid` (the peer's), `accept`, `reason` (`too_large` / `no_space` / `busy` / `declined` / `failed`, when not accepted) |
 | `file.done` | either | M5 | `fid` (the peer's), `ok`, `reason` (`cancelled` / `failed` / `no_space`, when not ok) |
 | `file.cancel` | either | M5 | `fid` (the sender's own), `reason` |
-| `net.share` | R→B, B→R | M8 | start or stop internet sharing / proxy address, ports, per-session credentials |
+| `net.share` | R→B, B→R | M8 | request: `id`, `on` / reply (same `id`) or event (no `id`, when the bridge's user stops it): `on`, and while on `host`, `port` (one port for SOCKS5 and HTTP), `user`, `pass` (new for every start), `pac` (`http://host:port/proxy.pac`), `vpn` (the bridge's traffic goes through a VPN), `direct` [domain suffix]. `error` `permission` while the bridge's user hasn't allowed sharing. Needs `net.share` |
 
 ### Capabilities (`status.caps`)
 
@@ -299,8 +310,11 @@ The bridge lists only what this phone can do right now: the permission is grante
 version supports it. The iPhone hides or explains anything missing instead of guessing from the Android version.
 
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
-`call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `wifi` (M5: the bridge's Wi-Fi
-link is switched on), `files` (M5: it can send and receive files over a Wi-Fi session)
+`call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `call.media` (call audio can
+be relayed to the iPhone: "Talk on iPhone" is on and Shizuku is ready), `call.media.talk` (the iPhone's microphone
+can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone), `net.share`
+(the bridge's user allows internet sharing, M8), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
+it can send and receive files over a Wi-Fi session)
 
 R lists what it can receive in its own `device.info` as `caps` (M5): `["files"]` when it accepts `file.offer`. B
 offers files only to an R that listed `files`; R offers only to a B whose `status.caps` has `files`.
@@ -328,6 +342,26 @@ in `BULK` frames on the same connection. Without a Wi-Fi session, no transfer st
   `reason: "cancelled"`. Both drop partial data, and data that arrives for a finished fid is ignored.
 - When the Wi-Fi session closes, its transfers fail; there's no resume in v0.
 - Other first bytes in a `BULK` plaintext are reserved; receivers ignore records they don't know.
+
+### Call audio (M6)
+
+Call audio travels only on the Wi-Fi link's **media channel** (UDP, channel 1, media keys, 64-record replay window;
+see "Records"). Each media record's plaintext is one packet:
+
+| Bytes | Field |
+|-------|-------|
+| 1 | kind: `0x01` = 16-bit little-endian mono PCM at 16 kHz, one 20 ms frame |
+| 2 | sequence number, big-endian, +1 per frame, wraps at 65 536 |
+| 640 | 320 samples (kind `0x01`) |
+
+- Both directions use the same format; packets are sent every 20 ms while the relay is active. Receivers drop
+  unknown kinds and wrong sizes, play frames in sequence order behind a 60 ms jitter buffer, and cover a lost frame by
+  repeating the previous one at half volume (twice at most), then silence.
+- Uncompressed PCM (32 KB/s each way) is fine on a local network and needs no codec on either side; a compressed kind
+  can be added later without breaking older receivers.
+- R starts the relay with `call.media.start` once the call is in progress and its media channel is open, and plays
+  silence (not nothing) while muted, so B's jitter buffer stays steady. Audio is never stored on either phone.
+- A call-audio packet is 643 bytes, well under the media channel's 1200-byte limit (M5).
 
 ### Clarifications (v0)
 

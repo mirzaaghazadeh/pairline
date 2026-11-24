@@ -1,9 +1,12 @@
 package app.pairline.android
 
 import android.app.Application
+import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.files.FileNotifications
 import app.pairline.android.files.FileTransfers
 import app.pairline.android.link.IdentityStore
+import app.pairline.android.netshare.NetShare
+import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.link.LinkManager
 import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
@@ -53,13 +56,51 @@ object AppGraph {
     val sims: SimDirectory by lazy { SimDirectory(app) }
     val smsStore: SmsStore by lazy { SmsStore(app, sims) }
     val smsSender: SmsSender by lazy { SmsSender(app, sims, smsStore, link::send) }
-    val calls: CallTracker by lazy { CallTracker(app, sims, prefs, link::send) { router.statusChanged() } }
+    val calls: CallTracker by lazy {
+        CallTracker(app, sims, prefs, link::send) { router.statusChanged() }.also { tracker ->
+            tracker.onCallEnded = { id -> audioRelay.stop(id, "call ended") }
+        }
+    }
     val contacts: ContactsSync by lazy { ContactsSync(app, sims) }
     val ussd: UssdRunner by lazy { UssdRunner(app, sims) }
     val status: StatusMonitor by lazy {
-        StatusMonitor(app, sims, prefs, BuildConfig.VERSION_NAME) { calls.inCallServiceAvailable }
+        StatusMonitor(
+            app,
+            sims,
+            prefs,
+            BuildConfig.VERSION_NAME,
+            inCallServiceAvailable = { calls.inCallServiceAvailable },
+            mediaCaps = { audioRelay.canListen to audioRelay.canTalk },
+        )
     }
     val router: MessageRouter by lazy {
-        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, files)
+        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files)
+    }
+
+    /** Internet sharing for the paired iPhone (M8, D-048). */
+    val netShare: NetShare by lazy {
+        NetShare(app, prefs).also { share ->
+            share.onChange = { router.netShareChanged() }
+            share.peerAddress = { link.wifiPeerAddress }
+        }
+    }
+
+    /** Shizuku and the privileged service ("Talk on iPhone", D-046). Started by [PairlineApp]. */
+    val privileged: PrivilegedManager by lazy {
+        PrivilegedManager(app).also { manager ->
+            manager.onChange = {
+                router.statusChanged()
+                // The user turned on Talk on iPhone: also let Android bind the companion call service, which gives
+                // the iPhone the keypad, mute and speaker (Android 12+).
+                if (prefs.talkOnIphone && manager.state.value == PrivilegedManager.State.READY) {
+                    io.execute { manager.allowOngoingCalls() }
+                }
+            }
+        }
+    }
+
+    /** Call audio between this phone and the iPhone (D-047). */
+    val audioRelay: CallAudioRelay by lazy {
+        CallAudioRelay(privileged, prefs, link::send).also { relay -> relay.onCapsChanged = { router.statusChanged() } }
     }
 }

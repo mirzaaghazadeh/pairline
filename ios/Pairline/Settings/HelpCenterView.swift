@@ -70,6 +70,9 @@ struct HelpCenterView: View {
                 Text("Troubleshooting")
             }
             Section {
+                Link(destination: AppInfo.telegramGroupURL) {
+                    Label("Help group on Telegram", systemImage: "bubble.left.and.bubble.right")
+                }
                 Link(destination: AppInfo.website) {
                     Label {
                         Text(verbatim: "pairline.navid.tr")
@@ -78,7 +81,7 @@ struct HelpCenterView: View {
                     }
                 }
             } footer: {
-                Text("Still stuck? The website has more help. Opening it is the only time Pairline sends you online, and only when you tap.")
+                Text("Still stuck? Ask in our Telegram help group, or see the website. Opening one of these links is the only time Pairline sends you online, and only when you tap.")
             }
         }
         .navigationTitle(Text("Help"))

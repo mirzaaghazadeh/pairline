@@ -296,6 +296,16 @@ class CallTracker(
         t.state = CallMapping.ENDED
         t.since = System.currentTimeMillis()
         sendState(t, reason)
+        onCallEnded?.invoke(t.id)
+    }
+
+    /** Called on the calls thread when a call ends; the audio relay stops with it. */
+    @Volatile
+    var onCallEnded: ((String) -> Unit)? = null
+
+    /** Whether [id] is a call in progress (answered or dialing), for `call.media.start`. */
+    fun isInProgress(id: String): Boolean = onCall(id) { t ->
+        t.state == CallMapping.ACTIVE || t.state == CallMapping.DIALING || t.state == CallMapping.HELD
     }
 
     /** After the iPhone reconnects: the current state of every ongoing call, so it can catch up. */

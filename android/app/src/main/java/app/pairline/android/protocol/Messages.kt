@@ -26,6 +26,11 @@ object Msg {
     const val CALL_DIAL = "call.dial"
     const val CALL_DTMF = "call.dtmf"
     const val CALL_AUDIO = "call.audio"
+    const val CALL_MEDIA_START = "call.media.start"
+    const val CALL_MEDIA_STOP = "call.media.stop"
+    const val CALL_MEDIA_STATE = "call.media.state"
+    const val CALL_MEDIA_FEEDBACK = "call.media.feedback"
+    const val NET_SHARE = "net.share"
     const val CONTACTS_SYNC = "contacts.sync"
     const val CALLLOG_SYNC = "calllog.sync"
     const val CONTACTS_ADD = "contacts.add"
@@ -57,10 +62,19 @@ object Caps {
     const val WIFI = "wifi"
     const val FILES = "files"
 
+    /** Call audio can be heard on the iPhone ("Talk on iPhone" set up, Shizuku ready, capture allowed). D-047. */
+    const val CALL_MEDIA = "call.media"
+
+    /** …and the iPhone's microphone can be fed into the call. */
+    const val CALL_MEDIA_TALK = "call.media.talk"
+
+    /** The user allows internet sharing for the iPhone (M8, D-048). */
+    const val NET_SHARE = "net.share"
+
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, WIFI, FILES,
+        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK, NET_SHARE, WIFI, FILES,
     )
 }
 

@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import UIKit
 import WidgetKit
@@ -39,6 +40,8 @@ final class BridgeController: ObservableObject {
     @Published private(set) var syncing = false
     @Published private(set) var latency: TimeInterval?
     @Published var banner: String?
+    /// Internet sharing through the bridge (M8): the last `net.share` reply or event.
+    @Published var netShare: NetShareInfo?
     /// Set by the app: whether link features are allowed (trial or purchase). Demo mode is always allowed.
     @Published var canUseLink = true
 
@@ -57,6 +60,8 @@ final class BridgeController: ObservableObject {
         self.phase = link.phase
         self.calls = CallCenter(useCallKit: mode == .real)
         calls.bridge = self
+        // Call audio (M6) rides on the Wi-Fi session's media channel (M5); nil while there's no open channel.
+        calls.mediaTransport = { [weak link] in (link as? LinkManager)?.mediaChannel as? AudioPacketTransport }
         link.onPhaseChange = { [weak self] phase in self?.phaseChanged(phase) }
         link.onTransportsChange = { [weak self] in
             guard let self else { return }
@@ -163,6 +168,11 @@ final class BridgeController: ObservableObject {
             calls.handleIncoming(event)
         case .callState(let event):
             calls.handleState(event)
+        case .callMediaState(let event):
+            calls.handleMediaState(event)
+        case .netShare(let info) where inbound.id == nil:
+            // The bridge stopped sharing by itself (its user turned it off).
+            netShare = info
         default:
             break
         }
@@ -180,6 +190,19 @@ final class BridgeController: ObservableObject {
             }
         }
         saveWidget()
+        requestMicrophoneIfNeeded(s)
+    }
+
+    /// The bridge just offered "Talk on iPhone": ask for the microphone now, while the app is open, rather than in
+    /// the middle of the first call. iOS asks only once; the answer is kept in Settings › Pairline.
+    private func requestMicrophoneIfNeeded(_ s: BridgeStatus) {
+        guard mode == .real, s.caps?.contains(Capability.callMediaTalk.rawValue) == true,
+              UIApplication.shared.applicationState == .active else { return }
+        let session = AVAudioSession.sharedInstance()
+        guard session.recordPermission == .undetermined else { return }
+        session.requestRecordPermission { granted in
+            log.info("audio", "Microphone \(granted ? "allowed" : "denied") for calls")
+        }
     }
 
     private func notify(_ message: StoredMessage) {

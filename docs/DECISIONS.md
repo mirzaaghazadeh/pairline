@@ -513,6 +513,82 @@ SMS and call history from the iPhone. Decision numbers reserved for the parallel
 list, update check details), D-044–D-045 (M5 Wi-Fi link, files), D-046–D-047 (M6 call audio, Shizuku),
 D-048 (M8), D-049 (M9).
 
+### D-046 — Shizuku for privileged access: `dev.rikka.shizuku:api` + `provider` 13.1.5 (2026-11-24)
+
+Android gives normal apps no way to hear a phone call or speak into it; the shell user can on Android 10+
+(`CAPTURE_AUDIO_OUTPUT`, `MODIFY_PHONE_STATE`, `MODIFY_AUDIO_ROUTING` — checked on the Android 16 emulator; missing on
+Android 9). Shizuku is the established, open-source way for a user to lend an app shell rights without root.
+- **Library:** `dev.rikka.shizuku:api` and `:provider` 13.1.5, Apache-2.0. Binder IPC to the user's Shizuku app
+  only; no network code (the CI network fence scans our sources; the library opens no sockets).
+- **Fenced (AGENTS.md rule 7):** everything privileged runs in `privileged/PrivilegedService`, a Shizuku user service
+  in its own process, behind `IPrivilegedService.aidl`, which has exactly four operations: `probe`,
+  `allowOngoingCalls` (Pairline's own package only), `startCapture` (`VOICE_DOWNLINK`/`VOICE_CALL` at 8/16/48 kHz),
+  `startInject` (16-bit PCM to the telephony output, optional bridge-mic mute restored on stop). Every call checks
+  that the caller's uid is Pairline's; every argument is checked against a fixed list. Audio is attributed to the
+  shell package (`createPackageContext("com.android.shell")`), which is what the process really is.
+- **User in control (rule 5):** Pairline never installs or starts Shizuku and never turns on Wireless debugging; the
+  setup screen only opens Shizuku, the Play Store and Developer options for the user. Shizuku shows its own permission
+  dialog. Everything else in Pairline works without it.
+- **`MANAGE_ONGOING_CALLS`** moves from the debug manifest to every build (answers the M3 open question). It's an
+  app-op nobody gets at install; the privileged service turns it on for Pairline when the user turns on "Talk on
+  iPhone", which lets Android bind the companion `InCallService` → keypad, mute and speaker from the iPhone.
+- R8 keeps `PrivilegedService(Context)` because Shizuku instantiates it by name.
+
+### D-047 — Call audio on the iPhone: uncompressed 16 kHz PCM over the Wi-Fi media channel (2026-11-24)
+
+- **Path:** caller's voice ← `VOICE_DOWNLINK` capture (the far end only, so the iPhone user doesn't hear themselves;
+  `VOICE_CALL` as the fallback) → 20 ms frames → Wi-Fi media channel (UDP, AES-GCM, PROTOCOL.md "Call audio") →
+  iPhone; iPhone microphone → same channel → 60 ms jitter buffer → telephony output (the call's uplink), paced one
+  frame per 20 ms by the app so the pipe to the service can't build delay.
+- **No codec:** 32 KB/s each way is nothing on a local network, needs nothing on either side and adds no latency.
+  The packet has a kind byte so a compressed format can come later.
+- **Learning what works:** after a relayed call the iPhone can send `call.media.feedback`. "Couldn't hear the
+  caller" switches the capture source; "they couldn't hear me" first stops muting the bridge's microphone, then
+  after two more failures reports talking as unsupported (`call.media.talk` disappears). Settings can reset this.
+- **Honest capabilities:** `call.media` only when the user turned on Talk on iPhone, Shizuku is ready and capture is
+  allowed; `call.media.talk` only when a telephony output exists too. Without talk the iPhone still hears the call
+  and the user talks on the bridge phone.
+- **Tested:** unit tests (packets, jitter buffer, resampling, caps), builds incl. release/R8. Real calls still need a
+  real Android 10+ phone with Shizuku (the first tester has Android 15); the emulator has no real call audio.
+
+### D-048 — Internet sharing: one SOCKS5 + HTTP proxy port on the local network, PAC for iOS (2026-11-24)
+
+- **Why a proxy and not plain tethering:** Android sends hotspot clients' traffic around its own VPN, so tethering
+  alone doesn't give the iPhone the bridge's VPN. A proxy's outbound connections are the bridge app's own, so they
+  follow Android's default network, which is the VPN when one is on.
+- **One port, both protocols:** the first byte tells SOCKS5 (`0x05`) from HTTP. SOCKS5 (CONNECT only, RFC 1929
+  username/password) for Telegram, which takes a one-tap `tg://socks` link. HTTP CONNECT and absolute-form requests
+  (one request per connection) for iOS's Wi-Fi proxy settings, plus `GET /proxy.pac`.
+- **Safety:** bound to the bridge's Wi-Fi/hotspot address only, never all interfaces; only private/link-local
+  clients; port and credentials new on every start and kept in memory only. HTTP needs the password too, except from
+  the paired iPhone's Wi-Fi-link address once M5 knows it (iOS's automatic proxy settings can't carry a password).
+  The PAC file holds no secret. Logs keep only a connection count.
+- **Off by default, two switches:** the bridge's user must allow sharing (`net.share` capability), then the iPhone
+  starts and stops it. It survives link drops (so browsing doesn't break when Bluetooth blinks) and stops when either
+  side turns it off. Disallowing on the bridge stops it and tells the iPhone (`net.share` event).
+- **Split routing in the PAC file:** local addresses always direct; `.ir` direct when the user turns that on (the
+  list ships in the app, D-013); everything else `PROXY` with no `DIRECT` fallback, so a dropped bridge stops
+  traffic instead of quietly bypassing the VPN.
+- **VPN shown, app name not:** `ACCESS_NETWORK_STATE` tells whether a VPN network exists; Android doesn't reveal which
+  app owns it, and we do no IP lookups.
+- **Tested:** JVM tests run the proxy on loopback against an echo server (SOCKS5 with/without password, HTTP 407 and
+  CONNECT, PAC contents, parsing). A real iPhone↔bridge test needs the M5 Wi-Fi link.
+
+### D-049 — The logo: two chain links (2026-11-24)
+
+The maintainer picked option 4 of five Telegram avatar directions ("Chain") and made it Pairline's logo everywhere:
+two links of a chain, one for each phone, the white one passing over the green one at the top and under it at the
+bottom, on the brand-blue gradient (#2A6FD6 → #15468F). It replaces the two-phones mark.
+- **One geometry** (a 512-unit artboard: 220 × 120 pill links, 32-unit strokes, overlapping by 100), used by
+  `ios/tools/make_icon.swift` (app icon light/dark/tinted, launch mark, brand mark), the Android adaptive icon,
+  monochrome icon and status-bar icon (`res/drawable/ic_launcher_*.xml`, `ic_stat_pairline.xml`), and in
+  `pairline-web` (logo, favicons, PWA icons, share images, the Telegram avatars in `design/telegram/`).
+- **The interlock** is drawn without masks: draw the white link, the green link, then the white link's top half
+  again. That works in SVG (with no ids, so the mark can repeat on a page), CoreGraphics and Android vectors.
+  One-colour versions (tinted iOS icon, themed Android icon, notification icon) keep the two links apart by tone or
+  simply overlap.
+- Users see it with the next builds: iOS after the next App Store upload, Android from the next release.
+
 ### D-044 — The Wi-Fi link is a full link of its own, next to Bluetooth (2026-11-24)
 
 The Galaxy Note 8 can't hold a Bluetooth link with Apple devices (D-040), and call audio (M6) needs a low-latency
@@ -531,13 +607,18 @@ connection runs the same pairing, handshake and records as Bluetooth, with its o
 - **Finding the bridge:** the pairing QR code carries the bridge's local addresses and port (optional parameters;
   old links still work), the bridge advertises `_pairline._tcp` over DNS-SD with a random name (never the phone's
   name or the device id), and `wifi.offer` over Bluetooth repeats the addresses and, while it runs, the hotspot's
-  name and passphrase. The iPhone pairs over whichever transport reaches the bridge first.
+  name and passphrase. The iPhone pairs over whichever transport reaches the bridge first. The iPhone starts looking
+  on Wi-Fi only once the bridge has mentioned Wi-Fi (pair link, `wifi.offer` or the `wifi` capability), so an older
+  bridge never triggers the Local Network prompt.
 - **Local only.** The bridge binds one listener per local address of its Wi-Fi and hotspot interfaces — never mobile
   data or VPN interfaces, even when they have a private address — and drops peers that aren't private, link-local or
   unique-local. The media socket is bound to the session's address and its Android `Network`, because unbound UDP
   sockets leave on the default network (often mobile data when the Wi-Fi has no internet); accepted TCP sockets
   already follow their network. The listener can be turned off in Settings (on by default).
 - **Keep-alive:** ping after 15 s of silence, close after 45 s, so a Wi-Fi drop moves traffic back to Bluetooth fast.
+- **Call audio (D-047)** uses this media channel: the bridge hands it to its relay as it opens and closes, and the
+  iPhone's `CallCenter` takes `LinkManager.mediaChannel`. Internet sharing (D-048) learns the iPhone's address from
+  the authenticated Wi-Fi session.
 - **Hotspot (best effort):** Android's local-only hotspot, started by the user from Settings — Android starts one
   only for an app in the foreground, and needs `NEARBY_WIFI_DEVICES` on 13+ or location permission with Location on
   for 9–12. Band choice uses `startLocalOnlyHotspotWithConfiguration` + `SoftApConfiguration.Builder.setChannels`,

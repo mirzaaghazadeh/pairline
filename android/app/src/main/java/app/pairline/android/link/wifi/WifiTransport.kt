@@ -294,6 +294,7 @@ class WifiTransport(
     private inner class WifiConnection(private val socket: Socket, override val label: String) :
         LinkConnection, MediaCapable {
         override val kind = TransportKind.WIFI
+        override val peerAddress: InetAddress? = socket.inetAddress
         private val writer = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-$label-write") }
         private val backlog = Semaphore(MAX_BACKLOG)
         private val output by lazy { BufferedOutputStream(socket.getOutputStream(), 64 * 1024) }

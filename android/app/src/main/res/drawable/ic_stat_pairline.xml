@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Status-bar icon: two phones joined by a line (monochrome). -->
+<!-- Status-bar icon: the two chain links of the app icon, in one color. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="#FFFFFFFF"
-        android:fillType="evenOdd"
-        android:pathData="M4.5,4h4a1.5,1.5 0,0 1,1.5 1.5v13a1.5,1.5 0,0 1,-1.5 1.5h-4a1.5,1.5 0,0 1,-1.5 -1.5v-13a1.5,1.5 0,0 1,1.5 -1.5zM4.5,6v11h4v-11z" />
+        android:pathData="M5.62,8.52H11.42A3.48,3.48 0,0 1,11.42 15.48H5.62A3.48,3.48 0,0 1,5.62 8.52Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFFFF" />
     <path
-        android:fillColor="#FFFFFFFF"
-        android:fillType="evenOdd"
-        android:pathData="M15.5,4h4a1.5,1.5 0,0 1,1.5 1.5v13a1.5,1.5 0,0 1,-1.5 1.5h-4a1.5,1.5 0,0 1,-1.5 -1.5v-13a1.5,1.5 0,0 1,1.5 -1.5zM15.5,6v11h4v-11z" />
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M10,11h4v2h-4z" />
+        android:pathData="M12.58,8.52H18.38A3.48,3.48 0,0 1,18.38 15.48H12.58A3.48,3.48 0,0 1,12.58 8.52Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFFFF" />
 </vector>

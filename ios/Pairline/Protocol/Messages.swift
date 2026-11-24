@@ -182,6 +182,28 @@ struct CallIncomingEvent: Codable, Equatable {
     var name: String?
 }
 
+/// `net.share`: internet sharing through the bridge phone (M8, D-048). Reply to a request, or an event when the bridge
+/// stops sharing by itself.
+struct NetShareInfo: Codable, Equatable {
+    var on: Bool
+    var host: String?
+    var port: Int?
+    var user: String?
+    var pass: String?
+    var pac: String?
+    var vpn: Bool?
+    var direct: [String]?
+}
+
+/// `call.media.state`: the bridge started, stopped or failed to relay call audio (M6, D-047).
+struct CallMediaStateEvent: Codable, Equatable {
+    var call: OpaqueValue
+    var state: String
+    var listen: Bool?
+    var talk: Bool?
+    var reason: String?
+}
+
 struct CallStateEvent: Codable, Equatable {
     var call: OpaqueValue
     var state: String
@@ -275,6 +297,8 @@ enum InboundMessage {
     case smsHistory(SMSHistoryReply)
     case callIncoming(CallIncomingEvent)
     case callState(CallStateEvent)
+    case callMediaState(CallMediaStateEvent)
+    case netShare(NetShareInfo)
     case contactsSync(ContactsSyncReply)
     case calllogSync(CallLogSyncReply)
     case ussdResult(USSDResult)
@@ -372,6 +396,8 @@ struct Inbound {
             message = .smsHistory(SMSHistoryReply(msgs: b.msgs?.elements ?? [], more: b.more ?? false))
         case "call.incoming": message = .callIncoming(try body(CallIncomingEvent.self))
         case "call.state": message = .callState(try body(CallStateEvent.self))
+        case "call.media.state": message = .callMediaState(try body(CallMediaStateEvent.self))
+        case "net.share": message = .netShare(try body(NetShareInfo.self))
         case "contacts.sync":
             let b = try body(ContactsBody.self)
             message = .contactsSync(ContactsSyncReply(contacts: b.contacts?.elements ?? [],
@@ -505,6 +531,25 @@ struct Outbound {
         return Outbound("call.audio", fields)
     }
 
+    /// Asks the bridge to relay this call's audio over the Wi-Fi media channel (PROTOCOL.md "Call audio").
+    static func callMediaStart(_ call: OpaqueValue, talk: Bool) -> Outbound {
+        Outbound("call.media.start", ["call": call.jsonObject, "talk": talk])
+    }
+
+    static func callMediaStop(_ call: OpaqueValue) -> Outbound {
+        Outbound("call.media.stop", ["call": call.jsonObject])
+    }
+
+    /// Turns internet sharing through the bridge on or off (M8). The reply is `net.share` with the proxy details.
+    static func netShare(on: Bool) -> Outbound {
+        Outbound("net.share", ["on": on])
+    }
+
+    /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
+    static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {
+        Outbound("call.media.feedback", ["heard": optional(heard), "heardMe": optional(heardMe)])
+    }
+
     static func contactsSync(since: OpaqueValue?) -> Outbound {
         Outbound("contacts.sync", ["since": optional(since?.jsonObject)])
     }
@@ -538,7 +583,15 @@ enum Capability: String, CaseIterable, Identifiable {
     case contactsAdd = "contacts.add"
     case ussd = "ussd"
     case dualSIM = "dualsim"
+    /// The bridge can relay call audio to this iPhone ("Talk on iPhone", M6).
+    case callMedia = "call.media"
+    /// …and can feed this iPhone's microphone into the call.
+    case callMediaTalk = "call.media.talk"
+    /// The bridge's user allows internet sharing for this iPhone (M8).
+    case netShare = "net.share"
+    /// The bridge's Wi-Fi link is on (M5).
     case wifi = "wifi"
+    /// The bridge sends and receives files over a Wi-Fi session (M5).
     case files = "files"
 
     var id: String { rawValue }

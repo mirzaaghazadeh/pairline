@@ -25,6 +25,9 @@ struct CapabilityInfo: Identifiable {
         case .contactsAdd: return "person.badge.plus"
         case .ussd: return "number"
         case .dualSIM: return "simcard.2"
+        case .callMedia: return "ear"
+        case .callMediaTalk: return "mic"
+        case .netShare: return "network"
         case .wifi: return "wifi"
         case .files: return "doc.on.doc"
         }
@@ -39,12 +42,15 @@ struct CapabilityInfo: Identifiable {
         case .callControl: return String(localized: "Answer and end calls")
         case .callDial: return String(localized: "Place calls")
         case .callDTMF: return String(localized: "Keypad tones during calls")
-        case .callAudio: return String(localized: "Call audio on iPhone")
+        case .callAudio: return String(localized: "Mute and speaker from iPhone", table: "CallAudio")
         case .contacts: return String(localized: "Contacts")
         case .calllog: return String(localized: "Call history")
         case .contactsAdd: return String(localized: "Add contacts from iPhone")
         case .ussd: return String(localized: "USSD codes")
         case .dualSIM: return String(localized: "Dual SIM")
+        case .callMedia: return String(localized: "Hear calls on iPhone", table: "CallAudio")
+        case .callMediaTalk: return String(localized: "Talk from iPhone", table: "CallAudio")
+        case .netShare: return String(localized: "Internet sharing", table: "NetShare")
         case .wifi: return String(localized: "Wi-Fi link")
         case .files: return String(localized: "Send files")
         }
@@ -61,10 +67,14 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Turn on call control in Pairline Bridge on your Android phone.")
         case .callDial:
             return String(localized: "Allow the phone permission in Pairline Bridge on your Android phone.")
-        case .callDTMF:
-            return String(localized: "This bridge phone can't send keypad tones yet. Use the Android phone's keypad.")
-        case .callAudio:
-            return String(localized: "Coming in a later update. Until then, talk on the Android phone.")
+        case .callDTMF, .callAudio:
+            return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Shizuku).", table: "CallAudio")
+        case .callMedia:
+            return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, the free Shizuku app, and both phones on the same Wi-Fi.", table: "CallAudio")
+        case .callMediaTalk:
+            return String(localized: "This bridge phone can't feed audio into calls. You hear calls on the iPhone and talk on the Android phone.", table: "CallAudio")
+        case .netShare:
+            return String(localized: "Turn on Internet sharing in Pairline Bridge › Settings on your Android phone.", table: "NetShare")
         case .contacts:
             return String(localized: "Turn on contacts sync in Pairline Bridge on your Android phone.")
         case .calllog:

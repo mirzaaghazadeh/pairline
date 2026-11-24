@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="netshare_title">مشاركة الإنترنت</string>
+    <string name="netshare_allow">اسمح للآيفون باستخدام إنترنت هذا الهاتف</string>
+    <string name="netshare_allow_sub">فقط عندما تفعّلها من الآيفون. عندها تمر حركة بيانات الآيفون عبر اتصال هذا الهاتف وشبكته الافتراضية الخاصة (VPN)، من خلال شبكة الواي فاي لديك أو نقطة اتصال هذا الهاتف.</string>
+    <string name="netshare_active">المشاركة جارية</string>
+    <string name="netshare_idle">لا توجد مشاركة الآن</string>
+    <string name="netshare_vpn_on">شبكة VPN مفعّلة: تمر حركة بيانات الآيفون عبرها. اضغط لإيقاف المشاركة.</string>
+    <string name="netshare_vpn_off">لا توجد شبكة VPN على هذا الهاتف: تخرج حركة بيانات الآيفون عبر اتصال هذا الهاتف نفسه.</string>
+    <string name="netshare_direct_iran">المواقع الإيرانية (‎.ir) مباشرة</string>
+    <string name="netshare_direct_iran_sub">المواقع التي تنتهي بـ ‎.ir لا تمر عبر هذا الهاتف وشبكة VPN الخاصة به.</string>
+</resources>

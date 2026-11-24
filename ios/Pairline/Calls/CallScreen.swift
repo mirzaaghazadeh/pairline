@@ -1,12 +1,30 @@
 import SwiftUI
 
 /// The in-app call screen: incoming calls in demo mode, and every call placed or answered from the iPhone.
-/// Call audio stays on the Android phone until call audio ships (M6), and the screen says so.
+/// It says where the call's audio is: on this iPhone ("Talk on iPhone", M6) or on the Android phone.
 struct CallScreen: View {
     @EnvironmentObject private var calls: CallCenter
     @EnvironmentObject private var bridge: BridgeController
     @State private var showKeypad = false
     @State private var typed = ""
+    @State private var showAudioInfo = false
+
+    private var audioLabel: Text {
+        switch calls.audioRoute {
+        case .iphone(talk: true): return Text("Audio on this iPhone", tableName: "CallAudio")
+        case .iphone(talk: false): return Text("Listening here · talk on your Android phone", tableName: "CallAudio")
+        case .connecting: return Text("Moving audio to this iPhone…", tableName: "CallAudio")
+        case .bridge: return Text("Audio plays on your Android phone")
+        }
+    }
+
+    private var audioSymbol: String {
+        switch calls.audioRoute {
+        case .iphone: return "iphone.gen3"
+        case .connecting: return "arrow.left.arrow.right"
+        case .bridge: return "speaker.wave.2.fill"
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -22,6 +40,7 @@ struct CallScreen: View {
         .preferredColorScheme(.dark)
         .onAppear { calls.callScreenVisible = true }
         .onDisappear { calls.callScreenVisible = false }
+        .sheet(isPresented: $showAudioInfo) { CallAudioInfoSheet() }
     }
 
     private func content(_ call: ActiveCall) -> some View {
@@ -84,15 +103,20 @@ struct CallScreen: View {
                 .foregroundStyle(.white.opacity(0.8))
                 .padding(.top, 10)
 
-            // In protocol v0 call audio always stays on the Android phone; `call.audio` only switches its mute and
-            // speaker. Streaming to the iPhone (M6) will come with its own capability.
-            Label("Audio plays on your Android phone", systemImage: "speaker.wave.2.fill")
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(.white.opacity(0.85))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(Capsule().fill(.white.opacity(0.12)))
-                .padding(.top, 18)
+            // Where the call's audio is: on this iPhone when the bridge relays it (call.media, D-047), otherwise on
+            // the Android phone. Tapping explains how to set up Talk on iPhone.
+            Button {
+                showAudioInfo = true
+            } label: {
+                Label { audioLabel } icon: { Image(systemName: audioSymbol) }
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(Capsule().fill(.white.opacity(0.12)))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 18)
             Spacer(minLength: 16)
 
             if showKeypad && call.state == .active {

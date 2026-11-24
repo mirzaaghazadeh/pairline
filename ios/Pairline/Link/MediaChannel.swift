@@ -147,3 +147,6 @@ final class MediaSocket: MediaChannel {
         if !plaintext.isEmpty { handler?(plaintext) }
     }
 }
+
+/// Call audio (M6, `CallAudioEngine`) takes the media channel as it is: same members, same rules.
+extension MediaSocket: AudioPacketTransport {}

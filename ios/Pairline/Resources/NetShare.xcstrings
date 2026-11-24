@@ -1,0 +1,150 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Apps with SOCKS5 proxy settings" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التطبيقات التي تدعم إعدادات وكيل SOCKS5" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Apps with SOCKS5 proxy settings" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برنامه‌هایی که تنظیمات پراکسی SOCKS5 دارند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "SOCKS5 proxy ayarı olan uygulamalar" } }
+      }
+    },
+    "Internet sharing" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مشاركة الإنترنت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Internet sharing" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اشتراک اینترنت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İnternet paylaşımı" } }
+      }
+    },
+    "Open Settings › Wi-Fi, tap ⓘ next to your network, then Configure Proxy › Automatic, and paste this URL. Set it back to Off when you stop sharing." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "افتح الإعدادات › Wi-Fi، واضغط ⓘ بجوار شبكتك، ثم تهيئة الوكيل › تلقائي، والصق هذا الرابط. أعده إلى «إيقاف» عندما توقف المشاركة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Settings › Wi-Fi, tap ⓘ next to your network, then Configure Proxy › Automatic, and paste this URL. Set it back to Off when you stop sharing." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تنظیمات › Wi-Fi را باز کنید، کنار شبکه‌تان روی ⓘ بزنید، بعد پیکربندی پراکسی › خودکار را انتخاب کنید و این نشانی را بچسبانید. وقتی اشتراک را متوقف کردید، آن را به «خاموش» برگردانید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ayarlar › Wi-Fi’yi açın, ağınızın yanındaki ⓘ simgesine dokunun, ardından Proxy’yi Yapılandır › Otomatik’i seçip bu URL’yi yapıştırın. Paylaşımı durdurduğunuzda yeniden Kapalı yapın." } }
+      }
+    },
+    "Password" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كلمة المرور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Password" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گذرواژه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Parola" } }
+      }
+    },
+    "Port" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المنفذ" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Port" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پورت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port" } }
+      }
+    },
+    "Proxy configuration URL" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رابط إعداد الوكيل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Proxy configuration URL" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نشانی پیکربندی پراکسی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Proxy yapılandırma URL’si" } }
+      }
+    },
+    "Safari and most apps" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "Safari ومعظم التطبيقات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Safari and most apps" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Safari و بیشتر برنامه‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Safari ve çoğu uygulama" } }
+      }
+    },
+    "Server" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الخادم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرور" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucu" } }
+      }
+    },
+    "Sites ending in %@ go direct." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المواقع التي تنتهي بـ %@ تتصل مباشرة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sites ending in %@ go direct." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سایت‌هایی که به %@ ختم می‌شوند مستقیم وصل می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ ile biten siteler doğrudan bağlanır." } }
+      }
+    },
+    "The bridge phone has no VPN on." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد شبكة VPN مفعّلة على الهاتف الوسيط." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The bridge phone has no VPN on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی پل VPN روشن نیست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonda açık VPN yok." } }
+      }
+    },
+    "The bridge phone's VPN is on." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شبكة VPN على الهاتف الوسيط مفعّلة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The bridge phone's VPN is on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "VPN گوشی پل روشن است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonun VPN’i açık." } }
+      }
+    },
+    "These change every time you turn sharing on." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تتغير هذه في كل مرة تفعّل فيها المشاركة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "These change every time you turn sharing on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این‌ها هر بار که اشتراک را روشن می‌کنید عوض می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bunlar paylaşımı her açtığınızda değişir." } }
+      }
+    },
+    "Traffic you send through it goes out through the Android phone's connection, and through its VPN if one is on. Both phones need the same Wi-Fi, or this iPhone joined to the Android phone's hotspot." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تخرج البيانات التي ترسلها عبرها من خلال اتصال هاتف أندرويد، وعبر شبكة VPN الخاصة به إن كانت مفعّلة. يجب أن يكون الهاتفان على شبكة الواي فاي نفسها، أو أن يتصل هذا الآيفون بنقطة اتصال هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Traffic you send through it goes out through the Android phone's connection, and through its VPN if one is on. Both phones need the same Wi-Fi, or this iPhone joined to the Android phone's hotspot." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ترافیکی که از این مسیر می‌فرستید از اتصال گوشی اندرویدی و اگر VPN روشن باشد از VPN آن خارج می‌شود. هر دو گوشی باید به یک وای‌فای وصل باشند یا این آیفون به هات‌اسپات گوشی اندرویدی وصل شده باشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu yoldan gönderdiğiniz trafik Android telefonun bağlantısından, açıksa onun VPN’inden çıkar. İki telefonun aynı Wi-Fi ağında olması ya da bu iPhone’un Android telefonun erişim noktasına bağlanması gerekir." } }
+      }
+    },
+    "Turn on Internet sharing in Pairline Bridge › Settings on your Android phone first." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «مشاركة الإنترنت» أولًا في Pairline Bridge › الإعدادات على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Internet sharing in Pairline Bridge › Settings on your Android phone first." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اول «اشتراک اینترنت» را در Pairline Bridge › تنظیمات روی گوشی اندرویدی روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Önce Android telefonunuzda Pairline Bridge › Ayarlar’dan İnternet paylaşımını açın." } }
+      }
+    },
+    "Turn on Internet sharing in Pairline Bridge › Settings on your Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «مشاركة الإنترنت» في Pairline Bridge › الإعدادات على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Internet sharing in Pairline Bridge › Settings on your Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«اشتراک اینترنت» را در Pairline Bridge › تنظیمات روی گوشی اندرویدی روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda Pairline Bridge › Ayarlar’dan İnternet paylaşımını açın." } }
+      }
+    },
+    "Use in Telegram" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استخدام في تيليجرام" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use in Telegram" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "استفاده در تلگرام" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telegram’da kullan" } }
+      }
+    },
+    "Use the bridge phone's internet" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استخدم إنترنت الهاتف الوسيط" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use the bridge phone's internet" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "استفاده از اینترنت گوشی پل" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonun internetini kullan" } }
+      }
+    },
+    "Username" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسم المستخدم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Username" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نام کاربری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kullanıcı adı" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -102,8 +102,8 @@ final class MessageCodecTests: XCTestCase {
     }
 
     func testUnknownTypesAreIgnoredButBadJSONThrows() throws {
-        let unknown = try decode(["t": "net.share", "ssid": "x"])
-        XCTAssertEqual(unknown.type, "net.share")
+        let unknown = try decode(["t": "future.feature", "ssid": "x"])
+        XCTAssertEqual(unknown.type, "future.feature")
         if case .unknown = unknown.message {} else { XCTFail() }
         XCTAssertThrowsError(try Inbound.decode(Data("not json".utf8)))
         XCTAssertThrowsError(try Inbound.decode(Data("{\"id\":1}".utf8)))

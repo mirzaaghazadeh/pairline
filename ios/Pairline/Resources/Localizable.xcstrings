@@ -4004,6 +4004,28 @@
         }
       }
     },
+    "Help group on Telegram" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مجموعة المساعدة على تيليجرام"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "گروه پشتیبانی در تلگرام"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telegram yardım grubu"
+          }
+        }
+      }
+    },
     "Hide call screen" : {
       "localizations" : {
         "ar" : {
@@ -5474,6 +5496,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Android telefonunuzun numarasına gelen yeni SMS'ler burada görünecek."
+          }
+        }
+      }
+    },
+    "News and help in your language. The group is public, so never post your phone number, messages or codes there." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الأخبار والمساعدة بالإنجليزية إلى أن تتوفر قناة عربية. المجموعة عامة، فلا تنشر فيها رقم هاتفك أو رسائلك أو رموزك أبدًا."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اخبار و پشتیبانی به فارسی. گروه عمومی است؛ پس هرگز شماره تلفن، پیامک‌ها یا کدهای خود را آن‌جا نفرستید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Türkçe haberler ve yardım. Grup herkese açıktır; telefon numaranızı, mesajlarınızı veya kodlarınızı asla oraya yazmayın."
+          }
+        }
+      }
+    },
+    "News on Telegram" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الأخبار على تيليجرام"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اخبار در تلگرام"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telegram’da haberler"
           }
         }
       }
@@ -8622,24 +8688,24 @@
         }
       }
     },
-    "Still stuck? The website has more help. Opening it is the only time Pairline sends you online, and only when you tap." : {
+    "Still stuck? Ask in our Telegram help group, or see the website. Opening one of these links is the only time Pairline sends you online, and only when you tap." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ما زلت تواجه مشكلة؟ ستجد مزيدًا من المساعدة على الموقع. فتحه هو المرة الوحيدة التي يوجّهك فيها Pairline إلى الإنترنت، وذلك فقط عندما تضغط بنفسك."
+            "value" : "ما زلت تواجه مشكلة؟ اسأل في مجموعة المساعدة على تيليجرام أو زر الموقع. فتح أحد هذه الروابط هو المرة الوحيدة التي يوجّهك فيها Pairline إلى الإنترنت، وذلك فقط عندما تضغط بنفسك."
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هنوز مشکل دارید؟ در وب‌سایت راهنمایی بیشتری هست. باز کردن آن تنها جایی است که Pairline شما را به اینترنت می‌برد، آن هم فقط وقتی خودتان روی آن بزنید."
+            "value" : "هنوز مشکل دارید؟ در گروه پشتیبانی تلگرام بپرسید یا به وب‌سایت سر بزنید. باز کردن این پیوندها تنها جایی است که Pairline شما را به اینترنت می‌برد، آن هم فقط وقتی خودتان روی آن‌ها بزنید."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sorun devam mı ediyor? Web sitesinde daha fazla yardım bulabilirsiniz. Pairline'ın sizi internete yönlendirdiği tek durum budur ve yalnızca siz dokunduğunuzda gerçekleşir."
+            "value" : "Sorun devam mı ediyor? Telegram yardım grubumuzda sorun ya da web sitesine bakın. Pairline'ın sizi internete yönlendirdiği tek durum bu bağlantılardan birini açmanızdır ve yalnızca siz dokunduğunuzda gerçekleşir."
           }
         }
       }
@@ -8794,6 +8860,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eşleştirme kodu göstermek için köprü uygulamasında Eşleştir'e dokunun."
+          }
+        }
+      }
+    },
+    "Telegram" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تيليجرام"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلگرام"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telegram"
           }
         }
       }

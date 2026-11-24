@@ -1,0 +1,246 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Android keeps call audio away from apps, so this needs Android 10 or later and Shizuku. Some phones only allow listening; then you hear the call here and talk on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يحتاج هذا إلى أندرويد 10 أو أحدث وإلى Shizuku. بعض الهواتف تسمح بالاستماع فقط؛ عندها تسمع المكالمة هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android keeps call audio away from apps, so this needs Android 10 or later and Shizuku. Some phones only allow listening; then you hear the call here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین این کار به اندروید ۱۰ یا جدیدتر و Shizuku نیاز دارد. بعضی گوشی‌ها فقط اجازهٔ شنیدن می‌دهند؛ آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android arama sesini uygulamalardan uzak tutar; bu yüzden Android 10 veya üstü ve Shizuku gerekir. Bazı telefonlar yalnızca dinlemeye izin verir; o zaman aramayı burada duyar, Android telefondan konuşursunuz." } }
+      }
+    },
+    "Audio on this iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هذا الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio on this iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی همین آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses bu iPhone’da" } }
+      }
+    },
+    "Both of us heard each other" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سمع كلٌّ منا الآخر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Both of us heard each other" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هر دو صدای هم را شنیدیم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İkimiz de birbirimizi duyduk" } }
+      }
+    },
+    "Call audio" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "صوت المكالمة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call audio" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi" } }
+      }
+    },
+    "Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ينتقل صوت المكالمة بين هاتفيك عبر شبكة الواي فاي لديك بتشفير تام بين الطرفين، ولا يُسجَّل أو يُحفظ أبدًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس از طریق وای‌فای شما و با رمزگذاری سرتاسری بین دو گوشی‌تان جابه‌جا می‌شود. هرگز ضبط یا ذخیره نمی‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi iki telefonunuz arasında Wi-Fi ağınız üzerinden uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz." } }
+      }
+    },
+    "Hear calls on iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سماع المكالمات على الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hear calls on iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شنیدن تماس‌ها روی آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramaları iPhone’da duyma" } }
+      }
+    },
+    "How did the call sound?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كيف كان صوت المكالمة؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "How did the call sound?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس چطور بود؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramanın sesi nasıldı?" } }
+      }
+    },
+    "I couldn't hear them" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم أسمع الطرف الآخر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "I couldn't hear them" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای طرف مقابل را نشنیدم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Karşı tarafı duyamadım" } }
+      }
+    },
+    "Install and start Shizuku, a free app, and allow Pairline in it. The bridge app shows each step." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ثبّت Shizuku، وهو تطبيق مجاني، وشغّله واسمح لـ Pairline فيه. يعرض تطبيق الهاتف الوسيط كل خطوة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Install and start Shizuku, a free app, and allow Pairline in it. The bridge app shows each step." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برنامهٔ رایگان Shizuku را نصب و اجرا کنید و در آن به Pairline اجازه بدهید. برنامهٔ پل همهٔ مراحل را نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ücretsiz bir uygulama olan Shizuku’yu yükleyip başlatın ve içinde Pairline’a izin verin. Köprü uygulaması her adımı gösterir." } }
+      }
+    },
+    "Keep both phones on the same Wi-Fi. Calls you take on this iPhone then use its microphone and speaker." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أبقِ الهاتفين على شبكة الواي فاي نفسها. عندها تستخدم المكالمات التي تردّ عليها على هذا الآيفون ميكروفونه ومكبّر صوته." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep both phones on the same Wi-Fi. Calls you take on this iPhone then use its microphone and speaker." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هر دو گوشی را به یک وای‌فای وصل نگه دارید. آن‌وقت تماس‌هایی که روی این آیفون جواب می‌دهید از میکروفون و بلندگوی آن استفاده می‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İki telefonu da aynı Wi-Fi ağında tutun. Böylece bu iPhone’da yanıtladığınız aramalar onun mikrofonunu ve hoparlörünü kullanır." } }
+      }
+    },
+    "Listening here · talk on your Android phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسمع هنا · تحدّث من هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Listening here · talk on your Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شنیدن اینجا · صحبت با گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Burada dinliyorsunuz · Android telefondan konuşun" } }
+      }
+    },
+    "Moving audio to this iPhone…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ نقل الصوت إلى هذا الآيفون…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Moving audio to this iPhone…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال آوردن صدا به این آیفون…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses bu iPhone’a aktarılıyor…" } }
+      }
+    },
+    "Moving the audio to this iPhone…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ نقل الصوت إلى هذا الآيفون…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Moving the audio to this iPhone…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال آوردن صدا به این آیفون…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses bu iPhone’a aktarılıyor…" } }
+      }
+    },
+    "Mute and speaker from iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كتم الصوت ومكبّر الصوت من الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mute and speaker from iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بی‌صدا و بلندگو از آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan sessiz ve hoparlör" } }
+      }
+    },
+    "Not now" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ليس الآن" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not now" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالا نه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şimdi değil" } }
+      }
+    },
+    "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It needs the free Shizuku app and the same Wi-Fi." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختياري: فعّل «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط لتسمع المكالمات وتردّ عليها بهذا الآيفون. يحتاج إلى تطبيق Shizuku المجاني وشبكة الواي فاي نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It needs the free Shizuku app and the same Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اختیاری: «مکالمه با آیفون» را در برنامهٔ پل راه بیندازید تا تماس‌ها را با همین آیفون بشنوید و جواب بدهید. به برنامهٔ رایگان Shizuku و یک وای‌فای مشترک نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İsteğe bağlı: aramaları bu iPhone ile duyup yanıtlamak için köprü uygulamasında “iPhone’dan konuşma”yı kurun. Ücretsiz Shizuku uygulaması ve aynı Wi-Fi ağı gerekir." } }
+      }
+    },
+    "On the Android phone, open Pairline Bridge › Settings › Talk on iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "على هاتف أندرويد، افتح Pairline Bridge › الإعدادات › التحدث عبر الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "On the Android phone, open Pairline Bridge › Settings › Talk on iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی، Pairline Bridge › تنظیمات › مکالمه با آیفون را باز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonda Pairline Bridge › Ayarlar › iPhone’dan konuşma’yı açın." } }
+      }
+    },
+    "Talk from iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التحدث من الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Talk from iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صحبت از آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan konuşma" } }
+      }
+    },
+    "Talk on your iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التحدث عبر الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Talk on your iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مکالمه با آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan konuşun" } }
+      }
+    },
+    "The call's audio went back to your Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عاد صوت المكالمة إلى هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The call's audio went back to your Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس به گوشی اندرویدی برگشت." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramanın sesi Android telefona geri döndü." } }
+      }
+    },
+    "The iPhone's microphone isn't available for the call." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ميكروفون الآيفون غير متاح لهذه المكالمة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The iPhone's microphone isn't available for the call." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "میکروفون آیفون برای این تماس در دسترس نیست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’un mikrofonu bu arama için kullanılamıyor." } }
+      }
+    },
+    "They couldn't hear me" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يسمعني الطرف الآخر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "They couldn't hear me" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "طرف مقابل صدای مرا نشنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Karşı taraf beni duyamadı" } }
+      }
+    },
+    "This bridge phone can't feed audio into calls. You hear calls on the iPhone and talk on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يستطيع هذا الهاتف الوسيط إدخال الصوت في المكالمات. تسمع المكالمات على الآيفون وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This bridge phone can't feed audio into calls. You hear calls on the iPhone and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این گوشی پل نمی‌تواند صدا را وارد تماس کند. تماس‌ها را روی آیفون می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu köprü telefon aramalara ses aktaramıyor. Aramaları iPhone’da duyar, Android telefondan konuşursunuz." } }
+      }
+    },
+    "This call's audio is on this iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "صوت هذه المكالمة على هذا الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This call's audio is on this iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای این تماس روی همین آیفون است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu aramanın sesi bu iPhone’da." } }
+      }
+    },
+    "This call's audio plays on your Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يعمل صوت هذه المكالمة على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This call's audio plays on your Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای این تماس روی گوشی اندرویدی پخش می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu aramanın sesi Android telefonunuzda çalıyor." } }
+      }
+    },
+    "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Shizuku)." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد (يحتاج إلى أندرويد 12 أو أحدث وإلى Shizuku)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Shizuku)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید (به اندروید ۱۲ یا جدیدتر و Shizuku نیاز دارد)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın (Android 12 veya üstü ve Shizuku gerekir)." } }
+      }
+    },
+    "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, the free Shizuku app, and both phones on the same Wi-Fi." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد. يحتاج إلى أندرويد 10 أو أحدث وتطبيق Shizuku المجاني، وأن يكون الهاتفان على شبكة الواي فاي نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, the free Shizuku app, and both phones on the same Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید. به اندروید ۱۰ یا جدیدتر، برنامهٔ رایگان Shizuku و اتصال هر دو گوشی به یک وای‌فای نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın. Android 10 veya üstü, ücretsiz Shizuku uygulaması ve iki telefonun aynı Wi-Fi ağında olması gerekir." } }
+      }
+    },
+    "You hear this call here. Talk on your Android phone: it can't take audio from the iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسمع هذه المكالمة هنا. تحدّث من هاتف أندرويد: فهو لا يستطيع أخذ الصوت من الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "You hear this call here. Talk on your Android phone: it can't take audio from the iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این تماس را اینجا می‌شنوید. با گوشی اندرویدی صحبت کنید؛ آن گوشی نمی‌تواند صدا را از آیفون بگیرد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu aramayı burada duyuyorsunuz. Android telefondan konuşun: o telefon iPhone’dan ses alamıyor." } }
+      }
+    },
+    "Your answer helps Pairline pick what works on your Android phone. Nothing else is sent." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تساعد إجابتك Pairline على اختيار ما ينجح على هاتف أندرويد. لا يُرسَل أي شيء آخر." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your answer helps Pairline pick what works on your Android phone. Nothing else is sent." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "جواب شما به Pairline کمک می‌کند بهترین روش را برای گوشی اندرویدی‌تان انتخاب کند. چیز دیگری فرستاده نمی‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yanıtınız, Pairline’ın Android telefonunuzda neyin işe yaradığını seçmesine yardımcı olur. Başka hiçbir şey gönderilmez." } }
+      }
+    },
+    "Your bridge is set up for Talk on iPhone, but the phones aren't on the same Wi-Fi right now." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتفك الوسيط مُعدّ لـ «التحدث عبر الآيفون»، لكن الهاتفين ليسا على شبكة الواي فاي نفسها الآن." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your bridge is set up for Talk on iPhone, but the phones aren't on the same Wi-Fi right now." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل شما برای «مکالمه با آیفون» آماده است، اما دو گوشی الان به یک وای‌فای وصل نیستند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonunuz iPhone’dan konuşma için hazır, ancak telefonlar şu anda aynı Wi-Fi ağında değil." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

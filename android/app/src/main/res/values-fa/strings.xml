@@ -289,6 +289,12 @@
     <string name="settings_version">نسخه</string>
     <string name="settings_license">لایسنس: FSL-1.1-ALv2</string>
     <string name="settings_license_sub">استفاده از آن رایگان است. کد عمومی است تا هر کسی بتواند ببیند برنامه چه می‌کند؛ لایسنس هر نسخه دو سال پس از انتشارش به Apache-2.0 تغییر می‌کند.</string>
+    <string name="settings_telegram_channel">اخبار در تلگرام</string>
+    <string name="settings_telegram_channel_sub">نسخه‌های تازه و نکته‌ها، به فارسی</string>
+    <string name="settings_telegram_group">گروه پشتیبانی در تلگرام</string>
+    <string name="settings_telegram_group_sub">از دیگر کاربران Pairline و سازندهٔ آن بپرسید. گروه عمومی است؛ پس هرگز شماره تلفن، پیامک‌ها یا کدهای خود را آن‌جا نفرستید.</string>
+    <string name="telegram_channel_url">https://t.me/pairline_fa</string>
+    <string name="telegram_group_url">https://t.me/pairline_groups/5</string>
     <string name="settings_source">کد منبع</string>
     <!-- Starts with U+200F (right-to-left mark) so the URL lines up with the RTL layout. -->
     <string name="settings_source_sub">‏github.com/mirzaaghazadeh/pairline</string>

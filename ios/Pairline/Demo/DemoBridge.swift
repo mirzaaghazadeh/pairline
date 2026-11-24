@@ -95,7 +95,9 @@ final class DemoBridge: BridgeLink {
                  "net": "LTE", "roaming": false, "defaultSms": false, "defaultVoice": false],
             ],
             "app": "0.1.0",
-            "caps": Capability.allCases.filter { $0 != .callAudio }.map(\.rawValue),
+            // Demo mode has no audio relay: calls stay "audio on the Android phone".
+            "caps": Capability.allCases.filter { ![.callAudio, .callMedia, .callMediaTalk, .netShare].contains($0) }
+                .map(\.rawValue),
             "time": Date().milliseconds,
         ]
         if let id { body["id"] = id }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="talk_title">التحدث عبر الآيفون</string>
+    <string name="talk_body">استمع إلى المكالمات وتحدّث بميكروفون الآيفون ومكبّر صوته. يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يحتاج هذا إلى Shizuku، وهو تطبيق مجاني يمنح Pairline صلاحيات إضافية بإذنك. ويجب أن يكون الهاتفان على شبكة الواي فاي نفسها.</string>
+    <string name="settings_talk">التحدث عبر الآيفون</string>
+    <string name="talk_summary_on">مفعّل</string>
+    <string name="talk_summary_off">متوقف</string>
+    <string name="talk_summary_needs_shizuku">يحتاج إلى Shizuku</string>
+    <string name="talk_summary_unsupported">يحتاج إلى أندرويد 10 أو أحدث</string>
+    <string name="talk_android_too_old">يعمل هذا الهاتف بأندرويد %1$s. صوت المكالمات على الآيفون يحتاج إلى أندرويد 10 أو أحدث. ستظل المكالمات ترنّ على الآيفون، وتتحدث من هذا الهاتف.</string>
+    <string name="talk_steps">الإعداد</string>
+    <string name="talk_step_install">ثبّت Shizuku</string>
+    <string name="talk_step_install_sub">تطبيق مجاني مفتوح المصدر من Play Store أو GitHub.</string>
+    <string name="talk_get_shizuku">احصل على Shizuku</string>
+    <string name="talk_step_start">شغّل Shizuku</string>
+    <string name="talk_step_outdated">حدّث Shizuku إلى الإصدار 13 أو أحدث</string>
+    <string name="talk_step_start_sub">في Shizuku، اضغط Start أسفل «Start via Wireless debugging» واتبع خطواته. أنت من يفعّل «تصحيح الأخطاء اللاسلكي» في «خيارات المطوّرين»، ولا يفعل Pairline ذلك أبدًا. بعد إعادة تشغيل الهاتف، شغّل Shizuku من جديد.</string>
+    <string name="talk_step_start_sub_q">في أندرويد 10، يُشغَّل Shizuku مرة واحدة من حاسوب، ويعرض تطبيق Shizuku الأمر اللازم. بعد إعادة تشغيل الهاتف، شغّله من جديد.</string>
+    <string name="talk_open_shizuku">افتح Shizuku</string>
+    <string name="talk_open_developer">خيارات المطوّرين</string>
+    <string name="talk_step_allow">اسمح لـ Pairline في Shizuku</string>
+    <string name="talk_step_allow_sub">يسألك Shizuku إن كان Pairline يستطيع استخدامه. يستخدمه Pairline فقط لصوت المكالمات ولوحة المفاتيح وكتم الصوت ومكبّر الصوت أثناء المكالمة.</string>
+    <string name="talk_allow_denied">رفضت ذلك من قبل. افتح Shizuku، ثم Authorized apps، وفعّل Pairline.</string>
+    <string name="talk_allow">السماح</string>
+    <string name="talk_this_phone">على هذا الهاتف</string>
+    <string name="talk_listen_yes">يستطيع الآيفون سماع مكالماتك</string>
+    <string name="talk_listen_no">لا يسمح هذا الهاتف لـ Shizuku بالتقاط صوت المكالمات</string>
+    <string name="talk_talk_yes">يمكن أن يصل صوتك من الآيفون إلى المكالمة</string>
+    <string name="talk_talk_no">لا يستطيع هذا الهاتف إدخال الصوت في المكالمة: ستسمع المكالمات على الآيفون وتتحدث من هذا الهاتف</string>
+    <string name="talk_switch">التحدث عبر الآيفون</string>
+    <string name="talk_switch_sub">عند الرد على الآيفون، ينتقل صوت المكالمة إلى الآيفون. ويفعّل أيضًا لوحة المفاتيح وكتم الصوت ومكبّر الصوت من الآيفون.</string>
+    <string name="talk_reset">ابدأ صوت المكالمات من جديد</string>
+    <string name="talk_reset_sub">يتعلّم Pairline ما ينجح على هذا الهاتف من إجاباتك بعد المكالمات. هذا الخيار ينساها.</string>
+    <string name="talk_wifi_note">ينتقل صوت المكالمة عبر شبكة الواي فاي لديك بتشفير تام بين الطرفين، ولا يُسجَّل أو يُحفظ أبدًا.</string>
+    <string name="talk_setup_title">التحدث عبر الآيفون (اختياري)</string>
+    <string name="talk_setup_later">الإعداد لاحقًا</string>
+</resources>

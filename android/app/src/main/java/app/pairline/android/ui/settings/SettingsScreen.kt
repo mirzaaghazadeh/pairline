@@ -156,6 +156,13 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(
+                    title = stringResource(R.string.settings_talk),
+                    subtitle = app.pairline.android.ui.talk.talkSummary(),
+                    icon = PIcons.Phone,
+                    onClick = { navigate(Route.Talk) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
                     title = stringResource(if (paired) R.string.home_pair_new else R.string.home_pair),
                     icon = PIcons.Qr,
                     onClick = { navigate(Route.Pairing) },
@@ -174,6 +181,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
             }
 
             WifiSection(prefsTick)
+
+            app.pairline.android.ui.netshare.NetShareSettings()
 
             SectionCard(title = stringResource(R.string.home_keep_running)) {
                 ListRow(
@@ -212,6 +221,25 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     subtitle = stringResource(R.string.home_diag_sub),
                     icon = PIcons.Report,
                     onClick = { navigate(Route.Diagnostics) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                // Telegram links follow the app's language (strings.xml); opening one only hands the link to the system.
+                val channelUrl = stringResource(R.string.telegram_channel_url)
+                ListRow(
+                    title = stringResource(R.string.settings_telegram_channel),
+                    subtitle = stringResource(R.string.settings_telegram_channel_sub),
+                    icon = PIcons.Send,
+                    onClick = { SystemActions.openUrl(context, channelUrl) },
+                    trailing = { androidx.compose.material3.Icon(PIcons.OpenExternal, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                val groupUrl = stringResource(R.string.telegram_group_url)
+                ListRow(
+                    title = stringResource(R.string.settings_telegram_group),
+                    subtitle = stringResource(R.string.settings_telegram_group_sub),
+                    icon = PIcons.Forum,
+                    onClick = { SystemActions.openUrl(context, groupUrl) },
+                    trailing = { androidx.compose.material3.Icon(PIcons.OpenExternal, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(

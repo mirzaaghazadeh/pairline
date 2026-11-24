@@ -12,6 +12,7 @@ import android.telephony.TelephonyManager
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import app.pairline.android.AppGraph
+import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.link.wifi.HotspotState
 import app.pairline.android.link.wifi.WifiTransport
 import app.pairline.android.log.Log
@@ -74,6 +75,10 @@ class LinkService : Service() {
             graph.hotspot.state.collect { s ->
                 link.updateState { it.copy(hotspotBand = (s as? HotspotState.On)?.band) }
             }
+        }
+        // Call audio (M6) rides on the Wi-Fi session's media channel; the relay stops when the channel closes.
+        scope.launch {
+            link.media.collect { channel -> graph.audioRelay.setTransport(channel?.let(::MediaPacketTransport)) }
         }
 
         graph.status.onChange = graph.router::statusChanged
@@ -219,6 +224,15 @@ class LinkService : Service() {
         fun stop(context: Context) {
             context.stopService(Intent(context, LinkService::class.java))
         }
+    }
+}
+
+/** The media channel as the call-audio relay wants it (D-047). */
+private class MediaPacketTransport(private val channel: MediaChannel) : CallAudioRelay.PacketTransport {
+    override val isOpen: Boolean get() = channel.isOpen
+    override fun send(packet: ByteArray) = channel.send(packet)
+    override fun setReceiver(receiver: ((ByteArray) -> Unit)?) {
+        channel.onPacket = receiver
     }
 }
 

@@ -18,6 +18,9 @@ interface LinkConnection {
     /** A short label for logs ("ble#3"). Never a MAC or IP address. */
     val label: String
 
+    /** The iPhone's IP address on a Wi-Fi connection; null on other transports. Never logged. */
+    val peerAddress: java.net.InetAddress? get() = null
+
     /** Queues one whole frame; the transport splits it as needed. */
     fun send(frame: ByteArray)
 

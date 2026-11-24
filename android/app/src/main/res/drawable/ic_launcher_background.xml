@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Brand blue with a soft diagonal gradient. -->
+<!-- Brand blue, lighter at the top left (the same gradient as the iOS icon and the website). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
@@ -14,9 +14,8 @@
                 android:startX="0"
                 android:startY="0"
                 android:type="linear">
-                <item android:color="#FF2E74DB" android:offset="0" />
-                <item android:color="#FF1F5FBF" android:offset="0.55" />
-                <item android:color="#FF174A96" android:offset="1" />
+                <item android:color="#FF2A6FD6" android:offset="0" />
+                <item android:color="#FF15468F" android:offset="1" />
             </gradient>
         </aapt:attr>
     </path>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="talk_title">iPhone’dan konuşun</string>
+    <string name="talk_body">Aramaları iPhone’un kendi mikrofonu ve hoparlörüyle duyun ve konuşun. Android, arama sesini uygulamalardan uzak tutar; bu yüzden bunun için Shizuku gerekir: izninizle Pairline’a ek erişim veren ücretsiz bir uygulama. İki telefonun da aynı Wi-Fi ağında olması gerekir.</string>
+    <string name="settings_talk">iPhone’dan konuşma</string>
+    <string name="talk_summary_on">Açık</string>
+    <string name="talk_summary_off">Kapalı</string>
+    <string name="talk_summary_needs_shizuku">Shizuku gerekli</string>
+    <string name="talk_summary_unsupported">Android 10 veya üstü gerekli</string>
+    <string name="talk_android_too_old">Bu telefonda Android %1$s var. iPhone’da arama sesi için Android 10 veya üstü gerekir. Aramalar yine iPhone’da çalar, konuşmayı bu telefondan yaparsınız.</string>
+    <string name="talk_steps">Kurulum</string>
+    <string name="talk_step_install">Shizuku’yu yükleyin</string>
+    <string name="talk_step_install_sub">Play Store’dan veya GitHub’dan ücretsiz, açık kaynaklı bir uygulama.</string>
+    <string name="talk_get_shizuku">Shizuku’yu edinin</string>
+    <string name="talk_step_start">Shizuku’yu başlatın</string>
+    <string name="talk_step_outdated">Shizuku’yu 13 veya üstü bir sürüme güncelleyin</string>
+    <string name="talk_step_start_sub">Shizuku’da “Start via Wireless debugging” altındaki Start’a dokunun ve adımlarını izleyin. Kablosuz hata ayıklamayı Geliştirici seçenekleri’nde siz açarsınız; Pairline bunu asla yapmaz. Telefon yeniden başladıktan sonra Shizuku’yu tekrar başlatın.</string>
+    <string name="talk_step_start_sub_q">Android 10’da Shizuku bir kez bilgisayardan başlatılır; komutu Shizuku uygulaması gösterir. Telefon yeniden başladıktan sonra tekrar başlatın.</string>
+    <string name="talk_open_shizuku">Shizuku’yu aç</string>
+    <string name="talk_open_developer">Geliştirici seçenekleri</string>
+    <string name="talk_step_allow">Shizuku’da Pairline’a izin verin</string>
+    <string name="talk_step_allow_sub">Shizuku, Pairline’ın onu kullanıp kullanamayacağını sorar. Pairline onu yalnızca arama sesi ve aramadaki tuş takımı, sessiz ve hoparlör için kullanır.</string>
+    <string name="talk_allow_denied">Daha önce izin vermediniz. Shizuku’yu açın, Authorized apps’e gidin ve Pairline’ı açın.</string>
+    <string name="talk_allow">İzin ver</string>
+    <string name="talk_this_phone">Bu telefonda</string>
+    <string name="talk_listen_yes">iPhone aramalarınızı duyabilir</string>
+    <string name="talk_listen_no">Bu telefon, Shizuku’nun arama sesini almasına izin vermiyor</string>
+    <string name="talk_talk_yes">iPhone’daki sesiniz aramaya iletilebilir</string>
+    <string name="talk_talk_no">Bu telefon aramaya ses aktaramıyor: aramaları iPhone’da duyar, bu telefondan konuşursunuz</string>
+    <string name="talk_switch">iPhone’dan konuşma</string>
+    <string name="talk_switch_sub">iPhone’da yanıtladığınızda aramanın sesi iPhone’a geçer. iPhone’dan tuş takımı, sessiz ve hoparlörü de açar.</string>
+    <string name="talk_reset">Arama sesini baştan başlat</string>
+    <string name="talk_reset_sub">Pairline, aramalardan sonraki yanıtlarınızdan bu telefonda neyin işe yaradığını öğrenir. Bu seçenek onları unutur.</string>
+    <string name="talk_wifi_note">Arama sesi Wi-Fi ağınız üzerinden uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz.</string>
+    <string name="talk_setup_title">iPhone’dan konuşun (isteğe bağlı)</string>
+    <string name="talk_setup_later">Sonra kur</string>
+</resources>

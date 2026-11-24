@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="talk_title">مکالمه با آیفون</string>
+    <string name="talk_body">تماس‌ها را با میکروفون و بلندگوی خودِ آیفون بشنوید و صحبت کنید. اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین این کار به Shizuku نیاز دارد؛ برنامه‌ای رایگان که با اجازهٔ شما دسترسی بیشتری به Pairline می‌دهد. هر دو گوشی هم باید به یک وای‌فای وصل باشند.</string>
+    <string name="settings_talk">مکالمه با آیفون</string>
+    <string name="talk_summary_on">روشن</string>
+    <string name="talk_summary_off">خاموش</string>
+    <string name="talk_summary_needs_shizuku">به Shizuku نیاز دارد</string>
+    <string name="talk_summary_unsupported">به اندروید ۱۰ یا جدیدتر نیاز دارد</string>
+    <string name="talk_android_too_old">این گوشی اندروید %1$s دارد. صدای تماس روی آیفون به اندروید ۱۰ یا جدیدتر نیاز دارد. تماس‌ها همچنان روی آیفون زنگ می‌خورند و شما با همین گوشی صحبت می‌کنید.</string>
+    <string name="talk_steps">راه‌اندازی</string>
+    <string name="talk_step_install">نصب Shizuku</string>
+    <string name="talk_step_install_sub">برنامه‌ای رایگان و متن‌باز از Play Store یا GitHub.</string>
+    <string name="talk_get_shizuku">دریافت Shizuku</string>
+    <string name="talk_step_start">اجرای Shizuku</string>
+    <string name="talk_step_outdated">Shizuku را به نسخهٔ ۱۳ یا جدیدتر به‌روز کنید</string>
+    <string name="talk_step_start_sub">در Shizuku، زیر «Start via Wireless debugging» روی Start بزنید و مراحلش را دنبال کنید. اشکال‌زدایی بی‌سیم را خودتان در «گزینه‌های برنامه‌نویس» روشن می‌کنید؛ Pairline هرگز این کار را نمی‌کند. بعد از هر بار روشن‌شدن دوبارهٔ گوشی، Shizuku را دوباره اجرا کنید.</string>
+    <string name="talk_step_start_sub_q">در اندروید ۱۰، Shizuku یک بار از روی کامپیوتر اجرا می‌شود؛ خودِ برنامهٔ Shizuku دستورش را نشان می‌دهد. بعد از هر بار روشن‌شدن دوبارهٔ گوشی، دوباره اجرایش کنید.</string>
+    <string name="talk_open_shizuku">باز کردن Shizuku</string>
+    <string name="talk_open_developer">گزینه‌های برنامه‌نویس</string>
+    <string name="talk_step_allow">اجازه به Pairline در Shizuku</string>
+    <string name="talk_step_allow_sub">Shizuku می‌پرسد آیا Pairline می‌تواند از آن استفاده کند. Pairline فقط برای صدای تماس و صفحه‌کلید، بی‌صدا و بلندگوی تماس از آن استفاده می‌کند.</string>
+    <string name="talk_allow_denied">قبلاً اجازه ندادید. Shizuku را باز کنید، به Authorized apps بروید و Pairline را روشن کنید.</string>
+    <string name="talk_allow">اجازه دادن</string>
+    <string name="talk_this_phone">روی این گوشی</string>
+    <string name="talk_listen_yes">آیفون می‌تواند صدای تماس‌هایتان را بشنود</string>
+    <string name="talk_listen_no">این گوشی اجازه نمی‌دهد Shizuku صدای تماس را بگیرد</string>
+    <string name="talk_talk_yes">صدای شما از آیفون می‌تواند به تماس برسد</string>
+    <string name="talk_talk_no">این گوشی نمی‌تواند صدا را وارد تماس کند: تماس را روی آیفون می‌شنوید و با همین گوشی صحبت می‌کنید</string>
+    <string name="talk_switch">مکالمه با آیفون</string>
+    <string name="talk_switch_sub">وقتی روی آیفون جواب می‌دهید، صدای تماس به آیفون منتقل می‌شود. صفحه‌کلید، بی‌صدا و بلندگو را هم روی آیفون فعال می‌کند.</string>
+    <string name="talk_reset">شروع دوبارهٔ صدای تماس</string>
+    <string name="talk_reset_sub">Pairline از جواب‌های شما بعد از تماس‌ها یاد می‌گیرد چه چیزی روی این گوشی کار می‌کند. این گزینه آن‌ها را فراموش می‌کند.</string>
+    <string name="talk_wifi_note">صدای تماس از طریق وای‌فای شما و با رمزگذاری سرتاسری منتقل می‌شود. هرگز ضبط یا ذخیره نمی‌شود.</string>
+    <string name="talk_setup_title">مکالمه با آیفون (اختیاری)</string>
+    <string name="talk_setup_later">بعداً راه‌اندازی می‌کنم</string>
+</resources>
