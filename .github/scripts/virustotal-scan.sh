@@ -66,6 +66,10 @@ cell="[$malicious / $total engines flagged it]($report)"
 if [ "$suspicious" -gt 0 ]; then cell="$cell, $suspicious marked it suspicious"; fi
 
 if [ $((malicious + suspicious)) -gt 0 ]; then
-  finish "$cell" "$malicious engine(s) flagged the APK as malicious and $suspicious as suspicious. Read the report before publishing: $report"
+  # e.g. "Ikarus: malicious (Trojan.AndroidOS.X)"; the names tell a known false positive from a real problem.
+  engines="$(jq -r '[.data.attributes.results // {} | to_entries[]
+    | select(.value.category == "malicious" or .value.category == "suspicious")
+    | "\(.key): \(.value.category) (\(.value.result // "no name"))"] | join("; ")' <<<"$json" || true)"
+  finish "$cell" "$malicious engine(s) flagged the APK as malicious and $suspicious as suspicious${engines:+ ($engines)}. Read the report before publishing: $report"
 fi
 finish "$cell"
