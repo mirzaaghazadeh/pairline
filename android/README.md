@@ -5,7 +5,7 @@ picture and `../docs/PROTOCOL.md` for the wire format.
 
 - **Build:** Gradle with Kotlin DSL and a version catalog (`gradle/libs.versions.toml`), JDK 17
 - **Versions:** applicationId `app.pairline.android` (provisional, D-007), minSdk 30, compileSdk 37, targetSdk 36
-- **UI:** Jetpack Compose, Material 3, English / Persian / Arabic (D-019)
+- **UI:** Jetpack Compose, Material 3, English / Persian / Arabic / Turkish (D-019)
 - **Permissions:** no `INTERNET` in release builds until M5. Every permission is listed in `../docs/PRIVACY.md`.
 
 ## Layout

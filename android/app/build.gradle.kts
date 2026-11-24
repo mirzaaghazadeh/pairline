@@ -24,9 +24,9 @@ android {
     }
 
     androidResources {
-        // The app ships in English, Persian and Arabic (D-019). Dropping the other languages that
+        // The app ships in English, Persian, Arabic and Turkish (D-019). Dropping the other languages that
         // libraries bring along keeps every screen in one language.
-        localeFilters += listOf("en", "fa", "ar")
+        localeFilters += listOf("en", "fa", "ar", "tr")
     }
 
     buildTypes {

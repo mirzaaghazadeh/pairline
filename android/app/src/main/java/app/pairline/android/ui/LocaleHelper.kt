@@ -15,7 +15,7 @@ import java.util.Locale
  */
 object LocaleHelper {
     /** Language tags offered in Settings; "" follows the system. */
-    val SUPPORTED = listOf("", "en", "fa", "ar")
+    val SUPPORTED = listOf("", "en", "fa", "ar", "tr")
 
     fun current(context: Context): String {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

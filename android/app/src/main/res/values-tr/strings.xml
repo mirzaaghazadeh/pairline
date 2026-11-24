@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- app_name is not translated (D-001); it comes from values/strings.xml. -->
+    <!-- Used inside sentences: "Connected to your iPhone". -->
+    <string name="generic_iphone">iPhone\'unuz</string>
+    <!-- Used as a name on its own, when the iPhone hasn't told us its model yet. -->
+    <string name="generic_iphone_name">iPhone</string>
+
+    <!-- Common actions -->
+    <string name="action_back">Geri</string>
+    <string name="action_cancel">İptal</string>
+    <string name="action_continue">Devam</string>
+    <string name="action_done">Bitti</string>
+    <string name="action_done_continue">Bunu yaptım, devam et</string>
+    <string name="action_allow">İzin ver</string>
+    <string name="action_fix">Düzelt</string>
+    <string name="action_get_started">Başlayın</string>
+    <string name="action_not_now">Şimdi değil</string>
+    <string name="action_skip_for_now">Şimdilik atla</string>
+    <string name="action_try_again">Tekrar dene</string>
+    <string name="action_open_app_info">Uygulama bilgilerini aç</string>
+    <string name="action_open_settings">Ayarları aç</string>
+    <string name="action_open_pairline">Pairline\'ı aç</string>
+    <string name="action_turn_on_bt">Bluetooth\'u aç</string>
+    <string name="action_understood">Anladım</string>
+
+    <!-- Persistent notification of the link service -->
+    <string name="notif_channel_link">Bağlantı durumu</string>
+    <string name="notif_channel_link_desc">iPhone\'unuzun bağlı olup olmadığını gösterir. Android, Pairline\'ın çalışmaya devam edebilmesi için bu bildirimi zorunlu tutar.</string>
+    <string name="notif_connected_title">%1$s bağlı</string>
+    <string name="notif_connected_text">Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
+    <string name="notif_waiting_title">iPhone\'unuz bekleniyor</string>
+    <string name="notif_waiting_text">iPhone\'unuz yakında olduğunda ve Bluetooth açıkken Pairline otomatik olarak yeniden bağlanır.</string>
+    <string name="notif_not_paired_title">Henüz eşleştirilmedi</string>
+    <string name="notif_not_paired_text">Pairline\'ı açın ve kodu iPhone\'unuzla tarayın.</string>
+    <string name="notif_bt_off_title">Bluetooth kapalı</string>
+    <string name="notif_bt_off_text">iPhone\'unuzun bağlanabilmesi için Bluetooth\'u açın.</string>
+    <string name="notif_permission_title">İzin gerekiyor</string>
+    <string name="notif_permission_text">iPhone\'unuzun bağlanabilmesi için Pairline\'ı açıp Yakındaki cihazlar iznini verin.</string>
+
+    <!-- Setup: welcome -->
+    <string name="welcome_title">Android SIM\'iniz, iPhone\'unuzda</string>
+    <string name="welcome_body">Pairline bu telefonu bir köprüye dönüştürür. Telefonu yakınınızda tutun ve SIM kartını iPhone\'unuzdan kullanın.</string>
+    <string name="welcome_point_calls">Aramaları görün, yanıtlayın ve arama yapın</string>
+    <string name="welcome_point_sms">Mesajları okuyun ve gönderin</string>
+    <string name="welcome_point_contacts">Kişilere ve arama geçmişine de erişin</string>
+    <string name="welcome_point_ussd">Bakiyenizi kontrol edin ve USSD kodları çalıştırın</string>
+
+    <!-- Setup: privacy promise -->
+    <string name="privacy_title">Verileriniz iki telefonunuzun arasında kalır</string>
+    <string name="privacy_body">Pairline\'ın sunucusu yoktur. Mesajlarınız, aramalarınız ve kişileriniz bu telefondan doğrudan iPhone\'unuza gider, başka hiçbir yere gitmez.</string>
+    <string name="privacy_point_e2e">Her şey, yalnızca telefonlarınızda bulunan anahtarlarla uçtan uca şifrelenir</string>
+    <string name="privacy_point_accounts">Hesap yok, kayıt yok, telefon numarası doğrulaması yok</string>
+    <string name="privacy_point_tracking">Reklam, analiz veya herhangi bir izleme yok</string>
+    <string name="privacy_point_source">Kaynak kodu herkese açıktır, böylece herkes inceleyebilir</string>
+
+    <!-- Setup: Android 11 notice -->
+    <string name="android11_title">Bu telefon Android 11 kullanıyor</string>
+    <string name="android11_body">Pairline burada çalışır, ancak Android 11 artık güvenlik güncellemesi almıyor. SIM kartınızı taşıyan ve mesajlarınızı aktaran bir telefon olabildiğince güvenli olmalıdır.</string>
+    <string name="android11_tip">En iyi seçenek: yalnızca köprü olarak kullandığınız, üzerinde başka uygulama olmayan yedek bir telefon.</string>
+
+    <!-- Setup and Settings: permissions -->
+    <string name="perm_bt_title">iPhone\'unuzu bulma ve ona bağlanma</string>
+    <string name="perm_bt_why">Pairline, iPhone\'unuzla Bluetooth üzerinden iletişim kurar. Android bu izne \"Yakındaki cihazlar\" adını verir.</string>
+    <string name="perm_bt_detail">Bu izin yalnızca Pairline\'ın kendini eşleştirilmiş iPhone\'unuza tanıtmasını sağlar. Konumunuzu kullanmaz.</string>
+    <string name="perm_sms_title">SMS mesajları</string>
+    <string name="perm_sms_why">Yeni mesajları iPhone\'unuzda göstermek, oradan yanıt göndermek ve mesaj geçmişinizi yüklemek için.</string>
+    <string name="perm_sms_detail">Mesajlarınız her zamanki gibi Android\'in kendi mesajlaşma uygulamasında kalır. Pairline kopyalarını saklamaz.</string>
+    <string name="perm_phone_title">Telefon aramaları ve SIM kartlar</string>
+    <string name="perm_phone_why">Bir arama geldiğinde iPhone\'unuza haber vermek, aramayı oradan yanıtlamak veya sonlandırmak, arama yapmak ve USSD kodları çalıştırmak için.</string>
+    <string name="perm_phone_detail">Bu izin ayrıca iPhone\'unuzun operatörünüzü, sinyal gücünü ve hangi SIM\'in kullanılacağını göstermesini sağlar.</string>
+    <string name="perm_calllog_title">Arama geçmişi</string>
+    <string name="perm_calllog_why">Kimin aradığını ve arama geçmişinizi iPhone\'unuzda göstermek için.</string>
+    <string name="perm_calllog_detail">Android 12 ve sonraki sürümlerde arayanın numarası yalnızca bu izinle alınabilir.</string>
+    <string name="perm_contacts_title">Kişiler</string>
+    <string name="perm_contacts_why">Arayanların adlarını ve kişilerinizi iPhone\'unuzda göstermek için.</string>
+    <string name="perm_contacts_detail">Pairline kişileri yalnızca okur. iPhone\'dan kişi eklemek ayrı bir seçenektir ve varsayılan olarak kapalıdır.</string>
+    <string name="perm_notif_title">Durum bildirimi</string>
+    <string name="perm_notif_why">Android, Pairline\'ın arka planda çalışmaya devam edebilmesi için bir bildirim gerektirir. Bu bildirim iPhone\'unuzun bağlı olup olmadığını gösterir.</string>
+    <string name="perm_notif_detail">Pairline bildirimlerde mesaj metni veya numara göstermez.</string>
+    <string name="perm_granted_note">İzin verildi. Teşekkürler!</string>
+    <string name="perm_denied_note">Bu izin olmadan bazı özellikler iPhone\'unuzda çalışmaz. İzni daha sonra Ayarlar → İzinler bölümünden verebilirsiniz.</string>
+    <string name="perm_optional_note">İsteğe bağlı. Geri kalan her şey bu izin olmadan da çalışır.</string>
+    <string name="perm_blocked_note">Android bir daha sormayacak. Uygulama bilgileri → İzinler bölümünü açın ve izni oradan verin.</string>
+    <string name="perm_blocked_note_13">Android bir daha sormayacak. Uygulama bilgileri → İzinler bölümünü açın ve izni oradan verin. Android bunun \"kısıtlanmış ayar\" olduğunu söylerse önce Uygulama bilgileri ekranında ⋮ simgesine dokunun ve \"Kısıtlanmış ayarlara izin ver\" seçeneğini belirleyin.</string>
+    <string name="perm_state_granted">İzin verildi</string>
+    <string name="perm_state_needed">Gerekli</string>
+    <string name="perm_state_optional">İsteğe bağlı</string>
+    <string name="perm_state_blocked">Engellendi</string>
+    <string name="permissions_title">İzinler</string>
+    <string name="permissions_intro">Pairline\'ın bu telefonda neler yapabileceği ve nedenleri. İzin verilmemiş bir öğeyi düzeltmek için ona dokunun.</string>
+
+    <!-- Setup: background running -->
+    <string name="battery_title">Pairline\'ı çalışır durumda tutun</string>
+    <string name="battery_body">Android, pil tasarrufu için arka plandaki uygulamaları duraklatır. Aramaların ve mesajların iPhone\'unuza hemen ulaşması için Pairline\'ın uyanık kalması gerekir.</string>
+    <string name="battery_allow">Arka planda çalışmaya izin ver</string>
+    <string name="battery_note">Android bunu kendi penceresinde soracak. Pairline beklerken çok az pil kullanır.</string>
+    <string name="battery_done_note">Pairline\'ın arka planda çalışmasına izin verildi.</string>
+
+    <!-- Setup: maker-specific background settings -->
+    <string name="autostart_title">%1$s telefonlarında bir ayar daha</string>
+    <string name="autostart_body">Telefonunuzun üreticisi, Pairline\'ı durdurabilecek kendi pil yöneticisini ekliyor. Çalışmasına nasıl izin vereceğiniz aşağıda.</string>
+    <string name="maker_xiaomi">Xiaomi, Redmi ve POCO</string>
+    <string name="maker_samsung">Samsung</string>
+    <string name="maker_oppo">Oppo, Realme ve OnePlus</string>
+    <string name="maker_vivo">Vivo ve iQOO</string>
+    <string name="maker_huawei">Huawei ve Honor</string>
+    <!-- Capitalized: in Turkish it only starts a phrase ("Telefonunuz için ipuçları", "Adım 2: Telefonunuz"). -->
+    <string name="maker_other">Telefonunuz</string>
+    <string name="maker_xiaomi_steps">1. \"Ayarları aç\" düğmesine dokunun ve Pairline için otomatik başlatmayı açın.\n2. Ayarlar → Uygulamalar → Pairline → Pil tasarrufu bölümünde \"Kısıtlama yok\" seçeneğini belirleyin.\n3. Son uygulamaları açın, Pairline\'a uzun basın ve kilit simgesine dokunun.</string>
+    <string name="maker_samsung_steps">1. Ayarlar → Uygulamalar → Pairline → Pil bölümünde \"Kısıtlanmamış\" seçeneğini belirleyin.\n2. Ayarlar → Pil → Arka plan kullanım sınırları bölümünde Pairline\'ın \"Uyku modundaki uygulamalar\" veya \"Derin uyku modundaki uygulamalar\" listesinde olmadığından emin olun. Pairline\'ı \"Hiçbir zaman uyku moduna geçmeyen uygulamalar\" listesine ekleyebilirsiniz.</string>
+    <string name="maker_oppo_steps">1. \"Ayarları aç\" düğmesine dokunun ve Pairline için otomatik başlatmaya izin verin.\n2. Ayarlar → Pil → Pairline bölümünde arka plan etkinliğine izin verin veya \"Optimize etme\" seçeneğini belirleyin.\n3. Son uygulamaları açın ve Pairline\'ı kilitleyin.</string>
+    <string name="maker_vivo_steps">1. \"Ayarları aç\" düğmesine dokunun ve Pairline\'ın arka planda başlamasına izin verin.\n2. Ayarlar → Pil → Arka plan güç tüketimi bölümünde Pairline için yüksek arka plan güç kullanımına izin verin.</string>
+    <string name="maker_huawei_steps">1. \"Ayarları aç\" düğmesine dokunun (Uygulama başlatma), Pairline\'ı \"Manuel olarak yönet\" moduna alın ve Otomatik başlatma, İkincil başlatma ve Arka planda çalıştır seçeneklerini açın.\n2. Son uygulamaları açın ve Pairline\'ı kilitleyin.</string>
+    <string name="maker_other_steps">Genellikle Android\'in kendi pil muafiyeti yeterlidir. Ekran kapalıyken bağlantı yine de kopuyorsa Ayarlar → Uygulamalar → Pairline → Pil bölümünde \"Kısıtlanmamış\" veya \"Arka plan etkinliğine izin ver\" gibi bir seçenek arayın.</string>
+
+    <!-- Pairing -->
+    <string name="pair_title">iPhone\'unuzu eşleştirin</string>
+    <string name="pair_step_1">Pairline\'ı iPhone\'unuza yükleyin ve açın.</string>
+    <string name="pair_step_2">\"Köprü telefon eşleştir\" düğmesine dokunun.</string>
+    <string name="pair_step_3">iPhone\'unuzun kamerasını bu koda doğrultun.</string>
+    <string name="pair_expires">Kodun kalan süresi: %1$s</string>
+    <string name="pair_new_code">Yeni kod</string>
+    <string name="pair_keep_open">iPhone\'unuz eşleştirmenin tamamlandığını söyleyene kadar bu ekranı açık tutun. Kod 5 dakika boyunca yalnızca bir kez çalışır ve yalnızca bu ekranı görebilen biri tarafından kullanılabilir.</string>
+    <string name="pair_replaces">Yeni bir iPhone eşleştirirseniz %1$s ile olan eşleştirme kaldırılır.</string>
+    <string name="pair_success_title">Eşleştirildi!</string>
+    <string name="pair_success_text">iPhone\'unuz ve bu telefon artık birbirine güveniyor. Aralarında gidip gelenleri yalnızca onlar okuyabilir.</string>
+    <string name="pair_connecting">Bağlanıyor…</string>
+    <string name="pair_connected">Bağlandı. iPhone\'unuz artık bu telefonun SIM kartını kullanabilir.</string>
+    <string name="pair_too_many">Birisi birkaç kez yanlış kod denediği için bu kod iptal edildi. iPhone\'unuz hazır olduğunda yeni bir kod oluşturun.</string>
+    <string name="pair_need_bt">Bluetooth kapalı. iPhone\'unuzun bu telefonu bulabilmesi için Bluetooth\'u açın.</string>
+    <string name="pair_need_bt_perm">iPhone\'unuzun bu telefonu bulabilmesi için Yakındaki cihazlar iznini verin.</string>
+    <string name="pair_bt_problem">Bu telefon şu anda Bluetooth bağlantısı sunamıyor. Bluetooth\'u kapatıp yeniden açmayı veya telefonu yeniden başlatmayı deneyin.</string>
+    <string name="pair_qr_desc">Eşleştirme kodu. iPhone\'unuzdaki Pairline ile tarayın.</string>
+    <string name="pair_later">Daha sonra eşleştir</string>
+
+    <!-- Setup: done -->
+    <string name="done_title">Her şey hazır</string>
+    <string name="done_body_paired">Bu telefonu şarjlı ve iPhone\'unuzun yakınında tutun. Artık telefonu bir kenara bırakabilirsiniz; Pairline arka planda çalışmaya devam eder.</string>
+    <string name="done_body_unpaired">Pairline hazır. iPhone\'unuzu istediğiniz zaman ana ekrandan eşleştirebilirsiniz.</string>
+    <string name="done_note">Küçük bir bildirim Pairline\'ın çalıştığını gösterir. Bağlantı durumunu görmek için istediğiniz zaman bu bildirime dokunabilirsiniz.</string>
+
+    <!-- Home -->
+    <string name="state_connected">Bağlı</string>
+    <string name="state_searching">Bekleniyor</string>
+    <string name="state_not_paired">Eşleştirilmedi</string>
+    <string name="state_problem">İşlem gerekiyor</string>
+    <string name="home_connected_title">%1$s bağlı</string>
+    <string name="home_connected_body">Bluetooth üzerinden. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
+    <string name="home_connected_body_tcp">Hata ayıklama test bağlantısı üzerinden. Aramalar ve mesajlar aktarılıyor.</string>
+    <string name="home_waiting_title">%1$s bekleniyor</string>
+    <string name="home_waiting_body">Son bağlantı: %1$s. iPhone\'unuz yakındayken ve üzerinde Pairline açıkken veya arka planda çalışırken Pairline kendiliğinden yeniden bağlanır.</string>
+    <string name="home_waiting_never">iPhone\'unuz henüz bağlanmadı. Yakındayken ve Bluetooth açıkken iPhone\'da Pairline\'ı açın.</string>
+    <string name="home_not_paired_body">Bu telefonun SIM kartını iPhone\'unuzdan kullanmaya başlamak için eşleştirme yapın.</string>
+    <string name="home_bt_off_body">Bluetooth kapalıyken iPhone\'unuz bu telefona ulaşamaz.</string>
+    <string name="home_bt_perm_title">Yakındaki cihazlar izni verilmedi</string>
+    <string name="home_bt_perm_body">Pairline\'ın iPhone\'unuzla Bluetooth üzerinden iletişim kurabilmesi için bu izin gerekir.</string>
+    <string name="home_bt_unsupported_title">Bluetooth kullanılamıyor</string>
+    <string name="home_bt_unsupported_body">Bu telefon, Pairline\'ın ihtiyaç duyduğu Bluetooth aksesuarı rolünü üstlenemiyor.</string>
+    <string name="home_this_phone">Bu telefon</string>
+    <string name="home_battery">Pil</string>
+    <string name="home_battery_level">%%%1$d</string>
+    <string name="home_battery_charging">%%%1$d, şarj oluyor</string>
+    <string name="home_sim_slot">SIM %1$d</string>
+    <string name="home_no_service">Hizmet yok</string>
+    <string name="home_roaming">Dolaşım</string>
+    <string name="home_default_both">Varsayılan</string>
+    <string name="home_default_sms">SMS için varsayılan</string>
+    <string name="home_default_calls">Aramalar için varsayılan</string>
+    <string name="home_no_sims">SIM bulunamadı</string>
+    <string name="home_no_sims_sub">Bir SIM takın veya Pairline\'ın görebilmesi için \"Telefon aramaları ve SIM kartlar\" iznini verin.</string>
+    <string name="home_supports">iPhone\'unuzun yapabilecekleri</string>
+    <string name="home_keep_running">Kesintisiz çalışma</string>
+    <string name="home_battery_ok">Arka planda çalışmasına izin verildi</string>
+    <string name="home_battery_ok_sub">Android, pil tasarrufu için Pairline\'ı duraklatmaz.</string>
+    <string name="home_battery_restricted">Pil optimizasyonu açık</string>
+    <string name="home_battery_restricted_sub">Android, ekran kapalıyken Pairline\'ı duraklatabilir; aramalar veya mesajlar geç gelebilir.</string>
+    <string name="home_notifications_off">Bildirimler kapalı</string>
+    <string name="home_notifications_off_sub">Durum bildirimi olmadan Android, Pairline\'ı durdurabilir.</string>
+    <string name="home_keepalive_sub">%1$s için ipuçları</string>
+    <string name="home_actions">Diğer</string>
+    <string name="home_pair">iPhone eşleştir</string>
+    <string name="home_pair_new">Yeni bir iPhone eşleştir</string>
+    <string name="home_pair_sub">Eşleştirme kodunu göster</string>
+    <string name="home_unpair">iPhone eşleştirmesini kaldır</string>
+    <string name="home_unpair_sub">İki telefon da birbirini unutur</string>
+    <string name="home_diag_sub">Sorun giderme için okunabilir bir rapor</string>
+    <string name="home_debug_tcp_on">Hata ayıklama derlemesi: 127.0.0.1:47800 adresindeki test bağlantısı dinliyor.</string>
+    <string name="home_debug_tcp_off">Hata ayıklama derlemesi: test bağlantısı dinlemiyor.</string>
+
+    <!-- Capabilities -->
+    <string name="cap_sms_receive">Mesaj alma</string>
+    <string name="cap_sms_send">Mesaj gönderme</string>
+    <string name="cap_sms_history">Mesaj geçmişi</string>
+    <string name="cap_call_observe">Gelen aramaları görme</string>
+    <string name="cap_call_control">Aramaları yanıtlama, reddetme ve sonlandırma</string>
+    <string name="cap_call_dial">Arama yapma</string>
+    <string name="cap_call_dtmf">Arama sırasında tuş takımı, sesi kapatma ve hoparlör</string>
+    <string name="cap_contacts">Kişiler</string>
+    <string name="cap_calllog">Arama geçmişi</string>
+    <string name="cap_contacts_add">iPhone\'dan kişi ekleme</string>
+    <string name="cap_ussd">USSD kodları</string>
+    <string name="cap_dualsim">İki SIM arasında seçim</string>
+    <string name="cap_missing_sms">SMS mesajları izni gerekiyor.</string>
+    <string name="cap_missing_phone">Telefon aramaları izni gerekiyor.</string>
+    <string name="cap_missing_calllog">Arama geçmişi izni gerekiyor.</string>
+    <string name="cap_missing_contacts">Kişiler izni gerekiyor.</string>
+    <string name="cap_missing_contacts_add">Kapalı. İsterseniz Ayarlar\'dan açın.</string>
+    <string name="cap_missing_companion">Çoğu telefon, uygulamaların bir aramanın sesini kontrol etmesine henüz izin vermiyor. Bunlar için Android telefonu kullanın.</string>
+    <string name="cap_missing_dualsim">Yalnızca bir SIM etkin.</string>
+
+    <!-- Unpair dialog -->
+    <string name="unpair_title">iPhone\'unuzun eşleştirmesi kaldırılsın mı?</string>
+    <string name="unpair_body">Bu telefon iPhone\'unuzun anahtarını unutur; iPhone\'unuz bağlıysa ona da bu telefonu unutması söylenir. Pairline\'ı yeniden kullanmak için yeni bir kod taramanız gerekir.</string>
+    <string name="unpair_confirm">Eşleştirmeyi kaldır</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_general">Genel</string>
+    <string name="settings_language">Dil</string>
+    <string name="settings_language_system">Sistem varsayılanı</string>
+    <string name="settings_iphone">iPhone\'unuz</string>
+    <string name="settings_ios_version">iOS %1$s</string>
+    <string name="settings_app_version">Pairline %1$s</string>
+    <string name="settings_paired_since">Eşleştirme tarihi: %1$s</string>
+    <string name="settings_contacts_add">iPhone\'dan kişi ekleme</string>
+    <string name="settings_contacts_add_sub">iPhone\'unuzun bu telefona yeni kişiler kaydetmesine izin verir. Varsayılan olarak kapalıdır.</string>
+    <string name="settings_background">Arka planda çalışma</string>
+    <string name="settings_permissions_sub">Pairline\'ın neler yapabileceğini görün ve değiştirin</string>
+    <string name="settings_support">Yardım</string>
+    <string name="settings_help_sub">Kurulum, pil, sorun giderme, izinler</string>
+    <string name="settings_rerun_setup">Kurulumu yeniden çalıştır</string>
+    <string name="settings_rerun_setup_body">Kurulum adımlarını yeniden uygulayın. Eşleştirmeniz ve ayarlarınız olduğu gibi kalır.</string>
+    <string name="settings_about">Hakkında</string>
+    <string name="settings_version">Sürüm</string>
+    <string name="settings_license">Lisans: FSL-1.1-ALv2</string>
+    <string name="settings_license_sub">Kullanımı ücretsizdir. Kod herkese açıktır, böylece herkes ne yaptığını inceleyebilir; her sürüm, yayımlanmasından iki yıl sonra Apache-2.0 lisansına geçer.</string>
+    <string name="settings_source">Kaynak kodu</string>
+    <string name="settings_source_sub">github.com/mirzaaghazadeh/pairline</string>
+    <string name="settings_privacy">Gizlilik</string>
+    <string name="settings_privacy_body">Pairline\'ın sunucusu, hesabı, reklamı veya analizi yoktur. Mesajlarınız, aramalarınız ve kişileriniz yalnızca eşleştirilmiş iPhone\'unuza, uçtan uca şifrelenmiş olarak gider. Köprü uygulamasının internet kullanma izni bile yoktur. Günlükler bu telefonda kalır ve yalnızca siz onları gördükten sonra paylaşmayı seçerseniz paylaşılır.</string>
+
+    <!-- Keep running -->
+    <string name="keepalive_title">Pairline\'ı çalışır durumda tutun</string>
+    <string name="keepalive_intro">Android ve telefon üreticileri pil tasarrufu için arka plandaki uygulamaları durdurur. Bu ayarlar Pairline\'ın iPhone\'unuza bağlı kalmasını sağlar.</string>
+    <string name="keepalive_step_battery">Adım 1: Android\'in pil optimizasyonu</string>
+    <string name="keepalive_step_maker">Adım 2: %1$s</string>
+    <string name="keepalive_other_makers">Diğer telefon üreticileri</string>
+    <string name="keepalive_general">Bunlar da işe yarar: Mümkün olduğunda telefonu şarjda tutun, Pairline\'ı zorla durdurmayın ve Bluetooth\'u açık bırakın.</string>
+    <string name="keepalive_never_changes">Pairline bu ayarları hiçbir zaman kendiliğinden değiştirmez. Yalnızca sizin için doğru ekranı açar.</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_title">Tanılama</string>
+    <string name="diag_intro">Bu, raporun tamamıdır ve tam olarak bu hâliyle paylaşılır. Raporda telefon numarası, ad, mesaj veya anahtar yoktur. Paylaş düğmesine dokunmadığınız sürece hiçbir şey gönderilmez.</string>
+    <string name="diag_copy">Kopyala</string>
+    <string name="diag_copied">Rapor kopyalandı</string>
+    <string name="diag_share">Paylaş</string>
+    <string name="diag_clear">Günlüğü temizle</string>
+    <string name="diag_clear_body">Bu telefonda kayıtlı günlük silinsin mi? Rapor sıfırdan başlar.</string>
+    <string name="diag_clear_confirm">Temizle</string>
+
+    <!-- Help -->
+    <string name="help_title">Yardım</string>
+    <string name="help_section_setup">Başlarken</string>
+    <string name="help_section_battery">Pil ve bağlı kalma</string>
+    <string name="help_section_trouble">Sorun giderme</string>
+    <string name="help_section_permissions">Bu izinler neden gerekli?</string>
+    <string name="help_section_privacy">Gizlilik</string>
+
+    <string name="help_q_what">Pairline ne yapar?</string>
+    <string name="help_a_what">iPhone\'unuzun bu Android telefonun SIM kartını kullanmasını sağlar. Gelen aramalar ve mesajlar iPhone\'unuzda görünür; oradan aramaları yanıtlayabilir, mesajlara cevap yazabilir, arama yapabilir ve USSD kodları çalıştırabilirsiniz. Bu telefon yakınınızda kalır ve aramaları ve mesajlaşmayı asıl o yapar.</string>
+    <string name="help_q_iphone">iPhone\'da neye ihtiyacım var?</string>
+    <string name="help_a_iphone">iPhone için Pairline uygulaması (iOS 16 veya üzeri) gerekir ve Bluetooth açık olmalıdır. İki telefonun Bluetooth menzili içinde olması gerekir; bu genellikle aynı oda ya da birkaç oda ötesi demektir.</string>
+    <string name="help_q_pair">Nasıl eşleştiririm?</string>
+    <string name="help_a_pair">Bu telefonda kod göstermek için \"iPhone eşleştir\" bölümünü açın. iPhone\'unuzda Pairline\'ı açın, \"Köprü telefon eşleştir\" düğmesine dokunun ve kodu tarayın. Kod yalnızca bir kez çalışır ve 5 dakika sonra geçerliliğini yitirir.</string>
+    <string name="help_q_spare">Her gün kullandığım Android telefonu kullanabilir miyim?</string>
+    <string name="help_a_spare">Evet. Yine de en basiti, yalnızca köprü görevi gören yedek bir telefondur: Şarjda kalabilir ve üzerindeki başka hiçbir şey pil veya izinler için onunla yarışmaz.</string>
+    <string name="help_q_default_sms">Pairline\'ı varsayılan SMS uygulamam yapmam gerekir mi?</string>
+    <string name="help_a_default_sms">Hayır. Android\'in kendi mesajlaşma uygulaması her zamanki gibi çalışmaya ve tüm mesajlarınızı saklamaya devam eder. Pairline mesajları yalnızca aktarır.</string>
+
+    <string name="help_q_disconnects">Bağlantı neden bazen kopuyor?</string>
+    <string name="help_a_disconnects">Genellikle Android veya telefon üreticisi pil tasarrufu için Pairline\'ı duraklattığı ya da telefonlar Bluetooth menzilinin dışına çıktığı için. \"Pairline\'ı çalışır durumda tutun\" bölümünden arka planda çalışmaya izin verin ve telefonunuza özel ipuçlarını uygulayın.</string>
+    <string name="help_q_battery_use">Pairline pili çok tüketir mi?</string>
+    <string name="help_a_battery_use">Pek değil. Bluetooth Low Energy tam olarak bunun için tasarlanmıştır ve Pairline bir şey olana kadar uykuda bekler.</string>
+    <string name="help_q_notification">Neden her zaman bir bildirim var?</string>
+    <string name="help_a_notification">Android, arka planda çalışan uygulamaların bir bildirim göstermesini zorunlu tutar. Bu bildirim iPhone\'unuzun bağlı olup olmadığını söyler ve hiçbir zaman mesaj metni veya numara göstermez.</string>
+    <string name="help_q_distance">Telefonlar birbirinden ne kadar uzakta olabilir?</string>
+    <string name="help_a_distance">Aşağı yukarı bir Bluetooth kulaklığın çalıştığı mesafe kadar: kapalı alanda genellikle 10 ila 30 metre, kalın duvarların arkasında daha az.</string>
+
+    <string name="help_q_not_found">iPhone\'um bu telefonu bulamıyor</string>
+    <string name="help_a_not_found">İki telefonda da Bluetooth\'un açık olduğundan, bu uygulamanın uyarı olmadan \"Bekleniyor\" veya \"Eşleştirilmedi\" gösterdiğinden ve iPhone\'da Pairline\'ın açık olduğundan emin olun. Yine de bağlanmazsa iki telefonda da Bluetooth\'u kapatıp yeniden açın.</string>
+    <string name="help_q_no_sms">Mesajlar iPhone\'uma ulaşmıyor</string>
+    <string name="help_a_no_sms">İzinler bölümünde \"SMS mesajları\" izninin verildiğinden ve ana ekranda \"Bağlı\" yazdığından emin olun. Bağlantı kesikken gelen mesajlar, yeniden bağlanıldığında iPhone\'da görünür.</string>
+    <string name="help_q_call_audio">Arama sırasında nereden konuşurum?</string>
+    <string name="help_a_call_audio">Şimdilik bu Android telefondan. Aramaları iPhone\'unuzdan yanıtlayabilir, reddedebilir ve sonlandırabilirsiniz, ancak arama sesi Android telefonda kalır. iPhone\'da ses desteği planlanıyor.</string>
+    <string name="help_q_dtmf">Neden iPhone\'umdan tuş takımını kullanamıyor veya sesi kapatamıyorum?</string>
+    <string name="help_a_dtmf">Android, devam eden bir aramayı yalnızca birkaç uygulamanın kontrol etmesine izin verir. Çoğu telefonda Pairline aramaları yanıtlayıp sonlandırabilir, ancak tuş sesleri gönderemez veya sesi kapatamaz. Telefonunuz izin verdiğinde Pairline bu özelliği otomatik olarak kullanır.</string>
+    <string name="help_q_restricted">Android \"Kısıtlanmış ayar\" diyor</string>
+    <string name="help_a_restricted">Android 13 ve sonraki sürümler, uygulama mağazası dışından yüklenen uygulamalar için bazı izinleri sınırlar. Pairline için Uygulama bilgileri ekranını açın, üstteki ⋮ simgesine dokunun ve \"Kısıtlanmış ayarlara izin ver\" seçeneğini belirleyin, ardından izni tekrar verin.</string>
+
+    <string name="help_q_perm_nearby">Yakındaki cihazlar (Bluetooth)</string>
+    <string name="help_a_perm_nearby">iPhone\'unuzla bağlantı bu izinle kurulur. Pairline kendini yalnızca anonim bir kimlikle tanıtır, hiçbir zaman adınızla veya numaranızla değil; konumunuzu da kullanmaz.</string>
+    <string name="help_q_perm_sms">SMS mesajları</string>
+    <string name="help_a_perm_sms">Gelen mesajları iPhone\'unuza aktarmak, orada yazdıklarınızı göndermek ve iPhone istediğinde mesaj geçmişinizi yüklemek için.</string>
+    <string name="help_q_perm_phone">Telefon aramaları ve SIM kartlar</string>
+    <string name="help_a_perm_phone">iPhone\'unuz adına aramaları fark etmek, yanıtlamak, reddetmek, sonlandırmak ve arama yapmak, USSD kodları çalıştırmak, SIM kartlarınızı ve sinyalinizi göstermek için.</string>
+    <string name="help_q_perm_calllog">Arama geçmişi</string>
+    <string name="help_a_perm_calllog">Arayanın numarasını (Android 12 ve sonraki sürümler bunu yalnızca bu izinle paylaşır), arama geçmişinizi ve bir aramanın cevapsız mı yoksa reddedilmiş mi olduğunu göstermek için.</string>
+    <string name="help_q_perm_contacts">Kişiler</string>
+    <string name="help_a_perm_contacts">Arayanların adlarını ve kişilerinizi iPhone\'da göstermek için. Kişi yazma ayrı bir seçenektir ve siz açmadığınız sürece kapalıdır.</string>
+    <string name="help_q_perm_notif">Bildirimler</string>
+    <string name="help_a_perm_notif">Android\'in arka planda çalışan uygulamalar için zorunlu tuttuğu durum bildirimi için.</string>
+    <string name="help_q_perm_battery">Pil optimizasyonu</string>
+    <string name="help_a_perm_battery">Pairline, Android\'in kendi penceresinde Android\'den kendisini duraklatmamasını ister. Bunu istediğiniz zaman Android ayarlarından değiştirebilirsiniz.</string>
+
+    <string name="help_q_data">Verilerim nereye gidiyor?</string>
+    <string name="help_a_data">Yalnızca eşleştirilmiş iPhone\'unuza, uçtan uca şifrelenmiş olarak. Pairline\'ın sunucusu yoktur ve köprü uygulamasının internet kullanma izni yoktur.</string>
+    <string name="help_q_logs">Tanılama raporunda neler var?</string>
+    <string name="help_a_logs">Sürümler, izinler ve bağlantı olayları gibi teknik ayrıntılar. Telefon numaraları, e-postalar, adlar, mesaj metinleri ve anahtarlar çıkarılır. Paylaşmaya karar vermeden önce raporun tamamını görürsünüz.</string>
+    <string name="help_q_unpair">Eşleştirmeyi kaldırdığımda ne olur?</string>
+    <string name="help_a_unpair">İki telefon da birbirinin anahtarını siler, böylece artık birbirleriyle iletişim kuramazlar. Mesajlarınız ve kişileriniz bu telefonda oldukları yerde kalır.</string>
+</resources>
