@@ -18,11 +18,13 @@ DESCRIPTION = ("Pairline puts the SIM card of your Android phone on your iPhone 
                "your own two phones. Install the free Pairline Bridge app on the Android phone from "
                "https://getpairline.com/download, then pair the two phones with the QR code. No Android phone "
                "at hand? Demo mode shows the whole app with sample data.")
-WHAT_TO_TEST = ("First beta. Please try: pairing with the QR code; receiving and sending SMS; copying one-time "
-                "codes; incoming calls while the iPhone is locked; calling from the iPhone; contacts and call "
-                "history; USSD codes; the widget; and leaving both phones for an hour and checking that messages "
-                "still arrive. Call audio still plays on the Android phone in this version. Send feedback with a "
-                "screenshot from TestFlight.")
+WHAT_TO_TEST = ("Please try: pairing with the QR code; receiving and sending SMS; copying one-time codes; incoming "
+                "calls while the iPhone is locked; calling from the iPhone; Talk on iPhone (call audio on the "
+                "iPhone, needs Pairline Bridge 1.1 with Shizuku on the Android phone and both phones on the same "
+                "Wi-Fi or hotspot); internet sharing; sending files; deleting messages and calls; the block list; "
+                "contacts and call history; USSD codes; and leaving both phones for an hour and checking that "
+                "messages still arrive. Demo mode now shows Talk on iPhone and internet sharing as ready. Send "
+                "feedback with a screenshot from TestFlight.")
 
 
 def ok(status, data, what):
