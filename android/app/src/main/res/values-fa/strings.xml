@@ -188,9 +188,6 @@
     <string name="home_debug_tcp_off">نسخهٔ دیباگ: اتصال آزمایشی فعال نیست.</string>
 
     <!-- Wi-Fi link and files (M5) -->
-    <string name="link_bluetooth">بلوتوث</string>
-    <string name="link_wifi">وای‌فای</string>
-    <string name="link_both">بلوتوث + وای‌فای</string>
     <string name="home_connected_body_wifi">از طریق وای‌فای. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
     <string name="home_connected_body_both">از طریق بلوتوث و وای‌فای. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
     <string name="home_bt_off_wifi_body">بلوتوث خاموش است، اما آیفون شما هنوز می‌تواند از طریق همان شبکهٔ وای‌فای وصل شود.</string>

@@ -189,9 +189,6 @@
     <string name="home_debug_tcp_off">Debug build: the test link isn\'t listening.</string>
 
     <!-- Wi-Fi link and files (M5) -->
-    <string name="link_bluetooth">Bluetooth</string>
-    <string name="link_wifi">Wi-Fi</string>
-    <string name="link_both">Bluetooth + Wi-Fi</string>
     <string name="home_connected_body_wifi">Over Wi-Fi. Calls and messages are being relayed to your iPhone.</string>
     <string name="home_connected_body_both">Over Bluetooth and Wi-Fi. Calls and messages are being relayed to your iPhone.</string>
     <string name="home_bt_off_wifi_body">Bluetooth is off, but your iPhone can still connect over the same Wi-Fi network.</string>

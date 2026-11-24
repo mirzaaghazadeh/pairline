@@ -12,6 +12,7 @@ import android.os.Looper
 import android.util.SparseIntArray
 import androidx.annotation.RequiresApi
 import androidx.core.location.LocationManagerCompat
+import androidx.core.util.isEmpty
 import app.pairline.android.log.Log
 import app.pairline.android.telephony.Perms
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -194,7 +195,7 @@ class BridgeHotspot(private val context: Context) {
     @RequiresApi(36)
     private fun bandOf(c: SoftApConfiguration): String? {
         val channels = c.channels
-        if (channels.size() == 0) return null
+        if (channels.isEmpty()) return null
         return when (channels.keyAt(0)) {
             SoftApConfiguration.BAND_2GHZ -> "2.4"
             SoftApConfiguration.BAND_5GHZ -> "5"

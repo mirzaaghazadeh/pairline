@@ -189,9 +189,6 @@
     <string name="home_debug_tcp_off">إصدار تصحيح: رابط الاختبار ليس في وضع الاستماع.</string>
 
     <!-- Wi-Fi link and files (M5) -->
-    <string name="link_bluetooth">بلوتوث</string>
-    <string name="link_wifi">واي فاي</string>
-    <string name="link_both">بلوتوث + واي فاي</string>
     <string name="home_connected_body_wifi">عبر الواي فاي. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
     <string name="home_connected_body_both">عبر البلوتوث والواي فاي. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
     <string name="home_bt_off_wifi_body">البلوتوث متوقف، لكن ما زال بإمكان آيفونك الاتصال عبر شبكة الواي فاي نفسها.</string>

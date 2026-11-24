@@ -79,7 +79,13 @@ class FileTransfers(private val context: Context, private val link: LinkManager)
 
     private val queue = ArrayDeque<Outgoing>()
     private var active: Outgoing? = null
+
+    /** Incoming transfers by the iPhone's fid; [preparing] holds offers whose storage is being created. */
     private val incoming = HashMap<Long, Incoming>()
+    private val preparing = HashSet<Long>()
+
+    /** MediaStore calls (create, publish), which can take half a second. */
+    private val storage = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-files-storage") }
 
     // --- Sending ------------------------------------------------------------------------------------------------
 
@@ -278,17 +284,30 @@ class FileTransfers(private val context: Context, private val link: LinkManager)
             Log.i(TAG, "refused a file from the iPhone ($reason)")
             link.reply(token, Messages.fileAnswer(fid, false, reason))
         }
-        if (incoming.containsKey(fid)) return refuse("busy")
+        if (incoming.containsKey(fid) || fid in preparing) return refuse("busy")
         if (size < 0 || size > Proto.FILE_MAX_SIZE) return refuse("too_large")
-        if (incoming.size >= MAX_INCOMING) return refuse("busy")
-        if (!FileStore.hasRoomFor(context, size)) return refuse("no_space")
-        val sink = FileStore.createSink(context, name, mime) ?: return refuse("failed")
-        val entry = Incoming(ids.getAndIncrement(), fid, token, size, sink)
-        incoming[fid] = entry
-        publish(TransferItem(entry.id, false, name, size, 0, TransferPhase.ACTIVE))
-        Log.i(TAG, "file ${entry.id}: receiving from the iPhone")
-        link.reply(token, Messages.fileAnswer(fid, true))
-        if (size == 0L) complete(entry)
+        if (incoming.size + preparing.size >= MAX_INCOMING) return refuse("busy")
+        preparing += fid
+        // Creating the Downloads entry is a slow call into MediaStore: keep it off the link thread, which also
+        // carries the Bluetooth session. No data arrives before our file.answer, so nothing is missed meanwhile.
+        storage.execute {
+            val sink = if (FileStore.hasRoomFor(context, size)) FileStore.createSink(context, name, mime) else null
+            val reason = if (sink == null && !FileStore.hasRoomFor(context, size)) "no_space" else "failed"
+            linkThread {
+                preparing -= fid
+                if (sink == null) return@linkThread refuse(reason)
+                if (link.wifiToken != token) {
+                    sink.abort() // the Wi-Fi session ended meanwhile
+                    return@linkThread
+                }
+                val entry = Incoming(ids.getAndIncrement(), fid, token, size, sink)
+                incoming[fid] = entry
+                publish(TransferItem(entry.id, false, name, size, 0, TransferPhase.ACTIVE))
+                Log.i(TAG, "file ${entry.id}: receiving from the iPhone")
+                link.reply(token, Messages.fileAnswer(fid, true))
+                if (size == 0L) complete(entry)
+            }
+        }
     }
 
     override fun onBulk(token: Long, plaintext: ByteArray) {
@@ -316,20 +335,23 @@ class FileTransfers(private val context: Context, private val link: LinkManager)
         }
     }
 
+    /** All bytes are in: publish the file (a MediaStore call, off the link thread) and tell the iPhone. */
     private fun complete(entry: Incoming) {
         incoming.remove(entry.fid)
-        val uri = try {
-            entry.sink.commit()
-        } catch (e: Exception) {
-            Log.w(TAG, "file ${entry.id}: saving failed", e)
-            entry.sink.abort()
-            link.reply(entry.token, Messages.fileDone(entry.fid, false, "failed"))
-            update(entry.id) { it.copy(phase = TransferPhase.FAILED, reason = "failed") }
-            return
+        storage.execute {
+            val uri = try {
+                entry.sink.commit()
+            } catch (e: Exception) {
+                Log.w(TAG, "file ${entry.id}: saving failed", e)
+                entry.sink.abort()
+                link.reply(entry.token, Messages.fileDone(entry.fid, false, "failed"))
+                update(entry.id) { it.copy(phase = TransferPhase.FAILED, reason = "failed") }
+                return@execute
+            }
+            link.reply(entry.token, Messages.fileDone(entry.fid, true))
+            Log.i(TAG, "file ${entry.id}: received")
+            update(entry.id) { it.copy(phase = TransferPhase.DONE, transferred = entry.size, uri = uri) }
         }
-        link.reply(entry.token, Messages.fileDone(entry.fid, true))
-        Log.i(TAG, "file ${entry.id}: received")
-        update(entry.id) { it.copy(phase = TransferPhase.DONE, transferred = entry.size, uri = uri) }
     }
 
     private fun fail(entry: Incoming, reason: String) {

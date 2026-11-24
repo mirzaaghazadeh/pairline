@@ -189,9 +189,6 @@
     <string name="home_debug_tcp_off">Hata ayıklama derlemesi: test bağlantısı dinlemiyor.</string>
 
     <!-- Wi-Fi link and files (M5) -->
-    <string name="link_bluetooth">Bluetooth</string>
-    <string name="link_wifi">Wi-Fi</string>
-    <string name="link_both">Bluetooth + Wi-Fi</string>
     <string name="home_connected_body_wifi">Wi-Fi üzerinden. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
     <string name="home_connected_body_both">Bluetooth ve Wi-Fi üzerinden. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
     <string name="home_bt_off_wifi_body">Bluetooth kapalı, ancak iPhone\'unuz aynı Wi-Fi ağı üzerinden yine de bağlanabilir.</string>
