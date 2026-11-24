@@ -24,6 +24,7 @@
     <string name="action_open_pairline">فتح Pairline</string>
     <string name="action_turn_on_bt">تشغيل البلوتوث</string>
     <string name="action_understood">فهمت</string>
+    <string name="action_close">إغلاق</string>
 
     <!-- Persistent notification of the link service -->
     <string name="notif_channel_link">حالة الاتصال</string>
@@ -38,6 +39,9 @@
     <string name="notif_bt_off_text">شغّل البلوتوث ليتمكن آيفونك من الاتصال.</string>
     <string name="notif_permission_title">مطلوب إذن</string>
     <string name="notif_permission_text">افتح Pairline واسمح بإذن «الأجهزة المجاورة» ليتمكن آيفونك من الاتصال.</string>
+    <string name="notif_channel_updates">تحديثات التطبيق</string>
+    <string name="notif_channel_updates_desc">يُعلمك عند توفر إصدار جديد من Pairline Bridge.</string>
+    <string name="update_notif_text">انقر لمعرفة الجديد والتحديث.</string>
 
     <!-- Setup: welcome -->
     <string name="welcome_title">شريحة هاتفك الأندرويد على آيفونك</string>
@@ -54,6 +58,7 @@
     <string name="privacy_point_accounts">لا حساب ولا تسجيل ولا تحقق من رقم الهاتف</string>
     <string name="privacy_point_tracking">لا إعلانات ولا تحليلات ولا تتبّع من أي نوع</string>
     <string name="privacy_point_source">الشيفرة المصدرية منشورة علنًا، ليتمكن أي شخص من التحقق منها</string>
+    <string name="privacy_point_updates">يسأل GitHub مرة في اليوم عن إصدار أحدث من هذا التطبيق. يمكنك إيقاف ذلك من الإعدادات.</string>
 
     <!-- Setup: notice on Android 9, 10 and 11; %1$d is the Android version -->
     <string name="android11_title">يعمل هذا الهاتف بنظام أندرويد %1$d</string>
@@ -71,8 +76,8 @@
     <string name="perm_phone_why">لإعلام آيفونك بالمكالمات الواردة، والرد عليها أو إنهائها من هناك، وإجراء المكالمات، وتنفيذ رموز USSD.</string>
     <string name="perm_phone_detail">يتيح هذا أيضًا لآيفونك أن يعرض مشغّل شبكتك وقوة الإشارة، وأي شريحة تُستخدم.</string>
     <string name="perm_calllog_title">سجل المكالمات</string>
-    <string name="perm_calllog_why">لعرض هوية المتصل وسجل مكالماتك على آيفونك.</string>
-    <string name="perm_calllog_detail">في أندرويد ١٢ والإصدارات الأحدث، لا يتوفر رقم المتصل إلا بهذا الإذن.</string>
+    <string name="perm_calllog_why">لعرض هوية المتصل وسجل مكالماتك على آيفونك، ولحذف المكالمات التي تحذفها هناك.</string>
+    <string name="perm_calllog_detail">في أندرويد ١٢ والإصدارات الأحدث، لا يتوفر رقم المتصل إلا بهذا الإذن. لا يحذف Pairline أي مكالمة إلا عندما تحذفها أنت على آيفونك.</string>
     <string name="perm_contacts_title">جهات الاتصال</string>
     <string name="perm_contacts_why">لعرض أسماء المتصلين وجهات اتصالك على آيفونك.</string>
     <string name="perm_contacts_detail">يكتفي Pairline بقراءتها. أما إضافة جهات اتصال من الآيفون فهي خيار منفصل، ومتوقف افتراضيًا.</string>
@@ -201,6 +206,7 @@
     <string name="cap_contacts_add">إضافة جهات اتصال من الآيفون</string>
     <string name="cap_ussd">رموز USSD</string>
     <string name="cap_dualsim">الاختيار بين شريحتين</string>
+    <string name="cap_calllog_delete">حذف سجل المكالمات من الآيفون</string>
     <string name="cap_missing_sms">يحتاج إلى إذن «الرسائل النصية».</string>
     <string name="cap_missing_phone">يحتاج إلى إذن «المكالمات الهاتفية».</string>
     <string name="cap_missing_calllog">يحتاج إلى إذن «سجل المكالمات».</string>
@@ -238,7 +244,47 @@
     <string name="settings_source">الشيفرة المصدرية</string>
     <string name="settings_source_sub">&#x200F;github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">الخصوصية</string>
-    <string name="settings_privacy_body">لا يملك Pairline خوادم أو حسابات أو إعلانات أو تحليلات. تذهب رسائلك ومكالماتك وجهات اتصالك إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. بل إن تطبيق الجسر لا يملك حتى إذنًا باستخدام الإنترنت. تبقى السجلات على هذا الهاتف، ولا تُشارَك إلا إذا اخترت ذلك، بعد أن تطّلع عليها.</string>
+    <string name="settings_privacy_body">لا يملك Pairline خوادم أو حسابات أو إعلانات أو تحليلات. تذهب رسائلك ومكالماتك وجهات اتصالك إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. الاتصال الوحيد بالإنترنت الذي يجريه تطبيق الجسر من تلقاء نفسه هو التحقق اليومي من التحديثات على GitHub، ويمكنك إيقافه من قسم «التحديثات». تبقى السجلات على هذا الهاتف، ولا تُشارَك إلا إذا اخترت ذلك، بعد أن تطّلع عليها.</string>
+
+    <!-- Updates (D-042) -->
+    <string name="settings_updates">التحديثات</string>
+    <string name="settings_updates_auto">التحقق من وجود تحديثات</string>
+    <string name="settings_updates_auto_sub">يسأل Pairline موقع GitHub مرة في اليوم عمّا إذا كان هناك إصدار أحدث. لا يُرسَل أي شيء عنك أو عن هذا الهاتف.</string>
+    <string name="settings_updates_check_now">تحقّق الآن</string>
+    <string name="settings_updates_checking">جارٍ التحقق…</string>
+    <string name="settings_updates_never">لم يتم التحقق بعد</string>
+    <string name="settings_updates_current">الإصدار %1$s هو الأحدث. آخر تحقق: %2$s</string>
+    <string name="settings_updates_last">آخر تحقق: %1$s</string>
+    <string name="settings_updates_installed">المثبّت: %1$s</string>
+    <string name="update_available_title">يتوفر Pairline Bridge %1$s</string>
+    <string name="update_banner_body">لديك الإصدار %1$s. قبل أن يطلب منك أندرويد تثبيت التحديث، يتحقق Pairline من الملف الذي تم تنزيله بمطابقته مع المجموع الاختباري المنشور مع الإصدار ومع توقيع هذا التطبيق.</string>
+    <string name="update_action">تحديث</string>
+    <string name="update_whats_new">ما الجديد</string>
+    <string name="update_dialog_title">تحديث Pairline Bridge</string>
+    <string name="update_downloading">جارٍ تنزيل %1$s من GitHub…</string>
+    <string name="update_verifying">جارٍ التحقق من المجموع الاختباري للملف وتوقيعه…</string>
+    <string name="update_waiting">أكّد التحديث في شاشة أندرويد. إذا لم تُفتح، فانقر على «تثبيت».</string>
+    <string name="update_install">تثبيت</string>
+    <string name="update_failed_title">لم يُثبَّت التحديث</string>
+    <string name="update_permission_title">السماح بتثبيت التحديثات</string>
+    <string name="update_permission_body">يطلب منك أندرويد السماح لـ Pairline بتثبيت التحديثات. فعّل «السماح من هذا المصدر» لـ Pairline، ثم عُد. سيظل أندرويد يطلب تأكيدك لكل تحديث.</string>
+    <string name="update_error_network">تعذّر الوصول إلى GitHub. تحقق من اتصال هذا الهاتف بالإنترنت وحاول مرة أخرى.</string>
+    <string name="update_error_response">أرسل GitHub ردًّا غير متوقع. حاول لاحقًا.</string>
+    <string name="update_error_checksum">الملف الذي تم تنزيله لا يطابق المجموع الاختباري المنشور مع الإصدار، لذا لم يُثبَّت.</string>
+    <string name="update_error_signature">الملف الذي تم تنزيله ليس موقّعًا بالمفتاح نفسه الذي وُقّع به هذا التطبيق، لذا لم يُثبَّت.</string>
+    <string name="update_error_package">الملف الذي تم تنزيله ليس إصدارًا أحدث من هذا التطبيق، لذا لم يُثبَّت.</string>
+    <string name="update_error_storage">لا توجد مساحة فارغة كافية على هذا الهاتف للتحديث.</string>
+    <string name="update_error_install">تعذّر على أندرويد تثبيت التحديث. حاول مرة أخرى، أو نزّله من الموقع.</string>
+
+    <!-- Blocked numbers (D-043) -->
+    <string name="block_title">الأرقام المحظورة</string>
+    <string name="block_settings_sub">لا تصل رسائل هذه الأرقام ومكالماتها إلى آيفونك</string>
+    <string name="block_intro">لا تُرسَل الرسائل النصية من هذه الأرقام إلى آيفونك، وتُرفَض مكالماتها على هذا الهاتف (أو، إن لم يستطع Pairline إنهاء المكالمات هنا، فلا تظهر على الآيفون فحسب). يظل تطبيق الرسائل في أندرويد يستقبل رسائلها، لأن تطبيق الرسائل الافتراضي وحده يستطيع حظرها.</string>
+    <string name="block_add_hint">رقم هاتف أو اسم مرسِل</string>
+    <string name="block_add">حظر</string>
+    <string name="block_empty">لا توجد أرقام محظورة. احظر رقمًا هنا، أو من محادثة أو مكالمة أو جهة اتصال على آيفونك.</string>
+    <string name="block_remove">إلغاء حظر %1$s</string>
+    <string name="block_invalid">أدخل رقم هاتف أو اسم مرسِل.</string>
 
     <!-- Keep running -->
     <string name="keepalive_title">إبقاء Pairline قيد التشغيل</string>
@@ -305,7 +351,7 @@
     <string name="help_q_perm_phone">المكالمات الهاتفية وشرائح SIM</string>
     <string name="help_a_perm_phone">لرصد المكالمات، والرد عليها ورفضها وإنهائها وإجرائها نيابةً عن آيفونك، وتنفيذ رموز USSD، وعرض شرائحك وقوة الإشارة.</string>
     <string name="help_q_perm_calllog">سجل المكالمات</string>
-    <string name="help_a_perm_calllog">لعرض رقم المتصل (في أندرويد ١٢ والإصدارات الأحدث لا يُتاح الرقم إلا بهذا الإذن)، وسجل مكالماتك، وما إذا كانت المكالمة فائتة أو مرفوضة.</string>
+    <string name="help_a_perm_calllog">لعرض رقم المتصل (في أندرويد ١٢ والإصدارات الأحدث لا يُتاح الرقم إلا بهذا الإذن)، وسجل مكالماتك، وما إذا كانت المكالمة فائتة أو مرفوضة. وعندما تحذف مكالمات على آيفونك، يحذفها Pairline هنا أيضًا.</string>
     <string name="help_q_perm_contacts">جهات الاتصال</string>
     <string name="help_a_perm_contacts">لعرض أسماء المتصلين وجهات اتصالك على الآيفون. أما كتابة جهات الاتصال فهي خيار منفصل، ويبقى متوقفًا ما لم تفعّله.</string>
     <string name="help_q_perm_notif">الإشعارات</string>
@@ -314,7 +360,7 @@
     <string name="help_a_perm_battery">يطلب Pairline من أندرويد، عبر نافذة أندرويد نفسها، ألا يوقفه مؤقتًا. ويمكنك تغيير ذلك في أي وقت من إعدادات أندرويد.</string>
 
     <string name="help_q_data">إلى أين تذهب بياناتي؟</string>
-    <string name="help_a_data">إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. لا يملك Pairline أي خوادم، ولا يملك تطبيق الجسر إذنًا باستخدام الإنترنت.</string>
+    <string name="help_a_data">إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. لا يملك Pairline أي خوادم. الاتصال الآخر الوحيد هو التحقق اليومي من التحديثات على GitHub، وهو لا يرسل أي شيء عنك ويمكن إيقافه من الإعدادات.</string>
     <string name="help_q_logs">ماذا يتضمن تقرير التشخيص؟</string>
     <string name="help_a_logs">تفاصيل تقنية مثل الإصدارات والأذونات وأحداث الاتصال. وتُحذف منه أرقام الهواتف وعناوين البريد الإلكتروني والأسماء ونصوص الرسائل والمفاتيح. وترى التقرير كاملًا قبل أن تقرر مشاركته.</string>
     <string name="help_q_unpair">ماذا يحدث عند إلغاء الإقران؟</string>

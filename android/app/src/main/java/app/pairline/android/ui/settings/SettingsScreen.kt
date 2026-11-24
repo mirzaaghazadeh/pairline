@@ -66,6 +66,7 @@ import app.pairline.android.ui.grantState
 import app.pairline.android.ui.home.UnpairDialog
 import app.pairline.android.ui.refreshTick
 import app.pairline.android.ui.rememberPermissionRequester
+import app.pairline.android.ui.update.UpdatesSection
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -193,6 +194,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     onClick = { navigate(Route.Permissions) },
                 )
             }
+
+            UpdatesSection()
 
             SectionCard(title = stringResource(R.string.settings_support)) {
                 ListRow(

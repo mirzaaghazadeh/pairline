@@ -18,6 +18,11 @@ import app.pairline.android.ui.ScreenshotMode
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/state
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/setup-done
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/screenshot-mode-on   # or -off
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/update-pretend/1.0.0  # or /off
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/update-check
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/update-state
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/update-start
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/update-install-cached/<name>/<sha256>
  *
  * Only the shell user (adb), root and the app itself may call it.
  */
@@ -32,7 +37,40 @@ class DevToolsProvider : ContentProvider() {
         sortOrder: String?,
     ): Cursor? {
         checkCaller()
+        if (uri.pathSegments.size == 3 && uri.pathSegments[0] == "update-install-cached") {
+            // Checks and installs cache/updates/<name> (put there with `run-as`), expecting SHA-256 <hex>.
+            AppGraph.updates.debugInstallCached(uri.pathSegments[1], uri.pathSegments[2])
+            return MatrixCursor(arrayOf("started")).apply { addRow(arrayOf<Any>(true)) }
+        }
+        if (uri.pathSegments.size == 2 && uri.pathSegments[0] == "update-pretend") {
+            // Pretend to run an older version, so the update path can be tried against real releases.
+            val version = uri.pathSegments[1].takeIf { it != "off" }
+            AppGraph.updates.debugVersionOverride = version
+            Log.i("devtools", "update check pretends version ${version ?: "(off)"}")
+            return MatrixCursor(arrayOf("version")).apply { addRow(arrayOf<Any>(version ?: "")) }
+        }
         return when (uri.lastPathSegment) {
+            "update-check" -> MatrixCursor(arrayOf("started")).apply {
+                AppGraph.updates.checkNow()
+                addRow(arrayOf<Any>(true))
+            }
+            "update-state" -> MatrixCursor(arrayOf("installed", "available", "last_checked", "last_error", "checking", "flow")).apply {
+                val s = AppGraph.updates.status.value
+                addRow(
+                    arrayOf<Any>(
+                        s.installedVersion,
+                        s.available?.version?.toString() ?: "",
+                        s.lastChecked,
+                        s.lastError?.name ?: "",
+                        s.checking,
+                        AppGraph.updates.flow.value.toString(),
+                    ),
+                )
+            }
+            "update-start" -> MatrixCursor(arrayOf("started")).apply {
+                AppGraph.updates.startUpdate()
+                addRow(arrayOf<Any>(true))
+            }
             "pairing" -> MatrixCursor(arrayOf("uri", "expires_at")).apply {
                 // The secret is returned only to adb on a debug build, and never logged.
                 val offer = AppGraph.pairing.currentOrNewOffer()

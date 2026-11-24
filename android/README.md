@@ -6,7 +6,8 @@ picture and `../docs/PROTOCOL.md` for the wire format.
 - **Build:** Gradle with Kotlin DSL and a version catalog (`gradle/libs.versions.toml`), JDK 17
 - **Versions:** applicationId `app.pairline.android` (final, D-037), minSdk 28 (Android 9, D-038), compileSdk 37, targetSdk 36
 - **UI:** Jetpack Compose, Material 3, English / Persian / Arabic / Turkish (D-019)
-- **Permissions:** no `INTERNET` in release builds until M5. Every permission is listed in `../docs/PRIVACY.md`.
+- **Permissions:** every permission is listed in `../docs/PRIVACY.md`. Network code is fenced by
+  `../.github/scripts/network-code-check.sh` (D-041): the update check in `update/` talks to GitHub only.
 
 ## Layout
 
@@ -18,6 +19,7 @@ One `:app` module (`app/src/main/java/app/pairline/android/`):
 | `link` | `LinkService` (foreground service), `LinkManager` (sessions on one thread, keep-alive), `BleTransport` (advertiser + GATT server), `IdentityStore` (Keystore keys), pairing codes, `MessageRouter` |
 | `telephony` | Status and capabilities, SIM directory, SMS receive/send/history, calls (telephony callbacks + companion `InCallService`), contacts and call-log sync, USSD |
 | `log` | The local, redacted, 7-day log and its `Redactor` |
+| `update` | The daily GitHub release check, the verified download and the hand-off to Android's installer (D-042); it talks to GitHub only |
 | `ui` | Setup wizard, home, pairing, settings, permissions, keep-alive tips, diagnostics, help; theme and icons |
 
 Build-type source sets:

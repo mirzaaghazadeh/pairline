@@ -13,6 +13,7 @@ import app.pairline.android.telephony.SmsSender
 import app.pairline.android.telephony.SmsStore
 import app.pairline.android.telephony.StatusMonitor
 import app.pairline.android.telephony.UssdRunner
+import app.pairline.android.update.UpdateManager
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -52,4 +53,7 @@ object AppGraph {
     val router: MessageRouter by lazy {
         MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd)
     }
+
+    /** The daily GitHub update check and the verified update (D-042). */
+    val updates: UpdateManager by lazy { UpdateManager(app) }
 }

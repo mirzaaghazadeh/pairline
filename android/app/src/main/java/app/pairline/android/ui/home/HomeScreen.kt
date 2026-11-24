@@ -72,6 +72,7 @@ import app.pairline.android.ui.components.Tone
 import app.pairline.android.ui.components.toneColors
 import app.pairline.android.ui.refreshTick
 import app.pairline.android.ui.rememberPermissionRequester
+import app.pairline.android.ui.update.UpdateBanner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -122,6 +123,8 @@ fun HomeScreen(navigate: (Route) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             LinkCard(link, paired, prefsTick, now, navigate, onAllowBluetooth = { requestPermission(PermissionGroup.BLUETOOTH) })
+
+            UpdateBanner()
 
             PhoneCard(facts)
 

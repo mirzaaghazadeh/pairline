@@ -233,6 +233,7 @@ private fun PrivacyStep(next: () -> Unit) {
             Bullet(PIcons.Person, stringResource(R.string.privacy_point_accounts), Tone.GOOD)
             Bullet(PIcons.Shield, stringResource(R.string.privacy_point_tracking), Tone.GOOD)
             Bullet(PIcons.Code, stringResource(R.string.privacy_point_source), Tone.GOOD)
+            Bullet(PIcons.Download, stringResource(R.string.privacy_point_updates), Tone.GOOD)
         },
     )
 }

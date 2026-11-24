@@ -33,6 +33,8 @@ class MainActivity : ComponentActivity() {
         if (AppGraph.prefs.setupDone) {
             LinkService.start(this, "app opened")
             LinkService.refresh(this)
+            AppGraph.updates.checkIfDue("app opened")
         }
+        AppGraph.updates.onResume()
     }
 }

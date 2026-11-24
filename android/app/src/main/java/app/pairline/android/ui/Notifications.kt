@@ -14,10 +14,12 @@ import app.pairline.android.link.BluetoothStatus
 import app.pairline.android.link.LinkSnapshot
 import app.pairline.android.telephony.Perms
 
-/** The link service's persistent notification. It never shows message content or numbers. */
+/** The link service's persistent notification and the update notice. They never show message content or numbers. */
 object Notifications {
     const val LINK_ID = 1
+    const val UPDATE_ID = 2
     private const val LINK_CHANNEL = "link"
+    private const val UPDATE_CHANNEL = "updates"
 
     fun createChannels(context: Context) {
         val nm = context.getSystemService(NotificationManager::class.java) ?: return
@@ -30,6 +32,36 @@ object Notifications {
             setShowBadge(false)
         }
         nm.createNotificationChannel(channel)
+        nm.createNotificationChannel(
+            NotificationChannel(
+                UPDATE_CHANNEL,
+                context.getString(R.string.notif_channel_updates),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            ).apply { description = context.getString(R.string.notif_channel_updates_desc) },
+        )
+    }
+
+    /** "Pairline Bridge 1.2.0 is available": opens the app, where the user decides whether to update. */
+    fun showUpdate(context: Context, version: String) {
+        if (!Perms.allGranted(context, Perms.NOTIFICATIONS)) return
+        val nm = context.getSystemService(NotificationManager::class.java) ?: return
+        val r = LocaleHelper.wrap(context).resources
+        val open = PendingIntent.getActivity(
+            context,
+            UPDATE_ID,
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val notification = NotificationCompat.Builder(context, UPDATE_CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_pairline)
+            .setColor(ContextCompat.getColor(context, R.color.brand_blue))
+            .setContentTitle(r.getString(R.string.update_available_title, version))
+            .setContentText(r.getString(R.string.update_notif_text))
+            .setContentIntent(open)
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
+            .build()
+        nm.notify(UPDATE_ID, notification)
     }
 
     fun linkNotification(context: Context, s: LinkSnapshot, paired: Boolean, peerName: String?): Notification {

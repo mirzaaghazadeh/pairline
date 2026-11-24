@@ -19,8 +19,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -79,6 +81,13 @@ class LinkService : Service() {
             combine(link.state, graph.peers.paired, graph.prefs.changes) { s, paired, _ -> s to paired }
                 .distinctUntilChanged()
                 .collect { (s, paired) -> Notifications.updateLink(this@LinkService, s, paired, graph.prefs.peerName) }
+        }
+        // The daily update check (D-042): looks every hour whether a day has passed since the last one.
+        scope.launch {
+            while (isActive) {
+                graph.updates.checkIfDue("daily")
+                delay(UPDATE_LOOK_MS)
+            }
         }
     }
 
@@ -151,6 +160,7 @@ class LinkService : Service() {
 
     companion object {
         private const val TAG = "service"
+        private const val UPDATE_LOOK_MS = 3600_000L
         const val ACTION_REFRESH = "app.pairline.android.action.REFRESH"
 
         fun start(context: Context, reason: String) {

@@ -9,6 +9,10 @@
          code opens a connection. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Updates (D-042): hands a verified APK to Android's own installer, which always asks the user to confirm.
+         Android also asks the user once to allow "Install unknown apps" for Pairline. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- The Bluetooth link. Android 11 grants these at install; Android 12+ asks ("Nearby devices"). -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
@@ -101,6 +105,11 @@
         <!-- Sent and delivered reports for SMS sent from the iPhone; reached only through our PendingIntents. -->
         <receiver
             android:name=".telephony.SmsResultReceiver"
+            android:exported="false" />
+
+        <!-- Results of an update's install session; reached only through our own PendingIntent (D-042). -->
+        <receiver
+            android:name=".update.UpdateInstallReceiver"
             android:exported="false" />
 
         <receiver

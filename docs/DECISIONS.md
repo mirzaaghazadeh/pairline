@@ -512,3 +512,45 @@ Also added: M9, an Android **client** mode so two Android phones can pair (maint
 SMS and call history from the iPhone. Decision numbers reserved for the parallel work: D-042–D-043 (delete, block
 list, update check details), D-044–D-045 (M5 Wi-Fi link, files), D-046–D-047 (M6 call audio, Shizuku),
 D-048 (M8), D-049 (M9).
+
+### D-042 — How the Android update check works (2026-11-24)
+
+Details for D-041's daily check. All of it lives in `app.pairline.android.update`, the only package allowed to reach
+GitHub (`network-code-check.sh`).
+- **When:** while the link service runs it looks every hour whether a day has passed since the last attempt (3 hours
+  after a failed one), and the app checks the same way when it's opened. Only after setup is done, and never while
+  "Check for updates" is off. "Check now" in Settings works with the switch off too. No scheduler library: a
+  coroutine in `LinkService` is enough, so no new dependency.
+- **What:** `GET https://api.github.com/repos/mirzaaghazadeh/pairline/releases?per_page=20` with
+  `HttpsURLConnection` and `org.json`, a generic `User-Agent: Pairline-Bridge` (no version, no device), no cookies.
+  Redirects are followed by hand, at most 5, and only to HTTPS GitHub hosts (`api.github.com`, `github.com`,
+  `objects.githubusercontent.com`, `release-assets.githubusercontent.com`). Replies are capped at 4 MB, APKs at 150 MB
+  and at the size GitHub lists.
+- **Which release:** the newest one that is published (not a draft), not a pre-release, tagged `android-v<x.y.z>`
+  (exactly three numbers), with the asset `pairline-bridge-<x.y.z>.apk` on github.com and exactly one
+  `| APK SHA-256 | `<64 hex>` |` row in its notes (written by `android-release.yml`). Releases missing any of these
+  are skipped, so an APK that can't be checked is never offered. It's offered when its version is higher than
+  `BuildConfig.VERSION_NAME` without a `-debug`-style suffix, compared as numbers (1.10.0 > 1.9.0).
+- **Telling the user:** one notification per new version on a new "App updates" channel (default importance), a
+  card on the home screen and a row in Settings with the version and a "What's new" link to the release page, which
+  opens in the browser only when tapped.
+- **Installing (rule 6):** "Update" first makes sure Android's "Install unknown apps" is allowed for Pairline
+  (`REQUEST_INSTALL_PACKAGES`); if not, it explains and opens Android's own screen, and carries on when the user comes
+  back (Android 11 restarts the app when that switch changes, so the request is remembered for 10 minutes). The APK
+  goes to the app's cache and must pass, in order: SHA-256 equal to the notes' row (hashed while downloading and
+  again from the file), package name equal to ours, version code higher than the installed one, and signing
+  certificates (Android 9+ signing info) exactly equal to the installed app's. Only then is it written into a
+  `PackageInstaller` session, hashed once more while copying (the session is abandoned if it changed), and committed
+  with `USER_ACTION_REQUIRED` on Android 12+, so Android always shows its own confirmation screen. The cache file is
+  deleted afterwards and after any failure. A failed check or verification is logged by reason (no hashes, no URLs)
+  and shown in plain words; nothing is installed.
+- **Why a session and not `ACTION_VIEW` with a FileProvider:** no provider to declare, the file never leaves the
+  app's private cache, and the hash can be checked on the exact bytes Android installs.
+- **Debug builds** have adb-only devtools hooks (`update-pretend/<version>`, `update-check`, `update-state`,
+  `update-start`, `update-install-cached/<name>/<sha256>`) to test the path against real releases and locally built
+  APKs. Tested on the Android 11 emulator: the real 1.0.2 release is found, downloaded and its checksum matches; a
+  debug build refuses it (different package); a wrong checksum, the same version and a different signing key are
+  each refused; a correctly signed newer debug build installs through Android's confirmation screen.
+- **Setup and Settings:** the privacy step of the setup wizard now says the app asks GitHub once a day and that this
+  can be turned off; Settings has an Updates section (switch, Check now, last check, installed version). The
+  privacy texts that said the app had no internet permission were corrected.

@@ -24,6 +24,7 @@
     <string name="action_open_pairline">Open Pairline</string>
     <string name="action_turn_on_bt">Turn on Bluetooth</string>
     <string name="action_understood">I understand</string>
+    <string name="action_close">Close</string>
 
     <!-- Persistent notification of the link service -->
     <string name="notif_channel_link">Link status</string>
@@ -38,6 +39,9 @@
     <string name="notif_bt_off_text">Turn on Bluetooth so your iPhone can connect.</string>
     <string name="notif_permission_title">Permission needed</string>
     <string name="notif_permission_text">Open Pairline to allow Nearby devices, so your iPhone can connect.</string>
+    <string name="notif_channel_updates">App updates</string>
+    <string name="notif_channel_updates_desc">Tells you when a new version of Pairline Bridge is available.</string>
+    <string name="update_notif_text">Tap to see what\'s new and update.</string>
 
     <!-- Setup: welcome -->
     <string name="welcome_title">Your Android SIM, on your iPhone</string>
@@ -54,6 +58,7 @@
     <string name="privacy_point_accounts">No account, no sign-up, no phone-number check</string>
     <string name="privacy_point_tracking">No ads, analytics or tracking of any kind</string>
     <string name="privacy_point_source">The source code is public, so anyone can check it</string>
+    <string name="privacy_point_updates">Once a day it asks GitHub for a newer version of this app. You can turn this off in Settings.</string>
 
     <!-- Setup: notice on Android 9, 10 and 11; %1$d is the Android version -->
     <string name="android11_title">This phone runs Android %1$d</string>
@@ -71,8 +76,8 @@
     <string name="perm_phone_why">To tell your iPhone when a call comes in, answer or end it from there, make calls and run USSD codes.</string>
     <string name="perm_phone_detail">This also lets your iPhone show your carrier, signal and which SIM to use.</string>
     <string name="perm_calllog_title">Call history</string>
-    <string name="perm_calllog_why">To show who is calling, and your call history, on your iPhone.</string>
-    <string name="perm_calllog_detail">On Android 12 and later, the caller\'s number is only available with this permission.</string>
+    <string name="perm_calllog_why">To show who is calling and your call history on your iPhone, and to delete calls you remove there.</string>
+    <string name="perm_calllog_detail">On Android 12 and later, the caller\'s number is only available with this permission. Pairline deletes calls only when you delete them on your iPhone.</string>
     <string name="perm_contacts_title">Contacts</string>
     <string name="perm_contacts_why">To show caller names and your contacts on your iPhone.</string>
     <string name="perm_contacts_detail">Pairline only reads them. Adding contacts from the iPhone is a separate option, off by default.</string>
@@ -201,6 +206,7 @@
     <string name="cap_contacts_add">Add contacts from iPhone</string>
     <string name="cap_ussd">USSD codes</string>
     <string name="cap_dualsim">Choose between two SIMs</string>
+    <string name="cap_calllog_delete">Delete call history from iPhone</string>
     <string name="cap_missing_sms">Needs the Text messages permission.</string>
     <string name="cap_missing_phone">Needs the Phone calls permission.</string>
     <string name="cap_missing_calllog">Needs the Call history permission.</string>
@@ -238,7 +244,48 @@
     <string name="settings_source">Source code</string>
     <string name="settings_source_sub">github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">Privacy</string>
-    <string name="settings_privacy_body">Pairline has no servers, accounts, ads or analytics. Your messages, calls and contacts go only to your paired iPhone, encrypted end to end. The bridge app doesn\'t even have permission to use the internet. Logs stay on this phone and are shared only if you choose to, after you\'ve seen them.</string>
+    <string name="settings_privacy_body">Pairline has no servers, accounts, ads or analytics. Your messages, calls and contacts go only to your paired iPhone, encrypted end to end. The only internet connection the bridge app makes on its own is the daily update check on GitHub, which you can turn off under Updates. Logs stay on this phone and are shared only if you choose to, after you\'ve seen them.</string>
+
+    <!-- Updates (D-042); %1$s is a version such as 1.0.3 -->
+    <string name="settings_updates">Updates</string>
+    <string name="settings_updates_auto">Check for updates</string>
+    <string name="settings_updates_auto_sub">Once a day Pairline asks GitHub whether a newer version exists. Nothing about you or this phone is sent.</string>
+    <string name="settings_updates_check_now">Check now</string>
+    <string name="settings_updates_checking">Checking…</string>
+    <string name="settings_updates_never">Not checked yet</string>
+    <!-- %2$s is a relative time such as "5 minutes ago" -->
+    <string name="settings_updates_current">%1$s is the latest version. Last checked %2$s.</string>
+    <string name="settings_updates_last">Last checked %1$s</string>
+    <string name="settings_updates_installed">Installed: %1$s</string>
+    <string name="update_available_title">Pairline Bridge %1$s is available</string>
+    <string name="update_banner_body">You have %1$s. Before Android asks you to install the update, Pairline checks the download against the checksum published with the release and against this app\'s signature.</string>
+    <string name="update_action">Update</string>
+    <string name="update_whats_new">What\'s new</string>
+    <string name="update_dialog_title">Update Pairline Bridge</string>
+    <string name="update_downloading">Downloading %1$s from GitHub…</string>
+    <string name="update_verifying">Checking the file\'s checksum and signature…</string>
+    <string name="update_waiting">Confirm the update on Android\'s screen. If it didn\'t open, tap Install.</string>
+    <string name="update_install">Install</string>
+    <string name="update_failed_title">The update wasn\'t installed</string>
+    <string name="update_permission_title">Allow installing updates</string>
+    <string name="update_permission_body">Android asks you to allow Pairline to install updates. Turn on \"Allow from this source\" for Pairline, then come back. Android will still ask you to confirm every update.</string>
+    <string name="update_error_network">Couldn\'t reach GitHub. Check this phone\'s internet connection and try again.</string>
+    <string name="update_error_response">GitHub sent an unexpected answer. Try again later.</string>
+    <string name="update_error_checksum">The downloaded file doesn\'t match the checksum published with the release, so it wasn\'t installed.</string>
+    <string name="update_error_signature">The downloaded file isn\'t signed with the same key as this app, so it wasn\'t installed.</string>
+    <string name="update_error_package">The downloaded file isn\'t a newer version of this app, so it wasn\'t installed.</string>
+    <string name="update_error_storage">There isn\'t enough free space on this phone for the update.</string>
+    <string name="update_error_install">Android couldn\'t install the update. Try again, or download it from the website.</string>
+
+    <!-- Blocked numbers (D-043) -->
+    <string name="block_title">Blocked numbers</string>
+    <string name="block_settings_sub">Texts and calls from these numbers don\'t reach your iPhone</string>
+    <string name="block_intro">Texts from these numbers aren\'t sent to your iPhone, and their calls are declined on this phone (or, if Pairline can\'t end calls here, just not shown on the iPhone). Android\'s own messaging app still receives their texts, because only the default messaging app can block them.</string>
+    <string name="block_add_hint">Phone number or sender name</string>
+    <string name="block_add">Block</string>
+    <string name="block_empty">No blocked numbers. Block one here, or from a conversation, a call or a contact on your iPhone.</string>
+    <string name="block_remove">Unblock %1$s</string>
+    <string name="block_invalid">Enter a phone number or sender name.</string>
 
     <!-- Keep running -->
     <string name="keepalive_title">Keep Pairline running</string>
@@ -305,7 +352,7 @@
     <string name="help_q_perm_phone">Phone calls and SIM cards</string>
     <string name="help_a_perm_phone">To notice calls, answer, decline, end and make them for your iPhone, run USSD codes, and show your SIMs and signal.</string>
     <string name="help_q_perm_calllog">Call history</string>
-    <string name="help_a_perm_calllog">To show the caller\'s number (Android 12 and later only share it with this permission), your call history, and whether a call was missed or declined.</string>
+    <string name="help_a_perm_calllog">To show the caller\'s number (Android 12 and later only share it with this permission), your call history, and whether a call was missed or declined. When you delete calls on your iPhone, Pairline deletes them here too.</string>
     <string name="help_q_perm_contacts">Contacts</string>
     <string name="help_a_perm_contacts">To show caller names and your contacts on the iPhone. Writing contacts is a separate option, off unless you turn it on.</string>
     <string name="help_q_perm_notif">Notifications</string>
@@ -314,7 +361,7 @@
     <string name="help_a_perm_battery">Pairline asks Android, in Android\'s own window, not to pause it. You can change this anytime in Android\'s settings.</string>
 
     <string name="help_q_data">Where does my data go?</string>
-    <string name="help_a_data">Only to your paired iPhone, end-to-end encrypted. Pairline has no servers, and the bridge app has no permission to use the internet.</string>
+    <string name="help_a_data">Only to your paired iPhone, end-to-end encrypted. Pairline has no servers. The only other connection is the daily update check on GitHub, which sends nothing about you and can be turned off in Settings.</string>
     <string name="help_q_logs">What\'s in the diagnostics report?</string>
     <string name="help_a_logs">Technical details such as versions, permissions and connection events. Phone numbers, emails, names, message text and keys are removed. You see the whole report before you choose to share it.</string>
     <string name="help_q_unpair">What happens when I unpair?</string>

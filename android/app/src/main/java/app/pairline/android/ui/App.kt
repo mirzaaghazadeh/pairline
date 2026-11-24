@@ -37,6 +37,7 @@ import app.pairline.android.ui.pairing.PairingContent
 import app.pairline.android.ui.settings.PermissionsScreen
 import app.pairline.android.ui.settings.SettingsScreen
 import app.pairline.android.ui.setup.SetupFlow
+import app.pairline.android.ui.update.UpdateFlowDialog
 
 /** Screens after setup. A tiny back stack is enough for one activity (D-023: no navigation library). */
 sealed interface Route {
@@ -97,6 +98,7 @@ private fun MainNavigation() {
             Route.Help -> HelpScreen(back)
         }
     }
+    UpdateFlowDialog()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

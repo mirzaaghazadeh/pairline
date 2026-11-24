@@ -1,0 +1,77 @@
+[
+  {
+    "tag_name": "android-v9.0.0",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/untagged-1",
+    "draft": true,
+    "prerelease": false,
+    "body": "| APK SHA-256 | `1111111111111111111111111111111111111111111111111111111111111111` |",
+    "assets": [{"name": "pairline-bridge-9.0.0.apk", "size": 10, "browser_download_url": "https://github.com/mirzaaghazadeh/pairline/releases/download/android-v9.0.0/pairline-bridge-9.0.0.apk"}]
+  },
+  {
+    "tag_name": "android-v6.0.0-rc1",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/android-v6.0.0-rc1",
+    "draft": false,
+    "prerelease": false,
+    "body": "| APK SHA-256 | `6666666666666666666666666666666666666666666666666666666666666666` |",
+    "assets": [{"name": "pairline-bridge-6.0.0-rc1.apk", "size": 10, "browser_download_url": "https://github.com/mirzaaghazadeh/pairline/releases/download/android-v6.0.0-rc1/pairline-bridge-6.0.0-rc1.apk"}]
+  },
+  {
+    "tag_name": "android-v5.0.0",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/android-v5.0.0",
+    "draft": false,
+    "prerelease": false,
+    "body": "| APK SHA-256 | `5555555555555555555555555555555555555555555555555555555555555555` |",
+    "assets": [{"name": "pairline-bridge-5.0.0.apk", "size": 10, "browser_download_url": "https://evil.example.com/pairline-bridge-5.0.0.apk"}]
+  },
+  {
+    "tag_name": "android-v4.0.0",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/android-v4.0.0",
+    "draft": false,
+    "prerelease": false,
+    "body": "| APK SHA-256 | `4444444444444444444444444444444444444444444444444444444444444444` |",
+    "assets": [{"name": "pairline-bridge-3.9.0.apk", "size": 10, "browser_download_url": "https://github.com/mirzaaghazadeh/pairline/releases/download/android-v4.0.0/pairline-bridge-3.9.0.apk"}]
+  },
+  {
+    "tag_name": "android-v3.0.0",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/android-v3.0.0",
+    "draft": false,
+    "prerelease": false,
+    "body": "## Pairline Bridge 3.0.0 (Android)\n\nNo checksum row in these notes.",
+    "assets": [{"name": "pairline-bridge-3.0.0.apk", "size": 10, "browser_download_url": "https://github.com/mirzaaghazadeh/pairline/releases/download/android-v3.0.0/pairline-bridge-3.0.0.apk"}]
+  },
+  {
+    "tag_name": "android-v2.0.0",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/android-v2.0.0",
+    "draft": false,
+    "prerelease": true,
+    "body": "| APK SHA-256 | `2222222222222222222222222222222222222222222222222222222222222222` |",
+    "assets": [{"name": "pairline-bridge-2.0.0.apk", "size": 10, "browser_download_url": "https://github.com/mirzaaghazadeh/pairline/releases/download/android-v2.0.0/pairline-bridge-2.0.0.apk"}]
+  },
+  {
+    "tag_name": "ios-v1.1",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/ios-v1.1",
+    "draft": false,
+    "prerelease": false,
+    "body": "The iPhone app ships through the App Store.",
+    "assets": []
+  },
+  {
+    "tag_name": "android-v1.10.0",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/android-v1.10.0",
+    "draft": false,
+    "prerelease": false,
+    "body": "## Pairline Bridge 1.10.0 (Android)\n\nBuilt by [this GitHub Actions run](https://github.com/mirzaaghazadeh/pairline/actions/runs/1) from commit `c7d3fe0ff2d75cd905e08dcba495f67b75ed753c`.\n\n| | |\n|---|---|\n| APK SHA-256 | `BECAF1D7A9BDBC1D8CEDCAA707B20F00C49D09DAA0CA03B6919B1862CBDE660F` |\n| Signing certificate SHA-256 | `958c4cca6cd6d2b073a403ad86649d34faff992172d2c600cee625d17c8945c7` |\n| VirusTotal | [0 / 66 engines flagged it](https://www.virustotal.com/gui/file/becaf1d7a9bdbc1d8cedcaa707b20f00c49d09daa0ca03b6919b1862cbde660f) |\n\nHow to verify: [SECURITY.md](../../blob/c7d3fe0/SECURITY.md#verifying-a-release).\n",
+    "assets": [
+      {"name": "notes.txt", "size": 5, "browser_download_url": "https://github.com/mirzaaghazadeh/pairline/releases/download/android-v1.10.0/notes.txt"},
+      {"name": "pairline-bridge-1.10.0.apk", "size": 3059797, "browser_download_url": "https://github.com/mirzaaghazadeh/pairline/releases/download/android-v1.10.0/pairline-bridge-1.10.0.apk"}
+    ]
+  },
+  {
+    "tag_name": "android-v1.9.0",
+    "html_url": "https://github.com/mirzaaghazadeh/pairline/releases/tag/android-v1.9.0",
+    "draft": false,
+    "prerelease": false,
+    "body": "| | |\n|---|---|\n| APK SHA-256 | `982657064b65744130a935b26a3b49f2f0f3bcad3847e8b7a1f0b845fe008c9c` |\n",
+    "assets": [{"name": "pairline-bridge-1.9.0.apk", "size": 3059797, "browser_download_url": "https://github.com/mirzaaghazadeh/pairline/releases/download/android-v1.9.0/pairline-bridge-1.9.0.apk"}]
+  }
+]

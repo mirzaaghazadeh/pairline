@@ -85,8 +85,8 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [ ] Delete from the iPhone: SMS conversations and messages (removed from the iPhone; Android lets only the
       default SMS app delete them on the bridge phone) and call-history entries (removed on both phones,
       `WRITE_CALL_LOG`)
-- [ ] Android update check: daily against GitHub Releases, notification, verified download, installed through
-      Android's own install prompt; off switch in Settings (D-041)
+- [x] Android update check: daily against GitHub Releases, notification, verified download, installed through
+      Android's own install prompt; off switch in Settings (D-041, D-042) — emulator-tested against the real releases
 
 ## M5 — Local Wi-Fi link and file transfer
 
