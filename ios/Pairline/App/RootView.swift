@@ -165,7 +165,9 @@ struct ToastOverlay: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                     .onTapGesture { self.text = nil }
                     .task(id: text) {
-                        try? await Task.sleep(nanoseconds: 3_500_000_000)
+                        // Long enough to read: 3.5 s, or about 15 characters a second for longer notes. A tap closes it.
+                        let seconds = max(3.5, Double(text.count) / 15)
+                        try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
                         withAnimation { self.text = nil }
                     }
                     .accessibilityAddTraits(.isStaticText)

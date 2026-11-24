@@ -205,7 +205,11 @@
     <string name="settings_wifi_listening">Bu telefonun Wi-Fi ağında hazır</string>
     <string name="settings_wifi_no_network">Bu telefon şu anda bir Wi-Fi ağına bağlı değil</string>
     <string name="settings_hotspot">iPhone için erişim noktası</string>
-    <string name="settings_hotspot_sub">Ortak Wi-Fi yok mu? Bu telefonda yalnızca iPhone\'unuz için bir erişim noktası açın. İnterneti yoktur ve siz kapatana kadar açık kalır.</string>
+    <string name="settings_hotspot_sub">Ortak Wi-Fi yok mu? Bu telefonda yalnızca iPhone\'unuz için bir erişim noktası açın. Yalnızca iki telefonunuzu bağlar: interneti yoktur, bu yüzden iPhone “İnternet Bağlantısı Yok” gösterir ve kendi mobil verisini kullanır. Siz kapatana kadar açık kalır.</string>
+    <string name="settings_tether">Android’in kendi erişim noktası (internetli)</string>
+    <string name="settings_tether_sub">Bu telefonun internetine iPhone’da mı ihtiyacınız var? Bunun yerine Android’in kendi erişim noktasını açıp iPhone’u ona bağlayın: interneti paylaşır ve Pairline onun üzerinden de bağlanır.</string>
+    <string name="help_q_hotspot_internet">iPhone erişim noktasında “İnternet Bağlantısı Yok” diyor</string>
+    <string name="help_a_hotspot_internet">Pairline’ın erişim noktası yalnızca iki telefonunuzu bağlar; Android, uygulamaların bunun üzerinden internet paylaşmasına izin vermez. Ona bağlıyken iPhone internet için kendi mobil verisini kullanır. iPhone’un mobil verisi yoksa bunun yerine Android’in kendi erişim noktasını kullanın (Ayarlar › Erişim noktası ve internet paylaşımı ya da buradaki Ayarlar › Android’in kendi erişim noktası): bu telefonun internetini paylaşır ve Pairline onun üzerinden de bağlanır.</string>
     <string name="settings_hotspot_start">Erişim noktasını aç</string>
     <string name="settings_hotspot_stop">Erişim noktasını kapat</string>
     <string name="settings_hotspot_on">Açık: %1$s</string>

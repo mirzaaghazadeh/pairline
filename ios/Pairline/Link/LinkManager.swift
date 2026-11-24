@@ -160,6 +160,8 @@ final class LinkManager: BridgeLink {
     var onEvent: ((Inbound) -> Void)?
     var onEstablished: (() -> Void)?
     var onPeerChange: (() -> Void)?
+    /// The iPhone just joined the bridge's own hotspot, which has no internet (iOS says "No Internet Connection").
+    var onJoinedBridgeHotspot: (() -> Void)?
 
     /// The open media channel of the Wi-Fi session, or nil (no Wi-Fi session, or its UDP path isn't verified yet).
     private(set) var mediaChannel: MediaChannel?
@@ -442,7 +444,9 @@ final class LinkManager: BridgeLink {
                 hotspotTimer = Timer.scheduledTimer(withTimeInterval: 4, repeats: false) { [weak self] _ in
                     Task { @MainActor in
                         guard let self, self.pairingAttempt?.chosen == nil else { return }
-                        self.hotspot.join(ssid: ssid, password: password)
+                        self.hotspot.join(ssid: ssid, password: password) { [weak self] outcome in
+                            if outcome == .joined { self?.onJoinedBridgeHotspot?() }
+                        }
                     }
                 }
             }
@@ -791,6 +795,7 @@ final class LinkManager: BridgeLink {
                     guard let self, !self.wifi.isEstablished else { return }
                     self.hotspot.join(ssid: ssid, password: password) { [weak self] outcome in
                         if outcome == .joined || outcome == .alreadyJoined { self?.kickWiFi(reason: "joined the hotspot") }
+                        if outcome == .joined { self?.onJoinedBridgeHotspot?() }
                     }
                 }
             }

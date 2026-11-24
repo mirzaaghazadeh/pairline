@@ -1,12 +1,16 @@
 package app.pairline.android.link.wifi
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import androidx.core.content.ContextCompat
 import app.pairline.android.link.ConnectionListener
 import app.pairline.android.link.LinkConnection
 import app.pairline.android.link.LinkTransport
@@ -84,6 +88,15 @@ class WifiTransport(
         scheduleRescan(5_000)
     }
 
+    /**
+     * Android's own hotspot (Settings › Hotspot & tethering) isn't a Network the callback above sees, so its state
+     * changes come as broadcasts. Over it the iPhone also gets this phone's internet, which Pairline's own
+     * local-only hotspot can't give.
+     */
+    private val tetherReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) = hotspotListener()
+    }
+
     override fun start() {
         if (running) return
         running = true
@@ -101,6 +114,14 @@ class WifiTransport(
                 Log.w(TAG, "can't watch Wi-Fi networks; rescanning on a timer only", e)
             }
             hotspot.addListener(hotspotListener)
+            runCatching {
+                val filter = IntentFilter().apply {
+                    addAction(ACTION_WIFI_AP_STATE_CHANGED)
+                    addAction(ACTION_TETHER_STATE_CHANGED)
+                }
+                // System broadcasts still arrive at a receiver that isn't exported.
+                ContextCompat.registerReceiver(app, tetherReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+            }
             periodic = control.scheduleWithFixedDelay({ rescan() }, RESCAN_EVERY_S, RESCAN_EVERY_S, TimeUnit.SECONDS)
             rescan()
         }
@@ -111,6 +132,7 @@ class WifiTransport(
         running = false
         control.execute {
             runCatching { connectivity?.unregisterNetworkCallback(networkCallback) }
+            runCatching { app.unregisterReceiver(tetherReceiver) }
             hotspot.removeListener(hotspotListener)
             periodic?.cancel(false)
             pendingRescan?.cancel(false)
@@ -393,6 +415,10 @@ class WifiTransport(
         const val SERVICE_TYPE = "_pairline._tcp"
         private const val BACKLOG = 8
         private const val RESCAN_EVERY_S = 20L
+
+        // Android's own broadcasts for its hotspot and tethering (not in the public SDK, sent since Android 4).
+        private const val ACTION_WIFI_AP_STATE_CHANGED = "android.net.wifi.WIFI_AP_STATE_CHANGED"
+        private const val ACTION_TETHER_STATE_CHANGED = "android.net.conn.TETHER_STATE_CHANGED"
         private const val MAX_CONNECTIONS = 8
         private const val MAX_BACKLOG = 32
     }

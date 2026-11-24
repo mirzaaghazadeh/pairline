@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "iOS says “No Internet Connection” on the Android phone’s hotspot" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يعرض iOS «لا يوجد اتصال بالإنترنت» على نقطة اتصال هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "iOS says “No Internet Connection” on the Android phone’s hotspot" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "iOS روی هات‌اسپات گوشی اندرویدی «No Internet Connection» نشان می‌دهد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iOS, Android telefonun erişim noktasında “İnternet Bağlantısı Yok” diyor" } }
+      }
+    },
+    "Joined the Android phone’s hotspot. It only links your two phones, so iOS shows “No Internet Connection”; this iPhone uses its own mobile data meanwhile. For the Android phone’s internet, use its own hotspot instead." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم الاتصال بنقطة اتصال هاتف أندرويد. فهي تربط هاتفيك فقط، لذلك يعرض iOS «لا يوجد اتصال بالإنترنت»؛ ويستخدم هذا الآيفون بيانات الجوال الخاصة به في الأثناء. لإنترنت هاتف أندرويد، استخدم بدلًا منها نقطة الاتصال الخاصة بأندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Joined the Android phone’s hotspot. It only links your two phones, so iOS shows “No Internet Connection”; this iPhone uses its own mobile data meanwhile. For the Android phone’s internet, use its own hotspot instead." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به هات‌اسپات گوشی اندرویدی وصل شدید. این هات‌اسپات فقط دو گوشی‌تان را به هم وصل می‌کند، برای همین iOS «No Internet Connection» نشان می‌دهد؛ در این فاصله این آیفون از اینترنت همراه خودش استفاده می‌کند. برای اینترنت گوشی اندرویدی، به‌جایش از هات‌اسپات خودِ اندروید استفاده کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun erişim noktasına bağlanıldı. Yalnızca iki telefonunuzu bağlar, bu yüzden iOS “İnternet Bağlantısı Yok” gösterir; bu iPhone bu arada kendi mobil verisini kullanır. Android telefonun interneti için onun yerine Android’in kendi erişim noktasını kullanın." } }
+      }
+    },
+    "The hotspot Pairline Bridge starts only links your two phones: Android doesn’t let apps share the internet through it, so iOS shows “No Internet Connection” and this iPhone uses its own mobile data. If it has none, turn on the Android phone’s own hotspot instead (Settings › Hotspot & tethering on Android) and join that: it shares the internet, and Pairline connects over it too." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نقطة الاتصال التي يشغّلها Pairline Bridge تربط هاتفيك فقط: لا يسمح أندرويد للتطبيقات بمشاركة الإنترنت عبرها، لذلك يعرض iOS «لا يوجد اتصال بالإنترنت» ويستخدم هذا الآيفون بيانات الجوال الخاصة به. وإن لم تكن لديه، فشغّل بدلًا منها نقطة الاتصال الخاصة بهاتف أندرويد (الإعدادات ← نقطة الاتصال والربط على أندرويد) واتصل بها: فهي تشارك الإنترنت، ويتصل Pairline عبرها أيضًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The hotspot Pairline Bridge starts only links your two phones: Android doesn’t let apps share the internet through it, so iOS shows “No Internet Connection” and this iPhone uses its own mobile data. If it has none, turn on the Android phone’s own hotspot instead (Settings › Hotspot & tethering on Android) and join that: it shares the internet, and Pairline connects over it too." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هات‌اسپاتی که Pairline Bridge روشن می‌کند فقط دو گوشی‌تان را به هم وصل می‌کند: اندروید به برنامه‌ها اجازه نمی‌دهد از راه آن اینترنت را به اشتراک بگذارند، برای همین iOS «No Internet Connection» نشان می‌دهد و این آیفون از اینترنت همراه خودش استفاده می‌کند. اگر اینترنت همراه ندارد، به‌جایش هات‌اسپات خودِ گوشی اندرویدی را روشن کنید (تنظیمات ← نقطه اتصال و اشتراک‌گذاری اینترنت در اندروید) و به آن وصل شوید: اینترنت را به اشتراک می‌گذارد و Pairline هم از طریق آن وصل می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge’in açtığı erişim noktası yalnızca iki telefonunuzu bağlar: Android, uygulamaların bunun üzerinden internet paylaşmasına izin vermez; bu yüzden iOS “İnternet Bağlantısı Yok” gösterir ve bu iPhone kendi mobil verisini kullanır. Mobil verisi yoksa bunun yerine Android telefonun kendi erişim noktasını açın (Android’de Ayarlar › Erişim noktası ve internet paylaşımı) ve ona bağlanın: interneti paylaşır ve Pairline onun üzerinden de bağlanır." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

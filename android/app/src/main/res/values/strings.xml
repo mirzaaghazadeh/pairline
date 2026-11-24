@@ -205,7 +205,11 @@
     <string name="settings_wifi_listening">Ready on this phone\'s Wi-Fi network</string>
     <string name="settings_wifi_no_network">This phone isn\'t on a Wi-Fi network right now</string>
     <string name="settings_hotspot">Hotspot for iPhone</string>
-    <string name="settings_hotspot_sub">No shared Wi-Fi? Start a hotspot on this phone just for your iPhone. It has no internet and stays on until you stop it.</string>
+    <string name="settings_hotspot_sub">No shared Wi-Fi? Start a hotspot on this phone just for your iPhone. It only links your two phones: it has no internet, so the iPhone shows “No Internet Connection” and uses its own mobile data. It stays on until you stop it.</string>
+    <string name="settings_tether">Android’s own hotspot (with internet)</string>
+    <string name="settings_tether_sub">Need this phone’s internet on the iPhone? Turn on Android’s own hotspot instead and join it on the iPhone: it shares the internet, and Pairline connects over it too.</string>
+    <string name="help_q_hotspot_internet">The iPhone says “No Internet Connection” on the hotspot</string>
+    <string name="help_a_hotspot_internet">Pairline’s hotspot only links your two phones; Android doesn’t let apps share the internet through it. While on it, the iPhone uses its own mobile data for the internet. If the iPhone has none, use Android’s own hotspot instead (Settings › Hotspot &amp; tethering, or Settings › Android’s own hotspot here): it shares this phone’s internet, and Pairline connects over it too.</string>
     <string name="settings_hotspot_start">Start hotspot</string>
     <string name="settings_hotspot_stop">Stop hotspot</string>
     <string name="settings_hotspot_on">On: %1$s</string>

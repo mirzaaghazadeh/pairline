@@ -31,6 +31,18 @@ object SystemActions {
         start(context, Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
     }
 
+    /**
+     * Android's own Hotspot & tethering screen. Only opens it: the user turns the hotspot on there (AGENTS.md rule 5).
+     * Most phones export AOSP's tethering activity; otherwise "Network & internet".
+     */
+    fun openTetherSettings(context: Context) {
+        val screens = listOf(
+            ComponentName("com.android.settings", "com.android.settings.Settings\$TetherSettingsActivity"),
+            ComponentName("com.android.settings", "com.android.settings.TetherSettings"),
+        )
+        if (screens.none { start(context, Intent().setComponent(it)) }) start(context, Intent(Settings.ACTION_WIRELESS_SETTINGS))
+    }
+
     fun openNotificationSettings(context: Context) {
         start(
             context,

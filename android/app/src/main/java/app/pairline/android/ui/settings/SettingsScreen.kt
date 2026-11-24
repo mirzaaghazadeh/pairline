@@ -412,6 +412,16 @@ private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
                 ),
             )
         }
+        // Pairline's hotspot is local-only (Android lets apps share no internet through it); Android's own hotspot
+        // shares this phone's internet, and the Wi-Fi link works over it too.
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        ListRow(
+            title = stringResource(R.string.settings_tether),
+            subtitle = stringResource(R.string.settings_tether_sub),
+            icon = PIcons.OpenExternal,
+            iconTone = Tone.NEUTRAL,
+            onClick = { app.pairline.android.ui.SystemActions.openTetherSettings(context) },
+        )
         if (hotspot.bandChoiceSupported) {
             HorizontalDivider(Modifier.padding(horizontal = 16.dp))
             ListRow(

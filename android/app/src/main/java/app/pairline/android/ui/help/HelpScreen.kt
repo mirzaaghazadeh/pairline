@@ -73,6 +73,7 @@ private val sections = listOf(
             Faq(R.string.help_q_not_found, R.string.help_a_not_found),
             Faq(R.string.help_q_no_sms, R.string.help_a_no_sms),
             Faq(R.string.help_q_call_audio, R.string.help_a_call_audio),
+            Faq(R.string.help_q_hotspot_internet, R.string.help_a_hotspot_internet),
             Faq(R.string.help_q_dtmf, R.string.help_a_dtmf),
             Faq(R.string.help_q_restricted, R.string.help_a_restricted),
         ),

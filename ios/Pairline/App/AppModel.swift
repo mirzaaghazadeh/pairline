@@ -81,6 +81,9 @@ final class AppModel: ObservableObject {
             }
             .store(in: &cancellables)
 
+        link.onJoinedBridgeHotspot = { [weak self] in
+            self?.toast = String(localized: "Joined the Android phone’s hotspot. It only links your two phones, so iOS shows “No Internet Connection”; this iPhone uses its own mobile data meanwhile. For the Android phone’s internet, use its own hotspot instead.", table: "Hotspot")
+        }
         link.files.onReceived = { [weak self] _ in
             self?.toast = String(localized: "File received. Find it in the Files app under Pairline › Received.")
         }

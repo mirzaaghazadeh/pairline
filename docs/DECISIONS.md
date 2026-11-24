@@ -838,3 +838,19 @@ Shizuku".
   own NsdManager. Verified on the Android 11 and 16 emulators; real phones (Samsung, Xiaomi) still to test.
 - Removed: the Shizuku libraries, its provider and `<queries>` entry, and every Shizuku string; help and setup texts
   in EN/FA/AR/TR describe Wireless debugging instead.
+
+### D-055 — The bridge's hotspot has no internet; Android's own hotspot is the way to share it (2026-11-24)
+
+A user reported "the hotspot doesn't work: the iPhone says No Internet Connection". That is how Pairline's hotspot
+(M5) works: Android's local-only hotspot links the two phones but lets no app route internet through it. An iPhone
+with its own mobile data keeps using it; one without (common, since the SIM is in the Android phone) is offline while
+joined. Nothing explained this. Now:
+- The bridge's hotspot setting says what the iPhone will show, and a new row opens Android's own Hotspot & tethering
+  screen (only opens it; rule 5): that hotspot shares the phone's internet, and the Wi-Fi link already listens on its
+  interface. The bridge now rescans as soon as Android's hotspot or tethering changes (its broadcasts), not only every
+  20 seconds.
+- The iPhone explains it in a notice right after it joins the bridge's hotspot (long notices now stay up long enough
+  to read), and both apps have a Help entry. Arabic texts quote iOS's Arabic wording.
+- Not done: starting a tethering hotspot from Pairline (it would need the helper's shell rights for a system
+  setting) and internet sharing (M8) over the local-only hotspot, whose random name means the iPhone's proxy setting
+  would have to be entered again each time.
