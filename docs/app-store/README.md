@@ -26,6 +26,10 @@ All images are flattened without an alpha channel; App Store Connect rejects tra
 
 ## Where things go in App Store Connect
 
+The app record: Apple ID **6838659501**, bundle ID `app.pairline.ios`, team 7Y68TERDUC (the maintainer's personal
+account). "Pairline" alone is taken on the App Store, so the store name is "Pairline: SMS & Call Bridge" (Turkish
+"Pairline: SMS ve Arama Köprüsü", Arabic "Pairline: رسائل ومكالمات"); the Home Screen name stays "Pairline".
+
 - **Screenshots:** the first slide is what the product page opens with, and the first three are what search results
   show, so slides 1-3 carry the main message (SIM on iPhone, calls, codes). The App Store has no separate "header" or
   "search" image for an app; it uses these.
