@@ -492,3 +492,23 @@ link 40 s later (LL procedure timeout). The iPhone's links end the same way from
 seconds, no GATT request, closed by the iPhone. Asking for the 1M PHY on connection completed on the Note 8 but
 didn't change this, so it was taken out again. It happens below Android's APIs, in the Bluetooth chip's firmware,
 and the app has no lever on it. Other Android 9 phones may be fine; until more are tested, the minimum stays Android 9.
+
+### D-041 — The Android app gets `INTERNET`: Wi-Fi link and a daily update check against GitHub (2026-11-24)
+
+The maintainer asked for the bridge to check GitHub for new releases and suggest updating, and chose "daily, with
+an off switch" over opt-in or a browser-only button. This amends AGENTS.md rule 2, which promised that Pairline
+starts no outside connections:
+- **What's sent:** one HTTPS request a day to `api.github.com` for the public release list, and the APK download from
+  GitHub when the user taps Update. Nothing about the user, their phone or their data; GitHub sees the phone's IP
+  address and that a Pairline app asked. On by default, explained during setup, off with one switch in Settings.
+- **Installing stays manual (rule 6):** the APK must match the SHA-256 in the release notes and be signed with the
+  same certificate as the installed app, and it installs through Android's own confirmation screen.
+- **Fenced in CI:** `.github/scripts/network-code-check.sh` fails the build if network code appears outside
+  `update/` (GitHub hosts only), `link/wifi/` (the M5 Wi-Fi link, local addresses only) and `netshare/` (M8). The
+  release APK may now declare `INTERNET`; `android-policy-check.sh` no longer fails on it.
+- PRIVACY.md lists the new flow; the website's privacy page follows.
+
+Also added: M9, an Android **client** mode so two Android phones can pair (maintainer request), and on M4 deleting
+SMS and call history from the iPhone. Decision numbers reserved for the parallel work: D-042–D-043 (delete, block
+list, update check details), D-044–D-045 (M5 Wi-Fi link, files), D-046–D-047 (M6 call audio, Shizuku),
+D-048 (M8), D-049 (M9).

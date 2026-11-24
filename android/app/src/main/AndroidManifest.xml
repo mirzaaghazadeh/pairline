@@ -2,9 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Every permission must be listed in docs/PRIVACY.md (AGENTS.md rule 4).
-         No INTERNET permission until M5; CI fails if the release APK declares it.
-         The debug build adds INTERNET for its local TCP test transport (src/debug, D-018). -->
+    <!-- Every permission must be listed in docs/PRIVACY.md (AGENTS.md rule 4). -->
+
+    <!-- Network (D-041): the Wi-Fi link to the iPhone on the local network, and the daily update check against
+         api.github.com (Settings can turn it off). CI (.github/scripts/network-code-check.sh) fails if any other
+         code opens a connection. -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- The Bluetooth link. Android 11 grants these at install; Android 12+ asks ("Nearby devices"). -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />

@@ -11,12 +11,14 @@ on:
       - 'protocol/**'
       - '.github/workflows/android.yml'
       - '.github/scripts/android-policy-check.sh'
+      - '.github/scripts/network-code-check.sh'
   pull_request:
     paths:
       - 'android/**'
       - 'protocol/**'
       - '.github/workflows/android.yml'
       - '.github/scripts/android-policy-check.sh'
+      - '.github/scripts/network-code-check.sh'
   workflow_dispatch:
 
 permissions:
@@ -60,6 +62,9 @@ jobs:
 
       - name: Policy checks (release APK)
         run: ../.github/scripts/android-policy-check.sh app/build/outputs/apk/release/app-release-unsigned.apk release
+
+      - name: Network code stays in update/, link/wifi/ and netshare/ (D-041)
+        run: ../.github/scripts/network-code-check.sh
 
       - name: Upload debug APK
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

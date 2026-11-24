@@ -26,8 +26,10 @@ one, stop and ask the maintainer instead of working around it.
    call log, call audio, files and one-time codes travel only over the encrypted Pairline link
    between the paired phones. Never send them to any server, and never write them to logs.
 2. **No accounts and no Pairline backend in v1.** The apps make no requests to our servers. The only
-   outside party is Apple (App Store / StoreKit) on the iPhone. The opt-in internet-sharing feature
-   (M8, `netshare`) forwards the iPhone's own traffic; Pairline itself still starts no outside connections.
+   outside parties are Apple (App Store / StoreKit) on the iPhone and, on Android, GitHub for the daily
+   update check, which the user can turn off (D-041; it sends nothing about the user). The opt-in
+   internet-sharing feature (M8, `netshare`) forwards the iPhone's own traffic. Android network code lives
+   only in `update/`, `link/wifi/` and `netshare/` (`.github/scripts/network-code-check.sh`).
 3. **No analytics, ads, crash-reporting, attribution or IP-geolocation code.** No Firebase, Sentry,
    AppsFlyer, ipinfo-style lookups, etc.
 4. **`docs/PRIVACY.md` lists every data flow and permission.** A change that adds or changes a data

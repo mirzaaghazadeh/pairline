@@ -55,16 +55,16 @@ Any change that adds or changes a data flow or permission must update this file 
 |-----|-------------|-----|
 | Android bridge | Your iPhone over Bluetooth LE | The link |
 | Android bridge | Your iPhone over local Wi-Fi (from M5) | Audio, files |
+| Android bridge, unless you turn it off | `api.github.com` once a day, and GitHub's download servers when you tap Update | Checks for a newer Pairline Bridge release. The request carries no user data; GitHub sees your IP address and that a Pairline app asked (D-041) |
 | iPhone app | Your bridge phone over Bluetooth LE and local Wi-Fi | The link |
 | iPhone app | Apple App Store (StoreKit) | Purchases |
 | Android bridge, only while internet sharing is on (M8) | The sites your iPhone visits | Forwards your iPhone's own traffic; Pairline starts no connections of its own |
 
-Nothing else. The Android app doesn't request the `INTERNET` permission until the Wi-Fi link exists
-(M5). **Debug builds only** (never the release APK, checked by CI): the bridge also listens on `127.0.0.1:47800`
-inside the phone or emulator, so developers can connect a test iPhone app through `adb forward` (D-018); it isn't
-reachable from any network. After that, it only connects to addresses on your local network, except when you turn on
-internet sharing (M8). Setup videos, routing lists and the known-device list ship inside the app,
-so nothing is downloaded.
+Nothing else. The Android app's network code is confined by CI to three places: the update check (GitHub only),
+the Wi-Fi link (addresses on your local network only) and internet sharing (M8, only while you have it on).
+**Debug builds only** (never the release APK): the bridge also listens on `127.0.0.1:47800` inside the phone or
+emulator, so developers can connect a test iPhone app through `adb forward` (D-018); it isn't reachable from any
+network. Setup videos, routing lists and the known-device list ship inside the app, so nothing else is downloaded.
 
 **iPhone app:** it makes no network requests of its own; the only outside party is Apple (StoreKit, App Store
 purchases and restores). Links you tap — the bridge download page `pairline.navid.tr`, the privacy policy, the terms,
@@ -93,7 +93,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | `POST_NOTIFICATIONS` (Android 13+) | The status notification the background service requires | Setup |
 | `RECEIVE_BOOT_COMPLETED` | Restart the link after a reboot and after an app update | Install |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Lets Pairline open Android's own dialog asking you to keep it running | Setup, optional |
-| `INTERNET` (from M5) | Local Wi-Fi sockets only | Install |
+| `INTERNET` | The Wi-Fi link (local addresses only) and the daily update check against GitHub, which you can turn off (D-041) | Install |
 | `INTERNET` (**debug builds only**) | The local test transport on `127.0.0.1:47800` (D-018) | Install |
 | `MANAGE_ONGOING_CALLS` (**debug builds only**) | Lets developers test the companion call service on an emulator. Never granted unless a developer runs `adb shell appops set … MANAGE_ONGOING_CALLS allow` | — |
 

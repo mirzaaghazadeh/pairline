@@ -3,7 +3,7 @@
 #
 #   android-policy-check.sh <apk> [release]
 #
-# - no android.permission.INTERNET (until M5 replaces this with a local-sockets-only check)
+# - INTERNET is allowed (D-041); network-code-check.sh confines the code that uses it
 # - no analytics, ads, crash-reporting or attribution SDK classes in the dex
 # - with "release": the APK must not be debuggable
 #
@@ -25,10 +25,6 @@ echo "== Checking $(basename "$apk") with build-tools $(basename "$bt")"
 
 perms="$("$bt/aapt2" dump permissions "$apk")"
 echo "$perms"
-if grep -q "name='android.permission.INTERNET'" <<<"$perms"; then
-  echo "::error::The APK declares android.permission.INTERNET, which isn't allowed before M5 (docs/ARCHITECTURE.md)."
-  fail=1
-fi
 
 # Package prefixes of analytics, ads, crash-reporting, attribution and IP-lookup SDKs (AGENTS.md rule 3).
 # Release builds keep class names (-dontobfuscate in app/proguard-rules.pro), which this check relies on.

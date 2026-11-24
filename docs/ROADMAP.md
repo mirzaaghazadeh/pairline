@@ -1,10 +1,11 @@
 # Roadmap
 
-**Current milestone: real-device testing of M1–M4, then M7 — Payments and first release**
+**Current milestones (2026-11-24): M5 Wi-Fi link, M6 call audio, M4 leftovers (delete, block list), update
+check; then M8 and M9.** The maintainer asked to finish every milestone.
 
-M0–M4 are built and tested on the Android emulator and the iOS Simulator over the debug TCP link (D-018). Bluetooth,
-CallKit's system UI, the camera scanner, dual SIM and real USSD still need a real Android phone and iPhone. M5, M6 and
-M8 are not started; the transport interface and the media/bulk channel keys are ready for them.
+M0–M4 are built and tested on the emulator and Simulator, and M1–M3 now on real phones too: pairing, SMS and
+call control work between an iPhone and an Android 15 bridge (Pairline Bridge 1.0.2). The Galaxy Note 8 can't
+hold a Bluetooth link with Apple devices (D-040); the Wi-Fi link is its way in.
 
 Agents: tick checkboxes as work lands, and move the "Current milestone" line when a milestone is done.
 
@@ -81,6 +82,11 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [x] Dual-SIM support everywhere — every Android request takes a SIM slot; needs a real dual-SIM phone test
 - [ ] Block list
 - [x] iOS widget with the bridge phone's battery and signal; low-battery alert
+- [ ] Delete from the iPhone: SMS conversations and messages (removed from the iPhone; Android lets only the
+      default SMS app delete them on the bridge phone) and call-history entries (removed on both phones,
+      `WRITE_CALL_LOG`)
+- [ ] Android update check: daily against GitHub Releases, notification, verified download, installed through
+      Android's own install prompt; off switch in Settings (D-041)
 
 ## M5 — Local Wi-Fi link and file transfer
 
@@ -134,6 +140,19 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
 - [ ] Shows which VPN app is active on the bridge phone, read locally (no IP lookups)
 - [ ] `netshare` package is the only code allowed to open non-local connections, and only for the iPhone's
       own traffic; CI and PRIVACY.md updated
+
+## M9 — Android client mode (two Android phones)
+
+The same Android app runs as a **bridge** (holds the SIM) or a **client** (uses the bridge's SIM), so two Android
+phones can pair the way an iPhone and an Android phone do. Free, like the rest of the Android app.
+
+- [ ] First launch asks: "This phone has the SIM I want to use" (bridge) or "Use another phone's SIM" (client);
+      switchable later in Settings (switching unpairs)
+- [ ] Client: scan the bridge's QR code, BLE central role, the same session and records as the iPhone (PROTOCOL.md)
+- [ ] Client: SMS threads and sending, contacts, call history, USSD, bridge status
+- [ ] Client: incoming and outgoing bridged calls with Android's own call screen (self-managed `ConnectionService`)
+- [ ] Client: Wi-Fi link and call audio once M5/M6 land
+- [ ] Shared test vectors pass in client mode too
 
 ## Later
 
