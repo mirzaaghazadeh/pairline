@@ -161,6 +161,9 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 - Both apps implement `docs/PROTOCOL.md`; shared test vectors in `protocol/` must pass on both.
 - User-visible strings in English, Persian and Arabic from the start (D-019). Persian and Arabic are
   right-to-left; check every screen mirrored, with phone numbers and codes kept left-to-right.
+- Persian text uses the bundled Estedad typeface (D-032). On iOS use text styles (`.font(.headline)`) or
+  `.font(.rounded(_:weight:))`, not `.system(...)`, for anything that shows words; on Android use
+  `MaterialTheme.typography`. Both switch to Estedad in Persian automatically.
 - Small, reviewable commits. Never commit secrets, signing keys, keystores, `.env` files or
   provisioning profiles.
 - **Commit and push as you go.** After each finished, building piece of work, commit it and push to

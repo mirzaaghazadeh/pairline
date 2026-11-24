@@ -334,3 +334,31 @@ several makers still need testing.
   recording or appear in the recent-apps preview; debug builds allow screenshots for docs.
 - **Maker tips only open screens:** the Xiaomi, Oppo/Realme/OnePlus, Vivo and Huawei/Honor settings screens are opened
   by component name when they exist, otherwise App info. Pairline never changes those settings (AGENTS.md rule 5).
+
+### D-032 — Persian text uses the Estedad typeface (2026-11-24)
+
+The maintainer asked for Persian to be set in **Estedad** ([aminabedi68/Estedad](https://github.com/aminabedi68/Estedad),
+release 8.5, `Estedad-v8.5.zip` SHA-256 `e780f2c9527e9d9f673b61f1e093c17d6e217c1e4be15a957bb287e13344728e`), in both
+apps and on the website. English and Arabic keep their current fonts (system font in the apps, Vazirmatn for Arabic on
+the website).
+
+| | Files | License |
+|-|-------|---------|
+| iOS (app and widget) | `ios/Shared/Fonts/Estedad-{Regular,Medium,SemiBold,Bold}.ttf`, listed under `UIAppFonts` | SIL OFL 1.1 (`Estedad-OFL.txt`, bundled) |
+| Android | `android/app/src/main/res/font/estedad_{regular,medium,semibold,bold}.ttf` | SIL OFL 1.1 (`assets/licenses/Estedad-OFL.txt`, bundled) |
+
+- **A font, not code:** static font files with no code, no network access and no build tooling; D-024's "Apple frameworks
+  only" still holds for code. Each file also carries its copyright and OFL notice in its name table. The iPhone app's
+  About screen credits it.
+- **iOS:** `Shared/AppFont.swift` shadows SwiftUI's `Font.largeTitle` … `Font.caption2` inside the module, so every
+  existing `.font(.headline)` call picks Estedad in Persian (sized per text style and scaling with Dynamic Type) and
+  returns exactly `Font.system(style)` otherwise. `Font.rounded(_:weight:)` replaces the rounded-design system titles.
+  `AppFontAppearance` covers the UIKit-drawn bars (navigation titles, tab labels, bar buttons, segmented pickers).
+  Alerts and system menus keep the system font. The language is read once at launch (iOS relaunches the app when its
+  language changes).
+- **Android:** `PairlineTheme` swaps every Material 3 text style to the Estedad family when the app's locale is `fa`.
+- **Website** (`pairline-web`): the variable `estedad-wght.woff2`, limited by `unicode-range` to Arabic-script
+  characters, so Latin text stays Inter.
+- **Four static weights** (Regular, Medium, SemiBold, Bold; about 160 KB each) instead of the variable TTF, because SwiftUI's
+  `.weight()` and Compose's `FontWeight` both pick between static faces reliably. Lighter and heavier weights map to the
+  nearest bundled one.
