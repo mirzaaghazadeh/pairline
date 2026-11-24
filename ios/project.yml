@@ -15,10 +15,9 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     SWIFT_STRICT_CONCURRENCY: minimal
-    # Matches the App Store version in App Store Connect. Build 1 is uploaded; `asc publish appstore` picks the next
-    # free build number itself, so this only matters for archives made in Xcode.
-    MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "5"
+    # Matches the App Store version in App Store Connect. Every upload needs a new build number (docs/RELEASING.md).
+    MARKETING_VERSION: "1.0.1"
+    CURRENT_PROJECT_VERSION: "6"
     # The maintainer's team (forks: set your own to run on a device). CI builds without signing.
     DEVELOPMENT_TEAM: "7Y68TERDUC"
     CODE_SIGN_STYLE: Automatic

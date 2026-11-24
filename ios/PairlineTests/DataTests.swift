@@ -240,7 +240,10 @@ final class DemoModeTests: XCTestCase {
         XCTAssertEqual(controller.db.contacts().count, DemoContent.english.people.count)
         XCTAssertEqual(controller.db.calls().count, DemoContent.english.calls.count)
         XCTAssertTrue(controller.isDualSIM)
-        XCTAssertFalse(controller.has(.callAudio), "the demo shows how a missing capability is explained")
+        // The demo is a fully set-up bridge, Talk on iPhone and internet sharing included.
+        for capability in Capability.allCases {
+            XCTAssertTrue(controller.has(capability), "demo lacks \(capability.rawValue)")
+        }
         let otp = controller.db.conversations().first { $0.primaryAddress == "NWBANK" }
         XCTAssertEqual(otp.flatMap { OTPDetector.code(in: $0.snippet) }, "482913")
 
