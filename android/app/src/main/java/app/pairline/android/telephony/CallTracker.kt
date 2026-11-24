@@ -57,7 +57,14 @@ class CallTracker(
         var wasRinging = state == CallMapping.RINGING
         var weRejected = false
         var weEnded = false
+
+        /** From a blocked number: never shown on the iPhone (D-043). */
+        var blocked = false
     }
+
+    /** The block list's check (D-043); set by [app.pairline.android.AppGraph]. */
+    @Volatile
+    var isBlocked: (String?) -> Boolean = { false }
 
     private val pool = Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "pairline-calls") }
 
@@ -252,6 +259,7 @@ class CallTracker(
     }
 
     private fun sendIncoming(t: Tracked) {
+        if (suppressed(t)) return
         t.incomingSent = true
         if (t.name == null) t.name = lookupName(t.number)
         Log.i(TAG, "incoming call (${t.id})")
@@ -266,8 +274,40 @@ class CallTracker(
     }
 
     private fun sendState(t: Tracked, reason: String?) {
+        if (suppressed(t)) return
         Log.i(TAG, "call ${t.id}: ${t.state}${reason?.let { " ($it)" } ?: ""}")
         emit(stateJson(t, reason))
+    }
+
+    /**
+     * An incoming call from a blocked number (D-043), noticed before the iPhone heard of it, is never shown there and
+     * is declined on this phone when Pairline can end calls. A call the iPhone already shows is left alone.
+     */
+    private fun suppressed(t: Tracked): Boolean {
+        if (!t.blocked && t.incoming && !t.incomingSent && t.number != null && isBlocked(t.number)) {
+            t.blocked = true
+            Log.i(TAG, "incoming call from a blocked number (${t.id}); not shown on the iPhone")
+            declineBlocked(t, 0)
+        }
+        return t.blocked
+    }
+
+    @SuppressLint("MissingPermission")
+    @Suppress("DEPRECATION")
+    private fun declineBlocked(t: Tracked, attempt: Int) {
+        if (!calls.containsKey(t.id) || t.state != CallMapping.RINGING) return
+        t.weRejected = true
+        t.telecom?.let { call ->
+            runCatching { call.reject(false, null) }
+            return
+        }
+        if (!Perms.granted(context, Manifest.permission.ANSWER_PHONE_CALLS)) {
+            if (attempt == 0) Log.i(TAG, "can't decline it on this phone (no call-control permission)")
+            return
+        }
+        val ended = runCatching { context.getSystemService(TelecomManager::class.java)?.endCall() == true }.getOrDefault(false)
+        // Like reject(): Telecom refuses while it's still screening the call, so retry briefly.
+        if (!ended && attempt < 15) executor.schedule({ declineBlocked(t, attempt + 1) }, 200, TimeUnit.MILLISECONDS)
     }
 
     private fun stateJson(t: Tracked, reason: String?) = JSONObject()
@@ -311,7 +351,7 @@ class CallTracker(
     /** After the iPhone reconnects: the current state of every ongoing call, so it can catch up. */
     fun replay() = executor.execute {
         for (t in calls.values) {
-            if (t.state == CallMapping.ENDED) continue
+            if (t.state == CallMapping.ENDED || t.blocked) continue
             if (t.incoming && t.state == CallMapping.RINGING) sendIncoming(t)
             emit(stateJson(t, null))
         }

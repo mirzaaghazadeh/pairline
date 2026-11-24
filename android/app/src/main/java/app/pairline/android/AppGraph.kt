@@ -13,6 +13,7 @@ import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
 import app.pairline.android.link.PrefsPeerKeyStore
 import app.pairline.android.link.wifi.BridgeHotspot
+import app.pairline.android.telephony.BlockList
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
 import app.pairline.android.telephony.SimDirectory
@@ -20,6 +21,7 @@ import app.pairline.android.telephony.SmsSender
 import app.pairline.android.telephony.SmsStore
 import app.pairline.android.telephony.StatusMonitor
 import app.pairline.android.telephony.UssdRunner
+import app.pairline.android.update.UpdateManager
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -55,14 +57,18 @@ object AppGraph {
     val files by lazy { FileTransfers(app, link).also { it.notifications = FileNotifications(app) } }
 
     val sims: SimDirectory by lazy { SimDirectory(app) }
-    val smsStore: SmsStore by lazy { SmsStore(app, sims) }
+
+    /** Numbers whose texts and calls don't reach the iPhone (D-043). */
+    val blockList: BlockList by lazy { BlockList(app) }
+    val smsStore: SmsStore by lazy { SmsStore(app, sims, blockList::isBlocked) }
     val smsSender: SmsSender by lazy { SmsSender(app, sims, smsStore, link::send) }
     val calls: CallTracker by lazy {
         CallTracker(app, sims, prefs, link::send) { router.statusChanged() }.also { tracker ->
             tracker.onCallEnded = { id -> audioRelay.stop(id, "call ended") }
+            tracker.isBlocked = blockList::isBlocked
         }
     }
-    val contacts: ContactsSync by lazy { ContactsSync(app, sims) }
+    val contacts: ContactsSync by lazy { ContactsSync(app, sims, blockList::isBlocked) }
     val ussd: UssdRunner by lazy { UssdRunner(app, sims) }
     val status: StatusMonitor by lazy {
         StatusMonitor(
@@ -75,7 +81,7 @@ object AppGraph {
         )
     }
     val router: MessageRouter by lazy {
-        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files)
+        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList)
     }
 
     /** Internet sharing for the paired iPhone (M8, D-048). */
@@ -110,4 +116,7 @@ object AppGraph {
     val audioRelay: CallAudioRelay by lazy {
         CallAudioRelay(privileged, prefs, link::send).also { relay -> relay.onCapsChanged = { router.statusChanged() } }
     }
+
+    /** The daily GitHub update check and the verified update (D-042). */
+    val updates: UpdateManager by lazy { UpdateManager(app) }
 }

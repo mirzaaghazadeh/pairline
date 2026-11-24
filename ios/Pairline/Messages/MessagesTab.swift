@@ -8,22 +8,60 @@ struct MessagesTab: View {
     @State private var search = ""
     @State private var showCompose = false
     @State private var prefill: (name: String?, number: String)?
+    @State private var editMode: EditMode = .inactive
+    @State private var selection = Set<Int64>()
+    @State private var confirmDelete: [Int64] = []
 
     var body: some View {
         NavigationStack(path: $path) {
-            ConversationList(search: search)
+            ConversationList(search: search, selection: $selection, onDelete: { confirmDelete = $0 })
+                .environment(\.editMode, $editMode)
                 .navigationTitle(Text("Messages"))
                 .searchable(text: $search, prompt: Text("Search messages and people"))
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            prefill = nil
-                            showCompose = true
-                        } label: {
-                            Image(systemName: "square.and.pencil")
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        if editMode.isEditing || !db.conversations().isEmpty {
+                            Button(editMode.isEditing ? String(localized: "Done") : String(localized: "Edit")) {
+                                withAnimation {
+                                    editMode = editMode.isEditing ? .inactive : .active
+                                    selection.removeAll()
+                                }
+                            }
                         }
-                        .accessibilityLabel(Text("New message"))
                     }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        if editMode.isEditing {
+                            Button(role: .destructive) {
+                                confirmDelete = Array(selection)
+                            } label: {
+                                Text("Delete")
+                            }
+                            .tint(Color.brandRed)
+                            .disabled(selection.isEmpty)
+                        } else {
+                            Button {
+                                prefill = nil
+                                showCompose = true
+                            } label: {
+                                Image(systemName: "square.and.pencil")
+                            }
+                            .accessibilityLabel(Text("New message"))
+                        }
+                    }
+                }
+                .confirmationDialog(Text("Delete from this iPhone?"),
+                                    isPresented: Binding(get: { !confirmDelete.isEmpty },
+                                                         set: { if !$0 { confirmDelete = [] } }),
+                                    titleVisibility: .visible) {
+                    Button("Delete", role: .destructive) {
+                        bridge.deleteConversations(confirmDelete)
+                        confirmDelete = []
+                        selection.removeAll()
+                        editMode = .inactive
+                        Haptics.success()
+                    }
+                } message: {
+                    Text("The messages stay on your Android phone, because Android lets only its default messaging app delete texts. A new message brings the conversation back here.")
                 }
                 .navigationDestination(for: Int64.self) { thread in
                     ThreadView(thread: thread)
@@ -52,13 +90,18 @@ struct MessagesTab: View {
 
 struct ConversationList: View {
     let search: String
+    @Binding var selection: Set<Int64>
+    /// Asks to delete these conversations (the caller confirms first).
+    var onDelete: ([Int64]) -> Void = { _ in }
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var bridge: BridgeController
     @EnvironmentObject private var db: AppDatabase
+    @Environment(\.editMode) private var editMode
     @State private var rows: [(Conversation, StoredMessage?)] = []
 
     var body: some View {
-        List {
+        // Selection only while editing, so a tap opens the conversation otherwise.
+        List(selection: editMode?.wrappedValue.isEditing == true ? $selection : nil) {
             Section {
                 BridgeBanners()
                     .listRowInsets(EdgeInsets())
@@ -73,6 +116,16 @@ struct ConversationList: View {
                 ForEach(rows, id: \.0.thread) { conversation, match in
                     NavigationLink(value: conversation.thread) {
                         ConversationRow(conversation: conversation, match: match)
+                    }
+                    .tag(conversation.thread)
+                    .swipeActions(edge: .trailing) {
+                        // Not `role: .destructive`: that removes the row before the user has confirmed.
+                        Button {
+                            onDelete([conversation.thread])
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        .tint(Color.brandRed)
                     }
                     .swipeActions(edge: .leading) {
                         if conversation.unread > 0 {

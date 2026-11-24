@@ -122,6 +122,25 @@ final class TextHelpersTests: XCTestCase {
         XCTAssertEqual(PhoneNumber.ltr("+1"), "\u{2066}+1\u{2069}")
     }
 
+    /// The same cases as the bridge's TelephonyLogicTest, so both phones agree on what a block covers (D-043).
+    func testBlockMatching() {
+        let cases: [(String, String, Bool)] = [
+            ("+98 912 123 4567", "09121234567", true),
+            ("+1 555 1234", "5551234", true),
+            ("+354 555 1234", "555 1234", true),
+            ("+1 (555) 010-0200", "+15550100201", false),
+            ("5551234", "5551235", false),
+            ("12345", "12345", true),
+            ("12345", "912345", false),
+            ("BANK", "bank", true),
+            ("BANK", "BANKX", false),
+            ("۰۹۱۲۱۲۳۴۵۶۷", "+989121234567", true),
+        ]
+        for (blocked, number, expected) in cases {
+            XCTAssertEqual(PhoneNumber.blockMatches(blocked, number), expected, "\(blocked) vs \(number)")
+        }
+    }
+
     func testVersionsAndDirection() {
         XCTAssertLessThan(Version("0.1.9"), Version("0.1.10"))
         XCTAssertLessThan(Version("0.9"), Version("1.0.0"))

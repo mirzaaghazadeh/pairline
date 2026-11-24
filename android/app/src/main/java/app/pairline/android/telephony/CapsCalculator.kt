@@ -59,6 +59,10 @@ object CapsCalculator {
             caps += Caps.WIFI
             caps += Caps.FILES
         }
+        // Deleting needs the keys from the call-log sync, so both permissions.
+        if (has(Manifest.permission.READ_CALL_LOG) && has(Manifest.permission.WRITE_CALL_LOG)) caps += Caps.CALLLOG_DELETE
+        // The block list needs no permission: it filters what the bridge relays (D-043).
+        caps += Caps.BLOCK
         return Caps.ALL.filter { it in caps }
     }
 }

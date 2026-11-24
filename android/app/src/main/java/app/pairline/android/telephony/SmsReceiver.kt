@@ -12,8 +12,8 @@ import app.pairline.android.protocol.putNullable
 import org.json.JSONObject
 
 /**
- * Relays each incoming SMS to the iPhone as `sms.new` (RECEIVE_SMS). Pairline isn't the default SMS app,
- * so Android's own messaging app still stores and shows the message as usual.
+ * Relays each incoming SMS to the iPhone as `sms.new` (RECEIVE_SMS), unless the sender is blocked (D-043). Pairline
+ * isn't the default SMS app, so Android's own messaging app still stores and shows the message as usual.
  */
 class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -43,6 +43,10 @@ class SmsReceiver : BroadcastReceiver() {
     }
 
     private fun relay(from: String, body: String, subId: Int, receivedAt: Long) {
+        if (AppGraph.blockList.isBlocked(from)) {
+            Log.i(TAG, "SMS from a blocked number; not relayed")
+            return
+        }
         Log.i(TAG, "SMS received")
         if (!AppGraph.link.isConnected) {
             Log.i(TAG, "iPhone not connected; it will get the message from history when it reconnects")

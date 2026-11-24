@@ -110,6 +110,31 @@ final class MessageCodecTests: XCTestCase {
         XCTAssertThrowsError(try decode(["t": "sms.new", "msg": ["key": 1]]))
     }
 
+    func testBlockListAndCallLogDelete() throws {
+        let reply = try decode(["t": "block.list", "id": 4,
+                                "numbers": [["n": "+15551234", "time": 1_764_000_000_000], ["time": 1], "bad"]])
+        XCTAssertEqual(reply.id, 4)
+        guard case .blockList(let list) = reply.message else { return XCTFail() }
+        XCTAssertEqual(list, [BlockedNumber(n: "+15551234", time: 1_764_000_000_000)], "bad entries are skipped")
+        let event = try decode(["t": "block.list", "numbers": []])
+        XCTAssertNil(event.id, "the bridge's own changes arrive as an event")
+        guard case .blockList(let empty) = event.message else { return XCTFail() }
+        XCTAssertTrue(empty.isEmpty)
+
+        let set = try json(.blockSet(add: ["+15551234"], remove: []))
+        XCTAssertEqual(set["t"] as? String, "block.set")
+        XCTAssertEqual(set["add"] as? [String], ["+15551234"])
+        XCTAssertEqual(set["remove"] as? [String], [])
+        XCTAssertEqual(try json(.blockList)["t"] as? String, "block.list")
+        let delete = try json(.calllogDelete(keys: ["cl:1", "cl:2"]))
+        XCTAssertEqual(delete["t"] as? String, "calllog.delete")
+        XCTAssertEqual(delete["keys"] as? [String], ["cl:1", "cl:2"])
+        XCTAssertNil(delete["all"])
+        XCTAssertEqual(try json(.calllogDeleteAll)["all"] as? Bool, true)
+        XCTAssertEqual(Capability(rawValue: "calllog.delete"), .calllogDelete)
+        XCTAssertEqual(Capability(rawValue: "block"), .block)
+    }
+
     func testOutboundShapes() throws {
         let send = try json(.smsSend(sim: nil, to: "+989121234567", body: "سلام 👋", cid: "c-1"), id: 7)
         XCTAssertEqual(send["t"] as? String, "sms.send")

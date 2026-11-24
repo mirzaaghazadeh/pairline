@@ -105,6 +105,25 @@ enum PhoneNumber {
         return String(digits.suffix(9))
     }
 
+    /// The ASCII digits of a number, in order (Persian and Arabic-Indic digits converted).
+    static func digits(_ text: String) -> String {
+        String(asciiDigits(text).filter { $0.isASCII && $0.isNumber })
+    }
+
+    /// Whether a block-list entry covers `number`, the same rule as the bridge (D-043): with seven or more digits on
+    /// both sides, the last digits agree (as many as the shorter has, up to 9), so "+354 555 1234" covers "5551234".
+    /// Shorter numbers and sender names such as "BANK" must match exactly.
+    static func blockMatches(_ blocked: String, _ number: String) -> Bool {
+        let a = digits(blocked)
+        let b = digits(number)
+        if a.count >= 7 && b.count >= 7 {
+            let n = min(9, a.count, b.count)
+            return a.suffix(n) == b.suffix(n)
+        }
+        guard let key = matchKey(blocked) else { return false }
+        return key == matchKey(number)
+    }
+
     /// Whether an address looks like a phone number (and not an alphanumeric sender such as "BANK").
     static func isPhoneNumber(_ text: String) -> Bool {
         let digits = asciiDigits(text).filter { $0.isASCII && $0.isNumber }

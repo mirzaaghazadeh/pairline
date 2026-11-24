@@ -69,6 +69,7 @@ import app.pairline.android.ui.grantState
 import app.pairline.android.ui.home.UnpairDialog
 import app.pairline.android.ui.refreshTick
 import app.pairline.android.ui.rememberPermissionRequester
+import app.pairline.android.ui.update.UpdatesSection
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -163,6 +164,13 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(
+                    title = stringResource(R.string.block_title),
+                    subtitle = stringResource(R.string.block_settings_sub),
+                    icon = PIcons.Block,
+                    onClick = { navigate(Route.BlockList) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
                     title = stringResource(if (paired) R.string.home_pair_new else R.string.home_pair),
                     icon = PIcons.Qr,
                     onClick = { navigate(Route.Pairing) },
@@ -207,6 +215,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     onClick = { navigate(Route.Permissions) },
                 )
             }
+
+            UpdatesSection()
 
             SectionCard(title = stringResource(R.string.settings_support)) {
                 ListRow(

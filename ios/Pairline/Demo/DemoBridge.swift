@@ -20,6 +20,7 @@ final class DemoBridge: BridgeLink {
     private var messages: [SMSMessage] = []
     private var contacts: [ContactRecord] = []
     private var calls: [CallLogRecord] = []
+    private var blocked: [BlockedNumber] = []
     private var nextKey = 1000
     private var activeCall: (id: Int64, number: String, dir: String, state: String)?
     private var nextCallID: Int64 = 1
@@ -172,12 +173,38 @@ final class DemoBridge: BridgeLink {
             return ["t": "ok", "id": id]
         case "call.dtmf", "call.audio":
             return ["t": "ok", "id": id]
+        case "calllog.delete":
+            if f["all"] as? Bool == true {
+                calls.removeAll()
+            } else {
+                let keys = Set(f["keys"] as? [String] ?? [])
+                calls.removeAll { keys.contains($0.key) }
+            }
+            return ["t": "ok", "id": id]
+        case "block.list":
+            return blockListBody(id: id)
+        case "block.set":
+            let remove = f["remove"] as? [String] ?? []
+            blocked.removeAll { entry in remove.contains { PhoneNumber.blockMatches(entry.n, $0) } }
+            for number in f["add"] as? [String] ?? [] where !isBlocked(number) {
+                blocked.append(BlockedNumber(n: number, time: Date().milliseconds))
+            }
+            return blockListBody(id: id)
         default:
             return ["t": "error", "id": id, "code": "unsupported", "msg": "Not in the demo"]
         }
     }
 
     private func awaitDelay() throws {}
+
+    private func blockListBody(id: Int) -> [String: Any] {
+        ["t": "block.list", "id": id, "numbers": blocked.map { ["n": $0.n, "time": $0.time ?? 0] }]
+    }
+
+    /// Like the real bridge (D-043): a blocked number's texts and calls don't reach the iPhone.
+    private func isBlocked(_ number: String) -> Bool {
+        blocked.contains { PhoneNumber.blockMatches($0.n, number) }
+    }
 
     private func threadSummaries() -> [[String: Any]] {
         let grouped = Dictionary(grouping: messages, by: { $0.thread ?? 0 })
@@ -230,6 +257,7 @@ final class DemoBridge: BridgeLink {
     }
 
     private func receive(from address: String, text: String) {
+        guard !isBlocked(address) else { return }
         nextKey += 1
         let message = SMSMessage(key: "sms:\(nextKey)", thread: threadID(for: address), addr: address, body: text,
                                  time: Date().milliseconds, box: "in", sim: 0, state: "received")
@@ -283,6 +311,7 @@ final class DemoBridge: BridgeLink {
     func simulateIncomingCall() {
         guard phase == .connected, activeCall == nil else { return }
         let person = content.people[0]
+        guard !isBlocked(person.number) else { return }
         let callID = nextCallID
         nextCallID += 1
         activeCall = (callID, person.number, "in", "ringing")

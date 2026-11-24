@@ -10,14 +10,29 @@ struct ThreadView: View {
     @State private var conversation: Conversation?
     @State private var loadingOlder = false
     @State private var lastCount = 0
+    @State private var confirmDeleteMessage: StoredMessage?
+    @State private var confirmDeleteConversation = false
+    @State private var blockRequest: BlockRequest?
+    @Environment(\.dismiss) private var dismiss
 
     private var address: String { conversation?.primaryAddress ?? messages.last?.addr ?? "" }
     private var name: String { db.displayName(for: address) }
+    private var isBlocked: Bool { bridge.isBlocked(address) }
 
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: 3) {
+                    if isBlocked {
+                        InfoBanner(symbol: "hand.raised.fill", tint: .brandRed,
+                                   text: Text("You blocked this number. Its texts and calls don't reach this iPhone.")) {
+                            Button("Unblock") {
+                                BlockActions.run(app: app, bridge: bridge, numbers: [address], block: false)
+                            }
+                            .font(.subheadline.weight(.semibold))
+                        }
+                        .padding(.top, 8)
+                    }
                     if conversation?.hasOlder == true, thread >= 0, bridge.phase.isConnected {
                         olderLoader
                     }
@@ -30,7 +45,8 @@ struct ThreadView: View {
                         ForEach(Array(group.messages.enumerated()), id: \.element.key) { index, message in
                             let next = index + 1 < group.messages.count ? group.messages[index + 1] : nil
                             MessageBubble(message: message, isLastInGroup: next?.isOutgoing != message.isOutgoing,
-                                          simLabel: bridge.isDualSIM ? message.sim : nil)
+                                          simLabel: bridge.isDualSIM ? message.sim : nil,
+                                          onDelete: { confirmDeleteMessage = message })
                                 .id(message.key)
                         }
                     }
@@ -78,7 +94,7 @@ struct ThreadView: View {
                 }
                 .accessibilityElement(children: .combine)
             }
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
                 if PhoneNumber.isPhoneNumber(address) {
                     Button {
                         calls.startCall(number: address, sim: bridge.defaultSim(forSMS: false))
@@ -87,7 +103,48 @@ struct ThreadView: View {
                     }
                     .accessibilityLabel(Text("Call"))
                 }
+                Menu {
+                    if bridge.has(.block) && !address.isEmpty {
+                        if isBlocked {
+                            Button {
+                                BlockActions.run(app: app, bridge: bridge, numbers: [address], block: false)
+                            } label: { Label("Unblock", systemImage: "hand.raised.slash") }
+                        } else {
+                            Button(role: .destructive) {
+                                blockRequest = BlockRequest(numbers: [address])
+                            } label: { Label("Block", systemImage: "hand.raised") }
+                        }
+                    }
+                    Button(role: .destructive) {
+                        confirmDeleteConversation = true
+                    } label: { Label("Delete Conversation", systemImage: "trash") }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                .accessibilityLabel(Text("More"))
             }
+        }
+        .blockPrompt($blockRequest)
+        .confirmationDialog(Text("Delete from this iPhone?"), isPresented: $confirmDeleteConversation,
+                            titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                bridge.deleteConversations([thread])
+                Haptics.success()
+                dismiss()
+            }
+        } message: {
+            Text("The messages stay on your Android phone, because Android lets only its default messaging app delete texts. A new message brings the conversation back here.")
+        }
+        .confirmationDialog(Text("Delete this message from this iPhone?"),
+                            isPresented: Binding(get: { confirmDeleteMessage != nil },
+                                                 set: { if !$0 { confirmDeleteMessage = nil } }),
+                            titleVisibility: .visible, presenting: confirmDeleteMessage) { message in
+            Button("Delete", role: .destructive) {
+                bridge.deleteMessages([message.key])
+                confirmDeleteMessage = nil
+            }
+        } message: { _ in
+            Text("It stays on your Android phone, because Android lets only its default messaging app delete texts.")
         }
     }
 
@@ -140,6 +197,7 @@ struct MessageBubble: View {
     let message: StoredMessage
     let isLastInGroup: Bool
     let simLabel: Int?
+    var onDelete: (() -> Void)?
     @EnvironmentObject private var bridge: BridgeController
     @EnvironmentObject private var db: AppDatabase
 
@@ -180,6 +238,11 @@ struct MessageBubble: View {
                     Button {
                         bridge.retry(message)
                     } label: { Label("Try again", systemImage: "arrow.clockwise") }
+                }
+                if let onDelete {
+                    Button(role: .destructive, action: onDelete) {
+                        Label("Delete", systemImage: "trash")
+                    }
                 }
             }
             if !message.isOutgoing { Spacer(minLength: 48) }

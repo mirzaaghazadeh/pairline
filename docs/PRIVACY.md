@@ -15,9 +15,10 @@ Any change that adds or changes a data flow or permission must update this file 
 
 | Data | Leaves the device? | Goes to | Stored where | How long |
 |------|--------------------|---------|--------------|----------|
-| SMS (text, numbers, time) | Yes, encrypted | Your paired iPhone only | Android's own SMS store, as usual; on iPhone, Pairline's local database | Until you delete it or unpair |
+| SMS (text, numbers, time) | Yes, encrypted | Your paired iPhone only | Android's own SMS store, as usual; on iPhone, Pairline's local database | Until you delete it or unpair. Deleting on the iPhone removes it there only: Android lets only its default messaging app delete texts |
 | Contacts | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until unpair |
-| Call log | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until unpair |
+| Call log | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until you delete it or unpair. Deleting on the iPhone also deletes it on the bridge phone when Pairline Bridge has the call-history permission |
+| Block list (numbers and sender names you block) | Yes, encrypted | Between your two phones only | Bridge app's private storage (excluded from backups); iPhone: Pairline's local database | Until you unblock them; unpairing removes the iPhone's copy (D-043) |
 | Contacts you add on the iPhone (opt-in, off until you turn it on in the bridge app) | Yes, encrypted | Your bridge phone only | Android Contacts | Until you delete them |
 | Files you send (M5), only when you share them | Yes, encrypted, over the local Wi-Fi link only | The other paired phone only | Android: Downloads/Pairline (Android 10+) or Pairline's own folder (Android 9). iPhone: Pairline's Received folder, visible in the Files app | Until you delete them |
 | The bridge's local Wi-Fi addresses and Wi-Fi port (M5) | Yes: in the pairing QR code, and encrypted to your paired iPhone (`wifi.offer`) | Your iPhone only | iPhone: with the pairing, to reconnect | Until unpair |
@@ -44,6 +45,8 @@ Any change that adds or changes a data flow or permission must update this file 
 |------|--------------------|--------------|----------|
 | Synced SMS, contacts and call log | No | Pairline's SQLite database in the app's Application Support folder, file protection `completeUntilFirstUserAuthentication` (readable after the first unlock, so messages that arrive while locked can be saved), **excluded from iCloud and computer backups** | Until unpair (unpairing deletes it) |
 | Messages you write before the bridge confirms them | Yes, encrypted, to your bridge phone only | Same database (an outbox), sent when the link is up | Until sent; then like any message |
+| What you deleted (so a later sync doesn't bring it back) | No | Same database: the deleted message's or call's id and time, and for a deleted conversation its id and the other party's number. Never the text (D-043) | Until unpair |
+| Block list | Yes, encrypted, to your bridge phone only (it keeps the list that counts) | Same database, a copy of the bridge's list | Until you unblock or unpair |
 | New-message and code notifications | No (iOS may mirror notifications to your own Apple Watch) | iOS Notification Center. Sender name or number and, if "Show message text" is on, the text | Until you clear them; unpairing clears them |
 | One-time codes | No | Detected on the iPhone only. "Copy code" puts the code on **this iPhone's** clipboard: never on Universal Clipboard, and it expires after 3 minutes. Other copied text is also local-only | 3 minutes |
 | Widget status (link state, bridge battery, signal, carrier name) | No | The app group container shared with Pairline's own widget. No messages, numbers or contacts | Overwritten on every status update; deleted on unpair |
@@ -60,7 +63,7 @@ Any change that adds or changes a data flow or permission must update this file 
 |-----|-------------|-----|
 | Android bridge | Your iPhone over Bluetooth LE | The link |
 | Android bridge, unless you turn the Wi-Fi link off | Your iPhone over local Wi-Fi: listens on TCP port 47820 (and a UDP port for call audio) only on its Wi-Fi and hotspot addresses, never on mobile data or VPNs, and refuses anything that isn't on your local network. Announces itself with DNS-SD (random name) | The Wi-Fi link (M5): the same encrypted session as Bluetooth, plus call audio and files |
-| Android bridge, unless you turn it off | `api.github.com` once a day, and GitHub's download servers when you tap Update | Checks for a newer Pairline Bridge release. The request carries no user data; GitHub sees your IP address and that a Pairline app asked (D-041) |
+| Android bridge, unless you turn it off | `api.github.com` once a day, and GitHub's download servers when you tap Update | Checks for a newer Pairline Bridge release. The request carries no user data; GitHub sees your IP address and that a Pairline app asked (D-041). The downloaded APK stays in the app's private cache until Android has it, and is installed only after you confirm on Android's screen (D-042) |
 | iPhone app | Your bridge phone over Bluetooth LE and local Wi-Fi | The link |
 | iPhone app | Apple App Store (StoreKit) | Purchases |
 | Android bridge, only while internet sharing is on (M8) | The sites your iPhone visits | Forwards your iPhone's own traffic; Pairline starts no connections of its own |
@@ -95,6 +98,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | `ANSWER_PHONE_CALLS` | Answer, decline and end calls from the iPhone | Setup |
 | `CALL_COMPANION_APP` | Receive call events as a companion app | Install |
 | `READ_CALL_LOG` | The caller's number on Android 12+, call history on the iPhone, missed vs declined | Setup, optional |
+| `WRITE_CALL_LOG` | Delete call-history entries you delete on the iPhone, and nothing else (D-043) | Setup, optional, together with `READ_CALL_LOG` (one Android dialog); or from "What your iPhone can do" |
 | `READ_CONTACTS` | Caller names and contacts on the iPhone | Setup, optional |
 | `WRITE_CONTACTS` | Add contacts from the iPhone | Only when you turn on "Add contacts from iPhone" in Settings (off by default) |
 | `ACCESS_WIFI_STATE`, `CHANGE_WIFI_STATE` (M5) | Start and stop Android's local-only hotspot for the iPhone | Install; used only when you tap "Start hotspot" |
@@ -108,6 +112,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | `RECEIVE_BOOT_COMPLETED` | Restart the link after a reboot and after an app update | Install |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Lets Pairline open Android's own dialog asking you to keep it running | Setup, optional |
 | `INTERNET` | The Wi-Fi link (local addresses only) and the daily update check against GitHub, which you can turn off (D-041) | Install |
+| `REQUEST_INSTALL_PACKAGES` | Hand a downloaded update, after its checksum and signature are checked, to Android's own installer, which asks you to confirm every update (D-042). Android also asks you once to allow "Install unknown apps" for Pairline | When you first tap Update |
 | `INTERNET` (**debug builds only**) | The local test transport on `127.0.0.1:47800` (D-018) | Install |
 | `CHANGE_NETWORK_STATE` (**debug builds only**) | On the Android emulator only, the Wi-Fi link is reached through the emulator's own NAT on its emulated mobile-data interface; this lets the call-audio socket answer on that interface (D-044) | Install |
 | `MANAGE_ONGOING_CALLS` | Lets Android bind Pairline's companion call service, which gives the iPhone the keypad, mute and speaker during calls (Android 12+). Declared by every build but granted to nobody at install: Pairline turns on this app-op through Shizuku only when you turn on "Talk on iPhone" (D-046) | Only with Talk on iPhone |

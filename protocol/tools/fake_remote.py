@@ -31,6 +31,9 @@ connection. Options may appear anywhere on the line and are shared by all action
   contacts                        contacts.sync from scratch, following `cursor` pages
   calllog                         calllog.sync from scratch, following `cursor` pages
   contacts-add --name NAME --number NUMBER   contacts.add
+  calllog-delete --keys cl:1,cl:2 | --all-calls   calllog.delete (deletes on the bridge phone!)
+  blocks                          block.list: the bridge's block list
+  block | unblock  --number NUMBER           block.set with add / remove; prints the new list
   ussd     --code CODE [--sim N]  ussd.run; waits up to max(--timeout, --wait) for ussd.result
   listen   [--seconds S] [--auto-answer] [--auto-end S]
                                   print incoming events; optionally answer every call.incoming
@@ -1117,6 +1120,33 @@ def act_contacts_add(s: Session, a: argparse.Namespace) -> None:
     check_reply(s, s.call("contacts.add", name=a.name, numbers=[{"n": a.number, "label": "mobile"}]), "ok")
 
 
+def act_calllog_delete(s: Session, a: argparse.Namespace) -> None:
+    if a.all_calls:
+        check_reply(s, s.call("calllog.delete", all=True), "ok")
+    else:
+        keys = [k.strip() for k in (a.keys or "").split(",") if k.strip()]
+        check_reply(s, s.call("calllog.delete", keys=keys), "ok")
+
+
+def show_block_list(s: Session, reply: Msg) -> None:
+    if check_reply(s, reply, "block.list"):
+        numbers = reply.get("numbers") or []
+        s.out.note(f"block.list: {len(numbers)} entries: "
+                   + ", ".join(str(n.get("n")) for n in numbers if isinstance(n, dict)))
+
+
+def act_blocks(s: Session, a: argparse.Namespace) -> None:
+    show_block_list(s, s.call("block.list"))
+
+
+def act_block(s: Session, a: argparse.Namespace) -> None:
+    show_block_list(s, s.call("block.set", add=[a.number], remove=[]))
+
+
+def act_unblock(s: Session, a: argparse.Namespace) -> None:
+    show_block_list(s, s.call("block.set", add=[], remove=[a.number]))
+
+
 def act_ussd(s: Session, a: argparse.Namespace) -> None:
     timeout = max(a.timeout, a.wait)
     rid = s.request("ussd.run", sim=a.sim, code=a.code)
@@ -1378,12 +1408,13 @@ ACTIONS: dict[str, Callable[[Session, argparse.Namespace], None]] = {
     "answer": simple_request("call.answer", "call"), "reject": simple_request("call.reject", "call"),
     "end": simple_request("call.end", "call"), "dtmf": simple_request("call.dtmf", "call", "digit"),
     "audio": act_audio, "contacts": act_contacts, "calllog": act_calllog, "contacts-add": act_contacts_add,
+    "calllog-delete": act_calllog_delete, "blocks": act_blocks, "block": act_block, "unblock": act_unblock,
     "ussd": act_ussd, "listen": act_listen, "unpair": act_unpair, "all": act_all,
     "media": act_media, "send-file": act_send_file, "receive-file": act_receive_file,
 }
 REQUIRED = {"send-sms": ("to", "body"), "dial": ("number",), "answer": ("call",), "reject": ("call",),
             "end": ("call",), "dtmf": ("call", "digit"), "audio": ("call",), "contacts-add": ("name", "number"),
-            "ussd": ("code",), "send-file": ("file",)}
+            "ussd": ("code",), "send-file": ("file",), "block": ("number",), "unblock": ("number",)}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1443,6 +1474,8 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--speaker", type=parse_bool, metavar="true|false", help="audio: use the speaker")
     g.add_argument("--name", metavar="NAME", help="contacts-add: contact name")
     g.add_argument("--code", metavar="CODE", help="ussd: code such as '*100#'")
+    g.add_argument("--keys", metavar="KEYS", help="calllog-delete: comma-separated call-log keys, e.g. cl:12,cl:13")
+    g.add_argument("--all-calls", action="store_true", help="calllog-delete: delete the whole call log")
     g.add_argument("--seconds", type=positive(float), default=30.0, metavar="S",
                    help="listen: how long to listen (default 30)")
     g.add_argument("--auto-answer", action="store_true", help="listen: answer every call.incoming")

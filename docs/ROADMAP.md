@@ -1,7 +1,8 @@
 # Roadmap
 
-**Current milestones (2026-11-24): M5 Wi-Fi link, M6 call audio, M4 leftovers (delete, block list), update
-check; M8 next.** The maintainer asked to finish every milestone; M9 (Android client mode) was dropped (D-050).
+**Current milestones (2026-11-24): real-phone tests of M5 (Wi-Fi link), M6 (call audio) and M8 (internet
+sharing).** M4 is done (delete, block list and the update check landed, D-042, D-043). The maintainer asked to finish
+every milestone; M9 (Android client mode) was dropped (D-050).
 
 M0–M4 are built and tested on the emulator and Simulator, and M1–M3 now on real phones too: pairing, SMS and
 call control work between an iPhone and an Android 15 bridge (Pairline Bridge 1.0.2). The Galaxy Note 8 can't
@@ -81,13 +82,15 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [x] USSD codes from the iPhone — iOS: common and saved codes. Android: `sendUssdRequest` per SIM (the emulator has
       no USSD network, so only the timeout path is verified)
 - [x] Dual-SIM support everywhere — every Android request takes a SIM slot; needs a real dual-SIM phone test
-- [ ] Block list
+- [x] Block list — kept and enforced on the bridge (`block.list` / `block.set`), edited from conversations, calls,
+      contacts and Settings on the iPhone and from the bridge app (D-043); emulator- and Simulator-tested
 - [x] iOS widget with the bridge phone's battery and signal; low-battery alert
-- [ ] Delete from the iPhone: SMS conversations and messages (removed from the iPhone; Android lets only the
+- [x] Delete from the iPhone: SMS conversations and messages (removed from the iPhone; Android lets only the
       default SMS app delete them on the bridge phone) and call-history entries (removed on both phones,
-      `WRITE_CALL_LOG`)
-- [ ] Android update check: daily against GitHub Releases, notification, verified download, installed through
-      Android's own install prompt; off switch in Settings (D-041)
+      `WRITE_CALL_LOG`, `calllog.delete`; iPhone only when the bridge can't) — with tombstones so syncs don't bring
+      them back (D-043)
+- [x] Android update check: daily against GitHub Releases, notification, verified download, installed through
+      Android's own install prompt; off switch in Settings (D-041, D-042) — emulator-tested against the real releases
 
 ## M5 — Local Wi-Fi link and file transfer
 

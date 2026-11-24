@@ -63,8 +63,17 @@ object SmsMapping {
     fun threadsLimit(requested: Long?): Int = (requested ?: 50L).coerceIn(1, 200).toInt()
 }
 
-/** Reads SMS history and threads from Android's SMS store (READ_SMS). Never writes to it. */
-class SmsStore(private val context: Context, private val sims: SimDirectory) {
+/**
+ * Reads SMS history and threads from Android's SMS store (READ_SMS). Never writes to it. Texts received from a
+ * blocked number ([isBlocked], D-043) are left out of what the iPhone gets; texts sent to it stay.
+ */
+class SmsStore(
+    private val context: Context,
+    private val sims: SimDirectory,
+    private val isBlocked: (String?) -> Boolean = { false },
+) {
+
+    private fun hidden(row: SmsRow) = row.type == Telephony.Sms.MESSAGE_TYPE_INBOX && isBlocked(row.address)
 
     private val projection = arrayOf(
         Telephony.Sms._ID,
@@ -88,16 +97,38 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
         requireRead()
         if (before != null && after != null) throw RequestException(ErrorCode.INVALID, "use before or after, not both")
         // Numbers are inlined (they're Longs): "?" arguments are text, which some providers compare as text.
-        val where = StringBuilder("${Telephony.Sms.TYPE} != ${Telephony.Sms.MESSAGE_TYPE_DRAFT}")
-        if (thread != null) where.append(" AND ${Telephony.Sms.THREAD_ID} = $thread")
-        if (before != null) where.append(" AND ${Telephony.Sms.DATE} < $before")
-        if (after != null) where.append(" AND ${Telephony.Sms.DATE} > $after")
+        fun where(bound: Long?, inclusive: Boolean): String {
+            val w = StringBuilder("${Telephony.Sms.TYPE} != ${Telephony.Sms.MESSAGE_TYPE_DRAFT}")
+            if (thread != null) w.append(" AND ${Telephony.Sms.THREAD_ID} = $thread")
+            val op = if (after != null) (if (inclusive) ">=" else ">") else (if (inclusive) "<=" else "<")
+            if (bound != null) w.append(" AND ${Telephony.Sms.DATE} $op $bound")
+            return w.toString()
+        }
         val order = if (after != null) "${Telephony.Sms.DATE} ASC" else "${Telephony.Sms.DATE} DESC"
         val slots = slotMap()
         // Extra rows so a group of messages with the same time can be kept together on one page.
         val fetch = limit + SAME_TIME_SLACK
-        val rows = query(where.toString(), "$order, ${Telephony.Sms._ID} ASC LIMIT $fetch")
-        val (page, _) = JsonPager.pageByTime(rows, limit, rows.size < fetch, { it.time }) { it.toJson(slots[it.subId]) }
+        // Blocked senders' texts are dropped, so read on until the page can be filled (or the store ends). Each
+        // round continues at the last time read, inclusively, and skips rows it has already seen.
+        val rows = ArrayList<SmsRow>()
+        val seen = HashSet<Long>()
+        var bound = after ?: before
+        var inclusive = false
+        var exhausted = false
+        var rounds = 0
+        while (rounds++ < MAX_ROUNDS) {
+            val batch = query(where(bound, inclusive), "$order, ${Telephony.Sms._ID} ASC LIMIT $fetch")
+            exhausted = batch.size < fetch
+            batch.filter { seen.add(it.id) && !hidden(it) }.let { rows += it }
+            if (exhausted || rows.size >= fetch || batch.isEmpty()) break
+            if (batch.last().time == bound && inclusive) {
+                exhausted = false
+                break // a whole batch with one time: give up on filling this page rather than loop
+            }
+            bound = batch.last().time
+            inclusive = true
+        }
+        val (page, _) = JsonPager.pageByTime(rows, limit, exhausted, { it.time }) { it.toJson(slots[it.subId]) }
         return JSONObject()
             .put("t", Msg.SMS_HISTORY)
             .put("id", id)
@@ -112,12 +143,14 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
         val all = LinkedHashMap<Long, ThreadAgg>()
         context.contentResolver.query(
             Telephony.Sms.CONTENT_URI,
-            arrayOf(Telephony.Sms.THREAD_ID, Telephony.Sms.ADDRESS, Telephony.Sms.DATE, Telephony.Sms._ID),
+            arrayOf(Telephony.Sms.THREAD_ID, Telephony.Sms.ADDRESS, Telephony.Sms.DATE, Telephony.Sms._ID, Telephony.Sms.TYPE),
             "${Telephony.Sms.TYPE} != ${Telephony.Sms.MESSAGE_TYPE_DRAFT}",
             null,
             "${Telephony.Sms.DATE} DESC",
         )?.use { c ->
             while (c.moveToNext()) {
+                // A blocked sender's texts don't count: a thread of only those isn't listed (D-043).
+                if (c.getInt(4) == Telephony.Sms.MESSAGE_TYPE_INBOX && isBlocked(c.getString(1))) continue
                 val thread = c.getLong(0)
                 val agg = all.getOrPut(thread) { ThreadAgg(thread, c.getLong(3), c.getLong(2)) }
                 agg.count++
@@ -179,6 +212,9 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
 
     private companion object {
         const val SAME_TIME_SLACK = 200
+
+        /** History queries per page when blocked senders' texts are skipped (each reads `limit + 200` rows). */
+        const val MAX_ROUNDS = 20
     }
 
     private fun bodiesOf(ids: List<Long>): Map<Long, String> {

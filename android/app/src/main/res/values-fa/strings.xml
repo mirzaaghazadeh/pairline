@@ -23,6 +23,7 @@
     <string name="action_open_pairline">باز کردن Pairline</string>
     <string name="action_turn_on_bt">روشن کردن بلوتوث</string>
     <string name="action_understood">متوجه شدم</string>
+    <string name="action_close">بستن</string>
 
     <!-- Persistent notification of the link service -->
     <string name="notif_channel_link">وضعیت اتصال</string>
@@ -37,6 +38,9 @@
     <string name="notif_bt_off_text">بلوتوث را روشن کنید تا آیفون شما بتواند وصل شود.</string>
     <string name="notif_permission_title">به یک مجوز نیاز است</string>
     <string name="notif_permission_text">برنامهٔ Pairline را باز کنید و مجوز «دستگاه‌های اطراف» را بدهید تا آیفون شما بتواند وصل شود.</string>
+    <string name="notif_channel_updates">به‌روزرسانی برنامه</string>
+    <string name="notif_channel_updates_desc">وقتی نسخهٔ تازه‌ای از Pairline Bridge منتشر شود، خبرتان می‌کند.</string>
+    <string name="update_notif_text">برای دیدن تغییرات و به‌روزرسانی ضربه بزنید.</string>
 
     <!-- Setup: welcome -->
     <string name="welcome_title">سیم‌کارت گوشی اندرویدتان، روی آیفونتان</string>
@@ -53,6 +57,7 @@
     <string name="privacy_point_accounts">بدون حساب کاربری، بدون ثبت‌نام، بدون تأیید شمارهٔ تلفن</string>
     <string name="privacy_point_tracking">بدون تبلیغات، آمارگیری یا هر نوع ردیابی</string>
     <string name="privacy_point_source">کد منبع عمومی است، پس هر کسی می‌تواند آن را بررسی کند</string>
+    <string name="privacy_point_updates">روزی یک بار از GitHub می‌پرسد که نسخهٔ جدیدتری از این برنامه هست یا نه. می‌توانید این را در تنظیمات خاموش کنید.</string>
 
     <!-- Setup: notice on Android 9, 10 and 11; %1$d is the Android version -->
     <string name="android11_title">این گوشی اندروید %1$d دارد</string>
@@ -70,8 +75,8 @@
     <string name="perm_phone_why">برای اینکه آیفون شما از تماس ورودی باخبر شود، از همان‌جا تماس را جواب بدهید یا قطع کنید، تماس بگیرید و کدهای USSD را اجرا کنید.</string>
     <string name="perm_phone_detail">با این مجوز، آیفون شما می‌تواند اپراتور و قدرت آنتن را هم نشان دهد و بداند از کدام سیم‌کارت استفاده کند.</string>
     <string name="perm_calllog_title">سابقهٔ تماس‌ها</string>
-    <string name="perm_calllog_why">برای اینکه روی آیفون، هم ببینید چه کسی تماس می‌گیرد و هم سابقهٔ تماس‌هایتان را.</string>
-    <string name="perm_calllog_detail">در اندروید ۱۲ و بالاتر، شمارهٔ تماس‌گیرنده فقط با این مجوز در دسترس است.</string>
+    <string name="perm_calllog_why">برای اینکه روی آیفون، هم ببینید چه کسی تماس می‌گیرد و هم سابقهٔ تماس‌هایتان را، و تماس‌هایی که آنجا پاک می‌کنید اینجا هم پاک شوند.</string>
+    <string name="perm_calllog_detail">در اندروید ۱۲ و بالاتر، شمارهٔ تماس‌گیرنده فقط با این مجوز در دسترس است. Pairline فقط تماس‌هایی را پاک می‌کند که خودتان روی آیفون پاک کنید.</string>
     <string name="perm_contacts_title">مخاطبین</string>
     <string name="perm_contacts_why">برای نمایش نام تماس‌گیرنده و مخاطبین شما روی آیفون.</string>
     <string name="perm_contacts_detail">برنامهٔ Pairline فقط مخاطبین را می‌خواند. افزودن مخاطب از آیفون یک گزینهٔ جداگانه است که به‌طور پیش‌فرض خاموش است.</string>
@@ -255,6 +260,7 @@
     <string name="cap_contacts_add">افزودن مخاطب از آیفون</string>
     <string name="cap_ussd">کدهای USSD</string>
     <string name="cap_dualsim">انتخاب بین دو سیم‌کارت</string>
+    <string name="cap_calllog_delete">پاک کردن سابقهٔ تماس از آیفون</string>
     <string name="cap_missing_sms">به مجوز «پیامک‌ها» نیاز دارد.</string>
     <string name="cap_missing_phone">به مجوز «تماس‌ها و سیم‌کارت‌ها» نیاز دارد.</string>
     <string name="cap_missing_calllog">به مجوز «سابقهٔ تماس‌ها» نیاز دارد.</string>
@@ -299,7 +305,47 @@
     <!-- Starts with U+200F (right-to-left mark) so the URL lines up with the RTL layout. -->
     <string name="settings_source_sub">‏github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">حریم خصوصی</string>
-    <string name="settings_privacy_body">در Pairline خبری از سرور، حساب کاربری، تبلیغات یا آمارگیری نیست. پیام‌ها، تماس‌ها و مخاطبین شما فقط به آیفونِ جفت‌شدهٔ شما می‌روند، آن هم با رمزگذاری سرتاسری. این برنامه حتی مجوز استفاده از اینترنت را ندارد. گزارش‌ها روی همین گوشی می‌مانند و فقط اگر خودتان بخواهید، آن هم بعد از اینکه آن‌ها را دیدید، با کسی به اشتراک گذاشته می‌شوند.</string>
+    <string name="settings_privacy_body">در Pairline خبری از سرور، حساب کاربری، تبلیغات یا آمارگیری نیست. پیام‌ها، تماس‌ها و مخاطبین شما فقط به آیفونِ جفت‌شدهٔ شما می‌روند، آن هم با رمزگذاری سرتاسری. تنها اتصال اینترنتی که این برنامه خودش برقرار می‌کند، بررسی روزانهٔ به‌روزرسانی در GitHub است که می‌توانید در بخش «به‌روزرسانی‌ها» خاموشش کنید. گزارش‌ها روی همین گوشی می‌مانند و فقط اگر خودتان بخواهید، آن هم بعد از اینکه آن‌ها را دیدید، با کسی به اشتراک گذاشته می‌شوند.</string>
+
+    <!-- Updates (D-042) -->
+    <string name="settings_updates">به‌روزرسانی‌ها</string>
+    <string name="settings_updates_auto">بررسی به‌روزرسانی</string>
+    <string name="settings_updates_auto_sub">Pairline روزی یک بار از GitHub می‌پرسد که نسخهٔ جدیدتری هست یا نه. هیچ اطلاعاتی دربارهٔ شما یا این گوشی فرستاده نمی‌شود.</string>
+    <string name="settings_updates_check_now">همین حالا بررسی کن</string>
+    <string name="settings_updates_checking">در حال بررسی…</string>
+    <string name="settings_updates_never">هنوز بررسی نشده</string>
+    <string name="settings_updates_current">%1$s جدیدترین نسخه است. آخرین بررسی: %2$s</string>
+    <string name="settings_updates_last">آخرین بررسی: %1$s</string>
+    <string name="settings_updates_installed">نسخهٔ نصب‌شده: %1$s</string>
+    <string name="update_available_title">Pairline Bridge %1$s منتشر شده است</string>
+    <string name="update_banner_body">نسخهٔ شما %1$s است. پیش از اینکه اندروید نصب به‌روزرسانی را از شما بپرسد، Pairline فایل دانلودشده را با چک‌سامی که همراه نسخه منتشر شده و با امضای این برنامه مقایسه می‌کند.</string>
+    <string name="update_action">به‌روزرسانی</string>
+    <string name="update_whats_new">تغییرات این نسخه</string>
+    <string name="update_dialog_title">به‌روزرسانی Pairline Bridge</string>
+    <string name="update_downloading">در حال دانلود %1$s از GitHub…</string>
+    <string name="update_verifying">در حال بررسی چک‌سام و امضای فایل…</string>
+    <string name="update_waiting">به‌روزرسانی را در صفحهٔ اندروید تأیید کنید. اگر باز نشد، روی «نصب» بزنید.</string>
+    <string name="update_install">نصب</string>
+    <string name="update_failed_title">به‌روزرسانی نصب نشد</string>
+    <string name="update_permission_title">اجازهٔ نصب به‌روزرسانی‌ها</string>
+    <string name="update_permission_body">اندروید از شما می‌خواهد به Pairline اجازهٔ نصب به‌روزرسانی بدهید. برای Pairline گزینهٔ «اجازه از این منبع» را روشن کنید و برگردید. اندروید باز هم برای هر به‌روزرسانی از شما تأیید می‌گیرد.</string>
+    <string name="update_error_network">به GitHub وصل نشد. اتصال اینترنت این گوشی را بررسی کنید و دوباره امتحان کنید.</string>
+    <string name="update_error_response">پاسخ GitHub غیرمنتظره بود. بعداً دوباره امتحان کنید.</string>
+    <string name="update_error_checksum">فایل دانلودشده با چک‌سامی که همراه نسخه منتشر شده یکی نیست، پس نصب نشد.</string>
+    <string name="update_error_signature">فایل دانلودشده با همان کلیدِ این برنامه امضا نشده است، پس نصب نشد.</string>
+    <string name="update_error_package">فایل دانلودشده نسخهٔ جدیدتری از این برنامه نیست، پس نصب نشد.</string>
+    <string name="update_error_storage">فضای خالی کافی برای به‌روزرسانی روی این گوشی نیست.</string>
+    <string name="update_error_install">اندروید نتوانست به‌روزرسانی را نصب کند. دوباره امتحان کنید یا آن را از وب‌سایت دانلود کنید.</string>
+
+    <!-- Blocked numbers (D-043) -->
+    <string name="block_title">شماره‌های مسدود</string>
+    <string name="block_settings_sub">پیامک‌ها و تماس‌های این شماره‌ها به آیفون شما نمی‌رسند</string>
+    <string name="block_intro">پیامک‌های این شماره‌ها به آیفون شما فرستاده نمی‌شوند و تماس‌هایشان روی این گوشی رد می‌شوند (یا اگر Pairline اینجا نتواند تماس را قطع کند، فقط روی آیفون نشان داده نمی‌شوند). برنامهٔ پیامک خود اندروید همچنان پیامک‌هایشان را دریافت می‌کند، چون فقط برنامهٔ پیش‌فرض پیامک می‌تواند آن‌ها را مسدود کند.</string>
+    <string name="block_add_hint">شماره تلفن یا نام فرستنده</string>
+    <string name="block_add">مسدود کن</string>
+    <string name="block_empty">هیچ شماره‌ای مسدود نیست. می‌توانید اینجا، یا روی آیفون از یک گفتگو، تماس یا مخاطب، شماره‌ای را مسدود کنید.</string>
+    <string name="block_remove">رفع انسداد %1$s</string>
+    <string name="block_invalid">یک شماره تلفن یا نام فرستنده وارد کنید.</string>
 
     <!-- Keep running -->
     <string name="keepalive_title">فعال نگه داشتن Pairline</string>
@@ -366,7 +412,7 @@
     <string name="help_q_perm_phone">تماس‌ها و سیم‌کارت‌ها</string>
     <string name="help_a_perm_phone">برای اینکه Pairline از طرف آیفون شما تماس‌ها را تشخیص دهد، جواب دهد، رد کند، قطع کند و تماس بگیرد، کدهای USSD را اجرا کند، و سیم‌کارت‌ها و آنتن شما را نشان دهد.</string>
     <string name="help_q_perm_calllog">سابقهٔ تماس‌ها</string>
-    <string name="help_a_perm_calllog">برای نمایش شمارهٔ تماس‌گیرنده (اندروید ۱۲ و بالاتر آن را فقط با این مجوز در اختیار برنامه می‌گذارد)، سابقهٔ تماس‌ها، و اینکه تماسی بی‌پاسخ مانده یا رد شده است.</string>
+    <string name="help_a_perm_calllog">برای نمایش شمارهٔ تماس‌گیرنده (اندروید ۱۲ و بالاتر آن را فقط با این مجوز در اختیار برنامه می‌گذارد)، سابقهٔ تماس‌ها، و اینکه تماسی بی‌پاسخ مانده یا رد شده است. وقتی تماس‌ها را روی آیفون پاک کنید، Pairline آن‌ها را اینجا هم پاک می‌کند.</string>
     <string name="help_q_perm_contacts">مخاطبین</string>
     <string name="help_a_perm_contacts">برای نمایش نام تماس‌گیرنده و مخاطبین شما روی آیفون. نوشتن مخاطب یک گزینهٔ جداگانه است و تا خودتان روشنش نکنید، خاموش می‌ماند.</string>
     <string name="help_q_perm_notif">اعلان‌ها</string>
@@ -375,7 +421,7 @@
     <string name="help_a_perm_battery">در پنجرهٔ خود اندروید، Pairline از اندروید می‌خواهد که آن را متوقف نکند. هر وقت بخواهید می‌توانید این را در تنظیمات اندروید تغییر دهید.</string>
 
     <string name="help_q_data">اطلاعات من کجا می‌رود؟</string>
-    <string name="help_a_data">فقط به آیفونِ جفت‌شدهٔ شما، با رمزگذاری سرتاسری. Pairline هیچ سروری ندارد و این برنامه مجوز استفاده از اینترنت را ندارد.</string>
+    <string name="help_a_data">فقط به آیفونِ جفت‌شدهٔ شما، با رمزگذاری سرتاسری. Pairline هیچ سروری ندارد. تنها اتصال دیگر، بررسی روزانهٔ به‌روزرسانی در GitHub است که هیچ اطلاعاتی از شما نمی‌فرستد و در تنظیمات خاموش می‌شود.</string>
     <string name="help_q_logs">در گزارش عیب‌یابی چه چیزهایی هست؟</string>
     <string name="help_a_logs">جزئیات فنی مثل نسخه‌ها، مجوزها و رویدادهای اتصال. شماره تلفن‌ها، ایمیل‌ها، نام‌ها، متن پیام‌ها و کلیدها حذف می‌شوند. پیش از اینکه تصمیم بگیرید آن را به اشتراک بگذارید، کل گزارش را می‌بینید.</string>
     <string name="help_q_unpair">وقتی جفت‌سازی را لغو کنم چه می‌شود؟</string>

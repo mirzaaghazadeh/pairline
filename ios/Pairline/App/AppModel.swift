@@ -251,6 +251,29 @@ final class AppModel: ObservableObject {
                 self.link.files.send(url: url)
             }
         }
+        // Block list and deleting (D-043) through the link once connected and synced, for end-to-end tests:
+        // -PairlineBlock <number>, -PairlineUnblock <number>, -PairlineDeleteThread <thread>,
+        // -PairlineDeleteCall <key>, -PairlineClearCalls.
+        let value = { (flag: String) -> String? in
+            guard let index = args.firstIndex(of: flag), index + 1 < args.count else { return nil }
+            return args[index + 1]
+        }
+        let block = value("-PairlineBlock"), unblock = value("-PairlineUnblock")
+        let deleteThread = value("-PairlineDeleteThread").flatMap { Int64($0) }, deleteCall = value("-PairlineDeleteCall")
+        let clearCalls = args.contains("-PairlineClearCalls")
+        if block != nil || unblock != nil || deleteThread != nil || deleteCall != nil || clearCalls {
+            Task { @MainActor in
+                for _ in 0..<40 where !self.active.phase.isConnected || self.active.status == nil || self.active.syncing {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                }
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                if let block { try? await self.active.setBlocked([block], true) }
+                if let unblock { try? await self.active.setBlocked([unblock], false) }
+                if let deleteThread { self.active.deleteConversations([deleteThread]) }
+                if let deleteCall { _ = await self.active.deleteCalls([deleteCall]) }
+                if clearCalls { _ = await self.active.clearCallHistory() }
+            }
+        }
         // Places one call through the link once connected.
         if let index = args.firstIndex(of: "-PairlineDial"), index + 1 < args.count {
             let number = args[index + 1]

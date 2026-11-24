@@ -61,6 +61,21 @@ final class AppDatabase: ObservableObject {
                 try db.execute("PRAGMA user_version = 1")
             }
         }
+        if version < 2 {
+            // What the user deleted on this iPhone (D-043), so later syncs don't bring it back. No message text.
+            try db.transaction {
+                // A deleted message by key. `addr_key` only for "rx:" keys, whose stored copy arrives under another key.
+                try db.execute("""
+                    CREATE TABLE IF NOT EXISTS deleted_messages (key TEXT PRIMARY KEY, addr_key TEXT, time INTEGER NOT NULL)
+                    """)
+                // A deleted conversation: everything in it up to `before`. `addr_key` for single-number conversations.
+                try db.execute("""
+                    CREATE TABLE IF NOT EXISTS deleted_threads (thread INTEGER PRIMARY KEY, addr_key TEXT, before INTEGER NOT NULL)
+                    """)
+                try db.execute("CREATE TABLE IF NOT EXISTS deleted_calls (key TEXT PRIMARY KEY)")
+                try db.execute("PRAGMA user_version = 2")
+            }
+        }
     }
 
     private func changed() {
@@ -101,6 +116,7 @@ final class AppDatabase: ObservableObject {
     }
 
     private func upsert(_ m: SMSMessage, countUnread: Bool) throws -> Bool {
+        if try wasDeleted(m) { return false }
         let thread = m.thread ?? PhoneNumber.syntheticThreadID(for: m.addr)
         let state = m.state ?? (m.box == "out" ? "sent" : "received")
         if try !db.query("SELECT key FROM messages WHERE key = ?", [.text(m.key)]).isEmpty {
@@ -139,6 +155,29 @@ final class AppDatabase: ObservableObject {
         try touchThread(thread, addr: m.addr, body: m.body, time: m.time, newMessage: countUnread,
                         unread: countUnread && m.box == "in")
         return true
+    }
+
+    /// Whether the user deleted this message on the iPhone, alone or with its conversation (D-043).
+    private func wasDeleted(_ m: SMSMessage) throws -> Bool {
+        if try !db.query("SELECT key FROM deleted_messages WHERE key = ?", [.text(m.key)]).isEmpty { return true }
+        let thread = m.thread ?? PhoneNumber.syntheticThreadID(for: m.addr)
+        let addrKey = PhoneNumber.matchKey(m.addr)
+        // A deleted conversation hides what it held, but not newer messages. A conversation started on this iPhone
+        // (negative id) is found by number too: the bridge files its messages under its own thread id.
+        if try !db.query("""
+            SELECT thread FROM deleted_threads WHERE (thread = ? OR (thread < 0 AND addr_key = ?)) AND before >= ?
+            """, [.int(thread), .from(addrKey), .int(m.time)]).isEmpty {
+            return true
+        }
+        // A deleted "rx:" message (announced before Android stored it): its stored copy comes from the same number
+        // within 60 s under its real key. The tombstone moves to that key, so it hides exactly one message.
+        if m.box == "in", !m.key.hasPrefix("rx:"), let addrKey, let twin = try db.query("""
+            SELECT key FROM deleted_messages WHERE key LIKE 'rx:%' AND addr_key = ? AND ABS(time - ?) <= 60000 LIMIT 1
+            """, [.text(addrKey), .int(m.time)]).first?.string("key") {
+            try db.execute("UPDATE deleted_messages SET key = ?, addr_key = NULL WHERE key = ?", [.text(m.key), .text(twin)])
+            return true
+        }
+        return false
     }
 
     /// The key of an incoming message with the same text from the same address within ±60 s, if one is stored.
@@ -204,6 +243,11 @@ final class AppDatabase: ObservableObject {
         guard !threads.isEmpty else { return }
         try? db.transaction {
             for t in threads {
+                // A conversation deleted on this iPhone comes back only with a newer message.
+                if try !db.query("SELECT thread FROM deleted_threads WHERE thread = ? AND before >= ?",
+                                 [.int(t.thread), .int(t.time ?? 0)]).isEmpty {
+                    continue
+                }
                 let addrs = encodeList(t.addrs ?? [])
                 try db.execute("""
                     INSERT INTO threads(thread, addrs, snippet, time, count) VALUES(?, ?, ?, ?, ?)
@@ -248,7 +292,18 @@ final class AppDatabase: ObservableObject {
     func updateState(cid: String, state: MessageState, key: String?, error: String?) {
         try? db.transaction {
             guard let row = try db.query("SELECT key FROM messages WHERE cid = ?", [.text(cid)]).first,
-                  let current = row.string("key") else { return }
+                  let current = row.string("key") else {
+                // Deleted on this iPhone before the bridge reported its key: that key is deleted too.
+                if let key, try !db.query("SELECT key FROM deleted_messages WHERE key = ?", [.text("local:\(cid)")]).isEmpty {
+                    try db.execute("INSERT OR IGNORE INTO deleted_messages(key, time) VALUES(?, ?)",
+                                   [.text(key), .int(Date().milliseconds)])
+                    if let thread = try db.query("SELECT thread FROM messages WHERE key = ?", [.text(key)]).first?.int64("thread") {
+                        try db.execute("DELETE FROM messages WHERE key = ?", [.text(key)])
+                        try refreshThreadAfterDelete(thread)
+                    }
+                }
+                return
+            }
             try db.execute("UPDATE messages SET state = ?, error = ? WHERE key = ?",
                            [.text(state.rawValue), .from(error), .text(current)])
             if let key, key != current {
@@ -269,16 +324,99 @@ final class AppDatabase: ObservableObject {
         updateState(cid: cid, state: .failed, key: nil, error: error)
     }
 
-    func deleteMessage(key: String) {
-        try? db.execute("DELETE FROM messages WHERE key = ?", [.text(key)])
+    // MARK: - Deleting (D-043)
+
+    /// Deletes messages from this iPhone only (Android lets only its default messaging app delete texts) and
+    /// remembers them, so a later sync doesn't bring them back.
+    func deleteMessages(keys: [String]) {
+        guard !keys.isEmpty else { return }
+        try? db.transaction {
+            try rememberSyncedUntil()
+            var threads = Set<Int64>()
+            for key in keys {
+                guard let row = try db.query("SELECT thread, addr, time FROM messages WHERE key = ?", [.text(key)]).first,
+                      let thread = row.int64("thread") else { continue }
+                try tombstone(key: key, addr: row.string("addr") ?? "", time: row.int64("time") ?? 0)
+                try db.execute("DELETE FROM messages WHERE key = ?", [.text(key)])
+                if key.hasPrefix("sms:") {
+                    // The bridge's count included it; keep "load earlier messages" honest.
+                    try db.execute("UPDATE threads SET count = count - 1 WHERE thread = ? AND count > 0", [.int(thread)])
+                }
+                threads.insert(thread)
+            }
+            for thread in threads { try refreshThreadAfterDelete(thread) }
+        }
         changed()
+    }
+
+    /// Deletes whole conversations from this iPhone only, and remembers them up to their newest message: a newer
+    /// message brings the conversation back with just that message.
+    func deleteConversations(_ threads: [Int64]) {
+        guard !threads.isEmpty else { return }
+        try? db.transaction {
+            try rememberSyncedUntil()
+            for thread in threads {
+                let row = try db.query("SELECT time, addrs FROM threads WHERE thread = ?", [.int(thread)]).first
+                let newest = try db.query("SELECT MAX(time) AS t FROM messages WHERE thread = ?", [.int(thread)]).first?
+                    .int64("t") ?? 0
+                let before = max(row?.int64("time") ?? 0, newest)
+                let addrs = decodeList(row?.string("addrs"))
+                let addrKey = addrs.count == 1 ? PhoneNumber.matchKey(addrs[0]) : nil
+                // Messages without the bridge's key yet are remembered one by one: they may arrive under a new key.
+                for m in try db.query("""
+                    SELECT key, addr, time FROM messages WHERE thread = ? AND (key LIKE 'rx:%' OR key LIKE 'local:%')
+                    """, [.int(thread)]) {
+                    try tombstone(key: m.string("key") ?? "", addr: m.string("addr") ?? "", time: m.int64("time") ?? 0)
+                }
+                try db.execute("""
+                    INSERT INTO deleted_threads(thread, addr_key, before) VALUES(?, ?, ?)
+                    ON CONFLICT(thread) DO UPDATE SET before = MAX(before, excluded.before),
+                      addr_key = COALESCE(excluded.addr_key, deleted_threads.addr_key)
+                    """, [.int(thread), .from(addrKey), .int(before)])
+                try db.execute("DELETE FROM messages WHERE thread = ?", [.int(thread)])
+                try db.execute("DELETE FROM threads WHERE thread = ?", [.int(thread)])
+            }
+        }
+        changed()
+    }
+
+    private func tombstone(key: String, addr: String, time: Int64) throws {
+        guard !key.isEmpty else { return }
+        let addrKey = key.hasPrefix("rx:") ? PhoneNumber.matchKey(addr) : nil
+        try db.execute("INSERT OR REPLACE INTO deleted_messages(key, addr_key, time) VALUES(?, ?, ?)",
+                       [.text(key), .from(addrKey), .int(time)])
+    }
+
+    /// Before deleting: remember how far the bridge's messages were synced, so deleting the newest ones doesn't make
+    /// the next sync fetch them again (or start over when everything was deleted).
+    private func rememberSyncedUntil() throws {
+        guard let newest = newestMessageTime else { return }
+        setValue(String(newest), for: "sms.synced_until")
+    }
+
+    /// After messages left a conversation: show its newest remaining message, or drop it if nothing is left to load.
+    private func refreshThreadAfterDelete(_ thread: Int64) throws {
+        if let last = try db.query("SELECT body, time FROM messages WHERE thread = ? ORDER BY time DESC LIMIT 1",
+                                   [.int(thread)]).first {
+            try db.execute("UPDATE threads SET snippet = ?, time = ? WHERE thread = ?",
+                           [.text(last.string("body") ?? ""), .int(last.int64("time") ?? 0), .int(thread)])
+            return
+        }
+        let olderOnBridge = try db.query("SELECT has_older FROM threads WHERE thread = ?", [.int(thread)]).first?
+            .bool("has_older") == true
+        if thread < 0 || historyComplete || !olderOnBridge {
+            try db.execute("DELETE FROM threads WHERE thread = ?", [.int(thread)])
+        } else {
+            try db.execute("UPDATE threads SET snippet = '', unread = 0 WHERE thread = ?", [.int(thread)])
+        }
     }
 
     func conversations() -> [Conversation] {
         let rows = (try? db.query("""
             SELECT t.thread, t.addrs, t.snippet, t.time, t.unread,
               (t.has_older = 1 AND (t.count IS NULL OR
-                (SELECT COUNT(*) FROM messages m WHERE m.thread = t.thread) < t.count)) AS has_older,
+                (SELECT COUNT(*) FROM messages m WHERE m.thread = t.thread) < t.count)
+                AND NOT EXISTS (SELECT 1 FROM deleted_threads d WHERE d.thread = t.thread)) AS has_older,
               (SELECT box FROM messages m WHERE m.thread = t.thread ORDER BY time DESC LIMIT 1) AS last_box,
               (SELECT state FROM messages m WHERE m.thread = t.thread ORDER BY time DESC LIMIT 1) AS last_state
             FROM threads t ORDER BY t.time DESC
@@ -370,9 +508,13 @@ final class AppDatabase: ObservableObject {
         changed()
     }
 
+    /// Where the next incremental sync starts: the newest bridge message seen, including ones deleted since.
     var newestMessageTime: Int64? {
-        (try? db.query("SELECT MAX(time) AS t FROM messages WHERE key NOT LIKE 'local:%' AND key NOT LIKE 'rx:%'"))?
+        let stored = (try? db.query("SELECT MAX(time) AS t FROM messages WHERE key NOT LIKE 'local:%' AND key NOT LIKE 'rx:%'"))?
             .first?.int64("t")
+        let remembered = value("sms.synced_until").flatMap { Int64($0) }
+        guard let stored else { return remembered }
+        return max(stored, remembered ?? stored)
     }
 
     func oldestMessageTime(thread: Int64) -> Int64? {
@@ -450,8 +592,12 @@ final class AppDatabase: ObservableObject {
 
     func upsertCalls(_ calls: [CallLogRecord]) {
         guard !calls.isEmpty else { return }
+        let clearedBefore = value("calls.cleared_before").flatMap { Int64($0) } ?? Int64.min
         try? db.transaction {
             for c in calls {
+                // Deleted on this iPhone only (D-043): a later sync doesn't bring it back.
+                if c.time <= clearedBefore { continue }
+                if try !db.query("SELECT key FROM deleted_calls WHERE key = ?", [.text(c.key)]).isEmpty { continue }
                 try db.execute("""
                     INSERT INTO calls(key, number, name, type, time, dur, sim) VALUES(?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(key) DO UPDATE SET number = excluded.number, name = excluded.name, type = excluded.type,
@@ -489,12 +635,48 @@ final class AppDatabase: ObservableObject {
         changed()
     }
 
+    /// Deletes call-history entries. With `remember`, they were deleted on this iPhone only and a later sync must
+    /// not bring them back; without, the bridge deleted them too (its ids may be reused, so nothing is kept).
+    func deleteCalls(keys: [String], remember: Bool) {
+        guard !keys.isEmpty else { return }
+        try? db.transaction {
+            for key in keys {
+                if remember { try db.execute("INSERT OR IGNORE INTO deleted_calls(key) VALUES(?)", [.text(key)]) }
+                try db.execute("DELETE FROM calls WHERE key = ?", [.text(key)])
+            }
+        }
+        changed()
+    }
+
+    /// "Clear all". With `remember` (this iPhone only), entries up to the newest one cleared stay hidden.
+    func clearCallHistory(remember: Bool) {
+        if remember, let newest = (try? db.query("SELECT MAX(time) AS t FROM calls"))?.first?.int64("t") {
+            let previous = value("calls.cleared_before").flatMap { Int64($0) } ?? newest
+            setValue(String(max(newest, previous)), for: "calls.cleared_before")
+        }
+        clearCalls()
+    }
+
+    // MARK: - Block list (a copy of the bridge's, D-043)
+
+    var blockedNumbers: [BlockedNumber] {
+        guard let data = value("block.list")?.data(using: .utf8) else { return [] }
+        return (try? JSONDecoder().decode([BlockedNumber].self, from: data)) ?? []
+    }
+
+    func setBlockedNumbers(_ list: [BlockedNumber]) {
+        let text = (try? JSONEncoder().encode(list)).map { String(decoding: $0, as: UTF8.self) }
+        setValue(text, for: "block.list")
+        changed()
+    }
+
     // MARK: - Wipe
 
     /// Deletes everything synced from the bridge (unpair).
     func wipe() {
         try? db.transaction {
-            for table in ["messages", "threads", "contacts", "calls", "kv"] {
+            for table in ["messages", "threads", "contacts", "calls", "kv", "deleted_messages", "deleted_threads",
+                          "deleted_calls"] {
                 try db.execute("DELETE FROM \(table)")
             }
         }

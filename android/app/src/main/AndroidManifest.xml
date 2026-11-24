@@ -24,6 +24,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="32" />
 
+    <!-- Updates (D-042): hands a verified APK to Android's own installer, which always asks the user to confirm.
+         Android also asks the user once to allow "Install unknown apps" for Pairline. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- The Bluetooth link. Android 11 grants these at install; Android 12+ asks ("Nearby devices"). -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
@@ -42,6 +46,8 @@
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <uses-permission android:name="android.permission.CALL_COMPANION_APP" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <!-- Only to delete call-log entries the user deletes on the iPhone (calllog.delete, D-043). -->
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
     <!-- Android 12+ binds the companion call service (keypad, mute, speaker from the iPhone) only for apps holding
          this app-op. Nobody gets it at install: Pairline turns it on through Shizuku only when the user sets up
          "Talk on iPhone" (D-046). -->
@@ -171,6 +177,11 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Results of an update's install session; reached only through our own PendingIntent (D-042). -->
+        <receiver
+            android:name=".update.UpdateInstallReceiver"
+            android:exported="false" />
 
         <receiver
             android:name=".link.BootReceiver"

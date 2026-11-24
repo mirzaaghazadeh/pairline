@@ -30,6 +30,8 @@ struct CapabilityInfo: Identifiable {
         case .netShare: return "network"
         case .wifi: return "wifi"
         case .files: return "doc.on.doc"
+        case .calllogDelete: return "trash"
+        case .block: return "hand.raised"
         }
     }
 
@@ -53,6 +55,8 @@ struct CapabilityInfo: Identifiable {
         case .netShare: return String(localized: "Internet sharing", table: "NetShare")
         case .wifi: return String(localized: "Wi-Fi link")
         case .files: return String(localized: "Send files")
+        case .calllogDelete: return String(localized: "Delete calls on the bridge phone")
+        case .block: return String(localized: "Block list")
         }
     }
 
@@ -89,6 +93,10 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Turn on the Wi-Fi link in Pairline Bridge on your Android phone.")
         case .files:
             return String(localized: "Update Pairline Bridge on your Android phone to send files.")
+        case .calllogDelete:
+            return String(localized: "Allow the call history permission in Pairline Bridge on your Android phone. Until then, calls you delete are removed from this iPhone only.")
+        case .block:
+            return String(localized: "Update Pairline Bridge on your Android phone to block numbers.")
         }
     }
 }

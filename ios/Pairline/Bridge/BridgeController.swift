@@ -44,6 +44,8 @@ final class BridgeController: ObservableObject {
     @Published var netShare: NetShareInfo?
     /// Set by the app: whether link features are allowed (trial or purchase). Demo mode is always allowed.
     @Published var canUseLink = true
+    /// A copy of the bridge's block list (D-043); the bridge's own list is the one that counts.
+    @Published private(set) var blockedNumbers: [BlockedNumber] = []
 
     var onPaywallRequest: (() -> Void)?
     var isDemo: Bool { mode == .demo }
@@ -59,6 +61,7 @@ final class BridgeController: ObservableObject {
         self.db = db
         self.phase = link.phase
         self.calls = CallCenter(useCallKit: mode == .real)
+        self.blockedNumbers = db.blockedNumbers
         calls.bridge = self
         // Call audio (M6) rides on the Wi-Fi session's media channel (M5); nil while there's no open channel.
         calls.mediaTransport = { [weak link] in (link as? LinkManager)?.mediaChannel as? AudioPacketTransport }
@@ -128,6 +131,7 @@ final class BridgeController: ObservableObject {
             }
             await sync()
             await flushOutbox()
+            await refreshBlockList()
             await measureLatency()
         }
         latencyTimer?.invalidate()
@@ -173,6 +177,9 @@ final class BridgeController: ObservableObject {
         case .netShare(let info) where inbound.id == nil:
             // The bridge stopped sharing by itself (its user turned it off).
             netShare = info
+        case .blockList(let list):
+            // Changed in the bridge app itself.
+            applyBlockList(list)
         default:
             break
         }
@@ -439,6 +446,112 @@ final class BridgeController: ObservableObject {
         await syncContacts()
     }
 
+    // MARK: - Deleting (D-043)
+
+    /// Deletes conversations from this iPhone. Android lets only its default messaging app delete texts, so they
+    /// stay on the bridge phone; a later sync doesn't bring them back.
+    func deleteConversations(_ threads: [Int64]) {
+        guard !threads.isEmpty else { return }
+        db.deleteConversations(threads)
+        if mode == .real { threads.forEach { Notifier.shared.removeDelivered(thread: $0) } }
+        log.info("sms", "Deleted \(threads.count) conversation(s) on this iPhone")
+        updateBadge()
+    }
+
+    /// Deletes single messages from this iPhone (see `deleteConversations`).
+    func deleteMessages(_ keys: [String]) {
+        guard !keys.isEmpty else { return }
+        db.deleteMessages(keys: keys)
+        log.info("sms", "Deleted \(keys.count) message(s) on this iPhone")
+        updateBadge()
+    }
+
+    enum CallDeletion {
+        /// Deleted here and on the bridge phone.
+        case bothPhones
+        /// The bridge can't delete calls right now (not connected, no permission, or no purchase): this iPhone only.
+        case iPhoneOnly
+        /// The bridge was asked but couldn't: this iPhone only.
+        case bridgeFailed
+    }
+
+    /// Whether deleting call history right now also deletes it on the bridge phone.
+    var deletesCallsOnBridge: Bool { canUseLink && phase.isConnected && has(.calllogDelete) }
+
+    /// Deletes call-history entries here and, when it can, on the bridge phone (`calllog.delete`).
+    func deleteCalls(_ keys: [String]) async -> CallDeletion {
+        guard !keys.isEmpty else { return .bothPhones }
+        guard deletesCallsOnBridge else {
+            db.deleteCalls(keys: keys, remember: true)
+            return .iPhoneOnly
+        }
+        do {
+            for start in stride(from: 0, to: keys.count, by: 500) {
+                _ = try await link.request(.calllogDelete(keys: Array(keys[start..<min(start + 500, keys.count)])))
+            }
+            db.deleteCalls(keys: keys, remember: false)
+            log.info("calls", "Deleted \(keys.count) call(s) on both phones")
+            return .bothPhones
+        } catch {
+            log.warning("calls", "The bridge couldn't delete calls: \(error.localizedDescription)")
+            db.deleteCalls(keys: keys, remember: true)
+            return .bridgeFailed
+        }
+    }
+
+    /// "Clear all": the whole call history, here and, when it can, on the bridge phone.
+    func clearCallHistory() async -> CallDeletion {
+        guard deletesCallsOnBridge else {
+            db.clearCallHistory(remember: true)
+            return .iPhoneOnly
+        }
+        do {
+            _ = try await link.request(.calllogDeleteAll)
+            db.clearCallHistory(remember: false)
+            log.info("calls", "Cleared the call history on both phones")
+            return .bothPhones
+        } catch {
+            log.warning("calls", "The bridge couldn't clear its call history: \(error.localizedDescription)")
+            db.clearCallHistory(remember: true)
+            return .bridgeFailed
+        }
+    }
+
+    // MARK: - Block list (D-043)
+
+    func isBlocked(_ number: String) -> Bool {
+        !number.isEmpty && blockedNumbers.contains { PhoneNumber.blockMatches($0.n, number) }
+    }
+
+    /// Fetches the bridge's list (after every connect).
+    func refreshBlockList() async {
+        guard canUseLink, phase.isConnected, has(.block) else { return }
+        if let reply = try? await link.request(.blockList), case .blockList(let list) = reply.message {
+            applyBlockList(list)
+        }
+    }
+
+    /// Blocks or unblocks numbers (or sender names) on the bridge phone, which keeps the list that counts.
+    func setBlocked(_ numbers: [String], _ blocked: Bool) async throws {
+        guard !numbers.isEmpty else { return }
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        guard status == nil || has(.block) else { throw ActionError.missingCapability(.block) }
+        let message: Outbound = blocked ? .blockSet(add: numbers, remove: []) : .blockSet(add: [], remove: numbers)
+        let reply = try await link.request(message)
+        if case .blockList(let list) = reply.message { applyBlockList(list) }
+        log.info("block", blocked ? "Blocked \(numbers.count) number(s)" : "Unblocked \(numbers.count) number(s)")
+        Haptics.success()
+    }
+
+    private func applyBlockList(_ list: [BlockedNumber]) {
+        guard list != blockedNumbers else { return }
+        blockedNumbers = list
+        db.setBlockedNumbers(list)
+    }
+
     func refreshStatus() async {
         guard phase.isConnected else { return }
         if let reply = try? await link.request(.statusGet), case .status(let s) = reply.message {
@@ -453,6 +566,7 @@ final class BridgeController: ObservableObject {
         status = nil
         deviceInfo = nil
         statusUpdatedAt = nil
+        blockedNumbers = []
         if mode == .real {
             WidgetSnapshot.clear()
             WidgetCenter.shared.reloadAllTimelines()

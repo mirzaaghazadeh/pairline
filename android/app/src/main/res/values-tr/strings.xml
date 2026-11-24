@@ -23,6 +23,7 @@
     <string name="action_open_pairline">Pairline\'ı aç</string>
     <string name="action_turn_on_bt">Bluetooth\'u aç</string>
     <string name="action_understood">Anladım</string>
+    <string name="action_close">Kapat</string>
 
     <!-- Persistent notification of the link service -->
     <string name="notif_channel_link">Bağlantı durumu</string>
@@ -37,6 +38,9 @@
     <string name="notif_bt_off_text">iPhone\'unuzun bağlanabilmesi için Bluetooth\'u açın.</string>
     <string name="notif_permission_title">İzin gerekiyor</string>
     <string name="notif_permission_text">iPhone\'unuzun bağlanabilmesi için Pairline\'ı açıp Yakındaki cihazlar iznini verin.</string>
+    <string name="notif_channel_updates">Uygulama güncellemeleri</string>
+    <string name="notif_channel_updates_desc">Pairline Bridge\'in yeni bir sürümü çıktığında size haber verir.</string>
+    <string name="update_notif_text">Yenilikleri görmek ve güncellemek için dokunun.</string>
 
     <!-- Setup: welcome -->
     <string name="welcome_title">Android SIM\'iniz, iPhone\'unuzda</string>
@@ -53,6 +57,7 @@
     <string name="privacy_point_accounts">Hesap yok, kayıt yok, telefon numarası doğrulaması yok</string>
     <string name="privacy_point_tracking">Reklam, analiz veya herhangi bir izleme yok</string>
     <string name="privacy_point_source">Kaynak kodu herkese açıktır, böylece herkes inceleyebilir</string>
+    <string name="privacy_point_updates">Günde bir kez GitHub\'a bu uygulamanın daha yeni bir sürümü olup olmadığını sorar. Bunu Ayarlar\'dan kapatabilirsiniz.</string>
 
     <!-- Setup: notice on Android 9, 10 and 11; %1$d is the Android version -->
     <string name="android11_title">Bu telefon Android %1$d kullanıyor</string>
@@ -70,8 +75,8 @@
     <string name="perm_phone_why">Bir arama geldiğinde iPhone\'unuza haber vermek, aramayı oradan yanıtlamak veya sonlandırmak, arama yapmak ve USSD kodları çalıştırmak için.</string>
     <string name="perm_phone_detail">Bu izin ayrıca iPhone\'unuzun operatörünüzü, sinyal gücünü ve hangi SIM\'in kullanılacağını göstermesini sağlar.</string>
     <string name="perm_calllog_title">Arama geçmişi</string>
-    <string name="perm_calllog_why">Kimin aradığını ve arama geçmişinizi iPhone\'unuzda göstermek için.</string>
-    <string name="perm_calllog_detail">Android 12 ve sonraki sürümlerde arayanın numarası yalnızca bu izinle alınabilir.</string>
+    <string name="perm_calllog_why">Kimin aradığını ve arama geçmişinizi iPhone\'unuzda göstermek ve orada sildiğiniz aramaları burada da silmek için.</string>
+    <string name="perm_calllog_detail">Android 12 ve sonraki sürümlerde arayanın numarası yalnızca bu izinle alınabilir. Pairline yalnızca iPhone\'unuzda sildiğiniz aramaları siler.</string>
     <string name="perm_contacts_title">Kişiler</string>
     <string name="perm_contacts_why">Arayanların adlarını ve kişilerinizi iPhone\'unuzda göstermek için.</string>
     <string name="perm_contacts_detail">Pairline kişileri yalnızca okur. iPhone\'dan kişi eklemek ayrı bir seçenektir ve varsayılan olarak kapalıdır.</string>
@@ -256,6 +261,7 @@
     <string name="cap_contacts_add">iPhone\'dan kişi ekleme</string>
     <string name="cap_ussd">USSD kodları</string>
     <string name="cap_dualsim">İki SIM arasında seçim</string>
+    <string name="cap_calllog_delete">Arama geçmişini iPhone\'dan silme</string>
     <string name="cap_missing_sms">SMS mesajları izni gerekiyor.</string>
     <string name="cap_missing_phone">Telefon aramaları izni gerekiyor.</string>
     <string name="cap_missing_calllog">Arama geçmişi izni gerekiyor.</string>
@@ -299,7 +305,47 @@
     <string name="settings_source">Kaynak kodu</string>
     <string name="settings_source_sub">github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">Gizlilik</string>
-    <string name="settings_privacy_body">Pairline\'ın sunucusu, hesabı, reklamı veya analizi yoktur. Mesajlarınız, aramalarınız ve kişileriniz yalnızca eşleştirilmiş iPhone\'unuza, uçtan uca şifrelenmiş olarak gider. Köprü uygulamasının internet kullanma izni bile yoktur. Günlükler bu telefonda kalır ve yalnızca siz onları gördükten sonra paylaşmayı seçerseniz paylaşılır.</string>
+    <string name="settings_privacy_body">Pairline\'ın sunucusu, hesabı, reklamı veya analizi yoktur. Mesajlarınız, aramalarınız ve kişileriniz yalnızca eşleştirilmiş iPhone\'unuza, uçtan uca şifrelenmiş olarak gider. Köprü uygulamasının kendiliğinden kurduğu tek internet bağlantısı GitHub\'daki günlük güncelleme denetimidir ve bunu Güncellemeler bölümünden kapatabilirsiniz. Günlükler bu telefonda kalır ve yalnızca siz onları gördükten sonra paylaşmayı seçerseniz paylaşılır.</string>
+
+    <!-- Updates (D-042) -->
+    <string name="settings_updates">Güncellemeler</string>
+    <string name="settings_updates_auto">Güncellemeleri denetle</string>
+    <string name="settings_updates_auto_sub">Pairline günde bir kez GitHub\'a daha yeni bir sürüm olup olmadığını sorar. Sizin veya bu telefon hakkında hiçbir şey gönderilmez.</string>
+    <string name="settings_updates_check_now">Şimdi denetle</string>
+    <string name="settings_updates_checking">Denetleniyor…</string>
+    <string name="settings_updates_never">Henüz denetlenmedi</string>
+    <string name="settings_updates_current">%1$s en son sürüm. Son denetim: %2$s</string>
+    <string name="settings_updates_last">Son denetim: %1$s</string>
+    <string name="settings_updates_installed">Yüklü: %1$s</string>
+    <string name="update_available_title">Pairline Bridge %1$s yayımlandı</string>
+    <string name="update_banner_body">Sizdeki sürüm %1$s. Android güncellemeyi yüklemeyi sormadan önce Pairline, indirilen dosyayı sürümle birlikte yayımlanan sağlama toplamıyla ve bu uygulamanın imzasıyla karşılaştırır.</string>
+    <string name="update_action">Güncelle</string>
+    <string name="update_whats_new">Yenilikler</string>
+    <string name="update_dialog_title">Pairline Bridge\'i güncelle</string>
+    <string name="update_downloading">%1$s GitHub\'dan indiriliyor…</string>
+    <string name="update_verifying">Dosyanın sağlama toplamı ve imzası kontrol ediliyor…</string>
+    <string name="update_waiting">Güncellemeyi Android\'in ekranında onaylayın. Açılmadıysa Yükle\'ye dokunun.</string>
+    <string name="update_install">Yükle</string>
+    <string name="update_failed_title">Güncelleme yüklenmedi</string>
+    <string name="update_permission_title">Güncellemeleri yüklemeye izin verin</string>
+    <string name="update_permission_body">Android, Pairline\'ın güncelleme yüklemesine izin vermenizi istiyor. Pairline için \"Bu kaynaktan izin ver\" seçeneğini açın ve geri dönün. Android her güncellemeyi yine de onayınıza sunar.</string>
+    <string name="update_error_network">GitHub\'a ulaşılamadı. Bu telefonun internet bağlantısını kontrol edip tekrar deneyin.</string>
+    <string name="update_error_response">GitHub beklenmedik bir yanıt verdi. Daha sonra tekrar deneyin.</string>
+    <string name="update_error_checksum">İndirilen dosya, sürümle birlikte yayımlanan sağlama toplamıyla eşleşmiyor, bu yüzden yüklenmedi.</string>
+    <string name="update_error_signature">İndirilen dosya bu uygulamayla aynı anahtarla imzalanmamış, bu yüzden yüklenmedi.</string>
+    <string name="update_error_package">İndirilen dosya bu uygulamanın daha yeni bir sürümü değil, bu yüzden yüklenmedi.</string>
+    <string name="update_error_storage">Bu telefonda güncelleme için yeterli boş alan yok.</string>
+    <string name="update_error_install">Android güncellemeyi yükleyemedi. Tekrar deneyin veya web sitesinden indirin.</string>
+
+    <!-- Blocked numbers (D-043) -->
+    <string name="block_title">Engellenen numaralar</string>
+    <string name="block_settings_sub">Bu numaralardan gelen mesajlar ve aramalar iPhone\'unuza ulaşmaz</string>
+    <string name="block_intro">Bu numaralardan gelen kısa mesajlar iPhone\'unuza gönderilmez ve aramaları bu telefonda reddedilir (Pairline burada aramaları sonlandıramıyorsa yalnızca iPhone\'da gösterilmez). Android\'in kendi mesajlaşma uygulaması mesajlarını almaya devam eder, çünkü onları yalnızca varsayılan mesajlaşma uygulaması engelleyebilir.</string>
+    <string name="block_add_hint">Telefon numarası veya gönderen adı</string>
+    <string name="block_add">Engelle</string>
+    <string name="block_empty">Engellenen numara yok. Bir numarayı burada ya da iPhone\'unuzda bir sohbetten, aramadan veya kişiden engelleyin.</string>
+    <string name="block_remove">%1$s engelini kaldır</string>
+    <string name="block_invalid">Bir telefon numarası veya gönderen adı girin.</string>
 
     <!-- Keep running -->
     <string name="keepalive_title">Pairline\'ı çalışır durumda tutun</string>
@@ -366,7 +412,7 @@
     <string name="help_q_perm_phone">Telefon aramaları ve SIM kartlar</string>
     <string name="help_a_perm_phone">iPhone\'unuz adına aramaları fark etmek, yanıtlamak, reddetmek, sonlandırmak ve arama yapmak, USSD kodları çalıştırmak, SIM kartlarınızı ve sinyalinizi göstermek için.</string>
     <string name="help_q_perm_calllog">Arama geçmişi</string>
-    <string name="help_a_perm_calllog">Arayanın numarasını (Android 12 ve sonraki sürümler bunu yalnızca bu izinle paylaşır), arama geçmişinizi ve bir aramanın cevapsız mı yoksa reddedilmiş mi olduğunu göstermek için.</string>
+    <string name="help_a_perm_calllog">Arayanın numarasını (Android 12 ve sonraki sürümler bunu yalnızca bu izinle paylaşır), arama geçmişinizi ve bir aramanın cevapsız mı yoksa reddedilmiş mi olduğunu göstermek için. iPhone\'unuzda arama sildiğinizde Pairline onları burada da siler.</string>
     <string name="help_q_perm_contacts">Kişiler</string>
     <string name="help_a_perm_contacts">Arayanların adlarını ve kişilerinizi iPhone\'da göstermek için. Kişi yazma ayrı bir seçenektir ve siz açmadığınız sürece kapalıdır.</string>
     <string name="help_q_perm_notif">Bildirimler</string>
@@ -375,7 +421,7 @@
     <string name="help_a_perm_battery">Pairline, Android\'in kendi penceresinde Android\'den kendisini duraklatmamasını ister. Bunu istediğiniz zaman Android ayarlarından değiştirebilirsiniz.</string>
 
     <string name="help_q_data">Verilerim nereye gidiyor?</string>
-    <string name="help_a_data">Yalnızca eşleştirilmiş iPhone\'unuza, uçtan uca şifrelenmiş olarak. Pairline\'ın sunucusu yoktur ve köprü uygulamasının internet kullanma izni yoktur.</string>
+    <string name="help_a_data">Yalnızca eşleştirilmiş iPhone\'unuza, uçtan uca şifrelenmiş olarak. Pairline\'ın sunucusu yoktur. Tek diğer bağlantı GitHub\'daki günlük güncelleme denetimidir; sizin hakkınızda hiçbir şey göndermez ve Ayarlar\'dan kapatılabilir.</string>
     <string name="help_q_logs">Tanılama raporunda neler var?</string>
     <string name="help_a_logs">Sürümler, izinler ve bağlantı olayları gibi teknik ayrıntılar. Telefon numaraları, e-postalar, adlar, mesaj metinleri ve anahtarlar çıkarılır. Paylaşmaya karar vermeden önce raporun tamamını görürsünüz.</string>
     <string name="help_q_unpair">Eşleştirmeyi kaldırdığımda ne olur?</string>

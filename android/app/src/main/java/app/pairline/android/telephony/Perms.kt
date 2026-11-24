@@ -23,7 +23,8 @@ object Perms {
         Manifest.permission.ANSWER_PHONE_CALLS,
     )
 
-    val CALL_LOG = listOf(Manifest.permission.READ_CALL_LOG)
+    /** Reading for history and caller numbers; writing only to delete calls the user deletes on the iPhone (D-043). */
+    val CALL_LOG = listOf(Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG)
 
     val CONTACTS = listOf(Manifest.permission.READ_CONTACTS)
 

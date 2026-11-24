@@ -17,6 +17,8 @@ import app.pairline.android.protocol.longOrNull
 import app.pairline.android.protocol.requestId
 import app.pairline.android.protocol.stringOrNull
 import app.pairline.android.protocol.type
+import app.pairline.android.telephony.BlockList
+import app.pairline.android.telephony.BlockRules
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
 import app.pairline.android.telephony.PhoneNumbers
@@ -53,6 +55,7 @@ class MessageRouter(
     private val audio: CallAudioRelay,
     private val netShare: NetShare,
     private val files: FileMessageHandler,
+    private val blockList: BlockList,
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -231,6 +234,9 @@ class MessageRouter(
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }
             Msg.CONTACTS_ADD -> request(message) { id -> contactsAdd(id, message) }
+            Msg.CALLLOG_DELETE -> request(message) { id -> calllogDelete(id, message) }
+            Msg.BLOCK_LIST -> request(message) { id -> blockList.toMessage(id) }
+            Msg.BLOCK_SET -> request(message) { id -> blockSet(id, message) }
             Msg.USSD_RUN -> request(message) { id ->
                 ussd.run(id, sim(message), message.stringOrNull("code") ?: invalid("code missing")) {
                     link.reply(token, it)
@@ -297,6 +303,37 @@ class MessageRouter(
         return Messages.ok(id)
     }
 
+    /** `calllog.delete`: `keys` (call-log keys) or `all: true`. Only what the user deleted on the iPhone. */
+    private fun calllogDelete(id: Long, m: JSONObject): JSONObject {
+        val all = m.boolOrNull("all") == true
+        val keys = strings(m.optJSONArray("keys"), MAX_DELETE_KEYS)
+        if (!all && keys.isEmpty()) invalid("keys missing")
+        val deleted = contacts.deleteCalls(keys, all)
+        Log.i(TAG, "call history: $deleted ${if (all) "(all)" else "selected"} entries deleted from the iPhone")
+        return Messages.ok(id)
+    }
+
+    /** `block.set`: `add` and `remove` (numbers or sender names) → the updated `block.list`. */
+    private fun blockSet(id: Long, m: JSONObject): JSONObject {
+        val add = strings(m.optJSONArray("add"), BlockRules.MAX_PER_REQUEST)
+        val remove = strings(m.optJSONArray("remove"), BlockRules.MAX_PER_REQUEST)
+        if (add.isEmpty() && remove.isEmpty()) invalid("add or remove missing")
+        if (add.any { PhoneNumbers.normalizeBlockable(it) == null }) invalid("bad number")
+        if (blockList.update(add, remove)) Log.i(TAG, "block list changed from the iPhone (${blockList.all().size} entries)")
+        return blockList.toMessage(id)
+    }
+
+    /** After the list changed in the bridge app itself: the iPhone's copy follows (`block.list` without an id). */
+    fun blockListChanged() {
+        if (link.isConnected) scope.launch { link.send(blockList.toMessage(null)) }
+    }
+
+    private fun strings(array: JSONArray?, max: Int): List<String> {
+        if (array == null) return emptyList()
+        if (array.length() > max) invalid("too many entries")
+        return (0 until array.length()).map { array.opt(it) as? String ?: invalid("not a string") }
+    }
+
     private fun onDeviceInfo(m: JSONObject) {
         prefs.peerName = m.stringOrNull("name")?.take(60)
         prefs.peerOs = m.stringOrNull("os")?.take(20)
@@ -335,5 +372,6 @@ class MessageRouter(
         const val TAG = "router"
         const val STATUS_INTERVAL_MS = 60_000L
         const val STATUS_DEBOUNCE_MS = 2_000L
+        const val MAX_DELETE_KEYS = 500
     }
 }

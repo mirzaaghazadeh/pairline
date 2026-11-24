@@ -658,3 +658,92 @@ connection runs the same pairing, handshake and records as Bluetooth, with its o
   the app sends them over the Wi-Fi link and deletes them after delivery. The extension never talks to the bridge
   itself, so it needs no keys.
 - File names are shown on the phones (notifications, the transfer list) but never logged.
+
+### D-042 — How the Android update check works (2026-11-24)
+
+Details for D-041's daily check. All of it lives in `app.pairline.android.update`, the only package allowed to reach
+GitHub (`network-code-check.sh`).
+- **When:** while the link service runs it looks every hour whether a day has passed since the last attempt (3 hours
+  after a failed one), and the app checks the same way when it's opened. Only after setup is done, and never while
+  "Check for updates" is off. "Check now" in Settings works with the switch off too. No scheduler library: a
+  coroutine in `LinkService` is enough, so no new dependency.
+- **What:** `GET https://api.github.com/repos/mirzaaghazadeh/pairline/releases?per_page=20` with
+  `HttpsURLConnection` and `org.json`, a generic `User-Agent: Pairline-Bridge` (no version, no device), no cookies.
+  Redirects are followed by hand, at most 5, and only to HTTPS GitHub hosts (`api.github.com`, `github.com`,
+  `objects.githubusercontent.com`, `release-assets.githubusercontent.com`). Replies are capped at 4 MB, APKs at 150 MB
+  and at the size GitHub lists.
+- **Which release:** the newest one that is published (not a draft), not a pre-release, tagged `android-v<x.y.z>`
+  (exactly three numbers), with the asset `pairline-bridge-<x.y.z>.apk` on github.com and exactly one
+  `| APK SHA-256 | `<64 hex>` |` row in its notes (written by `android-release.yml`). Releases missing any of these
+  are skipped, so an APK that can't be checked is never offered. It's offered when its version is higher than
+  `BuildConfig.VERSION_NAME` without a `-debug`-style suffix, compared as numbers (1.10.0 > 1.9.0).
+- **Telling the user:** one notification per new version on a new "App updates" channel (default importance), a
+  card on the home screen and a row in Settings with the version and a "What's new" link to the release page, which
+  opens in the browser only when tapped.
+- **Installing (rule 6):** "Update" first makes sure Android's "Install unknown apps" is allowed for Pairline
+  (`REQUEST_INSTALL_PACKAGES`); if not, it explains and opens Android's own screen, and carries on when the user comes
+  back (Android 11 restarts the app when that switch changes, so the request is remembered for 10 minutes). The APK
+  goes to the app's cache and must pass, in order: SHA-256 equal to the notes' row (hashed while downloading and
+  again from the file), package name equal to ours, version code higher than the installed one, and signing
+  certificates (Android 9+ signing info) exactly equal to the installed app's. Only then is it written into a
+  `PackageInstaller` session, hashed once more while copying (the session is abandoned if it changed), and committed
+  with `USER_ACTION_REQUIRED` on Android 12+, so Android always shows its own confirmation screen. The cache file is
+  deleted afterwards and after any failure. A failed check or verification is logged by reason (no hashes, no URLs)
+  and shown in plain words; nothing is installed.
+- **Why a session and not `ACTION_VIEW` with a FileProvider:** no provider to declare, the file never leaves the
+  app's private cache, and the hash can be checked on the exact bytes Android installs.
+- **Debug builds** have adb-only devtools hooks (`update-pretend/<version>`, `update-check`, `update-state`,
+  `update-start`, `update-install-cached/<name>/<sha256>`) to test the path against real releases and locally built
+  APKs. Tested on the Android 11 emulator: the real 1.0.2 release is found, downloaded and its checksum matches; a
+  debug build refuses it (different package); a wrong checksum, the same version and a different signing key are
+  each refused; a correctly signed newer debug build installs through Android's confirmation screen.
+- **Setup and Settings:** the privacy step of the setup wizard now says the app asks GitHub once a day and that this
+  can be turned off; Settings has an Updates section (switch, Check now, last check, installed version). The
+  privacy texts that said the app had no internet permission were corrected.
+
+### D-043 — Deleting from the iPhone, and a block list kept on the bridge (2026-11-24)
+
+**Deleting.**
+- **SMS are deleted on the iPhone only.** Android lets only the default SMS app write to its SMS store, and Pairline
+  isn't one (becoming it would take over the user's messaging), so there's no `sms.delete`. Conversations (swipe, or
+  Edit with multi-select) and single messages (context menu) are removed from Pairline's database, and the confirm
+  dialog says the messages stay on the Android phone and why.
+- **Tombstones** keep later syncs from bringing them back: a deleted message's key (and, for an `rx:` message, its
+  number's match key, because its stored copy arrives under another key within 60 s); a deleted conversation's
+  thread id with the time of its newest message, so a newer message brings the conversation back with just that
+  message (and nothing to "load earlier"); for a conversation started on the iPhone (negative id) also the number,
+  because the bridge files it under its own thread id. A message deleted before the bridge reported its key is
+  caught by its `cid` when `sms.state` arrives. The newest synced time is remembered, so deleting the newest
+  messages, or everything, doesn't make the next sync fetch them again. No text and no hashes of text are kept;
+  unpairing deletes the tombstones with everything else.
+- **Call history is deleted on both phones when it can be:** new request `calllog.delete` (`keys` or `all: true`),
+  capability `calllog.delete` while the bridge holds `READ_CALL_LOG` and the new `WRITE_CALL_LOG`. `WRITE_CALL_LOG`
+  joined the optional "Call history" step of the setup wizard: both are in Android's call-log permission group, so
+  it's one dialog (or no dialog at all for users who already allowed reading). Asking only when the user first
+  deletes on the iPhone was rejected: the bridge can't show a permission dialog while it sits in a drawer, and a
+  notification asking for it would be noisier than one more line in a step the user already sees. Existing users
+  see "Delete call history from iPhone" in "What your iPhone can do" with a Fix button. Without the capability, or
+  when the bridge isn't connected, the iPhone deletes locally and keeps tombstones (keys, and for "Clear all" the
+  newest cleared time); the confirm dialog says which will happen. Entries the bridge deleted keep no tombstone,
+  since Android may reuse their ids.
+
+**Block list.**
+- **The bridge keeps the list that counts** (`block.list` / `block.set`, capability `block`), because it must work
+  while the iPhone is away. It's a small JSON list in the bridge app's private preferences (excluded from backups);
+  the iPhone keeps a copy in its database for the UI. Changes made in the bridge app's own screen (Settings ›
+  Blocked numbers) reach the iPhone as a `block.list` event without an `id`. At most 500 entries (one 30 KB page).
+- **What blocking does on the bridge:** no `sms.new` for texts from the number; its received texts are left out of
+  `sms.threads` and `sms.history` (texts sent to it stay); its incoming calls get no `call.incoming` /
+  `call.state` and are declined (companion `InCallService`, or `TelecomManager.endCall` with `ANSWER_PHONE_CALLS`;
+  without either they just aren't shown); its incoming entries are left out of `calllog.sync`. Android's own
+  messaging app and dialer still see them: only the default SMS app or the system's call screening can block those,
+  and the texts say so. A call the iPhone already shows when the number arrives late is left alone, so the iPhone
+  never has a ringing call that silently disappears.
+- **Matching:** with 7+ digits on both sides, the trailing digits must agree, as many as the shorter number has, up
+  to 9 (so a number saved with its country code matches its local form even in countries with 7-digit numbers);
+  shorter numbers and sender names such as "BANK" match exactly. The existing 9-digit match key alone missed
+  `+354 555 1234` vs `555 1234`. Both apps and `fake_bridge.py` implement the same rule and test the same cases.
+- **Where to block on the iPhone:** a conversation's ⋯ menu, a call's context menu, a contact's page (all of its
+  numbers), and Settings › Blocked numbers (add by hand, swipe to unblock). Blocking asks first; unblocking doesn't.
+- History pages on the bridge skip a blocked sender's texts by reading on (up to 20 rounds of `limit + 200` rows)
+  so a page is never empty while more remain; with no blocked numbers it's the same single query as before.

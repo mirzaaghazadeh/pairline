@@ -42,6 +42,9 @@ object Msg {
     const val FILE_ANSWER = "file.answer"
     const val FILE_DONE = "file.done"
     const val FILE_CANCEL = "file.cancel"
+    const val CALLLOG_DELETE = "calllog.delete"
+    const val BLOCK_LIST = "block.list"
+    const val BLOCK_SET = "block.set"
 }
 
 /** Capabilities in `status.caps` (PROTOCOL.md, "Capabilities"). */
@@ -71,10 +74,17 @@ object Caps {
     /** The user allows internet sharing for the iPhone (M8, D-048). */
     const val NET_SHARE = "net.share"
 
+    /** Call-history entries can be deleted on the bridge too (D-043). */
+    const val CALLLOG_DELETE = "calllog.delete"
+
+    /** The bridge keeps a block list (D-043). */
+    const val BLOCK = "block"
+
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
         CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK, NET_SHARE, WIFI, FILES,
+        CALLLOG_DELETE, BLOCK,
     )
 }
 
