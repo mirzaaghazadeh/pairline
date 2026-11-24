@@ -1,6 +1,230 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Bluetooth + Wi-Fi" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "البلوتوث + Wi-Fi" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بلوتوث + وای‌فای" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bluetooth + Wi-Fi" } }
+      }
+    },
+    "Cancelled" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أُلغي" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "لغو شد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İptal edildi" } }
+      }
+    },
+    "Cancelled on the other phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أُلغي على الهاتف الآخر." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در گوشی دیگر لغو شد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Diğer telefonda iptal edildi." } }
+      }
+    },
+    "Choose files" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختيار ملفات" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتخاب فایل" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosya seç" } }
+      }
+    },
+    "Clear" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مسح" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاک کردن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Temizle" } }
+      }
+    },
+    "Connect both phones to the same Wi-Fi network to send files. Files go only between your two phones, encrypted." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لإرسال الملفات، صِل الهاتفين بشبكة Wi-Fi نفسها. تنتقل الملفات مشفّرة بين هاتفيك فقط." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای ارسال فایل، هر دو گوشی را به یک شبکه وای‌فای وصل کنید. فایل‌ها رمزنگاری‌شده و فقط بین دو گوشی شما جابه‌جا می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosya göndermek için iki telefonu aynı Wi-Fi ağına bağlayın. Dosyalar şifreli olarak yalnızca iki telefonunuz arasında gider." } }
+      }
+    },
+    "Couldn't read this file." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّرت قراءة هذا الملف." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خواندن این فایل ممکن نشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu dosya okunamadı." } }
+      }
+    },
+    "Couldn't save the file." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر حفظ الملف." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ذخیره فایل ممکن نشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosya kaydedilemedi." } }
+      }
+    },
+    "File received. Find it in the Files app under Pairline › Received." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم استلام الملف. ستجده في تطبيق الملفات ضمن Pairline › Received." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فایل دریافت شد. آن را در برنامه Files، در Pairline › Received پیدا کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosya alındı. Dosyalar uygulamasında Pairline › Received altında bulabilirsiniz." } }
+      }
+    },
+    "Files up to 1 GB can be received." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يمكن استلام ملفات حتى 1 غيغابايت." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فایل‌های تا ۱ گیگابایت را می‌توان دریافت کرد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "En fazla 1 GB'lık dosyalar alınabilir." } }
+      }
+    },
+    "Files up to 1 GB can be sent." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يمكن إرسال ملفات حتى 1 غيغابايت." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فایل‌های تا ۱ گیگابایت را می‌توان فرستاد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "En fazla 1 GB'lık dosyalar gönderilebilir." } }
+      }
+    },
+    "Or connect both phones to the same Wi-Fi network." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أو صِل الهاتفين بشبكة Wi-Fi نفسها." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یا هر دو گوشی را به یک شبکه وای‌فای وصل کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ya da iki telefonu aynı Wi-Fi ağına bağlayın." } }
+      }
+    },
+    "Photos and documents over Wi-Fi, both ways" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصور والمستندات عبر Wi-Fi في الاتجاهين" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "عکس و سند از طریق وای‌فای، در هر دو جهت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Wi-Fi üzerinden iki yönlü fotoğraf ve belge" } }
+      }
+    },
+    "Saved · %@" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حُفظ · %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ذخیره شد · %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kaydedildi · %@" } }
+      }
+    },
+    "Send files" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إرسال الملفات" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ارسال فایل" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosya gönder" } }
+      }
+    },
+    "Send photos, videos and documents to your bridge phone. Files it sends you are saved in the Files app under Pairline › Received." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أرسل الصور ومقاطع الفيديو والمستندات إلى الهاتف الوسيط. تُحفظ الملفات التي يرسلها إليك في تطبيق الملفات ضمن Pairline › Received." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "عکس، ویدیو و سند را به گوشی پل بفرستید. فایل‌هایی که آن گوشی برایتان می‌فرستد در برنامه Files، در Pairline › Received ذخیره می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefona fotoğraf, video ve belge gönderin. Onun size gönderdiği dosyalar Dosyalar uygulamasında Pairline › Received altına kaydedilir." } }
+      }
+    },
+    "Sent · %@" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أُرسل · %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ارسال شد · %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gönderildi · %@" } }
+      }
+    },
+    "The file changed while it was being sent." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تغيّر الملف أثناء إرساله." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فایل هنگام ارسال تغییر کرد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosya gönderilirken değişti." } }
+      }
+    },
+    "The file is too large for the other phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الملف كبير جدًا بالنسبة للهاتف الآخر." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این فایل برای گوشی دیگر بیش از حد بزرگ است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosya diğer telefon için çok büyük." } }
+      }
+    },
+    "The other phone declined the file." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رفض الهاتف الآخر الملف." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی دیگر این فایل را نپذیرفت." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Diğer telefon dosyayı reddetti." } }
+      }
+    },
+    "The other phone doesn't have enough free space." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد مساحة فارغة كافية على الهاتف الآخر." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی دیگر فضای خالی کافی ندارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Diğer telefonda yeterli boş alan yok." } }
+      }
+    },
+    "The other phone is busy. Try again in a moment." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الهاتف الآخر مشغول. أعد المحاولة بعد قليل." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی دیگر مشغول است. چند لحظه دیگر دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Diğer telefon meşgul. Birazdan tekrar deneyin." } }
+      }
+    },
+    "The transfer failed." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فشل النقل." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتقال انجام نشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aktarım başarısız oldu." } }
+      }
+    },
+    "The Wi-Fi connection dropped." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "انقطع الاتصال عبر Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال وای‌فای قطع شد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Wi-Fi bağlantısı koptu." } }
+      }
+    },
+    "There isn't enough free space on this iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد مساحة فارغة كافية على هذا الـ iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فضای خالی کافی روی این آیفون نیست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone'da yeterli boş alan yok." } }
+      }
+    },
+    "Too many files at once. Send it again in a moment." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ملفات كثيرة في وقت واحد. أعد الإرسال بعد قليل." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تعداد فایل‌های هم‌زمان زیاد است. چند لحظه دیگر دوباره بفرستید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aynı anda çok fazla dosya var. Birazdan tekrar gönderin." } }
+      }
+    },
+    "Transfers" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عمليات النقل" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتقال‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aktarımlar" } }
+      }
+    },
+    "Turn on the Wi-Fi link in Pairline Bridge on your Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل الاتصال عبر Wi-Fi في Pairline Bridge على هاتف أندرويد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در Pairline Bridge روی گوشی اندرویدی خود، اتصال وای‌فای را روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge'te Wi-Fi bağlantısını açın." } }
+      }
+    },
+    "Update Pairline Bridge on your Android phone to send files." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حدّث Pairline Bridge على هاتف أندرويد لإرسال الملفات." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای ارسال فایل، Pairline Bridge را روی گوشی اندرویدی خود به‌روزرسانی کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosya göndermek için Android telefonunuzdaki Pairline Bridge'i güncelleyin." } }
+      }
+    },
+    "Waiting · %@" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قيد الانتظار · %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در انتظار · %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bekliyor · %@" } }
+      }
+    },
+    "Wi-Fi" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "Wi-Fi" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وای‌فای" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Wi-Fi" } }
+      }
+    },
+    "Wi-Fi link" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الاتصال عبر Wi-Fi" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال وای‌فای" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Wi-Fi bağlantısı" } }
+      }
+    },
     "–" : {
       "extractionState" : "stale",
       "localizations" : {

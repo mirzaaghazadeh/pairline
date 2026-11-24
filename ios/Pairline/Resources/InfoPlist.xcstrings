@@ -1,6 +1,36 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "NSLocalNetworkUsageDescription" : {
+      "comment" : "Privacy - Local Network Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يتصل Pairline بهاتفك الوسيط الذي يعمل بنظام أندرويد عبر شبكة Wi-Fi لديك لمزامنة أسرع ولإرسال الملفات وصوت المكالمات. لا يُرسل أي شيء إلى الإنترنت."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pairline connects to your Android bridge phone over your Wi-Fi network for faster syncing, files and call audio. Nothing goes to the internet."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline از طریق شبکه وای‌فای شما به گوشی پل اندرویدی وصل می‌شود تا همگام‌سازی سریع‌تر، ارسال فایل و صدای تماس ممکن شود. چیزی به اینترنت فرستاده نمی‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline, daha hızlı eşzamanlama, dosya ve arama sesi için Wi-Fi ağınız üzerinden Android köprü telefonunuza bağlanır. İnternete hiçbir şey gönderilmez."
+          }
+        }
+      }
+    },
     "CFBundleDisplayName" : {
       "comment" : "Bundle display name",
       "extractionState" : "extracted_with_value",
