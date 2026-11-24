@@ -18,7 +18,7 @@ settings:
     # Matches the App Store version in App Store Connect. Build 1 is uploaded; `asc publish appstore` picks the next
     # free build number itself, so this only matters for archives made in Xcode.
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "2"
+    CURRENT_PROJECT_VERSION: "3"
     # The maintainer's team (forks: set your own to run on a device). CI builds without signing.
     DEVELOPMENT_TEAM: "7Y68TERDUC"
     CODE_SIGN_STYLE: Automatic

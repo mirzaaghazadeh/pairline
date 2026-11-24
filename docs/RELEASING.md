@@ -64,5 +64,22 @@ from the tagged commit without our key, which is the basis for the reproducible-
 
 ## iOS (remote app)
 
-Built and uploaded from Xcode to App Store Connect. Each release note names the git tag and commit
-(`ios-v<version>`). Details are added when the iOS project exists.
+Built and uploaded to App Store Connect from Xcode (Product › Archive › Distribute) or from the command line. Each
+release note names the git tag and commit (`ios-v<version>`).
+
+1. Raise `CURRENT_PROJECT_VERSION` in `ios/project.yml` (every upload needs a new build number) and run
+   `xcodegen generate`.
+2. Archive and upload with an App Store Connect API key (team 7Y68TERDUC):
+   ```sh
+   AUTH=(-allowProvisioningUpdates -authenticationKeyPath AuthKey_<KEY_ID>.p8
+         -authenticationKeyID <KEY_ID> -authenticationKeyIssuerID <ISSUER_ID>)
+   xcodebuild -scheme Pairline -configuration Release -destination 'generic/platform=iOS' \
+     -archivePath build/Pairline.xcarchive archive "${AUTH[@]}"
+   # ExportOptions.plist: method app-store-connect, destination upload, teamID 7Y68TERDUC, signingStyle automatic
+   PATH=/usr/bin:$PATH xcodebuild -exportArchive -archivePath build/Pairline.xcarchive \
+     -exportOptionsPlist ExportOptions.plist -exportPath build/export "${AUTH[@]}"
+   ```
+   The export needs Apple's `/usr/bin/rsync`; with Homebrew's rsync first in `PATH` it fails with
+   "exportArchive Copy failed".
+3. Uploading doesn't submit anything. Attach the build to the version in App Store Connect and submit it for review
+   when it's time; `Info.plist` already answers the export-compliance question (D-035).
