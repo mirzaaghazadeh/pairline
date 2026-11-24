@@ -47,4 +47,8 @@
     <string name="help_a_debugging">Some banking and payment apps refuse to open while Developer options or Wireless debugging are on. Pairline never turns them on by itself. Turn Wireless debugging off while you use such an app; Shizuku may stop, and you start it again later for call audio.</string>
     <string name="help_q_listen_only">I hear calls on the iPhone, but they can’t hear me</string>
     <string name="help_a_listen_only">Some phones don’t let any app feed audio into a call. Then you hear calls on the iPhone and talk on this phone. After each call the iPhone asks how it sounded; your answers help Pairline try another way on the next call.</string>
+    <!-- Home screen, "What Pairline can do" -->
+    <string name="cap_missing_talk">Optional: hear and answer calls on the iPhone itself. Needs the free Shizuku app.</string>
+    <string name="cap_missing_dtmf_talk">Comes with Talk on iPhone.</string>
+    <string name="action_set_up">Set up</string>
 </resources>

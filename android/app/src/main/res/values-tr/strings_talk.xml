@@ -46,4 +46,7 @@
     <string name="help_a_debugging">Bazı banka ve ödeme uygulamaları Geliştirici seçenekleri veya Kablosuz hata ayıklama açıkken açılmaz. Pairline bunları asla kendiliğinden açmaz. Böyle bir uygulamayı kullanırken Kablosuz hata ayıklamayı kapatın; Shizuku durabilir, arama sesi için onu daha sonra yeniden başlatırsınız.</string>
     <string name="help_q_listen_only">Aramaları iPhone’da duyuyorum ama karşı taraf beni duymuyor</string>
     <string name="help_a_listen_only">Bazı telefonlar hiçbir uygulamanın aramaya ses aktarmasına izin vermez. O zaman aramaları iPhone’da duyar, bu telefondan konuşursunuz. Her aramadan sonra iPhone sesin nasıl olduğunu sorar; yanıtlarınız Pairline’ın bir sonraki aramada başka bir yol denemesine yardımcı olur.</string>
+    <string name="cap_missing_talk">İsteğe bağlı: aramaları iPhone’un kendisinde duyun ve yanıtlayın. Ücretsiz Shizuku uygulaması gerekir.</string>
+    <string name="cap_missing_dtmf_talk">iPhone’dan konuşma ile birlikte gelir.</string>
+    <string name="action_set_up">Kur</string>
 </resources>

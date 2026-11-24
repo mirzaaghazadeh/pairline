@@ -20,8 +20,8 @@ android {
         targetSdk = 36
         // A release tag must be android-v<versionName>; the release workflow checks this.
         // Raise versionCode for every release.
-        versionCode = 4
-        versionName = "1.1.0"
+        versionCode = 5
+        versionName = "1.1.1"
     }
 
     androidResources {

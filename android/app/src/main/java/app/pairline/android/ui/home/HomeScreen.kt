@@ -140,6 +140,7 @@ fun HomeScreen(navigate: (Route) -> Unit) {
                 when (fix) {
                     is Fix.Permission -> requestPermission(fix.group)
                     Fix.Settings -> navigate(Route.Settings)
+                    Fix.Talk -> navigate(Route.Talk)
                 }
             })
 
@@ -429,9 +430,14 @@ private fun SignalBars(level: Int) {
 sealed interface Fix {
     data class Permission(val group: PermissionGroup) : Fix
     data object Settings : Fix
+    /** Talk on iPhone's setup (Shizuku, D-047). Optional, so its rows offer "Set up" instead of a warning. */
+    data object Talk : Fix
 }
 
 private data class Feature(val cap: String, @StringRes val title: Int, @StringRes val missing: Int, val fix: Fix?)
+
+/** Call audio on the iPhone needs Android 10 or later (D-047). */
+private val talkSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
 private val features = listOf(
     Feature(Caps.SMS_RECEIVE, R.string.cap_sms_receive, R.string.cap_missing_sms, Fix.Permission(PermissionGroup.SMS)),
@@ -440,7 +446,17 @@ private val features = listOf(
     Feature(Caps.CALL_OBSERVE, R.string.cap_call_observe, R.string.cap_missing_phone, Fix.Permission(PermissionGroup.PHONE)),
     Feature(Caps.CALL_CONTROL, R.string.cap_call_control, R.string.cap_missing_phone, Fix.Permission(PermissionGroup.PHONE)),
     Feature(Caps.CALL_DIAL, R.string.cap_call_dial, R.string.cap_missing_phone, Fix.Permission(PermissionGroup.PHONE)),
-    Feature(Caps.CALL_DTMF, R.string.cap_call_dtmf, R.string.cap_missing_companion, null),
+    Feature(
+        Caps.CALL_MEDIA, R.string.settings_talk,
+        if (talkSupported) R.string.cap_missing_talk else R.string.talk_summary_unsupported,
+        if (talkSupported) Fix.Talk else null,
+    ),
+    // The keypad, mute and speaker come with the same Shizuku setup (it allows Pairline's in-call service).
+    Feature(
+        Caps.CALL_DTMF, R.string.cap_call_dtmf,
+        if (talkSupported) R.string.cap_missing_dtmf_talk else R.string.cap_missing_companion,
+        if (talkSupported) Fix.Talk else null,
+    ),
     Feature(Caps.CONTACTS, R.string.cap_contacts, R.string.cap_missing_contacts, Fix.Permission(PermissionGroup.CONTACTS)),
     Feature(Caps.CALLLOG, R.string.cap_calllog, R.string.cap_missing_calllog, Fix.Permission(PermissionGroup.CALL_LOG)),
     Feature(Caps.CALLLOG_DELETE, R.string.cap_calllog_delete, R.string.cap_missing_calllog, Fix.Permission(PermissionGroup.CALL_LOG)),
@@ -451,18 +467,30 @@ private val features = listOf(
 
 @Composable
 private fun CapabilitiesCard(caps: List<String>, onFix: (Fix) -> Unit) {
+    val prefsTick by AppGraph.prefs.changes.collectAsState()
+    val talkOn = remember(prefsTick) { AppGraph.prefs.talkOnIphone }
     SectionCard(title = stringResource(R.string.home_supports), contentPadding = PaddingValues(vertical = 4.dp)) {
         features.forEachIndexed { i, f ->
             if (i > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp))
             val ok = f.cap in caps
+            val needsFix = f.fix != null && f.fix != Fix.Talk
             ListRow(
                 title = stringResource(f.title),
-                subtitle = if (ok) null else stringResource(f.missing),
-                icon = if (ok) PIcons.CheckCircle else if (f.fix != null) PIcons.Warning else PIcons.Info,
-                iconTone = if (ok) Tone.GOOD else if (f.fix != null) Tone.WARN else Tone.NEUTRAL,
+                subtitle = when {
+                    ok -> null
+                    // Turned on but not working, e.g. Shizuku stopped after a restart: say what's missing.
+                    f.cap == Caps.CALL_MEDIA && talkSupported && talkOn -> app.pairline.android.ui.talk.talkSummary()
+                    else -> stringResource(f.missing)
+                },
+                icon = if (ok) PIcons.CheckCircle else if (needsFix) PIcons.Warning else PIcons.Info,
+                iconTone = if (ok) Tone.GOOD else if (needsFix) Tone.WARN else Tone.NEUTRAL,
                 showChevron = false,
                 trailing = if (!ok && f.fix != null) {
-                    { TextButton(onClick = { onFix(f.fix) }) { Text(stringResource(R.string.action_fix)) } }
+                    {
+                        TextButton(onClick = { onFix(f.fix) }) {
+                            Text(stringResource(if (f.fix == Fix.Talk) R.string.action_set_up else R.string.action_fix))
+                        }
+                    }
                 } else {
                     null
                 },
