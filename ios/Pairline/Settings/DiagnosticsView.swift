@@ -59,7 +59,8 @@ struct DiagnosticsView: View {
     private func build() {
         let bridge = app.real
         var lines: [String] = []
-        lines.append("Pairline \(AppInfo.version) (\(AppInfo.build)), protocol v\(WireProtocol.version)")
+        // "build 12", not "(12)": the redactor took "1.0.1 (12" for a phone number.
+        lines.append("Pairline \(AppInfo.version) build \(AppInfo.build), protocol v\(WireProtocol.version)")
         lines.append("iOS \(UIDevice.current.systemVersion), \(UIDevice.current.model)")
         lines.append("Language: \(Bundle.main.preferredLocalizations.first ?? "?")")
         lines.append("Access: \(describe(purchases.access))")
