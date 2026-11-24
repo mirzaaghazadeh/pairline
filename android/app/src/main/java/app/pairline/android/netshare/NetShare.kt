@@ -16,7 +16,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Starts and stops internet sharing for the paired iPhone (M8, D-048). Off unless the user allows it in the bridge
- * app; the iPhone then turns it on and off with `net.share`. Each start makes a new port and new credentials.
+ * app; the iPhone then turns it on and off with `net.share`. The port (47830 when free) and the credentials stay the
+ * same from one start to the next, so the iPhone's proxy settings keep working; switching sharing off on the bridge
+ * retires the credentials (D-058).
  */
 class NetShare(private val context: Context, private val prefs: AppPrefs) {
 
@@ -41,8 +43,9 @@ class NetShare(private val context: Context, private val prefs: AppPrefs) {
         _session.value?.let { return it }
         val address = localAddress()
             ?: throw RequestException(ErrorCode.UNSUPPORTED, "the bridge isn't on a Wi-Fi network or hotspot")
-        val username = "pl-" + token(6)
-        val password = token(20)
+        // The same port and credentials every time (until sharing is switched off on the bridge), so the proxy URL
+        // pasted into the iPhone's Wi-Fi settings and the Telegram proxy keep working the next time.
+        val (username, password) = credentials()
         var current: Session? = null
         val p = ShareProxy(
             bindAddress = address,
@@ -52,7 +55,12 @@ class NetShare(private val context: Context, private val prefs: AppPrefs) {
             allowedClient = { peerAddress() },
         )
         val port = try {
-            p.start()
+            try {
+                p.start(PREFERRED_PORT)
+            } catch (e: java.io.IOException) {
+                Log.w(TAG, "proxy port $PREFERRED_PORT is busy; using another one")
+                p.start()
+            }
         } catch (e: java.io.IOException) {
             throw RequestException(ErrorCode.FAILED, "couldn't open the proxy port")
         }
@@ -120,6 +128,16 @@ class NetShare(private val context: Context, private val prefs: AppPrefs) {
         return true
     }
 
+    /** The stored credentials, or new ones (kept until sharing is switched off on the bridge). */
+    private fun credentials(): Pair<String, String> {
+        prefs.netShareCredentials?.split(':', limit = 2)?.takeIf { it.size == 2 && it.all(String::isNotEmpty) }?.let {
+            return it[0] to it[1]
+        }
+        val made = ("pl-" + token(6)) to token(20)
+        prefs.netShareCredentials = "${made.first}:${made.second}"
+        return made
+    }
+
     private fun token(length: Int): String {
         val random = SecureRandom()
         return String(CharArray(length) { ALPHABET[random.nextInt(ALPHABET.length)] })
@@ -127,6 +145,8 @@ class NetShare(private val context: Context, private val prefs: AppPrefs) {
 
     companion object {
         private const val TAG = "netshare"
+        /** Next to the Wi-Fi link's 47820; another one is used only if something else holds it. */
+        const val PREFERRED_PORT = 47830
         private const val ALPHABET = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         private val WIFI_NAMES = listOf("wlan", "ap", "swlan", "softap", "wifi", "eth")
     }

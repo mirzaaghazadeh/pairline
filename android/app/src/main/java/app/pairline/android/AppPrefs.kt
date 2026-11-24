@@ -103,6 +103,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getBoolean(AUDIO_MUTE_MIC, false)
         set(value) = edit { putBoolean(AUDIO_MUTE_MIC, value) }
 
+    /** Silence this phone's earpiece while the call's audio is on the iPhone. Turns off if the iPhone then hears nothing. */
+    var audioSilenceEarpiece: Boolean
+        get() = prefs.getBoolean(AUDIO_SILENCE_EARPIECE, true)
+        set(value) = edit { putBoolean(AUDIO_SILENCE_EARPIECE, value) }
+
     /** Consecutive calls where the other side couldn't hear the iPhone. After two, talking is reported as unsupported. */
     var audioTalkFailures: Int
         get() = prefs.getInt(AUDIO_TALK_FAILURES, 0)
@@ -111,7 +116,16 @@ class AppPrefs(context: Context) {
     /** The user lets the paired iPhone use this phone's internet (M8, D-048). Off by default. */
     var netShareAllowed: Boolean
         get() = prefs.getBoolean(NET_SHARE_ALLOWED, false)
-        set(value) = edit { putBoolean(NET_SHARE_ALLOWED, value) }
+        set(value) = edit {
+            putBoolean(NET_SHARE_ALLOWED, value)
+            // Switching sharing off on the bridge retires the proxy's credentials; the next start makes new ones.
+            if (!value) remove(NET_SHARE_CREDENTIALS)
+        }
+
+    /** The proxy's "username:password", kept across starts so the iPhone's settings keep working (D-058). */
+    var netShareCredentials: String?
+        get() = prefs.getString(NET_SHARE_CREDENTIALS, null)
+        set(value) = edit { putString(NET_SHARE_CREDENTIALS, value) }
 
     /** While sharing, Iranian (.ir) sites go direct instead of through this phone's VPN. */
     var netShareDirectIran: Boolean
@@ -155,8 +169,10 @@ class AppPrefs(context: Context) {
         const val BRIDGE_STOPPED = "bridge_stopped"
         const val AUDIO_SOURCE = "audio_capture_source"
         const val AUDIO_MUTE_MIC = "audio_mute_bridge_mic"
+        const val AUDIO_SILENCE_EARPIECE = "audio_silence_earpiece"
         const val AUDIO_TALK_FAILURES = "audio_talk_failures"
         const val NET_SHARE_ALLOWED = "net_share_allowed"
         const val NET_SHARE_DIRECT_IR = "net_share_direct_ir"
+        const val NET_SHARE_CREDENTIALS = "net_share_credentials"
     }
 }

@@ -68,11 +68,11 @@
 
     <string name="talk_manage">Bilmekte fayda var</string>
     <string name="talk_tip_restart">Yeniden başlatmadan sonra</string>
-    <string name="talk_tip_restart_sub">Android, telefon yeniden başlayınca Kablosuz hata ayıklamayı kapatır. Tekrar açın; Pairline yardımcısını kendiliğinden başlatır. Pairline size bir bildirimle hatırlatır.</string>
+    <string name="talk_tip_restart_sub">Android, telefon yeniden başlayınca veya Wi-Fi’den ayrılınca Kablosuz hata ayıklamayı kapatır. Pairline, bu telefon Wi-Fi’ye bağlanır bağlanmaz onu kendiliğinden yeniden açar ve yardımcısını başlatır.</string>
     <string name="talk_tip_hotspot">Bu telefonun erişim noktasını kullanmak</string>
     <string name="talk_tip_hotspot_sub">Kablosuz hata ayıklama yalnızca bu telefon bir Wi-Fi ağına bağlıyken çalışır; bu yüzden erişim noktasını açmak (veya Wi-Fi’yi kapatmak) onu kapatır. Pairline’ın yardımcısını önce Wi-Fi’deyken başlatın: erişim noktasına geçtikten sonra da telefon yeniden başlayana kadar çalışır.</string>
     <string name="talk_tip_banking">Banka uygulamaları</string>
-    <string name="talk_tip_banking_sub">Bazı banka uygulamaları Kablosuz hata ayıklama açıkken açılmaz. Pairline’ın yardımcısı çalışmaya başladıktan sonra Kablosuz hata ayıklamayı yeniden kapatabilirsiniz: aramalar telefon yeniden başlayana kadar iPhone’da çalmaya devam eder.</string>
+    <string name="talk_tip_banking_sub">Bazı banka uygulamaları Geliştirici seçenekleri veya Kablosuz hata ayıklama açıkken açılmaz. Pairline, yardımcısının ihtiyacı olduğunda bunları yeniden açar; bu yüzden böyle bir uygulamayı kullanırken iPhone’dan konuşma’yı kapatın.</string>
     <string name="talk_forget">Eşlemeyi unut</string>
     <string name="talk_forget_sub">Yardımcıyı durdurur ve Pairline’ın anahtarını siler. Kablosuz hata ayıklama › Eşlenen cihazlar altından da “Pairline”ı kaldırın.</string>
     <string name="talk_wifi_note">Arama sesi Wi-Fi ağınız üzerinden uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz.</string>
@@ -99,15 +99,15 @@
 
     <string name="talk_reminder_channel">iPhone’dan konuşma</string>
     <string name="talk_reminder_title">Kablosuz hata ayıklamayı açın</string>
-    <string name="talk_reminder_text">Telefon yeniden başladı, bu yüzden arama sesi bu telefona döndü. Dokunun ve Kablosuz hata ayıklamayı açın: Pairline yardımcısını kendiliğinden başlatır. Bu arada aramalar yine iPhone’da çalar.</string>
+    <string name="talk_reminder_text">Telefon yeniden başladı, bu yüzden arama sesi bu telefona döndü. Pairline, bu telefon Wi-Fi’ye bağlanınca Kablosuz hata ayıklamayı kendiliğinden açar; hemen yapmak için dokunun. Bu arada aramalar yine iPhone’da çalar.</string>
 
     <string name="help_section_talk">iPhone’dan konuşma</string>
     <string name="help_q_shizuku">Kablosuz hata ayıklama burada ne işe yarıyor? Root gerekir mi?</string>
     <string name="help_a_shizuku">Android, arama sesine yalnızca kendi hata ayıklama aracının erişmesine izin verir. Kablosuz hata ayıklama açıkken Pairline, kendi uygulamasından bu aracın haklarıyla küçük bir yardımcı başlatır: ek uygulama ve root gerekmez. Yardımcı yalnızca arama sesini taşır ve aramadaki tuş takımı, sessiz ve hoparlörü yönetir. Telefon yeniden başlayınca durur; “Eşlemeyi unut” ise Pairline’ın erişimini tamamen kaldırır.</string>
     <string name="help_q_restart">Telefon yeniden başlayınca arama sesi neden bu telefona dönüyor?</string>
-    <string name="help_a_restart">Android, telefon her yeniden başladığında Kablosuz hata ayıklamayı kapatır ve yardımcı da onunla durur. Pairline bunun üzerine bir bildirim gösterir: dokunup Kablosuz hata ayıklamayı açın, Pairline yardımcısını kendiliğinden başlatır. O zamana kadar aramalar iPhone’da çalar ve çalışır, ses bu telefonda olur.</string>
+    <string name="help_a_restart">Android, telefon her yeniden başladığında veya Wi-Fi’den ayrıldığında Kablosuz hata ayıklamayı kapatır ve yardımcı da onunla durur. Pairline, bu telefon bir Wi-Fi ağına bağlanır bağlanmaz onu kendiliğinden yeniden açar ve yardımcısını tekrar başlatır. O zamana kadar aramalar iPhone’da çalar ve çalışır, ses bu telefonda olur.</string>
     <string name="help_q_debugging">Bir uygulama hata ayıklamanın açık olduğundan şikâyet ediyor</string>
-    <string name="help_a_debugging">Bazı banka ve ödeme uygulamaları Geliştirici seçenekleri veya Kablosuz hata ayıklama açıkken açılmaz. Pairline bunları asla kendiliğinden açmaz. Pairline’ın yardımcısı çalışmaya başladıktan sonra Kablosuz hata ayıklamayı kapatabilirsiniz; aramalar bir sonraki yeniden başlatmaya kadar iPhone’da çalmaya devam eder.</string>
+    <string name="help_a_debugging">Bazı banka ve ödeme uygulamaları Geliştirici seçenekleri veya Kablosuz hata ayıklama açıkken açılmaz. iPhone’dan konuşma açıkken Pairline, yardımcısının ihtiyacı olduğunda bunları yeniden açar. Böyle bir uygulamayı kullanırken iPhone’dan konuşma’yı kapatın.</string>
     <string name="help_q_listen_only">Aramaları iPhone’da duyuyorum ama karşı taraf beni duymuyor</string>
     <string name="help_a_listen_only">Bazı telefonlar hiçbir uygulamanın aramaya ses aktarmasına izin vermez. O zaman aramaları iPhone’da duyar, bu telefondan konuşursunuz. Her aramadan sonra iPhone sesin nasıl olduğunu sorar; yanıtlarınız Pairline’ın bir sonraki aramada başka bir yol denemesine yardımcı olur.</string>
 

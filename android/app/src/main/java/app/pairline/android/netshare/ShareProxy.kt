@@ -47,7 +47,12 @@ class ShareProxy(
     fun start(port: Int = 0): Int {
         val s = ServerSocket()
         s.reuseAddress = true
-        s.bind(InetSocketAddress(bindAddress, port), 64)
+        try {
+            s.bind(InetSocketAddress(bindAddress, port), 64)
+        } catch (e: java.io.IOException) {
+            s.close() // a busy preferred port: the caller tries another one
+            throw e
+        }
         server = s
         running = true
         pool.execute { acceptLoop(s) }

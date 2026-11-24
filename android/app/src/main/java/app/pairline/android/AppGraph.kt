@@ -102,7 +102,13 @@ object AppGraph {
                         TalkReminder.cancel(app)
                         // The user turned on Talk on iPhone: also let Android bind the companion call service, which
                         // gives the iPhone the keypad, mute and speaker (Android 12+).
-                        if (prefs.talkOnIphone) io.execute { manager.allowOngoingCalls() }
+                        // It also lets Pairline turn Wireless debugging back on by itself after a restart (D-059).
+                        if (prefs.talkOnIphone) {
+                            io.execute {
+                                manager.allowOngoingCalls()
+                                manager.allowSecureSettings()
+                            }
+                        }
                     }
                     // The helper is gone (usually a restart turned Wireless debugging off): tell the user once per
                     // boot how to get call audio back.

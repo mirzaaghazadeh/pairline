@@ -15,6 +15,7 @@ import androidx.core.app.RemoteInput
 import app.pairline.android.AppGraph
 import app.pairline.android.MainActivity
 import app.pairline.android.R
+import app.pairline.android.link.LinkService
 import app.pairline.android.privileged.PrivilegedManager.Pairing
 
 /**
@@ -100,6 +101,9 @@ class PairingCodeReceiver : BroadcastReceiver() {
             PairingNotification.isCancel(intent) -> manager.cancelPairing()
             PairingNotification.isCode(intent) -> {
                 val code = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(PairingNotification.KEY_CODE)?.toString().orEmpty()
+                // Pairing takes several seconds: run it in the link's foreground service, which Android keeps alive,
+                // not in this receiver, which Android may end (with the app) once it returns.
+                if (LinkService.pairWithCode(context, code)) return
                 val pending = goAsync()
                 AppGraph.io.execute {
                     try {
@@ -113,7 +117,10 @@ class PairingCodeReceiver : BroadcastReceiver() {
     }
 }
 
-/** Opening Developer options. Pairline only opens the screen; the user changes the settings there (rule 5). */
+/**
+ * Opening Developer options for the first setup. (Once set up, Pairline turns the debugging settings back on by itself
+ * when its helper needs them, D-059.)
+ */
 object DeveloperSettings {
     /** Developer options, scrolled to Wireless debugging where the Settings app supports it. */
     fun wirelessDebugging(): Intent {

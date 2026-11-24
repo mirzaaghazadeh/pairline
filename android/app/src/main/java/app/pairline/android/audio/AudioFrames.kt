@@ -41,9 +41,15 @@ class JitterBuffer(
     private val frameBytes: Int = AudioPackets.FRAME_BYTES,
     /** Frames to hold before playing starts: 3 × 20 ms = 60 ms. */
     private val target: Int = 3,
-    /** Above this many waiting frames the buffer skips ahead, so delay can't build up. */
-    private val capacity: Int = 12,
+    /**
+     * A hard limit of 1 s waiting. Below it, extra delay (a burst after a Wi-Fi stall, or a sender clock running a
+     * little fast) drains by skipping quiet frames only ([take]), so no speech is cut; only past it does the buffer jump.
+     */
+    private val capacity: Int = 50,
 ) {
+    /** Quiet frames skipped to bring the delay back down (for the call's log line). */
+    var skipped = 0
+        private set
     private val frames = HashMap<Int, ByteArray>()
     private var next = -1
     private var buffering = true
@@ -74,6 +80,16 @@ class JitterBuffer(
     @Synchronized
     fun take(): ByteArray? {
         if (buffering) return null
+        // More than [DRAIN_ABOVE] frames waiting: drop one quiet frame per call until back near the target. Pauses
+        // between words get a little shorter; speech is never cut.
+        while (frames.size > target + DRAIN_ABOVE) {
+            val waiting = frames[next] ?: break
+            if (Pcm.rms(waiting) > QUIET_RMS) break
+            frames.remove(next)
+            next = (next + 1) and 0xFFFF
+            skipped++
+            break
+        }
         val frame = frames.remove(next)
         next = (next + 1) and 0xFFFF
         if (frame != null) {
@@ -107,6 +123,12 @@ class JitterBuffer(
 
     companion object {
         private const val CONCEAL_FRAMES = 2
+
+        /** Frames above the target before quiet frames are skipped: 4 × 20 ms of slack for ordinary Wi-Fi jitter. */
+        private const val DRAIN_ABOVE = 4
+
+        /** Below this level (16-bit RMS, about −46 dBFS) a frame counts as quiet. */
+        const val QUIET_RMS = 160
 
         /** 25 frames (half a second) with nothing: start over and buffer again. */
         private const val RESET_AFTER_MISSES = 25

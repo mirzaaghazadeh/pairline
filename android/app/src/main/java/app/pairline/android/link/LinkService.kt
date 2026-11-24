@@ -128,6 +128,12 @@ class LinkService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
+        if (intent?.action == ACTION_ADB_PAIR) {
+            // The Wireless debugging code typed into Pairline's notification (D-054): pair while this foreground
+            // service keeps the process alive.
+            val code = intent.getStringExtra(EXTRA_CODE).orEmpty()
+            graph.io.execute { graph.privileged.submitPairingCode(code) }
+        }
         if (intent?.action == ACTION_REFRESH) {
             // Permissions or settings may have changed. start() is a no-op while the GATT server runs, so a
             // live connection isn't disturbed; it retries if Bluetooth wasn't usable before.
@@ -220,6 +226,26 @@ class LinkService : Service() {
         private const val TAG = "service"
         private const val UPDATE_LOOK_MS = 3600_000L
         const val ACTION_REFRESH = "app.pairline.android.action.REFRESH"
+        private const val ACTION_ADB_PAIR = "app.pairline.android.action.ADB_PAIR"
+        private const val EXTRA_CODE = "code"
+
+        /**
+         * Hands a Wireless debugging pairing code to the running link service. False when Pairline is stopped or Android
+         * refuses the start; the caller then pairs by itself.
+         */
+        fun pairWithCode(context: Context, code: String): Boolean {
+            if (AppGraph.prefs.bridgeStopped) return false
+            return try {
+                ContextCompat.startForegroundService(
+                    context,
+                    Intent(context, LinkService::class.java).setAction(ACTION_ADB_PAIR).putExtra(EXTRA_CODE, code),
+                )
+                true
+            } catch (e: Exception) {
+                Log.w(TAG, "couldn't hand the pairing code to the link service", e)
+                false
+            }
+        }
 
         /** Starts the link unless the user stopped Pairline; [byUser] (Start, pairing, setup) clears that first. */
         fun start(context: Context, reason: String, byUser: Boolean = false) {

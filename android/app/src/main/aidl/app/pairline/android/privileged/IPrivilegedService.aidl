@@ -19,8 +19,9 @@ interface IPrivilegedService {
     boolean allowOngoingCalls(String packageName) = 3;
 
     /**
-     * Starts capturing call audio from [source] (VOICE_DOWNLINK or VOICE_CALL) at [sampleRate] (8000, 16000 or
-     * 48000). Returns the read end of a pipe carrying 16-bit little-endian mono PCM.
+     * Starts capturing call audio from [source] (VOICE_DOWNLINK, VOICE_CALL, or PrivilegedService.SOURCE_INTERCEPT for
+     * Android 13's call-audio interception) at [sampleRate] (8000, 16000 or 48000). Returns the read end of a pipe
+     * carrying 16-bit little-endian mono PCM.
      */
     ParcelFileDescriptor startCapture(int source, int sampleRate) = 4;
 
@@ -31,6 +32,15 @@ interface IPrivilegedService {
      */
     ParcelFileDescriptor startInject(int sampleRate, boolean muteMic) = 5;
 
-    /** Stops capture and injection and restores the microphone. */
+    /** Stops capture and injection and restores the microphone and the earpiece. */
     void stopAudio() = 6;
+
+    /**
+     * Grants ([allow]) or revokes WRITE_SECURE_SETTINGS for Pairline itself, so it can turn Developer options and
+     * Wireless debugging back on when this helper is needed again (D-059). Refuses any other package.
+     */
+    boolean allowSecureSettings(String packageName, boolean allow) = 7;
+
+    /** During a relayed call: silences ([on]) this phone's earpiece, or restores it. Also restored by stopAudio(). */
+    boolean silenceEarpiece(boolean on) = 8;
 }

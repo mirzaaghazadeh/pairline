@@ -3,6 +3,7 @@ package app.pairline.android.link
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattServer
@@ -187,7 +188,57 @@ class BleTransport(
 
     /** The device read `id`, subscribed or wrote: it's a Pairline central, so stay hidden while it's connected. */
     private fun claim(device: BluetoothDevice) {
-        if (device.address in links) claimed += device.address
+        if (device.address in links) {
+            claimed += device.address
+            holdLeLink(device)
+        }
+    }
+
+    /** LE links this phone holds, as a GATT client, to each connected iPhone ([holdLeLink]). */
+    private val held = HashMap<String, BluetoothGatt>()
+    private val holdAttempts = HashMap<String, Int>()
+
+    /**
+     * Holds an LE link to a connected iPhone for as long as it's connected. When the two phones are also paired over
+     * classic Bluetooth (e.g. for Bluetooth tethering), iOS may run Pairline's GATT connection over the classic link
+     * and move it to LE as soon as an LE link appears, which ends the session each time ("the bridge's service went
+     * away" on the iPhone, again and again). With this phone holding an LE link, iOS keeps the session on LE. Over an
+     * LE connection this rides the existing link and changes nothing. It's released only when the iPhone disconnects,
+     * so it never ends a session itself. Nothing is read or written over it.
+     */
+    private fun holdLeLink(device: BluetoothDevice) {
+        if (device.address in held || server == null) return
+        val gatt = try {
+            device.connectGatt(context, false, holdCallback, BluetoothDevice.TRANSPORT_LE)
+        } catch (e: SecurityException) {
+            null
+        } ?: return
+        held[device.address] = gatt
+        Log.i(TAG, "holding an LE link to the iPhone")
+    }
+
+    private fun releaseLeLink(address: String) {
+        holdAttempts.remove(address)
+        held.remove(address)?.let { runCatching { it.close() } }
+    }
+
+    private val holdCallback = object : BluetoothGattCallback() {
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            if (newState != BluetoothProfile.STATE_DISCONNECTED) return
+            handler.post {
+                val address = gatt.device.address
+                if (held[address] !== gatt) return@post
+                held.remove(address)
+                runCatching { gatt.close() }
+                // The iPhone is still connected (e.g. the LE connection attempt timed out): try again a few times.
+                val tries = (holdAttempts[address] ?: 0) + 1
+                holdAttempts[address] = tries
+                Log.i(TAG, "LE link hold ended (status $status, try $tries)")
+                if (address in claimed && tries < MAX_HOLD_ATTEMPTS) {
+                    handler.postDelayed({ if (address in claimed) holdLeLink(gatt.device) }, HOLD_RETRY_MS)
+                }
+            }
+        }
     }
 
     private fun resumeAdvertisingIfIdle() {
@@ -204,6 +255,7 @@ class BleTransport(
         subscribed.clear()
         links.clear()
         claimed.clear()
+        for (address in held.keys.toList()) releaseLeLink(address)
         runCatching { server?.close() }
         server = null
         txCharacteristic = null
@@ -244,6 +296,7 @@ class BleTransport(
                     mtus.remove(device.address)
                     links.remove(device.address)
                     claimed.remove(device.address)
+                    releaseLeLink(device.address)
                     connections[device.address]?.disconnect("Bluetooth disconnected (status $status)", linkGone = true)
                     resumeAdvertisingIfIdle()
                 }
@@ -486,6 +539,8 @@ class BleTransport(
     companion object {
         private const val TAG = "ble"
         private const val UNCLAIMED_LINK_MS = 8_000L
+        private const val HOLD_RETRY_MS = 5_000L
+        private const val MAX_HOLD_ATTEMPTS = 6
         val SERVICE_UUID: UUID = UUID.fromString("8CC09D09-4084-4E91-A358-A153EB79D422")
         val RX_UUID: UUID = UUID.fromString("15347F70-79F0-40C4-92DE-ED6612B4CE5F")
         val TX_UUID: UUID = UUID.fromString("8A38CBD3-5771-4174-9C10-7EB7FD219E6B")

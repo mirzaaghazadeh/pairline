@@ -77,6 +77,20 @@ class AudioFramesTest {
     }
 
     @Test
+    fun extraDelayDrainsThroughQuietFramesOnly() {
+        val jb = JitterBuffer(target = 3)
+        // A burst: 15 frames waiting, frames 1-3 quiet, the rest speech.
+        for (s in 0 until 15) jb.put(s, frame(if (s in 1..3) 0 else 3000))
+        assertArrayEquals(frame(3000), jb.take()) // frame 0 (speech): never skipped
+        assertArrayEquals(frame(0), jb.take()) // frame 1 skipped, frame 2 played
+        assertArrayEquals(frame(3000), jb.take()) // frame 3 skipped, frame 4 played
+        assertEquals(2, jb.skipped)
+        // From here on only speech waits: every frame plays, in order.
+        for (s in 5 until 15) assertArrayEquals(frame(3000), jb.take())
+        assertEquals(2, jb.skipped)
+    }
+
+    @Test
     fun resampleKeepsDurationAndLevel() {
         val tone48 = ShortArray(960) { 1000 }
         val down = Pcm.resample(tone48, 48_000, 16_000)

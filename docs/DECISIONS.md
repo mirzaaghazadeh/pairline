@@ -892,21 +892,6 @@ Testing on a Galaxy Note 3 running Android 10 and reports from a tester's Samsun
   handing the audio back to the Android phone. When iOS stops the engine for a route change (AirPods, car, speaker,
   CallKit), a fresh engine starts in the same session (at most 6 times per call). An iPhone-side failure gets its
   own alert (microphone permission) instead of the bridge one.
-
-### D-057 — The iPhone app declares the `voip` background mode (2026-11-25)
-
-A tester's diagnostics report showed CallKit refusing every incoming call ("CallKit didn't show the call",
-`com.apple.CallKit.error`) and every call placed from the iPhone (`requesttransaction` errors), so calls never rang on
-the iPhone. CallKit's generic error `CXErrorCodeMissingVoIPBackgroundMode` is what an app gets when `voip` is missing
-from `UIBackgroundModes`, and Pairline had only `audio` and `bluetooth-central` (D-027 left `voip` out because there
-was no PushKit and no call audio). Pairline now declares `voip`. It still uses no PushKit and no server (rule 2): calls
-arrive over the link to the bridge phone, and iOS wakes the app for them through `bluetooth-central` as before. This
-supersedes D-027's first point.
-- If CallKit still declines a call (Focus) while Pairline is in the background, a local notification says who is
-  calling and opens the in-app call screen; it's removed when the call ends.
-- The diagnostics report redacted the error codes away: its number rule matched across line breaks (an error code,
-  the line break and the next line's time stamp). Numbers no longer span lines, and the report keeps each line's time
-  stamp.
 - **Incoming calls while the iPhone is locked.** iOS keeps only Bluetooth links alive in the background, and doesn't
   relaunch an app the user swiped away. The iPhone's Bridge tab now says so when the link is over Wi-Fi only, and
   when the user swipes Pairline away (while iOS still runs it) a local notification says calls and messages are
@@ -916,3 +901,67 @@ supersedes D-027's first point.
   and the helper, and keeps them off across reboots and updates (`bridge_stopped`). The home screen then says
   Pairline is stopped, with Start. Starting it again from Settings or the home screen, showing a pairing code or
   finishing setup clears the flag. No new data flow or permission.
+
+### D-057 — The iPhone app declares the `voip` background mode (2026-11-25)
+
+A tester's diagnostics report showed CallKit refusing every incoming call ("CallKit didn't show the call",
+`com.apple.CallKit.error`) and every call placed from the iPhone (`requesttransaction` error 1, "unentitled"), so
+calls never rang on the iPhone. CallKit's generic error `CXErrorCodeMissingVoIPBackgroundMode` is what an app gets
+when `voip` is missing from `UIBackgroundModes`, and Pairline had only `audio` and `bluetooth-central` (D-027 left
+`voip` out because there was no PushKit and no call audio). Pairline now declares `voip`. It still uses no PushKit and
+no server (rule 2): calls arrive over the link to the bridge phone, and iOS wakes the app for them through
+`bluetooth-central` as before. This supersedes D-027's first point. Confirmed by the same tester: with build 12 the
+`requesttransaction` errors stopped.
+- If CallKit still declines a call (Focus) while Pairline is in the background, a local notification says who is
+  calling and opens the in-app call screen; it's removed when the call ends.
+- The diagnostics report redacted the error codes away: its number rule matched across line breaks (an error code,
+  the line break and the next line's time stamp). Numbers no longer span lines, and the report keeps each line's time
+  stamp.
+
+### D-058 — Internet sharing keeps its address; the iPhone checks its Wi-Fi proxy (2026-11-25)
+
+Testers reported "no internet" with internet sharing. The iPhone uses it through a proxy configuration URL pasted
+into the Wi-Fi network's settings, and the bridge made a new port and new credentials at every start, so the pasted URL
+(and Telegram's proxy) stopped working each time sharing was turned on again, and a URL left in place after sharing
+stopped meant no internet at all on that network.
+- The bridge's proxy uses port 47830 (another one only if that's taken) and keeps its credentials from one start to
+  the next; switching internet sharing off in the bridge app retires them.
+- The iPhone reads the current Wi-Fi's proxy setting (locally, `CFNetworkCopySystemProxySettings`) and says whether it
+  uses the bridge, isn't set yet, points at an old address, or still points at the bridge while sharing is off (also
+  on the Bridge tab, where "no internet" is noticed first).
+- Not done: setting the proxy automatically. That needs a VPN configuration on the iPhone, which App Review allows
+  only from organization developer accounts.
+
+### D-059 — Pairline turns the debugging settings back on for Talk on iPhone (2026-11-25)
+
+The maintainer's decision, replacing rule 5's "never re-enable USB or Wireless debugging": testers kept losing Talk on
+iPhone because Android switches Wireless debugging off at every restart and whenever Wi-Fi drops, and the helper can
+only start while it's on.
+- Once the helper runs, it grants Pairline itself `WRITE_SECURE_SETTINGS` (`cmd package grant`, a development
+  permission the shell may grant; Pairline's own package only). While Talk on iPhone is on and the helper isn't
+  running, Pairline turns Developer options, USB debugging and Wireless debugging back on (Wireless debugging only on
+  a Wi-Fi network, where it can run), then starts the helper as before. If it keeps going off (e.g. the user declines
+  Android's "allow on this network" prompt) the retries back off from 15 s to about half an hour.
+- It also switches off Android's 7-day expiry of debugging authorizations, which would otherwise make the user pair
+  again after a long uptime.
+- Turning Talk on iPhone off or "Forget pairing" returns the permission (`cmd package revoke`) and ends all of this.
+  No other setting is ever changed. AGENTS.md rules 5 and 7 and PRIVACY.md say so.
+
+### D-060 — Call audio and link reliability fixes from tester reports (2026-11-25)
+
+- **The helper states its identity to the audio server.** Started with `app_process`, the helper builds its contexts
+  from the system context, whose app-ops package isn't the shell's; recording then fails to start ("call audio
+  capture didn't start", seen on a tester's Android 15 Samsung). The helper now uses a context that says
+  `com.android.shell` and its uid (package, app-ops package, attribution) and an AudioManager made for it.
+- **Pairing from the notification runs in the link's foreground service,** not in the notification's broadcast
+  receiver, which Android may end (with the app) while pairing still runs.
+- **This phone's earpiece is silent during a relayed call** (voice-call volume 0 as the shell user, restored when the
+  relay ends or Pairline's process dies). If the iPhone then can't hear the caller, the next call leaves it on.
+- **The bridge holds an LE link to the iPhone during a session.** With the phones also paired over classic Bluetooth
+  (e.g. for Bluetooth tethering), iOS may run the session over the classic link and end it when it moves to LE,
+  again and again ("the bridge's service went away", seen in a tester's log).
+- **No speech cut by the jitter buffers.** Both directions keep up to 1 s and bring extra delay down by skipping quiet
+  frames only, instead of dropping up to 180 ms at once after a Wi-Fi stall.
+- **iPhone:** the in-app call screen turns off at the ear while the audio is on the earpiece, and a dial the bridge
+  accepted but never reported ends after 30 s.
+- **Call-audio failures list every source tried** (with Android's audio mode), so one report from the iPhone says why.

@@ -47,7 +47,7 @@ object HelperMain {
     }
 
     /** Keeps [service] handed to Pairline, again after Pairline's process restarts. */
-    private class Link(private val service: IBinder, private val user: Int) {
+    private class Link(private val service: PrivilegedService, private val user: Int) {
         private val main = Handler(Looper.getMainLooper())
         private val apk = File(System.getenv("CLASSPATH").orEmpty())
         private var appToken: IBinder? = null
@@ -61,9 +61,11 @@ object HelperMain {
             }
             appToken = token
             missingSince = 0L
-            // When Pairline's process ends, wait for it to come back (or stop, see below).
-            runCatching { token.linkToDeath({ main.post { appToken = null; waitForApp() } }, 0) }
-                .onFailure { main.post { waitForApp() } }
+            // When Pairline's process ends, give the call its own microphone and earpiece back (a relayed call can't
+            // go on without Pairline), then wait for it to come back (or stop, see below).
+            runCatching {
+                token.linkToDeath({ main.post { service.releaseAudio(); appToken = null; waitForApp() } }, 0)
+            }.onFailure { main.post { waitForApp() } }
         }
 
         private fun waitForApp() {

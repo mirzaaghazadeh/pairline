@@ -104,7 +104,11 @@ class CallAudioRelay(
      * iPhone. This is how the relay settles on what works on this phone.
      */
     fun feedback(heard: Boolean?, heardMe: Boolean?) {
-        if (heard == false) {
+        if (heard == false && prefs.audioSilenceEarpiece) {
+            // On a phone whose capture follows the call volume, silencing the earpiece also silenced the relay.
+            prefs.audioSilenceEarpiece = false
+            Log.i(TAG, "caller not heard on the iPhone: next call leaves this phone's earpiece on")
+        } else if (heard == false) {
             // The next source in the phone's order, round and round.
             val order = captureOrder()
             val current = order.indexOf(prefs.audioCaptureSource).coerceAtLeast(0)
@@ -129,6 +133,7 @@ class CallAudioRelay(
     fun resetLearning() {
         prefs.audioCaptureSource = 0
         prefs.audioMuteBridgeMic = false
+        prefs.audioSilenceEarpiece = true
         prefs.audioTalkFailures = 0
         onCapsChanged?.invoke()
     }
@@ -141,6 +146,13 @@ class CallAudioRelay(
         if (privileged.probe.value?.interceptable == true) add(PrivilegedService.SOURCE_INTERCEPT)
         add(SOURCE_DOWNLINK)
         add(SOURCE_CALL)
+    }
+
+    private fun sourceName(source: Int): String = when (source) {
+        PrivilegedService.SOURCE_INTERCEPT -> "interception"
+        SOURCE_DOWNLINK -> "downlink"
+        SOURCE_CALL -> "voice call"
+        else -> "source $source"
     }
 
     /**
@@ -199,6 +211,8 @@ class CallAudioRelay(
             val preferred = prefs.audioCaptureSource.takeIf { it in order } ?: order.first()
             val sources = listOf(preferred) + (order - preferred)
             var problem: String? = null
+            // Every source's reason, so a failure report (also shown on the iPhone) says what each one did.
+            val problems = LinkedHashMap<Int, String>()
             var opened = preferred
             capture@ for (source in sources) {
                 for (rate in CAPTURE_RATES) {
@@ -214,6 +228,7 @@ class CallAudioRelay(
                             break@capture
                         } catch (e: RuntimeException) {
                             problem = e.message
+                            problems.putIfAbsent(source, "${sourceName(source)} at $rate Hz: ${e.message}")
                             // The interception API refuses until the call's audio mode is set: ask again shortly.
                             val notYet = source == PrivilegedService.SOURCE_INTERCEPT &&
                                 problem?.contains("not available in mode") == true
@@ -224,8 +239,19 @@ class CallAudioRelay(
                 }
             }
             if (captureFd == null) {
-                Log.w(TAG, "call audio capture failed (sources $sources): $problem")
-                throw RequestException(ErrorCode.FAILED, "couldn't capture call audio: $problem")
+                val detail = problems.values.joinToString("; ").ifEmpty { problem ?: "no source" }
+                val summary = "couldn't capture call audio (Android ${android.os.Build.VERSION.SDK_INT}, audio mode " +
+                    "${audioMode()}, interception ${privileged.probe.value?.interceptable == true}): $detail"
+                Log.w(TAG, summary)
+                throw RequestException(ErrorCode.FAILED, summary)
+            }
+            // The caller's voice is on the iPhone now: don't also play it from this phone's earpiece (the capture
+            // taps the call before the volume). Undone by stopAudio() at the end.
+            if (prefs.audioSilenceEarpiece) {
+                val silenced = runCatching { service.silenceEarpiece(true) }
+                    .onFailure { Log.w(TAG, "couldn't silence this phone's earpiece: ${it.message}") }
+                    .getOrDefault(false)
+                if (silenced) Log.i(TAG, "this phone's earpiece is silent during the relay")
             }
             if (wantTalk) {
                 try {
@@ -308,7 +334,11 @@ class CallAudioRelay(
             runCatching { captureFd?.close() }
             runCatching { injectFd?.close() }
             val level = if (sent > 0) levelSum / sent else 0
-            Log.i(TAG, "call audio stopped ($reason): sent $sent frames (average level $level), received $received")
+            Log.i(
+                TAG,
+                "call audio stopped ($reason): sent $sent frames (average level $level), received $received, " +
+                    "quiet frames skipped ${jitter.skipped}",
+            )
         }
 
         private fun readFully(input: InputStream, buffer: ByteArray): Boolean {

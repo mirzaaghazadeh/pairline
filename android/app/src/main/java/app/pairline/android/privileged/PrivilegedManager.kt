@@ -1,11 +1,17 @@
 package app.pairline.android.privileged
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.database.ContentObserver
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import app.pairline.android.AppPrefs
 import app.pairline.android.log.Log
@@ -123,8 +129,19 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
             }
         }
         val resolver = context.contentResolver
-        for (key in listOf(Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, ADB_WIFI_ENABLED)) {
+        for (key in listOf(Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, Settings.Global.ADB_ENABLED, ADB_WIFI_ENABLED)) {
             runCatching { resolver.registerContentObserver(Settings.Global.getUriFor(key), false, observer) }
+        }
+        // Wireless debugging works only on a Wi-Fi network: when one comes up, the helper may be started again.
+        runCatching {
+            context.getSystemService(ConnectivityManager::class.java)?.registerNetworkCallback(
+                NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build(),
+                object : ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) {
+                        main.post { refresh() }
+                    }
+                },
+            )
         }
         refresh()
     }
@@ -137,11 +154,14 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
             // Not needed any more: stop it, but only if Pairline can start it again by itself, or if the user
             // stopped Pairline (then everything stops, even if Talk on iPhone needs Wireless debugging again later).
             if (!wanted && (canRestart() || prefs.bridgeStopped)) {
-                stopHelper()
+                // Talk on iPhone switched off: also take back Pairline's right to change secure settings.
+                stopHelper(revokeSettings = !prefs.talkOnIphone)
                 return set(nextWithoutHelper())
             }
+            autoEnableFailures = 0
             return set(State.READY)
         }
+        if (wanted && paired) turnDebuggingBackOn()
         set(nextWithoutHelper())
         if (_state.value == State.IDLE && wanted) startHelper()
     }
@@ -264,12 +284,86 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         }
     }
 
-    private fun stopHelper() {
+    private fun stopHelper(revokeSettings: Boolean = false) {
         val s = service ?: return
         service = null
         _probe.value = null
-        worker.execute { runCatching { s.destroy() } }
+        worker.execute {
+            if (revokeSettings && canWriteSecureSettings()) {
+                runCatching { s.allowSecureSettings(context.packageName, false) }
+                Log.i(TAG, "secure-settings permission returned")
+            }
+            runCatching { s.destroy() }
+        }
         Log.i(TAG, "helper stopped (not needed)")
+    }
+
+    /**
+     * Lets Pairline turn Wireless debugging back on by itself later (D-059). Called once the helper is ready and Talk
+     * on iPhone is on; off the main thread.
+     */
+    fun allowSecureSettings(): Boolean {
+        if (!canWriteSecureSettings()) {
+            val s = service ?: return false
+            val granted = runCatching { s.allowSecureSettings(context.packageName, true) }
+                .onFailure { Log.w(TAG, "couldn't get the secure-settings permission", it) }
+                .getOrDefault(false)
+            if (!granted) return false
+            Log.i(TAG, "Pairline may now turn Wireless debugging back on by itself")
+        }
+        keepAuthorization()
+        return true
+    }
+
+    fun canWriteSecureSettings(): Boolean =
+        context.checkSelfPermission(WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED
+
+    private var lastAutoEnable = 0L
+    private var autoEnableFailures = 0
+
+    /**
+     * Talk on iPhone is on and its helper is gone (after a restart, or Android switched Wireless debugging off with
+     * Wi-Fi): turn Developer options, USB debugging (some phones switch Wireless debugging off with it) and Wireless
+     * debugging back on, as the user chose (D-059). Only on a Wi-Fi network, where Wireless debugging can run, and
+     * backing off if it keeps going off again (e.g. the user declines Android's "allow on this network" prompt).
+     */
+    private fun turnDebuggingBackOn() {
+        if (!prefs.talkOnIphone || prefs.bridgeStopped || starting) return
+        val resolver = context.contentResolver
+        val off = listOf(Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, Settings.Global.ADB_ENABLED, ADB_WIFI_ENABLED)
+            .filter { runCatching { Settings.Global.getInt(resolver, it, 0) != 1 }.getOrDefault(false) }
+        if (off.isEmpty() || !canWriteSecureSettings() || !onWifi()) return
+        val now = SystemClock.elapsedRealtime()
+        val wait = AUTO_ENABLE_BASE_MS shl autoEnableFailures.coerceAtMost(7)
+        if (lastAutoEnable != 0L && now - lastAutoEnable < wait) return
+        lastAutoEnable = now
+        autoEnableFailures++
+        runCatching { off.forEach { Settings.Global.putInt(resolver, it, 1) } }
+            .onSuccess { Log.i(TAG, "turned back on for the helper: ${off.joinToString()}") }
+            .onFailure { Log.w(TAG, "couldn't turn debugging on", it) }
+    }
+
+    /**
+     * Android forgets debugging authorizations unused for 7 days, which would make the user pair Pairline again after
+     * a long uptime. With the secure-settings permission, switch that expiry off (Developer options' "Disable adb
+     * authorization timeout"), as part of keeping Talk on iPhone working by itself (D-059).
+     */
+    private fun keepAuthorization() {
+        if (!canWriteSecureSettings()) return
+        val resolver = context.contentResolver
+        runCatching {
+            if (Settings.Global.getLong(resolver, ADB_ALLOWED_CONNECTION_TIME, -1L) != 0L) {
+                Settings.Global.putLong(resolver, ADB_ALLOWED_CONNECTION_TIME, 0L)
+                Log.i(TAG, "debugging authorizations no longer expire")
+            }
+        }.onFailure { Log.w(TAG, "couldn't keep the debugging authorization", it) }
+    }
+
+    private fun onWifi(): Boolean {
+        val cm = context.getSystemService(ConnectivityManager::class.java) ?: return false
+        return runCatching {
+            cm.allNetworks.any { cm.getNetworkCapabilities(it)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true }
+        }.getOrDefault(false)
     }
 
     /**
@@ -357,7 +451,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
     /** "Forget pairing": stops the helper and deletes Pairline's key. */
     fun forget() {
         cancelPairing()
-        stopHelper()
+        stopHelper(revokeSettings = true)
         prefs.adbPaired = false
         worker.execute { AdbKey.delete(context) }
         refresh()
@@ -385,6 +479,10 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
     companion object {
         private const val TAG = "privileged"
         private const val ADB_WIFI_ENABLED = "adb_wifi_enabled"
+        private const val WRITE_SECURE_SETTINGS = "android.permission.WRITE_SECURE_SETTINGS"
+        private const val ADB_ALLOWED_CONNECTION_TIME = "adb_allowed_connection_time"
+        /** 15 s, doubled after each try that didn't bring the helper back (at most ~32 min). */
+        private const val AUTO_ENABLE_BASE_MS = 15_000L
         private const val FIND_TIMEOUT_MS = 8_000L
         // The first start after an install can be slow (Android verifies the APK's code for the new process).
         private const val ATTACH_TIMEOUT_MS = 20_000L

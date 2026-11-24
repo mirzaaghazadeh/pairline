@@ -1,7 +1,10 @@
 package app.pairline.android.privileged
 
 import android.annotation.SuppressLint
+import android.content.AttributionSource
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
@@ -14,6 +17,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.Process
+import androidx.annotation.RequiresApi
 import app.pairline.android.BuildConfig
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
@@ -25,10 +29,11 @@ import org.json.JSONObject
  * ([HelperMain]) as the shell user; the app talks to it through [IPrivilegedService].
  *
  * - Only Pairline's own uid may call it ([checkCaller]); every argument is checked against a fixed list.
- * - It can do four things: report what the phone allows, turn on Pairline's MANAGE_ONGOING_CALLS app-op, capture
- *   the call's audio, and feed audio into the call. Nothing else is reachable.
- * - It never touches settings the user didn't ask for (rule 5): the microphone mute it sets during a relayed call is
- *   restored by [stopAudio], and the app-op is set only when the user turns on "Talk on iPhone".
+ * - It can do six things: report what the phone allows, turn on Pairline's MANAGE_ONGOING_CALLS app-op, let
+ *   Pairline write secure settings (D-059), capture the call's audio, feed audio into the call, and silence this
+ *   phone's earpiece during a relayed call. Nothing else is reachable.
+ * - The microphone mute and earpiece silence it sets during a relayed call are restored by [stopAudio], or when
+ *   Pairline's process ends; the app-op and the permission are set only once the user turned on "Talk on iPhone".
  * - It writes no logs: errors go back to the app as exceptions, and the app logs them (redacted) in its own log.
  */
 class PrivilegedService(private val context: Context) : IPrivilegedService.Stub() {
@@ -36,15 +41,29 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
     private val ownerUid: Int = context.packageManager.getPackageUid(BuildConfig.APPLICATION_ID, 0)
 
     /**
-     * Audio calls are attributed to the shell package, which is what this process really is (uid 2000). Attributing
-     * them to Pairline's package from the shell uid would fail Android's package/uid check.
+     * Audio calls are attributed to the shell package, which is what this process really is (uid 2000). A context
+     * created from the system context inherits the system's app-ops package (or none), which makes the audio server
+     * refuse to start recording ("didn't start"); [ShellIdentity] states the shell package and uid explicitly.
      */
-    private val shell: Context = runCatching { context.createPackageContext(SHELL_PACKAGE, 0) }.getOrDefault(context)
+    private val shell: Context = ShellIdentity(runCatching { context.createPackageContext(SHELL_PACKAGE, 0) }.getOrDefault(context))
+
+    /**
+     * An AudioManager made for [shell] itself: getSystemService would hand back one cached for the system context,
+     * whose package doesn't match this process's uid (volume and interception calls check that).
+     */
+    private val audio: AudioManager by lazy {
+        runCatching {
+            AudioManager::class.java.getDeclaredConstructor(Context::class.java)
+                .apply { isAccessible = true }
+                .newInstance(shell)
+        }.getOrElse { shell.getSystemService(AudioManager::class.java) }
+    }
 
     private val lock = Any()
     private var capture: Capture? = null
     private var inject: Inject? = null
     private var micMuteBefore: Boolean? = null
+    private var voiceVolumeBefore: Int? = null
 
     override fun destroy() {
         checkCaller()
@@ -148,6 +167,46 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         synchronized(lock) { stopLocked() }
     }
 
+    /**
+     * During a relayed call, silences this phone's earpiece (the voice-call volume at 0, which the shell user may set
+     * because it holds MODIFY_PHONE_STATE), so the caller's voice doesn't also play here. Restored by [stopAudio], or
+     * when Pairline's process ends ([releaseAudio]).
+     */
+    override fun silenceEarpiece(on: Boolean): Boolean {
+        checkCaller()
+        synchronized(lock) {
+            val am = audioManager()
+            if (!on) {
+                restoreEarpiece(am)
+                return true
+            }
+            if (voiceVolumeBefore == null) {
+                voiceVolumeBefore = am.getStreamVolume(AudioManager.STREAM_VOICE_CALL)
+                am.setStreamVolume(AudioManager.STREAM_VOICE_CALL, 0, 0)
+            }
+            return am.getStreamVolume(AudioManager.STREAM_VOICE_CALL) == 0
+        }
+    }
+
+    /**
+     * Lets Pairline itself change secure settings (WRITE_SECURE_SETTINGS, a development permission the shell may
+     * grant), so it can turn Developer options and Wireless debugging back on when this helper is needed again after
+     * a restart (D-059). Only Pairline's own package, only this permission; [allow] false takes it back.
+     */
+    override fun allowSecureSettings(packageName: String?, allow: Boolean): Boolean {
+        checkCaller()
+        if (packageName != BuildConfig.APPLICATION_ID) throw SecurityException("only Pairline's own package")
+        val verb = if (allow) "grant" else "revoke"
+        val process = ProcessBuilder(CMD, "package", verb, packageName, WRITE_SECURE_SETTINGS)
+            .redirectErrorStream(true)
+            .start()
+        process.inputStream.use { it.readBytes() }
+        return process.waitFor() == 0
+    }
+
+    /** Pairline's process ended: give the call back its microphone and earpiece. Helper-internal, not on the binder. */
+    fun releaseAudio() = synchronized(lock) { stopLocked() }
+
     private fun stopLocked() {
         capture?.stop()
         capture = null
@@ -155,6 +214,13 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         inject = null
         micMuteBefore?.let { before -> runCatching { audioManager().isMicrophoneMute = before } }
         micMuteBefore = null
+        runCatching { restoreEarpiece(audioManager()) }
+    }
+
+    private fun restoreEarpiece(am: AudioManager) {
+        val before = voiceVolumeBefore ?: return
+        voiceVolumeBefore = null
+        am.setStreamVolume(AudioManager.STREAM_VOICE_CALL, before, 0)
     }
 
     private fun checkCaller() {
@@ -162,7 +228,7 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         if (uid != ownerUid) throw SecurityException("uid $uid isn't Pairline")
     }
 
-    private fun audioManager(): AudioManager = shell.getSystemService(AudioManager::class.java)
+    private fun audioManager(): AudioManager = audio
 
     @SuppressLint("MissingPermission") // the shell user holds RECORD_AUDIO and, on Android 10+, CAPTURE_AUDIO_OUTPUT
     private fun openRecord(source: Int, rate: Int): AudioRecord {
@@ -247,6 +313,24 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
             .setBufferSizeInBytes(maxOf(min, frameBytes(rate) * 4))
             .setTransferMode(AudioTrack.MODE_STREAM)
             .build()
+    }
+
+    /**
+     * Who this process is to Android's audio server and app ops: the shell package with this process's uid (2000).
+     * Package name, app-ops package and attribution all say so, and the target SDK is the running one (AudioManager
+     * reports some modes differently to old targets).
+     */
+    private class ShellIdentity(base: Context) : ContextWrapper(base) {
+        override fun getPackageName(): String = SHELL_PACKAGE
+        override fun getOpPackageName(): String = SHELL_PACKAGE
+        override fun getApplicationContext(): Context = this
+
+        @RequiresApi(Build.VERSION_CODES.S)
+        override fun getAttributionSource(): AttributionSource =
+            AttributionSource.Builder(Process.myUid()).setPackageName(SHELL_PACKAGE).build()
+
+        override fun getApplicationInfo(): ApplicationInfo =
+            ApplicationInfo(super.getApplicationInfo()).also { it.targetSdkVersion = Build.VERSION.SDK_INT }
     }
 
     /** Reads 20 ms frames from the call and writes them into a pipe the app reads. */
@@ -334,7 +418,7 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
 
     companion object {
         /** Bump when [IPrivilegedService] changes, so the app replaces a running older service. */
-        const val VERSION = 2
+        const val VERSION = 3
 
         /** Not a MediaRecorder source: Android 13's call-audio interception API ([openInterceptRecord]). */
         const val SOURCE_INTERCEPT = 100
@@ -342,6 +426,7 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         private const val SHELL_PACKAGE = "com.android.shell"
         private const val CMD = "/system/bin/cmd"
         private const val CALL_AUDIO_INTERCEPTION = "android.permission.CALL_AUDIO_INTERCEPTION"
+        private const val WRITE_SECURE_SETTINGS = "android.permission.WRITE_SECURE_SETTINGS"
         private val CAPTURE_SOURCES =
             setOf(MediaRecorder.AudioSource.VOICE_DOWNLINK, MediaRecorder.AudioSource.VOICE_CALL, SOURCE_INTERCEPT)
         private val SAMPLE_RATES = setOf(8_000, 16_000, 48_000)
