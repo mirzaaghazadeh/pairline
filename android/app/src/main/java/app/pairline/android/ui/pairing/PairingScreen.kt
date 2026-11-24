@@ -30,8 +30,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -82,7 +85,9 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
     val outcome by pairing.outcome.collectAsState()
     val link by AppGraph.link.state.collectAsState()
     val paired by AppGraph.peers.paired.collectAsState()
-    val previousPeer = remember { if (paired) AppGraph.prefs.peerName else null }
+    // Saveable, like `started` below: after a rotation or language change the iPhone that just paired isn't "previous".
+    val previousPeer by rememberSaveable { mutableStateOf(if (paired) AppGraph.prefs.peerName else null) }
+    var started by rememberSaveable { mutableStateOf(false) }
     val requestPermission = rememberPermissionRequester()
     val now by produceState(System.currentTimeMillis()) {
         while (true) {
@@ -94,15 +99,23 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
     val view = LocalView.current
     DisposableEffect(Unit) {
         LinkService.start(context, "pairing screen")
-        pairing.resetOutcome()
-        pairing.newOffer()
+        if (!started) {
+            // Opened now, not recreated: start over with a fresh code.
+            pairing.resetOutcome()
+            pairing.newOffer()
+            started = true
+        } else if (pairing.outcome.value != PairingOutcome.PAIRED) {
+            // Recreated (rotation, language or theme change): keep the code the iPhone may be scanning.
+            pairing.currentOrNewOffer()
+        }
         view.keepScreenOn = true
-        val window = (context as? Activity)?.window
+        val activity = context as? Activity
+        val window = activity?.window
         if (!BuildConfig.DEBUG) window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         onDispose {
             view.keepScreenOn = false
             if (!BuildConfig.DEBUG) window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
-            pairing.cancel()
+            if (activity?.isChangingConfigurations != true) pairing.cancel()
         }
     }
 
@@ -201,8 +214,8 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                         stringResource(R.string.pair_step_3),
                     ),
                 )
-                if (previousPeer != null) {
-                    NoteBox(stringResource(R.string.pair_replaces, previousPeer), Tone.WARN, PIcons.Warning)
+                previousPeer?.let { name ->
+                    NoteBox(stringResource(R.string.pair_replaces, name), Tone.WARN, PIcons.Warning)
                 }
                 NoteBox(stringResource(R.string.pair_keep_open), Tone.NEUTRAL, PIcons.Lock)
             }
