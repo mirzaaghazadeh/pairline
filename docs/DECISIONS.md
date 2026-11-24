@@ -394,6 +394,10 @@ Extends D-019 at the maintainer's request.
 - **Age rating:** every content answer NONE/false except "Messaging and chat", because Pairline sends and receives SMS.
 - **Price and availability:** free download; in-app purchases "3-day Trial" (free) and "Pairline Full Access"
   ($11.99), both non-consumable; every territory except China mainland (D-027).
+- **Submitted 2026-11-24 with manual release.** Version 1.0, both in-app purchases and the header/search images went
+  to App Review together. After approval the version waits for a manual release, because the Android bridge has no
+  signed release on the website yet and Bluetooth/CallKit still need real-device testing. Release with
+  `asc versions release` (or the button in App Store Connect) once both are done.
 
 ### D-035 — Export compliance: encryption only through Apple's operating system (2026-11-24)
 

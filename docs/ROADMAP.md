@@ -109,14 +109,16 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 
 - [x] Decide the pricing: 3 free days, then one-time $11.99 (D-017, supersedes D-008)
 - [x] StoreKit 2 products and paywall; on-device entitlement checks; Restore Purchases
-- [x] 3-day trial through a free "3-day Trial" non-consumable (D-017, D-025); products still to be created in App
-      Store Connect
-- [x] Demo mode with sample data (D-020), in English, Persian and Arabic
-- [ ] Website at pairline.navid.tr with privacy policy and support pages (separate repo, D-021) — built in
-      `pairline-web` (EN/FA/AR, release mirroring, Coolify compose); deployment on Coolify pending
+- [x] 3-day trial through a free "3-day Trial" non-consumable (D-017, D-025); both products created in App Store
+      Connect (`docs/app-store/api/iap.py`)
+- [x] Demo mode with sample data (D-020), in English, Persian, Arabic and Turkish
+- [x] Website at pairline.navid.tr with privacy policy and support pages (separate repo, D-021), deployed on Coolify
 - [ ] Android release signing; reproducible-build instructions; publish hash and certificate fingerprint
-- [ ] Privacy policy page generated from PRIVACY.md; App Store privacy label "Data Not Collected"
-- [ ] App Store submission; Android APK on the website
+- [x] Privacy policy page generated from PRIVACY.md; App Store privacy label "Data Not Collected" (published)
+- [x] App Store listing (EN/AR/TR text, screenshots for iPhone and iPad, header and search images) — `docs/app-store/`
+- [x] App Store submission: version 1.0 (build 1) and both in-app purchases submitted 2026-11-24, **manual release**
+      (D-034): release only after the Android APK is downloadable and the real-device tests pass
+- [ ] Android APK on the website (needs the release signing above)
 - [ ] External review of PROTOCOL.md
 
 ## M8 — Internet sharing (opt-in)
