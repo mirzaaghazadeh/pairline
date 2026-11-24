@@ -20,7 +20,7 @@ android {
         // A release tag must be android-v<versionName>; the release workflow checks this.
         // Raise versionCode for every release.
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
     }
 
     androidResources {
