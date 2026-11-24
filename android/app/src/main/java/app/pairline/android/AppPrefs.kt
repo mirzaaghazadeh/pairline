@@ -86,11 +86,12 @@ class AppPrefs(context: Context) {
         set(value) = edit { putBoolean(BRIDGE_STOPPED, value) }
 
     /**
-     * Which capture source relays the caller's voice: VOICE_DOWNLINK (3, default) or VOICE_CALL (4). Switches when
-     * the iPhone reports it couldn't hear the caller.
+     * The capture source that relays the caller's voice, as learned on this phone: Android 13's interception API
+     * (PrivilegedService.SOURCE_INTERCEPT), VOICE_DOWNLINK (3) or VOICE_CALL (4); 0 until something was learned, then
+     * the best the phone offers comes first. Changes when a source doesn't open or the iPhone couldn't hear the caller.
      */
     var audioCaptureSource: Int
-        get() = prefs.getInt(AUDIO_SOURCE, 3)
+        get() = prefs.getInt(AUDIO_SOURCE, 0)
         set(value) = edit { putInt(AUDIO_SOURCE, value) }
 
     /** Mute this phone's own microphone while the iPhone's voice is fed into the call. Flips on "they couldn't hear me". */

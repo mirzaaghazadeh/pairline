@@ -116,7 +116,9 @@ object AppGraph {
 
     /** Call audio between this phone and the iPhone (D-047). */
     val audioRelay: CallAudioRelay by lazy {
-        CallAudioRelay(privileged, prefs, link::send).also { relay -> relay.onCapsChanged = { router.statusChanged() } }
+        val audio = app.getSystemService(android.media.AudioManager::class.java)
+        CallAudioRelay(privileged, prefs, link::send, audioMode = { audio.mode })
+            .also { relay -> relay.onCapsChanged = { router.statusChanged() } }
     }
 
     /** The daily GitHub update check and the verified update (D-042). */

@@ -65,11 +65,13 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         val captureOutput: Boolean,
         val modifyPhoneState: Boolean,
         val telephonyOutput: Boolean,
+        /** Android 13's call-audio interception API works here for the shell user. */
+        val interceptable: Boolean = false,
     ) {
         /** The caller's voice can be captured. */
-        val canListen: Boolean get() = captureOutput
+        val canListen: Boolean get() = captureOutput || interceptable
         /** The iPhone's microphone can be fed into the call. */
-        val canTalk: Boolean get() = telephonyOutput && (modifyPhoneState || root)
+        val canTalk: Boolean get() = interceptable || (telephonyOutput && (modifyPhoneState || root))
     }
 
     private val main = Handler(Looper.getMainLooper())
@@ -254,7 +256,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         }
         service = s
         _probe.value = p
-        Log.i(TAG, "helper ready (sdk ${p?.sdk}, listen ${p?.canListen}, talk ${p?.canTalk})")
+        Log.i(TAG, "helper ready (sdk ${p?.sdk}, listen ${p?.canListen}, talk ${p?.canTalk}, interception ${p?.interceptable})")
         attached?.countDown()
         main.post {
             failure = null
@@ -398,6 +400,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
                 captureOutput = o.optBoolean("captureOutput"),
                 modifyPhoneState = o.optBoolean("modifyPhoneState"),
                 telephonyOutput = o.optBoolean("telephonyOutput"),
+                interceptable = o.optBoolean("interceptable"),
             )
         }
     }

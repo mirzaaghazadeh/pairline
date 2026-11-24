@@ -16,6 +16,7 @@ import android.os.ParcelFileDescriptor
 import android.os.Process
 import app.pairline.android.BuildConfig
 import java.io.IOException
+import java.lang.reflect.InvocationTargetException
 import kotlin.system.exitProcess
 import org.json.JSONObject
 
@@ -66,7 +67,36 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
             .put("modifyPhoneState", granted("android.permission.MODIFY_PHONE_STATE"))
             .put("modifyAudioRouting", granted("android.permission.MODIFY_AUDIO_ROUTING"))
             .put("telephonyOutput", outputs.any { it.type == AudioDeviceInfo.TYPE_TELEPHONY })
+            .put("interceptable", granted(CALL_AUDIO_INTERCEPTION) && interceptable())
             .toString()
+    }
+
+    /**
+     * Android 13's call-audio interception API (`AudioManager.isPstnCallAudioInterceptable`, a system API, so reached
+     * by reflection): the platform's own way to take a mobile call's downlink and feed its uplink. Not every phone
+     * maker enables it.
+     */
+    private fun interceptable(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false
+        return runCatching { callAudioApi("isPstnCallAudioInterceptable") as Boolean }.getOrDefault(false)
+    }
+
+    /** Calls one of AudioManager's call-audio interception methods; its own errors come back as plain exceptions. */
+    private fun callAudioApi(name: String, format: AudioFormat? = null): Any? {
+        val am = audioManager()
+        return try {
+            if (format == null) {
+                AudioManager::class.java.getMethod(name).invoke(am)
+            } else {
+                AudioManager::class.java.getMethod(name, AudioFormat::class.java).invoke(am, format)
+            }
+        } catch (e: InvocationTargetException) {
+            // Only some exception types cross the binder: hand the app the platform's reason as one of them.
+            val cause = e.targetException
+            throw IllegalStateException(cause.message ?: cause.javaClass.simpleName)
+        } catch (e: ReflectiveOperationException) {
+            throw IllegalStateException("call audio interception isn't available here (${e.javaClass.simpleName})")
+        }
     }
 
     override fun allowOngoingCalls(packageName: String?): Boolean {
@@ -87,7 +117,8 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         synchronized(lock) {
             capture?.stop()
             capture = null
-            val c = Capture(openRecord(source, sampleRate), sampleRate)
+            val record = if (source == SOURCE_INTERCEPT) openInterceptRecord(sampleRate) else openRecord(source, sampleRate)
+            val c = Capture(record, sampleRate)
             capture = c
             return c.start()
         }
@@ -100,13 +131,8 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
             inject?.stop()
             inject = null
             val am = audioManager()
-            val device = am.getDevices(AudioManager.GET_DEVICES_OUTPUTS).firstOrNull { it.type == AudioDeviceInfo.TYPE_TELEPHONY }
-                ?: throw IllegalStateException("this phone has no telephony audio output")
-            val track = openTrack(sampleRate)
-            if (!track.setPreferredDevice(device)) {
-                track.release()
-                throw IllegalStateException("couldn't route audio to the telephony output")
-            }
+            // Android 13's uplink injection first, where the phone offers it; else the telephony output device.
+            val track = (if (interceptable()) openInterceptTrack(sampleRate) else null) ?: openTelephonyTrack(am, sampleRate)
             if (muteMic && micMuteBefore == null) {
                 micMuteBefore = am.isMicrophoneMute
                 am.isMicrophoneMute = true
@@ -164,20 +190,60 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         return record
     }
 
+    /**
+     * The call's downlink through Android 13's interception API. It refuses ("not available in mode …") until Android
+     * has switched the phone to its in-call audio mode, which can lag the call's dialing or answer; the app waits for
+     * that and asks again.
+     */
+    private fun openInterceptRecord(rate: Int): AudioRecord {
+        if (!interceptable()) throw IllegalStateException("this phone doesn't offer call audio interception")
+        val record = callAudioApi("getCallDownlinkExtractionAudioRecord", pcmFormat(rate, AudioFormat.CHANNEL_IN_MONO))
+            as? AudioRecord ?: throw IllegalStateException("call audio interception gave no recorder")
+        if (record.state != AudioRecord.STATE_INITIALIZED) {
+            record.release()
+            throw IllegalStateException("call audio interception didn't initialize")
+        }
+        return record
+    }
+
+    /** The call's uplink through Android 13's interception API; null (then the telephony output is used) if refused. */
+    private fun openInterceptTrack(rate: Int): AudioTrack? {
+        val track = runCatching {
+            callAudioApi("getCallUplinkInjectionAudioTrack", pcmFormat(rate, AudioFormat.CHANNEL_OUT_MONO)) as? AudioTrack
+        }.getOrNull() ?: return null
+        if (track.state != AudioTrack.STATE_INITIALIZED) {
+            track.release()
+            return null
+        }
+        return track
+    }
+
+    private fun openTelephonyTrack(am: AudioManager, rate: Int): AudioTrack {
+        val device = am.getDevices(AudioManager.GET_DEVICES_OUTPUTS).firstOrNull { it.type == AudioDeviceInfo.TYPE_TELEPHONY }
+            ?: throw IllegalStateException("this phone has no telephony audio output")
+        val track = openTrack(rate)
+        if (!track.setPreferredDevice(device)) {
+            track.release()
+            throw IllegalStateException("couldn't route audio to the telephony output")
+        }
+        return track
+    }
+
+    private fun pcmFormat(rate: Int, channels: Int): AudioFormat = AudioFormat.Builder()
+        .setSampleRate(rate)
+        .setChannelMask(channels)
+        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+        .build()
+
     private fun openTrack(rate: Int): AudioTrack {
         val attributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
             .build()
-        val format = AudioFormat.Builder()
-            .setSampleRate(rate)
-            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-            .build()
         val min = AudioTrack.getMinBufferSize(rate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
         return AudioTrack.Builder()
             .setAudioAttributes(attributes)
-            .setAudioFormat(format)
+            .setAudioFormat(pcmFormat(rate, AudioFormat.CHANNEL_OUT_MONO))
             .setBufferSizeInBytes(maxOf(min, frameBytes(rate) * 4))
             .setTransferMode(AudioTrack.MODE_STREAM)
             .build()
@@ -268,11 +334,16 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
 
     companion object {
         /** Bump when [IPrivilegedService] changes, so the app replaces a running older service. */
-        const val VERSION = 1
+        const val VERSION = 2
+
+        /** Not a MediaRecorder source: Android 13's call-audio interception API ([openInterceptRecord]). */
+        const val SOURCE_INTERCEPT = 100
 
         private const val SHELL_PACKAGE = "com.android.shell"
         private const val CMD = "/system/bin/cmd"
-        private val CAPTURE_SOURCES = setOf(MediaRecorder.AudioSource.VOICE_DOWNLINK, MediaRecorder.AudioSource.VOICE_CALL)
+        private const val CALL_AUDIO_INTERCEPTION = "android.permission.CALL_AUDIO_INTERCEPTION"
+        private val CAPTURE_SOURCES =
+            setOf(MediaRecorder.AudioSource.VOICE_DOWNLINK, MediaRecorder.AudioSource.VOICE_CALL, SOURCE_INTERCEPT)
         private val SAMPLE_RATES = setOf(8_000, 16_000, 48_000)
 
         /** 20 ms of 16-bit mono audio. */

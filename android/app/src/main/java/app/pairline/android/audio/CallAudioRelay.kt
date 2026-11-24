@@ -1,10 +1,12 @@
 package app.pairline.android.audio
 
+import android.media.AudioManager
 import android.os.ParcelFileDescriptor
 import app.pairline.android.AppPrefs
 import app.pairline.android.log.Log
 import app.pairline.android.privileged.IPrivilegedService
 import app.pairline.android.privileged.PrivilegedManager
+import app.pairline.android.privileged.PrivilegedService
 import app.pairline.android.protocol.ErrorCode
 import app.pairline.android.protocol.Msg
 import app.pairline.android.protocol.RequestException
@@ -25,6 +27,8 @@ class CallAudioRelay(
     private val privileged: PrivilegedManager,
     private val prefs: AppPrefs,
     private val emit: (JSONObject) -> Unit,
+    /** Android's current audio mode (`AudioManager.getMode`). */
+    private val audioMode: () -> Int = { AudioManager.MODE_IN_CALL },
 ) {
     /** The Wi-Fi link's encrypted media channel (M5). Lossy and unordered; [send] never blocks. */
     interface PacketTransport {
@@ -101,7 +105,10 @@ class CallAudioRelay(
      */
     fun feedback(heard: Boolean?, heardMe: Boolean?) {
         if (heard == false) {
-            prefs.audioCaptureSource = if (prefs.audioCaptureSource == SOURCE_DOWNLINK) SOURCE_CALL else SOURCE_DOWNLINK
+            // The next source in the phone's order, round and round.
+            val order = captureOrder()
+            val current = order.indexOf(prefs.audioCaptureSource).coerceAtLeast(0)
+            prefs.audioCaptureSource = order[(current + 1) % order.size]
             Log.i(TAG, "caller not heard on the iPhone: next call captures from source ${prefs.audioCaptureSource}")
         }
         when (heardMe) {
@@ -120,10 +127,32 @@ class CallAudioRelay(
 
     /** Turns relaying back to its first-try settings (Settings › Talk on iPhone › Reset). */
     fun resetLearning() {
-        prefs.audioCaptureSource = SOURCE_DOWNLINK
+        prefs.audioCaptureSource = 0
         prefs.audioMuteBridgeMic = true
         prefs.audioTalkFailures = 0
         onCapsChanged?.invoke()
+    }
+
+    /**
+     * The capture sources this phone may offer, best first: Android 13's interception API (made for exactly this,
+     * where the phone maker enabled it), then the caller's side of the call, then both sides mixed.
+     */
+    private fun captureOrder(): List<Int> = buildList {
+        if (privileged.probe.value?.interceptable == true) add(PrivilegedService.SOURCE_INTERCEPT)
+        add(SOURCE_DOWNLINK)
+        add(SOURCE_CALL)
+    }
+
+    /**
+     * Waits (up to [CALL_MODE_WAIT_MS]) until Android has put the phone in its in-call audio mode. Right after a call is
+     * dialed or answered the mode can still be "normal", and capture then fails or records nothing.
+     */
+    private fun awaitCallAudioMode(deadline: Long): Boolean {
+        while (true) {
+            if (audioMode() in CALL_MODES) return true
+            if (System.nanoTime() > deadline) return false
+            Thread.sleep(POLL_MS)
+        }
     }
 
     private fun state(callId: String, state: String, listen: Boolean, talk: Boolean, reason: String?) {
@@ -159,25 +188,38 @@ class CallAudioRelay(
             private set
 
         fun open() {
-            // The learned source first, then the other one: some phones (Samsung among them) open only one of the
-            // two. Whichever opens is remembered for the next call.
-            val preferred = prefs.audioCaptureSource
-            val sources = listOf(preferred, if (preferred == SOURCE_DOWNLINK) SOURCE_CALL else SOURCE_DOWNLINK)
+            // One deadline for waiting on the call's audio mode and for asking the interception API again.
+            val deadline = System.nanoTime() + CALL_MODE_WAIT_MS * 1_000_000
+            if (!awaitCallAudioMode(deadline)) {
+                Log.w(TAG, "the phone isn't in its call audio mode yet (mode ${audioMode()}); trying anyway")
+            }
+            // The learned source first, then the others: phones differ in which ones open (some only one of them).
+            // Whichever opens is remembered for the next call.
+            val order = captureOrder()
+            val preferred = prefs.audioCaptureSource.takeIf { it in order } ?: order.first()
+            val sources = listOf(preferred) + (order - preferred)
             var problem: String? = null
             var opened = preferred
             capture@ for (source in sources) {
                 for (rate in CAPTURE_RATES) {
-                    try {
-                        captureFd = service.startCapture(source, rate)
-                        captureRate = rate
-                        opened = source
-                        if (source != preferred) {
-                            prefs.audioCaptureSource = source
-                            Log.i(TAG, "capture source $preferred didn't open; using $source from now on")
+                    while (true) {
+                        try {
+                            captureFd = service.startCapture(source, rate)
+                            captureRate = rate
+                            opened = source
+                            if (source != preferred) {
+                                prefs.audioCaptureSource = source
+                                Log.i(TAG, "capture source $preferred didn't open; using $source from now on")
+                            }
+                            break@capture
+                        } catch (e: RuntimeException) {
+                            problem = e.message
+                            // The interception API refuses until the call's audio mode is set: ask again shortly.
+                            val notYet = source == PrivilegedService.SOURCE_INTERCEPT &&
+                                problem?.contains("not available in mode") == true
+                            if (!notYet || System.nanoTime() > deadline) break
+                            Thread.sleep(POLL_MS)
                         }
-                        break@capture
-                    } catch (e: RuntimeException) {
-                        problem = e.message
                     }
                 }
             }
@@ -286,6 +328,17 @@ class CallAudioRelay(
         const val SOURCE_CALL = 4 // MediaRecorder.AudioSource.VOICE_CALL
         private const val MAX_TALK_FAILURES = 2
         private val CAPTURE_RATES = listOf(16_000, 48_000, 8_000)
+        private const val CALL_MODE_WAIT_MS = 4_000L
+        private const val POLL_MS = 30L
+
+        /** In-call audio modes: a mobile call, a VoIP call, and Android 11/13's screening and redirect modes. */
+        private val CALL_MODES = setOf(
+            AudioManager.MODE_IN_CALL,
+            AudioManager.MODE_IN_COMMUNICATION,
+            4, // MODE_CALL_SCREENING (Android 11)
+            5, // MODE_CALL_REDIRECT (Android 13)
+            6, // MODE_COMMUNICATION_REDIRECT (Android 13)
+        )
         private const val FRAME_NANOS = 20_000_000L
         private const val RESYNC_NANOS = 200_000_000L
     }

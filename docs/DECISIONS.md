@@ -874,6 +874,19 @@ Testing on a Galaxy Note 3 running Android 10 and reports from a tester's Samsun
   one before failing and remembers whichever opened. When it still fails, the iPhone shows an alert on the call
   screen with the bridge's reason and how to send a diagnostics report; before, a notice appeared behind the call
   screen, where nobody saw it.
+- **Call audio from Android's own interception API, after the call's audio mode is set.** The iPhone asks for the
+  audio as soon as a call it placed is dialing, when Android may not have switched to its in-call audio mode yet;
+  capture then fails or records nothing. The bridge now waits (up to 4 s) for an in-call mode before capturing. On
+  Android 13+, where the phone maker enables it (`isPstnCallAudioInterceptable`, the shell's
+  `CALL_AUDIO_INTERCEPTION`), the helper uses Android's call-audio interception API
+  (`getCallDownlinkExtractionAudioRecord` / `getCallUplinkInjectionAudioTrack`), which exists for this purpose; it
+  refuses until the in-call mode is set, so the bridge asks again every 30 ms within the same 4 s. The older
+  sources (`VOICE_DOWNLINK`, `VOICE_CALL`, the telephony output) remain the fallback, and the learned source now
+  cycles through all three. Helper version 2 (a running version-1 helper is replaced).
+- **Incoming calls while the iPhone is locked.** iOS keeps only Bluetooth links alive in the background, and doesn't
+  relaunch an app the user swiped away. The iPhone's Bridge tab now says so when the link is over Wi-Fi only, and
+  when the user swipes Pairline away (while iOS still runs it) a local notification says calls and messages are
+  paused until Pairline is opened again; it's removed when Pairline opens.
 - **Stop Pairline.** Users asked for a way to turn the bridge off without uninstalling it. Settings › Keep running ›
   Stop Pairline (after a confirmation) ends the link service, the Wi-Fi link, the bridge's hotspot, internet sharing
   and the helper, and keeps them off across reboots and updates (`bridge_stopped`). The home screen then says
