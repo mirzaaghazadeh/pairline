@@ -1,0 +1,65 @@
+name: VirusTotal scan of a release
+
+# Manual: scans the APK attached to an existing GitHub Release (e.g. one made before D-039) on VirusTotal
+# and puts the report link in that release's notes, replacing an older VirusTotal row if there is one.
+# New releases are scanned by android-release.yml before the draft is created.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag, e.g. android-v1.0.1
+        required: true
+      update_notes:
+        description: Add the VirusTotal row to the release notes
+        type: boolean
+        default: true
+
+permissions:
+  contents: write # read the release asset and edit the release notes
+
+concurrency:
+  group: virustotal-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download the release APK
+        run: |
+          gh release download "$TAG" --pattern '*.apk' --dir "$RUNNER_TEMP/release"
+          count="$(find "$RUNNER_TEMP/release" -name '*.apk' | wc -l)"
+          if [ "$count" -ne 1 ]; then echo "::error::Expected one APK in release $TAG, found $count"; exit 1; fi
+          echo "APK=$(find "$RUNNER_TEMP/release" -name '*.apk')" >> "$GITHUB_ENV"
+
+      - name: VirusTotal scan
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        run: |
+          .github/scripts/virustotal-scan.sh "$APK" "$RUNNER_TEMP/virustotal.md"
+          echo "**$TAG** $(basename "$APK"): VirusTotal $(cat "$RUNNER_TEMP/virustotal.md")" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Add the VirusTotal row to the release notes
+        if: inputs.update_notes
+        run: |
+          gh release view "$TAG" --json body --jq .body > "$RUNNER_TEMP/old.md"
+          # Drop any earlier VirusTotal line and put the new row after the signing-certificate row
+          # (android-release.yml's layout); notes without that row get a line at the end.
+          CELL="$(cat "$RUNNER_TEMP/virustotal.md")" awk '
+            /^\| VirusTotal \|/ || /^VirusTotal: / { next }
+            { print }
+            /^\| Signing certificate SHA-256 \|/ { print "| VirusTotal | " ENVIRON["CELL"] " |"; done = 1 }
+            END { if (!done) { print ""; print "VirusTotal: " ENVIRON["CELL"] } }
+          ' "$RUNNER_TEMP/old.md" > "$RUNNER_TEMP/new.md"
+          diff "$RUNNER_TEMP/old.md" "$RUNNER_TEMP/new.md" || true
+          gh release edit "$TAG" --notes-file "$RUNNER_TEMP/new.md"

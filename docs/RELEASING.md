@@ -31,6 +31,9 @@ reinstall. Keep at least two offline backups (for example, a password manager an
 
 3. Never commit the `.p12` file (`.gitignore` blocks `*.p12`, `*.jks` and `*.keystore`).
 
+4. For the VirusTotal scan (D-039), add a VirusTotal API key (free account → API key): `gh secret set VT_API_KEY`.
+   Without it the release still builds; the notes say "not scanned".
+
 ### Making a release
 
 1. In `android/app/build.gradle.kts`, raise `versionCode` and set `versionName`, e.g. `0.2.0`. Commit to `main`.
@@ -42,9 +45,16 @@ reinstall. Keep at least two offline backups (for example, a password manager an
    ```
 
 3. The workflow checks that the tag matches `versionName`, builds, runs the policy checks
-   (`.github/scripts/android-policy-check.sh`), signs, and creates a **draft** GitHub Release with the APK,
-   its SHA-256 and the signing-certificate digest. Versions starting with `0.` are marked as pre-releases.
-4. Review the draft and publish it.
+   (`.github/scripts/android-policy-check.sh`), signs, scans the signed APK on VirusTotal
+   (`.github/scripts/virustotal-scan.sh`), and creates a **draft** GitHub Release with the APK, its SHA-256, the
+   signing-certificate digest and the VirusTotal report link. Versions starting with `0.` are marked as pre-releases.
+4. Review the draft and publish it. If the VirusTotal row shows detections or "not scanned", open the report (or the
+   run's warnings) first. One or two engines flagging a new APK is usually a false positive; check which engines and
+   what they call it before publishing.
+
+To scan a release that already exists (made before the scan was added, or when the scan didn't finish), run the
+**VirusTotal scan of a release** workflow from the Actions tab with the release tag
+(`gh workflow run virustotal.yml -f tag=android-v1.0.1`). It adds or replaces the VirusTotal row in that release's notes.
 5. The first release only: copy the certificate digest into `SECURITY.md` ("Verifying a release").
 
 ### Why signing happens outside Gradle

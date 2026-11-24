@@ -450,3 +450,19 @@ old. `minSdk` is now 28. Android lint listed every newer API in use, and each no
 Bluetooth works the same: Android 9–11 use the install-time `BLUETOOTH`/`BLUETOOTH_ADMIN` permissions the manifest
 already declares (up to API 30), and advertising as a peripheral needs no location permission. Tested: build, unit
 tests and lint at minSdk 28; on-device testing on the Note 8 is next. Released as Pairline Bridge 1.0.1.
+
+### D-039 — Release APKs are scanned on VirusTotal (2026-11-24)
+
+Sideloaded APKs get asked "is this safe?", and a VirusTotal report is the answer people already know.
+`android-release.yml` now uploads the signed APK to VirusTotal after verifying its signature, waits for the scan (up
+to 10 minutes) and puts a "VirusTotal" row in the draft's notes: the report link and how many engines flagged it.
+- **What's sent:** only the release APK, the same public file attached to the GitHub Release. Nothing from users and
+  nothing from the apps; the apps still make no requests (rules 1–3). VirusTotal shares uploaded files with security
+  vendors, which is fine for a file we publish anyway.
+- **How:** `.github/scripts/virustotal-scan.sh`, plain `curl` and `jq` against the v3 API. No third-party action, so
+  the key (`VT_API_KEY` secret) only reaches our own script and VirusTotal.
+- **It never blocks a release.** A missing key, an API error, a slow scan or a detection becomes a workflow warning and
+  shows in the draft's row; the person publishing the draft reads the report first. New APKs often draw a false
+  positive from one or two engines, so a detection is a reason to look, not an automatic stop.
+- Releases made before this (1.0.0, 1.0.1) can be scanned with the manual `virustotal.yml` workflow, which adds the
+  same row to the existing release notes.

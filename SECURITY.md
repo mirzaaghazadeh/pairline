@@ -30,6 +30,9 @@ tagged commit. Each release note links the build run. Process: [docs/RELEASING.m
 3. Reproducible build: build the tagged commit with the documented toolchain and compare the result
    (instructions come with the first release).
 
+Each release note also links the APK's VirusTotal report. The workflow uploads the signed APK there before the
+release is published; the report's SHA-256 is the same as the release file's.
+
 ### iOS
 
 Apple re-signs and encrypts App Store builds, so they can't be compared byte-for-byte with the

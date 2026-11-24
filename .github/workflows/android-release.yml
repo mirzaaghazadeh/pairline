@@ -1,9 +1,10 @@
 name: Android release
 
 # The only way a release APK is made: push a tag android-v<versionName>, e.g. android-v0.1.0.
-# Builds the unsigned release APK from that commit, runs the policy checks, signs it, and attaches it
-# to a DRAFT GitHub Release with its SHA-256 and signing-certificate digest. A person reviews and
-# publishes the draft. Setup and verification: docs/RELEASING.md and SECURITY.md.
+# Builds the unsigned release APK from that commit, runs the policy checks, signs it, scans it on
+# VirusTotal, and attaches it to a DRAFT GitHub Release with its SHA-256, signing-certificate digest
+# and VirusTotal report link. A person reviews and publishes the draft. Setup and verification:
+# docs/RELEASING.md and SECURITY.md.
 
 on:
   push:
@@ -22,7 +23,7 @@ env:
 jobs:
   release:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45 # the VirusTotal scan can take up to 10 minutes
     defaults:
       run:
         working-directory: android
@@ -82,7 +83,7 @@ jobs:
             --ks-pass env:KEYSTORE_PASSWORD \
             --out "$RUNNER_TEMP/pairline-bridge-$VERSION.apk" "$RUNNER_TEMP/aligned.apk"
 
-      - name: Verify and write release notes
+      - name: Verify the signature
         run: |
           bt="$ANDROID_HOME/build-tools/$BUILD_TOOLS"
           apk="$RUNNER_TEMP/pairline-bridge-$VERSION.apk"
@@ -90,6 +91,21 @@ jobs:
           # e.g. "V3.0 Signer: certificate SHA-256 digest: 52d7..." (format varies by build-tools version)
           cert="$(sed -n 's/^.*Signer.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/certs.txt" | head -1)"
           if [ -z "$cert" ]; then echo "::error::Couldn't read the signing certificate digest"; exit 1; fi
+          echo "CERT=$cert" >> "$GITHUB_ENV"
+
+      # Uploads the signed APK (and nothing else) to VirusTotal for the report link in the notes (D-039).
+      # Never fails the release; problems show up as a warning and in the draft's VirusTotal row.
+      - name: VirusTotal scan
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        run: |
+          ../.github/scripts/virustotal-scan.sh "$RUNNER_TEMP/pairline-bridge-$VERSION.apk" "$RUNNER_TEMP/virustotal.md"
+
+      - name: Write release notes
+        run: |
+          apk="$RUNNER_TEMP/pairline-bridge-$VERSION.apk"
+          cert="$CERT"
+          vt="$(cat "$RUNNER_TEMP/virustotal.md")"
           sum="$(sha256sum "$apk" | cut -d' ' -f1)"
           run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           {
@@ -101,6 +117,7 @@ jobs:
             echo "|---|---|"
             echo "| APK SHA-256 | \`$sum\` |"
             echo "| Signing certificate SHA-256 | \`$cert\` |"
+            echo "| VirusTotal | $vt |"
             echo "| Toolchain | Temurin JDK 17, Gradle wrapper, build-tools $BUILD_TOOLS, ubuntu-24.04 |"
             echo
             echo "How to verify: [SECURITY.md](../../blob/$GITHUB_SHA/SECURITY.md#verifying-a-release)."
