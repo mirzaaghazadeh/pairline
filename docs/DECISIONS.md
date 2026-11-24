@@ -409,3 +409,29 @@ operating system's), which needs no encryption documentation. So `ITSAppUsesNonE
 `Info.plist`, and build 1.0 (1) was marked the same with `asc builds update --uses-non-exempt-encryption=false`.
 Revisit this before adding any cryptography that doesn't come from the operating system (for example a bundled
 Opus/TLS library in M5/M6), and get the maintainer's sign-off: it is a legal declaration.
+
+### D-036 — A free week, then $9.99 once (supersedes the numbers in D-017) (2026-11-24)
+
+The maintainer changed the pricing: **7 free days**, then **$9.99** once (was 3 days and $11.99). The trial still
+starts with a free "7-day Trial" non-consumable (`app.pairline.ios.trial7day`), as App Review Guideline 3.1.1 asks for
+time-based trials in non-subscription apps: one tap and Face ID, no payment method, nothing charged. An automatic
+trial with no tap was considered and rejected because Apple may reject it under 3.1.1. The old
+`app.pairline.ios.trial3day` item can't be deleted (it was once in a submission); it was never approved or sold and
+is left out of every submission. Build 1.0 (2) carries the change; it was resubmitted with manual release.
+
+### D-037 — Android 1.0.0, the signing key, and where language detection lives (2026-11-24)
+
+- **Pairline Bridge 1.0.0** (versionCode 1) is the first signed release, built by `android-release.yml` from tag
+  `android-v1.0.0`. `app.pairline.android` is final (settles the Android part of D-007). The signing key was created
+  on the maintainer's Mac in `~/.pairline-signing/` (outside the repo, mode 600) and stored in GitHub Actions secrets;
+  its certificate SHA-256 is in SECURITY.md. **Back up `~/.pairline-signing/` offline:** without it no update can
+  ever be installed over 1.0.0.
+- **Language by country is a website feature only.** `pairline.navid.tr/country.txt` returns Cloudflare's
+  CF-IPCountry, and the site's script uses it (after the browser's language list) to open a first visit in Persian,
+  Arabic or Turkish. The apps don't call it: AGENTS.md rules 2 and 3 promise that the apps make no requests to our
+  servers and do no IP lookups, and the Android app has no `INTERNET` permission. The apps already open in the
+  phone's own language, which is the better signal.
+- **The App Store price follows the website's `APP_PRICE_USD`** when the website is given an App Store Connect API key
+  (`ASC_*` env): on each deploy it sets the price schedule of `app.pairline.ios.full` to that value. The apps show
+  whatever price StoreKit reports, so a price change needs no app update. The key gives App Manager access to every
+  app on the team, so it should be a dedicated key that can be revoked on its own.
