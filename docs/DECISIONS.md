@@ -394,3 +394,14 @@ Extends D-019 at the maintainer's request.
 - **Age rating:** every content answer NONE/false except "Messaging and chat", because Pairline sends and receives SMS.
 - **Price and availability:** free download; in-app purchases "3-day Trial" (free) and "Pairline Full Access"
   ($11.99), both non-consumable; every territory except China mainland (D-027).
+
+### D-035 — Export compliance: encryption only through Apple's operating system (2026-11-24)
+
+The link's encryption (P-256 ECDH, HKDF-SHA256, AES-256-GCM; PROTOCOL.md) is done entirely with Apple's CryptoKit,
+the cryptography built into iOS; the app contains no cryptographic algorithm of its own and no third-party crypto
+library (AGENTS.md rule 8, D-024). In App Store Connect's export-compliance questions that is "none of the algorithms
+mentioned above" (neither proprietary algorithms nor standard ones implemented instead of or in addition to the
+operating system's), which needs no encryption documentation. So `ITSAppUsesNonExemptEncryption` is `NO` in
+`Info.plist`, and build 1.0 (1) was marked the same with `asc builds update --uses-non-exempt-encryption=false`.
+Revisit this before adding any cryptography that doesn't come from the operating system (for example a bundled
+Opus/TLS library in M5/M6), and get the maintainer's sign-off: it is a legal declaration.
