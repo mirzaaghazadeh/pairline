@@ -9,6 +9,7 @@ Everything the App Store product page needs, kept as source so it can be regener
 | `render.sh` | Renders everything into `out/` (git-ignored) with headless Chrome and ImageMagick |
 | `metadata/` | Name, subtitle, promotional text, description, keywords, URLs, categories, review notes (fastlane `deliver` layout) |
 | `upload.sh` | Uploads `metadata/` and the screenshots to App Store Connect with `fastlane deliver` |
+| `assets.html`, `upload-assets.sh` | The iOS 27 product-page header and search-results images per locale, uploaded and placed with the `asc` CLI |
 | `api/` | Small App Store Connect API scripts (Python standard library + `openssl`): `iap.py` sets up the two in-app purchases, `app_setup.py` the price, availability and content rights. Both are idempotent |
 
 **Credentials** stay outside the repo. The API scripts read `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_PATH` (the
@@ -35,9 +36,14 @@ The app record: Apple ID **6838659501**, bundle ID `app.pairline.ios`, team 7Y68
 account). "Pairline" alone is taken on the App Store, so the store name is "Pairline: SMS & Call Bridge" (Turkish
 "Pairline: SMS ve Arama Köprüsü", Arabic "Pairline: رسائل ومكالمات"); the Home Screen name stays "Pairline".
 
-- **Screenshots:** the first slide is what the product page opens with, and the first three are what search results
-  show, so slides 1-3 carry the main message (SIM on iPhone, calls, codes). The App Store has no separate "header" or
-  "search" image for an app; it uses these.
+- **Screenshots:** slides 1-3 carry the main message (SIM on iPhone, calls, codes), since older App Store versions
+  show the first three in search results.
+- **Product page header and search results image** (iOS 27 Asset Library): `assets.html` renders a text-free header
+  (3840 x 1646, three phones centered: the page crops it per device and puts Back and Share over the top corners) and
+  a search image (3840 x 2560, headline and two phones) per locale. `upload-assets.sh` (asc CLI) uploads them and
+  places each locale's pair. They're reviewed with the version: add them to the review submission
+  (`asc review items add --item-type appAssetLibraryImages`). Apple's rules: no price, URL, copyright mark, awards
+  or other platforms' logos.
 - **App icon:** comes from the build (`ios/Pairline/Resources/Assets.xcassets/AppIcon.appiconset`, no alpha channel).
 - **In-app purchases:** `app.pairline.ios.trial3day` "3-day Trial" (non-consumable, free) and `app.pairline.ios.full`
   "Pairline Full Access" (non-consumable, $11.99). Each needs a review screenshot (use

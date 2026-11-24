@@ -11,6 +11,7 @@
 #       "key_filepath": "/Users/you/.appstoreconnect/private_keys/AuthKey_ABC123DEFG.p8"}
 #
 # Usage: ASC_API_KEY_JSON=~/.appstoreconnect/pairline.json docs/app-store/upload.sh
+# Text only (keep the uploaded screenshots): SKIP_SCREENSHOTS=true ASC_API_KEY_JSON=… docs/app-store/upload.sh
 set -eu
 here=${0:A:h}
 : ${ASC_API_KEY_JSON:?Set ASC_API_KEY_JSON to the API key JSON file (see the comment at the top)}
@@ -35,6 +36,7 @@ fastlane deliver \
   --metadata_path "$here/metadata" \
   --screenshots_path "$stage" \
   --overwrite_screenshots true \
+  --skip_screenshots "${SKIP_SCREENSHOTS:-false}" \
   --skip_binary_upload true \
   --skip_app_version_update true \
   --submit_for_review false \

@@ -2,6 +2,8 @@
 # Renders the App Store screenshots from slides.html with headless Chrome and ImageMagick:
 #   out/<locale>/large/NN.png   1320 x 2868  (iPhone with Dynamic Island, large display)
 #   out/<locale>/medium/NN.png  1206 x 2622  (iPhone with Dynamic Island, medium display: the required size)
+#   out/<locale>/assets/header.png  3840 x 1646  (iOS 27 product page header, Asset Library)
+#   out/<locale>/assets/search.png  3840 x 2560  (iOS 27 search results asset, Asset Library)
 # and the in-app purchase promotional images from iap.html: out/iap/{full,trial}.png (1024 x 1024).
 # Locales: en-US, ar-SA and tr (App Store Connect locale codes; Turkish has no region).
 # Every output is flattened: App Store Connect rejects images with an alpha channel.
@@ -38,6 +40,13 @@ for lang locale in ${(kv)locales}; do
     magick "$out/$locale/large/$n.png" -resize '1206x2622!' "$out/$locale/medium/$n.png"
     echo "$locale $n"
   done
+done
+
+for lang locale in ${(kv)locales}; do
+  mkdir -p "$out/$locale/assets"
+  shoot "file://$here/assets.html#lang=$lang&kind=header" 3840 1646 "$out/$locale/assets/header.png"
+  shoot "file://$here/assets.html#lang=$lang&kind=search" 3840 2560 "$out/$locale/assets/search.png"
+  echo "$locale header + search"
 done
 
 mkdir -p "$out/iap"
