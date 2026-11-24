@@ -37,10 +37,15 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 - Observe and control calls through an `InCallService` declared for the companion role (`CALL_COMPANION_APP`).
 - Answer, reject and end through the `Call` object; place calls with `TelecomManager.placeCall` (`CALL_PHONE`).
 - Whether the companion service is bound without extra steps varies by Android version and maker.
-  iTell used a shell command for this. Verify in the M3 spike before building on it.
+  iTell used a shell command for this. First spike result (D-030): Android 16 binds it only for apps holding
+  `MANAGE_ONGOING_CALLS`. Without it, the bridge follows calls through per-SIM telephony callbacks (and the
+  `PHONE_STATE` broadcast for the number on 12+), and answers/ends with `TelecomManager` (`ANSWER_PHONE_CALLS`);
+  DTMF, mute and speaker then aren't available. When the service is bound it takes over.
 
 **Contacts and call log**
-- Read-only (`READ_CONTACTS`, `READ_CALL_LOG`), synced incrementally using content observers.
+- Read-only (`READ_CONTACTS`, `READ_CALL_LOG`), synced incrementally when the iPhone asks: contacts by
+  `CONTACT_LAST_UPDATED_TIMESTAMP` plus `DeletedContacts`, the call log by row id. Adding contacts from the iPhone
+  (`WRITE_CONTACTS`) is a separate opt-in setting.
 
 **USSD**
 - `TelephonyManager.sendUssdRequest` (needs `CALL_PHONE`).
@@ -60,7 +65,13 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 **Setup experience (M1)**
 - Setup is the hardest part for users, so each step has a short EN/FA video bundled in the app.
 - The videos play in picture-in-picture while the user is in Android Settings: battery, autostart, Shizuku.
+  Until they're recorded, each wizard step has an animated illustration drawn in Compose (D-031).
 - A diagnostics screen shows a readable report; "Share report" shows the exact text before it's sent anywhere.
+
+**Debug builds (D-018)**
+- A TCP transport on `127.0.0.1:47800` runs the same pairing, handshake and records as BLE, for the emulator and
+  the iOS Simulator; an adb-only content provider hands out the pairing link. `protocol/tools/fake_remote.py` plays
+  the iPhone in end-to-end tests (`android/README.md`). None of this is in the release APK.
 
 **Sharing files (M5)**
 - Android: a share target, "Send to iPhone", appears in every app's share sheet.
