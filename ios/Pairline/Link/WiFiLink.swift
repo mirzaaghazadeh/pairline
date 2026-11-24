@@ -190,6 +190,11 @@ final class WiFiConnector: LinkConnector {
         bad[endpoint.key] = Date().addingTimeInterval(Self.badCandidateTime)
     }
 
+    /// The pinned bridge changed (paired or unpaired): an address that held "someone else's bridge" may be ours now.
+    func forgetBad() {
+        bad = [:]
+    }
+
     func connect(_ target: ConnectTarget, completion: @escaping (Result<(FrameTransport, UUID?), Error>) -> Void) {
         cancel()
         self.completion = completion

@@ -377,29 +377,31 @@ private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
             },
             icon = PIcons.Hotspot,
             iconTone = if (on != null) Tone.GOOD else if (hotspotState is HotspotState.Failed) Tone.WARN else Tone.ACCENT,
-            trailing = {
-                TextButton(onClick = {
-                    when {
-                        on != null || hotspotState == HotspotState.Starting -> hotspot.stop()
-                        Perms.allGranted(context, hotspot.requiredPermissions()) -> hotspot.start(prefs.hotspotBand)
-                        else -> {
-                            prefs.markRequested(hotspot.requiredPermissions())
-                            askPermissions.launch(hotspot.requiredPermissions().toTypedArray())
-                        }
+        )
+        // Below the text rather than beside it, so the explanation keeps the full width.
+        TextButton(
+            onClick = {
+                when {
+                    on != null || hotspotState == HotspotState.Starting -> hotspot.stop()
+                    Perms.allGranted(context, hotspot.requiredPermissions()) -> hotspot.start(prefs.hotspotBand)
+                    else -> {
+                        prefs.markRequested(hotspot.requiredPermissions())
+                        askPermissions.launch(hotspot.requiredPermissions().toTypedArray())
                     }
-                }) {
-                    Text(
-                        stringResource(
-                            if (on != null || hotspotState == HotspotState.Starting) {
-                                R.string.settings_hotspot_stop
-                            } else {
-                                R.string.settings_hotspot_start
-                            },
-                        ),
-                    )
                 }
             },
-        )
+            modifier = Modifier.padding(start = 64.dp, bottom = 8.dp),
+        ) {
+            Text(
+                stringResource(
+                    if (on != null || hotspotState == HotspotState.Starting) {
+                        R.string.settings_hotspot_stop
+                    } else {
+                        R.string.settings_hotspot_start
+                    },
+                ),
+            )
+        }
         if (hotspot.bandChoiceSupported) {
             HorizontalDivider(Modifier.padding(horizontal = 16.dp))
             ListRow(

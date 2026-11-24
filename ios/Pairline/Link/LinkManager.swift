@@ -550,6 +550,7 @@ final class LinkManager: BridgeLink {
         }
         teardown()
         peerStore.clear()
+        (connectors[.wifi] as? WiFiConnector)?.forgetBad()
         bridgeCaps = []
         hotspot.reset()
         lanes.forEach { $0.retryAttempt = 0 }
@@ -561,6 +562,7 @@ final class LinkManager: BridgeLink {
         log.info("link", "The bridge unpaired this iPhone")
         teardown()
         peerStore.clear()
+        (connectors[.wifi] as? WiFiConnector)?.forgetBad()
         bridgeCaps = []
         updatePhase()
         onPeerChange?()
@@ -592,6 +594,8 @@ final class LinkManager: BridgeLink {
             }
             self.peerStore.save(PairedPeer(deviceID: pairing.deviceID, publicKey: bridgeKey, pairedAt: Date(), name: nil,
                                            peripheralID: peripheralID, transport: kind.rawValue, wifi: hints))
+            // Addresses that failed with the previous bridge's key may be this bridge.
+            (self.connectors[.wifi] as? WiFiConnector)?.forgetBad()
             self.onPeerChange?()
         }
         session.onEstablished = { [weak self, weak session, weak lane] in
