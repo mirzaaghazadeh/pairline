@@ -3,7 +3,21 @@
 Use your Android phone's SIM card on your iPhone — calls, SMS, contacts and more — over an
 end-to-end encrypted link between your own two phones.
 
-> **Status: pre-alpha.** Nothing is usable yet. See [docs/ROADMAP.md](docs/ROADMAP.md).
+<p align="center">
+  <img src="docs/images/readme-screens.png" width="100%"
+       alt="Pairline Bridge on Android, connected to the iPhone; the iPhone app's Messages with a one-time code, an incoming call, and the bridge's SIM, signal and battery">
+</p>
+
+## Download
+
+| App | Get it | Needs |
+|-----|--------|-------|
+| **Pairline Bridge** for the Android phone with the SIM (free) | **[Download the latest APK](https://pairline.navid.tr/download/android)** · [latest release on GitHub](https://github.com/mirzaaghazadeh/pairline/releases/latest) · [all versions](https://github.com/mirzaaghazadeh/pairline/releases) | Android 9 or later |
+| **Pairline** for iPhone | Coming soon to the App Store · [pairline.navid.tr](https://pairline.navid.tr/download) | iOS 16 or later |
+
+Both links always point to the newest release. Each release's notes list the APK's SHA-256, its signing
+certificate and its [VirusTotal](https://www.virustotal.com) report; see [Verifying releases](#verifying-releases).
+Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Our promise
 
@@ -28,7 +42,7 @@ The phones talk over Bluetooth LE, plus local Wi-Fi for audio and files. Details
 ## Pricing
 
 - **Android app:** free.
-- **iPhone app:** free download; extra features through In-App Purchase on the App Store.
+- **iPhone app:** free download with a free week, then a one-time $9.99 In-App Purchase. Demo mode is always free.
 
 ## License
 
@@ -43,8 +57,9 @@ Pairline is **source-available** under the
 
 ## Verifying releases
 
-Each release will publish SHA-256 hashes and the Android signing-certificate fingerprint, and the
-Android build will be reproducible from source. See [SECURITY.md](SECURITY.md).
+Android APKs are built and signed only by GitHub Actions from a tagged commit. Each release's notes link the
+build run and list the APK's SHA-256, the signing-certificate fingerprint and the APK's VirusTotal report.
+How to check them: [SECURITY.md](SECURITY.md#verifying-a-release).
 
 ## Documentation
 
