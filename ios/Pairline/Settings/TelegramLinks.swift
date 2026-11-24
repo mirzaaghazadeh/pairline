@@ -7,7 +7,8 @@ extension AppInfo {
     static var telegramChannelURL: URL { URL(string: "https://t.me/pairline_\(telegramLanguage)")! }
 
     static var telegramGroupURL: URL {
-        let topic = ["en": 3, "fa": 5, "tr": 7][telegramLanguage] ?? 3
+        // English is the group's General topic (1); Persian and Turkish have topics of their own.
+        let topic = ["en": 1, "fa": 5, "tr": 7][telegramLanguage] ?? 1
         return URL(string: "https://t.me/pairline_groups/\(topic)")!
     }
 

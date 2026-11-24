@@ -241,7 +241,7 @@
     <string name="settings_telegram_group_sub">اسأل مستخدمي Pairline الآخرين والمطوّر. المجموعة عامة، فلا تنشر فيها رقم هاتفك أو رسائلك أو رموزك أبدًا.</string>
     <!-- No Arabic channel yet: the English channel and help topic. -->
     <string name="telegram_channel_url">https://t.me/pairline_en</string>
-    <string name="telegram_group_url">https://t.me/pairline_groups/3</string>
+    <string name="telegram_group_url">https://t.me/pairline_groups/1</string>
     <string name="settings_source">الشيفرة المصدرية</string>
     <string name="settings_source_sub">&#x200F;github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">الخصوصية</string>

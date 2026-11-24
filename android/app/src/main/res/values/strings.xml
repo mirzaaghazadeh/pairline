@@ -241,7 +241,7 @@
     <string name="settings_telegram_group_sub">Ask other Pairline users and the developer. The group is public, so never post your phone number, messages or codes there.</string>
     <!-- The Telegram chats for the app's language: Persian and Turkish have their own, Arabic uses the English ones. -->
     <string name="telegram_channel_url">https://t.me/pairline_en</string>
-    <string name="telegram_group_url">https://t.me/pairline_groups/3</string>
+    <string name="telegram_group_url">https://t.me/pairline_groups/1</string>
     <string name="settings_source">Source code</string>
     <string name="settings_source_sub">github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">Privacy</string>
