@@ -94,9 +94,13 @@ class AppPrefs(context: Context) {
         get() = prefs.getInt(AUDIO_SOURCE, 0)
         set(value) = edit { putInt(AUDIO_SOURCE, value) }
 
-    /** Mute this phone's own microphone while the iPhone's voice is fed into the call. Flips on "they couldn't hear me". */
+    /**
+     * Mute this phone's own microphone while the iPhone's voice is fed into the call. Off by default: on several audio
+     * systems (some Samsung, Qualcomm and MediaTek phones) the mute also silences the fed-in voice, so the caller would
+     * hear nothing. Turns off again on "they couldn't hear me".
+     */
     var audioMuteBridgeMic: Boolean
-        get() = prefs.getBoolean(AUDIO_MUTE_MIC, true)
+        get() = prefs.getBoolean(AUDIO_MUTE_MIC, false)
         set(value) = edit { putBoolean(AUDIO_MUTE_MIC, value) }
 
     /** Consecutive calls where the other side couldn't hear the iPhone. After two, talking is reported as unsupported. */

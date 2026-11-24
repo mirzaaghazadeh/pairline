@@ -128,7 +128,7 @@ class CallAudioRelay(
     /** Turns relaying back to its first-try settings (Settings › Talk on iPhone › Reset). */
     fun resetLearning() {
         prefs.audioCaptureSource = 0
-        prefs.audioMuteBridgeMic = true
+        prefs.audioMuteBridgeMic = false
         prefs.audioTalkFailures = 0
         onCapsChanged?.invoke()
     }

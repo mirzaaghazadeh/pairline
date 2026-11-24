@@ -883,6 +883,15 @@ Testing on a Galaxy Note 3 running Android 10 and reports from a tester's Samsun
   refuses until the in-call mode is set, so the bridge asks again every 30 ms within the same 4 s. The older
   sources (`VOICE_DOWNLINK`, `VOICE_CALL`, the telephony output) remain the fallback, and the learned source now
   cycles through all three. Helper version 2 (a running version-1 helper is replaced).
+- **The bridge's microphone stays on by default.** On several audio systems (some Samsung, Qualcomm and MediaTek
+  phones) muting the phone's microphone also silences the voice fed into the call, so the caller heard nothing
+  from the iPhone. The mute is now off unless set; the learning from D-047 still turns it off after "they couldn't
+  hear me". This supersedes D-047's default.
+- **The iPhone keeps the audio when its own audio engine is picky.** If the call-audio engine won't start with echo
+  cancellation (voice processing), the iPhone tries a fresh engine without it for the rest of the call instead of
+  handing the audio back to the Android phone. When iOS stops the engine for a route change (AirPods, car, speaker,
+  CallKit), a fresh engine starts in the same session (at most 6 times per call). An iPhone-side failure gets its
+  own alert (microphone permission) instead of the bridge one.
 - **Incoming calls while the iPhone is locked.** iOS keeps only Bluetooth links alive in the background, and doesn't
   relaunch an app the user swiped away. The iPhone's Bridge tab now says so when the link is over Wi-Fi only, and
   when the user swipes Pairline away (while iOS still runs it) a local notification says calls and messages are
