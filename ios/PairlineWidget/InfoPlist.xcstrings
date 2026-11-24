@@ -22,6 +22,12 @@
             "state" : "translated",
             "value" : "Pairline"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline"
+          }
         }
       }
     },
@@ -42,6 +48,12 @@
           }
         },
         "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PairlineWidget"
+          }
+        },
+        "tr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PairlineWidget"

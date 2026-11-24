@@ -49,6 +49,7 @@ struct DemoContent {
         switch language {
         case "fa": return persian
         case "ar": return arabic
+        case "tr": return turkish
         default: return english
         }
     }
@@ -121,6 +122,76 @@ struct DemoContent {
         ussdBalance: "Your balance is $23.40. Data left: 4.2 GB, valid until Dec 31.",
         ussdMenu: "1. Buy a data pack\n2. Check minutes\n3. Roaming\n0. Exit",
         ussdUnknown: "Unknown code. Check the code and try again."
+    )
+
+    // MARK: - Turkish
+
+    static let turkish = DemoContent(
+        carriers: ("Ay Mobil", "Yıldız Net"),
+        ownNumber: "+90 532 555 0134",
+        people: [
+            Person(name: "Elif Yılmaz", number: "+90 532 555 0182", label: "mobile", email: "elif@example.com", starred: true),
+            Person(name: "Emre Demir", number: "+90 541 555 0147", label: "mobile", email: nil, starred: false),
+            Person(name: "Annem", number: "+90 212 555 0110", label: "home", email: nil, starred: true),
+            Person(name: "Zeynep Kaya", number: "+90 505 555 0199", label: "work", email: "zeynep@example.org", starred: false),
+            Person(name: "Can Öztürk", number: "+90 533 555 0123", label: "mobile", email: nil, starred: false),
+            Person(name: "Ayşe Çelik", number: "+90 542 555 0165", label: "mobile", email: "ayse@example.net", starred: true),
+            Person(name: "Burak Şahin", number: "+90 507 555 0171", label: "mobile", email: nil, starred: false),
+            Person(name: "Dr. Selin Arslan", number: "+90 216 555 0190", label: "work", email: nil, starred: false),
+            Person(name: "Deniz Aydın", number: "+90 538 555 0156", label: "mobile", email: nil, starred: false),
+            Person(name: "Mert Koç", number: "+90 544 555 0138", label: "mobile", email: nil, starred: false),
+        ],
+        conversations: [
+            Conversation(person: 0, sender: "", lines: [
+                Line(fromMe: false, text: "Bu akşamki yemek hâlâ geçerli mi?", minutesAgo: 95),
+                Line(fromMe: true, text: "Evet! 19:30'da her zamanki yerde mi?", minutesAgo: 92),
+                Line(fromMe: false, text: "Süper. Üç kişilik masa ayırtıyorum, Can da geliyor 🎉", minutesAgo: 90),
+                Line(fromMe: true, text: "Harika, orada görüşürüz", minutesAgo: 12),
+            ]),
+            Conversation(person: nil, sender: "ORNEKBANK", lines: [
+                Line(fromMe: false, text: "Örnek Bank: Doğrulama kodunuz 482913. 10 dakika geçerlidir. Kimseyle paylaşmayın.", minutesAgo: 3),
+            ]),
+            Conversation(person: 2, sender: "", lines: [
+                Line(fromMe: false, text: "Sağ salim indin mi?", minutesAgo: 60 * 5),
+                Line(fromMe: true, text: "Yeni indik. Birazdan arıyorum ❤️", minutesAgo: 60 * 5 - 20),
+                Line(fromMe: false, text: "Eve varınca ara beni", minutesAgo: 60 * 5 - 25),
+            ]),
+            Conversation(person: nil, sender: "KARGO", lines: [
+                Line(fromMe: false, text: "Kargonuz dağıtımda, bugün 14:00-17:00 arasında teslim edilecek. Takip: example.com/t/8K2Q", minutesAgo: 60 * 8),
+            ]),
+            Conversation(person: 3, sender: "", lines: [
+                Line(fromMe: false, text: "Toplantıdan önce sunumu gönderebilir misin?", minutesAgo: 60 * 26),
+                Line(fromMe: true, text: "Hemen gönderiyorum", minutesAgo: 60 * 25),
+                Line(fromMe: false, text: "Geldi, teşekkürler!", minutesAgo: 60 * 25 - 30),
+            ]),
+            Conversation(person: 1, sender: "", lines: [
+                Line(fromMe: false, text: "Cumartesi oyun gecesi var mı?", minutesAgo: 60 * 50),
+                Line(fromMe: true, text: "Ben varım. Atıştırmalıklar benden", minutesAgo: 60 * 49),
+            ]),
+            Conversation(person: nil, sender: "ACME-ID", lines: [
+                Line(fromMe: false, text: "Acme giriş kodunuz: G-551203", minutesAgo: 60 * 75),
+            ]),
+            Conversation(person: 5, sender: "", lines: [
+                Line(fromMe: true, text: "Doğum günün kutlu olsun Ayşe! 🎂", minutesAgo: 60 * 24 * 4),
+                Line(fromMe: false, text: "Çok teşekkür ederim!! 😊", minutesAgo: 60 * 24 * 4 - 40),
+            ]),
+        ],
+        calls: [
+            Call(person: 2, number: "", type: "in", minutesAgo: 45, duration: 754, sim: 0),
+            Call(person: 0, number: "", type: "out", minutesAgo: 130, duration: 212, sim: 0),
+            Call(person: nil, number: "+90 850 555 0100", type: "missed", minutesAgo: 60 * 6, duration: 0, sim: 1),
+            Call(person: 3, number: "", type: "out", minutesAgo: 60 * 26, duration: 1260, sim: 1),
+            Call(person: 4, number: "", type: "missed", minutesAgo: 60 * 30, duration: 0, sim: 0),
+            Call(person: 1, number: "", type: "in", minutesAgo: 60 * 52, duration: 95, sim: 0),
+            Call(person: nil, number: "+90 530 555 0177", type: "rejected", minutesAgo: 60 * 70, duration: 0, sim: 0),
+            Call(person: 7, number: "", type: "out", minutesAgo: 60 * 96, duration: 180, sim: 1),
+            Call(person: 5, number: "", type: "in", minutesAgo: 60 * 24 * 4, duration: 620, sim: 0),
+        ],
+        incomingOTP: ("ORNEKBANK", "Örnek Bank: Ödemeyi onaylamak için tek kullanımlık şifreniz 739204. Kimseyle paylaşmayın."),
+        replies: ["Olur 👍", "Yoldayım!", "Teşekkürler, sonra konuşuruz", "Haha, süper"],
+        ussdBalance: "Bakiyeniz 234,50 TL. Kalan internet: 4,2 GB, 31 Aralık'a kadar geçerli.",
+        ussdMenu: "1. İnternet paketi al\n2. Kalan dakikalar\n3. Yurt dışı kullanım\n0. Çıkış",
+        ussdUnknown: "Geçersiz kod. Kodu kontrol edip tekrar deneyin."
     )
 
     // MARK: - Persian

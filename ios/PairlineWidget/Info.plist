@@ -17,6 +17,7 @@
 		<string>en</string>
 		<string>fa</string>
 		<string>ar</string>
+		<string>tr</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>

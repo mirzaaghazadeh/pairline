@@ -22,6 +22,12 @@
             "state" : "translated",
             "value" : "Pairline"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline"
+          }
         }
       }
     },
@@ -42,6 +48,12 @@
           }
         },
         "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline"
+          }
+        },
+        "tr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairline"
@@ -70,6 +82,12 @@
             "state" : "translated",
             "value" : "Pairline از بلوتوث برای اتصال به گوشی پل اندرویدی شما استفاده می‌کند تا بتوانید از سیم‌کارت آن روی این آیفون استفاده کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline, Android köprü telefonunuzun SIM kartını bu iPhone'da kullanabilmeniz için o telefona Bluetooth ile bağlanır."
+          }
         }
       }
     },
@@ -93,6 +111,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairline فقط برای اسکن کد جفت‌سازی‌ای که روی گوشی پل اندرویدی شما نمایش داده می‌شود، از دوربین استفاده می‌کند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline, kamerayı yalnızca Android köprü telefonunuzda gösterilen eşleştirme kodunu taramak için kullanır."
           }
         }
       }

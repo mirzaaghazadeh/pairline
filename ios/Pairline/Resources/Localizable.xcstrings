@@ -15,6 +15,12 @@
             "state" : "translated",
             "value" : "–"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "–"
+          }
         }
       }
     },
@@ -30,6 +36,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ تماس را رد کرد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ aramayı reddetti."
           }
         }
       }
@@ -47,6 +59,12 @@
             "state" : "translated",
             "value" : "%@ پاسخ نداد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ yanıt vermedi."
+          }
         }
       }
     },
@@ -63,6 +81,12 @@
             "state" : "translated",
             "value" : "%@ مشغول است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ meşgul."
+          }
         }
       }
     },
@@ -75,6 +99,12 @@
           }
         },
         "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld ms"
+          }
+        },
+        "tr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld ms"
@@ -161,6 +191,24 @@
               }
             }
           }
+        },
+        "tr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Siz yokken %lld yeni mesaj geldi."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Siz yokken %lld yeni mesaj geldi."
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -178,6 +226,12 @@
             "state" : "translated",
             "value" : "%lld%%"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%%%lld"
+          }
         }
       }
     },
@@ -193,6 +247,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای اینکه همه‌چیز درست کار کند، به نسخه جدیدتری از Pairline Bridge نیاز است. آخرین نسخه را روی گوشی اندرویدی خود نصب کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Her şeyin çalışması için daha yeni bir Pairline Bridge gerekiyor. Android telefonunuza en son sürümü yükleyin."
           }
         }
       }
@@ -210,6 +270,12 @@
             "state" : "translated",
             "value" : "یک اتصال خصوصی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Özel bir bağlantı"
+          }
         }
       }
     },
@@ -225,6 +291,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "درباره"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hakkında"
           }
         }
       }
@@ -242,6 +314,12 @@
             "state" : "translated",
             "value" : "درباره Pairline"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline hakkında"
+          }
         }
       }
     },
@@ -257,6 +335,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پاسخ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kabul et"
           }
         }
       }
@@ -274,6 +358,12 @@
             "state" : "translated",
             "value" : "قدردانی‌ها"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teşekkürler"
+          }
         }
       }
     },
@@ -289,6 +379,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "افزودن مخاطب"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kişi ekle"
           }
         }
       }
@@ -306,6 +402,12 @@
             "state" : "translated",
             "value" : "افزودن مخاطب از آیفون"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone'dan kişi ekleme"
+          }
         }
       }
     },
@@ -321,6 +423,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "افزودن شماره"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numara ekle"
           }
         }
       }
@@ -338,6 +446,12 @@
             "state" : "translated",
             "value" : "پس از ۳ روز، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند تا زمانی که Pairline را یک بار بخرید. پیام‌هایی که از قبل روی این آیفون هستند قابل خواندن می‌مانند و حالت نمایشی، راهنما و تنظیمات همچنان کار می‌کنند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 gün sonra, Pairline'ı bir kez satın alana kadar mesaj gönderme, aramalar, eşzamanlama ve USSD durur. Bu iPhone'daki mesajlar okunabilir kalır; demo modu, yardım ve ayarlar çalışmaya devam eder."
+          }
         }
       }
     },
@@ -353,6 +467,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پس از راه‌اندازی مجدد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeniden başlatmadan sonra"
           }
         }
       }
@@ -370,6 +490,12 @@
             "state" : "translated",
             "value" : "پس از راه‌اندازی مجدد آیفون، یک بار قفل آن را باز کنید. Pairline خودش دوباره وصل می‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone'u yeniden başlattıktan sonra kilidini bir kez açın. Pairline kendiliğinden yeniden bağlanır."
+          }
         }
       }
     },
@@ -385,6 +511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "همه"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tümü"
           }
         }
       }
@@ -402,6 +534,12 @@
             "state" : "translated",
             "value" : "اجازه دسترسی به دوربین"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kameraya izin ver"
+          }
         }
       }
     },
@@ -417,6 +555,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "وقتی اندروید پرسید، اجازه دهید بدون محدودیت باتری اجرا شود. بعضی گوشی‌ها تنظیمات جداگانه‌ای برای اجرای خودکار دارند؛ برنامه پل جای آن‌ها را نشان می‌دهد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android sorduğunda pil kısıtlaması olmadan çalışmasına izin verin. Bazı telefonlarda ek otomatik başlatma ayarları bulunur; köprü uygulaması bunların nerede olduğunu gösterir."
           }
         }
       }
@@ -434,6 +578,12 @@
             "state" : "translated",
             "value" : "اجازه نمایش اعلان‌ها"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildirimlere izin ver"
+          }
         }
       }
     },
@@ -449,6 +599,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در تنظیمات آیفون، اعلان‌های Pairline را مجاز کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone'un Ayarlar uygulamasında Pairline için bildirimlere izin verin."
           }
         }
       }
@@ -466,6 +622,12 @@
             "state" : "translated",
             "value" : "در Pairline Bridge روی گوشی اندرویدی خود، ارسال پیامک را مجاز کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzdaki Pairline Bridge'te SMS göndermeye izin verin."
+          }
         }
       }
     },
@@ -481,6 +643,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در Pairline Bridge روی گوشی اندرویدی خود، دسترسی به پیامک را مجاز کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzdaki Pairline Bridge'te SMS erişimine izin verin."
           }
         }
       }
@@ -498,6 +666,12 @@
             "state" : "translated",
             "value" : "مجوزهایی را که درخواست می‌کند بدهید: پیامک، تلفن و بلوتوث."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İstediği izinleri verin: SMS, telefon ve Bluetooth."
+          }
         }
       }
     },
@@ -513,6 +687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در Pairline Bridge روی گوشی اندرویدی خود، مجوز تلفن را بدهید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzdaki Pairline Bridge'te telefon iznini verin."
           }
         }
       }
@@ -530,6 +710,12 @@
             "state" : "translated",
             "value" : "مجوزهای خواسته‌شده را بدهید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İstediği izinleri verin"
+          }
         }
       }
     },
@@ -545,6 +731,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "یک قانون iOS"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir iOS kuralı"
           }
         }
       }
@@ -562,6 +754,12 @@
             "state" : "translated",
             "value" : "اندروید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android"
+          }
         }
       }
     },
@@ -577,6 +775,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اندروید ممکن است برای صرفه‌جویی در مصرف باتری، برنامه‌های پس‌زمینه را متوقف کند. این تنظیمات Pairline Bridge را در تمام طول روز متصل نگه می‌دارند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android, pil tasarrufu için arka plandaki uygulamaları durdurabilir. Bu ayarlar Pairline Bridge'in gün boyu bağlı kalmasını sağlar."
           }
         }
       }
@@ -594,6 +798,12 @@
             "state" : "translated",
             "value" : "پاسخ دادن و قطع تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramaları yanıtlama ve sonlandırma"
+          }
         }
       }
     },
@@ -609,6 +819,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "فعلاً پاسخ با آیفون، مکالمه با اندروید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdilik iPhone'da yanıtlayın, Android'de konuşun"
           }
         }
       }
@@ -626,6 +842,12 @@
             "state" : "translated",
             "value" : "خرید از طریق اپل انجام می‌شود"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Satın alma işlemlerini Apple yönetir"
+          }
         }
       }
     },
@@ -641,6 +863,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "فعلاً صدا روی گوشی اندرویدی است"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ses şimdilik Android telefonda"
           }
         }
       }
@@ -658,6 +886,12 @@
             "state" : "translated",
             "value" : "صدا از گوشی اندرویدی شما پخش می‌شود"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ses Android telefonunuzda çalınır"
+          }
         }
       }
     },
@@ -673,6 +907,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اجرای خودکار (شیائومی، اوپو، ویوو، هواوی)"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otomatik başlatma (Xiaomi, Oppo, Vivo, Huawei)"
           }
         }
       }
@@ -690,6 +930,12 @@
             "state" : "translated",
             "value" : "در دسترس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kullanılabilir"
+          }
         }
       }
     },
@@ -705,6 +951,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بازگشت"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geri"
           }
         }
       }
@@ -722,6 +974,12 @@
             "state" : "translated",
             "value" : "کدهای موجودی و بسته در هر اپراتور فرق دارد. کدهایی را که اپراتور شما استفاده می‌کند با زدن ستاره کنار نتیجه ذخیره کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bakiye ve paket kodları operatöre göre değişir. Operatörünüzün kullandığı kodları sonuçtaki yıldızla kaydedin."
+          }
         }
       }
     },
@@ -737,6 +995,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "موجودی، بسته‌ها و خدمات اپراتور"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bakiye, paketler ve operatör hizmetleri"
           }
         }
       }
@@ -754,6 +1018,12 @@
             "state" : "translated",
             "value" : "باتری"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pil"
+          }
         }
       }
     },
@@ -769,6 +1039,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "باتری %lld درصد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pil yüzde %lld"
           }
         }
       }
@@ -786,6 +1062,12 @@
             "state" : "translated",
             "value" : "بهینه‌سازی باتری"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pil optimizasyonu"
+          }
         }
       }
     },
@@ -801,6 +1083,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تنظیمات مهم باتری"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Önemli pil ayarları"
           }
         }
       }
@@ -818,6 +1106,12 @@
             "state" : "translated",
             "value" : "وضعیت باتری نامشخص"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pil durumu bilinmiyor"
+          }
         }
       }
     },
@@ -833,6 +1127,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مسدودشده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engellendi"
           }
         }
       }
@@ -850,6 +1150,12 @@
             "state" : "translated",
             "value" : "بلوتوث"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth"
+          }
         }
       }
     },
@@ -865,6 +1171,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بلوتوث خاموش است"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth kapalı"
           }
         }
       }
@@ -882,6 +1194,12 @@
             "state" : "translated",
             "value" : "اجازه دسترسی به بلوتوث داده نشده است"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth'a izin verilmiyor"
+          }
         }
       }
     },
@@ -897,6 +1215,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بلوتوث مجاز نیست"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth'a izin verilmedi"
           }
         }
       }
@@ -914,6 +1238,12 @@
             "state" : "translated",
             "value" : "بلوتوث روی هر دو گوشی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İki telefonda da Bluetooth"
+          }
         }
       }
     },
@@ -929,6 +1259,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بلوتوث در دسترس نیست"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth kullanılamıyor"
           }
         }
       }
@@ -946,6 +1282,12 @@
             "state" : "translated",
             "value" : "پل"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü"
+          }
         }
       }
     },
@@ -961,6 +1303,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هشدار باتری پل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü pil uyarıları"
           }
         }
       }
@@ -978,6 +1326,12 @@
             "state" : "translated",
             "value" : "پیش‌فرض پل"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprünün varsayılanı"
+          }
         }
       }
     },
@@ -993,6 +1347,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گوشی پل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon"
           }
         }
       }
@@ -1010,6 +1370,12 @@
             "state" : "translated",
             "value" : "باتری گوشی پل کم است"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonun pili azaldı"
+          }
         }
       }
     },
@@ -1025,6 +1391,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تماس‌هایی که از طریق پل انجام می‌شوند در فهرست «اخیر» تلفن آیفون نمی‌آیند، مگر اینکه این گزینه را در تنظیمات روشن کنید؛ چون فهرست «اخیر» ممکن است با iCloud همگام شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprülenen aramalar, Ayarlar'da açmadığınız sürece iPhone'un Son Aramalar listesinde görünmez, çünkü Son Aramalar iCloud ile eşzamanlanabilir."
           }
         }
       }
@@ -1042,6 +1414,12 @@
             "state" : "translated",
             "value" : "گوشی‌ها را به هم نزدیک‌تر کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefonları birbirine yaklaştırın."
+          }
         }
       }
     },
@@ -1057,6 +1435,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مشغول"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meşgul"
           }
         }
       }
@@ -1074,6 +1458,12 @@
             "state" : "translated",
             "value" : "خرید همین حالا با %@"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi %@ karşılığında satın al"
+          }
         }
       }
     },
@@ -1090,6 +1480,12 @@
             "state" : "translated",
             "value" : "خرید یک‌باره · %@"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir kez satın al · %@"
+          }
         }
       }
     },
@@ -1105,6 +1501,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خرید Pairline با %@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ı %@ karşılığında satın al"
           }
         }
       }
@@ -1123,6 +1525,12 @@
             "state" : "translated",
             "value" : "خرید Pairline از طریق App Store انجام می‌شود. برنامه رسیدهای امضاشده توسط اپل را روی خود دستگاه بررسی می‌کند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline satın alma işlemi App Store üzerinden yapılır. Uygulama, Apple tarafından imzalanmış makbuzları cihazda doğrular."
+          }
         }
       }
     },
@@ -1138,6 +1546,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خرید Pairline از طریق App Store انجام می‌شود. برنامه تراکنش‌های امضاشده توسط اپل را روی خود دستگاه بررسی می‌کند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline satın alma işlemi App Store üzerinden yapılır. Uygulama, Apple tarafından imzalanmış işlemleri cihazda doğrular."
           }
         }
       }
@@ -1155,6 +1569,12 @@
             "state" : "translated",
             "value" : "تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ara"
+          }
         }
       }
     },
@@ -1170,6 +1590,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "فعلاً صدای تماس روی گوشی اندرویدی شماست، پس همان‌جا آن را بی‌صدا کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama sesi şimdilik Android telefonunuzda, bu yüzden sesi orada kapatın."
           }
         }
       }
@@ -1187,6 +1613,12 @@
             "state" : "translated",
             "value" : "فعلاً صدای تماس روی گوشی اندرویدی شماست، پس از دکمه بلندگوی همان گوشی استفاده کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama sesi şimdilik Android telefonunuzda, bu yüzden oradaki hoparlör düğmesini kullanın."
+          }
         }
       }
     },
@@ -1202,6 +1634,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "صدای تماس روی آیفون"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone'da arama sesi"
           }
         }
       }
@@ -1219,6 +1657,12 @@
             "state" : "translated",
             "value" : "تماس پایان یافت"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama sona erdi"
+          }
         }
       }
     },
@@ -1234,6 +1678,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تماس ناموفق بود"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama başarısız oldu"
           }
         }
       }
@@ -1251,6 +1701,12 @@
             "state" : "translated",
             "value" : "وضعیت انتقال تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çağrı yönlendirme durumu"
+          }
         }
       }
     },
@@ -1266,6 +1722,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "از صفحه‌کلید، مخاطبین یا تماس‌های اخیر تماس بگیرید. در گوشی‌های دو سیم‌کارته، سیم‌کارت را انتخاب کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuş takımından, kişilerden veya son aramalardan arama yapın. Çift SIM'li telefonlarda SIM'i seçin."
           }
         }
       }
@@ -1283,6 +1745,12 @@
             "state" : "translated",
             "value" : "سابقه تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama geçmişi"
+          }
         }
       }
     },
@@ -1298,6 +1766,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سابقه تماس خاموش است"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama geçmişi kapalı"
           }
         }
       }
@@ -1315,6 +1789,12 @@
             "state" : "translated",
             "value" : "وضعیت انتظار تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çağrı bekletme durumu"
+          }
         }
       }
     },
@@ -1330,6 +1810,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "وضعیت نمایش شماره"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arayan kimliği durumu"
           }
         }
       }
@@ -1347,6 +1833,12 @@
             "state" : "translated",
             "value" : "در حال تماس…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aranıyor…"
+          }
         }
       }
     },
@@ -1362,6 +1854,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تماس‌ها"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramalar"
           }
         }
       }
@@ -1379,6 +1877,12 @@
             "state" : "translated",
             "value" : "دوباره با این شماره تماس می‌گیرد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geri arar"
+          }
         }
       }
     },
@@ -1394,6 +1898,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تماس‌ها روی آیفون زنگ نمی‌خورند"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramalar iPhone'da çalmıyor"
           }
         }
       }
@@ -1411,6 +1921,12 @@
             "state" : "translated",
             "value" : "تماس‌های سیم‌کارت گوشی اندرویدی شما اینجا فهرست می‌شوند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzun SIM'iyle yapılan aramalar burada listelenecek."
+          }
         }
       }
     },
@@ -1426,6 +1942,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تماس‌ها روی آیفون شما"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramalar iPhone'unuzda"
           }
         }
       }
@@ -1443,6 +1965,12 @@
             "state" : "translated",
             "value" : "تماس‌هایی که با شماره اندرویدی شما گرفته می‌شوند، با همان صفحه تماس معمول آیفون روی این آیفون زنگ می‌خورند، حتی وقتی قفل است. همین‌جا پاسخ دهید یا رد کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android numaranıza gelen aramalar, kilitliyken bile bu iPhone'da normal iPhone arama ekranıyla çalar. Buradan yanıtlayın veya reddedin."
+          }
         }
       }
     },
@@ -1459,6 +1987,12 @@
             "state" : "translated",
             "value" : "دوربین"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamera"
+          }
         }
       }
     },
@@ -1474,6 +2008,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دسترسی به دوربین خاموش است. Pairline فقط برای اسکن کد جفت‌سازی از دوربین استفاده می‌کند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamera erişimi kapalı. Pairline kamerayı yalnızca eşleştirme kodunu taramak için kullanır."
           }
         }
       }
@@ -1492,6 +2032,12 @@
             "state" : "translated",
             "value" : "می‌توانم کد منبع را ببینم؟"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kodu görebilir miyim?"
+          }
         }
       }
     },
@@ -1507,6 +2053,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "می‌توانم کد منبع را ببینم؟"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaynak kodunu görebilir miyim?"
           }
         }
       }
@@ -1524,6 +2076,12 @@
             "state" : "translated",
             "value" : "می‌توانم هنگام تماس با آیفون صحبت کنم؟"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama sırasında iPhone'dan konuşabilir miyim?"
+          }
         }
       }
     },
@@ -1539,6 +2097,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "لغو"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vazgeç"
           }
         }
       }
@@ -1556,6 +2120,34 @@
             "state" : "translated",
             "value" : "پاسخ اپراتور"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operatör yanıtı"
+          }
+        }
+      }
+    },
+    "Change the language in iPhone Settings › Pairline › Language." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لتغيير اللغة، انتقل إلى الإعدادات › Pairline › اللغة على الآيفون."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "زبان را از تنظیمات آیفون › Pairline › زبان تغییر دهید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dili değiştirmek için iPhone'da Ayarlar › Pairline › Dil bölümüne gidin."
+          }
         }
       }
     },
@@ -1571,6 +2163,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای متصل ماندن، به‌زودی شارژش کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlı kalmak için yakında şarj edin"
           }
         }
       }
@@ -1588,6 +2186,12 @@
             "state" : "translated",
             "value" : "گوشی پل را شارژ کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonu şarj edin"
+          }
         }
       }
     },
@@ -1603,6 +2207,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در حال شارژ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şarj oluyor"
           }
         }
       }
@@ -1621,6 +2231,12 @@
             "state" : "translated",
             "value" : "مطمئن شوید بلوتوث روی هر دو گوشی روشن است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Her iki telefonda da Bluetooth'un açık olduğunu kontrol edin."
+          }
         }
       }
     },
@@ -1636,6 +2252,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مطمئن شوید «کنترل تماس» در Pairline Bridge روشن است."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge'te arama denetiminin açık olduğunu kontrol edin."
           }
         }
       }
@@ -1653,6 +2275,12 @@
             "state" : "translated",
             "value" : "زبانه «پل» را بررسی کنید: کنار «هشدار تماس‌های ورودی» باید علامت تیک باشد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü sekmesini kontrol edin: Gelen arama uyarıları için onay işareti görünmelidir."
+          }
         }
       }
     },
@@ -1668,6 +2296,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در حال بررسی خرید شما…"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Satın alımınız kontrol ediliyor…"
           }
         }
       }
@@ -1685,6 +2319,12 @@
             "state" : "translated",
             "value" : "انتخاب سیم‌کارت"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIM seçin"
+          }
         }
       }
     },
@@ -1700,6 +2340,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پاک کردن گزارش"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Günlüğü temizle"
           }
         }
       }
@@ -1717,6 +2363,12 @@
             "state" : "translated",
             "value" : "گزارش پاک شود؟"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Günlük temizlensin mi?"
+          }
         }
       }
     },
@@ -1732,6 +2384,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بستن"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kapat"
           }
         }
       }
@@ -1749,6 +2407,12 @@
             "state" : "translated",
             "value" : "کد اجرا نشد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kod çalışmadı"
+          }
         }
       }
     },
@@ -1764,6 +2428,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کد، مثلاً ‎*140#‎"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kod, örneğin *140#"
           }
         }
       }
@@ -1781,6 +2451,12 @@
             "state" : "translated",
             "value" : "کدها روی سیم‌کارت گوشی اندرویدی شما اجرا می‌شوند. پاسخ‌های اپراتور اینجا نمایش داده می‌شوند و ذخیره نمی‌شوند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kodlar Android telefonunuzun SIM'inde çalışır. Operatör yanıtları burada görünür ve saklanmaz."
+          }
         }
       }
     },
@@ -1796,6 +2472,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در به‌روزرسانی‌های بعدی اضافه می‌شود. تا آن موقع، با گوشی اندرویدی صحبت کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sonraki bir güncellemeyle gelecek. O zamana kadar Android telefondan konuşun."
           }
         }
       }
@@ -1813,6 +2495,12 @@
             "state" : "translated",
             "value" : "کدهای رایج"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sık kullanılan kodlar"
+          }
         }
       }
     },
@@ -1828,6 +2516,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "متصل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlı"
           }
         }
       }
@@ -1845,6 +2539,12 @@
             "state" : "translated",
             "value" : "جزئیات مخاطب"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kişi bilgileri"
+          }
         }
       }
     },
@@ -1860,6 +2560,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مخاطبین"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kişiler"
           }
         }
       }
@@ -1877,6 +2583,12 @@
             "state" : "translated",
             "value" : "مخاطبین و سابقه تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kişiler ve arama geçmişi"
+          }
         }
       }
     },
@@ -1892,6 +2604,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مخاطبین گوشی اندرویدی شما پس از همگام‌سازی اینجا نمایش داده می‌شوند و فقط روی همین آیفون می‌مانند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzdaki kişiler eşzamanlandıktan sonra burada görünür. Yalnızca bu iPhone'da kalırlar."
           }
         }
       }
@@ -1909,6 +2627,12 @@
             "state" : "translated",
             "value" : "همگام‌سازی مخاطبین خاموش است"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kişi eşzamanlama kapalı"
+          }
         }
       }
     },
@@ -1924,6 +2648,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ادامه"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Devam"
           }
         }
       }
@@ -1941,6 +2671,12 @@
             "state" : "translated",
             "value" : "کپی شد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopyalandı"
+          }
         }
       }
     },
@@ -1956,6 +2692,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کپی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopyala"
           }
         }
       }
@@ -1973,6 +2715,12 @@
             "state" : "translated",
             "value" : "کپی کد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kodu Kopyala"
+          }
         }
       }
     },
@@ -1988,6 +2736,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کپی کد %@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ kodunu kopyala"
           }
         }
       }
@@ -2005,6 +2759,12 @@
             "state" : "translated",
             "value" : "کپی پیوند"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlantıyı kopyala"
+          }
         }
       }
     },
@@ -2020,6 +2780,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کپی پاسخ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yanıtı kopyala"
           }
         }
       }
@@ -2037,6 +2803,12 @@
             "state" : "translated",
             "value" : "گوشی پل پیدا نشد. هر دو گوشی را با بلوتوث روشن نزدیک هم نگه دارید و Pairline Bridge را باز بگذارید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon bulunamadı. İki telefonu Bluetooth açıkken birbirine yakın tutun ve Pairline Bridge'i açık bırakın."
+          }
         }
       }
     },
@@ -2052,6 +2824,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "TCP اشکال‌زدایی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug TCP"
           }
         }
       }
@@ -2069,6 +2847,12 @@
             "state" : "translated",
             "value" : "رد کردن"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reddet"
+          }
         }
       }
     },
@@ -2084,6 +2868,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رد شد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reddedildi"
           }
         }
       }
@@ -2101,6 +2891,12 @@
             "state" : "translated",
             "value" : "سیم‌کارت پیش‌فرض"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varsayılan SIM"
+          }
         }
       }
     },
@@ -2116,6 +2912,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حذف"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sil"
           }
         }
       }
@@ -2133,6 +2935,12 @@
             "state" : "translated",
             "value" : "تحویل شد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teslim edildi"
+          }
         }
       }
     },
@@ -2148,6 +2956,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نمایشی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demo"
           }
         }
       }
@@ -2165,6 +2979,12 @@
             "state" : "translated",
             "value" : "پل نمایشی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demo köprü"
+          }
         }
       }
     },
@@ -2180,6 +3000,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حالت نمایشی · داده‌های نمونه"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demo modu · örnek veriler"
           }
         }
       }
@@ -2197,6 +3023,12 @@
             "state" : "translated",
             "value" : "عیب‌یابی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tanılama"
+          }
         }
       }
     },
@@ -2212,6 +3044,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "آیا هر دو گوشی باید نزدیک هم باشند؟"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İki telefonun da yakında olması gerekiyor mu?"
           }
         }
       }
@@ -2229,6 +3067,12 @@
             "state" : "translated",
             "value" : "آیا داده‌های من از سروری عبور می‌کند؟"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verilerim bir sunucudan geçiyor mu?"
+          }
         }
       }
     },
@@ -2244,6 +3088,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "آیا Pairline با پیام‌های گروهی یا MMS کار می‌کند؟"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline grup mesajları veya MMS ile çalışıyor mu?"
           }
         }
       }
@@ -2261,6 +3111,12 @@
             "state" : "translated",
             "value" : "Pairline را با کشیدن نبندید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ı kaydırarak kapatmayın"
+          }
         }
       }
     },
@@ -2276,6 +3132,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairline را در صفحه جابه‌جایی برنامه‌های آیفون با کشیدن به بالا نبندید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ı iPhone'un uygulama değiştiricisinde kaydırarak kapatmayın."
           }
         }
       }
@@ -2293,6 +3155,12 @@
             "state" : "translated",
             "value" : "تمام"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitti"
+          }
         }
       }
     },
@@ -2308,6 +3176,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دو سیم‌کارت"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çift SIM"
           }
         }
       }
@@ -2325,6 +3199,12 @@
             "state" : "translated",
             "value" : "دو سیم‌کارت، USSD و ویجت"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çift SIM, USSD ve widget"
+          }
         }
       }
     },
@@ -2340,6 +3220,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ایمیل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e-posta"
           }
         }
       }
@@ -2357,6 +3243,12 @@
             "state" : "translated",
             "value" : "قطع"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitir"
+          }
         }
       }
     },
@@ -2372,6 +3264,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رمزنگاری سرتاسری بین گوشی‌های شما. بدون سرور، بدون حساب کاربری، بدون ردیابی."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefonlarınız arasında uçtan uca şifreli. Sunucu yok, hesap yok, izleme yok."
           }
         }
       }
@@ -2389,6 +3287,12 @@
             "state" : "translated",
             "value" : "پایان یافت"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sona erdi"
+          }
         }
       }
     },
@@ -2404,6 +3308,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "همه امکانات فعال است. سپس با یک بار پرداخت %@ آن را نگه دارید؛ وگرنه دیگر وصل نمی‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Her şey çalışır. Ardından kullanmaya devam etmek için bir kez %@ ödeyin; aksi halde bağlantı kurulmaz."
           }
         }
       }
@@ -2421,6 +3331,12 @@
             "state" : "translated",
             "value" : "روی گوشی اندرویدی، Pairline Bridge را از بهینه‌سازی باتری مستثنا کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonda Pairline Bridge'i pil optimizasyonunun dışında tutun."
+          }
         }
       }
     },
@@ -2436,6 +3352,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خروج از نمایش"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demodan çık"
           }
         }
       }
@@ -2453,6 +3375,12 @@
             "state" : "translated",
             "value" : "خروج از حالت نمایشی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demo modundan çık"
+          }
         }
       }
     },
@@ -2468,6 +3396,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "امتحان حالت نمایشی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demo modunu keşfet"
           }
         }
       }
@@ -2485,6 +3419,12 @@
             "state" : "translated",
             "value" : "دیدن نسخه نمایشی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demoyu keşfet"
+          }
         }
       }
     },
@@ -2500,6 +3440,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "علاقه‌مندی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favori"
           }
         }
       }
@@ -2517,6 +3463,12 @@
             "state" : "translated",
             "value" : "علاقه‌مندی‌ها"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriler"
+          }
         }
       }
     },
@@ -2532,6 +3484,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای پیام‌ها و کدهای جدید و هشدارهای پل."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeni mesajlar, kodlar ve köprü uyarıları için."
           }
         }
       }
@@ -2549,6 +3507,12 @@
             "state" : "translated",
             "value" : "انتقال تماس هنگام اشغال بودن"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meşgulken yönlendirme"
+          }
         }
       }
     },
@@ -2564,6 +3528,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "انتقال تماس هنگام در دسترس نبودن"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulaşılamadığında yönlendirme"
           }
         }
       }
@@ -2581,6 +3551,12 @@
             "state" : "translated",
             "value" : "۳ روز رایگان، سپس برای ادامه استفاده از Pairline یک بار %@ پرداخت کنید. اگر خرید نکنید، پس از پایان دوره آزمایشی، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند؛ پیام‌های همگام‌شده شما قابل خواندن می‌مانند. هیچ مبلغی به‌طور خودکار پرداخت نمی‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 gün ücretsiz, ardından Pairline'ı kullanmaya devam etmek için tek seferlik %@. Satın almazsanız deneme süresinden sonra mesaj gönderme, aramalar, eşzamanlama ve USSD durur; eşzamanlanan mesajlarınız okunabilir kalır. Otomatik olarak hiçbir ücret alınmaz."
+          }
         }
       }
     },
@@ -2596,6 +3572,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دوره آزمایشی رایگان تمام شد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz deneme sona erdi"
           }
         }
       }
@@ -2613,6 +3595,12 @@
             "state" : "translated",
             "value" : "دوره آزمایشی رایگان شروع نشده است"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz deneme başlamadı"
+          }
         }
       }
     },
@@ -2628,6 +3616,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دوره آزمایشی رایگان: %@ باقی مانده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz deneme: %@ kaldı"
           }
         }
       }
@@ -2645,6 +3639,12 @@
             "state" : "translated",
             "value" : "دسترسی کامل · سپاسگزاریم!"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tam erişim · Teşekkürler!"
+          }
         }
       }
     },
@@ -2660,6 +3660,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "متن کامل سیاست حریم خصوصی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gizlilik politikasının tamamı"
           }
         }
       }
@@ -2677,6 +3683,12 @@
             "state" : "translated",
             "value" : "پیام‌ها، کدها و تماس‌های سیم‌کارت گوشی اندرویدی خود را همین‌جا، روی آیفونی که همراه دارید، دریافت کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzun SIM'ine gelen mesajları, kodları ve aramaları hemen burada, yanınızda taşıdığınız iPhone'da alın."
+          }
         }
       }
     },
@@ -2692,6 +3704,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "شروع کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Başlayın"
           }
         }
       }
@@ -2709,6 +3727,12 @@
             "state" : "translated",
             "value" : "راهنماها"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kılavuzlar"
+          }
         }
       }
     },
@@ -2724,6 +3748,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "راهنما"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yardım"
           }
         }
       }
@@ -2741,6 +3771,12 @@
             "state" : "translated",
             "value" : "مرکز راهنما"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yardım merkezi"
+          }
         }
       }
     },
@@ -2756,6 +3792,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پنهان کردن صفحه تماس"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama ekranını gizle"
           }
         }
       }
@@ -2773,6 +3815,12 @@
             "state" : "translated",
             "value" : "پنهان کردن صفحه‌کلید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuş takımını gizle"
+          }
         }
       }
     },
@@ -2788,6 +3836,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خانه"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ev"
           }
         }
       }
@@ -2805,6 +3859,12 @@
             "state" : "translated",
             "value" : "تماس‌ها چطور کار می‌کنند"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramalar nasıl çalışır"
+          }
         }
       }
     },
@@ -2820,6 +3880,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "چطور کار می‌کند"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nasıl çalışır"
           }
         }
       }
@@ -2837,6 +3903,12 @@
             "state" : "translated",
             "value" : "چطور می‌خواهید شروع کنید؟"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nasıl başlamak istersiniz?"
+          }
         }
       }
     },
@@ -2852,6 +3924,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نصبش کردم"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yükledim"
           }
         }
       }
@@ -2869,6 +3947,12 @@
             "state" : "translated",
             "value" : "اگر قبلاً با آیفون دیگری جفت کرده‌اید، جفت‌سازی دوباره جایگزین آن می‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daha önce başka bir iPhone ile eşleştirdiyseniz yeni eşleştirme eskisinin yerini alır."
+          }
         }
       }
     },
@@ -2884,6 +3968,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اگر Pairline را در صفحه جابه‌جایی برنامه‌ها به بالا بکشید، iOS آن را متوقف می‌کند و تا وقتی دوباره بازش نکنید، برای بلوتوث بیدارش نمی‌کند. پیام‌ها و تماس‌ها تا آن زمان منتظر می‌مانند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ı uygulama değiştiricide yukarı kaydırırsanız iOS onu durdurur ve siz yeniden açana kadar Bluetooth için uyandırmaz. Mesajlar ve aramalar o zamana kadar bekler."
           }
         }
       }
@@ -2901,6 +3991,12 @@
             "state" : "translated",
             "value" : "در Pairline Bridge روی «باتری» بزنید و «اجازه دادن» را انتخاب کنید تا اندروید آن را متوقف نکند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge'te Pil'e dokunun ve Android'in onu durdurmaması için İzin Ver'i seçin."
+          }
         }
       }
     },
@@ -2916,6 +4012,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ورودی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelen"
           }
         }
       }
@@ -2933,6 +4035,12 @@
             "state" : "translated",
             "value" : "تماس ورودی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelen arama"
+          }
         }
       }
     },
@@ -2948,6 +4056,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هشدار تماس‌های ورودی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelen arama uyarıları"
           }
         }
       }
@@ -2965,6 +4079,12 @@
             "state" : "translated",
             "value" : "تماس‌های ورودی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelen aramalar"
+          }
         }
       }
     },
@@ -2980,6 +4100,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نصب Pairline Bridge"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge'i yükleyin"
           }
         }
       }
@@ -2997,6 +4123,12 @@
             "state" : "translated",
             "value" : "نصب Pairline Bridge و جفت‌سازی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge'i yükleyin ve eşleştirin"
+          }
         }
       }
     },
@@ -3012,6 +4144,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairline Bridge را روی گوشی اندرویدی‌ای که سیم‌کارت شما در آن است نصب کنید، سپس کد جفت‌سازی آن را اسکن کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge'i SIM kartınızın takılı olduğu Android telefona yükleyin, ardından eşleştirme kodunu tarayın."
           }
         }
       }
@@ -3029,6 +4167,12 @@
             "state" : "translated",
             "value" : "Pairline Bridge را روی گوشی اندرویدی خود نصب کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge'i Android telefonunuza yükleyin"
+          }
         }
       }
     },
@@ -3044,6 +4188,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "آیفون"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone"
           }
         }
       }
@@ -3061,6 +4211,12 @@
             "state" : "translated",
             "value" : "فهرست «اخیر» آیفون"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone Son Aramalar"
+          }
         }
       }
     },
@@ -3076,6 +4232,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "فهرست «اخیر» آیفون ممکن است با iCloud همگام شود، به همین دلیل این گزینه به‌طور پیش‌فرض خاموش است. تماس‌ها همیشه در Pairline فهرست می‌شوند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone Son Aramalar listesi iCloud ile eşzamanlanabilir, bu yüzden bu seçenek varsayılan olarak kapalıdır. Aramalar Pairline'da her zaman listelenir."
           }
         }
       }
@@ -3093,6 +4255,12 @@
             "state" : "translated",
             "value" : "آیا اشتراکی است؟"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abonelik mi?"
+          }
         }
       }
     },
@@ -3108,6 +4276,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیام می‌دهد که پل این آیفون را نمی‌شناسد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprünün bu iPhone'u tanımadığı yazıyor"
           }
         }
       }
@@ -3125,6 +4299,12 @@
             "state" : "translated",
             "value" : "رایگان است و روی گوشی اندرویدی‌ای اجرا می‌شود که سیم‌کارت شما در آن است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsizdir. SIM kartınızın takılı olduğu Android telefonda çalışır."
+          }
         }
       }
     },
@@ -3140,6 +4320,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کافی است Pairline را در پس‌زمینه باز بگذارید. هر وقت گوشی پل چیز تازه‌ای داشته باشد، iOS آن را بیدار می‌کند، بدون اینکه باتری شما را خالی کند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ı arka planda bırakmanız yeterli. Köprü telefonda yeni bir şey olduğunda iOS onu pilinizi tüketmeden uyandırır."
           }
         }
       }
@@ -3157,6 +4343,12 @@
             "state" : "translated",
             "value" : "بلوتوث را روشن و گوشی‌ها را در فاصله حدود ۱۰ متری هم نگه دارید. دیوار و کیف، برد را کم می‌کنند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth'u açık, telefonları da yaklaşık 10 metre mesafe içinde tutun. Duvarlar ve çantalar menzili kısaltır."
+          }
         }
       }
     },
@@ -3172,6 +4364,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هر دو گوشی را نزدیک هم نگه دارید و Pairline Bridge را باز بگذارید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İki telefonu birbirine yakın tutun ve Pairline Bridge'i açık bırakın."
           }
         }
       }
@@ -3189,6 +4387,12 @@
             "state" : "translated",
             "value" : "هر دو گوشی را در برد بلوتوث، یعنی حدود ۱۰ متر، نگه دارید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İki telefonu da Bluetooth menzili içinde, yaklaşık 10 metre mesafede tutun."
+          }
         }
       }
     },
@@ -3204,6 +4408,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بگذارید در حال اجرا بماند"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çalışır durumda tutun"
           }
         }
       }
@@ -3221,6 +4431,12 @@
             "state" : "translated",
             "value" : "هنگام اسکن، Pairline Bridge را روی صفحه باز نگه دارید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarama yaparken Pairline Bridge'i ekranda açık tutun."
+          }
         }
       }
     },
@@ -3236,6 +4452,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اتصال را پایدار نگه دارید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlantıyı canlı tutun"
           }
         }
       }
@@ -3253,6 +4475,12 @@
             "state" : "translated",
             "value" : "صفحه‌کلید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuş takımı"
+          }
         }
       }
     },
@@ -3268,6 +4496,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تون‌های صفحه‌کلید هنگام تماس"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama sırasında tuş sesleri"
           }
         }
       }
@@ -3285,6 +4519,12 @@
             "state" : "translated",
             "value" : "کلیدها در سخت‌افزار امن می‌مانند"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anahtarlar güvenli donanımda kalır"
+          }
         }
       }
     },
@@ -3300,6 +4540,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "زبان"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dil"
           }
         }
       }
@@ -3317,6 +4563,12 @@
             "state" : "translated",
             "value" : "آخرین به‌روزرسانی %@ پیش"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son güncelleme %@ önce"
+          }
         }
       }
     },
@@ -3332,6 +4584,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بعداً"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daha sonra"
           }
         }
       }
@@ -3349,6 +4607,12 @@
             "state" : "translated",
             "value" : "اجازه دهید بدون محدودیت باتری اجرا شود تا اتصال برقرار بماند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlantının kesilmemesi için pil kısıtlaması olmadan çalışmasına izin verin."
+          }
         }
       }
     },
@@ -3364,6 +4628,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اتصال متوقف شده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlantı duraklatıldı"
           }
         }
       }
@@ -3381,6 +4651,12 @@
             "state" : "translated",
             "value" : "بارگیری پیام‌های قبلی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Önceki mesajları yükle"
+          }
         }
       }
     },
@@ -3396,6 +4672,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "آن را در برنامه‌های اخیر قفل کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son uygulamalarda kilitleyin"
           }
         }
       }
@@ -3413,6 +4695,12 @@
             "state" : "translated",
             "value" : "در جست‌وجوی کد Pairline…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline kodu aranıyor…"
+          }
         }
       }
     },
@@ -3428,6 +4716,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در جست‌وجوی گوشی پل شما"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuz aranıyor"
           }
         }
       }
@@ -3445,6 +4739,12 @@
             "state" : "translated",
             "value" : "در جست‌وجوی پل شما…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprünüz aranıyor…"
+          }
         }
       }
     },
@@ -3460,6 +4760,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اصلی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ana"
           }
         }
       }
@@ -3477,6 +4783,12 @@
             "state" : "translated",
             "value" : "مطمئن شوید بلوتوث هر دو گوشی روشن است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Her iki telefonda da Bluetooth'un açık olduğundan emin olun."
+          }
         }
       }
     },
@@ -3492,6 +4804,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مطمئن شوید Pairline Bridge روی گوشی اندرویدی در حال اجراست و بلوتوث آن گوشی روشن است."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge'in Android telefonda çalıştığından ve orada Bluetooth'un açık olduğundan emin olun."
           }
         }
       }
@@ -3509,6 +4827,12 @@
             "state" : "translated",
             "value" : "برقراری تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama yapma"
+          }
         }
       }
     },
@@ -3524,6 +4848,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "علامت‌گذاری به‌عنوان خوانده‌شده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okundu olarak işaretle"
           }
         }
       }
@@ -3541,6 +4871,12 @@
             "state" : "translated",
             "value" : "پیام"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesaj"
+          }
         }
       }
     },
@@ -3556,6 +4892,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سابقه پیام‌ها"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesaj geçmişi"
           }
         }
       }
@@ -3573,6 +4915,12 @@
             "state" : "translated",
             "value" : "پیام‌ها"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlar"
+          }
         }
       }
     },
@@ -3588,6 +4936,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "از این پس، پیام‌ها و تماس‌های سیم‌کارت گوشی اندرویدی شما به این آیفون می‌آیند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzun SIM'ine gelen mesajlar ve aramalar artık bu iPhone'a geliyor."
           }
         }
       }
@@ -3605,6 +4959,12 @@
             "state" : "translated",
             "value" : "پیام‌ها و کدهای یک‌بارمصرف"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlar ve tek kullanımlık kodlar"
+          }
         }
       }
     },
@@ -3620,6 +4980,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیام‌ها دیر می‌رسند یا اصلاً نمی‌رسند"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlar geç geliyor veya hiç gelmiyor"
           }
         }
       }
@@ -3637,6 +5003,12 @@
             "state" : "translated",
             "value" : "پس از جفت‌سازی، پیام‌های سیم‌کارت گوشی اندرویدی شما اینجا نمایش داده می‌شوند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirildikten sonra Android telefonunuzun SIM'ine gelen mesajlar burada görünecek."
+          }
         }
       }
     },
@@ -3652,6 +5024,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیام‌ها، تماس‌ها، مخاطبین و کدهای USSD همراه با اعلان اینجا نمایش داده می‌شوند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlar, aramalar, kişiler ve USSD kodları bildirimlerle birlikte burada görünür."
           }
         }
       }
@@ -3669,6 +5047,12 @@
             "state" : "translated",
             "value" : "بی‌پاسخ"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cevapsız"
+          }
         }
       }
     },
@@ -3684,6 +5068,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "موبایل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cep"
           }
         }
       }
@@ -3701,6 +5091,12 @@
             "state" : "translated",
             "value" : "بی‌صدا"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessiz"
+          }
         }
       }
     },
@@ -3716,6 +5112,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نام"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ad"
           }
         }
       }
@@ -3733,6 +5135,12 @@
             "state" : "translated",
             "value" : "نام یا شماره"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ad veya numara"
+          }
         }
       }
     },
@@ -3748,6 +5156,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مخاطب جدید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeni Kişi"
           }
         }
       }
@@ -3765,6 +5179,12 @@
             "state" : "translated",
             "value" : "پیام جدید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeni mesaj"
+          }
         }
       }
     },
@@ -3780,6 +5200,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیام جدید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeni Mesaj"
           }
         }
       }
@@ -3797,6 +5223,12 @@
             "state" : "translated",
             "value" : "کد یک‌بارمصرف جدید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeni tek kullanımlık kod"
+          }
         }
       }
     },
@@ -3812,6 +5244,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیامک‌های جدیدی که به شماره گوشی اندرویدی شما می‌رسند، اینجا نمایش داده می‌شوند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzun numarasına gelen yeni SMS'ler burada görünecek."
           }
         }
       }
@@ -3829,6 +5267,12 @@
             "state" : "translated",
             "value" : "حالا گوشی اندرویدی خود را جفت کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi de Android telefonunuzu eşleştirin."
+          }
         }
       }
     },
@@ -3844,6 +5288,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بدون ابزار تحلیل و تبلیغات"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analiz veya reklam yok"
           }
         }
       }
@@ -3861,6 +5311,12 @@
             "state" : "translated",
             "value" : "بدون ابزار تحلیل، تبلیغات یا گزارش‌گر خطا. هرگز."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analiz, reklam veya çökme raporlayıcı yok. Asla."
+          }
         }
       }
     },
@@ -3876,6 +5332,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بدون پاسخ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yanıt yok"
           }
         }
       }
@@ -3893,6 +5355,12 @@
             "state" : "translated",
             "value" : "هنوز گوشی پلی ندارید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henüz köprü telefon yok"
+          }
         }
       }
     },
@@ -3908,6 +5376,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هیچ مخاطبی با «%@» مطابقت ندارد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” ile eşleşen kişi yok."
           }
         }
       }
@@ -3925,6 +5399,12 @@
             "state" : "translated",
             "value" : "هیچ مخاطبی مطابقت ندارد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleşen kişi yok."
+          }
         }
       }
     },
@@ -3940,6 +5420,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هنوز مخاطبی نیست"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henüz kişi yok"
           }
         }
       }
@@ -3957,6 +5443,12 @@
             "state" : "translated",
             "value" : "هیچ پیام یا شخصی با «%@» مطابقت ندارد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” ile eşleşen mesaj veya kişi yok."
+          }
         }
       }
     },
@@ -3972,6 +5464,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هنوز پیامی نیست"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henüz mesaj yok"
           }
         }
       }
@@ -3989,6 +5487,12 @@
             "state" : "translated",
             "value" : "تماس بی‌پاسخی ندارید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cevapsız arama yok"
+          }
         }
       }
     },
@@ -4004,6 +5508,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هیچ خریدی برای این حساب اپل پیدا نشد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu Apple Hesabı için satın alma bulunamadı."
           }
         }
       }
@@ -4021,6 +5531,12 @@
             "state" : "translated",
             "value" : "تماس اخیری نیست"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son arama yok"
+          }
         }
       }
     },
@@ -4036,6 +5552,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نتیجه‌ای پیدا نشد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sonuç yok"
           }
         }
       }
@@ -4053,6 +5575,12 @@
             "state" : "translated",
             "value" : "بدون سرور، بدون حساب کاربری"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucu yok, hesap yok"
+          }
         }
       }
     },
@@ -4068,6 +5596,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هنوز اطلاعاتی از سیم‌کارت دریافت نشده است."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henüz SIM bilgisi yok."
           }
         }
       }
@@ -4085,6 +5619,12 @@
             "state" : "translated",
             "value" : "بدون اشتراک، بدون حساب کاربری."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abonelik yok, hesap yok."
+          }
         }
       }
     },
@@ -4100,6 +5640,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بدون اشتراک. برای همیشه مال شما."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abonelik yok. Sonsuza dek sizin."
           }
         }
       }
@@ -4117,6 +5663,12 @@
             "state" : "translated",
             "value" : "بدون ردیابی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İzleme yok"
+          }
         }
       }
     },
@@ -4132,6 +5684,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هیچ کدی برای ردیابی، گزارش خطا یا تبلیغات در برنامه وجود ندارد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uygulamada izleme, çökme raporlama veya reklam kodu yoktur."
           }
         }
       }
@@ -4149,6 +5707,12 @@
             "state" : "translated",
             "value" : "نه. Pairline را فقط یک بار می‌خرید. برنامه اندروید رایگان است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hayır. Pairline tek seferlik bir satın almadır. Android uygulaması ücretsizdir."
+          }
         }
       }
     },
@@ -4164,6 +5728,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نه. گوشی‌ها مستقیماً از طریق بلوتوث و با رمزنگاری سرتاسری با هم ارتباط دارند. Pairline هیچ سرور و حساب کاربری ندارد و هیچ ابزار تحلیل یا تبلیغاتی هم در آن نیست."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hayır. Telefonlar Bluetooth üzerinden, uçtan uca şifreli olarak doğrudan iletişim kurar. Pairline'ın sunucusu ve hesabı yoktur; analiz veya reklam da içermez."
           }
         }
       }
@@ -4181,6 +5751,12 @@
             "state" : "translated",
             "value" : "در دسترس نیست"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kullanılamıyor"
+          }
         }
       }
     },
@@ -4196,6 +5772,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "الان نه"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi değil"
           }
         }
       }
@@ -4213,6 +5795,12 @@
             "state" : "translated",
             "value" : "جفت نشده"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirilmedi"
+          }
         }
       }
     },
@@ -4228,6 +5816,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ارسال نشد · دوباره امتحان کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gönderilmedi · Tekrar deneyin"
           }
         }
       }
@@ -4245,6 +5839,12 @@
             "state" : "translated",
             "value" : "هنوز نه. Pairline فعلاً پیامک‌های متنی را پشتیبانی می‌کند. پیام‌های تصویری (MMS) در برنامه‌های آینده است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henüz değil. Pairline SMS metin mesajlarını destekler. Resimli mesajlar (MMS) planlanıyor."
+          }
         }
       }
     },
@@ -4260,6 +5860,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هنوز نه. پاسخ دادن، رد کردن و گرفتن تماس را با آیفون انجام می‌دهید و صدا روی گوشی اندرویدی می‌ماند. پخش صدای تماس روی آیفون در برنامه‌های آینده است."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henüz değil. Aramaları iPhone'dan yanıtlar, reddeder ve başlatırsınız; ses ise Android telefonda kalır. iPhone'da arama sesi planlanıyor."
           }
         }
       }
@@ -4277,6 +5883,12 @@
             "state" : "translated",
             "value" : "هیچ‌چیز از دو گوشی شما بیرون نمی‌رود"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiçbir şey iki telefonunuzun dışına çıkmaz"
+          }
         }
       }
     },
@@ -4292,6 +5904,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اعلان‌ها"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildirimler"
           }
         }
       }
@@ -4309,6 +5927,12 @@
             "state" : "translated",
             "value" : "اعلان‌ها خاموش‌اند. آن‌ها را در تنظیمات روشن کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildirimler kapalı. Ayarlar'dan açın"
+          }
         }
       }
     },
@@ -4324,6 +5948,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "شماره پنهان"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numara gizli"
           }
         }
       }
@@ -4341,6 +5971,12 @@
             "state" : "translated",
             "value" : "خاموش"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kapalı"
+          }
         }
       }
     },
@@ -4356,6 +5992,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تأیید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamam"
           }
         }
       }
@@ -4373,6 +6015,12 @@
             "state" : "translated",
             "value" : "روشن"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Açık"
+          }
         }
       }
     },
@@ -4388,6 +6036,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "با باتری"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pil gücünde"
           }
         }
       }
@@ -4405,6 +6059,12 @@
             "state" : "translated",
             "value" : "در انتظار"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beklemede"
+          }
         }
       }
     },
@@ -4420,6 +6080,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در بسیاری از گوشی‌های اندرویدی می‌توانید Pairline Bridge را در صفحه برنامه‌های اخیر قفل کنید تا هنگام پاک‌سازی بسته نشود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Birçok Android telefonda, temizleme işlemlerinin Pairline Bridge'i atlaması için onu son uygulamalar ekranında kilitleyebilirsiniz."
           }
         }
       }
@@ -4437,6 +6103,12 @@
             "state" : "translated",
             "value" : "روی گوشی اندرویدی‌ای که سیم‌کارت شما در آن است، pairline.navid.tr را باز کنید و Pairline Bridge را دانلود کنید. رایگان است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIM kartınızın takılı olduğu Android telefonda pairline.navid.tr adresini açın ve Pairline Bridge'i indirin. Ücretsizdir."
+          }
         }
       }
     },
@@ -4452,6 +6124,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای کدهای یک‌بارمصرف، دکمه «کپی کد» در اعلان نمایش داده می‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tek kullanımlık kodlar için bildirimde Kodu Kopyala düğmesi görünür."
           }
         }
       }
@@ -4469,6 +6147,12 @@
             "state" : "translated",
             "value" : "خرید یک‌باره"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tek seferlik satın alma"
+          }
         }
       }
     },
@@ -4484,6 +6168,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "فقط برای اسکن کد جفت‌سازی."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yalnızca eşleştirme kodunu taramak için."
           }
         }
       }
@@ -4501,6 +6191,12 @@
             "state" : "translated",
             "value" : "باز برای بررسی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İncelemeye açık"
+          }
         }
       }
     },
@@ -4516,6 +6212,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairline Bridge را روی گوشی اندرویدی باز کنید و مطمئن شوید نوشته است که در حال اجراست."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonda Pairline Bridge'i açın ve çalıştığını gösterdiğinden emin olun."
           }
         }
       }
@@ -4533,6 +6235,12 @@
             "state" : "translated",
             "value" : "Pairline Bridge را روی گوشی اندرویدی باز کنید، روی «جفت کردن» بزنید و دوربین این آیفون را رو به کد بگیرید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonda Pairline Bridge'i açın, Eşleştir'e dokunun ve bu iPhone'u koda doğrultun."
+          }
         }
       }
     },
@@ -4548,6 +6256,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "باز کردن تنظیمات"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarlar'ı Aç"
           }
         }
       }
@@ -4566,6 +6280,12 @@
             "state" : "translated",
             "value" : "متن‌باز"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Açık kaynak"
+          }
         }
       }
     },
@@ -4581,6 +6301,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "باز کردن گفتگو"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konuşmayı aç"
           }
         }
       }
@@ -4598,6 +6324,12 @@
             "state" : "translated",
             "value" : "دیگر"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "diğer"
+          }
         }
       }
     },
@@ -4613,6 +6345,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خروجی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giden"
           }
         }
       }
@@ -4636,6 +6374,12 @@
             "state" : "translated",
             "value" : "صفحه %1$lld از %2$lld"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sayfa %1$lld / %2$lld"
+          }
         }
       }
     },
@@ -4651,6 +6395,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جفت کردن گوشی پل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon eşleştir"
           }
         }
       }
@@ -4668,6 +6418,12 @@
             "state" : "translated",
             "value" : "جفت کردن گوشی پل دیگر"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Başka bir köprü telefon eşleştir"
+          }
         }
       }
     },
@@ -4683,6 +6439,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "همین حالا جفت کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi eşleştir"
           }
         }
       }
@@ -4700,6 +6462,12 @@
             "state" : "translated",
             "value" : "گوشی پل خود را جفت کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuzu eşleştirin"
+          }
         }
       }
     },
@@ -4715,6 +6483,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جفت‌شده در %@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme tarihi: %@"
           }
         }
       }
@@ -4732,6 +6506,12 @@
             "state" : "translated",
             "value" : "برای جفت‌سازی و اتصال، دوره آزمایشی فعال یا خرید لازم است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme ve bağlantı için etkin bir deneme veya satın alma gerekir."
+          }
         }
       }
     },
@@ -4747,6 +6527,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جفت‌سازی انجام نمی‌شود"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme başarısız oluyor"
           }
         }
       }
@@ -4764,6 +6550,12 @@
             "state" : "translated",
             "value" : "در حال جفت‌سازی با گوشی پل…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuzla eşleştiriliyor…"
+          }
         }
       }
     },
@@ -4780,6 +6572,12 @@
             "state" : "translated",
             "value" : "در حال جفت‌سازی…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştiriliyor…"
+          }
         }
       }
     },
@@ -4792,6 +6590,12 @@
           }
         },
         "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline"
+          }
+        },
+        "tr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairline"
@@ -4812,6 +6616,12 @@
             "state" : "translated",
             "value" : "Pairline Bridge دسترسی به پیامک، تلفن، بلوتوث و اعلان‌ها را درخواست می‌کند تا بتواند پیام‌ها و تماس‌ها را منتقل کند. هر مجوز در خود برنامه توضیح داده شده است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge, mesajları ve aramaları aktarabilmek için SMS, telefon, Bluetooth ve bildirim izni ister. Her izin uygulamada açıklanır."
+          }
         }
       }
     },
@@ -4827,6 +6637,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دسترسی کامل Pairline"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Tam Erişim"
           }
         }
       }
@@ -4844,6 +6660,12 @@
             "state" : "translated",
             "value" : "Pairline هیچ سروری ندارد. هیچ‌وقت لازم نیست ثبت‌نام کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ın sunucusu yok. Hiçbir zaman kaydolmanız gerekmez."
+          }
         }
       }
     },
@@ -4859,6 +6681,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairline طوری ساخته شده که پیام‌ها و تماس‌های شما فقط مال خودتان بماند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline, mesajlarınız ve aramalarınız size ait kalsın diye tasarlandı."
           }
         }
       }
@@ -4876,6 +6704,12 @@
             "state" : "translated",
             "value" : "Pairline به این آیفون امکان می‌دهد از سیم‌کارت گوشی اندرویدی شما استفاده کند: پیام‌ها، تماس‌ها، مخاطبین، سابقه تماس و کدهای USSD، از طریق یک اتصال رمزنگاری‌شده بین دو گوشی شما."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline, bu iPhone'un Android telefonunuzdaki SIM kartı kullanmasını sağlar: iki telefonunuz arasındaki şifreli bir bağlantı üzerinden mesajlar, aramalar, kişiler, arama geçmişi ve USSD kodları."
+          }
         }
       }
     },
@@ -4892,21 +6726,11 @@
             "state" : "translated",
             "value" : "Pairline برای ارتباط با گوشی پل به بلوتوث نیاز دارد. آن را در تنظیمات مجاز کنید."
           }
-        }
-      }
-    },
-    "Pairline speaks English, فارسی and العربية. Change it in iPhone Settings › Pairline › Language." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يتوفر Pairline باللغات English وفارسی والعربية. لتغيير اللغة، انتقل إلى الإعدادات › Pairline › اللغة على الآيفون."
-          }
         },
-        "fa" : {
+        "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pairline به زبان‌های English، فارسی و العربية در دسترس است. زبان را از تنظیمات آیفون › Pairline › زبان تغییر دهید."
+            "value" : "Pairline'ın köprü telefonunuzla iletişim kurması için Bluetooth gerekir. Ayarlar'da izin verin."
           }
         }
       }
@@ -4924,21 +6748,11 @@
             "state" : "translated",
             "value" : "Pairline فقط از فریم‌ورک‌های اپل استفاده می‌کند و هیچ کد شخص ثالثی در آن نیست."
           }
-        }
-      }
-    },
-    "Persian text is set in Estedad, an open-source typeface by the Estedad Project, under the SIL Open Font License 1.1." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يُعرض النص الفارسي بخط Estedad (استعداد)، وهو خط مفتوح المصدر من مشروع Estedad، بموجب رخصة SIL Open Font License 1.1."
-          }
         },
-        "fa" : {
+        "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "متن فارسی با قلم استعداد نوشته شده است؛ قلمی متن‌باز از پروژهٔ استعداد، با مجوز SIL Open Font License 1.1."
+            "value" : "Pairline yalnızca Apple'ın çerçevelerini kullanır: üçüncü taraf kodu yoktur."
           }
         }
       }
@@ -4956,6 +6770,12 @@
             "state" : "translated",
             "value" : "وقتی باتری گوشی پل کم شود، Pairline به شما هشدار می‌دهد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline, köprü telefonun pili azaldığında sizi uyarır."
+          }
         }
       }
     },
@@ -4971,6 +6791,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کد منبع Pairline عمومی است تا بتوانید بررسی کنید چه کاری انجام می‌دهد. طبق مجوز Functional Source License می‌توانید آن را برای هر استفاده غیررقابتی بخوانید، بسازید و تغییر دهید. هر نسخه دو سال پس از انتشار، تحت مجوز Apache 2.0 قرار می‌گیرد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ın kaynak kodu herkese açıktır; böylece ne yaptığını kontrol edebilirsiniz. Functional Source License kapsamında kodu rakip olmayan her türlü kullanım için okuyabilir, derleyebilir ve değiştirebilirsiniz. Her sürüm, yayımlanmasından iki yıl sonra Apache 2.0 lisansına geçer."
           }
         }
       }
@@ -4988,6 +6814,12 @@
             "state" : "translated",
             "value" : "جای‌گذاری"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yapıştır"
+          }
         }
       }
     },
@@ -5003,6 +6835,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مجوزها"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İzinler"
+          }
+        }
+      }
+    },
+    "Persian text is set in Estedad, an open-source typeface by the Estedad Project, under the SIL Open Font License 1.1." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُعرض النص الفارسي بخط Estedad (استعداد)، وهو خط مفتوح المصدر من مشروع Estedad، بموجب رخصة SIL Open Font License 1.1."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متن فارسی با قلم استعداد نوشته شده است؛ قلمی متن‌باز از پروژهٔ استعداد، با مجوز SIL Open Font License 1.1."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farsça metinlerde, Estedad Projesi'nin açık kaynaklı yazı tipi Estedad, SIL Open Font License 1.1 kapsamında kullanılır."
           }
         }
       }
@@ -5020,6 +6880,12 @@
             "state" : "translated",
             "value" : "شماره تلفن"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefon numarası"
+          }
         }
       }
     },
@@ -5035,6 +6901,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سیم‌کارت را انتخاب کنید، موجودی خود را بررسی کنید و باتری و سیگنال را در یک نگاه ببینید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIM seçin, bakiyenizi kontrol edin, pil ve sinyal durumunu bir bakışta görün."
           }
         }
       }
@@ -5052,6 +6924,12 @@
             "state" : "translated",
             "value" : "برقراری تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama yapma"
+          }
         }
       }
     },
@@ -5067,6 +6945,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حریم خصوصی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gizlilik"
           }
         }
       }
@@ -5085,6 +6969,12 @@
             "state" : "translated",
             "value" : "سیاست حریم خصوصی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gizlilik politikası"
+          }
         }
       }
     },
@@ -5100,6 +6990,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سیاست حریم خصوصی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gizlilik Politikası"
           }
         }
       }
@@ -5117,6 +7013,12 @@
             "state" : "translated",
             "value" : "خصوصی از پایه"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gizlilik için tasarlandı"
+          }
         }
       }
     },
@@ -5132,6 +7034,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای همگام‌سازی، در «پیام‌ها» صفحه را به پایین بکشید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşzamanlamak için Mesajlar'da aşağı çekin."
           }
         }
       }
@@ -5149,6 +7057,12 @@
             "state" : "translated",
             "value" : "کد QR برای %@"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ için QR kodu"
+          }
         }
       }
     },
@@ -5164,6 +7078,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پرسش‌ها"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorular"
           }
         }
       }
@@ -5181,6 +7101,12 @@
             "state" : "translated",
             "value" : "خوانده‌شده"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okundu"
+          }
         }
       }
     },
@@ -5196,6 +7122,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیامک بخوانید و بفرستید، و کدها را مستقیم از اعلان کپی کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMS okuyup gönderin, kodları doğrudan bildirimden kopyalayın."
           }
         }
       }
@@ -5213,6 +7145,12 @@
             "state" : "translated",
             "value" : "گزارش‌های خوانا"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okunabilir günlükler"
+          }
         }
       }
     },
@@ -5228,6 +7166,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دریافت تماس"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama al"
           }
         }
       }
@@ -5245,6 +7189,12 @@
             "state" : "translated",
             "value" : "دریافت کد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kod al"
+          }
         }
       }
     },
@@ -5260,6 +7210,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دریافت پیام"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesaj al"
           }
         }
       }
@@ -5277,6 +7233,12 @@
             "state" : "translated",
             "value" : "دریافت پیام‌ها"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesaj alma"
+          }
         }
       }
     },
@@ -5292,6 +7254,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تماس‌های اخیر"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son aramalar"
           }
         }
       }
@@ -5309,6 +7277,12 @@
             "state" : "translated",
             "value" : "اخیر"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son Aramalar"
+          }
         }
       }
     },
@@ -5324,6 +7298,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "به‌زودی دوباره وصل می‌شود…"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Birazdan yeniden bağlanılacak…"
           }
         }
       }
@@ -5341,6 +7321,12 @@
             "state" : "translated",
             "value" : "حذف از کدهای ذخیره‌شده"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kayıtlı kodlardan kaldır"
+          }
         }
       }
     },
@@ -5356,6 +7342,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حذف گیرنده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alıcıyı kaldır"
           }
         }
       }
@@ -5373,6 +7365,12 @@
             "state" : "translated",
             "value" : "بازیابی خریدها"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Satın Alınanları Geri Yükle"
+          }
         }
       }
     },
@@ -5388,6 +7386,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "زنگ خوردن، پاسخ دادن، رد کردن و شماره‌گیری با صفحه تماس آیفون."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone arama ekranıyla çalma, yanıtlama, reddetme ve numara çevirme."
           }
         }
       }
@@ -5405,6 +7409,12 @@
             "state" : "translated",
             "value" : "در حال زنگ خوردن…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çalıyor…"
+          }
         }
       }
     },
@@ -5420,6 +7430,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رومینگ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dolaşım"
           }
         }
       }
@@ -5437,6 +7453,12 @@
             "state" : "translated",
             "value" : "اجرای کد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kodu çalıştır"
+          }
         }
       }
     },
@@ -5452,6 +7474,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ذخیره"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaydet"
           }
         }
       }
@@ -5469,6 +7497,12 @@
             "state" : "translated",
             "value" : "ذخیره کد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kodu kaydet"
+          }
         }
       }
     },
@@ -5484,6 +7518,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کدهای ذخیره‌شده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kayıtlı kodlar"
           }
         }
       }
@@ -5501,6 +7541,12 @@
             "state" : "translated",
             "value" : "کد جفت‌سازی را اسکن کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme kodunu tarayın"
+          }
         }
       }
     },
@@ -5516,6 +7562,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "این را با دوربین گوشی اندرویدی اسکن کنید یا این نشانی را باز کنید:"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bunu Android telefonun kamerasıyla tarayın veya şu adresi açın:"
           }
         }
       }
@@ -5533,6 +7585,12 @@
             "state" : "translated",
             "value" : "جست‌وجوی مخاطبین"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kişilerde ara"
+          }
         }
       }
     },
@@ -5548,6 +7606,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جست‌وجوی پیام‌ها و افراد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlarda ve kişilerde ara"
           }
         }
       }
@@ -5565,6 +7629,12 @@
             "state" : "translated",
             "value" : "در حال ایمن‌سازی اتصال…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlantı güvenli hale getiriliyor…"
+          }
         }
       }
     },
@@ -5580,6 +7650,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دیدن گزینه‌ها"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seçenekleri gör"
           }
         }
       }
@@ -5597,6 +7673,12 @@
             "state" : "translated",
             "value" : "Pairline را با داده‌های نمونه ببینید؛ رایگان و بدون نیاز به گوشی اندرویدی."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ı örnek verilerle görün. Android telefon gerekmez, ücretsizdir."
+          }
         }
       }
     },
@@ -5612,6 +7694,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ارسال"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gönder"
           }
         }
       }
@@ -5629,6 +7717,12 @@
             "state" : "translated",
             "value" : "ارسال پیام"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesaj gönderme"
+          }
         }
       }
     },
@@ -5644,6 +7738,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ارسال به %@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ numarasına gönder"
           }
         }
       }
@@ -5661,6 +7761,12 @@
             "state" : "translated",
             "value" : "در حال ارسال…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gönderiliyor…"
+          }
         }
       }
     },
@@ -5676,6 +7782,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ارسال شد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gönderildi"
           }
         }
       }
@@ -5693,6 +7805,12 @@
             "state" : "translated",
             "value" : "راه‌اندازی گوشی اندرویدی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonu kurun"
+          }
         }
       }
     },
@@ -5708,6 +7826,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تنظیمات"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarlar"
           }
         }
       }
@@ -5725,6 +7849,12 @@
             "state" : "translated",
             "value" : "اشتراک‌گذاری"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paylaş"
+          }
         }
       }
     },
@@ -5740,6 +7870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اشتراک‌گذاری گزارش"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raporu paylaş"
           }
         }
       }
@@ -5757,6 +7893,12 @@
             "state" : "translated",
             "value" : "نمایش"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Göster"
+          }
         }
       }
     },
@@ -5772,6 +7914,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در Pairline Bridge یک کد تازه نمایش دهید؛ هر کد فقط یک بار و به مدت ۵ دقیقه کار می‌کند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline Bridge'te yeni bir kod gösterin; her kod yalnızca bir kez ve 5 dakika boyunca çalışır."
           }
         }
       }
@@ -5789,6 +7937,12 @@
             "state" : "translated",
             "value" : "یک کد جفت‌سازی جدید روی گوشی اندرویدی نمایش دهید و دوباره آن را اسکن کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonda yeni bir eşleştirme kodu gösterin ve tekrar tarayın."
+          }
         }
       }
     },
@@ -5804,6 +7958,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نمایش تماس‌ها در «اخیر» آیفون"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramaları iPhone'un Son Aramalar listesinde göster"
           }
         }
       }
@@ -5821,6 +7981,12 @@
             "state" : "translated",
             "value" : "نمایش IMEI"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IMEI'yi göster"
+          }
         }
       }
     },
@@ -5836,6 +8002,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نمایش متن پیام"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesaj metnini göster"
           }
         }
       }
@@ -5853,6 +8025,12 @@
             "state" : "translated",
             "value" : "سیگنال %lld از ۴"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinyal %lld/4"
+          }
         }
       }
     },
@@ -5868,6 +8046,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سیم‌کارت"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIM"
           }
         }
       }
@@ -5885,6 +8069,12 @@
             "state" : "translated",
             "value" : "سیم‌کارت %lld"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIM %lld"
+          }
         }
       }
     },
@@ -5900,6 +8090,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سیم‌کارت‌ها"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIM kartlar"
           }
         }
       }
@@ -5917,6 +8113,12 @@
             "state" : "translated",
             "value" : "سیم‌کارت تماس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramalar için SIM"
+          }
         }
       }
     },
@@ -5932,6 +8134,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سیم‌کارت پیام"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlar için SIM"
           }
         }
       }
@@ -5955,6 +8163,12 @@
             "state" : "translated",
             "value" : "بخش‌های پیامک: %1$lld · باقی‌مانده: %2$lld"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMS parçası: %1$lld · kalan: %2$lld"
+          }
         }
       }
     },
@@ -5970,6 +8184,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تا از پیام‌ها، کدها و تماس‌های جدید باخبر شوید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yeni mesajlardan, kodlardan ve aramalardan haberdar olmanız için."
           }
         }
       }
@@ -5987,6 +8207,12 @@
             "state" : "translated",
             "value" : "کد منبع"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaynak kodu"
+          }
         }
       }
     },
@@ -6002,6 +8228,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کد منبع در GitHub"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub'da kaynak kodu"
           }
         }
       }
@@ -6019,6 +8251,12 @@
             "state" : "translated",
             "value" : "بلندگو"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoparlör"
+          }
         }
       }
     },
@@ -6034,6 +8272,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "شروع"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Başla"
           }
         }
       }
@@ -6051,6 +8295,12 @@
             "state" : "translated",
             "value" : "شروع دوره آزمایشی رایگان ۳ روزه"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 günlük ücretsiz denemeyi başlat"
+          }
         }
       }
     },
@@ -6066,6 +8316,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای اتصال، ۳ روز رایگان خود را شروع کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlanmak için 3 günlük ücretsiz denemenizi başlatın."
           }
         }
       }
@@ -6083,6 +8339,12 @@
             "state" : "translated",
             "value" : "برای جفت کردن گوشی پل، دوره آزمایشی رایگان را شروع کنید یا Pairline را بخرید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon eşleştirmek için ücretsiz denemenizi başlatın veya Pairline'ın kilidini açın."
+          }
         }
       }
     },
@@ -6098,6 +8360,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای جفت‌سازی، دوره آزمایشی رایگان را شروع کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirmek için ücretsiz denemenizi başlatın"
           }
         }
       }
@@ -6121,6 +8389,12 @@
             "state" : "translated",
             "value" : "مرحله %1$lld از %2$lld"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adım %1$lld / %2$lld"
+          }
         }
       }
     },
@@ -6136,6 +8410,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هنوز مشکل دارید؟ در وب‌سایت راهنمایی بیشتری هست. باز کردن آن تنها جایی است که Pairline شما را به اینترنت می‌برد، آن هم فقط وقتی خودتان روی آن بزنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorun devam mı ediyor? Web sitesinde daha fazla yardım bulabilirsiniz. Pairline'ın sizi internete yönlendirdiği tek durum budur ve yalnızca siz dokunduğunuzda gerçekleşir."
           }
         }
       }
@@ -6153,6 +8433,12 @@
             "state" : "translated",
             "value" : "فقط روی همین آیفون ذخیره می‌شود"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yalnızca bu iPhone'da saklanır"
+          }
         }
       }
     },
@@ -6168,6 +8454,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "از گوشی اندرویدی همگام‌سازی شده و فقط روی همین آیفون نگهداری می‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefondan eşzamanlanır ve yalnızca bu iPhone'da saklanır."
           }
         }
       }
@@ -6185,6 +8477,12 @@
             "state" : "translated",
             "value" : "از گوشی پل شما همگام‌سازی شده است. فقط روی همین آیفون نگهداری می‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuzdan eşzamanlandı. Yalnızca bu iPhone'da saklanır."
+          }
         }
       }
     },
@@ -6200,6 +8498,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیام‌ها، مخاطبین و سابقه تماس همگام‌شده در یک پایگاه داده محافظت‌شده نگهداری می‌شوند که در نسخه‌های پشتیبان قرار نمی‌گیرد. با لغو جفت‌سازی، همه آن‌ها حذف می‌شوند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşzamanlanan mesajlar, kişiler ve arama geçmişi, yedeklemelerin dışında tutulan korumalı bir veritabanında saklanır. Eşleştirmeyi kaldırmak bunları siler."
           }
         }
       }
@@ -6217,6 +8521,12 @@
             "state" : "translated",
             "value" : "در حال همگام‌سازی پیام‌ها…"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlar eşzamanlanıyor…"
+          }
         }
       }
     },
@@ -6232,6 +8542,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در Pairline Bridge روی «جفت کردن» بزنید تا یک کد QR نمایش داده شود، سپس آن را با این آیفون اسکن کنید. این کد فقط یک بار و به مدت ۵ دقیقه کار می‌کند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR kodu göstermek için Pairline Bridge'te Eşleştir'e dokunun, ardından kodu bu iPhone'dan tarayın. Kod yalnızca bir kez ve 5 dakika boyunca çalışır."
           }
         }
       }
@@ -6249,6 +8565,12 @@
             "state" : "translated",
             "value" : "در برنامه پل روی «جفت کردن» بزنید تا کد جفت‌سازی نمایش داده شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme kodu göstermek için köprü uygulamasında Eşleştir'e dokunun."
+          }
         }
       }
     },
@@ -6264,6 +8586,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "شرایط"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koşullar"
           }
         }
       }
@@ -6282,6 +8610,12 @@
             "state" : "translated",
             "value" : "شرایط استفاده"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kullanım koşulları"
+          }
         }
       }
     },
@@ -6297,6 +8631,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "شرایط استفاده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kullanım Koşulları"
           }
         }
       }
@@ -6314,6 +8654,12 @@
             "state" : "translated",
             "value" : "پیامک"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metin mesajı"
+          }
         }
       }
     },
@@ -6329,6 +8675,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "از اینکه از نرم‌افزار مستقل و حافظ حریم خصوصی حمایت می‌کنید، سپاسگزاریم."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağımsız ve gizliliğe saygılı yazılımı desteklediğiniz için teşekkürler."
           }
         }
       }
@@ -6346,6 +8698,12 @@
             "state" : "translated",
             "value" : "انجام نشد. روی گوشی اندرویدی دوباره امتحان کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu işe yaramadı. Android telefonda tekrar deneyin."
+          }
         }
       }
     },
@@ -6361,6 +8719,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "این کد جفت‌سازی Pairline نیست."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu bir Pairline eşleştirme kodu değil."
           }
         }
       }
@@ -6378,6 +8742,12 @@
             "state" : "translated",
             "value" : "دوره آزمایشی ۳ روزه رایگان است. پس از پایان آن، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند تا زمانی که Pairline را یک بار با قیمت %@ بخرید. پیام‌هایی که از قبل همگام شده‌اند قابل خواندن می‌مانند. هیچ مبلغی به‌طور خودکار پرداخت نمی‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 günlük deneme ücretsizdir. Deneme bittiğinde, Pairline'ı %@ karşılığında bir kez satın alana kadar mesaj gönderme, aramalar, eşzamanlama ve USSD durur. Önceden eşzamanlanmış mesajlar okunabilir kalır. Otomatik olarak hiçbir ücret alınmaz."
+          }
         }
       }
     },
@@ -6393,6 +8763,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "احتمالاً داده‌های برنامه اندروید پاک شده یا با آیفون دیگری جفت شده است."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android uygulamasının verileri büyük olasılıkla silindi veya uygulama başka bir iPhone ile eşleştirildi."
           }
         }
       }
@@ -6410,6 +8786,12 @@
             "state" : "translated",
             "value" : "برنامه پل اندروید رایگان است. پرداخت توسط اپل انجام می‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android köprü uygulaması ücretsizdir. Ödeme Apple tarafından gerçekleştirilir."
+          }
         }
       }
     },
@@ -6425,6 +8807,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App Store در حال حاضر در دسترس نیست. اتصال اینترنت خود را بررسی کنید و دوباره امتحان کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store şu anda kullanılamıyor. Bağlantınızı kontrol edip tekrar deneyin."
           }
         }
       }
@@ -6442,6 +8830,12 @@
             "state" : "translated",
             "value" : "پل"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü"
+          }
         }
       }
     },
@@ -6457,6 +8851,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برنامه پل هنوز از این قابلیت پشتیبانی نمی‌کند. آن را روی گوشی اندرویدی خود به‌روزرسانی کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü uygulaması bunu henüz desteklemiyor. Android telefonunuzda uygulamayı güncelleyin."
           }
         }
       }
@@ -6474,6 +8874,12 @@
             "state" : "translated",
             "value" : "برنامه پل مجوز لازم برای این کار را ندارد. برای دادن مجوز، Pairline Bridge را روی گوشی اندرویدی خود باز کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü uygulamasında bunun için gereken bir izin eksik. İzin vermek için Android telefonunuzda Pairline Bridge'i açın."
+          }
         }
       }
     },
@@ -6489,6 +8895,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گوشی پل نتوانست این کار را انجام دهد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon bunu yapamadı."
           }
         }
       }
@@ -6506,6 +8918,12 @@
             "state" : "translated",
             "value" : "گوشی پل نتوانست این درخواست را انجام دهد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon bu isteği işleyemedi."
+          }
         }
       }
     },
@@ -6521,6 +8939,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گوشی پل نتوانست ثابت کند که این کد را خودش نمایش داده است. برای حفظ امنیت شما، جفت‌سازی متوقف شد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon bu kodu kendisinin gösterdiğini kanıtlayamadı. Güvenliğiniz için eşleştirme durduruldu."
           }
         }
       }
@@ -6539,6 +8963,12 @@
             "state" : "translated",
             "value" : "گوشی پل نتوانست این درخواست را پردازش کند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon bu isteği kullanamadı."
+          }
         }
       }
     },
@@ -6554,6 +8984,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گوشی پل این آیفون را نپذیرفت. یک کد جدید نمایش دهید و دوباره آن را اسکن کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon bu iPhone'u kabul etmedi. Yeni bir kod gösterin ve tekrar tarayın."
           }
         }
       }
@@ -6571,6 +9007,12 @@
             "state" : "translated",
             "value" : "گوشی پل به‌موقع پاسخ نداد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon zamanında yanıt vermedi."
+          }
         }
       }
     },
@@ -6586,6 +9028,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گوشی پل در حال جفت‌سازی با دستگاه دیگری است. چند لحظه دیگر دوباره امتحان کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon başka bir aygıtla eşleştirme yapıyor. Birazdan tekrar deneyin."
           }
         }
       }
@@ -6603,6 +9051,12 @@
             "state" : "translated",
             "value" : "گوشی پل مشغول است. چند لحظه دیگر دوباره امتحان کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon meşgul. Birazdan tekrar deneyin."
+          }
         }
       }
     },
@@ -6618,6 +9072,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تماس برقرار نشد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arama tamamlanamadı."
           }
         }
       }
@@ -6635,6 +9095,12 @@
             "state" : "translated",
             "value" : "این کد فقط یک بار و فقط برای همین جفت‌سازی کار می‌کند. تنها کسی که صفحه گوشی اندرویدی شما را می‌بیند می‌تواند جفت کند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kod yalnızca bir kez ve yalnızca bu eşleştirme için çalışır. Yalnızca Android ekranınızı görebilen biri eşleştirme yapabilir."
+          }
         }
       }
     },
@@ -6650,6 +9116,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اتصال در حین جفت‌سازی قطع شد. دوباره امتحان کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme sırasında bağlantı kesildi. Tekrar deneyin."
           }
         }
       }
@@ -6667,6 +9139,12 @@
             "state" : "translated",
             "value" : "مخاطب در مخاطبین گوشی اندرویدی ذخیره می‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kişi, Android telefonun kişilerine kaydedilir."
+          }
         }
       }
     },
@@ -6682,6 +9160,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گزارش عیب‌یابی همین‌جا ذخیره می‌شود، اطلاعات شخصی از آن حذف شده و فقط اگر خودتان بخواهید، پس از اینکه آن را دیدید، به اشتراک گذاشته می‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tanılama günlüğü burada saklanır, kişisel bilgilerden arındırılmıştır ve yalnızca siz gördükten sonra paylaşmayı seçerseniz paylaşılır."
           }
         }
       }
@@ -6699,6 +9183,12 @@
             "state" : "translated",
             "value" : "برنامه رایگان Pairline Bridge روی گوشی اندرویدی‌ای اجرا می‌شود که سیم‌کارت شما در آن است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz Pairline Bridge uygulaması, SIM kartınızın takılı olduğu Android telefonda çalışır."
+          }
         }
       }
     },
@@ -6714,6 +9204,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "آیفون پل را پیدا نمی‌کند"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone köprüyü bulamıyor"
           }
         }
       }
@@ -6731,6 +9227,12 @@
             "state" : "translated",
             "value" : "گوشی‌ها مستقیماً از طریق بلوتوث و با رمزنگاری سرتاسری به هم وصل می‌شوند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefonlar Bluetooth üzerinden doğrudan ve uçtan uca şifreli olarak bağlanır."
+          }
         }
       }
     },
@@ -6746,6 +9248,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خرید تأیید نشد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Satın alma doğrulanamadı."
           }
         }
       }
@@ -6763,6 +9271,12 @@
             "state" : "translated",
             "value" : "کد منبع عمومی است، پس هر کسی می‌تواند درستی این وعده‌ها را بررسی کند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaynak kodu herkese açıktır; böylece herkes bu sözleri kontrol edebilir."
+          }
         }
       }
     },
@@ -6778,6 +9292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "یک تماس دیگر در جریان است."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaten devam eden bir arama var."
           }
         }
       }
@@ -6795,6 +9315,12 @@
             "state" : "translated",
             "value" : "Pairline هیچ فضای ابری ندارد. هیچ‌وقت لازم نیست ثبت‌نام کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline bulutu yoktur. Hiçbir zaman kaydolmanız gerekmez."
+          }
         }
       }
     },
@@ -6810,6 +9336,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "این گوشی پل هنوز نمی‌تواند تون‌های صفحه‌کلید را بفرستد. از صفحه‌کلید گوشی اندرویدی استفاده کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu köprü telefon henüz tuş takımı seslerini gönderemiyor. Android telefonun tuş takımını kullanın."
           }
         }
       }
@@ -6827,6 +9359,12 @@
             "state" : "translated",
             "value" : "این گوشی پل یک سیم‌کارت فعال دارد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu köprü telefonda tek bir etkin SIM var."
+          }
         }
       }
     },
@@ -6842,6 +9380,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "این دستگاه دوربین ندارد. برای اسکن کد جفت‌سازی از یک آیفون واقعی استفاده کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu aygıtta kamera yok. Eşleştirme kodunu taramak için fiziksel bir iPhone kullanın."
           }
         }
       }
@@ -6859,6 +9403,12 @@
             "state" : "translated",
             "value" : "این آیفون گوشی پل را فراموش می‌کند و پیام‌ها، مخاطبین و سابقه تماسی را که از آن همگام شده‌اند حذف می‌کند. چیزی از روی گوشی اندرویدی حذف نمی‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu iPhone köprü telefonu unutur ve ondan eşzamanlanan mesajları, kişileri ve arama geçmişini kaldırır. Android telefonda hiçbir şey silinmez."
+          }
         }
       }
     },
@@ -6874,6 +9424,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "این آیفون گوشی پل را فراموش می‌کند و هر چه از آن همگام شده را حذف می‌کند. گوشی پل الان وصل نیست، پس جفت‌سازی را در Pairline Bridge روی گوشی اندرویدی هم لغو کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu iPhone köprü telefonu unutur ve ondan eşzamanlanan verileri kaldırır. Köprü telefon bağlı olmadığından, Android telefondaki Pairline Bridge'te de eşleştirmeyi kaldırın."
           }
         }
       }
@@ -6891,6 +9447,12 @@
             "state" : "translated",
             "value" : "کلید جفت‌سازی این آیفون در صورت امکان در Secure Enclave و در غیر این صورت در Keychain نگهداری می‌شود و هرگز از دستگاه خارج نمی‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu iPhone'un eşleştirme anahtarı, varsa Secure Enclave'de, yoksa Anahtar Zinciri'nde saklanır ve aygıttan asla çıkmaz."
+          }
         }
       }
     },
@@ -6906,6 +9468,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "این دقیقاً همان متنی است که با زدن «اشتراک‌گذاری» فرستاده می‌شود. شماره تلفن‌ها، ایمیل‌ها و نشانی دستگاه‌ها حذف شده‌اند و متن پیام‌ها هرگز ثبت نمی‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paylaş'a dokunursanız paylaşılacak metnin tam hali budur. Telefon numaraları, e-posta adresleri ve aygıt adresleri kaldırılır; mesaj metni ise hiçbir zaman günlüğe kaydedilmez."
           }
         }
       }
@@ -6923,6 +9491,12 @@
             "state" : "translated",
             "value" : "این کد جفت‌سازی منقضی شده است. یک کد جدید روی گوشی پل نمایش دهید و دوباره آن را اسکن کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu eşleştirme kodunun süresi doldu. Köprü telefonda yeni bir kod gösterin ve tekrar tarayın."
+          }
         }
       }
     },
@@ -6938,6 +9512,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "این کد جفت‌سازی قبلاً استفاده شده است. یک کد جدید روی گوشی پل نمایش دهید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu eşleştirme kodu zaten kullanıldı. Köprü telefonda yeni bir kod gösterin."
           }
         }
       }
@@ -6955,6 +9535,12 @@
             "state" : "translated",
             "value" : "نکته‌هایی برای اتصالی که تمام روز برقرار بماند"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gün boyu süren bir bağlantı için ipuçları"
+          }
         }
       }
     },
@@ -6970,6 +9556,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای اتصال به گوشی پل شما."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuza bağlanmak için."
           }
         }
       }
@@ -6987,6 +9579,12 @@
             "state" : "translated",
             "value" : "به:"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kime:"
+          }
         }
       }
     },
@@ -7002,6 +9600,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "امروز"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugün"
           }
         }
       }
@@ -7019,6 +9623,12 @@
             "state" : "translated",
             "value" : "ابزارها"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Araçlar"
+          }
         }
       }
     },
@@ -7034,6 +9644,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دوره آزمایشی تمام شد"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deneme sona erdi"
           }
         }
       }
@@ -7051,6 +9667,12 @@
             "state" : "translated",
             "value" : "یادآوری دوره آزمایشی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deneme hatırlatıcısı"
+          }
         }
       }
     },
@@ -7066,6 +9688,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رفع اشکال"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorun giderme"
           }
         }
       }
@@ -7083,6 +9711,12 @@
             "state" : "translated",
             "value" : "دوباره امتحان کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tekrar deneyin"
+          }
         }
       }
     },
@@ -7098,6 +9732,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "۳ روز رایگان امتحان کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 gün ücretsiz deneyin"
           }
         }
       }
@@ -7115,6 +9755,12 @@
             "state" : "translated",
             "value" : "امتحان کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deneyin"
+          }
         }
       }
     },
@@ -7130,6 +9776,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "همین حالا امتحان کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi deneyin"
           }
         }
       }
@@ -7147,6 +9799,12 @@
             "state" : "translated",
             "value" : "بلوتوث گوشی اندرویدی را خاموش و دوباره روشن کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonda Bluetooth'u kapatıp yeniden açın."
+          }
         }
       }
     },
@@ -7162,6 +9820,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حالت «تمرکز» یا «مزاحم نشوید» را خاموش کنید؛ این حالت‌ها ممکن است تماس‌ها را بی‌صدا کنند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramaları sessize alabilen Odak'ı veya Rahatsız Etme'yi kapatın."
           }
         }
       }
@@ -7179,6 +9843,12 @@
             "state" : "translated",
             "value" : "در Pairline Bridge روی گوشی اندرویدی خود، گزینه «افزودن مخاطب از آیفون» را روشن کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzdaki Pairline Bridge'te \"iPhone'dan kişi ekle\" seçeneğini açın."
+          }
         }
       }
     },
@@ -7194,6 +9864,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در برنامه امنیت یا باتری گوشی، «اجرای خودکار» را برای Pairline Bridge روشن کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefonun güvenlik veya pil uygulamasında Pairline Bridge için Otomatik başlatma'yı açın."
           }
         }
       }
@@ -7211,6 +9887,12 @@
             "state" : "translated",
             "value" : "بلوتوث را روشن کنید و به Pairline اجازه استفاده از آن را بدهید، سپس دوباره امتحان کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth'u açın ve Pairline'ın kullanmasına izin verin, ardından tekrar deneyin."
+          }
         }
       }
     },
@@ -7226,6 +9908,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای دسترسی به گوشی پل، بلوتوث را از مرکز کنترل یا تنظیمات روشن کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuza ulaşmak için Denetim Merkezi'nden veya Ayarlar'dan Bluetooth'u açın."
           }
         }
       }
@@ -7243,6 +9931,12 @@
             "state" : "translated",
             "value" : "در Pairline Bridge روی گوشی اندرویدی خود، «کنترل تماس» را روشن کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzdaki Pairline Bridge'te arama denetimini açın."
+          }
         }
       }
     },
@@ -7258,6 +9952,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در Pairline Bridge روی گوشی اندرویدی خود، همگام‌سازی سابقه تماس را روشن کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzdaki Pairline Bridge'te arama geçmişi eşzamanlamasını açın."
           }
         }
       }
@@ -7275,6 +9975,12 @@
             "state" : "translated",
             "value" : "در Pairline Bridge روی گوشی اندرویدی خود، همگام‌سازی مخاطبین را روشن کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzdaki Pairline Bridge'te kişi eşzamanlamasını açın."
+          }
         }
       }
     },
@@ -7290,6 +9996,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دو گوشی، یک خط"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İki telefon, tek hat"
           }
         }
       }
@@ -7307,6 +10019,12 @@
             "state" : "translated",
             "value" : "یک شماره تلفن وارد کنید. مخاطبین پس از همگام‌سازی از گوشی پل، اینجا نمایش داده می‌شوند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir telefon numarası yazın. Kişiler, köprü telefondan eşzamanlandıktan sonra burada görünür."
+          }
         }
       }
     },
@@ -7322,6 +10040,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ناشناس"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilinmiyor"
           }
         }
       }
@@ -7339,6 +10063,12 @@
             "state" : "translated",
             "value" : "تماس‌گیرنده ناشناس"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilinmeyen arayan"
+          }
         }
       }
     },
@@ -7354,6 +10084,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خرید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kilidi aç"
           }
         }
       }
@@ -7371,6 +10107,12 @@
             "state" : "translated",
             "value" : "خرید Pairline"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ın kilidini aç"
+          }
         }
       }
     },
@@ -7386,6 +10128,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خرید Pairline · %@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline'ın kilidini aç · %@"
           }
         }
       }
@@ -7403,6 +10151,12 @@
             "state" : "translated",
             "value" : "Pairline را با یک بار پرداخت %@ بخرید تا همچنان از سیم‌کارت اندرویدی خود روی این آیفون استفاده کنید. در هر صورت، پیام‌های همگام‌شده شما قابل خواندن می‌مانند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android SIM'inizi bu iPhone'da kullanmaya devam etmek için Pairline'ın kilidini tek seferlik %@ karşılığında açın. Eşzamanlanan mesajlarınız her durumda okunabilir kalır."
+          }
         }
       }
     },
@@ -7418,6 +10172,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برای ارسال پیام، Pairline را بخرید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesaj göndermek için Pairline'ın kilidini açın"
           }
         }
       }
@@ -7435,6 +10195,12 @@
             "state" : "translated",
             "value" : "لغو جفت‌سازی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirmeyi kaldır"
+          }
         }
       }
     },
@@ -7450,6 +10216,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جفت‌سازی این گوشی پل لغو شود؟"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu köprü telefonun eşleştirmesi kaldırılsın mı?"
           }
         }
       }
@@ -7467,6 +10239,12 @@
             "state" : "translated",
             "value" : "جفت‌سازی لغو شد. پیام‌های همگام‌شده شما از این آیفون حذف شدند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme kaldırıldı. Eşzamanlanan mesajlarınız bu iPhone'dan silindi."
+          }
         }
       }
     },
@@ -7482,6 +10260,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خوانده‌نشده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okunmamış"
           }
         }
       }
@@ -7499,6 +10283,12 @@
             "state" : "translated",
             "value" : "برنامه پل را به‌روزرسانی کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü uygulamanızı güncelleyin"
+          }
         }
       }
     },
@@ -7514,6 +10304,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کد USSD"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USSD kodu"
           }
         }
       }
@@ -7531,6 +10327,12 @@
             "state" : "translated",
             "value" : "کدهای USSD"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USSD kodları"
+          }
         }
       }
     },
@@ -7546,6 +10348,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "کدهای USSD"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USSD Kodları"
           }
         }
       }
@@ -7569,6 +10377,12 @@
             "state" : "translated",
             "value" : "نسخه %1$@ (%2$@)"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sürüm %1$@ (%2$@)"
+          }
         }
       }
     },
@@ -7591,6 +10405,12 @@
             "state" : "translated",
             "value" : "نسخه %1$@ (%2$@) · پروتکل اتصال v%3$lld"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sürüm %1$@ (%2$@) · Bağlantı protokolü v%3$lld"
+          }
         }
       }
     },
@@ -7606,6 +10426,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پست صوتی"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesli mesaj"
           }
         }
       }
@@ -7623,6 +10449,12 @@
             "state" : "translated",
             "value" : "در انتظار پل"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü bekleniyor"
+          }
         }
       }
     },
@@ -7638,6 +10470,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بعد از دوره آزمایشی رایگان چه می‌شود؟"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz deneme bittikten sonra ne olur?"
           }
         }
       }
@@ -7655,6 +10493,12 @@
             "state" : "translated",
             "value" : "Pairline چیست؟"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline nedir?"
+          }
         }
       }
     },
@@ -7670,6 +10514,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "قابلیت‌های این پل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu köprünün yapabildikleri"
           }
         }
       }
@@ -7687,6 +10537,12 @@
             "state" : "translated",
             "value" : "چه باید کرد"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne yapmalı"
+          }
         }
       }
     },
@@ -7702,6 +10558,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "چرا برنامه آیفون باید در پس‌زمینه باز بماند"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone uygulaması neden arka planda açık kalmalı"
           }
         }
       }
@@ -7719,6 +10581,12 @@
             "state" : "translated",
             "value" : "محل کار"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iş"
+          }
         }
       }
     },
@@ -7734,6 +10602,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "بله. کد منبع Pairline عمومی است تا هر کسی بتواند بررسی کند چه کاری انجام می‌دهد."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evet. Pairline'ın kaynak kodu herkese açıktır; böylece herkes ne yaptığını kontrol edebilir."
           }
         }
       }
@@ -7751,6 +10625,12 @@
             "state" : "translated",
             "value" : "بله. اتصال از طریق بلوتوث است، پس گوشی‌ها را در فاصله حدود ۱۰ متری هم نگه دارید. جا گذاشتن گوشی اندرویدی در خانه وقتی بیرون هستید، هنوز پشتیبانی نمی‌شود."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evet. Bağlantı Bluetooth kullandığından telefonları yaklaşık 10 metre içinde tutun. Siz dışarıdayken Android telefonu evde bırakmak henüz desteklenmiyor."
+          }
         }
       }
     },
@@ -7766,6 +10646,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دیروز"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dün"
           }
         }
       }
@@ -7783,6 +10669,12 @@
             "state" : "translated",
             "value" : "شما"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siz"
+          }
         }
       }
     },
@@ -7798,6 +10690,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تماس‌ها را از آیفون کنترل می‌کنید، اما مکالمه با گوشی اندرویدی انجام می‌شود. پخش صدای تماس روی آیفون در به‌روزرسانی‌های بعدی اضافه می‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aramaları iPhone'dan yönetirsiniz ama konuşmayı Android telefonda yaparsınız. iPhone'da arama sesi sonraki bir güncellemeyle gelecek."
           }
         }
       }
@@ -7815,6 +10713,12 @@
             "state" : "translated",
             "value" : "Pairline را خریده‌اید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline artık sizin"
+          }
         }
       }
     },
@@ -7830,6 +10734,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "چیزی را از دست نداده‌اید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaçırdığınız bir şey yok."
           }
         }
       }
@@ -7847,6 +10757,12 @@
             "state" : "translated",
             "value" : "جفت‌سازی انجام شد!"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirme tamamlandı!"
+          }
         }
       }
     },
@@ -7862,6 +10778,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گوشی اندرویدی و آیفون شما، متصل به هم"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuz ve iPhone'unuz, birbirine bağlı"
           }
         }
       }
@@ -7880,6 +10802,12 @@
             "state" : "translated",
             "value" : "سیم‌کارت در گوشی اندرویدی شما می‌ماند و کارها را با آیفون انجام می‌دهید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuz SIM'i tutar. İletişimi iPhone'unuz üstlenir."
+          }
         }
       }
     },
@@ -7895,6 +10823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سیم‌کارت در گوشی اندرویدی می‌ماند و پیام‌ها و تماس‌ها روی آیفون شما نمایش داده می‌شوند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuz SIM'i tutar. Mesajları ve aramaları iPhone'unuz gösterir."
           }
         }
       }
@@ -7912,6 +10846,12 @@
             "state" : "translated",
             "value" : "سیم‌کارت اندرویدی شما روی آیفونتان. یک بار بپردازید، برای همیشه داشته باشید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android SIM'iniz iPhone'unuzda. Bir kez ödeyin, sonsuza dek sizin olsun."
+          }
         }
       }
     },
@@ -7927,6 +10867,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سیم‌کارت اندرویدی شما، روی آیفونتان."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android SIM'iniz, iPhone'unuzda."
           }
         }
       }
@@ -7944,6 +10890,12 @@
             "state" : "translated",
             "value" : "برنامه پل شما هنوز نمی‌تواند به تماس‌ها پاسخ دهد. با گوشی اندرویدی پاسخ دهید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü uygulamanız henüz aramaları yanıtlayamıyor. Android telefonda yanıtlayın."
+          }
         }
       }
     },
@@ -7959,6 +10911,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برنامه پل شما هنوز نمی‌تواند تماس بگیرد. در Pairline Bridge مجوز تلفن را بدهید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü uygulamanız henüz arama yapamıyor. Pairline Bridge'te telefon iznini verin."
           }
         }
       }
@@ -7976,6 +10934,12 @@
             "state" : "translated",
             "value" : "برنامه پل شما هنوز نمی‌تواند تون‌های صفحه‌کلید را بفرستد. از صفحه‌کلید گوشی اندرویدی استفاده کنید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü uygulamanız henüz tuş takımı sesleri gönderemiyor. Android telefondaki tuş takımını kullanın."
+          }
         }
       }
     },
@@ -7991,6 +10955,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "برنامه پل شما از نسخه دیگری از پروتکل اتصال استفاده می‌کند. برای اینکه همه‌چیز درست کار کند، Pairline Bridge را روی گوشی اندرویدی خود به‌روزرسانی کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü uygulamanız farklı bir bağlantı sürümü kullanıyor. Her şeyin çalışmaya devam etmesi için Android telefonunuzda Pairline Bridge'i güncelleyin."
           }
         }
       }
@@ -8008,6 +10978,12 @@
             "state" : "translated",
             "value" : "باتری گوشی پل شما %lld%% است. آن را شارژ کنید تا تماس‌ها و پیام‌ها همچنان به این آیفون برسند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuzun pili %%%lld. Aramaların ve mesajların bu iPhone'a gelmeye devam etmesi için şarj edin."
+          }
         }
       }
     },
@@ -8023,6 +10999,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گوشی پل شما در حال حاضر متصل نیست."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuz şu anda bağlı değil."
           }
         }
       }
@@ -8040,6 +11022,12 @@
             "state" : "translated",
             "value" : "گفتگوهای شما در راه‌اند و به‌زودی از گوشی پل می‌رسند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konuşmalarınız köprü telefondan aktarılıyor."
+          }
         }
       }
     },
@@ -8055,6 +11043,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دوره آزمایشی رایگان شما تمام شده است"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz denemeniz sona erdi"
           }
         }
       }
@@ -8072,6 +11066,12 @@
             "state" : "translated",
             "value" : "دوره آزمایشی رایگان شما تمام شده است، به همین دلیل این آیفون دیگر به گوشی پل وصل نمی‌شود. پیام‌های همگام‌شده شما همچنان اینجا هستند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz denemeniz sona erdiği için bu iPhone köprü telefona bağlanmayı durdurdu. Eşzamanlanan mesajlarınız hâlâ burada."
+          }
         }
       }
     },
@@ -8087,6 +11087,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دوره آزمایشی رایگان شما تمام شده است. پیام‌های همگام‌شده قابل خواندن می‌مانند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz denemeniz sona erdi. Eşzamanlanan mesajlar okunabilir kalır."
           }
         }
       }
@@ -8104,6 +11110,12 @@
             "state" : "translated",
             "value" : "دوره آزمایشی رایگان شما تمام شده است. برای ادامه استفاده از گوشی پل، Pairline را بخرید."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz denemeniz sona erdi. Köprü telefonunuzu kullanmaya devam etmek için Pairline'ın kilidini açın."
+          }
         }
       }
     },
@@ -8119,6 +11131,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دوره آزمایشی رایگان شما فعال است"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz denemeniz etkin"
           }
         }
       }
@@ -8136,6 +11154,12 @@
             "state" : "translated",
             "value" : "آیفون شما"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone'unuz"
+          }
         }
       }
     },
@@ -8151,6 +11175,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیام شما پس از اتصال دوباره گوشی پل ارسال می‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajınız, köprü telefon yeniden bağlandığında gönderilecek."
           }
         }
       }
@@ -8168,6 +11198,12 @@
             "state" : "translated",
             "value" : "پیام‌ها، مخاطبین، سابقه تماس و کدهای شما فقط بین گوشی اندرویدی شما و این آیفون و با رمزنگاری سرتاسری جابه‌جا می‌شوند."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlarınız, kişileriniz, arama geçmişiniz ve kodlarınız yalnızca Android telefonunuz ile bu iPhone arasında, uçtan uca şifreli olarak iletilir."
+          }
         }
       }
     },
@@ -8183,6 +11219,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "دوره آزمایشی Pairline شما فردا تمام می‌شود"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairline denemeniz yarın sona eriyor"
           }
         }
       }
@@ -8200,6 +11242,12 @@
             "state" : "translated",
             "value" : "خرید شما در انتظار تأیید است."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Satın alma işleminiz onay bekliyor."
+          }
         }
       }
     },
@@ -8216,6 +11264,12 @@
             "state" : "translated",
             "value" : "خرید شما بازیابی شد."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Satın alma işleminiz geri yüklendi."
+          }
         }
       }
     },
@@ -8231,6 +11285,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "پیام‌های همگام‌شده شما بدون خرید هم قابل خواندن می‌مانند. حالت نمایشی و راهنما همیشه کار می‌کنند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşzamanlanan mesajlarınız satın almadan da okunabilir kalır. Demo modu ve yardım her zaman çalışır."
           }
         }
       }

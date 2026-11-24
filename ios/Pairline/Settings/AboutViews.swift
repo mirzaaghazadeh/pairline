@@ -124,9 +124,12 @@ struct AboutView: View {
                 Text("Pairline uses only Apple's frameworks: no third-party code.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                Text("Persian text is set in Estedad, an open-source typeface by the Estedad Project, under the SIL Open Font License 1.1.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                // Shown only where the typeface is used, so the screen doesn't name languages for everyone else.
+                if AppFont.usesEstedad {
+                    Text("Persian text is set in Estedad, an open-source typeface by the Estedad Project, under the SIL Open Font License 1.1.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             } header: {
                 Text("Acknowledgements")
             }

@@ -220,7 +220,8 @@ struct SettingsTab: View {
                 }
             }
         } footer: {
-            Text("Pairline speaks English, فارسی and العربية. Change it in iPhone Settings › Pairline › Language.")
+            // The languages themselves are listed by iOS on that screen, not named here.
+            Text("Change the language in iPhone Settings › Pairline › Language.")
         }
     }
 

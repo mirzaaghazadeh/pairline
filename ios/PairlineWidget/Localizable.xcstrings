@@ -14,6 +14,12 @@
             "state" : "translated",
             "value" : "–"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "–"
+          }
         }
       }
     },
@@ -36,6 +42,12 @@
             "state" : "translated",
             "value" : "%1$@ · %2$@"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@"
+          }
         }
       }
     },
@@ -48,6 +60,12 @@
           }
         },
         "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "tr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld"
@@ -68,6 +86,12 @@
             "state" : "translated",
             "value" : "باتری، سیگنال و وضعیت اتصال گوشی پل شما."
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefonunuzun pil, sinyal ve bağlantı durumu."
+          }
         }
       }
     },
@@ -83,6 +107,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "گوشی پل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köprü telefon"
           }
         }
       }
@@ -100,6 +130,12 @@
             "state" : "translated",
             "value" : "متصل"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlı"
+          }
         }
       }
     },
@@ -115,6 +151,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "در حال اتصال…"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlanıyor…"
           }
         }
       }
@@ -132,6 +174,12 @@
             "state" : "translated",
             "value" : "نمایشی"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demo"
+          }
         }
       }
     },
@@ -147,6 +195,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "قفل"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kilitli"
           }
         }
       }
@@ -164,6 +218,12 @@
             "state" : "translated",
             "value" : "متصل نیست"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlı değil"
+          }
         }
       }
     },
@@ -179,6 +239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جفت نشده"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eşleştirilmedi"
           }
         }
       }
@@ -196,6 +262,12 @@
             "state" : "translated",
             "value" : "برای اتصال، Pairline را باز کنید"
           }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlanmak için Pairline'ı açın"
+          }
         }
       }
     },
@@ -211,6 +283,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "سیگنال %lld از ۴"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinyal %lld/4"
           }
         }
       }
