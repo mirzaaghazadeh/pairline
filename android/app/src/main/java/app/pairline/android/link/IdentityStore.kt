@@ -61,23 +61,39 @@ class IdentityStore(context: Context) {
 
     private fun loadOrCreate(): StaticKey {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !File(dir, WRAPPED_FILE).exists()) {
+            // An existing key is never deleted: losing it would silently break the pairing. Read errors (they
+            // happen right after boot or a system update) are retried, then reported to the caller.
+            loadKeystoreKeyWithRetry()?.let {
+                storage = Storage.KEYSTORE
+                return it
+            }
             try {
-                loadKeystoreKey()?.let {
-                    storage = Storage.KEYSTORE
-                    return it
-                }
                 val key = createKeystoreKey()
                 storage = Storage.KEYSTORE
                 Log.i(TAG, "identity key created in Android Keystore")
                 return key
             } catch (e: Exception) {
-                // Some phones updated to Android 12 keep an older Keymaster without key agreement.
+                // Some phones updated to Android 12 keep an older Keymaster without key agreement. Remove only
+                // the key this attempt just made, which can't be used, and use the wrapped key instead.
                 Log.w(TAG, "Keystore key agreement unavailable; using the wrapped key instead", e)
                 runCatching { keystore().deleteEntry(IDENTITY_ALIAS) }
             }
         }
         storage = Storage.WRAPPED
         return loadOrCreateWrapped()
+    }
+
+    private fun loadKeystoreKeyWithRetry(): StaticKey? {
+        var last: Exception? = null
+        for (attempt in 1..3) {
+            try {
+                return loadKeystoreKey()
+            } catch (e: Exception) {
+                last = e
+                Thread.sleep(300L * attempt)
+            }
+        }
+        throw IllegalStateException("Android Keystore isn't available right now", last)
     }
 
     private fun keystore(): KeyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }

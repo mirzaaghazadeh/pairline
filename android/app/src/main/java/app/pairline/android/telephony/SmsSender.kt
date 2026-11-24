@@ -39,8 +39,19 @@ class SmsSender(
 
     private val pending = ConcurrentHashMap<String, Pending>()
 
+    /** Sent and delivered reports are handled one at a time, in the order Android delivers them. */
+    val results: java.util.concurrent.ExecutorService =
+        java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-sms-results") }
+
+    /** Forgets messages whose delivery report never came, so their text doesn't stay in memory. */
+    private fun prune() {
+        val cutoff = System.currentTimeMillis() - PENDING_TTL_MS
+        pending.values.removeIf { it.startedAt < cutoff }
+    }
+
     /** Hands the message to the radio queue; throws [RequestException] if it can't. */
     fun send(sim: Int?, rawTo: String, body: String, cid: String) {
+        prune()
         if (!Perms.granted(context, Manifest.permission.SEND_SMS)) {
             throw RequestException(ErrorCode.PERMISSION, "SEND_SMS not granted")
         }
@@ -171,6 +182,7 @@ class SmsSender(
     companion object {
         private const val TAG = "sms"
         private const val MAX_BODY = 10_000
+        private const val PENDING_TTL_MS = 6 * 3600 * 1000L
         const val ACTION_SENT = "app.pairline.android.SMS_SENT"
         const val ACTION_DELIVERED = "app.pairline.android.SMS_DELIVERED"
         const val EXTRA_CID = "cid"
@@ -185,12 +197,14 @@ class SmsResultReceiver : BroadcastReceiver() {
         val code = resultCode
         val sender = AppGraph.smsSender
         val pending = goAsync()
-        AppGraph.io.execute {
+        sender.results.execute {
             try {
                 when (intent.action) {
                     SmsSender.ACTION_SENT -> sender.onSent(cid, code)
                     SmsSender.ACTION_DELIVERED -> sender.onDelivered(cid, intent)
                 }
+            } catch (e: Exception) {
+                Log.e("sms", "couldn't handle an SMS report", e)
             } finally {
                 pending.finish()
             }

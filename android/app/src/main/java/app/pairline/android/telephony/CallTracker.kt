@@ -148,6 +148,7 @@ class CallTracker(
     }
 
     private fun telecomStateChanged(t: Tracked, call: Call) {
+        if (!calls.containsKey(t.id)) return // already ended and reported
         val mapped = CallMapping.state(call.state) ?: return
         if (mapped == CallMapping.ENDED) {
             finish(t, call.details?.disconnectCause?.code)
@@ -196,6 +197,7 @@ class CallTracker(
                     sendState(ringing, null)
                 } else if (mine.none { it.state != CallMapping.ENDED }) {
                     val dial = lastDial?.takeIf { System.currentTimeMillis() - it.third < 30_000 }
+                    lastDial = null // used once: a later call placed on the phone itself isn't the iPhone's
                     val t = newCall(false, dial?.first, sims.slotFor(subId), CallMapping.DIALING, subId)
                     announce(t)
                 }
@@ -281,10 +283,11 @@ class CallTracker(
         endWith(t, CallMapping.reasonFromCallLog(latestCallLogType(t.since)))
     }
 
+    /** Reports the end once: onCallRemoved and the last state callback can both arrive for the same call. */
     private fun endWith(t: Tracked, reason: String) {
+        if (calls.remove(t.id) == null) return
         t.state = CallMapping.ENDED
         t.since = System.currentTimeMillis()
-        calls.remove(t.id)
         sendState(t, reason)
     }
 

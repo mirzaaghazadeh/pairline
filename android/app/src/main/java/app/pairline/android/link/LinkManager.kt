@@ -8,6 +8,7 @@ import app.pairline.android.protocol.SessionCallbacks
 import app.pairline.android.protocol.StaticKey
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -53,7 +54,9 @@ class LinkManager(
 
     private val executor = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-link") }
     private val dispatcher = executor.asCoroutineDispatcher()
-    val scope = CoroutineScope(SupervisorJob() + dispatcher)
+    val scope = CoroutineScope(
+        SupervisorJob() + dispatcher + CoroutineExceptionHandler { _, e -> Log.e(TAG, "link task failed", e) },
+    )
 
     private class Entry(val session: BridgeSession, val openedAt: Long) {
         var lastReceived: Long = openedAt
@@ -123,6 +126,24 @@ class LinkManager(
         entries[c]?.session?.send(message)
     }
 
+    /**
+     * Bumps with every new session. The iPhone restarts its request ids in each session, so a reply that
+     * finishes after a reconnect must not reach the new session, where the same id means another request.
+     */
+    @Volatile
+    var generation: Long = 0
+        private set
+
+    /** Sends a reply only if the session that asked is still the active one. */
+    fun reply(generation: Long, message: JSONObject) = post {
+        if (generation != this.generation) {
+            Log.d(TAG, "dropped a reply for an earlier session")
+            return@post
+        }
+        val c = active ?: return@post
+        entries[c]?.session?.send(message)
+    }
+
     val isConnected: Boolean get() = _state.value.connected
 
     /** The user unpaired on this phone: tell the iPhone if it's connected, then forget it. */
@@ -161,6 +182,7 @@ class LinkManager(
     private fun setActive(connection: LinkConnection?) {
         val previous = active
         active = connection
+        if (connection != previous) generation++
         if (connection != null) {
             updateState { it.copy(connected = true, transport = connection.kind, connectedSince = clock()) }
             prefs.lastSeen = clock()
@@ -222,7 +244,12 @@ class LinkManager(
         }
 
         override fun onMessage(message: JSONObject) {
-            handler?.onMessage(message)
+            // A bug in a handler is ours, not the iPhone's: log it and keep the session.
+            try {
+                handler?.onMessage(message)
+            } catch (e: Exception) {
+                Log.e(TAG, "handling a message failed", e)
+            }
         }
     }
 

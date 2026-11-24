@@ -167,15 +167,26 @@ class BleTransport(
         runCatching { advertiser?.stopAdvertising(advertiseCallback) }
         advertising = false
         advertiser = null
-        for (c in connections.values.toList()) {
-            runCatching { server?.cancelConnection(c.device) }
-            listener.onClosed(c, "Bluetooth link stopped")
-        }
+        for (c in connections.values.toList()) c.disconnect("Bluetooth link stopped")
         connections.clear()
+        subscribed.clear()
         runCatching { server?.close() }
         server = null
         txCharacteristic = null
-        onStatus(BluetoothStatus.UNKNOWN, false)
+        // Keep "off" visible when Bluetooth itself was turned off.
+        onStatus(if (manager?.adapter?.isEnabled == true) BluetoothStatus.UNKNOWN else BluetoothStatus.OFF, false)
+    }
+
+    /** Notification subscriptions are per link (the CCCD), so they outlive a closed session on the same link. */
+    private val subscribed = HashSet<String>()
+
+    /**
+     * The connection for a device that talks to Pairline. Created on first use, not on every LE connection:
+     * Android reports the phone's watch or earbuds connecting too, and those must never get a session.
+     */
+    private fun connectionFor(device: BluetoothDevice): BleConnection? {
+        if (server == null) return null
+        return connections.getOrPut(device.address) { BleConnection(device, "ble#${labels.getAndIncrement()}") }
     }
 
     private val callback = object : BluetoothGattServerCallback() {
@@ -191,23 +202,17 @@ class BleTransport(
         }
 
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
+            if (newState != BluetoothProfile.STATE_DISCONNECTED) return // sessions start on first use
             handler.post {
-                val key = device.address
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    if (connections.containsKey(key)) return@post
-                    val c = BleConnection(device, "ble#${labels.getAndIncrement()}")
-                    connections[key] = c
-                    listener.onOpened(c)
-                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    val c = connections.remove(key) ?: return@post
-                    listener.onClosed(c, "Bluetooth disconnected (status $status)")
-                    if (!advertising && server != null) startAdvertising()
-                }
+                subscribed.remove(device.address)
+                mtus.remove(device.address)
+                connections[device.address]?.disconnect("Bluetooth disconnected (status $status)", linkGone = true)
+                if (!advertising && server != null) startAdvertising()
             }
         }
 
         override fun onMtuChanged(device: BluetoothDevice, mtu: Int) {
-            handler.post { connections[device.address]?.mtu = mtu }
+            handler.post { mtus[device.address] = mtu }
         }
 
         override fun onCharacteristicReadRequest(
@@ -247,7 +252,7 @@ class BleTransport(
             }
             if (!ok) return
             val bytes = value!!.copyOf()
-            handler.post { connections[device.address]?.onFragment(bytes) }
+            handler.post { connectionFor(device)?.onFragment(bytes) }
         }
 
         override fun onDescriptorReadRequest(
@@ -256,8 +261,7 @@ class BleTransport(
             offset: Int,
             descriptor: BluetoothGattDescriptor,
         ) {
-            val subscribed = connections[device.address]?.subscribed == true
-            val value = if (subscribed) {
+            val value = if (device.address in subscribed) {
                 BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
             } else {
                 BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
@@ -287,9 +291,11 @@ class BleTransport(
             if (!ok) return
             val enable = (value!![0].toInt() and 0x01) != 0
             handler.post {
-                connections[device.address]?.let {
-                    it.subscribed = enable
-                    if (enable) it.pump()
+                if (enable) {
+                    subscribed += device.address
+                    connectionFor(device)?.pump()
+                } else {
+                    subscribed -= device.address
                 }
             }
         }
@@ -299,58 +305,91 @@ class BleTransport(
         }
     }
 
+    /** Negotiated MTU per link. */
+    private val mtus = HashMap<String, Int>()
+
+    /**
+     * One iPhone link. Everything runs on the handler thread. An object is "current" while it's the one in
+     * [connections] for its address; once disconnected it's dead, so a late retry or delayed close can never touch
+     * a newer link from the same address.
+     */
     private inner class BleConnection(val device: BluetoothDevice, override val label: String) : LinkConnection {
         override val kind = TransportKind.BLUETOOTH
-        var mtu = 23
-        var subscribed = false
+        private var opened = false
+        private var alive = true
+        private var closing = false
         private var inFlight = false
         private val queue = ArrayDeque<ByteArray>()
         private val reassembler = BleReassembler()
 
+        private val current: Boolean get() = alive && connections[device.address] === this
+
+        /** The session starts when the device first writes to `rx` (or subscribes to `tx`). */
+        private fun ensureOpened() {
+            if (opened || !current) return
+            opened = true
+            listener.onOpened(this)
+        }
+
         override fun send(frame: ByteArray) {
             handler.post {
-                if (closing || !connections.containsKey(device.address)) return@post
+                if (closing || !current) return@post
                 // ATT payload is MTU − 3; never below the BLE minimum.
+                val mtu = mtus[device.address] ?: 23
                 val payload = maxOf(BleFragmenter.MIN_ATT_PAYLOAD, mtu - 3)
                 queue.addAll(BleFragmenter.fragment(frame, payload))
                 pump()
             }
         }
 
-        private var closing = false
-
         /** Disconnects once frames already queued (such as a final `unpair`) are sent, or after 2 s at most. */
         override fun close() {
             handler.post {
-                if (closing) return@post
+                if (closing || !current) return@post
                 closing = true
                 if (queue.isEmpty() && !inFlight) {
-                    disconnect()
+                    disconnect("closed by the bridge")
                 } else {
-                    handler.postDelayed({ disconnect() }, 2_000)
+                    handler.postDelayed({ disconnect("closed by the bridge") }, 2_000)
                 }
             }
         }
 
-        private fun disconnect() {
+        /**
+         * Ends this connection now: forgets it, tells the session, and drops the link. A GATT server can't drop a
+         * link the iPhone opened with cancelConnection() alone; connect() first gives this app a hold on it.
+         */
+        fun disconnect(reason: String, linkGone: Boolean = false) {
+            if (!alive) return
+            alive = false
             queue.clear()
-            runCatching { server?.cancelConnection(device) }
+            if (connections[device.address] === this) connections.remove(device.address)
+            if (!linkGone) {
+                runCatching {
+                    server?.connect(device, false)
+                    server?.cancelConnection(device)
+                }
+            }
+            if (opened) listener.onClosed(this, reason)
         }
 
         fun onFragment(bytes: ByteArray) {
+            ensureOpened()
+            if (!current || closing) return
             val frame = try {
                 reassembler.accept(bytes)
             } catch (e: ProtocolException) {
                 Log.w(TAG, "$label: bad fragment (${e.message})")
                 reassembler.reset()
-                close()
+                disconnect("bad fragment")
                 return
             } ?: return
             listener.onFrame(this, frame)
         }
 
         fun pump() {
-            if (inFlight || !subscribed) return
+            ensureOpened()
+            if (!current || inFlight || device.address !in subscribed) return
             val next = queue.firstOrNull() ?: return
             val s = server ?: return
             val tx = txCharacteristic ?: return
@@ -374,12 +413,13 @@ class BleTransport(
         fun onSent(status: Int) {
             inFlight = false
             if (status != BluetoothGatt.GATT_SUCCESS) {
+                // A frame is now cut short; the iPhone can't recover this session.
                 Log.w(TAG, "$label: notification failed ($status)")
-                disconnect()
+                disconnect("notification failed")
                 return
             }
             pump()
-            if (closing && queue.isEmpty() && !inFlight) disconnect()
+            if (closing && queue.isEmpty() && !inFlight) disconnect("closed by the bridge")
         }
     }
 

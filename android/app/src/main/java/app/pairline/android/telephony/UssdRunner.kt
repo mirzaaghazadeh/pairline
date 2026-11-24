@@ -15,12 +15,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 import org.json.JSONObject
 
 /** Runs USSD codes (`ussd.run`) on a chosen SIM with TelephonyManager.sendUssdRequest (CALL_PHONE). */
-class UssdRunner(private val context: Context, private val sims: SimDirectory, private val emit: (JSONObject) -> Unit) {
+class UssdRunner(private val context: Context, private val sims: SimDirectory) {
     private val thread = HandlerThread("pairline-ussd").apply { start() }
     private val handler = Handler(thread.looper)
 
+    /** Starts the request; [emit] gets the `ussd.result` (with the request's id) when the network answers. */
     @SuppressLint("MissingPermission")
-    fun run(id: Long, sim: Int?, rawCode: String) {
+    fun run(id: Long, sim: Int?, rawCode: String, emit: (JSONObject) -> Unit) {
         if (!Perms.granted(context, Manifest.permission.CALL_PHONE)) {
             throw RequestException(ErrorCode.PERMISSION, "CALL_PHONE not granted")
         }

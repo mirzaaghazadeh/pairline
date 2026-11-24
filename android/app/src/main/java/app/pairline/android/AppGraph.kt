@@ -45,7 +45,7 @@ object AppGraph {
     val smsSender: SmsSender by lazy { SmsSender(app, sims, smsStore, link::send) }
     val calls: CallTracker by lazy { CallTracker(app, sims, prefs, link::send) { router.statusChanged() } }
     val contacts: ContactsSync by lazy { ContactsSync(app, sims) }
-    val ussd: UssdRunner by lazy { UssdRunner(app, sims, link::send) }
+    val ussd: UssdRunner by lazy { UssdRunner(app, sims) }
     val status: StatusMonitor by lazy {
         StatusMonitor(app, sims, prefs, BuildConfig.VERSION_NAME) { calls.inCallServiceAvailable }
     }

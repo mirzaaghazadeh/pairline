@@ -23,6 +23,7 @@ import app.pairline.android.telephony.SmsStore
 import app.pairline.android.telephony.StatusMonitor
 import app.pairline.android.telephony.UssdRunner
 import java.util.concurrent.atomic.AtomicLong
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,7 +49,9 @@ class MessageRouter(
     private val ussd: UssdRunner,
 ) : MessageHandler {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = CoroutineScope(
+        SupervisorJob() + Dispatchers.IO + CoroutineExceptionHandler { _, e -> Log.e(TAG, "router task failed", e) },
+    )
     private var ticker: Job? = null
     private val lastStatusKey = AtomicLong(0)
     private val lastStatusSent = AtomicLong(0)
@@ -63,9 +66,11 @@ class MessageRouter(
         }
         ticker?.cancel()
         ticker = scope.launch {
+            // At least every 60 s (PROTOCOL.md): wake when the last status turns 60 s old.
             while (isActive) {
-                delay(STATUS_INTERVAL_MS)
-                if (System.currentTimeMillis() - lastStatusSent.get() >= STATUS_INTERVAL_MS - 1000) sendStatus(force = true)
+                val age = System.currentTimeMillis() - lastStatusSent.get()
+                delay((STATUS_INTERVAL_MS - age).coerceIn(1_000, STATUS_INTERVAL_MS))
+                if (System.currentTimeMillis() - lastStatusSent.get() >= STATUS_INTERVAL_MS - 500) sendStatus(force = true)
             }
         }
     }
@@ -142,9 +147,14 @@ class MessageRouter(
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }
             Msg.CONTACTS_ADD -> request(message) { id -> contactsAdd(id, message) }
-            Msg.USSD_RUN -> request(message) { id ->
-                ussd.run(id, sim(message), message.stringOrNull("code") ?: invalid("code missing"))
-                null // the reply is the ussd.result event with the same id
+            Msg.USSD_RUN -> {
+                val generation = link.generation
+                request(message) { id ->
+                    ussd.run(id, sim(message), message.stringOrNull("code") ?: invalid("code missing")) {
+                        link.reply(generation, it)
+                    }
+                    null // the reply is the ussd.result with the same id, sent when the network answers
+                }
             }
             else -> message.requestId?.let { id ->
                 // Unknown request: answer so the iPhone doesn't wait (PROTOCOL.md clarifications).
@@ -157,6 +167,7 @@ class MessageRouter(
     private fun request(message: JSONObject, handler: (Long) -> JSONObject?) {
         val id = message.requestId ?: return // a request without an id can't be answered
         val type = message.type
+        val generation = link.generation // on the link thread: the session that asked
         scope.launch {
             val reply = try {
                 handler(id)
@@ -170,7 +181,7 @@ class MessageRouter(
                 Log.e(TAG, "$type failed", e)
                 Messages.error(id, ErrorCode.FAILED, "internal error")
             }
-            reply?.let(link::send)
+            reply?.let { link.reply(generation, it) }
         }
     }
 

@@ -45,7 +45,18 @@ class StatusMonitor(
     /** Per-SIM call-state changes: subscription id, TelephonyManager.CALL_STATE_*, number if Android shares it. */
     var onCallState: ((subId: Int, state: Int, number: String?) -> Unit)? = null
 
-    private val executor: Executor = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-radio") }
+    private val pool = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-radio") }
+
+    /** Runs radio callbacks and refreshes; an unexpected error is logged instead of killing the thread. */
+    private val executor: Executor = Executor { task ->
+        pool.execute {
+            try {
+                task.run()
+            } catch (e: Exception) {
+                Log.e(TAG, "radio task failed", e)
+            }
+        }
+    }
     private val telephony = context.getSystemService(TelephonyManager::class.java)
     private val subscriptions = context.getSystemService(SubscriptionManager::class.java)
     private val registered = HashMap<Int, Any>()

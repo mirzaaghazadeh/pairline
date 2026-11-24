@@ -108,25 +108,27 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
     /** `sms.threads` reply: newest first; threads whose newest message is older than [before]. */
     fun threads(id: Long, before: Long?, limit: Int): JSONObject {
         requireRead()
+        // One pass without message bodies (fast on large stores); snippets are loaded only for the page.
         val all = LinkedHashMap<Long, ThreadAgg>()
         context.contentResolver.query(
             Telephony.Sms.CONTENT_URI,
-            arrayOf(Telephony.Sms.THREAD_ID, Telephony.Sms.ADDRESS, Telephony.Sms.BODY, Telephony.Sms.DATE),
+            arrayOf(Telephony.Sms.THREAD_ID, Telephony.Sms.ADDRESS, Telephony.Sms.DATE, Telephony.Sms._ID),
             "${Telephony.Sms.TYPE} != ${Telephony.Sms.MESSAGE_TYPE_DRAFT}",
             null,
             "${Telephony.Sms.DATE} DESC",
         )?.use { c ->
             while (c.moveToNext()) {
                 val thread = c.getLong(0)
-                val agg = all.getOrPut(thread) {
-                    ThreadAgg(thread, SmsMapping.snippet(c.getString(2).orEmpty()), c.getLong(3))
-                }
+                val agg = all.getOrPut(thread) { ThreadAgg(thread, c.getLong(3), c.getLong(2)) }
                 agg.count++
                 c.getString(1)?.takeIf { it.isNotBlank() }?.let { if (agg.addrs.size < 10) agg.addrs += it }
             }
         }
         val candidates = all.values.filter { before == null || it.time < before }
-        val (page, _) = JsonPager.pageByTime(candidates, limit, sourceExhausted = true, time = { it.time }) { it.toJson() }
+        val window = candidates.take(limit + SAME_TIME_SLACK)
+        val bodies = bodiesOf(window.map { it.latestId })
+        window.forEach { it.snippet = SmsMapping.snippet(bodies[it.latestId].orEmpty()) }
+        val (page, _) = JsonPager.pageByTime(window, limit, window.size == candidates.size, { it.time }) { it.toJson() }
         return JSONObject()
             .put("t", Msg.SMS_THREADS)
             .put("id", id)
@@ -179,9 +181,23 @@ class SmsStore(private val context: Context, private val sims: SimDirectory) {
         const val SAME_TIME_SLACK = 200
     }
 
-    private class ThreadAgg(val thread: Long, val snippet: String, val time: Long) {
+    private fun bodiesOf(ids: List<Long>): Map<Long, String> {
+        if (ids.isEmpty()) return emptyMap()
+        val out = HashMap<Long, String>()
+        context.contentResolver.query(
+            Telephony.Sms.CONTENT_URI,
+            arrayOf(Telephony.Sms._ID, Telephony.Sms.BODY),
+            "${Telephony.Sms._ID} IN (${ids.joinToString(",")})",
+            null,
+            null,
+        )?.use { c -> while (c.moveToNext()) out[c.getLong(0)] = c.getString(1).orEmpty() }
+        return out
+    }
+
+    private class ThreadAgg(val thread: Long, val latestId: Long, val time: Long) {
         val addrs = LinkedHashSet<String>()
         var count = 0
+        var snippet = ""
 
         fun toJson(): JSONObject = JSONObject()
             .put("thread", thread)

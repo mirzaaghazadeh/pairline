@@ -197,7 +197,8 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
     /** `calllog.sync`: entries after the cursor, oldest first. `full: true` when starting from scratch. */
     fun callLog(id: Long, since: String?): JSONObject {
         require(Manifest.permission.READ_CALL_LOG)
-        val parsed = CallLogCursor.parse(since)
+        // A cursor past the newest entry means the call log was cleared: start over with a full sync.
+        val parsed = CallLogCursor.parse(since)?.takeIf { it.lastId <= newestCallLogId() }
         val after = parsed?.lastId ?: 0L
         val slotBySub = sims.activeSubscriptions().associate { it.subscriptionId.toString() to it.simSlotIndex }
         val rows = ArrayList<JSONObject>()
@@ -241,6 +242,15 @@ class ContactsSync(private val context: Context, private val sims: SimDirectory)
             .put("more", page.more || hasMoreRows)
             .put("full", parsed == null)
     }
+
+    /** The call-log provider rejects LIMIT in the sort order, so read the first row of a sorted query. */
+    private fun newestCallLogId(): Long = resolver.query(
+        CallLog.Calls.CONTENT_URI,
+        arrayOf(CallLog.Calls._ID),
+        null,
+        null,
+        "${CallLog.Calls._ID} DESC",
+    )?.use { c -> if (c.moveToFirst()) c.getLong(0) else 0L } ?: 0L
 
     /** `contacts.add` (opt-in): a new phone-only contact with a name and numbers. */
     fun add(name: String, numbers: List<Pair<String, String?>>) {

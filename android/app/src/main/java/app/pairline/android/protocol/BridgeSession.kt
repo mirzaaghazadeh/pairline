@@ -66,6 +66,9 @@ class BridgeSession(
             }
         } catch (e: ProtocolException) {
             fail(e.message ?: "protocol error")
+        } catch (e: Exception) {
+            // For example a Keystore error during key agreement: close now rather than leave the iPhone waiting.
+            fail("internal error (${e.javaClass.simpleName})")
         }
     }
 
