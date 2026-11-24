@@ -38,6 +38,9 @@ struct ActiveCall: Identifiable, Equatable {
 final class CallCenter: ObservableObject {
     @Published private(set) var current: ActiveCall?
     @Published var showCallScreen = false
+    /// True only while the call screen is actually on screen. `showCallScreen` can be true while SwiftUI drops the
+    /// presentation (another presentation or a transition in progress), so the call bar and the retry use this.
+    @Published var callScreenVisible = false
     @Published var notice: String?
 
     weak var bridge: BridgeController?

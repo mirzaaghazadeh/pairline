@@ -34,6 +34,7 @@ struct MainView: View {
     @EnvironmentObject private var app: AppModel
     @ObservedObject var bridge: BridgeController
     @ObservedObject private var calls: CallCenter
+    @State private var retriedCallScreen = false
 
     init(bridge: BridgeController) {
         self.bridge = bridge
@@ -69,12 +70,27 @@ struct MainView: View {
                 .environmentObject(bridge.db)
         }
         .overlay(alignment: .bottom) {
-            if let call = calls.current, !calls.showCallScreen {
-                OngoingCallBar(call: call) { calls.showCallScreen = true }
+            // Keyed on what's actually on screen, so a dropped presentation never leaves a call without controls.
+            if let call = calls.current, !calls.callScreenVisible {
+                OngoingCallBar(call: call) { presentCallScreen() }
                     .padding(.bottom, 56)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .onValueChange(calls.showCallScreen) { show in
+            guard show, !retriedCallScreen else { return }
+            // SwiftUI silently drops a fullScreenCover requested during another presentation or a transition.
+            // Ask once more if the screen hasn't appeared; after that the call bar stays as the way in.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                guard calls.showCallScreen, !calls.callScreenVisible, calls.current != nil else { return }
+                retriedCallScreen = true
+                presentCallScreen()
+            }
+        }
+        .onValueChange(calls.callScreenVisible) { visible in
+            if visible { retriedCallScreen = false }
+        }
+        .onValueChange(calls.current?.id) { _ in retriedCallScreen = false }
         .onReceive(calls.$notice.compactMap { $0 }) { notice in
             app.toast = notice
             calls.notice = nil
@@ -83,6 +99,16 @@ struct MainView: View {
             app.toast = text
             bridge.banner = nil
         }
+    }
+
+    /// Shows the call screen, re-requesting it when the flag is stuck on true after a dropped presentation.
+    private func presentCallScreen() {
+        guard calls.showCallScreen else {
+            calls.showCallScreen = true
+            return
+        }
+        calls.showCallScreen = false
+        DispatchQueue.main.async { calls.showCallScreen = true }
     }
 
     private var unreadBadge: Int {

@@ -20,6 +20,8 @@ struct CallScreen: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onAppear { calls.callScreenVisible = true }
+        .onDisappear { calls.callScreenVisible = false }
     }
 
     private func content(_ call: ActiveCall) -> some View {
@@ -82,15 +84,15 @@ struct CallScreen: View {
                 .foregroundStyle(.white.opacity(0.8))
                 .padding(.top, 10)
 
-            if !calls.canAudio {
-                Label("Audio plays on your Android phone", systemImage: "speaker.wave.2.fill")
-                    .font(.footnote.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.85))
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(Capsule().fill(.white.opacity(0.12)))
-                    .padding(.top, 18)
-            }
+            // In protocol v0 call audio always stays on the Android phone; `call.audio` only switches its mute and
+            // speaker. Streaming to the iPhone (M6) will come with its own capability.
+            Label("Audio plays on your Android phone", systemImage: "speaker.wave.2.fill")
+                .font(.footnote.weight(.medium))
+                .foregroundStyle(.white.opacity(0.85))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Capsule().fill(.white.opacity(0.12)))
+                .padding(.top, 18)
             Spacer(minLength: 16)
 
             if showKeypad && call.state == .active {
