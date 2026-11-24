@@ -31,7 +31,7 @@ struct CallAudioInfoSheet: View {
                     }
                 }
                 Section {
-                    t("After the Android phone restarts, turn on Wireless debugging on it again: the bridge app then starts its helper by itself and reminds you with a notification. Until then calls ring here and the audio stays on the Android phone.")
+                    t("After the Android phone restarts, the bridge app turns Wireless debugging back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Until then calls ring here and the audio stays on the Android phone.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                     t("Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored.")

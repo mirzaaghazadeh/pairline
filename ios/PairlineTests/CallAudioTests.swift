@@ -62,6 +62,18 @@ final class CallAudioTests: XCTestCase {
         XCTAssertEqual(jb.take(), frame(17))
     }
 
+    func testExtraDelayDrainsThroughQuietFramesOnly() {
+        let jb = JitterBuffer(target: 3)
+        // A burst: 15 frames waiting, frames 1-3 quiet, the rest speech.
+        for s in UInt16(0)..<15 { jb.put(s, frame((1...3).contains(s) ? 0 : 3000)) }
+        XCTAssertEqual(jb.take(), frame(3000)) // frame 0 (speech): never skipped
+        XCTAssertEqual(jb.take(), frame(0)) // frame 1 skipped, frame 2 played
+        XCTAssertEqual(jb.take(), frame(3000)) // frame 3 skipped, frame 4 played
+        XCTAssertEqual(jb.skipped, 2)
+        for _ in 5..<15 { XCTAssertEqual(jb.take(), frame(3000)) }
+        XCTAssertEqual(jb.skipped, 2)
+    }
+
     func testCallMediaMessages() throws {
         let start = try JSONSerialization.jsonObject(with: Outbound.callMediaStart(.string("c1"), talk: false).json(id: 7))
             as? [String: Any]

@@ -4,6 +4,42 @@ import SwiftUI
 /// Xcode doesn't also extract them into the shared Localizable catalog.
 private func t(_ key: String) -> Text { Text(LocalizedStringKey(key), tableName: "NetShare") }
 
+/// What the current Wi-Fi network's proxy setting (Settings › Wi-Fi › ⓘ › Configure Proxy) has to do with internet
+/// sharing. Read locally from iOS's proxy settings; nothing is sent anywhere.
+enum WiFiProxyStatus: Equatable {
+    /// Points at the bridge's current proxy configuration URL.
+    case usingBridge
+    /// Sharing is on, but this Wi-Fi has no automatic proxy set.
+    case notSet
+    /// Points at a Pairline proxy configuration that isn't the current one (an old address or port).
+    case outdated
+    /// Sharing is off, but this Wi-Fi still points at a Pairline proxy: nothing answers there, so no internet.
+    case leftOn
+    /// Nothing to say (no Pairline proxy involved).
+    case none
+
+    /// The automatic proxy configuration URL set for the current network, if any.
+    static func currentPACURL() -> String? {
+        guard let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? [String: Any],
+              (settings[kCFNetworkProxiesProxyAutoConfigEnable as String] as? NSNumber)?.boolValue == true else { return nil }
+        return settings[kCFNetworkProxiesProxyAutoConfigURLString as String] as? String
+    }
+
+    /// A URL the bridge serves (`http://<address>:<port>/proxy.pac`, D-048).
+    static func isPairlinePAC(_ url: String) -> Bool { url.hasPrefix("http://") && url.hasSuffix("/proxy.pac") }
+
+    static func current(sharingPAC: String?) -> WiFiProxyStatus {
+        let set = currentPACURL()
+        if let sharingPAC {
+            guard let set else { return .notSet }
+            if set == sharingPAC { return .usingBridge }
+            return isPairlinePAC(set) ? .outdated : .notSet
+        }
+        if let set, isPairlinePAC(set) { return .leftOn }
+        return .none
+    }
+}
+
 /// Settings › Internet sharing (M8, D-048): use the bridge phone's connection (and its VPN) on this iPhone. The
 /// bridge runs a proxy on your local network; this screen turns it on and shows how to use it. Pairline itself
 /// opens no connection: Safari and other apps use the proxy you set in Wi-Fi settings, Telegram uses its own.
@@ -13,9 +49,43 @@ struct NetShareView: View {
     @State private var busy = false
     @State private var error: String?
     @State private var copied: String?
+    @State private var proxy: WiFiProxyStatus = .none
+    @Environment(\.scenePhase) private var scenePhase
+
+    private func readProxy() {
+        proxy = WiFiProxyStatus.current(sharingPAC: info?.on == true ? info?.pac : nil)
+    }
+
+    @ViewBuilder private var proxyRow: some View {
+        switch proxy {
+        case .usingBridge:
+            Label { t("This Wi-Fi uses the bridge phone's internet.") } icon: {
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+            }
+        case .notSet:
+            Label { t("This Wi-Fi isn't set up yet: paste the URL below in its proxy settings.") } icon: {
+                Image(systemName: "exclamationmark.circle.fill").foregroundStyle(Color.brandAmber)
+            }
+        case .outdated:
+            Label { t("This Wi-Fi's proxy points to an old address. Paste the URL below again.") } icon: {
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Color.brandAmber)
+            }
+        case .leftOn:
+            Label {
+                t("This Wi-Fi still points to the bridge's proxy, which is off, so this iPhone has no internet on it. Set Settings › Wi-Fi › ⓘ › Configure Proxy back to Off, or turn sharing on.")
+            } icon: {
+                Image(systemName: "wifi.exclamationmark").foregroundStyle(.red)
+            }
+        case .none:
+            EmptyView()
+        }
+    }
 
     var body: some View {
         List {
+            if proxy != .none {
+                Section { proxyRow }
+            }
             Section {
                 Toggle(isOn: Binding(get: { info?.on == true }, set: { turn($0) })) {
                     Label { t("Use the bridge phone's internet") } icon: { Image(systemName: "network") }
@@ -68,7 +138,7 @@ struct NetShareView: View {
                     } header: {
                         t("Apps with SOCKS5 proxy settings")
                     } footer: {
-                        t("These change every time you turn sharing on.")
+                        t("These stay the same until internet sharing is switched off in Pairline Bridge.")
                     }
                 }
             }
@@ -79,8 +149,10 @@ struct NetShareView: View {
         }
         .navigationTitle(t("Internet sharing"))
         .navigationBarTitleDisplayMode(.inline)
-        .onReceive(bridge.$netShare) { info = $0 }
-        .onAppear { info = bridge.netShare }
+        .onReceive(bridge.$netShare) { info = $0; readProxy() }
+        .onAppear { info = bridge.netShare; readProxy() }
+        // Back from Settings › Wi-Fi: check the proxy again.
+        .onValueChange(scenePhase) { if $0 == .active { readProxy() } }
     }
 
     private func copyRow(_ value: String, label: String) -> some View {

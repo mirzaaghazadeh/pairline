@@ -167,7 +167,7 @@ struct HelpArticleView: View {
             HelpCard(symbol: "speaker.wave.2", title: Text("Where the audio is", tableName: "CallAudio"),
                      text: Text("Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker.", tableName: "CallAudio"))
             HelpCard(symbol: "arrow.clockwise", title: Text("After the Android phone restarts", tableName: "CallAudio"),
-                     text: Text("Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Calls keep ringing here meanwhile.", tableName: "CallAudio"))
+                     text: Text("Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Calls keep ringing here meanwhile.", tableName: "CallAudio"))
             HelpCard(symbol: "phone.arrow.up.right", title: Text("Making calls"),
                      text: Text("Call from the keypad, contacts or recents. Choose the SIM on dual-SIM phones."))
             HelpCard(symbol: "clock.arrow.circlepath", title: Text("iPhone Recents"),
@@ -235,7 +235,7 @@ struct FAQ: Identifiable {
             answer: "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone.",
             table: "CallAudio"),
         FAQ(id: 9, question: "Why does call audio go back to the Android phone sometimes?",
-            answer: "Android turns Wireless debugging off every time the Android phone restarts. The bridge app then shows a notification; tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Some phones also only allow listening: then you hear calls here and talk on the Android phone.",
+            answer: "Android turns Wireless debugging off every time the Android phone restarts or leaves Wi-Fi. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Some phones also only allow listening: then you hear calls here and talk on the Android phone.",
             table: "CallAudio"),
         FAQ(id: 10, question: "Can this iPhone use the Android phone's internet?",
             answer: "Yes. Turn on Internet sharing in the bridge app, then use Settings › Internet sharing here: it gives a link for your Wi-Fi proxy settings and a one-tap Telegram setting. Traffic goes through the Android phone and its VPN, if one is on.",

@@ -1,6 +1,14 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "The Android phone didn't place the call." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يُجرِ هاتف أندرويد المكالمة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone didn't place the call." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی تماس را برقرار نکرد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon aramayı başlatmadı." } }
+      }
+    },
     "Incoming call" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "مكالمة واردة" } },
@@ -97,12 +105,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra" } }
       }
     },
-    "After the Android phone restarts, turn on Wireless debugging on it again: the bridge app then starts its helper by itself and reminds you with a notification. Until then calls ring here and the audio stays on the Android phone." : {
+    "After the Android phone restarts, the bridge app turns Wireless debugging back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Until then calls ring here and the audio stays on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بعد إعادة تشغيل هاتف أندرويد، فعّل عليه «تصحيح الأخطاء اللاسلكي» من جديد: يشغّل تطبيق الهاتف الوسيط مساعده تلقائيًا ويذكّرك بإشعار. وحتى ذلك الحين ترنّ المكالمات هنا ويبقى الصوت على هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "After the Android phone restarts, turn on Wireless debugging on it again: the bridge app then starts its helper by itself and reminds you with a notification. Until then calls ring here and the audio stays on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعد از روشن‌شدن دوبارهٔ گوشی اندرویدی، «اشکال‌زدایی بی‌سیم» را روی آن دوباره روشن کنید: برنامهٔ پل دستیارش را خودش اجرا می‌کند و با یک اعلان یادآوری می‌کند. تا آن موقع تماس‌ها اینجا زنگ می‌خورند و صدا روی گوشی اندرویدی می‌ماند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra onda Kablosuz hata ayıklamayı yeniden açın: köprü uygulaması yardımcısını kendiliğinden başlatır ve bir bildirimle hatırlatır. O zamana kadar aramalar burada çalar, ses Android telefonda kalır." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بعد إعادة تشغيل هاتف أندرويد، يعيد تطبيق الهاتف الوسيط تفعيل «تصحيح الأخطاء اللاسلكي» تلقائيًا بمجرد اتصال ذلك الهاتف بالواي فاي، ويشغّل مساعده. وحتى ذلك الحين ترنّ المكالمات هنا ويبقى الصوت على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "After the Android phone restarts, the bridge app turns Wireless debugging back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Until then calls ring here and the audio stays on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعد از روشن‌شدن دوبارهٔ گوشی اندرویدی، برنامهٔ پل به‌محض اتصال آن گوشی به وای‌فای «اشکال‌زدایی بی‌سیم» را خودش دوباره روشن می‌کند و دستیارش را اجرا می‌کند. تا آن موقع تماس‌ها اینجا زنگ می‌خورند و صدا روی گوشی اندرویدی می‌ماند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra köprü uygulaması, o telefon Wi-Fi’ye bağlanır bağlanmaz Kablosuz hata ayıklamayı kendiliğinden yeniden açar ve yardımcısını başlatır. O zamana kadar aramalar burada çalar, ses Android telefonda kalır." } }
       }
     },
     "Android keeps call audio away from apps, so this needs Android 11 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone." : {
@@ -113,20 +121,20 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android arama sesini uygulamalardan uzak tutar; bu yüzden Android 11 veya üstü ve Android telefonda Kablosuz hata ayıklama gerekir (ek uygulama ve root gerekmez). Bazı telefonlar yalnızca dinlemeye izin verir; o zaman aramayı burada duyar, Android telefondan konuşursunuz." } }
       }
     },
-    "Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Calls keep ringing here meanwhile." : {
+    "Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Calls keep ringing here meanwhile." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد «تصحيح الأخطاء اللاسلكي» عند كل إعادة تشغيل، فيعود صوت المكالمات إلى هاتف أندرويد. يعرض تطبيق الهاتف الوسيط إشعارًا: اضغط عليه وفعّل «تصحيح الأخطاء اللاسلكي» من جديد، فيشغّل الهاتف الوسيط مساعده تلقائيًا. وفي الأثناء تظل المكالمات ترنّ هنا." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Calls keep ringing here meanwhile." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید با هر بار روشن‌شدن دوباره «اشکال‌زدایی بی‌سیم» را خاموش می‌کند، پس صدای تماس به گوشی اندرویدی برمی‌گردد. برنامهٔ پل یک اعلان نشان می‌دهد: روی آن بزنید و «اشکال‌زدایی بی‌سیم» را دوباره روشن کنید تا پل دستیارش را خودش اجرا کند. در این فاصله تماس‌ها اینجا زنگ می‌خورند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android her yeniden başlatmada Kablosuz hata ayıklamayı kapatır, bu yüzden arama sesi Android telefona döner. Köprü uygulaması bir bildirim gösterir: dokunup Kablosuz hata ayıklamayı yeniden açın; köprü yardımcısını kendiliğinden başlatır. Bu arada aramalar burada çalmaya devam eder." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد «تصحيح الأخطاء اللاسلكي» عند كل إعادة تشغيل، فيعود صوت المكالمات إلى هاتف أندرويد. يعيد تطبيق الهاتف الوسيط تفعيله تلقائيًا بمجرد اتصال ذلك الهاتف بالواي فاي، ويشغّل مساعده. وفي الأثناء تظل المكالمات ترنّ هنا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Calls keep ringing here meanwhile." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید با هر بار روشن‌شدن دوباره «اشکال‌زدایی بی‌سیم» را خاموش می‌کند، پس صدای تماس به گوشی اندرویدی برمی‌گردد. برنامهٔ پل به‌محض اتصال آن گوشی به وای‌فای، آن را خودش دوباره روشن می‌کند و دستیارش را اجرا می‌کند. در این فاصله تماس‌ها اینجا زنگ می‌خورند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android her yeniden başlatmada Kablosuz hata ayıklamayı kapatır, bu yüzden arama sesi Android telefona döner. Köprü uygulaması, o telefon Wi-Fi’ye bağlanır bağlanmaz onu kendiliğinden yeniden açar ve yardımcısını başlatır. Bu arada aramalar burada çalmaya devam eder." } }
       }
     },
-    "Android turns Wireless debugging off every time the Android phone restarts. The bridge app then shows a notification; tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Some phones also only allow listening: then you hear calls here and talk on the Android phone." : {
+    "Android turns Wireless debugging off every time the Android phone restarts or leaves Wi-Fi. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Some phones also only allow listening: then you hear calls here and talk on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد «تصحيح الأخطاء اللاسلكي» في كل مرة يُعاد فيها تشغيل هاتف أندرويد. عندها يعرض تطبيق الهاتف الوسيط إشعارًا؛ اضغط عليه وفعّل «تصحيح الأخطاء اللاسلكي» من جديد، فيشغّل الهاتف الوسيط مساعده تلقائيًا. كما أن بعض الهواتف تسمح بالاستماع فقط: عندها تسمع المكالمات هنا وتتحدث من هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android turns Wireless debugging off every time the Android phone restarts. The bridge app then shows a notification; tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Some phones also only allow listening: then you hear calls here and talk on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید هر بار که گوشی اندرویدی دوباره روشن می‌شود «اشکال‌زدایی بی‌سیم» را خاموش می‌کند. آن‌وقت برنامهٔ پل یک اعلان نشان می‌دهد؛ روی آن بزنید و «اشکال‌زدایی بی‌سیم» را دوباره روشن کنید تا پل دستیارش را خودش اجرا کند. بعضی گوشی‌ها هم فقط اجازهٔ شنیدن می‌دهند: آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android, Android telefon her yeniden başladığında Kablosuz hata ayıklamayı kapatır. Köprü uygulaması o zaman bir bildirim gösterir; dokunup Kablosuz hata ayıklamayı yeniden açın, köprü yardımcısını kendiliğinden başlatır. Bazı telefonlar ayrıca yalnızca dinlemeye izin verir: o zaman aramaları burada duyar, Android telefondan konuşursunuz." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد «تصحيح الأخطاء اللاسلكي» في كل مرة يُعاد فيها تشغيل هاتف أندرويد أو ينقطع عن الواي فاي. يعيد تطبيق الهاتف الوسيط تفعيله تلقائيًا بمجرد اتصال ذلك الهاتف بالواي فاي، ويشغّل مساعده. كما أن بعض الهواتف تسمح بالاستماع فقط: عندها تسمع المكالمات هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android turns Wireless debugging off every time the Android phone restarts or leaves Wi-Fi. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Some phones also only allow listening: then you hear calls here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید هر بار که گوشی اندرویدی دوباره روشن می‌شود یا از وای‌فای جدا می‌شود «اشکال‌زدایی بی‌سیم» را خاموش می‌کند. برنامهٔ پل به‌محض اتصال آن گوشی به وای‌فای، آن را خودش دوباره روشن می‌کند و دستیارش را اجرا می‌کند. بعضی گوشی‌ها هم فقط اجازهٔ شنیدن می‌دهند: آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android, Android telefon her yeniden başladığında veya Wi-Fi’den ayrıldığında Kablosuz hata ayıklamayı kapatır. Köprü uygulaması, o telefon Wi-Fi’ye bağlanır bağlanmaz onu kendiliğinden yeniden açar ve yardımcısını başlatır. Bazı telefonlar ayrıca yalnızca dinlemeye izin verir: o zaman aramaları burada duyar, Android telefondan konuşursunuz." } }
       }
     },
     "Answer here; talk here too with Talk on iPhone" : {

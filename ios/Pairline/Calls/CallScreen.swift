@@ -21,6 +21,11 @@ struct CallScreen: View {
         }
     }
 
+    /// The call's audio is on this iPhone's earpiece (not the speaker): the screen should turn off at the ear.
+    private var earpieceCall: Bool {
+        calls.audioOnIPhone && calls.current?.speaker != true
+    }
+
     private var audioSymbol: String {
         switch calls.audioRoute {
         case .iphone: return "iphone.gen3"
@@ -41,8 +46,17 @@ struct CallScreen: View {
             }
         }
         .preferredColorScheme(.dark)
-        .onAppear { calls.callScreenVisible = true }
-        .onDisappear { calls.callScreenVisible = false }
+        .onAppear {
+            calls.callScreenVisible = true
+            UIDevice.current.isProximityMonitoringEnabled = earpieceCall
+        }
+        .onDisappear {
+            calls.callScreenVisible = false
+            UIDevice.current.isProximityMonitoringEnabled = false
+        }
+        // Screen off at the ear, like a native call, while the audio is on this iPhone's earpiece. CallKit does this
+        // for its own screen only.
+        .onValueChange(earpieceCall) { UIDevice.current.isProximityMonitoringEnabled = $0 }
         .sheet(isPresented: $showAudioInfo) { CallAudioInfoSheet() }
         // Talk on iPhone is set up, but the phones aren't on the same Wi-Fi: say why the audio is on the other phone.
         .alert(Text("Why is the audio on the Android phone?", tableName: "CallAudio"), isPresented: $calls.wifiAlert) {

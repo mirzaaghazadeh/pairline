@@ -678,6 +678,7 @@ final class CallCenter: ObservableObject {
         guard let bridge else { return false }
         do {
             _ = try await bridge.link.request(.callDial(sim: call.sim, number: call.number))
+            watchDial(call.id)
             return true
         } catch {
             notice = error.localizedDescription
@@ -686,6 +687,21 @@ final class CallCenter: ObservableObject {
                 showCallScreen = false
             }
             return false
+        }
+    }
+
+    /// The bridge accepted the dial but never reported a call for it (Android dropped it): after 30 s, end it here
+    /// instead of showing "Calling…" with ringback for ever.
+    private func watchDial(_ id: UUID) {
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 30_000_000_000)
+            guard let self, let call = self.current, call.id == id, call.bridgeID == nil else { return }
+            log.warning("calls", "The bridge never reported the dialed call; ending it here")
+            if call.inCallKit { self.adapter?.reportEnded(id, reason: .failed) }
+            self.notice = String(localized: "The Android phone didn't place the call.", table: "CallAudio")
+            self.stopRelay(callEnded: true)
+            self.current = nil
+            self.showCallScreen = false
         }
     }
 

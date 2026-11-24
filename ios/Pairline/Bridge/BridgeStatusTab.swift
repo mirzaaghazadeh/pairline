@@ -17,6 +17,7 @@ struct BridgeStatusTab: View {
                             updateNotice
                         }
                         if wifiOnly { wifiOnlyNotice }
+                        if proxy == .leftOn || proxy == .outdated { proxyNotice }
                         batteryCard
                         simCards
                         capabilitiesCard
@@ -30,6 +31,9 @@ struct BridgeStatusTab: View {
             .background(Color(.systemGroupedBackground))
             .navigationTitle(Text("Bridge"))
             .refreshable { await bridge.refreshStatus() }
+            .onAppear(perform: readProxy)
+            .onReceive(bridge.$netShare) { _ in readProxy() }
+            .onValueChange(scenePhase) { if $0 == .active { readProxy() } }
         }
     }
 
@@ -112,6 +116,38 @@ struct BridgeStatusTab: View {
     /// only while Pairline is open or was just used (ARCHITECTURE.md, "The Wi-Fi link and iOS background").
     private var wifiOnly: Bool {
         bridge.phase.isConnected && !bridge.isDemo && !DebugSettings.marketingScreenshots && shownTransports == [.wifi]
+    }
+
+    /// The current Wi-Fi's proxy points at the bridge's internet sharing, but sharing is off (no internet at all on that
+    /// network) or the address changed. Checked when the tab appears and when Pairline comes back to the front.
+    @State private var proxy: WiFiProxyStatus = .none
+    @Environment(\.scenePhase) private var scenePhase
+
+    private func readProxy() {
+        let share = bridge.netShare
+        proxy = WiFiProxyStatus.current(sharingPAC: share?.on == true ? share?.pac : nil)
+    }
+
+    private var proxyNotice: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "wifi.exclamationmark")
+                .font(.title2)
+                .foregroundStyle(.red)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("No internet on this Wi-Fi?", tableName: "NetShare").font(.headline)
+                (proxy == .leftOn
+                    ? Text("This Wi-Fi still points to the bridge's proxy, which is off, so this iPhone has no internet on it. Set Settings › Wi-Fi › ⓘ › Configure Proxy back to Off, or turn sharing on.", tableName: "NetShare")
+                    : Text("This Wi-Fi's proxy points to an old address. Paste the URL below again.", tableName: "NetShare"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                NavigationLink {
+                    NetShareView()
+                } label: {
+                    Text("Internet sharing", tableName: "NetShare").font(.subheadline.weight(.semibold))
+                }
+            }
+        }
+        .card()
     }
 
     private var wifiOnlyNotice: some View {

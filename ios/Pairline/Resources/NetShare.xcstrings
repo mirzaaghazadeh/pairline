@@ -105,12 +105,52 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonun VPN’i açık." } }
       }
     },
-    "These change every time you turn sharing on." : {
+    "These stay the same until internet sharing is switched off in Pairline Bridge." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تتغير هذه في كل مرة تفعّل فيها المشاركة." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "These change every time you turn sharing on." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این‌ها هر بار که اشتراک را روشن می‌کنید عوض می‌شوند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bunlar paylaşımı her açtığınızda değişir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تبقى هذه كما هي إلى أن تُوقف مشاركة الإنترنت في Pairline Bridge." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "These stay the same until internet sharing is switched off in Pairline Bridge." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این‌ها تا وقتی اشتراک اینترنت در Pairline Bridge خاموش نشده، همین می‌مانند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bunlar, Pairline Bridge’de internet paylaşımı kapatılana kadar aynı kalır." } }
+      }
+    },
+    "No internet on this Wi-Fi?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يوجد إنترنت على هذه الشبكة؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No internet on this Wi-Fi?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی این وای‌فای اینترنت ندارید؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu Wi-Fi’de internet yok mu?" } }
+      }
+    },
+    "This Wi-Fi uses the bridge phone's internet." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تستخدم شبكة الواي فاي هذه إنترنت الهاتف الوسيط." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This Wi-Fi uses the bridge phone's internet." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این وای‌فای از اینترنت گوشی پل استفاده می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu Wi-Fi, köprü telefonun internetini kullanıyor." } }
+      }
+    },
+    "This Wi-Fi isn't set up yet: paste the URL below in its proxy settings." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم تُعَدّ شبكة الواي فاي هذه بعد: الصق الرابط أدناه في إعدادات الوكيل الخاصة بها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This Wi-Fi isn't set up yet: paste the URL below in its proxy settings." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این وای‌فای هنوز تنظیم نشده: نشانی زیر را در تنظیمات پراکسی آن بچسبانید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu Wi-Fi henüz ayarlanmadı: aşağıdaki adresi proxy ayarlarına yapıştırın." } }
+      }
+    },
+    "This Wi-Fi's proxy points to an old address. Paste the URL below again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يشير وكيل شبكة الواي فاي هذه إلى عنوان قديم. الصق الرابط أدناه من جديد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This Wi-Fi's proxy points to an old address. Paste the URL below again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پراکسی این وای‌فای به نشانی قدیمی اشاره می‌کند. نشانی زیر را دوباره بچسبانید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu Wi-Fi’nin proxy’si eski bir adresi gösteriyor. Aşağıdaki adresi yeniden yapıştırın." } }
+      }
+    },
+    "This Wi-Fi still points to the bridge's proxy, which is off, so this iPhone has no internet on it. Set Settings › Wi-Fi › ⓘ › Configure Proxy back to Off, or turn sharing on." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ما زالت شبكة الواي فاي هذه تشير إلى وكيل الهاتف الوسيط، وهو متوقف، لذا لا يوجد إنترنت على هذا الآيفون عبرها. أعد «الإعدادات › Wi-Fi › ⓘ › تكوين الوكيل» إلى «إيقاف»، أو فعّل المشاركة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This Wi-Fi still points to the bridge's proxy, which is off, so this iPhone has no internet on it. Set Settings › Wi-Fi › ⓘ › Configure Proxy back to Off, or turn sharing on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این وای‌فای هنوز به پراکسی گوشی پل اشاره می‌کند که خاموش است، برای همین این آیفون روی آن اینترنت ندارد. «تنظیمات › Wi-Fi › ⓘ › پیکربندی پراکسی» را به «خاموش» برگردانید، یا اشتراک را روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu Wi-Fi hâlâ köprünün kapalı olan proxy’sini gösteriyor, bu yüzden bu iPhone’da internet yok. Ayarlar › Wi-Fi › ⓘ › Proxy’yi Yapılandır’ı Kapalı’ya geri alın veya paylaşımı açın." } }
       }
     },
     "Traffic you send through it goes out through the Android phone's connection, and through its VPN if one is on. Both phones need the same Wi-Fi, or this iPhone joined to the Android phone's hotspot." : {

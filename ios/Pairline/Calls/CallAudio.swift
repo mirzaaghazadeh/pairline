@@ -46,7 +46,8 @@ enum AudioPackets {
 }
 
 /// Evens out network jitter exactly like the bridge's: holds 60 ms before playing, plays in sequence order, covers a
-/// lost frame by repeating the previous one at half volume (twice at most), then silence. Thread-safe.
+/// lost frame by repeating the previous one at half volume (twice at most), then silence. Extra delay (a burst after a
+/// Wi-Fi stall) drains by skipping quiet frames only, so speech is never cut; only past 1 s does it jump. Thread-safe.
 final class JitterBuffer: @unchecked Sendable {
     private let target: Int
     private let capacity: Int
@@ -56,10 +57,24 @@ final class JitterBuffer: @unchecked Sendable {
     private var buffering = true
     private var last: [Int16]?
     private var misses = 0
+    private var skippedFrames = 0
 
-    init(target: Int = 3, capacity: Int = 12) {
+    /// Frames above the target before quiet frames are skipped, and the level (RMS) below which a frame is quiet.
+    static let drainAbove = 4
+    static let quietRMS = 160.0
+
+    /// Quiet frames skipped to bring the delay back down.
+    var skipped: Int { lock.withLock { skippedFrames } }
+
+    init(target: Int = 3, capacity: Int = 50) {
         self.target = target
         self.capacity = capacity
+    }
+
+    static func rms(_ frame: [Int16]) -> Double {
+        guard !frame.isEmpty else { return 0 }
+        let sum = frame.reduce(0.0) { $0 + Double($1) * Double($1) }
+        return (sum / Double(frame.count)).squareRoot()
     }
 
     /// Signed distance a − b on the 16-bit sequence circle.
@@ -88,7 +103,13 @@ final class JitterBuffer: @unchecked Sendable {
     /// The next 20 ms to play, or nil while buffering (play silence). Call once per frame period.
     func take() -> [Int16]? {
         lock.withLock {
-            guard !buffering, let expected = next else { return nil }
+            guard !buffering, var expected = next else { return nil }
+            // Too much waiting: skip one quiet frame per period until back near the target (never speech).
+            if frames.count > target + Self.drainAbove, let waiting = frames[expected], Self.rms(waiting) <= Self.quietRMS {
+                frames[expected] = nil
+                expected = expected &+ 1
+                skippedFrames += 1
+            }
             next = expected &+ 1
             if let frame = frames.removeValue(forKey: expected) {
                 last = frame
@@ -220,7 +241,7 @@ final class CallAudioEngine {
         sourceNode = nil
         if voiceProcessing { try? engine.inputNode.setVoiceProcessingEnabled(false) }
         let sent = state.withLock { $0.sent }
-        log.info("audio", "Call audio stopped: sent \(sent) frames")
+        log.info("audio", "Call audio stopped: sent \(sent) frames, quiet frames skipped \(jitter.skipped)")
     }
 
     /// Routes the call to the loudspeaker or back to the receiver.
