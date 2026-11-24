@@ -6,7 +6,7 @@ HOW TO REVIEW WITHOUT AN ANDROID PHONE
 3. Tap "Try it" in the demo banner to receive a sample one-time code, a message or an incoming call.
 
 IN-APP PURCHASES (both non-consumable)
-- "3-day Trial" (free): starts a 3-day trial of all features.
+- "7-day Trial" (free): starts a 7-day trial of all features. It needs no payment method.
 - "Pairline Full Access": unlocks Pairline permanently with one payment.
 Restore Purchases is on the start screen, on the paywall and in Settings. Nothing renews or is charged automatically.
 

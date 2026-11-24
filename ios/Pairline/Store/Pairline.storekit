@@ -20,18 +20,18 @@
       "internalID" : "6739000001",
       "localizations" : [
         {
-          "description" : "Use every Pairline feature free for 3 days.",
-          "displayName" : "3-day Trial",
+          "description" : "Use every Pairline feature free for 7 days.",
+          "displayName" : "7-day Trial",
           "locale" : "en_US"
         }
       ],
-      "productID" : "app.pairline.ios.trial3day",
-      "referenceName" : "3-day Trial",
+      "productID" : "app.pairline.ios.trial7day",
+      "referenceName" : "7-day Trial",
       "type" : "NonConsumable"
     },
     {
-      "displayPrice" : "11.99",
-      "familyShareable" : true,
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
       "internalID" : "6739000002",
       "localizations" : [
         {

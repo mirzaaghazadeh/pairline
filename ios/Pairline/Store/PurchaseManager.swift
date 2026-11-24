@@ -1,13 +1,13 @@
 import Foundation
 import StoreKit
 
-/// StoreKit 2 purchases (D-017). Two non-consumables: a free "3-day Trial" and "Pairline Full Access".
+/// StoreKit 2 purchases (D-017, D-036). Two non-consumables: a free "7-day Trial" and "Pairline Full Access".
 /// Entitlements are verified on the device from Apple-signed transactions; there's no receipt server.
 @MainActor
 final class PurchaseManager: ObservableObject {
-    static let trialID = "app.pairline.ios.trial3day"
+    static let trialID = "app.pairline.ios.trial7day"
     static let fullID = "app.pairline.ios.full"
-    static let fallbackPrice = "$11.99"
+    static let fallbackPrice = "$9.99"
 
     @Published private(set) var access: AccessState = .loading
     @Published private(set) var fullProduct: Product?
@@ -49,7 +49,13 @@ final class PurchaseManager: ObservableObject {
         }
     }
 
-    var priceText: String { fullProduct?.displayPrice ?? Self.fallbackPrice }
+    var priceText: String {
+        #if DEBUG
+        // Store screenshots show the list price, not whatever the App Store sandbox still has cached.
+        if DebugSettings.marketingScreenshots { return Self.fallbackPrice }
+        #endif
+        return fullProduct?.displayPrice ?? Self.fallbackPrice
+    }
 
     func loadProducts() async {
         do {

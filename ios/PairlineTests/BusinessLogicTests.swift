@@ -26,14 +26,14 @@ final class TrialPolicyTests: XCTestCase {
 
     func testTurningTheClockBackDoesNotExtendTheTrial() {
         let store = MemoryTimeStore()
-        // Day 4: the trial has ended, and the app saw that time.
-        let day4 = start.addingTimeInterval(4 * 86400)
-        let seen = TrialPolicy.trustedNow(deviceNow: day4, highWater: store.highWater, signedDates: [start])
+        // Day 8: the trial has ended, and the app saw that time.
+        let day8 = start.addingTimeInterval(8 * 86400)
+        let seen = TrialPolicy.trustedNow(deviceNow: day8, highWater: store.highWater, signedDates: [start])
         store.save(seen)
         // The user sets the clock back to day 1.
         let rewound = start.addingTimeInterval(86400)
         let now = TrialPolicy.trustedNow(deviceNow: rewound, highWater: store.highWater, signedDates: [start])
-        XCTAssertEqual(now, day4)
+        XCTAssertEqual(now, day8)
         XCTAssertEqual(TrialPolicy.state(purchased: false, trialStart: start, now: now),
                        .expired(endedAt: start.addingTimeInterval(TrialPolicy.duration)))
     }
@@ -53,7 +53,7 @@ final class TrialPolicyTests: XCTestCase {
 
     func testRemainingAndReminder() {
         let end = start.addingTimeInterval(TrialPolicy.duration)
-        XCTAssertEqual(TrialPolicy.remaining(until: end, now: start).days, 3)
+        XCTAssertEqual(TrialPolicy.remaining(until: end, now: start).days, 7)
         let left = TrialPolicy.remaining(until: end, now: end.addingTimeInterval(-(26 * 3600 + 60)))
         XCTAssertEqual(left.days, 1)
         XCTAssertEqual(left.hours, 3)

@@ -12,18 +12,19 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 REVIEW_SHOT = f"{REPO}/docs/screenshots/ios/en/03-paywall.png"
 PRODUCTS = [
     {
-        "productId": "app.pairline.ios.trial3day", "name": "3-day Trial", "price": "0.0",
+        "productId": "app.pairline.ios.trial7day", "name": "7-day Trial", "price": "0.0",
         "image": f"{REPO}/docs/app-store/out/iap/trial.png",
-        "reviewNote": "Free non-consumable that starts the 3-day trial (App Review Guideline 3.1.1). When the 3 days "
-                      "end, the app asks the user to buy Pairline Full Access. Nothing renews or is charged.",
+        "reviewNote": "Free non-consumable that starts the 7-day trial (App Review Guideline 3.1.1); it needs no "
+                      "payment method. When the 7 days end, the app asks the user to buy Pairline Full Access. "
+                      "Nothing renews or is charged.",
         "loc": {
-            "en-US": ("3-day Trial", "Try every Pairline feature free for 3 days."),
-            "ar-SA": ("تجربة لمدة 3 أيام", "جرّب كل ميزات Pairline مجانًا لمدة 3 أيام."),
-            "tr": ("3 Günlük Deneme", "Tüm özellikleri 3 gün ücretsiz deneyin."),
+            "en-US": ("7-day Trial", "Try every Pairline feature free for 7 days."),
+            "ar-SA": ("تجربة لمدة 7 أيام", "جرّب كل ميزات Pairline مجانًا لمدة 7 أيام."),
+            "tr": ("7 Günlük Deneme", "Tüm özellikleri 7 gün ücretsiz deneyin."),
         },
     },
     {
-        "productId": "app.pairline.ios.full", "name": "Pairline Full Access", "price": "11.99",
+        "productId": "app.pairline.ios.full", "name": "Pairline Full Access", "price": "9.99",
         "image": f"{REPO}/docs/app-store/out/iap/full.png",
         "reviewNote": "One-time purchase that unlocks Pairline permanently. Restore Purchases is on the start "
                       "screen, the paywall and in Settings.",
@@ -102,12 +103,15 @@ for p in PRODUCTS:
         ok(*request("POST", "/v1/inAppPurchaseLocalizations", body), f"localization {locale}")
         print("  localization", locale)
 
+    points = all_pages(f"/v2/inAppPurchases/{iap_id}/pricePoints?filter%5Bterritory%5D=USA&limit=200")
+    point = next(pp for pp in points if float(pp["attributes"]["customerPrice"]) == float(p["price"]))
     status, sched = request("GET", f"/v2/inAppPurchases/{iap_id}/iapPriceSchedule?include=manualPrices")
-    if status == 200 and sched.get("included"):
-        print("  price already set")
+    current = {(x.get("relationships", {}).get("inAppPurchasePricePoint", {}).get("data") or {}).get("id")
+               for x in (sched.get("included", []) if status == 200 else [])}
+    if point["id"] in current:
+        print("  price already", p["price"])
     else:
-        points = all_pages(f"/v2/inAppPurchases/{iap_id}/pricePoints?filter%5Bterritory%5D=USA&limit=200")
-        point = next(pp for pp in points if pp["attributes"]["customerPrice"] in (p["price"], p["price"].rstrip("0").rstrip(".") or "0"))
+        # Posting a schedule replaces the previous one (a price change takes effect right away).
         body = {"data": {"type": "inAppPurchasePriceSchedules",
                          "relationships": {"inAppPurchase": {"data": {"type": "inAppPurchases", "id": iap_id}},
                                            "baseTerritory": {"data": {"type": "territories", "id": "USA"}},

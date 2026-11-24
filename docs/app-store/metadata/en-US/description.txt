@@ -27,6 +27,6 @@ HOW IT WORKS
 3. Keep the two phones within Bluetooth range
 
 PRICE
-Try every feature free for 3 days, then buy Pairline once to keep using it. There's no subscription, and nothing is charged automatically. Messages you've already synced stay readable either way.
+Try every feature free for a week, then buy Pairline once to keep using it. There's no subscription, and nothing is charged automatically. Messages you've already synced stay readable either way.
 
 Demo mode is always free: it shows the whole app with sample data, no Android phone needed.

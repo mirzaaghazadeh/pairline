@@ -433,24 +433,24 @@
         }
       }
     },
-    "After 3 days, sending messages, calls, syncing and USSD stop until you buy Pairline once. Messages already on this iPhone stay readable, and demo mode, help and settings keep working." : {
+    "After 7 days, sending messages, calls, syncing and USSD stop until you buy Pairline once. Messages already on this iPhone stay readable, and demo mode, help and settings keep working." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "بعد ثلاثة أيام، يتوقف إرسال الرسائل والمكالمات والمزامنة ورموز USSD إلى أن تشتري Pairline مرة واحدة. تبقى الرسائل الموجودة على هذا الآيفون قابلة للقراءة، ويستمر عمل وضع العرض والمساعدة والإعدادات."
+            "value" : "بعد سبعة أيام، يتوقف إرسال الرسائل والمكالمات والمزامنة ورموز USSD إلى أن تشتري Pairline مرة واحدة. تبقى الرسائل الموجودة على هذا الآيفون قابلة للقراءة، ويستمر عمل وضع العرض والمساعدة والإعدادات."
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "پس از ۳ روز، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند تا زمانی که Pairline را یک بار بخرید. پیام‌هایی که از قبل روی این آیفون هستند قابل خواندن می‌مانند و حالت نمایشی، راهنما و تنظیمات همچنان کار می‌کنند."
+            "value" : "پس از ۷ روز، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند تا زمانی که Pairline را یک بار بخرید. پیام‌هایی که از قبل روی این آیفون هستند قابل خواندن می‌مانند و حالت نمایشی، راهنما و تنظیمات همچنان کار می‌کنند."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3 gün sonra, Pairline'ı bir kez satın alana kadar mesaj gönderme, aramalar, eşzamanlama ve USSD durur. Bu iPhone'daki mesajlar okunabilir kalır; demo modu, yardım ve ayarlar çalışmaya devam eder."
+            "value" : "7 gün sonra, Pairline'ı bir kez satın alana kadar mesaj gönderme, aramalar, eşzamanlama ve USSD durur. Bu iPhone'daki mesajlar okunabilir kalır; demo modu, yardım ve ayarlar çalışmaya devam eder."
           }
         }
       }
@@ -3538,24 +3538,24 @@
         }
       }
     },
-    "Free for 3 days, then %@ once to keep using Pairline. If you don't buy, sending messages, calls, syncing and USSD stop after the trial; your synced messages stay readable. Nothing is charged automatically." : {
+    "Free for 7 days, then %@ once to keep using Pairline. If you don't buy, sending messages, calls, syncing and USSD stop after the trial; your synced messages stay readable. Nothing is charged automatically." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "مجاني لمدة ثلاثة أيام، ثم %@ لمرة واحدة لتواصل استخدام Pairline. إن لم تشترِه، يتوقف إرسال الرسائل والمكالمات والمزامنة ورموز USSD بعد انتهاء الفترة التجريبية، وتبقى رسائلك المتزامنة قابلة للقراءة. لا يُخصم أي مبلغ تلقائيًا."
+            "value" : "مجاني لمدة سبعة أيام، ثم %@ لمرة واحدة لتواصل استخدام Pairline. إن لم تشترِه، يتوقف إرسال الرسائل والمكالمات والمزامنة ورموز USSD بعد انتهاء الفترة التجريبية، وتبقى رسائلك المتزامنة قابلة للقراءة. لا يُخصم أي مبلغ تلقائيًا."
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "۳ روز رایگان، سپس برای ادامه استفاده از Pairline یک بار %@ پرداخت کنید. اگر خرید نکنید، پس از پایان دوره آزمایشی، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند؛ پیام‌های همگام‌شده شما قابل خواندن می‌مانند. هیچ مبلغی به‌طور خودکار پرداخت نمی‌شود."
+            "value" : "۷ روز رایگان، سپس برای ادامه استفاده از Pairline یک بار %@ پرداخت کنید. اگر خرید نکنید، پس از پایان دوره آزمایشی، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند؛ پیام‌های همگام‌شده شما قابل خواندن می‌مانند. هیچ مبلغی به‌طور خودکار پرداخت نمی‌شود."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3 gün ücretsiz, ardından Pairline'ı kullanmaya devam etmek için tek seferlik %@. Satın almazsanız deneme süresinden sonra mesaj gönderme, aramalar, eşzamanlama ve USSD durur; eşzamanlanan mesajlarınız okunabilir kalır. Otomatik olarak hiçbir ücret alınmaz."
+            "value" : "7 gün ücretsiz, ardından Pairline'ı kullanmaya devam etmek için tek seferlik %@. Satın almazsanız deneme süresinden sonra mesaj gönderme, aramalar, eşzamanlama ve USSD durur; eşzamanlanan mesajlarınız okunabilir kalır. Otomatik olarak hiçbir ücret alınmaz."
           }
         }
       }
@@ -8282,46 +8282,46 @@
         }
       }
     },
-    "Start 3-day free trial" : {
+    "Start 7-day free trial" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ابدأ الفترة التجريبية المجانية لثلاثة أيام"
+            "value" : "ابدأ الفترة التجريبية المجانية لسبعة أيام"
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "شروع دوره آزمایشی رایگان ۳ روزه"
+            "value" : "شروع دوره آزمایشی رایگان ۷ روزه"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3 günlük ücretsiz denemeyi başlat"
+            "value" : "7 günlük ücretsiz denemeyi başlat"
           }
         }
       }
     },
-    "Start your 3 free days to connect." : {
+    "Start your free week to connect." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ابدأ أيامك الثلاثة المجانية للاتصال."
+            "value" : "ابدأ أسبوعك المجاني للاتصال."
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "برای اتصال، ۳ روز رایگان خود را شروع کنید."
+            "value" : "برای اتصال، هفتهٔ رایگان خود را شروع کنید."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bağlanmak için 3 günlük ücretsiz denemenizi başlatın."
+            "value" : "Bağlanmak için ücretsiz haftanızı başlatın."
           }
         }
       }
@@ -8729,24 +8729,24 @@
         }
       }
     },
-    "The 3-day trial is free. When it ends, sending messages, calls, syncing and USSD stop until you buy Pairline for %@ once. Messages already synced stay readable. Nothing is charged automatically." : {
+    "The 7-day trial is free. When it ends, sending messages, calls, syncing and USSD stop until you buy Pairline for %@ once. Messages already synced stay readable. Nothing is charged automatically." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الفترة التجريبية لمدة ثلاثة أيام مجانية. عند انتهائها، يتوقف إرسال الرسائل والمكالمات والمزامنة ورموز USSD إلى أن تشتري Pairline مرة واحدة مقابل %@. تبقى الرسائل التي تمت مزامنتها قابلة للقراءة. لا يُخصم أي مبلغ تلقائيًا."
+            "value" : "الفترة التجريبية لمدة سبعة أيام مجانية. عند انتهائها، يتوقف إرسال الرسائل والمكالمات والمزامنة ورموز USSD إلى أن تشتري Pairline مرة واحدة مقابل %@. تبقى الرسائل التي تمت مزامنتها قابلة للقراءة. لا يُخصم أي مبلغ تلقائيًا."
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "دوره آزمایشی ۳ روزه رایگان است. پس از پایان آن، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند تا زمانی که Pairline را یک بار با قیمت %@ بخرید. پیام‌هایی که از قبل همگام شده‌اند قابل خواندن می‌مانند. هیچ مبلغی به‌طور خودکار پرداخت نمی‌شود."
+            "value" : "دوره آزمایشی ۷ روزه رایگان است. پس از پایان آن، ارسال پیام، تماس، همگام‌سازی و کدهای USSD متوقف می‌شوند تا زمانی که Pairline را یک بار با قیمت %@ بخرید. پیام‌هایی که از قبل همگام شده‌اند قابل خواندن می‌مانند. هیچ مبلغی به‌طور خودکار پرداخت نمی‌شود."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3 günlük deneme ücretsizdir. Deneme bittiğinde, Pairline'ı %@ karşılığında bir kez satın alana kadar mesaj gönderme, aramalar, eşzamanlama ve USSD durur. Önceden eşzamanlanmış mesajlar okunabilir kalır. Otomatik olarak hiçbir ücret alınmaz."
+            "value" : "7 günlük deneme ücretsizdir. Deneme bittiğinde, Pairline'ı %@ karşılığında bir kez satın alana kadar mesaj gönderme, aramalar, eşzamanlama ve USSD durur. Önceden eşzamanlanmış mesajlar okunabilir kalır. Otomatik olarak hiçbir ücret alınmaz."
           }
         }
       }
@@ -9720,24 +9720,24 @@
         }
       }
     },
-    "Try free for 3 days" : {
+    "Try free for 7 days" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "جرّبه مجانًا لثلاثة أيام"
+            "value" : "جرّبه مجانًا لسبعة أيام"
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "۳ روز رایگان امتحان کنید"
+            "value" : "۷ روز رایگان امتحان کنید"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3 gün ücretsiz deneyin"
+            "value" : "7 gün ücretsiz deneyin"
           }
         }
       }

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Access to link features under D-017: 3 free days from the trial's Apple-signed purchase date, then a
+/// Access to link features under D-017 and D-036: 7 free days from the trial's Apple-signed purchase date, then a
 /// one-time purchase.
 enum AccessState: Equatable {
     case loading
@@ -25,7 +25,8 @@ enum AccessState: Equatable {
 }
 
 enum TrialPolicy {
-    static let duration: TimeInterval = 3 * 24 * 3600
+    /// A free week (D-036).
+    static let duration: TimeInterval = 7 * 24 * 3600
     /// The reminder goes out about a day before the trial ends.
     static let reminderLead: TimeInterval = 24 * 3600
 

@@ -39,8 +39,8 @@ final class StoreKitTests: XCTestCase {
         XCTAssertEqual(trial?.type, .nonConsumable)
         XCTAssertEqual(trial?.price, 0)
         XCTAssertEqual(full?.type, .nonConsumable)
-        XCTAssertEqual(full?.price, Decimal(string: "11.99"))
-        XCTAssertEqual(trial?.displayName, "3-day Trial")
+        XCTAssertEqual(full?.price, Decimal(string: "9.99"))
+        XCTAssertEqual(trial?.displayName, "7-day Trial")
     }
 
     func testTrialThenExpiryThenPurchase() async throws {
@@ -55,8 +55,8 @@ final class StoreKitTests: XCTestCase {
         XCTAssertEqual(end.timeIntervalSince(now), TrialPolicy.duration, accuracy: 120)
         XCTAssertTrue(manager.access.allowsLink)
 
-        // Four days later the link features lock.
-        now = now.addingTimeInterval(4 * 86400)
+        // Eight days later the link features lock.
+        now = now.addingTimeInterval(8 * 86400)
         manager.evaluate()
         guard case .expired = manager.access else { return XCTFail("expected expired, got \(manager.access)") }
         XCTAssertFalse(manager.access.allowsLink)

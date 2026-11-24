@@ -231,7 +231,7 @@ struct BridgeBanners: View {
                             .font(.subheadline.weight(.semibold))
                     }
                 case .notStarted where app.isPaired:
-                    InfoBanner(symbol: "gift.fill", tint: .brandBlue, text: Text("Start your 3 free days to connect.")) {
+                    InfoBanner(symbol: "gift.fill", tint: .brandBlue, text: Text("Start your free week to connect.")) {
                         Button("Start") { app.showPaywall = true }
                             .font(.subheadline.weight(.semibold))
                     }

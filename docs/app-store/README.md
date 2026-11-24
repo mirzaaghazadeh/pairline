@@ -47,8 +47,8 @@ account). "Pairline" alone is taken on the App Store, so the store name is "Pair
   (`asc review items add --item-type appAssetLibraryImages`). Apple's rules: no price, URL, copyright mark, awards
   or other platforms' logos.
 - **App icon:** comes from the build (`ios/Pairline/Resources/Assets.xcassets/AppIcon.appiconset`, no alpha channel).
-- **In-app purchases:** `app.pairline.ios.trial3day` "3-day Trial" (non-consumable, free) and `app.pairline.ios.full`
-  "Pairline Full Access" (non-consumable, $11.99). Each needs a review screenshot (use
+- **In-app purchases:** `app.pairline.ios.trial7day` "7-day Trial" (non-consumable, free) and `app.pairline.ios.full`
+  "Pairline Full Access" (non-consumable, $9.99) (D-036). Each needs a review screenshot (use
   `docs/screenshots/ios/en/03-paywall.png`); the promotional images are optional.
 - **App Privacy:** "Data Not Collected" (`docs/PRIVACY.md`: nothing leaves the user's two phones).
 - **Availability:** remove China mainland (CallKit, D-027).

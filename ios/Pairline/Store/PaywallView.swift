@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// One-time purchase with a free 3-day trial (D-017). Before the trial starts it states the duration, what stops
+/// One-time purchase with a free 7-day trial (D-017, D-036). Before the trial starts it states the duration, what stops
 /// working afterwards, and the price (App Review guideline 3.1.1).
 struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
@@ -114,7 +114,7 @@ struct PaywallView: View {
                         if await purchases.startTrial() { finish() }
                     }
                 } label: {
-                    busyLabel(Text("Start 3-day free trial"))
+                    busyLabel(Text("Start 7-day free trial"))
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(purchases.busy)
@@ -127,7 +127,7 @@ struct PaywallView: View {
                 }
                 .buttonStyle(SecondaryButtonStyle())
                 .disabled(purchases.busy)
-                Text("Free for 3 days, then \(purchases.priceText) once to keep using Pairline. If you don't buy, sending messages, calls, syncing and USSD stop after the trial; your synced messages stay readable. Nothing is charged automatically.")
+                Text("Free for 7 days, then \(purchases.priceText) once to keep using Pairline. If you don't buy, sending messages, calls, syncing and USSD stop after the trial; your synced messages stay readable. Nothing is charged automatically.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

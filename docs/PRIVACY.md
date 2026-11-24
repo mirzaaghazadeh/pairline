@@ -106,7 +106,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | Notifications | New SMS, one-time codes, bridge battery alerts and the trial reminder (all local; no push) | After pairing, or from Settings |
 | Background mode `bluetooth-central` | iOS wakes Pairline for Bluetooth events from the bridge phone | No prompt |
 | CallKit (no prompt) | Shows calls on the iPhone call screen. Calls are added to iPhone Recents only if you turn that on | — |
-| In-App Purchase (no prompt) | The free 3-day trial and the one-time purchase (D-017) | — |
+| In-App Purchase (no prompt) | The free 7-day trial and the one-time purchase (D-017, D-036) | — |
 | App Group `group.app.pairline.ios` (no prompt) | Shares the bridge status with Pairline's widget | — |
 | Local Network (M5) | The Wi-Fi link | Not yet requested |
 | Microphone (M6) | Call audio | Not yet requested |

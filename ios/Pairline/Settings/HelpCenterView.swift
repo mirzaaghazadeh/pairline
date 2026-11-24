@@ -227,7 +227,7 @@ struct FAQ: Identifiable {
         FAQ(id: 4, question: "Can I talk on the iPhone during calls?",
             answer: "Not yet. You answer, decline and place calls from the iPhone, and the audio stays on the Android phone. iPhone call audio is planned."),
         FAQ(id: 5, question: "What happens after the free trial?",
-            answer: "After 3 days, sending messages, calls, syncing and USSD stop until you buy Pairline once. Messages already on this iPhone stay readable, and demo mode, help and settings keep working."),
+            answer: "After 7 days, sending messages, calls, syncing and USSD stop until you buy Pairline once. Messages already on this iPhone stay readable, and demo mode, help and settings keep working."),
         FAQ(id: 6, question: "Is it a subscription?",
             answer: "No. Pairline is a one-time purchase. The Android app is free."),
         FAQ(id: 7, question: "Can I see the source code?",

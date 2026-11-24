@@ -229,7 +229,7 @@ private struct ChoicePage: View {
                         onPair()
                     }
                 default:
-                    OptionCard(symbol: "gift.fill", tint: .brandFill, title: Text("Try free for 3 days"),
+                    OptionCard(symbol: "gift.fill", tint: .brandFill, title: Text("Try free for 7 days"),
                                text: Text("Everything works. Then \(purchases.priceText) once to keep it, or it stops connecting.")) {
                         Task {
                             if await purchases.startTrial() { onPair() }
@@ -249,7 +249,7 @@ private struct ChoicePage: View {
                 if purchases.busy {
                     ProgressView().padding(.top, 4)
                 }
-                Text("The 3-day trial is free. When it ends, sending messages, calls, syncing and USSD stop until you buy Pairline for \(purchases.priceText) once. Messages already synced stay readable. Nothing is charged automatically.")
+                Text("The 7-day trial is free. When it ends, sending messages, calls, syncing and USSD stop until you buy Pairline for \(purchases.priceText) once. Messages already synced stay readable. Nothing is charged automatically.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

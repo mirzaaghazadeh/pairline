@@ -57,7 +57,7 @@ one, stop and ask the maintainer instead of working around it.
 - The Android app is free: no license checks, paywalls, accounts or purchase code.
 - All payments happen in the iOS app via **StoreKit 2**. Entitlements are verified on the device
   from Apple-signed transactions; there is no receipt server.
-- iOS pricing: 3 free days through a free "3-day Trial" item, then a one-time $11.99 purchase (D-017).
+- iOS pricing: 7 free days through a free "7-day Trial" item, then a one-time $9.99 purchase (D-017, D-036).
   Demo mode is always free (D-020).
 
 ## Tech stack
