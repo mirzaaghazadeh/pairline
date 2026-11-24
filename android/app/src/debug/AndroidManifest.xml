@@ -6,6 +6,11 @@
     <!-- The debug TCP transport listens on 127.0.0.1:47800 for the emulator and the iOS Simulator. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Emulator only: `adb emu redir` reaches the Wi-Fi link through the emulator's mobile-data interface, which
+         Android keeps as a background network. Binding the media (UDP) socket to it, so replies take the same way
+         back, needs this permission. Release builds never use mobile data for the link and don't declare it. -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
     <!-- Lets testers check the companion InCallService path on an emulator: Android 12+ binds companion
          call services only for apps holding this (signature|appop|role). Granted only by hand, with
          `adb shell appops set app.pairline.android.debug MANAGE_ONGOING_CALLS allow`. Whether release builds

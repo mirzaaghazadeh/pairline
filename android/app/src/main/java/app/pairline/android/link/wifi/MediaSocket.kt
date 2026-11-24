@@ -1,5 +1,6 @@
 package app.pairline.android.link.wifi
 
+import android.net.Network
 import app.pairline.android.link.MediaEndpoint
 import app.pairline.android.log.Log
 import app.pairline.android.protocol.MediaOpener
@@ -163,8 +164,20 @@ internal class MediaSocket private constructor(
             sealKey: ByteArray,
             openKey: ByteArray,
             label: String,
+            network: Network?,
         ): MediaSocket? {
             val socket = bind(local, preferredPort) ?: bind(local, 0) ?: return null
+            // Datagrams go out on the network the session arrived on. Without this, Android sends them on the default
+            // network (often mobile data when the Wi-Fi has no internet), and they never reach the iPhone. Accepted
+            // TCP sockets get this for free; UDP sockets don't. The hotspot has no Network object: its subnet is in
+            // Android's local-network routes, which unbound sockets already use.
+            if (network != null) {
+                try {
+                    network.bindSocket(socket)
+                } catch (e: IOException) {
+                    Log.w(TAG, "$label: couldn't bind the media socket to its network", e)
+                }
+            }
             return MediaSocket(socket, peer, sealKey, openKey, label).also { it.start() }
         }
 

@@ -39,6 +39,23 @@ connection. Options may appear anywhere on the line and are shared by all action
   all                             status, ping, threads, history, contacts, calllog, and send-sms
                                   if --to is given (never dials, runs USSD or unpairs)
 
+Wi-Fi link (M5; connect to the bridge's Wi-Fi port 47820 instead of the debug port):
+  media    [--packets N] [--media-port P]
+                                  open the UDP media channel (probes), send N test packets and a replay;
+                                  a debug bridge with media echo on sends them back (counts media.open,
+                                  media.echo for --expect)
+  send-file --file PATH           file.offer + BULK data + file.done (counts file.sent)
+  receive-file [--seconds S] [--save-dir DIR]
+                                  accept the bridge's next file.offer and save it (counts file.received)
+
+  Emulator setup for the Wi-Fi link (its NAT lands on the emulated mobile interface, which only a debug
+  build on an emulator accepts):
+      adb emu redir add tcp:47820:47820 && adb emu redir add udp:47820:47820
+      adb shell content query --uri content://app.pairline.android.debug.devtools/media-echo-on
+      fake_remote.py --port 47820 session media --expect media.echo
+      adb shell content query --uri 'content://app.pairline.android.debug.devtools/send-test-file?size=5000000'
+      fake_remote.py --port 47820 session receive-file --save-dir /tmp --expect file.received
+
 The bridge's pings are always answered with pong. --expect TYPE (repeatable) fails the run if no
 message of that type arrived from the bridge. The last line is always PASS or FAIL.
 
@@ -96,10 +113,15 @@ Msg = dict[str, Any]
 VERSION = 0
 ROLE_R, ROLE_B = 0x52, 0x42  # 'R', 'B'
 DIR_B_TO_R, DIR_R_TO_B = 1, 2
-CH_CONTROL = 0
+CH_CONTROL, CH_MEDIA, CH_BULK = 0, 1, 2
 FRAME_PAIR_HELLO, FRAME_PAIR_OK, FRAME_PAIR_FAIL, FRAME_HELLO, FRAME_RECORD = 0x01, 0x02, 0x03, 0x10, 0x20
+FRAME_BULK = 0x21  # M5: bulk-channel record, Wi-Fi only
 FRAME_NAMES = {FRAME_PAIR_HELLO: "PAIR_HELLO", FRAME_PAIR_OK: "PAIR_OK", FRAME_PAIR_FAIL: "PAIR_FAIL",
-               FRAME_HELLO: "HELLO", FRAME_RECORD: "RECORD"}
+               FRAME_HELLO: "HELLO", FRAME_RECORD: "RECORD", FRAME_BULK: "BULK"}
+WIFI_PORT = 47820          # the bridge's Wi-Fi TCP (and usually UDP media) port
+MEDIA_MAX_PLAINTEXT = 1200
+FILE_CHUNK = 49152
+FILE_MAX = 1 << 30
 MAX_FRAME = 65535
 HELLO_LEN = 99
 RECORD_OVERHEAD = 8 + 16  # counter + GCM tag
@@ -109,7 +131,7 @@ PAIR_LABEL = b"pairline-pair-v0"
 SESSION_INFO = b"pairline v0 session"
 DEFAULT_PORT = 47800
 DEVICE_INFO: Msg = {"t": "device.info", "name": "Fake iPhone", "platform": "ios", "os": "18.0",
-                    "app": "0.0.0-fake", "proto": 0}
+                    "app": "0.0.0-fake", "proto": 0, "caps": ["files"]}
 
 
 class LinkError(Exception):
@@ -501,6 +523,35 @@ def check_vectors(c: Checker, v: Msg) -> None:
          [x.hex() for x in ble_fragments(frame, f["ble_single_fragment_att_payload"])], f["ble_single_fragment"])
     c.eq("BLE reassembly", ble_reassemble([h(x) for x in f["ble_fragments"]]), frame)
     c.eq("TCP framing", tcp_encode(frame), h(f["tcp"]))
+
+    # M5: media replay window, bulk file data, the Wi-Fi pair link.
+    w, window = v["media_replay_window"], ReplayWindow(v["media_replay_window"]["size"])
+    for i, step in enumerate(w["steps"]):
+        wire = h(step["wire"])
+        counter = struct.unpack(">Q", wire[:8])[0]
+        accepted = None
+        if window.may_accept(counter):
+            try:
+                accepted = open_record(named[w["key"]], w["direction"], w["channel"], wire)[1]
+                window.mark(counter)
+            except InvalidTag:
+                pass
+        c.eq(f"media window step {i} (counter {counter})", accepted is not None, step["accept"])
+        if step["accept"]:
+            c.eq(f"media window step {i} plaintext", accepted, h(step["plaintext_hex"]))
+    b = v["bulk_file_data"]
+    plain = b"\x01" + struct.pack(">IQ", b["fid"], b["offset"]) + b["data_utf8"].encode()
+    c.eq("bulk file data plaintext", plain, h(b["plaintext"]))
+    bulk_record = next(r for r in v["records"] if r["key"] == "bulk_k_br")
+    c.eq("bulk frame", bytes([FRAME_BULK]) + h(bulk_record["wire"]), h(b["frame"]))
+    c.eq("bulk TCP framing", tcp_encode(h(b["frame"])), h(b["tcp"]))
+    p = v["pair_uri_wifi"]
+    q = urllib.parse.parse_qs(urllib.parse.urlsplit(p["uri"]).query)
+    c.eq("pair link ip", q["ip"][0].split(","), p["ip"])
+    c.eq("pair link port", int(q["port"][0]), p["port"])
+    c.eq("pair link ssid", b64u_decode(q["ssid"][0]).decode(), p["ssid"])
+    c.eq("pair link pw", b64u_decode(q["pw"][0]).decode(), p["pw"])
+    c.eq("pair link still parses", parse_pair_uri(p["uri"]).device_id, h(v["pairing"]["device_id"]))
     buf = bytearray(h(f["tcp"]))
     c.eq("TCP deframing", (tcp_decode(buf), bytes(buf)), (frame, b""))
 
@@ -694,6 +745,13 @@ class Session:
         self.k_rb, self.k_br = keys.k_rb, keys.k_br
         self.tx = 0  # next counter to send; 0 is the confirm
         self.rx_last = -1  # last accepted counter; nothing accepted yet
+        # Wi-Fi sessions (M5): media and bulk keys from this session's okm; (B→R, R→B).
+        self.media_keys = channel_keys(keys.okm, "media")
+        self.bulk_keys = channel_keys(keys.okm, "bulk")
+        self.bulk_tx = 0
+        self.bulk_rx_last = -1
+        self.bulk_handler: Callable[[bytes], None] | None = None
+        self.bulk_received = 0
         self.next_id = 1
         self.backlog: deque[Msg] = deque(maxlen=1000)  # received but not yet consumed by a waiter
         self.received: Counter[str] = Counter()
@@ -727,10 +785,35 @@ class Session:
         except LinkError:
             pass
 
+    def send_bulk(self, plaintext: bytes) -> None:
+        """One BULK record (Wi-Fi only), sealed with the bulk R→B key on channel 2."""
+        wire = seal(self.bulk_keys[1], DIR_R_TO_B, self.bulk_tx, CH_BULK, plaintext)
+        self.bulk_tx += 1
+        self.link.send_frame(FRAME_BULK, wire)
+
+    def on_bulk_frame(self, body: bytes) -> None:
+        if self.rx_last < 0:
+            raise LinkError("BULK frame before the handshake")
+        try:
+            counter, plaintext = open_record(self.bulk_keys[0], DIR_B_TO_R, CH_BULK, body)
+        except InvalidTag:
+            raise LinkError("a BULK record from the bridge doesn't decrypt") from None
+        if counter <= self.bulk_rx_last:
+            raise LinkError(f"bulk replay check failed: counter {counter} <= {self.bulk_rx_last}")
+        self.bulk_rx_last = counter
+        self.bulk_received += 1
+        if self.bulk_handler is not None:
+            self.bulk_handler(plaintext)
+
     def recv_record(self, timeout: float) -> tuple[int, bytes] | None:
-        got = self.link.recv_frame(timeout)
-        if got is None:
-            return None
+        deadline = time.monotonic() + timeout
+        while True:
+            got = self.link.recv_frame(max(0.0, deadline - time.monotonic()))
+            if got is None:
+                return None
+            if got[0] != FRAME_BULK:
+                break
+            self.on_bulk_frame(got[1])
         ftype, body = got
         if ftype != FRAME_RECORD:
             raise LinkError(f"unexpected {FRAME_NAMES[ftype]} frame during the session")
@@ -1092,6 +1175,197 @@ def act_unpair(s: Session, a: argparse.Namespace) -> None:
     s.out.note(f"unpaired; removed the pinned bridge from {s.state.path}")
 
 
+class ReplayWindow:
+    """The media channel's 64-record sliding replay window (PROTOCOL.md, "Records")."""
+
+    def __init__(self, size: int = 64) -> None:
+        self.size, self.top, self.mask = size, -1, 0
+
+    def may_accept(self, counter: int) -> bool:
+        if self.top < 0 or counter > self.top:
+            return True
+        offset = self.top - counter
+        return offset < self.size and not (self.mask >> offset) & 1
+
+    def mark(self, counter: int) -> None:
+        if self.top < 0:
+            self.top, self.mask = counter, 1
+        elif counter > self.top:
+            shift = counter - self.top
+            self.mask = ((self.mask << shift) | 1) & ((1 << self.size) - 1) if shift < self.size else 1
+            self.top = counter
+        else:
+            self.mask |= 1 << (self.top - counter)
+
+
+class MediaPath:
+    """R's side of the UDP media channel (PROTOCOL.md, "Media channel (UDP)"): one record per datagram."""
+
+    def __init__(self, host: str, port: int, keys: tuple[bytes, bytes]) -> None:
+        family = socket.AF_INET6 if ":" in host else socket.AF_INET
+        self.sock = socket.socket(family, socket.SOCK_DGRAM)
+        self.sock.connect((host, port))
+        self.k_br, self.k_rb = keys
+        self.tx = 0
+        self.window = ReplayWindow()
+        self.packets: list[bytes] = []  # non-empty plaintexts from the bridge, in arrival order
+        self.probes_back = 0
+        self.dropped = 0
+        self.sent_wires: list[bytes] = []
+
+    def send(self, plaintext: bytes) -> bytes:
+        assert len(plaintext) <= MEDIA_MAX_PLAINTEXT
+        wire = seal(self.k_rb, DIR_R_TO_B, self.tx, CH_MEDIA, plaintext)
+        self.tx += 1
+        self.sock.send(wire)
+        return wire
+
+    def poll(self, timeout: float) -> int:
+        """Reads datagrams for up to timeout seconds; returns how many authenticated."""
+        deadline = time.monotonic() + timeout
+        good = 0
+        while True:
+            remaining = deadline - time.monotonic()
+            self.sock.settimeout(max(remaining, 0.001))
+            try:
+                data = self.sock.recv(2048)
+            except (socket.timeout, BlockingIOError):
+                return good
+            except OSError:  # e.g. ICMP port unreachable before the bridge listens
+                if remaining <= 0:
+                    return good
+                continue
+            if not RECORD_OVERHEAD <= len(data) <= RECORD_OVERHEAD + MEDIA_MAX_PLAINTEXT:
+                self.dropped += 1
+                continue
+            counter = struct.unpack(">Q", data[:8])[0]
+            if not self.window.may_accept(counter):
+                self.dropped += 1
+                continue
+            try:
+                _, plaintext = open_record(self.k_br, DIR_B_TO_R, CH_MEDIA, data)
+            except InvalidTag:
+                self.dropped += 1
+                continue
+            self.window.mark(counter)
+            good += 1
+            if plaintext:
+                self.packets.append(plaintext)
+            else:
+                self.probes_back += 1
+            if remaining <= 0:
+                return good
+
+
+def act_media(s: Session, a: argparse.Namespace) -> None:
+    """Opens the UDP media channel of this Wi-Fi session and sends test packets (echoed by a debug bridge
+    with media echo on). Counts results as media.open / media.echo for --expect."""
+    m = s.poll_for(lambda m: m["t"] == "wifi.media", s.timeout)
+    if m is None:
+        raise LinkError("no wifi.media from the bridge: is this a Wi-Fi session (--port 47820)?")
+    port = a.media_port or m.get("port")
+    if not isinstance(port, int):
+        raise LinkError("the bridge has no media channel this session (wifi.media port is null)")
+    path = MediaPath(a.host, port, s.media_keys)
+    start = time.monotonic()
+    while not path.probes_back:
+        if time.monotonic() - start > s.timeout:
+            raise LinkError(f"no probe came back from UDP {a.host}:{port} within {s.timeout:g}s "
+                            "(for the emulator: adb emu redir add udp:47820:47820)")
+        path.send(b"")
+        path.poll(0.25)
+    s.out.note(f"media channel open after {(time.monotonic() - start) * 1000:.0f} ms (UDP port {port})")
+    s.received["media.open"] += 1
+    first = None
+    for i in range(a.packets):
+        wire = path.send(struct.pack(">I", i) + os.urandom(156))
+        first = first or wire
+        path.poll(0.02)  # 20 ms apart, like audio frames
+    path.sock.send(first)  # a replay: the bridge must drop it, so it must not come back
+    path.poll(1.5)
+    echoed = [p for p in path.packets if len(p) == 160]
+    seqs = [struct.unpack(">I", p[:4])[0] for p in echoed]
+    s.out.note(f"sent {a.packets} packets of 160 bytes and one replay; {len(echoed)} came back "
+               f"({len(set(seqs))} distinct, {path.probes_back} probe replies, {path.dropped} dropped here)")
+    if len(seqs) != len(set(seqs)):
+        raise LinkError("a packet came back twice: the bridge accepted a replayed datagram")
+    s.received["media.echo"] += len(echoed)
+    path.sock.close()
+
+
+def act_send_file(s: Session, a: argparse.Namespace) -> None:
+    """file.offer, then the data in BULK records, then waits for file.done (Wi-Fi sessions only)."""
+    path = Path(a.file).expanduser()
+    size = path.stat().st_size
+    fid = int.from_bytes(os.urandom(4), "big")
+    s.send({"t": "file.offer", "fid": fid, "name": path.name, "size": size, "type": "application/octet-stream"})
+    answer = s.wait_for(lambda m: m["t"] == "file.answer" and m.get("fid") == fid, "file.answer")
+    if not answer.get("accept"):
+        raise LinkError(f"the bridge declined the file: {answer.get('reason')}")
+    digest = hashlib.sha256()
+    start = time.monotonic()
+    offset = 0
+    with path.open("rb") as f:
+        while chunk := f.read(FILE_CHUNK):
+            s.send_bulk(b"\x01" + struct.pack(">IQ", fid, offset) + chunk)
+            digest.update(chunk)
+            offset += len(chunk)
+    done = s.wait_for(lambda m: m["t"] == "file.done" and m.get("fid") == fid, "file.done",
+                      timeout=max(s.timeout, 120))
+    seconds = time.monotonic() - start
+    if not done.get("ok"):
+        raise LinkError(f"the bridge reports the file failed: {done.get('reason')}")
+    s.out.note(f"sent {size} bytes in {seconds:.2f} s ({size / max(seconds, 1e-6) / 1e6:.1f} MB/s), "
+               f"sha256 {digest.hexdigest()}")
+    s.received["file.sent"] += 1
+
+
+def act_receive_file(s: Session, a: argparse.Namespace) -> None:
+    """Waits up to --seconds for a file.offer, accepts it, saves the data and answers file.done."""
+    offer = s.wait_for(lambda m: m["t"] == "file.offer", "file.offer", timeout=a.seconds)
+    fid, size = offer.get("fid"), offer.get("size")
+    name = re.sub(r"[/\\\x00-\x1f]", "_", str(offer.get("name") or "file")).lstrip(".") or "file"
+    if not isinstance(fid, int) or not isinstance(size, int) or not 0 <= size <= FILE_MAX:
+        s.send({"t": "file.answer", "fid": fid, "accept": False, "reason": "too_large"})
+        raise LinkError("bad file.offer")
+    save_dir = Path(a.save_dir or ".").expanduser()
+    save_dir.mkdir(parents=True, exist_ok=True)
+    dest = save_dir / name
+    digest = hashlib.sha256()
+    received = 0
+    out = (save_dir / (name + ".part")).open("wb")
+
+    def handler(plaintext: bytes) -> None:
+        nonlocal received
+        if not plaintext or plaintext[0] != 1:
+            return
+        got_fid, offset = struct.unpack(">IQ", plaintext[1:13])
+        if got_fid != fid:
+            return
+        if offset != received:
+            raise LinkError(f"file data out of order: offset {offset}, expected {received}")
+        data = plaintext[13:]
+        out.write(data)
+        digest.update(data)
+        received += len(data)
+
+    s.bulk_handler = handler
+    s.send({"t": "file.answer", "fid": fid, "accept": True, "reason": None})
+    start = time.monotonic()
+    deadline = start + max(a.seconds, 120)
+    while received < size:
+        if time.monotonic() > deadline:
+            raise LinkError(f"timed out with {received} of {size} bytes")
+        s.poll_for(lambda m: m["t"] == "file.cancel" and m.get("fid") == fid, 0.5)
+    out.close()
+    (save_dir / (name + ".part")).replace(dest)
+    s.bulk_handler = None
+    s.send({"t": "file.done", "fid": fid, "ok": True, "reason": None})
+    seconds = time.monotonic() - start
+    s.out.note(f"received {name!r}: {size} bytes in {seconds:.2f} s, sha256 {digest.hexdigest()}, saved to {dest}")
+    s.received["file.received"] += 1
+
+
 def act_all(s: Session, a: argparse.Namespace) -> None:
     for name in ("status", "ping", "threads", "history", "contacts", "calllog") + (("send-sms",) if a.to else ()):
         s.out.note(f"== {name}")
@@ -1105,10 +1379,11 @@ ACTIONS: dict[str, Callable[[Session, argparse.Namespace], None]] = {
     "end": simple_request("call.end", "call"), "dtmf": simple_request("call.dtmf", "call", "digit"),
     "audio": act_audio, "contacts": act_contacts, "calllog": act_calllog, "contacts-add": act_contacts_add,
     "ussd": act_ussd, "listen": act_listen, "unpair": act_unpair, "all": act_all,
+    "media": act_media, "send-file": act_send_file, "receive-file": act_receive_file,
 }
 REQUIRED = {"send-sms": ("to", "body"), "dial": ("number",), "answer": ("call",), "reject": ("call",),
             "end": ("call",), "dtmf": ("call", "digit"), "audio": ("call",), "contacts-add": ("name", "number"),
-            "ussd": ("code",)}
+            "ussd": ("code",), "send-file": ("file",)}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1173,6 +1448,12 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--auto-answer", action="store_true", help="listen: answer every call.incoming")
     g.add_argument("--auto-end", type=positive(float), metavar="S",
                    help="listen: end each call S seconds after it becomes active")
+    g.add_argument("--packets", type=positive(int), default=50, metavar="N",
+                   help="media: test packets to send, 20 ms apart (default 50)")
+    g.add_argument("--media-port", type=int, metavar="PORT",
+                   help="media: UDP port to use instead of the one in wifi.media (e.g. a redirected port)")
+    g.add_argument("--file", metavar="PATH", help="send-file: the file to send")
+    g.add_argument("--save-dir", metavar="DIR", help="receive-file: where to save (default: current directory)")
     return p
 
 

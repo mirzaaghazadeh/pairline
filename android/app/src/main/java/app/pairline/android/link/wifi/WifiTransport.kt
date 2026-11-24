@@ -369,9 +369,21 @@ class WifiTransport(
         override fun openMedia(sealKey: ByteArray, openKey: ByteArray): MediaEndpoint? {
             val local = socket.localAddress ?: return null
             val peer = socket.inetAddress ?: return null
-            return MediaSocket.open(local, peer, PREFERRED_PORT, sealKey, openKey, label)
-                ?: null.also { Log.w(TAG, "$label: no media socket") }
+            val media = MediaSocket.open(local, peer, PREFERRED_PORT, sealKey, openKey, label, networkOf(local))
+            if (media == null) Log.w(TAG, "$label: no media socket")
+            return media
         }
+    }
+
+    /** The network that owns [address] (a Wi-Fi network; none for the hotspot, which isn't a Network). */
+    private fun networkOf(address: InetAddress): Network? {
+        val cm = connectivity ?: return null
+        @Suppress("DEPRECATION")
+        for (network in cm.allNetworks) {
+            val lp = cm.getLinkProperties(network) ?: continue
+            if (lp.linkAddresses.any { it.address == address }) return network
+        }
+        return null
     }
 
     companion object {

@@ -18,6 +18,9 @@ import app.pairline.android.ui.ScreenshotMode
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/state
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/setup-done
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/screenshot-mode-on   # or -off
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/wifi              # Wi-Fi link state
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/media-echo-on     # or -off
+ *     adb shell content query --uri 'content://app.pairline.android.debug.devtools/send-test-file?size=5000000'
  *
  * Only the shell user (adb), root and the app itself may call it.
  */
@@ -55,6 +58,28 @@ class DevToolsProvider : ContentProvider() {
                 AppGraph.prefs.setupDone = true
                 Log.i("devtools", "setup marked done by adb")
                 addRow(arrayOf<Any>(true))
+            }
+            "wifi" -> MatrixCursor(arrayOf("wifi", "transports", "addresses", "port", "media_open", "hotspot")).apply {
+                // Debug builds only: local addresses help point fake_remote.py at a real phone on the same Wi-Fi.
+                val s = AppGraph.link.state.value
+                addRow(
+                    arrayOf<Any>(
+                        s.wifi.name,
+                        s.transports.joinToString("+") { it.name },
+                        s.wifiHint?.addresses?.joinToString(",") ?: "",
+                        s.wifiHint?.port ?: 0,
+                        s.mediaOpen,
+                        AppGraph.hotspot.state.value.toString(),
+                    ),
+                )
+            }
+            "media-echo-on", "media-echo-off" -> MatrixCursor(arrayOf("media_echo")).apply {
+                WifiDevTools.setEcho(uri.lastPathSegment == "media-echo-on")
+                addRow(arrayOf<Any>(WifiDevTools.echo))
+            }
+            "send-test-file" -> MatrixCursor(arrayOf("size", "sha256")).apply {
+                val size = uri.getQueryParameter("size")?.toLongOrNull()?.coerceIn(0, 1L shl 30) ?: 1_000_000
+                addRow(arrayOf<Any>(size, WifiDevTools.sendTestFile(context!!, size)))
             }
             "screenshot-mode-on", "screenshot-mode-off" -> MatrixCursor(arrayOf("screenshot_mode")).apply {
                 ScreenshotMode.enabled = uri.lastPathSegment == "screenshot-mode-on"

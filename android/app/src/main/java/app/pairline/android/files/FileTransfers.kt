@@ -98,13 +98,19 @@ class FileTransfers(private val context: Context, private val link: LinkManager)
                 runCatching { source.openStream().close() }
                 continue
             }
-            val out = Outgoing(ids.getAndIncrement(), random.nextInt().toLong() and 0xffffffffL, source)
-            synchronized(lock) { queue.addLast(out) }
-            publish(TransferItem(out.id, true, source.name, source.size, 0, TransferPhase.WAITING))
+            enqueue(source)
             queued++
         }
         pump()
         return queued
+    }
+
+    /** Queues a file that's already open (shared items go through [send]; debug tools call this directly). */
+    fun enqueue(source: FileSource) {
+        val out = Outgoing(ids.getAndIncrement(), random.nextInt().toLong() and 0xffffffffL, source)
+        synchronized(lock) { queue.addLast(out) }
+        publish(TransferItem(out.id, true, source.name, source.size, 0, TransferPhase.WAITING))
+        pump()
     }
 
     /** The user cancelled a transfer (notification action or the app). */
