@@ -378,3 +378,19 @@ Extends D-019 at the maintainer's request.
   keeps its in-app picker with each language in its own name, because Android 11 and 12 have no system per-app
   language setting.
 - The Turkish, like the Persian and Arabic, was written from the English source and needs a native speaker's review.
+
+### D-034 — First App Store version: 1.0 on the maintainer's personal team, iPhone and iPad (2026-11-24)
+
+- **App record:** App Store Connect app 6838659501, bundle ID `app.pairline.ios` (settles the iOS part of D-007),
+  personal team 7Y68TERDUC. "Pairline" alone is taken, so the store name is "Pairline: SMS & Call Bridge"; the Home
+  Screen name stays "Pairline". Version 1.0 (`MARKETING_VERSION`), build 1 uploaded with the `asc` CLI.
+- **iPad is supported** (the maintainer's choice). The app was already universal (XcodeGen's preset), and its SwiftUI
+  layout works full-screen on iPad; an iPad without a SIM gets the Android phone's texts and calls. iPad screenshots
+  (`docs/screenshots/ipad/`) are real iPad Pro 12.9" captures, as Apple requires. The iPhone stays portrait-only
+  (`UISupportedInterfaceOrientations~iphone`); iPad allows every orientation, which Apple requires for iPad
+  multitasking (upload error ITMS-90474).
+- **App Privacy:** published as "Data Not Collected" (`docs/app-store/privacy.json`): no analytics, ads or servers,
+  and purchases are processed by Apple.
+- **Age rating:** every content answer NONE/false except "Messaging and chat", because Pairline sends and receives SMS.
+- **Price and availability:** free download; in-app purchases "3-day Trial" (free) and "Pairline Full Access"
+  ($11.99), both non-consumable; every territory except China mainland (D-027).

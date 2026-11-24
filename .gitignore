@@ -34,3 +34,6 @@ xcuserdata/
 
 # App Store images rendered by docs/app-store/render.sh
 docs/app-store/out/
+
+# asc CLI build artifacts (archives, IPAs)
+.asc/

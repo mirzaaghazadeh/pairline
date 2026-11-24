@@ -10,6 +10,8 @@ Everything the App Store product page needs, kept as source so it can be regener
 | `metadata/` | Name, subtitle, promotional text, description, keywords, URLs, categories, review notes (fastlane `deliver` layout) |
 | `upload.sh` | Uploads `metadata/` and the screenshots to App Store Connect with `fastlane deliver` |
 | `assets.html`, `upload-assets.sh` | The iOS 27 product-page header and search-results images per locale, uploaded and placed with the `asc` CLI |
+| `privacy.json` | The App Privacy declaration ("Data Not Collected"), applied and published with `asc web privacy` (needs an `asc web auth login` session) |
+| `../screenshots/ipad/<lang>/` | Real iPad Pro 12.9" captures (2048 x 2732, flattened), uploaded with `asc screenshots upload --device-type APP_IPAD_PRO_3GEN_129` |
 | `api/` | Small App Store Connect API scripts (Python standard library + `openssl`): `iap.py` sets up the two in-app purchases, `app_setup.py` the price, availability and content rights. Both are idempotent |
 
 **Credentials** stay outside the repo. The API scripts read `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_PATH` (the

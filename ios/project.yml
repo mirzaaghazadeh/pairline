@@ -15,12 +15,15 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     SWIFT_STRICT_CONCURRENCY: minimal
-    MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    # Matches the App Store version in App Store Connect. Build 1 is uploaded; `asc publish appstore` picks the next
+    # free build number itself, so this only matters for archives made in Xcode.
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "2"
     # The maintainer's team (forks: set your own to run on a device). CI builds without signing.
     DEVELOPMENT_TEAM: "7Y68TERDUC"
     CODE_SIGN_STYLE: Automatic
-    TARGETED_DEVICE_FAMILY: "1"
+    # iPhone and iPad (D-034). XcodeGen's iOS app preset sets "1,2" on the target anyway; this says so explicitly.
+    TARGETED_DEVICE_FAMILY: "1,2"
     SUPPORTS_MACCATALYST: NO
     SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
     LOCALIZATION_PREFERS_STRING_CATALOGS: YES
