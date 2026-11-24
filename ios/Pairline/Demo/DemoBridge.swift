@@ -9,8 +9,10 @@ final class DemoBridge: BridgeLink {
     }
     private(set) var latency: TimeInterval? = 0.042
     let transportKind: TransportKind = .demo
+    var activeTransports: [TransportKind] { phase.isConnected ? [.demo] : [] }
 
     var onPhaseChange: ((LinkPhase) -> Void)?
+    var onTransportsChange: (() -> Void)?
     var onEvent: ((Inbound) -> Void)?
     var onEstablished: (() -> Void)?
 

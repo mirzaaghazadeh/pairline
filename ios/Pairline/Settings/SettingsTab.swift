@@ -285,6 +285,7 @@ struct DebugSection: View {
             Picker("Pair over", selection: $transport) {
                 Text("Bluetooth").tag(TransportKind.bluetooth.rawValue)
                 Text(verbatim: "TCP 127.0.0.1:47800").tag(TransportKind.tcp.rawValue)
+                Text(verbatim: "Wi-Fi only").tag(TransportKind.wifi.rawValue)
             }
             TextField(String(localized: "Paste a pairing link"), text: $pasted)
                 .autocorrectionDisabled()

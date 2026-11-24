@@ -25,6 +25,8 @@ struct CapabilityInfo: Identifiable {
         case .contactsAdd: return "person.badge.plus"
         case .ussd: return "number"
         case .dualSIM: return "simcard.2"
+        case .wifi: return "wifi"
+        case .files: return "doc.on.doc"
         }
     }
 
@@ -43,6 +45,8 @@ struct CapabilityInfo: Identifiable {
         case .contactsAdd: return String(localized: "Add contacts from iPhone")
         case .ussd: return String(localized: "USSD codes")
         case .dualSIM: return String(localized: "Dual SIM")
+        case .wifi: return String(localized: "Wi-Fi link")
+        case .files: return String(localized: "Send files")
         }
     }
 
@@ -71,6 +75,10 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Allow the phone permission in Pairline Bridge on your Android phone.")
         case .dualSIM:
             return String(localized: "This bridge phone has one active SIM.")
+        case .wifi:
+            return String(localized: "Turn on the Wi-Fi link in Pairline Bridge on your Android phone.")
+        case .files:
+            return String(localized: "Update Pairline Bridge on your Android phone to send files.")
         }
     }
 }

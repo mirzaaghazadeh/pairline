@@ -63,8 +63,14 @@ struct DiagnosticsView: View {
         lines.append("iOS \(UIDevice.current.systemVersion), \(UIDevice.current.model)")
         lines.append("Language: \(Bundle.main.preferredLocalizations.first ?? "?")")
         lines.append("Access: \(describe(purchases.access))")
-        lines.append("Paired: \(app.isPaired ? "yes" : "no"), transport: \(app.link.transportKind.rawValue)")
+        lines.append("Paired: \(app.isPaired ? "yes" : "no"), active: \(app.link.activeTransports.map(\.rawValue).joined(separator: " + "))")
         lines.append("Link: \(describe(bridge.phase))")
+        lines.append("Bluetooth lane: \(app.link.primarySummary)")
+        lines.append("Wi-Fi lane: \(app.link.wifiSummary)")
+        let transfers = app.link.files.transfers
+        if !transfers.isEmpty {
+            lines.append("File transfers: \(transfers.filter { $0.state == .done }.count) done, \(transfers.filter { !$0.isFinished }.count) active")
+        }
         if let error = app.link.lastSessionError { lines.append("Last link error: \(error)") }
         if let info = bridge.deviceInfo {
             lines.append("Bridge: \(info.platform ?? "?") \(info.os ?? "?"), app \(info.app ?? "?"), protocol \(info.proto.map(String.init) ?? "?")")

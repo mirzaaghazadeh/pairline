@@ -48,6 +48,7 @@ final class AppModel: ObservableObject {
             #if DEBUG
             if kind == .tcp { return TCPConnector() }
             #endif
+            if kind == .wifi { return WiFiConnector() }
             return BluetoothCentral()
         }
         real = BridgeController(mode: .real, link: link, db: AppDatabase.openDefault())
@@ -71,6 +72,15 @@ final class AppModel: ObservableObject {
             self?.active.updateBadge()
         }
         notifier.onOpenStatus = { [weak self] in self?.tab = .bridge }
+
+        link.files.onReceived = { [weak self] _ in
+            self?.toast = String(localized: "File received. Find it in the Files app under Pairline › Received.")
+        }
+        // The Share extension queues files in the app group and posts this; send them once Wi-Fi is up.
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), nil, { _, _, _, _, _ in
+            Task { @MainActor in AppModel.shared.link.files.collectOutbox() }
+        }, SharedOutbox.darwinNotification as CFString, nil, .deliverImmediately)
+        link.files.collectOutbox()
 
         purchases.start()
         applyLaunchArguments()
@@ -174,6 +184,7 @@ final class AppModel: ObservableObject {
 
     func didBecomeActive() {
         link.reconnectNow()
+        link.files.collectOutbox()
         Task {
             await purchases.refresh()
             await Notifier.shared.refreshAuthorization()
@@ -228,6 +239,16 @@ final class AppModel: ObservableObject {
                 }
                 let message = try? self.active.sendSMS(to: to, body: body, sim: nil, thread: nil)
                 if let message { self.openThread = message.thread }
+            }
+        }
+        // Sends one file over Wi-Fi once the bridge can take files (end-to-end tests of the bulk channel).
+        if let index = args.firstIndex(of: "-PairlineSendFile"), index + 1 < args.count {
+            let url = URL(fileURLWithPath: args[index + 1])
+            Task { @MainActor in
+                for _ in 0..<120 where !self.link.files.canSend {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                }
+                self.link.files.send(url: url)
             }
         }
         // Places one call through the link once connected.

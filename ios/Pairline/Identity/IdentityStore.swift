@@ -89,8 +89,10 @@ struct PairedPeer: Codable, Equatable {
     var pairedAt: Date
     var name: String?
     var peripheralID: UUID?
-    /// "ble" or "tcp" (debug builds only).
+    /// The transport pairing used: "ble", "wifi", or "tcp" (debug builds only).
     var transport: String
+    /// How to reach the bridge over Wi-Fi (M5); nil until the bridge offered it.
+    var wifi: WiFiHints?
 }
 
 final class PeerStore {

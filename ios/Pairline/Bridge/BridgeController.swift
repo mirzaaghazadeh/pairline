@@ -31,6 +31,8 @@ final class BridgeController: ObservableObject {
     let calls: CallCenter
 
     @Published private(set) var phase: LinkPhase
+    /// The transports with a session right now (Bluetooth, Wi-Fi, or both).
+    @Published private(set) var transports: [TransportKind] = []
     @Published private(set) var status: BridgeStatus?
     @Published private(set) var deviceInfo: DeviceInfo?
     @Published private(set) var statusUpdatedAt: Date?
@@ -56,6 +58,10 @@ final class BridgeController: ObservableObject {
         self.calls = CallCenter(useCallKit: mode == .real)
         calls.bridge = self
         link.onPhaseChange = { [weak self] phase in self?.phaseChanged(phase) }
+        link.onTransportsChange = { [weak self] in
+            guard let self else { return }
+            self.transports = self.link.activeTransports
+        }
         link.onEvent = { [weak self] inbound in self?.handle(inbound) }
         link.onEstablished = { [weak self] in self?.established() }
         if mode == .real { saveWidget() }
@@ -101,6 +107,7 @@ final class BridgeController: ObservableObject {
 
     private func phaseChanged(_ phase: LinkPhase) {
         self.phase = phase
+        transports = link.activeTransports
         if phase != .connected {
             latencyTimer?.invalidate()
             latencyTimer = nil

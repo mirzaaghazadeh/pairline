@@ -27,6 +27,10 @@ enum ConnectError: Error {
 struct ConnectTarget {
     var deviceID: Data
     var knownPeripheral: UUID?
+    /// Wi-Fi: endpoints to try first (the pair link's addresses while pairing).
+    var wifi: [WiFiEndpoint] = []
+    /// Wi-Fi: try only `wifi` (pairing never sends `PAIR_HELLO` to an address the link didn't give).
+    var wifiExplicitOnly = false
 }
 
 /// Finds the bridge and opens a frame transport to it.

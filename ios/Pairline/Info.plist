@@ -46,6 +46,16 @@
 	<string>Pairline uses Bluetooth to connect to your Android bridge phone, so you can use its SIM card on this iPhone.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Pairline uses the camera only to scan the pairing code shown on your Android bridge phone.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Pairline connects to your Android bridge phone over your Wi-Fi network for faster syncing, files and call audio. Nothing goes to the internet.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_pairline._tcp</string>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

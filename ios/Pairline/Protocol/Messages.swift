@@ -199,6 +199,43 @@ struct USSDResult: Equatable {
     var error: String?
 }
 
+/// `wifi.offer` (M5): where B can be reached over Wi-Fi, and its hotspot while that's on.
+struct WiFiOffer: Codable, Equatable {
+    var ip: [String]?
+    var port: Int?
+    var ssid: String?
+    var password: String?
+    var band: String?
+}
+
+/// `file.offer` (M5).
+struct FileOfferMessage: Codable, Equatable {
+    var fid: UInt32
+    var name: String
+    var size: Int64
+    var type: String?
+}
+
+/// `file.answer` (about the peer's offer).
+struct FileAnswerMessage: Codable, Equatable {
+    var fid: UInt32
+    var accept: Bool
+    var reason: String?
+}
+
+/// `file.done` (about the peer's offer).
+struct FileDoneMessage: Codable, Equatable {
+    var fid: UInt32
+    var ok: Bool
+    var reason: String?
+}
+
+/// `file.cancel` (about the sender's own offer).
+struct FileCancelMessage: Codable, Equatable {
+    var fid: UInt32
+    var reason: String?
+}
+
 struct BridgeErrorReply: Equatable, Error {
     var code: String
     var msg: String?
@@ -241,6 +278,13 @@ enum InboundMessage {
     case contactsSync(ContactsSyncReply)
     case calllogSync(CallLogSyncReply)
     case ussdResult(USSDResult)
+    case wifiOffer(WiFiOffer)
+    /// `wifi.media`: B's UDP port for the media channel, or nil when there's none this session.
+    case wifiMedia(port: UInt16?)
+    case fileOffer(FileOfferMessage)
+    case fileAnswer(FileAnswerMessage)
+    case fileDone(FileDoneMessage)
+    case fileCancel(FileCancelMessage)
     case unknown
 }
 
@@ -288,6 +332,14 @@ struct Inbound {
         var full: Bool?
     }
     private struct USSDBody: Decodable { var ok: Bool?; var text: String?; var error: String? }
+    private struct MediaBody: Decodable { var port: Int? }
+    private struct OfferBody: Decodable {
+        var ip: LossyList<String>?
+        var port: Int?
+        var ssid: String?
+        var password: String?
+        var band: String?
+    }
 
     static func decode(_ data: Data) throws -> Inbound {
         let decoder = JSONDecoder()
@@ -332,6 +384,17 @@ struct Inbound {
         case "ussd.result":
             let b = try body(USSDBody.self)
             message = .ussdResult(USSDResult(ok: b.ok ?? false, text: b.text, error: b.error))
+        case "wifi.offer":
+            let b = try body(OfferBody.self)
+            message = .wifiOffer(WiFiOffer(ip: b.ip?.elements, port: b.port, ssid: b.ssid, password: b.password,
+                                           band: b.band))
+        case "wifi.media":
+            let port = try body(MediaBody.self).port.flatMap { UInt16(exactly: $0) }.flatMap { $0 == 0 ? nil : $0 }
+            message = .wifiMedia(port: port)
+        case "file.offer": message = .fileOffer(try body(FileOfferMessage.self))
+        case "file.answer": message = .fileAnswer(try body(FileAnswerMessage.self))
+        case "file.done": message = .fileDone(try body(FileDoneMessage.self))
+        case "file.cancel": message = .fileCancel(try body(FileCancelMessage.self))
         default:
             message = .unknown
         }
@@ -365,9 +428,40 @@ struct Outbound {
 
     private static func optional(_ value: Any?) -> Any { value ?? NSNull() }
 
+    /// What this iPhone app can receive (PROTOCOL.md, "Capabilities"): B only offers files when `files` is listed.
+    static let remoteCaps = ["files"]
+
     static func deviceInfo(name: String, os: String, app: String) -> Outbound {
-        Outbound("device.info", ["name": name, "platform": "ios", "os": os, "app": app, "proto": Int(WireProtocol.version)],
+        Outbound("device.info", ["name": name, "platform": "ios", "os": os, "app": app, "proto": Int(WireProtocol.version),
+                                 "caps": remoteCaps],
                  isRequest: false)
+    }
+
+    /// Requests whose replies can be large: sent on the Wi-Fi session when one is up (PROTOCOL.md, "Two sessions").
+    static let bulkTypes: Set<String> = ["sms.threads", "sms.history", "contacts.sync", "calllog.sync"]
+
+    var isBulk: Bool { Outbound.bulkTypes.contains(type) }
+
+    static func fileOffer(fid: UInt32, name: String, size: Int64, type: String?) -> Outbound {
+        Outbound("file.offer", ["fid": fid, "name": name, "size": size, "type": optional(type)], isRequest: false)
+    }
+
+    static func fileAnswer(fid: UInt32, accept: Bool, reason: String?) -> Outbound {
+        var fields: [String: Any] = ["fid": fid, "accept": accept]
+        if let reason { fields["reason"] = reason }
+        return Outbound("file.answer", fields, isRequest: false)
+    }
+
+    static func fileDone(fid: UInt32, ok: Bool, reason: String?) -> Outbound {
+        var fields: [String: Any] = ["fid": fid, "ok": ok]
+        if let reason { fields["reason"] = reason }
+        return Outbound("file.done", fields, isRequest: false)
+    }
+
+    static func fileCancel(fid: UInt32, reason: String?) -> Outbound {
+        var fields: [String: Any] = ["fid": fid]
+        if let reason { fields["reason"] = reason }
+        return Outbound("file.cancel", fields, isRequest: false)
     }
 
     static var statusGet: Outbound { Outbound("status.get") }
@@ -444,6 +538,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case contactsAdd = "contacts.add"
     case ussd = "ussd"
     case dualSIM = "dualsim"
+    case wifi = "wifi"
+    case files = "files"
 
     var id: String { rawValue }
 }

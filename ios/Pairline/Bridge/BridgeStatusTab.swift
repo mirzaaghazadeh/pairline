@@ -76,20 +76,31 @@ struct BridgeStatusTab: View {
         .card()
     }
 
+    private var shownTransports: [TransportKind] {
+        bridge.transports.isEmpty ? [bridge.link.transportKind] : bridge.transports
+    }
+
     private var transportSymbol: String {
         if DebugSettings.marketingScreenshots { return "dot.radiowaves.left.and.right" }
-        switch bridge.link.transportKind {
+        if shownTransports.contains(.wifi) { return "wifi" }
+        switch shownTransports.first ?? .bluetooth {
         case .bluetooth: return "dot.radiowaves.left.and.right"
         case .tcp: return "cable.connector"
+        case .wifi: return "wifi"
         case .demo: return "sparkles"
         }
     }
 
+    /// "Bluetooth", "Wi-Fi" or "Bluetooth + Wi-Fi" (PROTOCOL.md: both sessions can be up at once).
     private var transportName: Text {
         if DebugSettings.marketingScreenshots { return Text("Bluetooth") }
-        switch bridge.link.transportKind {
+        let kinds = shownTransports
+        if kinds.contains(.bluetooth), kinds.contains(.wifi) { return Text("Bluetooth + Wi-Fi") }
+        if kinds.contains(.tcp), kinds.contains(.wifi) { return Text(verbatim: "Debug TCP + Wi-Fi") }
+        switch kinds.first ?? .bluetooth {
         case .bluetooth: return Text("Bluetooth")
         case .tcp: return Text("Debug TCP")
+        case .wifi: return Text("Wi-Fi")
         case .demo: return Text("Demo")
         }
     }
@@ -239,6 +250,15 @@ struct BridgeStatusTab: View {
                             subtitle: Text("Balance, packages and carrier services"))
                 }
                 Divider().padding(.leading, 52)
+                if !bridge.isDemo {
+                    NavigationLink {
+                        FilesView(files: app.link.files)
+                    } label: {
+                        ToolRow(symbol: "doc.on.doc.fill", tint: .brandBlue, title: Text("Send files"),
+                                subtitle: Text("Photos and documents over Wi-Fi, both ways"))
+                    }
+                    Divider().padding(.leading, 52)
+                }
                 NavigationLink {
                     HelpCenterView()
                 } label: {
@@ -284,6 +304,7 @@ struct BridgeStatusTab: View {
                 Text("Looking for your bridge phone").font(.headline)
                 VStack(alignment: .leading, spacing: 10) {
                     HelpBullet(symbol: "antenna.radiowaves.left.and.right", text: Text("Keep both phones within Bluetooth range, about 10 meters."))
+                    HelpBullet(symbol: "wifi", text: Text("Or connect both phones to the same Wi-Fi network."))
                     HelpBullet(symbol: "iphone.gen2", text: Text("Make sure Pairline Bridge is running on the Android phone and Bluetooth is on there."))
                     HelpBullet(symbol: "battery.100", text: Text("Exclude Pairline Bridge from battery optimization on the Android phone."))
                 }

@@ -1,15 +1,29 @@
 import Foundation
 
-/// The QR pairing link `pairline://pair?v=0&id=<device id>&k=<bridge public key>&s=<pairing secret>`.
+/// The QR pairing link `pairline://pair?v=0&id=<device id>&k=<bridge public key>&s=<pairing secret>`, optionally with
+/// the bridge's Wi-Fi addresses (`ip`, `port`) and its hotspot (`ssid`, `pw`, base64url UTF-8) (PROTOCOL.md, "Pairing
+/// over Wi-Fi"). Unknown parameters are ignored, so links from older and newer bridges both parse.
 struct PairingLink: Equatable {
+    static let maxAddresses = 4
+
     let deviceID: Data
     let bridgeKey: Data
     let secret: Data
+    /// Private, link-local or unique-local addresses only; anything else in the link is dropped.
+    var wifiAddresses: [String] = []
+    var wifiPort: UInt16?
+    var hotspotSSID: String?
+    var hotspotPassword: String?
 
-    init(deviceID: Data, bridgeKey: Data, secret: Data) {
+    init(deviceID: Data, bridgeKey: Data, secret: Data, wifiAddresses: [String] = [], wifiPort: UInt16? = nil,
+         hotspotSSID: String? = nil, hotspotPassword: String? = nil) {
         self.deviceID = deviceID
         self.bridgeKey = bridgeKey
         self.secret = secret
+        self.wifiAddresses = wifiAddresses
+        self.wifiPort = wifiPort
+        self.hotspotSSID = hotspotSSID
+        self.hotspotPassword = hotspotPassword
     }
 
     init(string: String) throws {
@@ -25,15 +39,35 @@ struct PairingLink: Equatable {
               let secret = value("s").flatMap(Data.init(base64URL:)), secret.count == WireProtocol.pairingSecretLength
         else { throw ProtocolError.invalidPairingLink }
         _ = try CryptoPrimitives.publicKey(x963: key)
-        self.init(deviceID: id, bridgeKey: key, secret: secret)
+        let addresses = (value("ip") ?? "").split(separator: ",").map(String.init)
+            .filter { LocalAddress.isAllowed($0) }
+        func text(_ name: String) -> String? {
+            value(name).flatMap(Data.init(base64URL:)).flatMap { String(data: $0, encoding: .utf8) }
+                .flatMap { $0.isEmpty ? nil : $0 }
+        }
+        self.init(deviceID: id, bridgeKey: key, secret: secret,
+                  wifiAddresses: Array(addresses.prefix(PairingLink.maxAddresses)),
+                  wifiPort: value("port").flatMap(UInt16.init).flatMap { $0 == 0 ? nil : $0 },
+                  hotspotSSID: text("ssid"), hotspotPassword: text("pw"))
     }
+
+    /// Whether R can try to reach B over Wi-Fi with this link alone.
+    var hasWiFi: Bool { wifiPort != nil && !wifiAddresses.isEmpty }
 
     var uri: String {
-        "pairline://pair?v=0&id=\(deviceID.base64URL)&k=\(bridgeKey.base64URL)&s=\(secret.base64URL)"
+        var out = "pairline://pair?v=0&id=\(deviceID.base64URL)&k=\(bridgeKey.base64URL)&s=\(secret.base64URL)"
+        if !wifiAddresses.isEmpty { out += "&ip=" + wifiAddresses.joined(separator: ",") }
+        if let wifiPort { out += "&port=\(wifiPort)" }
+        if let hotspotSSID { out += "&ssid=" + Data(hotspotSSID.utf8).base64URL }
+        if let hotspotPassword { out += "&pw=" + Data(hotspotPassword.utf8).base64URL }
+        return out
     }
 
-    /// A pairing link must never be logged with its secret.
-    var redactedDescription: String { "pairline://pair?v=0&id=\(deviceID.base64URL)&k=…&s=…" }
+    /// A pairing link must never be logged with its secret (or the hotspot passphrase, or addresses).
+    var redactedDescription: String {
+        "pairline://pair?v=0&id=\(deviceID.base64URL)&k=…&s=…" + (hasWiFi ? " (+Wi-Fi)" : "")
+            + (hotspotSSID != nil ? " (+hotspot)" : "")
+    }
 }
 
 enum PairingCrypto {

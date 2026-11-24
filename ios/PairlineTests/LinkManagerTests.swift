@@ -4,21 +4,46 @@ import XCTest
 
 /// Connects the link manager to an in-test bridge.
 final class FakeConnector: LinkConnector {
-    let kind: TransportKind = .tcp
-    let availability: BluetoothAvailability = .poweredOn
+    let kind: TransportKind
+    var availability: BluetoothAvailability = .poweredOn
     var onAvailabilityChange: ((BluetoothAvailability) -> Void)?
     var makeTransport: () -> LoopbackTransport
+    /// When false, `connect` waits (like a bridge that isn't reachable) until cancelled or enabled.
+    var enabled: Bool
+    private(set) var targets: [ConnectTarget] = []
+    private var waiting: ((Result<(FrameTransport, UUID?), Error>) -> Void)?
 
-    init(makeTransport: @escaping () -> LoopbackTransport) {
+    init(kind: TransportKind = .tcp, enabled: Bool = true, makeTransport: @escaping () -> LoopbackTransport) {
+        self.kind = kind
+        self.enabled = enabled
         self.makeTransport = makeTransport
     }
 
     func connect(_ target: ConnectTarget, completion: @escaping (Result<(FrameTransport, UUID?), Error>) -> Void) {
+        cancel()
+        targets.append(target)
+        guard enabled else {
+            waiting = completion
+            return
+        }
         let transport = makeTransport()
         DispatchQueue.main.async { completion(.success((transport, nil))) }
     }
 
-    func cancel() {}
+    /// Lets a waiting `connect` through.
+    func enable() {
+        enabled = true
+        guard let completion = waiting else { return }
+        waiting = nil
+        let transport = makeTransport()
+        DispatchQueue.main.async { completion(.success((transport, nil))) }
+    }
+
+    func cancel() {
+        let completion = waiting
+        waiting = nil
+        completion?(.failure(ConnectError.cancelled))
+    }
 }
 
 /// Request/response, events, pairing, unpairing and reconnection through `LinkManager`.

@@ -8,12 +8,23 @@ protocol FrameTransport: AnyObject {
     var onClose: ((Error?) -> Void)? { get set }
     var kind: TransportKind { get }
     func send(_ frame: Data)
+    /// Sends and calls `completion` (on the main queue) once the transport took the frame, for flow control.
+    func send(_ frame: Data, completion: (() -> Void)?)
     func close()
+}
+
+extension FrameTransport {
+    func send(_ frame: Data, completion: (() -> Void)?) {
+        send(frame)
+        if let completion { DispatchQueue.main.async(execute: completion) }
+    }
 }
 
 enum TransportKind: String, Codable {
     case bluetooth = "ble"
     case tcp
+    /// The production Wi-Fi link (M5): a full session over TCP on the local network, plus media and bulk channels.
+    case wifi
     case demo
 }
 
@@ -48,6 +59,8 @@ final class LinkSession {
     private var helloR: Data?
     private var sealer: RecordSealer?
     private var opener: RecordOpener?
+    private var bulkSealer: RecordSealer?
+    private var bulkOpener: RecordOpener?
 
     private(set) var phase: Phase = .idle
     private(set) var keys: SessionKeys?
@@ -57,9 +70,15 @@ final class LinkSession {
     var onEstablished: (() -> Void)?
     /// Decrypted record plaintext (application messages, counter ≥ 1).
     var onMessage: ((Data) -> Void)?
+    /// Decrypted `BULK` record plaintext (Wi-Fi sessions only).
+    var onBulk: ((Data) -> Void)?
     var onClose: ((LinkSessionError?) -> Void)?
 
     var transportKind: TransportKind { transport.kind }
+    /// The transport under this session (the Wi-Fi link reads the peer's address from it for the media channel).
+    var frameTransport: FrameTransport { transport }
+    /// `BULK` frames exist only on the Wi-Fi link (PROTOCOL.md, "Frames").
+    var carriesBulk: Bool { transport.kind == .wifi }
 
     init(transport: FrameTransport, identity: KeyAgreementPrivateKey, pinnedBridgeKey: Data?, pairing: PairingLink?,
          ephemeral: KeyAgreementPrivateKey = P256.KeyAgreement.PrivateKey(),
@@ -91,6 +110,14 @@ final class LinkSession {
         let wire = try sealer.seal(plaintext)
         self.sealer = sealer
         transport.send(Frame(type: .record, body: wire).encoded)
+    }
+
+    /// Encrypts one bulk-channel record and sends it as a `BULK` frame. `completion` runs once the transport took it.
+    func sendBulk(_ plaintext: Data, completion: (() -> Void)? = nil) throws {
+        guard phase == .established, carriesBulk, var bulkSealer else { throw LinkSessionError.transportClosed }
+        let wire = try bulkSealer.seal(plaintext)
+        self.bulkSealer = bulkSealer
+        transport.send(Frame(type: .bulk, body: wire).encoded, completion: completion)
     }
 
     func close() {
@@ -137,6 +164,8 @@ final class LinkSession {
             handleConfirm(frame.body)
         case (.established, .record):
             handleRecord(frame.body)
+        case (.established, .bulk) where carriesBulk:
+            handleBulk(frame.body)
         default:
             finish(.protocolViolation("unexpected frame \(frame.type)"))
         }
@@ -185,6 +214,11 @@ final class LinkSession {
             let (counter, plaintext) = try opener.open(body)
             guard counter == 0, plaintext.isEmpty else { return finish(.protocolViolation("confirm")) }
             self.opener = opener
+            if carriesBulk, let keys {
+                let bulk = keys.wifiKeys(.bulk)
+                bulkSealer = RecordSealer(key: bulk.remoteToBridge, direction: .remoteToBridge, channel: .bulk)
+                bulkOpener = RecordOpener(key: bulk.bridgeToRemote, direction: .bridgeToRemote, channel: .bulk)
+            }
             phase = .established
             onEstablished?()
         } catch {
@@ -205,6 +239,18 @@ final class LinkSession {
         }
     }
 
+    /// Bulk records are ordered like control records: a replayed or forged one closes the connection.
+    private func handleBulk(_ body: Data) {
+        guard var bulkOpener else { return finish(.protocolViolation("state")) }
+        do {
+            let (_, plaintext) = try bulkOpener.open(body)
+            self.bulkOpener = bulkOpener
+            onBulk?(plaintext)
+        } catch {
+            finish(.protocolViolation("bulk"))
+        }
+    }
+
     private func finish(_ error: LinkSessionError?) {
         guard phase != .closed else { return }
         phase = .closed
@@ -213,11 +259,14 @@ final class LinkSession {
         transport.close()
         sealer = nil
         opener = nil
+        bulkSealer = nil
+        bulkOpener = nil
         let callback = onClose
         onClose = nil
         onPaired = nil
         onEstablished = nil
         onMessage = nil
+        onBulk = nil
         callback?(error)
     }
 }

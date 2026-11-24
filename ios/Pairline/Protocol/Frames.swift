@@ -19,6 +19,8 @@ enum FrameType: UInt8 {
     case pairFail = 0x03
     case hello = 0x10
     case record = 0x20
+    /// A record on the bulk channel (M5): Wi-Fi TCP only, after the handshake.
+    case bulk = 0x21
 }
 
 enum ProtocolError: Error, Equatable {

@@ -4,16 +4,18 @@ import Foundation
 
 /// Two connected in-memory transports. Frames are delivered asynchronously on the main queue, like the real ones.
 final class LoopbackTransport: FrameTransport {
-    let kind: TransportKind = .tcp
+    var kind: TransportKind = .tcp
     weak var peer: LoopbackTransport?
     var onFrame: ((Data) -> Void)?
     var onClose: ((Error?) -> Void)?
     private(set) var closed = false
     private(set) var sent: [Data] = []
 
-    static func pair() -> (LoopbackTransport, LoopbackTransport) {
+    static func pair(kind: TransportKind = .tcp) -> (LoopbackTransport, LoopbackTransport) {
         let a = LoopbackTransport()
         let b = LoopbackTransport()
+        a.kind = kind
+        b.kind = kind
         a.peer = b
         b.peer = a
         return (a, b)
@@ -55,12 +57,16 @@ final class TestBridge {
     var tamperPairOK = false
     var failReason: String?
 
-    private let transport: LoopbackTransport
+    let transport: LoopbackTransport
     private var sealer: RecordSealer?
     private var opener: RecordOpener?
+    private var bulkSealer: RecordSealer?
+    private var bulkOpener: RecordOpener?
     private(set) var received: [Data] = []
+    private(set) var receivedBulk: [Data] = []
     private(set) var confirmed = false
     var onMessage: (([String: Any]) -> Void)?
+    var onBulk: ((Data) -> Void)?
 
     init(transport: LoopbackTransport, identity: P256.KeyAgreement.PrivateKey = .init()) {
         self.transport = transport
@@ -81,6 +87,11 @@ final class TestBridge {
             handleHello(frame.body)
         case .record:
             handleRecord(frame.body)
+        case .bulk:
+            guard var bulkOpener, let (_, plaintext) = try? bulkOpener.open(frame.body) else { return transport.close() }
+            self.bulkOpener = bulkOpener
+            receivedBulk.append(plaintext)
+            onBulk?(plaintext)
         default:
             transport.close()
         }
@@ -126,6 +137,9 @@ final class TestBridge {
         let keys = SessionKeys.derive(ikm: ikm, helloR: helloR.encoded, helloB: helloB.encoded)
         var sealer = RecordSealer(key: keys.bridgeToRemote, direction: .bridgeToRemote)
         opener = RecordOpener(key: keys.remoteToBridge, direction: .remoteToBridge)
+        let bulk = keys.wifiKeys(.bulk)
+        bulkSealer = RecordSealer(key: bulk.bridgeToRemote, direction: .bridgeToRemote, channel: .bulk)
+        bulkOpener = RecordOpener(key: bulk.remoteToBridge, direction: .remoteToBridge, channel: .bulk)
         let confirm = try! sealer.seal(Data())
         self.sealer = sealer
         transport.send(Frame(type: .record, body: confirm).encoded)
@@ -152,6 +166,12 @@ final class TestBridge {
         let wire = try! sealer!.seal(plaintext)
         transport.send(Frame(type: .record, body: wire).encoded)
         return wire
+    }
+
+    /// Sends one bulk-channel record (`BULK` frame).
+    func sendBulk(_ plaintext: Data) {
+        let wire = try! bulkSealer!.seal(plaintext)
+        transport.send(Frame(type: .bulk, body: wire).encoded)
     }
 
     func sendRaw(record wire: Data) {
