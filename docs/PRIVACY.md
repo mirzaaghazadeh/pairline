@@ -9,7 +9,8 @@ Any change that adds or changes a data flow or permission must update this file 
 - **Pairline has no servers in version 1.** Nothing about you is sent to us.
 - **Your data moves only between your two phones.** Messages, contacts, call history and call audio go
   directly between them, encrypted.
-- **Apple is the only outside company involved,** and only when you buy something in the iPhone app.
+- **Only two outside companies are involved, and neither gets your data:** Apple, when you buy something in the
+  iPhone app, and GitHub, which the Android app asks once a day whether a new version exists (you can turn that off).
 
 ## Data flows
 
@@ -135,7 +136,6 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | Hotspot Configuration (M5, no permission prompt of its own) | Join the bridge's hotspot when it offers one. iOS asks "Join Wi-Fi network …?" every time | When the bridge offers its hotspot |
 | Files app folder (`UIFileSharingEnabled`) (M5) | Files you receive from the bridge phone appear under Pairline in the Files app | No prompt |
 | Share extension "Send to bridge phone" (M5) | Copies only what you share into the app group's outbox, which the app sends over the Wi-Fi link and then deletes | No prompt |
-| Microphone (M6) | Call audio | Not yet requested |
 | Contacts (optional, off by default; not yet used) | Save a contact from the bridge into iPhone Contacts | Not yet requested |
 
 ## Things Pairline will never do
