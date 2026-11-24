@@ -55,7 +55,7 @@ adb shell content query --uri content://app.pairline.android.debug.devtools/setu
 adb shell am start -n app.pairline.android.debug/app.pairline.android.MainActivity
 
 adb forward tcp:47800 tcp:47800
-LINK=$(adb shell content query --uri content://app.pairline.android.debug.devtools/pairing | sed -n 's/.*uri=\(pairline:[^,]*\),.*/\1/p')
+LINK=$(adb shell content query --uri content://app.pairline.android.debug.devtools/pairing | sed -n 's/^Row: 0 uri=\(pairline:.*\), expires_at=.*/\1/p')
 python3 -I ../protocol/tools/fake_remote.py pair --pair-uri "$LINK" status ping threads history
 python3 -I ../protocol/tools/fake_remote.py session listen --seconds 30 --auto-answer &
 adb emu sms send 5551234 "Your code is 4821"     # → sms.new
@@ -71,6 +71,30 @@ The devtools provider answers only adb (the shell user), root and the app itself
 `MANAGE_ONGOING_CALLS`. To test that path on an emulator (debug builds declare the permission):
 `adb shell appops set app.pairline.android.debug MANAGE_ONGOING_CALLS allow`. Without it, calls use the telephony
 callbacks: answer, decline and end work; keypad tones, mute and speaker answer `unsupported`.
+
+**Wi-Fi link (M5).** The production Wi-Fi transport listens on port 47820 on the phone's Wi-Fi and hotspot addresses
+(PROTOCOL.md, "Wi-Fi"). The emulator's own NAT forwards host ports to its emulated *mobile-data* interface, which a
+debug build accepts on an emulator only (never on a phone, never in release), so it can be tested from the Mac:
+
+```sh
+adb emu redir add tcp:47820:47820
+adb emu redir add udp:47820:47820     # the media channel
+adb shell content query --uri content://app.pairline.android.debug.devtools/wifi   # listening, addresses, port
+# Pair over Wi-Fi only (no debug TCP), like a phone whose Bluetooth can't reach an iPhone:
+python3 -I ../protocol/tools/fake_remote.py --port 47820 pair --pair-uri "$LINK" status
+# Media channel: probes, 100 packets echoed back, a replay that must be dropped
+adb shell content query --uri content://app.pairline.android.debug.devtools/media-echo-on
+python3 -I ../protocol/tools/fake_remote.py --port 47820 session media --packets 100 --expect media.echo
+# Files both ways (received files land in Downloads/Pairline)
+python3 -I ../protocol/tools/fake_remote.py --port 47820 session send-file --file ~/some.pdf --expect file.sent
+python3 -I ../protocol/tools/fake_remote.py --port 47820 session receive-file --save-dir /tmp --expect file.received &
+adb shell content query --uri 'content://app.pairline.android.debug.devtools/send-test-file?size=5000000'
+```
+
+Run a debug-TCP session (`--port 47800`, standing in for Bluetooth) and a Wi-Fi session at the same time to see the
+routing: events go to the Bluetooth/debug session, replies to whichever session asked, and events move to Wi-Fi when
+the other session closes. The first Wi-Fi connection right after `adb install` can be reset by the emulator; connect
+again. DNS-SD (`_pairline._tcp`) is advertised on the emulator's own virtual Wi-Fi, which the Mac can't see.
 
 **Languages and themes.** `adb shell cmd locale set-app-locales app.pairline.android.debug --locales fa` (or `ar`,
 `en-US`), and `adb shell cmd uimode night yes|no`. Screenshots of the main screens are in
