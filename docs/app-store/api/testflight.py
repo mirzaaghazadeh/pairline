@@ -20,8 +20,9 @@ DESCRIPTION = ("Pairline puts the SIM card of your Android phone on your iPhone 
                "at hand? Demo mode shows the whole app with sample data.")
 WHAT_TO_TEST = ("Please try: pairing with the QR code; receiving and sending SMS; copying one-time codes; incoming "
                 "calls while the iPhone is locked; calling from the iPhone; Talk on iPhone (call audio on the "
-                "iPhone, needs Pairline Bridge 1.2 on the Android phone, set up once with Wireless debugging, and "
-                "both phones on the same Wi-Fi); internet sharing; sending files; deleting messages and calls; the block list; "
+                "iPhone, needs Pairline Bridge 1.2.2 on an Android 11 or later phone, set up once with Wireless "
+                "debugging, and both phones on the same Wi-Fi; if the audio stays on the Android phone, the call "
+                "screen now says why); internet sharing; sending files; deleting messages and calls; the block list; "
                 "contacts and call history; USSD codes; and leaving both phones for an hour and checking that "
                 "messages still arrive. New: the bridge's signal, network and battery on the Lock Screen and in the "
                 "Dynamic Island (Settings > Bridge status on Lock Screen); check that it follows the bridge while "

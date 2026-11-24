@@ -123,6 +123,23 @@ final class CallCenter: ObservableObject {
         wifiAlert = true
     }
 
+    /// The bridge tried to move the call's audio here and couldn't; the call screen shows its reason, once per call.
+    /// A toast would sit behind the call screen, where nobody sees it.
+    @Published var relayFailureAlert = false
+    private(set) var relayFailureReason: String?
+    private var relayFailureExplained = Set<UUID>()
+
+    private func explainRelayFailure(_ reason: String?) {
+        guard let call = current, !relayFailureExplained.contains(call.id) else { return }
+        relayFailureExplained.insert(call.id)
+        relayFailureReason = reason
+        if callScreenVisible {
+            relayFailureAlert = true
+        } else {
+            notice = String(localized: "The call's audio went back to your Android phone.", table: "CallAudio")
+        }
+    }
+
     // MARK: - Bridge events
 
     func handleIncoming(_ event: CallIncomingEvent) {
@@ -283,7 +300,9 @@ final class CallCenter: ObservableObject {
         case "failed", "stopped":
             guard audioRoute != .bridge else { return }
             log.info("audio", "Bridge stopped relaying call audio: \(event.reason ?? "-")")
-            if event.state == "failed" || call.state == .active {
+            if event.state == "failed" {
+                explainRelayFailure(event.reason)
+            } else if call.state == .active {
                 notice = String(localized: "The call's audio went back to your Android phone.", table: "CallAudio")
             }
             stopRelay(callEnded: false)
@@ -312,7 +331,13 @@ final class CallCenter: ObservableObject {
                 self.startEngineIfReady()
             } catch {
                 log.warning("audio", "Bridge didn't start call audio: \(error.localizedDescription)")
-                if self.audioRoute == .connecting { self.audioRoute = .bridge }
+                guard self.current?.bridgeID == bridgeID, self.audioRoute == .connecting else { return }
+                self.audioRoute = .bridge
+                if case LinkError.bridge(let reply) = error {
+                    self.explainRelayFailure(reply.msg ?? reply.code)
+                } else {
+                    self.explainRelayFailure(error.localizedDescription)
+                }
             }
         }
     }

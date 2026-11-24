@@ -74,7 +74,7 @@ struct CapabilityInfo: Identifiable {
         case .callDTMF, .callAudio:
             return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Wireless debugging).", table: "CallAudio")
         case .callMedia:
-            return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi.", table: "CallAudio")
+            return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi.", table: "CallAudio")
         case .callMediaTalk:
             return String(localized: "This bridge phone can't feed audio into calls. You hear calls on the iPhone and talk on the Android phone.", table: "CallAudio")
         case .netShare:

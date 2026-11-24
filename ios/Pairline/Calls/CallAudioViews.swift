@@ -27,7 +27,7 @@ struct CallAudioInfoSheet: View {
                     } header: {
                         t("Talk on your iPhone")
                     } footer: {
-                        t("Android keeps call audio away from apps, so this needs Android 10 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone.")
+                        t("Android keeps call audio away from apps, so this needs Android 11 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone.")
                     }
                 }
                 Section {

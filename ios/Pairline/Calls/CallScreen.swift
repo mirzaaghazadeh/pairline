@@ -56,6 +56,14 @@ struct CallScreen: View {
         } message: {
             Text("Talk on iPhone is set up, but this iPhone isn't linked to the Android phone over Wi-Fi, which carries the call audio. Put both phones on the same Wi-Fi or join the Android phone's own hotspot. Already on the same Wi-Fi? Check iPhone Settings › Pairline › Local Network is on; guest Wi-Fi often keeps devices apart.", tableName: "CallAudio")
         }
+        // The bridge tried and failed: say so here (with its reason) instead of a toast behind the call screen.
+        .alert(Text("The audio stayed on the Android phone", tableName: "CallAudio"), isPresented: $calls.relayFailureAlert) {
+            Button { showAudioInfo = true } label: { Text("How to fix", tableName: "CallAudio") }
+            Button(role: .cancel) {} label: { Text("OK", tableName: "CallAudio") }
+        } message: {
+            Text("Pairline Bridge couldn't move this call's audio to the iPhone. Update Pairline Bridge and try another call. If it keeps happening, open Pairline Bridge › Settings › Diagnostics, share the report and send it to us.", tableName: "CallAudio")
+                + Text(verbatim: calls.relayFailureReason.map { "\n\n\($0)" } ?? "")
+        }
     }
 
     private func content(_ call: ActiveCall) -> some View {

@@ -1,6 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "The audio stayed on the Android phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بقي الصوت على هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The audio stayed on the Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی ماند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonda kaldı" } }
+      }
+    },
+    "Pairline Bridge couldn't move this call's audio to the iPhone. Update Pairline Bridge and try another call. If it keeps happening, open Pairline Bridge › Settings › Diagnostics, share the report and send it to us." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يتمكن Pairline Bridge من نقل صوت هذه المكالمة إلى الآيفون. حدّث Pairline Bridge وجرّب مكالمة أخرى. إن تكرر ذلك، افتح Pairline Bridge › الإعدادات › التشخيص، وشارك التقرير وأرسله إلينا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge couldn't move this call's audio to the iPhone. Update Pairline Bridge and try another call. If it keeps happening, open Pairline Bridge › Settings › Diagnostics, share the report and send it to us." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge نتوانست صدای این تماس را به آیفون بیاورد. Pairline Bridge را به‌روز کنید و با تماس دیگری امتحان کنید. اگر باز هم تکرار شد، Pairline Bridge › تنظیمات › عیب‌یابی را باز کنید، گزارش را به اشتراک بگذارید و برای ما بفرستید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge bu aramanın sesini iPhone’a taşıyamadı. Pairline Bridge’i güncelleyip başka bir arama deneyin. Tekrar olursa Pairline Bridge › Ayarlar › Tanılama’yı açın, raporu paylaşıp bize gönderin." } }
+      }
+    },
     "Why is the audio on the Android phone?" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "لماذا الصوت على هاتف أندرويد؟" } },
@@ -65,12 +81,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra onda Kablosuz hata ayıklamayı yeniden açın: köprü uygulaması yardımcısını kendiliğinden başlatır ve bir bildirimle hatırlatır. O zamana kadar aramalar burada çalar, ses Android telefonda kalır." } }
       }
     },
-    "Android keeps call audio away from apps, so this needs Android 10 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone." : {
+    "Android keeps call audio away from apps, so this needs Android 11 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يحتاج هذا إلى أندرويد 10 أو أحدث و«تصحيح الأخطاء اللاسلكي» على هاتف أندرويد (بلا تطبيق إضافي ولا روت). بعض الهواتف تسمح بالاستماع فقط؛ عندها تسمع المكالمة هنا وتتحدث من هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android keeps call audio away from apps, so this needs Android 10 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین این کار به اندروید ۱۰ یا جدیدتر و «اشکال‌زدایی بی‌سیم» روی گوشی اندرویدی نیاز دارد (بدون برنامهٔ اضافه و بدون روت). بعضی گوشی‌ها فقط اجازهٔ شنیدن می‌دهند؛ آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android arama sesini uygulamalardan uzak tutar; bu yüzden Android 10 veya üstü ve Android telefonda Kablosuz hata ayıklama gerekir (ek uygulama ve root gerekmez). Bazı telefonlar yalnızca dinlemeye izin verir; o zaman aramayı burada duyar, Android telefondan konuşursunuz." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يحتاج هذا إلى أندرويد 11 أو أحدث و«تصحيح الأخطاء اللاسلكي» على هاتف أندرويد (بلا تطبيق إضافي ولا روت). بعض الهواتف تسمح بالاستماع فقط؛ عندها تسمع المكالمة هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android keeps call audio away from apps, so this needs Android 11 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین این کار به اندروید ۱۱ یا جدیدتر و «اشکال‌زدایی بی‌سیم» روی گوشی اندرویدی نیاز دارد (بدون برنامهٔ اضافه و بدون روت). بعضی گوشی‌ها فقط اجازهٔ شنیدن می‌دهند؛ آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android arama sesini uygulamalardan uzak tutar; bu yüzden Android 11 veya üstü ve Android telefonda Kablosuz hata ayıklama gerekir (ek uygulama ve root gerekmez). Bazı telefonlar yalnızca dinlemeye izin verir; o zaman aramayı burada duyar, Android telefondan konuşursunuz." } }
       }
     },
     "Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Calls keep ringing here meanwhile." : {
@@ -305,12 +321,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın (Android 12 veya üstü ve Kablosuz hata ayıklama gerekir)." } }
       }
     },
-    "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi." : {
+    "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد. يحتاج إلى أندرويد 10 أو أحدث و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي)، وأن يكون الهاتفان على شبكة الواي فاي نفسها." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید. به اندروید ۱۰ یا جدیدتر، «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın. Android 10 veya üstü, Kablosuz hata ayıklama (ek uygulama gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد. يحتاج إلى أندرويد 11 أو أحدث و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي)، وأن يكون الهاتفان على شبكة الواي فاي نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید. به اندروید ۱۱ یا جدیدتر، «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın. Android 11 veya üstü, Kablosuz hata ayıklama (ek uygulama gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir." } }
       }
     },
     "You hear this call here. Talk on your Android phone: it can't take audio from the iPhone." : {
@@ -329,12 +345,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses nerede" } }
       }
     },
-    "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." : {
+    "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عادةً تتحكم في المكالمات من الآيفون وتتحدث من هاتف أندرويد. ومع إعداد «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط (أندرويد 10 أو أحدث، و«تصحيح الأخطاء اللاسلكي»، والواي فاي نفسه)، تستخدم المكالمات التي تردّ عليها هنا ميكروفون هذا الآيفون ومكبّر صوته." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "معمولاً تماس‌ها را از آیفون کنترل می‌کنید و با گوشی اندرویدی صحبت می‌کنید. با راه‌اندازی «مکالمه با آیفون» در برنامهٔ پل (اندروید ۱۰ یا جدیدتر، «اشکال‌زدایی بی‌سیم» و یک وای‌فای مشترک)، تماس‌هایی که اینجا جواب می‌دهید از میکروفون و بلندگوی همین آیفون استفاده می‌کنند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Normalde aramaları iPhone’dan yönetir, Android telefondan konuşursunuz. Köprü uygulamasında iPhone’dan konuşma kuruluysa (Android 10 veya üstü, Kablosuz hata ayıklama, aynı Wi-Fi), burada aldığınız aramalar bu iPhone’un mikrofonunu ve hoparlörünü kullanır." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عادةً تتحكم في المكالمات من الآيفون وتتحدث من هاتف أندرويد. ومع إعداد «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط (أندرويد 11 أو أحدث، و«تصحيح الأخطاء اللاسلكي»، والواي فاي نفسه)، تستخدم المكالمات التي تردّ عليها هنا ميكروفون هذا الآيفون ومكبّر صوته." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "معمولاً تماس‌ها را از آیفون کنترل می‌کنید و با گوشی اندرویدی صحبت می‌کنید. با راه‌اندازی «مکالمه با آیفون» در برنامهٔ پل (اندروید ۱۱ یا جدیدتر، «اشکال‌زدایی بی‌سیم» و یک وای‌فای مشترک)، تماس‌هایی که اینجا جواب می‌دهید از میکروفون و بلندگوی همین آیفون استفاده می‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Normalde aramaları iPhone’dan yönetir, Android telefondan konuşursunuz. Köprü uygulamasında iPhone’dan konuşma kuruluysa (Android 11 veya üstü, Kablosuz hata ayıklama, aynı Wi-Fi), burada aldığınız aramalar bu iPhone’un mikrofonunu ve hoparlörünü kullanır." } }
       }
     },
     "Why does call audio go back to the Android phone sometimes?" : {
@@ -345,12 +361,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi neden bazen Android telefona dönüyor?" } }
       }
     },
-    "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." : {
+    "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، مع «التحدث عبر الآيفون»: أعدّه في تطبيق الهاتف الوسيط من الإعدادات › التحدث عبر الآيفون. يحتاج إلى أندرويد 10 أو أحدث، و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي ولا روت)، وأن يكون الهاتفان على شبكة الواي فاي نفسها. ومن دونه تردّ هنا وتتحدث من هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، با «مکالمه با آیفون»: آن را در برنامهٔ پل از تنظیمات › مکالمه با آیفون راه بیندازید. به اندروید ۱۰ یا جدیدتر، «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه و بدون روت) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد. بدون آن، اینجا جواب می‌دهید و با گوشی اندرویدی صحبت می‌کنید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, iPhone’dan konuşma ile: köprü uygulamasında Ayarlar › iPhone’dan konuşma’dan kurun. Android 10 veya üstü, Kablosuz hata ayıklama (ek uygulama ve root gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir. Olmadan burada yanıtlar, Android telefondan konuşursunuz." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، مع «التحدث عبر الآيفون»: أعدّه في تطبيق الهاتف الوسيط من الإعدادات › التحدث عبر الآيفون. يحتاج إلى أندرويد 11 أو أحدث، و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي ولا روت)، وأن يكون الهاتفان على شبكة الواي فاي نفسها. ومن دونه تردّ هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، با «مکالمه با آیفون»: آن را در برنامهٔ پل از تنظیمات › مکالمه با آیفون راه بیندازید. به اندروید ۱۱ یا جدیدتر، «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه و بدون روت) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد. بدون آن، اینجا جواب می‌دهید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, iPhone’dan konuşma ile: köprü uygulamasında Ayarlar › iPhone’dan konuşma’dan kurun. Android 11 veya üstü, Kablosuz hata ayıklama (ek uygulama ve root gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir. Olmadan burada yanıtlar, Android telefondan konuşursunuz." } }
       }
     },
     "Your answer helps Pairline pick what works on your Android phone. Nothing else is sent." : {
