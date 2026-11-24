@@ -57,6 +57,7 @@ import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
 import app.pairline.android.ui.PermissionGroup
 import app.pairline.android.ui.Route
+import app.pairline.android.ui.ScreenshotMode
 import app.pairline.android.ui.SystemActions
 import app.pairline.android.ui.components.LinkIllustration
 import app.pairline.android.ui.components.LinkVisual
@@ -225,7 +226,11 @@ private fun LinkCard(
             StatusPill(stringResource(pill), tone)
             val (title, body) = when {
                 link.connected -> stringResource(R.string.home_connected_title, peer) to stringResource(
-                    if (link.transport == TransportKind.DEBUG_TCP) R.string.home_connected_body_tcp else R.string.home_connected_body,
+                    if (link.transport == TransportKind.DEBUG_TCP && !ScreenshotMode.enabled) {
+                        R.string.home_connected_body_tcp
+                    } else {
+                        R.string.home_connected_body
+                    },
                 )
                 link.bluetooth == BluetoothStatus.OFF -> stringResource(R.string.notif_bt_off_title) to stringResource(R.string.home_bt_off_body)
                 link.bluetooth == BluetoothStatus.NO_PERMISSION -> stringResource(R.string.home_bt_perm_title) to stringResource(R.string.home_bt_perm_body)

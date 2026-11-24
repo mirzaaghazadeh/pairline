@@ -9,6 +9,7 @@ import android.os.Binder
 import android.os.Process
 import app.pairline.android.AppGraph
 import app.pairline.android.log.Log
+import app.pairline.android.ui.ScreenshotMode
 
 /**
  * DEBUG BUILDS ONLY (D-018). Lets tests pair and drive the app without a camera:
@@ -16,6 +17,7 @@ import app.pairline.android.log.Log
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/pairing   # column `uri`
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/state
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/setup-done
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/screenshot-mode-on   # or -off
  *
  * Only the shell user (adb), root and the app itself may call it.
  */
@@ -53,6 +55,11 @@ class DevToolsProvider : ContentProvider() {
                 AppGraph.prefs.setupDone = true
                 Log.i("devtools", "setup marked done by adb")
                 addRow(arrayOf<Any>(true))
+            }
+            "screenshot-mode-on", "screenshot-mode-off" -> MatrixCursor(arrayOf("screenshot_mode")).apply {
+                ScreenshotMode.enabled = uri.lastPathSegment == "screenshot-mode-on"
+                Log.i("devtools", "screenshot mode ${if (ScreenshotMode.enabled) "on" else "off"}")
+                addRow(arrayOf<Any>(ScreenshotMode.enabled))
             }
             else -> null
         }
