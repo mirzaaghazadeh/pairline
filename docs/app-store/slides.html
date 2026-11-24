@@ -9,8 +9,6 @@
 <meta charset="utf-8">
 <title>Pairline App Store slide</title>
 <style>
-  @font-face { font-family: "Estedad"; src: url("../../ios/Shared/Fonts/Estedad-Bold.ttf"); font-weight: 700; }
-  @font-face { font-family: "Estedad"; src: url("../../ios/Shared/Fonts/Estedad-Medium.ttf"); font-weight: 500; }
   @font-face { font-family: "Vazirmatn"; src: url("fonts/vazirmatn-nl-wght.woff2"); font-weight: 100 900; }
 
   :root {
@@ -32,7 +30,6 @@
     -webkit-font-smoothing: antialiased;
   }
   body[data-lang="ar"] { font-family: "Vazirmatn", var(--latin); }
-  body[data-lang="fa"] { font-family: "Estedad", var(--latin); }
 
   /* The pairing motif: a faint dotted link across the canvas behind the phone. */
   .link {
@@ -58,12 +55,14 @@
     margin: 0; white-space: pre-line;
     font-size: 122px; line-height: 1.04; font-weight: 800; letter-spacing: -0.025em;
   }
-  body[data-lang="ar"] h1, body[data-lang="fa"] h1 { font-size: 112px; line-height: 1.28; letter-spacing: 0; font-weight: 700; }
+  body[data-lang="ar"] h1 { font-size: 112px; line-height: 1.28; letter-spacing: 0; font-weight: 700; }
+  /* Turkish words run longer than English ones. */
+  body[data-lang="tr"] h1 { font-size: 112px; }
   p.sub {
     margin: 0; max-width: 1060px;
     font-size: 50px; line-height: 1.32; font-weight: 500; color: var(--ink-soft);
   }
-  body[data-lang="ar"] p.sub, body[data-lang="fa"] p.sub { font-size: 46px; line-height: 1.6; }
+  body[data-lang="ar"] p.sub { font-size: 46px; line-height: 1.6; }
 
   /* The phone: a thin dark bezel around the real screen, with the Dynamic Island drawn on top. */
   .device {
@@ -90,37 +89,36 @@
   <div class="device"><div class="screen"><img id="shot" alt=""><div class="island"></div></div></div>
 
 <script>
-// One entry per slide: the screen to show and its copy in each language. App Store Connect has no Persian
-// localization; the Persian set is for the website and social media.
+// One entry per slide: the screen to show and its copy in each App Store language (English, Arabic, Turkish).
 const SLIDES = [
   { shot: "04-messages",
     en: ["Messages", "Your Android SIM,\non your iPhone", "Texts, calls and codes from the phone that holds your SIM."],
     ar: ["الرسائل", "شريحة أندرويد\nعلى آيفونك", "الرسائل والمكالمات والرموز من الهاتف الذي يحمل شريحتك."],
-    fa: ["پیامک‌ها", "سیم‌کارت اندرویدتان،\nروی آیفون", "پیامک، تماس و کدها از گوشی‌ای که سیم‌کارتتان در آن است."] },
+    tr: ["Mesajlar", "Android SIM'iniz\niPhone'unuzda", "Mesajlar, aramalar ve kodlar, SIM kartınızın takılı olduğu telefondan."] },
   { shot: "06-incoming-call",
     en: ["Calls", "Answer calls\non your iPhone", "Calls to your Android number ring right on your iPhone."],
     ar: ["المكالمات", "أجب على المكالمات\nمن آيفونك", "مكالمات رقمك على أندرويد ترنّ على آيفونك مباشرةً."],
-    fa: ["تماس‌ها", "جواب تماس‌ها\nروی آیفون", "تماس‌های شمارهٔ اندرویدتان روی آیفون زنگ می‌خورد."] },
+    tr: ["Aramalar", "Aramalar artık\niPhone'unuzda", "Android numaranıza gelen aramalar doğrudan iPhone'unuzda çalar."] },
   { shot: "05-one-time-code",
     en: ["One-time codes", "Codes in\none tap", "Verification codes are spotted and ready to copy."],
     ar: ["رموز التحقق", "الرموز\nبلمسة واحدة", "تُكتشف رموز التحقق وتصبح جاهزة للنسخ."],
-    fa: ["کدهای یک‌بارمصرف", "کدها\nبا یک لمس", "کدهای تأیید شناسایی می‌شوند و آمادهٔ کپی‌اند."] },
+    tr: ["Tek kullanımlık kodlar", "Kodlar\ntek dokunuşta", "Doğrulama kodları bulunur ve kopyalanmaya hazır olur."] },
   { shot: "07-contacts",
     en: ["Contacts", "Your contacts\ncome along", "Contacts and call history, synced from your Android phone."],
     ar: ["جهات الاتصال", "جهات اتصالك\nمعك دائمًا", "جهات الاتصال وسجل المكالمات متزامنة من هاتف أندرويد."],
-    fa: ["مخاطبین", "مخاطبانتان\nهمراهتان", "مخاطبین و سابقهٔ تماس‌ها از گوشی اندرویدتان همگام می‌شود."] },
+    tr: ["Kişiler", "Kişileriniz\nyanınızda", "Kişiler ve arama geçmişi, Android telefonunuzdan eşitlenir."] },
   { shot: "08-bridge-status",
     en: ["Bridge", "Your bridge\nat a glance", "Battery, signal and both SIM cards, live."],
     ar: ["الهاتف الوسيط", "الهاتف الوسيط\nفي لمحة", "البطارية والإشارة وكلتا الشريحتين، مباشرةً."],
-    fa: ["گوشی پل", "گوشی پل\nدر یک نگاه", "باتری، آنتن و هر دو سیم‌کارت، به‌صورت زنده."] },
+    tr: ["Köprü", "Köprü telefon\nbir bakışta", "Pil, sinyal ve iki SIM kart, anlık olarak."] },
   { shot: "09-privacy",
     en: ["Privacy", "Private\nby design", "End-to-end encrypted. No servers, no accounts, no tracking."],
     ar: ["الخصوصية", "الخصوصية\nفي الأساس", "تشفير تام بين هاتفيك. بلا خوادم ولا حسابات ولا تتبّع."],
-    fa: ["حریم خصوصی", "حریم خصوصی\nاز پایه", "رمزگذاری سرتاسری بین دو گوشی شما. بدون سرور، بدون حساب، بدون ردیابی."] },
+    tr: ["Gizlilik", "Gizlilik\nen baştan", "Uçtan uca şifreli. Sunucu yok, hesap yok, izleme yok."] },
   { shot: "02-start-options",
     en: ["One-time purchase", "Pay once.\nKeep it.", "Try it free for 3 days. No subscription, ever."],
     ar: ["شراء لمرة واحدة", "ادفع مرة واحدة\nواحتفظ به", "جرّبه مجانًا لمدة 3 أيام. بلا اشتراك أبدًا."],
-    fa: ["خرید یک‌باره", "یک بار بخرید،\nبرای همیشه", "سه روز رایگان امتحان کنید. بدون اشتراک."] },
+    tr: ["Tek seferlik satın alma", "Bir kez ödeyin,\nsizin olsun", "3 gün ücretsiz deneyin. Abonelik yok."] },
 ];
 
 const params = new URLSearchParams(location.hash.slice(1));
@@ -128,7 +126,7 @@ const lang = params.get("lang") || "en";
 const slide = SLIDES[(parseInt(params.get("s") || "1", 10) - 1)] || SLIDES[0];
 const [eyebrow, title, sub] = slide[lang];
 document.documentElement.lang = lang;
-document.documentElement.dir = lang === "en" ? "ltr" : "rtl";
+document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
 document.body.dataset.lang = lang;
 document.getElementById("eyebrow").textContent = eyebrow;
 document.getElementById("title").textContent = title;

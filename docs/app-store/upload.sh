@@ -1,6 +1,6 @@
 #!/bin/zsh
 # Uploads the App Store listing to App Store Connect with fastlane deliver: the text in metadata/ and the screenshots
-# render.sh writes to out/ (English and Arabic; the App Store has no Persian). It doesn't upload a build, doesn't
+# render.sh writes to out/ (English, Arabic and Turkish). It doesn't upload a build, doesn't
 # change the version and doesn't submit for review.
 #
 # Needs:
@@ -19,7 +19,7 @@ here=${0:A:h}
 # deliver reads one folder per locale and tells the display size from each image's pixel size.
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
-for locale in en-US ar-SA; do
+for locale in en-US ar-SA tr-TR; do
   mkdir -p "$stage/$locale"
   for size in large medium; do
     for f in $here/out/$locale/$size/*.png; do cp "$f" "$stage/$locale/$size-${f:t}"; done

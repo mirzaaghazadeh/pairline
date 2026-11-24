@@ -1,0 +1,1 @@
+çift sim,ikinci telefon,sms,otp,doğrulama kodu,iki telefon,sim kart,köprü,ussd,arama,mesaj,hat

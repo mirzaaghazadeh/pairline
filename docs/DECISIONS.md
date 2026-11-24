@@ -362,3 +362,19 @@ the website).
 - **Four static weights** (Regular, Medium, SemiBold, Bold; about 160 KB each) instead of the variable TTF, because SwiftUI's
   `.weight()` and Compose's `FontWeight` both pick between static faces reliably. Lighter and heavier weights map to the
   nearest bundled one.
+
+### D-033 — Turkish; the App Store listing in English, Arabic and Turkish (2026-11-24)
+
+Extends D-019 at the maintainer's request.
+
+- **Turkish (`tr`) in both apps:** every iPhone string catalog (app and widget, through the XLIFF workflow of D-028),
+  Android `values-tr`, Android's language picker and `locales_config.xml`, and Turkish demo data (made-up names,
+  +90 555 numbers, lira amounts). Turkish is left to right and uses the system font.
+- **App Store listing:** screenshots and text in English (`en-US`), Arabic (`ar-SA`) and Turkish (`tr-TR`) only
+  (`docs/app-store/`). No Persian screenshots or text in the listing.
+- **The iPhone app doesn't name its languages on its own screens.** The Settings footer only points to iPhone Settings ›
+  Pairline › Language, where iOS lists every language the app has (from `CFBundleLocalizations`), Persian included.
+  The Estedad credit in About shows only when the app runs in Persian. The Android app (GitHub, not the App Store)
+  keeps its in-app picker with each language in its own name, because Android 11 and 12 have no system per-app
+  language setting.
+- The Turkish, like the Persian and Arabic, was written from the English source and needs a native speaker's review.

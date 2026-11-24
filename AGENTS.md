@@ -166,8 +166,9 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 - Record decisions in `docs/DECISIONS.md` (append-only, dated). Don't silently reverse one; add a
   new entry that supersedes it.
 - Both apps implement `docs/PROTOCOL.md`; shared test vectors in `protocol/` must pass on both.
-- User-visible strings in English, Persian and Arabic from the start (D-019). Persian and Arabic are
-  right-to-left; check every screen mirrored, with phone numbers and codes kept left-to-right.
+- User-visible strings in English, Persian, Arabic and Turkish from the start (D-019, D-033). Persian and Arabic are
+  right-to-left; check every screen mirrored, with phone numbers and codes kept left-to-right. The App Store listing
+  is English, Arabic and Turkish, and the iPhone app doesn't list its languages on its own screens (D-033).
 - Persian text uses the bundled Estedad typeface (D-032). On iOS use text styles (`.font(.headline)`) or
   `.font(.rounded(_:weight:))`, not `.system(...)`, for anything that shows words; on Android use
   `MaterialTheme.typography`. Both switch to Estedad in Persian automatically.

@@ -4,22 +4,22 @@ Everything the App Store product page needs, kept as source so it can be regener
 
 | Path | What |
 |------|------|
-| `slides.html` | The 7 screenshot slides (headline, subtitle, the real app screen in a phone frame), copy in EN/AR/FA |
+| `slides.html` | The 7 screenshot slides (headline, subtitle, the real app screen in a phone frame), copy in EN/AR/TR |
 | `iap.html` | Promotional images for the two in-app purchases (1024 x 1024, no text, as Apple asks) |
 | `render.sh` | Renders everything into `out/` (git-ignored) with headless Chrome and ImageMagick |
 | `metadata/` | Name, subtitle, promotional text, description, keywords, URLs, categories, review notes (fastlane `deliver` layout) |
 | `upload.sh` | Uploads `metadata/` and the screenshots to App Store Connect with `fastlane deliver` |
-| `fonts/` | Vazirmatn (SIL OFL 1.1) for the Arabic slides. Persian uses the app's Estedad files (D-032) |
+| `fonts/` | Vazirmatn (SIL OFL 1.1) for the Arabic slides; English and Turkish use the system font (SF Pro) |
 
 The app screens come from `docs/screenshots/ios/<lang>/` (captured on the iPhone 18 Pro Simulator in demo mode with
 `-PairlineMarketing`; see `AGENTS.md`). Retake those first when the UI changes, then run `render.sh`.
 
 ## Outputs
 
-- `out/en-US/`, `out/ar-SA/`: `large/` 1320 x 2868 ("iPhone with Dynamic Island, large display", iPhone 18 Pro Max)
-  and `medium/` 1206 x 2622 ("medium display", the size App Store Connect requires). Seven slides each.
-- `out/fa/`: the same in Persian, for the website and social media. App Store Connect has no Persian localization;
-  Persian-speaking users see the English page.
+- `out/en-US/`, `out/ar-SA/`, `out/tr-TR/`: `large/` 1320 x 2868 ("iPhone with Dynamic Island, large display",
+  iPhone 18 Pro Max) and `medium/` 1206 x 2622 ("medium display", the size App Store Connect requires). Seven slides
+  each.
+- The App Store listing is in English, Arabic and Turkish only (D-033). Other app languages see the English page.
 - `out/iap/full.png`, `out/iap/trial.png`: the in-app purchase promotional images.
 
 All images are flattened without an alpha channel; App Store Connect rejects transparency.
