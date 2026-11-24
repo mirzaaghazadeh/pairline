@@ -55,9 +55,9 @@
     <string name="privacy_point_tracking">No ads, analytics or tracking of any kind</string>
     <string name="privacy_point_source">The source code is public, so anyone can check it</string>
 
-    <!-- Setup: Android 11 notice -->
-    <string name="android11_title">This phone runs Android 11</string>
-    <string name="android11_body">Pairline works here, but Android 11 no longer gets security updates. A phone that keeps your SIM and relays your messages should be as safe as possible.</string>
+    <!-- Setup: notice on Android 9, 10 and 11; %1$d is the Android version -->
+    <string name="android11_title">This phone runs Android %1$d</string>
+    <string name="android11_body">Pairline works here, but Android %1$d no longer gets security updates. A phone that keeps your SIM and relays your messages should be as safe as possible.</string>
     <string name="android11_tip">Best choice: a spare phone that you use only as a bridge, with no other apps on it.</string>
 
     <!-- Setup and Settings: permissions -->

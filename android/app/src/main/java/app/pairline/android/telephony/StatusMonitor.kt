@@ -9,6 +9,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.BatteryManager
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
 import android.telephony.PhoneStateListener
 import android.telephony.ServiceState
 import android.telephony.SignalStrength
@@ -22,7 +24,6 @@ import app.pairline.android.AppPrefs
 import app.pairline.android.log.Log
 import app.pairline.android.protocol.Msg
 import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -45,11 +46,16 @@ class StatusMonitor(
     /** Per-SIM call-state changes: subscription id, TelephonyManager.CALL_STATE_*, number if Android shares it. */
     var onCallState: ((subId: Int, state: Int, number: String?) -> Unit)? = null
 
-    private val pool = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-radio") }
+    /**
+     * One thread for radio callbacks and refreshes. It has a Looper because on Android 9 and 10 the
+     * PhoneStateListener and OnSubscriptionsChangedListener deliver to the looper of the thread that creates them.
+     */
+    private val radioThread = HandlerThread("pairline-radio").apply { start() }
+    private val radioHandler = Handler(radioThread.looper)
 
     /** Runs radio callbacks and refreshes; an unexpected error is logged instead of killing the thread. */
     private val executor: Executor = Executor { task ->
-        pool.execute {
+        radioHandler.post {
             try {
                 task.run()
             } catch (e: Exception) {
@@ -66,12 +72,8 @@ class StatusMonitor(
         override fun onReceive(context: Context, intent: Intent) = changed()
     }
 
-    private val subscriptionListener = object : SubscriptionManager.OnSubscriptionsChangedListener() {
-        override fun onSubscriptionsChanged() {
-            executor.execute { refreshRadioListeners() }
-            changed()
-        }
-    }
+    /** Created on the radio thread (see [radioThread]); touched only there. */
+    private var subscriptionListener: SubscriptionManager.OnSubscriptionsChangedListener? = null
 
     fun start() {
         if (started) return
@@ -82,20 +84,38 @@ class StatusMonitor(
             IntentFilter(Intent.ACTION_BATTERY_CHANGED),
             ContextCompat.RECEIVER_NOT_EXPORTED,
         )
-        try {
-            subscriptions?.addOnSubscriptionsChangedListener(executor, subscriptionListener)
-        } catch (e: Exception) {
-            Log.w(TAG, "can't watch SIM changes", e)
+        executor.execute {
+            val listener = object : SubscriptionManager.OnSubscriptionsChangedListener() {
+                override fun onSubscriptionsChanged() {
+                    executor.execute { refreshRadioListeners() }
+                    changed()
+                }
+            }
+            subscriptionListener = listener
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    subscriptions?.addOnSubscriptionsChangedListener(executor, listener)
+                } else {
+                    // Android 9 and 10: delivered on this (radio) thread's looper.
+                    @Suppress("DEPRECATION")
+                    subscriptions?.addOnSubscriptionsChangedListener(listener)
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "can't watch SIM changes", e)
+            }
+            refreshRadioListeners()
         }
-        executor.execute { refreshRadioListeners() }
     }
 
     fun stop() {
         if (!started) return
         started = false
         runCatching { context.unregisterReceiver(batteryReceiver) }
-        runCatching { subscriptions?.removeOnSubscriptionsChangedListener(subscriptionListener) }
-        executor.execute { unregisterAll() }
+        executor.execute {
+            subscriptionListener?.let { listener -> runCatching { subscriptions?.removeOnSubscriptionsChangedListener(listener) } }
+            subscriptionListener = null
+            unregisterAll()
+        }
     }
 
     /** Re-reads permissions (after the user grants one) and re-registers the radio listeners. */
@@ -177,14 +197,20 @@ class StatusMonitor(
         changed()
     }
 
+    /**
+     * Android 9–11. Runs on the radio thread, so the listener (created with the no-argument constructor) delivers
+     * on that thread's looper on every version, including Android 9, which has no Executor constructor.
+     */
     @Suppress("DEPRECATION")
     private fun legacyListener(subId: Int, tm: TelephonyManager): PhoneStateListener {
-        val listener = object : PhoneStateListener(executor) {
+        val listener = object : PhoneStateListener() {
             override fun onSignalStrengthsChanged(signalStrength: SignalStrength?) = changed()
             override fun onServiceStateChanged(serviceState: ServiceState?) {
                 serviceState?.let { sims.serviceStates[subId] = it.state }
                 changed()
             }
+            // Only called on Android 11 (5G NSA shows as an override of the LTE network type).
+            @RequiresApi(Build.VERSION_CODES.R)
             override fun onDisplayInfoChanged(telephonyDisplayInfo: TelephonyDisplayInfo) {
                 sims.displayOverrides[subId] = telephonyDisplayInfo.overrideNetworkType
                 changed()
@@ -193,11 +219,10 @@ class StatusMonitor(
                 onCallState?.invoke(subId, state, phoneNumber?.takeIf { it.isNotBlank() })
             }
         }
-        tm.listen(
-            listener,
-            PhoneStateListener.LISTEN_SIGNAL_STRENGTHS or PhoneStateListener.LISTEN_SERVICE_STATE or
-                PhoneStateListener.LISTEN_DISPLAY_INFO_CHANGED or PhoneStateListener.LISTEN_CALL_STATE,
-        )
+        var events = PhoneStateListener.LISTEN_SIGNAL_STRENGTHS or PhoneStateListener.LISTEN_SERVICE_STATE or
+            PhoneStateListener.LISTEN_CALL_STATE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) events = events or PhoneStateListener.LISTEN_DISPLAY_INFO_CHANGED
+        tm.listen(listener, events)
         return listener
     }
 

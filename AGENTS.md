@@ -66,7 +66,7 @@ one, stop and ask the maintainer instead of working around it.
 |----------------|-----------------------------------------------------|------------------------------------------------|
 | Language       | Kotlin                                              | Swift                                          |
 | UI             | Jetpack Compose                                     | SwiftUI                                        |
-| Minimum OS     | Android 11 (API 30)                                 | iOS 16                                         |
+| Minimum OS     | Android 9 (API 28; D-038)                           | iOS 16                                         |
 | Target         | latest (API 36)                                     | latest                                         |
 | Build          | Gradle, Kotlin DSL + version catalog, JDK 17        | Xcode + XcodeGen (`ios/project.yml`)           |
 | Key frameworks | Telephony/SmsManager, InCallService (companion), BLE GATT server, Shizuku (optional) | CallKit, CoreBluetooth, AVAudioSession, CryptoKit, StoreKit 2 |

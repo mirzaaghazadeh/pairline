@@ -237,12 +237,18 @@ private fun PrivacyStep(next: () -> Unit) {
     )
 }
 
+/** Shown on Android 9, 10 and 11, which no longer get security updates (D-038). */
 @Composable
 private fun Android11Step(next: () -> Unit) {
+    val version = when (Build.VERSION.SDK_INT) {
+        Build.VERSION_CODES.P -> 9
+        Build.VERSION_CODES.Q -> 10
+        else -> 11
+    }
     StepScaffold(
         illustration = { PulseIcon(PIcons.Warning, Tone.WARN) },
-        title = stringResource(R.string.android11_title),
-        body = stringResource(R.string.android11_body),
+        title = stringResource(R.string.android11_title, version),
+        body = stringResource(R.string.android11_body, version),
         buttons = { PrimaryButton(stringResource(R.string.action_understood), next) },
         extra = { NoteBox(stringResource(R.string.android11_tip), Tone.NEUTRAL, PIcons.Info) },
     )

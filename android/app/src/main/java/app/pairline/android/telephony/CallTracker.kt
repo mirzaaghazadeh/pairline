@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -112,7 +113,13 @@ class CallTracker(
 
     fun onCallAdded(call: Call) = executor.execute {
         val details = call.details
-        val incoming = details.callDirection != Call.Details.DIRECTION_OUTGOING
+        val incoming = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            details.callDirection != Call.Details.DIRECTION_OUTGOING
+        } else {
+            // Android 9 has no call direction: a call that arrives ringing is incoming, one being dialed outgoing.
+            @Suppress("DEPRECATION")
+            call.state == Call.STATE_RINGING
+        }
         val number = details.handle?.takeIf { it.scheme == "tel" }?.schemeSpecificPart?.takeIf { it.isNotBlank() }
         val state = CallMapping.state(call.state) ?: CallMapping.DIALING
         // The telephony callback may have seen this call first; adopt it so the id stays the same.

@@ -87,9 +87,7 @@ class SimDirectory(private val context: Context) {
         val telecom = context.getSystemService(TelecomManager::class.java) ?: return null
         if (!Perms.granted(context, Manifest.permission.READ_PHONE_STATE)) return null
         return try {
-            telecom.callCapablePhoneAccounts.firstOrNull { handle ->
-                telephony?.getSubscriptionId(handle) == subId
-            }
+            telecom.callCapablePhoneAccounts.firstOrNull { handle -> subIdFor(handle) == subId }
         } catch (_: SecurityException) {
             null
         }
@@ -100,10 +98,26 @@ class SimDirectory(private val context: Context) {
     fun slotForAccount(handle: PhoneAccountHandle?): Int? {
         if (handle == null) return null
         return try {
-            slotFor(telephony?.getSubscriptionId(handle))
+            slotFor(subIdFor(handle))
         } catch (_: Exception) {
             null
         }
+    }
+
+    /**
+     * The subscription behind a Telecom phone account. Android 11 has an API for it; on Android 9 and 10 the
+     * telephony phone account's id is the subscription id or the SIM's ICCID (it varies by maker), so match both.
+     */
+    @SuppressLint("MissingPermission")
+    private fun subIdFor(handle: PhoneAccountHandle): Int? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) return telephony?.getSubscriptionId(handle)
+        val id = handle.id?.takeIf { it.isNotBlank() } ?: return null
+        return activeSubscriptions().firstOrNull { info ->
+            if (info.subscriptionId.toString() == id) return@firstOrNull true
+            @Suppress("DEPRECATION")
+            val iccId = runCatching { info.iccId }.getOrNull()?.takeIf { it.isNotBlank() }
+            iccId != null && (id.startsWith(iccId) || iccId.startsWith(id))
+        }?.subscriptionId
     }
 
     fun snapshots(): List<SimSnapshot> {

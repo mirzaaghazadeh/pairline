@@ -54,9 +54,9 @@
     <string name="privacy_point_tracking">Reklam, analiz veya herhangi bir izleme yok</string>
     <string name="privacy_point_source">Kaynak kodu herkese açıktır, böylece herkes inceleyebilir</string>
 
-    <!-- Setup: Android 11 notice -->
-    <string name="android11_title">Bu telefon Android 11 kullanıyor</string>
-    <string name="android11_body">Pairline burada çalışır, ancak Android 11 artık güvenlik güncellemesi almıyor. SIM kartınızı taşıyan ve mesajlarınızı aktaran bir telefon olabildiğince güvenli olmalıdır.</string>
+    <!-- Setup: notice on Android 9, 10 and 11; %1$d is the Android version -->
+    <string name="android11_title">Bu telefon Android %1$d kullanıyor</string>
+    <string name="android11_body">Pairline burada çalışır, ancak Android %1$d artık güvenlik güncellemesi almıyor. SIM kartınızı taşıyan ve mesajlarınızı aktaran bir telefon olabildiğince güvenli olmalıdır.</string>
     <string name="android11_tip">En iyi seçenek: yalnızca köprü olarak kullandığınız, üzerinde başka uygulama olmayan yedek bir telefon.</string>
 
     <!-- Setup and Settings: permissions -->

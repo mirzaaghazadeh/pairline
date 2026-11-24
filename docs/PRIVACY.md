@@ -87,7 +87,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | `READ_CONTACTS` | Caller names and contacts on the iPhone | Setup, optional |
 | `WRITE_CONTACTS` | Add contacts from the iPhone | Only when you turn on "Add contacts from iPhone" in Settings (off by default) |
 | `ACCESS_WIFI_STATE`, `CHANGE_WIFI_STATE`; `NEARBY_WIFI_DEVICES` (Android 13+) (M5) | Create the hotspot the iPhone joins | When you turn on the Wi-Fi link |
-| `BLUETOOTH_ADVERTISE`, `BLUETOOTH_CONNECT` (Android 12+, "Nearby devices"); `BLUETOOTH`, `BLUETOOTH_ADMIN` (Android 11, at install) | The Bluetooth link. The advertisement carries only Pairline's service id: no name or number | Setup |
+| `BLUETOOTH_ADVERTISE`, `BLUETOOTH_CONNECT` (Android 12+, "Nearby devices"); `BLUETOOTH`, `BLUETOOTH_ADMIN` (Android 9–11, at install) | The Bluetooth link. The advertisement carries only Pairline's service id: no name or number | Setup |
 | `ACCESS_FINE_LOCATION` | **Not requested.** The bridge only advertises and accepts connections, which doesn't need location on any supported Android version | — |
 | `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_CONNECTED_DEVICE` | Keep the link running | Install |
 | `POST_NOTIFICATIONS` (Android 13+) | The status notification the background service requires | Setup |

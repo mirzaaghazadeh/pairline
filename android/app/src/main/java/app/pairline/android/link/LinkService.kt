@@ -107,6 +107,8 @@ class LinkService : Service() {
     private fun enterForeground(): Boolean {
         val notification = Notifications.linkNotification(this, graph.link.state.value, graph.peers.paired.value, graph.prefs.peerName)
         return try {
+            // ServiceCompat ignores the type below Android 10, so the inlined constant is safe on Android 9.
+            @Suppress("InlinedApi")
             ServiceCompat.startForeground(
                 this,
                 Notifications.LINK_ID,

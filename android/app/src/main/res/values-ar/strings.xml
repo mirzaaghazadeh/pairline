@@ -55,9 +55,9 @@
     <string name="privacy_point_tracking">لا إعلانات ولا تحليلات ولا تتبّع من أي نوع</string>
     <string name="privacy_point_source">الشيفرة المصدرية منشورة علنًا، ليتمكن أي شخص من التحقق منها</string>
 
-    <!-- Setup: Android 11 notice -->
-    <string name="android11_title">يعمل هذا الهاتف بنظام أندرويد ١١</string>
-    <string name="android11_body">يعمل Pairline على هذا الهاتف، لكن أندرويد ١١ لم يعد يتلقى تحديثات أمنية. والهاتف الذي يحمل شريحتك وينقل رسائلك ينبغي أن يكون آمنًا قدر الإمكان.</string>
+    <!-- Setup: notice on Android 9, 10 and 11; %1$d is the Android version -->
+    <string name="android11_title">يعمل هذا الهاتف بنظام أندرويد %1$d</string>
+    <string name="android11_body">يعمل Pairline على هذا الهاتف، لكن أندرويد %1$d لم يعد يتلقى تحديثات أمنية. والهاتف الذي يحمل شريحتك وينقل رسائلك ينبغي أن يكون آمنًا قدر الإمكان.</string>
     <string name="android11_tip">الخيار الأفضل: هاتف احتياطي تستخدمه جسرًا فقط، دون أي تطبيقات أخرى عليه.</string>
 
     <!-- Setup and Settings: permissions -->

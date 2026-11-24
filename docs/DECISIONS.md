@@ -435,3 +435,18 @@ is left out of every submission. Build 1.0 (2) carries the change; it was resubm
   (`ASC_*` env): on each deploy it sets the price schedule of `app.pairline.ios.full` to that value. The apps show
   whatever price StoreKit reports, so a price change needs no app update. The key gives App Manager access to every
   app on the team, so it should be a dedicated key that can be revoked on its own.
+
+### D-038 — The bridge runs on Android 9 and later (supersedes the Android 11 minimum) (2026-11-24)
+
+The maintainer's test phone (Galaxy Note 8) runs Android 9, and spare phones that end up as bridges are often that
+old. `minSdk` is now 28. Android lint listed every newer API in use, and each now has a fallback:
+- **Call direction** (Android 10): on Android 9 a call that arrives ringing is incoming, one being dialed outgoing.
+- **Phone account → SIM** (`getSubscriptionId(PhoneAccountHandle)`, Android 11): on Android 9 and 10 the telephony
+  phone account's id is the subscription id or the SIM's ICCID, depending on the maker; both are matched.
+- **SIM changes and radio state listeners** (Executor variants, Android 10/11): the radio thread is now a Looper
+  thread, and on Android 9 and 10 the listeners are created on it so they deliver there; the 5G display-info event
+  is only requested on Android 11.
+- The setup notice about missing security updates now names the phone's real version (9, 10 or 11).
+Bluetooth works the same: Android 9–11 use the install-time `BLUETOOTH`/`BLUETOOTH_ADMIN` permissions the manifest
+already declares (up to API 30), and advertising as a peripheral needs no location permission. Tested: build, unit
+tests and lint at minSdk 28; on-device testing on the Note 8 is next. Released as Pairline Bridge 1.0.1.

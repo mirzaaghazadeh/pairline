@@ -54,9 +54,9 @@
     <string name="privacy_point_tracking">بدون تبلیغات، آمارگیری یا هر نوع ردیابی</string>
     <string name="privacy_point_source">کد منبع عمومی است، پس هر کسی می‌تواند آن را بررسی کند</string>
 
-    <!-- Setup: Android 11 notice -->
-    <string name="android11_title">این گوشی اندروید ۱۱ دارد</string>
-    <string name="android11_body">برنامهٔ Pairline روی این گوشی کار می‌کند، اما اندروید ۱۱ دیگر به‌روزرسانی امنیتی دریافت نمی‌کند. گوشی‌ای که سیم‌کارت شما در آن است و پیام‌هایتان را منتقل می‌کند، باید تا جای ممکن امن باشد.</string>
+    <!-- Setup: notice on Android 9, 10 and 11; %1$d is the Android version -->
+    <string name="android11_title">این گوشی اندروید %1$d دارد</string>
+    <string name="android11_body">برنامهٔ Pairline روی این گوشی کار می‌کند، اما اندروید %1$d دیگر به‌روزرسانی امنیتی دریافت نمی‌کند. گوشی‌ای که سیم‌کارت شما در آن است و پیام‌هایتان را منتقل می‌کند، باید تا جای ممکن امن باشد.</string>
     <string name="android11_tip">بهترین انتخاب: یک گوشی اضافه که فقط به‌عنوان پل از آن استفاده می‌کنید و هیچ برنامهٔ دیگری روی آن نیست.</string>
 
     <!-- Setup and Settings: permissions -->

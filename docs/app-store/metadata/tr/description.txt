@@ -22,7 +22,7 @@ GİZLİLİK EN BAŞTAN
 • Kaynak kodu herkese açık; bu sözleri herkes kontrol edebilir
 
 NASIL ÇALIŞIR
-1. Ücretsiz Pairline Bridge uygulamasını Android telefona (Android 11 veya üstü) pairline.navid.tr adresinden yükleyin
+1. Ücretsiz Pairline Bridge uygulamasını Android telefona (Android 9 veya üstü) pairline.navid.tr adresinden yükleyin
 2. iPhone'unuzda Pairline'ı açın ve Android telefonun gösterdiği eşleştirme kodunu tarayın
 3. İki telefonu Bluetooth menzili içinde tutun
 

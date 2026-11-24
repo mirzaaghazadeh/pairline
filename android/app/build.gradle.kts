@@ -13,14 +13,15 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        // Provisional (D-007). Changing it after the first release breaks updates.
+        // Final since 1.0.0 (D-037). Changing it would break updates.
         applicationId = "app.pairline.android"
-        minSdk = 30
+        // Android 9 and later (D-038; was Android 11).
+        minSdk = 28
         targetSdk = 36
         // A release tag must be android-v<versionName>; the release workflow checks this.
         // Raise versionCode for every release.
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
 
     androidResources {

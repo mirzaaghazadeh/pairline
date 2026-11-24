@@ -11,7 +11,7 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 ## M0 — Project setup
 
 - [x] Repo docs: README, AGENTS.md, LICENSE (FSL-1.1-ALv2), PRIVACY, PROTOCOL draft, ARCHITECTURE, DECISIONS, SECURITY
-- [x] Android Gradle project in `android/`: Kotlin, Compose, minSdk 30, compileSdk 37 (D-016), targetSdk 36,
+- [x] Android Gradle project in `android/`: Kotlin, Compose, minSdk 28 (was 30; D-038), compileSdk 37 (D-016), targetSdk 36,
       applicationId `app.pairline.android` (provisional, D-007); `./gradlew assembleDebug test lint` pass
 - [x] iOS XcodeGen project in `ios/`: SwiftUI, iOS 16, bundle ID `app.pairline.ios` (provisional); builds for the
       simulator; has a unit-test target (plus a widget extension)
@@ -61,7 +61,7 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 
 ## M3 — Calls (control only; audio stays on Android)
 
-- [ ] Spike: companion `InCallService` binding on Android 11–16 and major makers — first finding (API 36 emulator):
+- [ ] Spike: companion `InCallService` binding on Android 9–16 and major makers — first finding (API 36 emulator):
       Telecom skips binding a companion `InCallService` unless the app holds `MANAGE_ONGOING_CALLS`
       (signature|appop|role). With the app-op allowed through adb it binds, and DTMF, mute and speaker work. Without
       it the bridge falls back to telephony callbacks plus `TelecomManager` answer/end. Real phones still to test;
