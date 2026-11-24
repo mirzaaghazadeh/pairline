@@ -9,6 +9,22 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "SOCKS5 proxy ayarı olan uygulamalar" } }
       }
     },
+    "Can this iPhone use the Android phone's internet?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل يمكن لهذا الآيفون استخدام إنترنت هاتف أندرويد؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can this iPhone use the Android phone's internet?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این آیفون می‌تواند از اینترنت گوشی اندرویدی استفاده کند؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone, Android telefonun internetini kullanabilir mi?" } }
+      }
+    },
+    "Yes. Turn on Internet sharing in the bridge app, then use Settings › Internet sharing here: it gives a link for your Wi-Fi proxy settings and a one-tap Telegram setting. Traffic goes through the Android phone and its VPN, if one is on." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم. فعّل «مشاركة الإنترنت» في تطبيق الهاتف الوسيط، ثم استخدم الإعدادات › مشاركة الإنترنت هنا: ستجد رابطًا لإعدادات وكيل الواي فاي وإعدادًا بضغطة واحدة لتيليجرام. تمر البيانات عبر هاتف أندرويد وعبر شبكة VPN الخاصة به إن كانت مفعّلة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes. Turn on Internet sharing in the bridge app, then use Settings › Internet sharing here: it gives a link for your Wi-Fi proxy settings and a one-tap Telegram setting. Traffic goes through the Android phone and its VPN, if one is on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله. «اشتراک اینترنت» را در برنامهٔ پل روشن کنید، بعد اینجا از تنظیمات › اشتراک اینترنت استفاده کنید: یک نشانی برای تنظیمات پراکسی وای‌فای و یک تنظیم یک‌ضربه‌ای برای تلگرام می‌دهد. ترافیک از گوشی اندرویدی و اگر VPN روشن باشد از VPN آن عبور می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet. Köprü uygulamasında İnternet paylaşımını açın, ardından buradaki Ayarlar › İnternet paylaşımı’nı kullanın: Wi-Fi proxy ayarlarınız için bir bağlantı ve tek dokunuşluk bir Telegram ayarı verir. Trafik Android telefondan, açıksa VPN’inden geçer." } }
+      }
+    },
     "Internet sharing" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "مشاركة الإنترنت" } },

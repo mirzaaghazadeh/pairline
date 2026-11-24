@@ -354,9 +354,9 @@
     <string name="help_q_no_sms">Messages don\'t reach my iPhone</string>
     <string name="help_a_no_sms">Make sure Text messages is allowed in Permissions and that the home screen says Connected. Messages that arrive while the link is down appear on the iPhone when it reconnects.</string>
     <string name="help_q_call_audio">Where do I talk during a call?</string>
-    <string name="help_a_call_audio">For now, on this Android phone. You can answer, decline and end calls from your iPhone, but the call audio stays on the Android phone. Audio on the iPhone is planned.</string>
+    <string name="help_a_call_audio">On this Android phone, unless you set up Talk on iPhone (Settings › Talk on iPhone). Then calls you answer or place on the iPhone use the iPhone\'s microphone and speaker. It needs Android 10 or later, the free Shizuku app and both phones on the same Wi-Fi.</string>
     <string name="help_q_dtmf">Why can\'t I use the keypad or mute from my iPhone?</string>
-    <string name="help_a_dtmf">Android only lets a few apps control a call in progress. On most phones Pairline can answer and end calls, but not send keypad tones or mute. When your phone allows it, Pairline uses it automatically.</string>
+    <string name="help_a_dtmf">Android only lets a few apps control a call in progress. Without help, Pairline can answer and end calls but not send keypad tones or mute. Set up Talk on iPhone (Settings › Talk on iPhone, Android 12 or later) and Pairline can do both.</string>
     <string name="help_q_restricted">Android says \"Restricted setting\"</string>
     <string name="help_a_restricted">Android 13 and later limit some permissions for apps installed outside an app store. Open App info for Pairline, tap ⋮ at the top and choose \"Allow restricted settings\", then allow the permission again.</string>
 

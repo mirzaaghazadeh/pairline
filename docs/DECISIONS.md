@@ -589,6 +589,13 @@ bottom, on the brand-blue gradient (#2A6FD6 → #15468F). It replaces the two-ph
   simply overlap.
 - Users see it with the next builds: iOS after the next App Store upload, Android from the next release.
 
+### D-050 — No Android client mode (drops M9) (2026-11-24)
+
+The maintainer decided against M9 (the Android app working as a client of another Android phone, added in D-041). The
+Android app stays a bridge only; the iPhone stays the only remote. The started work is kept, unmerged, on the branch
+`archive/m9-android-client-start` (one commit: the R-role session in Kotlin) in case this comes back. Decision numbers
+reserved for it in D-041 are free again.
+
 ### D-044 — The Wi-Fi link is a full link of its own, next to Bluetooth (2026-11-24)
 
 The Galaxy Note 8 can't hold a Bluetooth link with Apple devices (D-040), and call audio (M6) needs a low-latency

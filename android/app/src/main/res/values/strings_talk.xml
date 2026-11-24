@@ -35,4 +35,16 @@
     <string name="talk_wifi_note">Call audio goes over your Wi-Fi, encrypted end to end. It’s never recorded or stored.</string>
     <string name="talk_setup_title">Talk on your iPhone (optional)</string>
     <string name="talk_setup_later">Set up later</string>
+    <string name="talk_reminder_channel">Talk on iPhone</string>
+    <string name="talk_reminder_title">Call audio is back on this phone</string>
+    <string name="talk_reminder_text">Shizuku stopped when the phone restarted. Tap to open Shizuku and start it again, so calls play on your iPhone. Calls still ring on the iPhone meanwhile.</string>
+    <string name="help_section_talk">Talk on iPhone</string>
+    <string name="help_q_shizuku">What is Shizuku? Does it need root?</string>
+    <string name="help_a_shizuku">Shizuku is a free, open-source app that lends Pairline the rights of Android’s own debugging tool, with your permission. No root is needed. Pairline uses it only to carry call audio and for the call keypad, mute and speaker. You can take the permission back in Shizuku at any time.</string>
+    <string name="help_q_restart">Why does call audio go back to this phone after a restart?</string>
+    <string name="help_a_restart">Android turns Wireless debugging off every time the phone restarts, and that stops Shizuku. Pairline then shows a notification: tap it and start Shizuku again, and calls play on your iPhone again. Until then calls still ring and work on the iPhone, with the audio on this phone. On a rooted phone Shizuku can start by itself.</string>
+    <string name="help_q_debugging">An app complains that debugging is on</string>
+    <string name="help_a_debugging">Some banking and payment apps refuse to open while Developer options or Wireless debugging are on. Pairline never turns them on by itself. Turn Wireless debugging off while you use such an app; Shizuku may stop, and you start it again later for call audio.</string>
+    <string name="help_q_listen_only">I hear calls on the iPhone, but they can’t hear me</string>
+    <string name="help_a_listen_only">Some phones don’t let any app feed audio into a call. Then you hear calls on the iPhone and talk on this phone. After each call the iPhone asks how it sounded; your answers help Pairline try another way on the next call.</string>
 </resources>
