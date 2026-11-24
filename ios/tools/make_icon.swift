@@ -1,15 +1,21 @@
-// Draws the Pairline app icon and launch mark with CoreGraphics: two phones joined by a line.
+// Draws the Pairline app icon, launch mark and brand mark with CoreGraphics: two links of a chain, one for each
+// phone (the "Chain" logo, also on the website and in Telegram). The left link passes over the right one at the top
+// and under it at the bottom. Same geometry as pairline-web's public/img/app-icon.svg (512 units, doubled here).
 // Dev tool only. Regenerate with:
 //   swift ios/tools/make_icon.swift ios/Pairline/Resources/Assets.xcassets
 import AppKit
 import CoreGraphics
 import Foundation
 
-let blue = CGColor(srgbRed: 0x1F / 255, green: 0x5F / 255, blue: 0xBF / 255, alpha: 1)
-let blueLight = CGColor(srgbRed: 0x3D / 255, green: 0x7F / 255, blue: 0xE0 / 255, alpha: 1)
-let blueDeep = CGColor(srgbRed: 0x16 / 255, green: 0x46 / 255, blue: 0x93 / 255, alpha: 1)
-let green = CGColor(srgbRed: 0x12 / 255, green: 0xB8 / 255, blue: 0x86 / 255, alpha: 1)
-let white = CGColor(srgbRed: 1, green: 1, blue: 1, alpha: 1)
+func rgb(_ hex: UInt32) -> CGColor {
+    CGColor(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
+            blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
+}
+
+let blueTop = rgb(0x2A6FD6)
+let blueBottom = rgb(0x15468F)
+let green = rgb(0x19C994)
+let white = rgb(0xFFFFFF)
 
 enum Style { case icon, darkIcon, tintedIcon, launchMark }
 
@@ -23,101 +29,58 @@ func render(size: Int, style: Style) -> Data {
     let s = CGFloat(size) / 1024
     ctx.scaleBy(x: s, y: s)
 
-    let phoneFill: CGColor
-    let screenTop: CGColor
-    let screenBottom: CGColor
-    let lineColor: CGColor
+    // Background (CoreGraphics' origin is bottom-left, so "top-left" is y = 1024).
+    let left: CGColor
+    let right: CGColor
     switch style {
     case .icon:
-        let gradient = CGGradient(colorsSpace: space, colors: [blueLight, blue, blueDeep] as CFArray,
-                                  locations: [0, 0.55, 1])!
+        let gradient = CGGradient(colorsSpace: space, colors: [blueTop, blueBottom] as CFArray, locations: [0, 1])!
         ctx.drawLinearGradient(gradient, start: CGPoint(x: 0, y: 1024), end: CGPoint(x: 1024, y: 0), options: [])
-        phoneFill = white
-        screenTop = CGColor(srgbRed: 0xE7 / 255, green: 0xF0 / 255, blue: 0xFF / 255, alpha: 1)
-        screenBottom = CGColor(srgbRed: 0xC9 / 255, green: 0xDC / 255, blue: 0xFB / 255, alpha: 1)
-        lineColor = white
+        left = white
+        right = green
     case .darkIcon:
         let gradient = CGGradient(colorsSpace: space, colors: [
             CGColor(srgbRed: 0.10, green: 0.12, blue: 0.17, alpha: 1),
             CGColor(srgbRed: 0.04, green: 0.05, blue: 0.08, alpha: 1),
         ] as CFArray, locations: [0, 1])!
         ctx.drawLinearGradient(gradient, start: CGPoint(x: 0, y: 1024), end: CGPoint(x: 1024, y: 0), options: [])
-        phoneFill = CGColor(srgbRed: 0x9D / 255, green: 0xC1 / 255, blue: 0xFF / 255, alpha: 1)
-        screenTop = CGColor(srgbRed: 0.13, green: 0.20, blue: 0.33, alpha: 1)
-        screenBottom = CGColor(srgbRed: 0.08, green: 0.13, blue: 0.24, alpha: 1)
-        lineColor = phoneFill
+        left = rgb(0x9DC1FF)
+        right = green
     case .tintedIcon:
+        // iOS tints by luminance: two greys keep the links apart.
         ctx.setFillColor(CGColor(gray: 0, alpha: 1))
         ctx.fill(CGRect(x: 0, y: 0, width: 1024, height: 1024))
-        phoneFill = CGColor(gray: 1, alpha: 1)
-        screenTop = CGColor(gray: 0.35, alpha: 1)
-        screenBottom = CGColor(gray: 0.25, alpha: 1)
-        lineColor = phoneFill
+        left = CGColor(gray: 1, alpha: 1)
+        right = CGColor(gray: 0.62, alpha: 1)
     case .launchMark:
-        phoneFill = blue
-        screenTop = CGColor(srgbRed: 0xE7 / 255, green: 0xF0 / 255, blue: 0xFF / 255, alpha: 1)
-        screenBottom = CGColor(srgbRed: 0xD3 / 255, green: 0xE3 / 255, blue: 0xFC / 255, alpha: 1)
-        lineColor = blue
+        // Transparent, on the launch screen's white (light) or black (dark) background.
+        left = blueTop
+        right = green
     }
 
-    // Soft shadow under the phones on the icon styles.
-    func phone(_ x: CGFloat) {
-        let body = CGRect(x: x, y: 262, width: 260, height: 500)
-        let path = CGPath(roundedRect: body, cornerWidth: 70, cornerHeight: 70, transform: nil)
+    // The links: 440 × 240 rounded rectangles (fully round ends), 64 wide strokes, overlapping by 200.
+    let linkA = CGPath(roundedRect: CGRect(x: 172, y: 392, width: 440, height: 240), cornerWidth: 120, cornerHeight: 120,
+                       transform: nil)
+    let linkB = CGPath(roundedRect: CGRect(x: 412, y: 392, width: 440, height: 240), cornerWidth: 120, cornerHeight: 120,
+                       transform: nil)
+    ctx.setLineWidth(64)
+
+    func stroke(_ path: CGPath, _ color: CGColor, topHalfOnly: Bool = false) {
         ctx.saveGState()
-        if style != .launchMark && style != .tintedIcon {
-            ctx.setShadow(offset: CGSize(width: 0, height: -14), blur: 36,
-                          color: CGColor(srgbRed: 0, green: 0.05, blue: 0.2, alpha: 0.35))
+        if topHalfOnly { ctx.clip(to: CGRect(x: 0, y: 512, width: 1024, height: 512)) }
+        if style == .icon || style == .darkIcon {
+            ctx.setShadow(offset: CGSize(width: 0, height: -10), blur: 28,
+                          color: CGColor(srgbRed: 0, green: 0.05, blue: 0.2, alpha: 0.30))
         }
         ctx.addPath(path)
-        ctx.setFillColor(phoneFill)
-        ctx.fillPath()
+        ctx.setStrokeColor(color)
+        ctx.strokePath()
         ctx.restoreGState()
-
-        let screen = body.insetBy(dx: 22, dy: 22)
-        let screenPath = CGPath(roundedRect: screen, cornerWidth: 50, cornerHeight: 50, transform: nil)
-        ctx.saveGState()
-        ctx.addPath(screenPath)
-        ctx.clip()
-        let g = CGGradient(colorsSpace: space, colors: [screenTop, screenBottom] as CFArray, locations: [0, 1])!
-        ctx.drawLinearGradient(g, start: CGPoint(x: 0, y: screen.maxY), end: CGPoint(x: 0, y: screen.minY), options: [])
-        ctx.restoreGState()
-
-        // Speaker slot
-        let slot = CGRect(x: body.midX - 34, y: body.maxY - 44, width: 68, height: 12)
-        ctx.addPath(CGPath(roundedRect: slot, cornerWidth: 6, cornerHeight: 6, transform: nil))
-        ctx.setFillColor(phoneFill)
-        ctx.fillPath()
     }
 
-    phone(150)
-    phone(614)
-
-    // The line joining them: on the screens it takes the screen-ink color, between the phones the body color.
-    let screenInk = style == .icon ? blue : lineColor
-    let line = CGRect(x: 280, y: 491, width: 464, height: 42)
-    ctx.addPath(CGPath(roundedRect: line, cornerWidth: 21, cornerHeight: 21, transform: nil))
-    ctx.setFillColor(screenInk)
-    ctx.fillPath()
-    ctx.setFillColor(phoneFill)
-    ctx.fill(CGRect(x: 410, y: 491, width: 204, height: 42))
-
-    // Dots at each end, on the screens.
-    for cx in [CGFloat(280), CGFloat(744)] {
-        ctx.addEllipse(in: CGRect(x: cx - 40, y: 512 - 40, width: 80, height: 80))
-        ctx.setFillColor(screenInk)
-        ctx.fillPath()
-    }
-
-    // The "connected" node in the middle.
-    let node = CGRect(x: 512 - 70, y: 512 - 70, width: 140, height: 140)
-    ctx.addEllipse(in: node)
-    ctx.setFillColor(style == .tintedIcon ? CGColor(gray: 0.85, alpha: 1) : green)
-    ctx.fillPath()
-    ctx.addEllipse(in: node.insetBy(dx: 9, dy: 9))
-    ctx.setStrokeColor(style == .launchMark ? white : (style == .icon ? white : phoneFill))
-    ctx.setLineWidth(18)
-    ctx.strokePath()
+    stroke(linkA, left)
+    stroke(linkB, right)
+    stroke(linkA, left, topHalfOnly: true) // over the right link at the top, under it at the bottom
 
     let image = ctx.makeImage()!
     let rep = NSBitmapImageRep(cgImage: image)

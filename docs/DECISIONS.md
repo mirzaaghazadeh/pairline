@@ -573,3 +573,18 @@ Android 9). Shizuku is the established, open-source way for a user to lend an ap
   app owns it, and we do no IP lookups.
 - **Tested:** JVM tests run the proxy on loopback against an echo server (SOCKS5 with/without password, HTTP 407 and
   CONNECT, PAC contents, parsing). A real iPhone↔bridge test needs the M5 Wi-Fi link.
+
+### D-049 — The logo: two chain links (2026-11-24)
+
+The maintainer picked option 4 of five Telegram avatar directions ("Chain") and made it Pairline's logo everywhere:
+two links of a chain, one for each phone, the white one passing over the green one at the top and under it at the
+bottom, on the brand-blue gradient (#2A6FD6 → #15468F). It replaces the two-phones mark.
+- **One geometry** (a 512-unit artboard: 220 × 120 pill links, 32-unit strokes, overlapping by 100), used by
+  `ios/tools/make_icon.swift` (app icon light/dark/tinted, launch mark, brand mark), the Android adaptive icon,
+  monochrome icon and status-bar icon (`res/drawable/ic_launcher_*.xml`, `ic_stat_pairline.xml`), and in
+  `pairline-web` (logo, favicons, PWA icons, share images, the Telegram avatars in `design/telegram/`).
+- **The interlock** is drawn without masks: draw the white link, the green link, then the white link's top half
+  again. That works in SVG (with no ids, so the mark can repeat on a page), CoreGraphics and Android vectors.
+  One-colour versions (tinted iOS icon, themed Android icon, notification icon) keep the two links apart by tone or
+  simply overlap.
+- Users see it with the next builds: iOS after the next App Store upload, Android from the next release.
