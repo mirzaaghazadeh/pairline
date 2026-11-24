@@ -554,3 +554,50 @@ GitHub (`network-code-check.sh`).
 - **Setup and Settings:** the privacy step of the setup wizard now says the app asks GitHub once a day and that this
   can be turned off; Settings has an Updates section (switch, Check now, last check, installed version). The
   privacy texts that said the app had no internet permission were corrected.
+
+### D-043 — Deleting from the iPhone, and a block list kept on the bridge (2026-11-24)
+
+**Deleting.**
+- **SMS are deleted on the iPhone only.** Android lets only the default SMS app write to its SMS store, and Pairline
+  isn't one (becoming it would take over the user's messaging), so there's no `sms.delete`. Conversations (swipe, or
+  Edit with multi-select) and single messages (context menu) are removed from Pairline's database, and the confirm
+  dialog says the messages stay on the Android phone and why.
+- **Tombstones** keep later syncs from bringing them back: a deleted message's key (and, for an `rx:` message, its
+  number's match key, because its stored copy arrives under another key within 60 s); a deleted conversation's
+  thread id with the time of its newest message, so a newer message brings the conversation back with just that
+  message (and nothing to "load earlier"); for a conversation started on the iPhone (negative id) also the number,
+  because the bridge files it under its own thread id. A message deleted before the bridge reported its key is
+  caught by its `cid` when `sms.state` arrives. The newest synced time is remembered, so deleting the newest
+  messages, or everything, doesn't make the next sync fetch them again. No text and no hashes of text are kept;
+  unpairing deletes the tombstones with everything else.
+- **Call history is deleted on both phones when it can be:** new request `calllog.delete` (`keys` or `all: true`),
+  capability `calllog.delete` while the bridge holds `READ_CALL_LOG` and the new `WRITE_CALL_LOG`. `WRITE_CALL_LOG`
+  joined the optional "Call history" step of the setup wizard: both are in Android's call-log permission group, so
+  it's one dialog (or no dialog at all for users who already allowed reading). Asking only when the user first
+  deletes on the iPhone was rejected: the bridge can't show a permission dialog while it sits in a drawer, and a
+  notification asking for it would be noisier than one more line in a step the user already sees. Existing users
+  see "Delete call history from iPhone" in "What your iPhone can do" with a Fix button. Without the capability, or
+  when the bridge isn't connected, the iPhone deletes locally and keeps tombstones (keys, and for "Clear all" the
+  newest cleared time); the confirm dialog says which will happen. Entries the bridge deleted keep no tombstone,
+  since Android may reuse their ids.
+
+**Block list.**
+- **The bridge keeps the list that counts** (`block.list` / `block.set`, capability `block`), because it must work
+  while the iPhone is away. It's a small JSON list in the bridge app's private preferences (excluded from backups);
+  the iPhone keeps a copy in its database for the UI. Changes made in the bridge app's own screen (Settings ›
+  Blocked numbers) reach the iPhone as a `block.list` event without an `id`. At most 500 entries (one 30 KB page).
+- **What blocking does on the bridge:** no `sms.new` for texts from the number; its received texts are left out of
+  `sms.threads` and `sms.history` (texts sent to it stay); its incoming calls get no `call.incoming` /
+  `call.state` and are declined (companion `InCallService`, or `TelecomManager.endCall` with `ANSWER_PHONE_CALLS`;
+  without either they just aren't shown); its incoming entries are left out of `calllog.sync`. Android's own
+  messaging app and dialer still see them: only the default SMS app or the system's call screening can block those,
+  and the texts say so. A call the iPhone already shows when the number arrives late is left alone, so the iPhone
+  never has a ringing call that silently disappears.
+- **Matching:** with 7+ digits on both sides, the trailing digits must agree, as many as the shorter number has, up
+  to 9 (so a number saved with its country code matches its local form even in countries with 7-digit numbers);
+  shorter numbers and sender names such as "BANK" match exactly. The existing 9-digit match key alone missed
+  `+354 555 1234` vs `555 1234`. Both apps and `fake_bridge.py` implement the same rule and test the same cases.
+- **Where to block on the iPhone:** a conversation's ⋯ menu, a call's context menu, a contact's page (all of its
+  numbers), and Settings › Blocked numbers (add by hand, swipe to unblock). Blocking asks first; unblocking doesn't.
+- History pages on the bridge skip a blocked sender's texts by reading on (up to 20 rounds of `limit + 200` rows)
+  so a page is never empty while more remain; with no blocked numbers it's the same single query as before.

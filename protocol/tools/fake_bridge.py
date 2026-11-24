@@ -80,12 +80,14 @@ CONTACTS_PAGE = 13       # 25 sample contacts: a full sync takes 2 pages
 CALLLOG_PAGE = 20        # 30 sample entries: 2 pages
 
 ALL_CAPS = ["sms.receive", "sms.send", "sms.history", "call.observe", "call.control", "call.dial",
-            "call.dtmf", "call.audio", "contacts", "calllog", "contacts.add", "ussd", "dualsim"]
+            "call.dtmf", "call.audio", "contacts", "calllog", "contacts.add", "ussd", "dualsim",
+            "calllog.delete", "block"]
 CAP_FOR = {"sms.threads": "sms.history", "sms.history": "sms.history", "sms.send": "sms.send",
            "call.dial": "call.dial", "call.answer": "call.control", "call.reject": "call.control",
            "call.end": "call.control", "call.dtmf": "call.dtmf", "call.audio": "call.audio",
            "contacts.sync": "contacts", "calllog.sync": "calllog", "contacts.add": "contacts.add",
-           "ussd.run": "ussd"}
+           "ussd.run": "ussd", "calllog.delete": "calllog.delete", "block.list": "block", "block.set": "block"}
+MAX_BLOCKED = 500        # keeps a block.list reply under the 30 KB page size (PROTOCOL.md, D-043)
 
 
 class ProtocolError(Exception):
@@ -263,6 +265,38 @@ def dumps(obj) -> bytes:
 
 def norm(addr: str) -> str:
     return re.sub(r"[\s().-]", "", addr or "")
+
+
+def ascii_digits(s: str) -> str:
+    """The digits of s, with Persian and Arabic-Indic digits converted to ASCII."""
+    out = []
+    for ch in s or "":
+        if "0" <= ch <= "9":
+            out.append(ch)
+        elif "۰" <= ch <= "۹":
+            out.append(chr(ord(ch) - 0x06F0 + 48))
+        elif "٠" <= ch <= "٩":
+            out.append(chr(ord(ch) - 0x0660 + 48))
+    return "".join(out)
+
+
+def match_key(s: str):
+    """The apps' number key: the last 9 digits, or the lowercased text for short codes and sender names."""
+    d = ascii_digits(s)
+    if len(d) >= 5:
+        return d[-9:]
+    t = (s or "").strip().lower()
+    return "t:" + t if t else None
+
+
+def block_matches(blocked: str, number: str) -> bool:
+    """PROTOCOL.md (D-043): 7+ digits on both sides compare their endings (up to 9), else exact match keys."""
+    a, b = ascii_digits(blocked), ascii_digits(number)
+    if len(a) >= 7 and len(b) >= 7:
+        n = min(9, len(a), len(b))
+        return a[-n:] == b[-n:]
+    ka = match_key(blocked)
+    return ka is not None and ka == match_key(number)
 
 
 def log(text: str):
@@ -485,6 +519,7 @@ class Store:
         self.msgs, self.threads, self.times = [], {}, set()
         self.contacts, self.deleted, self.cseq = {}, {}, 0  # key -> (seq, contact); key -> seq
         self.calls, self.lseq = [], 0                       # [(seq, entry)]
+        self.blocked = []                                   # [{"n": …, "time": …}] (D-043)
         self.next_sms = self.next_contact = 1
         slot = (lambda s: 0) if single_sim else (lambda s: s)
         now = now_ms()
@@ -522,9 +557,33 @@ class Store:
         self.msgs.append(m)
         return m
 
+    # Block list (D-043): a blocked sender's texts and calls aren't shown on the iPhone
+    def is_blocked(self, number) -> bool:
+        return any(block_matches(e["n"], number or "") for e in self.blocked)
+
+    def hidden(self, m) -> bool:
+        return m["box"] == "in" and self.is_blocked(m["addr"])
+
+    def set_blocked(self, add, remove) -> bool:
+        before = list(self.blocked)
+        self.blocked = [e for e in self.blocked if not any(block_matches(e["n"], r) for r in remove)]
+        for number in add:
+            if any(block_matches(number, r) for r in remove) or self.is_blocked(number):
+                continue
+            if len(self.blocked) < MAX_BLOCKED:
+                self.blocked.append({"n": number, "time": now_ms()})
+        return self.blocked != before
+
+    def delete_calls(self, keys, everything) -> int:
+        before = len(self.calls)
+        self.calls = [] if everything else [(s, e) for s, e in self.calls if e["key"] not in keys]
+        return before - len(self.calls)
+
     def thread_list(self):
         newest, count = {}, {}
         for m in self.msgs:
+            if self.hidden(m):
+                continue
             tid = m["thread"]
             count[tid] = count.get(tid, 0) + 1
             if tid not in newest or m["time"] > newest[tid]["time"]:
@@ -534,7 +593,7 @@ class Store:
         return sorted(items, key=lambda x: x["time"], reverse=True)
 
     def history(self, thread, before, after, limit):
-        msgs = [m for m in self.msgs if thread is None or m["thread"] == thread]
+        msgs = [m for m in self.msgs if (thread is None or m["thread"] == thread) and not self.hidden(m)]
         if after is not None:
             msgs = sorted((m for m in msgs if m["time"] > after), key=lambda m: m["time"])
         else:
@@ -597,7 +656,8 @@ class Store:
 
     def calllog_page(self, since):
         seq0 = self.parse_cursor("l", since)
-        changes = [(s, e) for s, e in self.calls if seq0 is None or s > seq0]
+        changes = [(s, e) for s, e in self.calls if (seq0 is None or s > seq0)
+                   and not (e["type"] != "out" and self.is_blocked(e["number"]))]
         page, more = fit(changes, CALLLOG_PAGE, lambda x: len(dumps(x[1])))
         last = page[-1][0] if more else self.lseq
         return [e for _, e in page], self.cursor("l", last), more
@@ -775,6 +835,9 @@ HELP = """commands (console or control socket):
   caps all|none | caps a,b,c | caps -sms.send,+ussd   set capabilities -> status
   version <x.y.z>              bridge app version -> status + device.info
   delcontact <key>             delete a contact (shows in contacts.sync "deleted")
+  block <addr> | unblock <addr>   change the block list on the bridge -> block.list event (D-043)
+  blocks                       show the block list
+  calls                        the last 10 call-log entries (to see what calllog.delete removed)
   unpair                       send unpair, close and forget the iPhone
   disconnect                   close the current connection
   quit                         stop the fake bridge"""
@@ -804,6 +867,8 @@ class Bridge:
             "call.dtmf": self.req_call_dtmf, "call.audio": self.req_call_audio,
             "contacts.sync": self.req_contacts_sync, "calllog.sync": self.req_calllog_sync,
             "contacts.add": self.req_contacts_add, "ussd.run": self.req_ussd_run,
+            "calllog.delete": self.req_calllog_delete, "block.list": self.req_block_list,
+            "block.set": self.req_block_set,
         }
 
     # State file
@@ -1097,6 +1162,37 @@ class Bridge:
         full = since is None or self.store.parse_cursor("l", since) is None
         return {"t": "calllog.sync", "calls": calls, "cursor": cursor, "more": more, "full": full}
 
+    def req_calllog_delete(self, link, msg):
+        everything = arg_bool(msg, "all") is True
+        keys = msg.get("keys") or []
+        if not isinstance(keys, list) or not all(isinstance(k, str) for k in keys) or len(keys) > 500:
+            raise Reject("invalid", "keys must be a list of at most 500 call-log keys")
+        if not everything and not keys:
+            raise Reject("invalid", "keys missing")
+        n = self.store.delete_calls(set(keys), everything)
+        log(f"  deleted {n} call-log entries" + (" (all)" if everything else ""))
+        return {"t": "ok"}
+
+    def block_list(self) -> dict:
+        return {"t": "block.list", "numbers": list(self.store.blocked)}
+
+    def req_block_list(self, link, msg):
+        return self.block_list()
+
+    def req_block_set(self, link, msg):
+        lists = []
+        for key in ("add", "remove"):
+            v = msg.get(key) or []
+            if not isinstance(v, list) or len(v) > 100 or not all(
+                    isinstance(x, str) and 0 < len(x.strip()) <= 64 for x in v):
+                raise Reject("invalid", f"{key} must be a list of at most 100 numbers or sender names")
+            lists.append([x.strip() for x in v])
+        if not lists[0] and not lists[1]:
+            raise Reject("invalid", "add or remove missing")
+        if self.store.set_blocked(*lists):
+            log(f"  block list changed ({len(self.store.blocked)} entries)")
+        return self.block_list()
+
     def req_contacts_add(self, link, msg):
         name, numbers = arg_str(msg, "name").strip(), msg.get("numbers") or []
         if not isinstance(numbers, list) or not all(
@@ -1170,6 +1266,8 @@ class Bridge:
         m = self.store.add_msg(addr, body, "in", 0, "received")
         if "sms.receive" not in self.caps:
             return f"stored {m['key']}; sms.receive is off, so no sms.new"
+        if "block" in self.caps and self.store.is_blocked(addr):
+            return f"stored {m['key']}; the sender is blocked, so no sms.new"
         self.send_event({"t": "sms.new", "msg": m})
         return f"incoming {m['key']} in thread {m['thread']}"
 
@@ -1196,6 +1294,9 @@ class Bridge:
             raise CommandError("usage: call <addr> [name...]")
         if self.calls:
             raise CommandError("a call is already in progress (hangup first)")
+        if "block" in self.caps and self.store.is_blocked(addr):
+            self.store.add_call(addr, "rejected", now_ms(), 0, 0)
+            return "the caller is blocked: declined on the bridge, nothing sent to the iPhone"
         c = self.new_call("in", addr, 0)
         c["name"] = name.strip() or c["name"]
         if "call.observe" in self.caps:
@@ -1263,6 +1364,26 @@ class Bridge:
                             "app": rest, "proto": VERSION})
         self.push_status()
         return f"app version {rest}"
+
+    def cmd_block(self, rest, source):
+        if not rest:
+            raise CommandError("usage: block <addr>")
+        if self.store.set_blocked([rest], []):
+            self.send_event(self.block_list())  # changed on the bridge itself: the iPhone's copy follows
+        return f"blocked; {len(self.store.blocked)} entries"
+
+    def cmd_unblock(self, rest, source):
+        if not rest:
+            raise CommandError("usage: unblock <addr>")
+        if self.store.set_blocked([], [rest]):
+            self.send_event(self.block_list())
+        return f"unblocked; {len(self.store.blocked)} entries"
+
+    def cmd_blocks(self, rest, source):
+        return "\n".join(e["n"] for e in self.store.blocked) or "(no blocked numbers)"
+
+    def cmd_calls(self, rest, source):
+        return "\n".join(f"{e['key']} {e['type']} {e['number']}" for _, e in self.store.calls[-10:]) or "(no calls)"
 
     def cmd_delcontact(self, rest, source):
         if not self.store.delete_contact(rest):

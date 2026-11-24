@@ -111,6 +111,104 @@ final class AppDatabaseTests: XCTestCase {
         XCTAssertNil(db.value("calllog.cursor"))
     }
 
+    // MARK: - Deleting and the block list (D-043)
+
+    func testDeletedConversationStaysDeletedButANewMessageBringsItBack() {
+        let summary = SMSThreadSummary(thread: 7, addrs: ["+15550700"], snippet: "two", time: base + 2, count: 2)
+        let both = [msg("sms:1", thread: 7, addr: "+15550700", body: "one", at: 1),
+                    msg("sms:2", thread: 7, addr: "+15550700", body: "two", at: 2)]
+        db.upsertThreads([summary])
+        db.upsertMessages(both, countUnread: true)
+        XCTAssertEqual(db.unreadCount, 2)
+        db.deleteConversations([7])
+        XCTAssertNil(db.conversation(thread: 7))
+        XCTAssertEqual(db.unreadCount, 0)
+        // A full re-sync brings back neither the summary nor the messages.
+        db.upsertThreads([summary])
+        db.upsertMessages(both, countUnread: true)
+        XCTAssertNil(db.conversation(thread: 7))
+        XCTAssertEqual(db.messageCount, 0)
+        XCTAssertEqual(db.newestMessageTime, base + 2, "the next sync continues after what was deleted")
+        // A newer message brings the conversation back with just that message, and nothing older to load.
+        db.upsertMessages([msg("sms:3", thread: 7, addr: "+15550700", body: "three", at: 3)], countUnread: true)
+        XCTAssertEqual(db.messages(thread: 7).map(\.key), ["sms:3"])
+        db.upsertThreads([SMSThreadSummary(thread: 7, addrs: ["+15550700"], snippet: "three", time: base + 3, count: 3)])
+        XCTAssertEqual(db.conversation(thread: 7)?.hasOlder, false, "the older messages were deleted, not missing")
+    }
+
+    func testDeletedMessageStaysDeleted() {
+        db.upsertMessages([msg("sms:1", thread: 1, body: "keep", at: 1), msg("sms:2", thread: 1, body: "drop", at: 2)],
+                          countUnread: false)
+        db.deleteMessages(keys: ["sms:2"])
+        XCTAssertEqual(db.messages(thread: 1).map(\.key), ["sms:1"])
+        XCTAssertEqual(db.conversation(thread: 1)?.snippet, "keep")
+        db.upsertMessages([msg("sms:2", thread: 1, body: "drop", at: 2)], countUnread: false)
+        XCTAssertEqual(db.messages(thread: 1).map(\.key), ["sms:1"])
+        XCTAssertEqual(db.newestMessageTime, base + 2)
+        db.markAllThreadsComplete()
+        db.deleteMessages(keys: ["sms:1"])
+        XCTAssertNil(db.conversation(thread: 1), "nothing left to show or load")
+    }
+
+    func testMessagesDeletedBeforeTheyHadTheBridgesKeyStayDeleted() {
+        // An incoming message announced before Android stored it, then its stored copy under the real key.
+        db.upsertMessages([msg("rx:1764000000500", thread: nil, addr: "+98 912 555 0100", body: "code 1234", at: 500)],
+                          countUnread: true)
+        db.deleteMessages(keys: ["rx:1764000000500"])
+        db.upsertMessages([msg("sms:77", thread: 8, addr: "+989125550100", body: "code 1234", at: 0)], countUnread: true)
+        XCTAssertEqual(db.messageCount, 0, "the stored copy is the deleted message")
+        db.upsertMessages([msg("sms:78", thread: 8, addr: "+989125550100", body: "new", at: 90_000)], countUnread: true)
+        XCTAssertEqual(db.messageCount, 1, "and only that one")
+        // A message sent from this iPhone and deleted before the bridge reported its key.
+        let local = db.insertPending(thread: 1, to: "+15550100", body: "oops", sim: 0, cid: "c-9")
+        db.deleteMessages(keys: [local.key])
+        db.updateState(cid: "c-9", state: .sent, key: "sms:90", error: nil)
+        db.upsertMessages([msg("sms:90", thread: 1, body: "oops", at: 100_000, box: "out", state: "sent")], countUnread: false)
+        XCTAssertNil(db.message(key: "sms:90"))
+    }
+
+    func testDeletedConversationStartedOnThisIPhone() {
+        let local = db.insertPending(thread: nil, to: "+15550300", body: "Hello there", sim: nil, cid: "c-2")
+        db.deleteConversations([local.thread])
+        // The bridge files the sent message under its own thread id.
+        db.upsertMessages([SMSMessage(key: "sms:20", thread: 30, addr: "+1 555 0300", body: "Hello there",
+                                      time: local.time.milliseconds, box: "out", sim: 0, state: "sent")],
+                          countUnread: false)
+        XCTAssertNil(db.message(key: "sms:20"))
+        XCTAssertNil(db.conversation(thread: 30))
+    }
+
+    func testDeletedCallsStayDeletedOnlyWhenTheBridgeKeptThem() {
+        func call(_ n: Int, at offset: Int64) -> CallLogRecord {
+            CallLogRecord(key: "cl:\(n)", number: "+15550100", name: nil, type: "in", time: base + offset, dur: 1, sim: 0)
+        }
+        let all = [call(1, at: 0), call(2, at: 9)]
+        db.upsertCalls(all)
+        db.deleteCalls(keys: ["cl:1"], remember: true)
+        db.clearCalls() // a full sync starts over…
+        db.upsertCalls(all)
+        XCTAssertEqual(db.calls().map(\.key), ["cl:2"], "…without the call deleted on this iPhone only")
+        // Deleted on both phones: nothing is kept, so a reused id is a new call.
+        db.deleteCalls(keys: ["cl:2"], remember: false)
+        XCTAssertTrue(db.calls().isEmpty)
+        db.upsertCalls([call(2, at: 30)])
+        XCTAssertEqual(db.calls().map(\.key), ["cl:2"])
+        // "Clear all" on this iPhone only hides everything up to then.
+        db.clearCallHistory(remember: true)
+        db.upsertCalls(all + [call(2, at: 30), call(3, at: 40)])
+        XCTAssertEqual(db.calls().map(\.key), ["cl:3"])
+        db.wipe()
+        db.upsertCalls(all)
+        XCTAssertEqual(db.calls().count, 2, "unpairing forgets what was deleted")
+    }
+
+    func testBlockListCopyIsWipedOnUnpair() {
+        db.setBlockedNumbers([BlockedNumber(n: "+15551234", time: 1), BlockedNumber(n: "BANK", time: 2)])
+        XCTAssertEqual(db.blockedNumbers.map(\.n), ["+15551234", "BANK"])
+        db.wipe()
+        XCTAssertTrue(db.blockedNumbers.isEmpty)
+    }
+
     func testFileDatabaseIsProtected() throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).sqlite")
         _ = try AppDatabase(url: url)
@@ -156,6 +254,53 @@ final class DemoModeTests: XCTestCase {
         // USSD answers in the demo's language.
         let ussd = try await controller.runUSSD(code: "*140#", sim: 0)
         XCTAssertEqual(ussd.text, DemoContent.english.ussdBalance)
+        bridge.stop()
+    }
+
+    func testDemoBlockListAndDeleting() async throws {
+        let bridge = DemoBridge(content: .english)
+        let controller = BridgeController(mode: .demo, link: bridge, db: .inMemory())
+        let connected = expectation(description: "connected")
+        let previous = bridge.onEstablished
+        bridge.onEstablished = {
+            previous?()
+            connected.fulfill()
+        }
+        bridge.start()
+        await fulfillment(of: [connected], timeout: 3)
+        for _ in 0..<60 where controller.db.calls().count < DemoContent.english.calls.count || controller.syncing {
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        XCTAssertTrue(controller.has(.block))
+        XCTAssertTrue(controller.has(.calllogDelete))
+
+        // Blocking: the demo bridge, like the real one, stops relaying that person's texts.
+        let person = DemoContent.english.people[0].number
+        try await controller.setBlocked([person], true)
+        XCTAssertTrue(controller.isBlocked(person))
+        XCTAssertEqual(controller.db.blockedNumbers.count, 1)
+        let thread = try XCTUnwrap(controller.db.existingThread(for: person))
+        let before = controller.db.messages(thread: thread).count
+        bridge.simulateIncomingSMS(otp: false)
+        try await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertEqual(controller.db.messages(thread: thread).count, before)
+        try await controller.setBlocked([person], false)
+        XCTAssertFalse(controller.isBlocked(person))
+
+        // Calls are deleted on both phones, so a full sync doesn't bring them back.
+        let key = try XCTUnwrap(controller.db.calls().first?.key)
+        let deleted = await controller.deleteCalls([key])
+        XCTAssertEqual(deleted, .bothPhones)
+        await controller.sync()
+        XCTAssertFalse(controller.db.calls().contains { $0.key == key })
+        let cleared = await controller.clearCallHistory()
+        XCTAssertEqual(cleared, .bothPhones)
+        XCTAssertTrue(controller.db.calls().isEmpty)
+
+        // Conversations are removed from this iPhone only, and stay removed.
+        controller.deleteConversations([thread])
+        await controller.sync()
+        XCTAssertNil(controller.db.conversation(thread: thread))
         bridge.stop()
     }
 

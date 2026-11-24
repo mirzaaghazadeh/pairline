@@ -1,6 +1,244 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Allow the call history permission in Pairline Bridge on your Android phone. Until then, calls you delete are removed from this iPhone only." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسمح بإذن سجل المكالمات في Pairline Bridge على هاتف أندرويد. وإلى أن تفعل، تُحذف المكالمات التي تحذفها من هذا الآيفون فقط." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در Pairline Bridge روی گوشی اندرویدی خود، مجوز سابقه تماس را بدهید. تا آن موقع، تماس‌هایی که پاک می‌کنید فقط از این آیفون حذف می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge'te arama geçmişi iznini verin. O zamana kadar sildiğiniz aramalar yalnızca bu iPhone'dan kaldırılır." } }
+      }
+    },
+    "Block" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حظر" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مسدود کردن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Engelle" } }
+      }
+    },
+    "Block %@?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تريد حظر %@؟" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "%@ مسدود شود؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ engellensin mi?" } }
+      }
+    },
+    "Block Contact" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حظر جهة الاتصال" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مسدود کردن مخاطب" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kişiyi Engelle" } }
+      }
+    },
+    "Block list" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قائمة الحظر" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فهرست مسدودها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Engelleme listesi" } }
+      }
+    },
+    "Block this number?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تريد حظر هذا الرقم؟" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این شماره مسدود شود؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu numara engellensin mi?" } }
+      }
+    },
+    "Blocked numbers" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الأرقام المحظورة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شماره‌های مسدود" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Engellenen numaralar" } }
+      }
+    },
+    "Blocked. Texts and calls from this number won't reach this iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم الحظر. لن تصل رسائل هذا الرقم ومكالماته إلى هذا الآيفون." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مسدود شد. پیامک‌ها و تماس‌های این شماره به این آیفون نمی‌رسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Engellendi. Bu numaradan gelen mesajlar ve aramalar bu iPhone'a ulaşmayacak." } }
+      }
+    },
+    "Clear All" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مسح الكل" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاک کردن همه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tümünü Temizle" } }
+      }
+    },
+    "Clear All Calls" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مسح كل المكالمات" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاک کردن همه تماس‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tüm Aramaları Temizle" } }
+      }
+    },
+    "Clear all calls?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تريد مسح كل المكالمات؟" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "همه تماس‌ها پاک شوند؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tüm aramalar temizlensin mi?" } }
+      }
+    },
+    "Delete Conversation" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حذف المحادثة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حذف گفتگو" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sohbeti Sil" } }
+      }
+    },
+    "Delete calls on the bridge phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حذف المكالمات على الهاتف الوسيط" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حذف تماس‌ها روی گوشی پل" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonda aramaları silme" } }
+      }
+    },
+    "Delete from this iPhone?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تريد الحذف من هذا الآيفون؟" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از این آیفون حذف شود؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone'dan silinsin mi?" } }
+      }
+    },
+    "Delete this call?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تريد حذف هذه المكالمة؟" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این تماس حذف شود؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu arama silinsin mi?" } }
+      }
+    },
+    "Delete this message from this iPhone?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تريد حذف هذه الرسالة من هذا الآيفون؟" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این پیام از این آیفون حذف شود؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu mesaj bu iPhone'dan silinsin mi?" } }
+      }
+    },
+    "Deleted calls are also removed from the Android phone's call history." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُحذف المكالمات المحذوفة من سجل مكالمات هاتف أندرويد أيضًا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌های حذف‌شده از سابقه تماس گوشی اندروید هم پاک می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Silinen aramalar Android telefonun arama geçmişinden de kaldırılır." } }
+      }
+    },
+    "Deleted calls are removed from this iPhone only. The Android phone keeps them." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُحذف المكالمات المحذوفة من هذا الآيفون فقط، ويحتفظ بها هاتف أندرويد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌های حذف‌شده فقط از این آیفون پاک می‌شوند. گوشی اندروید آن‌ها را نگه می‌دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Silinen aramalar yalnızca bu iPhone'dan kaldırılır. Android telefon onları saklar." } }
+      }
+    },
+    "Deleted calls are removed from this iPhone only. To delete them on the Android phone too, allow the call history permission in Pairline Bridge." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُحذف المكالمات المحذوفة من هذا الآيفون فقط. لحذفها من هاتف أندرويد أيضًا، اسمح بإذن سجل المكالمات في Pairline Bridge." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌های حذف‌شده فقط از این آیفون پاک می‌شوند. برای اینکه روی گوشی اندروید هم پاک شوند، در Pairline Bridge مجوز سابقه تماس را بدهید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Silinen aramalar yalnızca bu iPhone'dan kaldırılır. Android telefonda da silinmeleri için Pairline Bridge'te arama geçmişi iznini verin." } }
+      }
+    },
+    "Edit" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعديل" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ویرایش" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Düzenle" } }
+      }
+    },
+    "It stays on your Android phone, because Android lets only its default messaging app delete texts." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ستبقى على هاتف أندرويد، لأن أندرويد لا يسمح بحذف الرسائل النصية إلا لتطبيق الرسائل الافتراضي." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این پیام روی گوشی اندرویدی شما می‌ماند، چون اندروید فقط به برنامه پیش‌فرض پیامک اجازه حذف پیامک‌ها را می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda kalır, çünkü Android kısa mesajları yalnızca varsayılan mesajlaşma uygulamasının silmesine izin verir." } }
+      }
+    },
+    "More" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المزيد" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بیشتر" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Diğer" } }
+      }
+    },
+    "No blocked numbers" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد أرقام محظورة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هیچ شماره‌ای مسدود نیست" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Engellenen numara yok" } }
+      }
+    },
+    "Phone number or sender name" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رقم هاتف أو اسم مرسِل" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شماره تلفن یا نام فرستنده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefon numarası veya gönderen adı" } }
+      }
+    },
+    "Texts and calls from it won't reach this iPhone, and Pairline Bridge declines its calls on the Android phone when it can. Android's own messaging app still receives its texts." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لن تصل رسائله ومكالماته إلى هذا الآيفون، وسيرفض Pairline Bridge مكالماته على هاتف أندرويد متى استطاع. يظل تطبيق الرسائل في أندرويد يستقبل رسائله." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها و تماس‌های آن به این آیفون نمی‌رسند و Pairline Bridge هر وقت بتواند تماس‌هایش را روی گوشی اندروید رد می‌کند. برنامه پیامک خود اندروید همچنان پیامک‌هایش را دریافت می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajları ve aramaları bu iPhone'a ulaşmaz; Pairline Bridge de mümkün olduğunda aramalarını Android telefonda reddeder. Android'in kendi mesajlaşma uygulaması mesajlarını almaya devam eder." } }
+      }
+    },
+    "Texts and calls from these numbers don't reach this iPhone. Your bridge phone keeps the list, so it works while this iPhone is away. Android's own messaging app still receives their texts." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا تصل رسائل هذه الأرقام ومكالماتها إلى هذا الآيفون. يحتفظ هاتفك الوسيط بالقائمة، لذا تعمل حتى عندما يكون هذا الآيفون بعيدًا. يظل تطبيق الرسائل في أندرويد يستقبل رسائلها." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها و تماس‌های این شماره‌ها به این آیفون نمی‌رسند. فهرست روی گوشی پل شما نگه داشته می‌شود، پس وقتی این آیفون دور است هم کار می‌کند. برنامه پیامک خود اندروید همچنان پیامک‌هایشان را دریافت می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu numaralardan gelen mesajlar ve aramalar bu iPhone'a ulaşmaz. Liste köprü telefonunuzda tutulur, böylece bu iPhone uzaktayken de çalışır. Android'in kendi mesajlaşma uygulaması mesajlarını almaya devam eder." } }
+      }
+    },
+    "The bridge phone couldn't delete the calls, so they were removed from this iPhone only." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر على الهاتف الوسيط حذف المكالمات، لذا حُذفت من هذا الآيفون فقط." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل نتوانست تماس‌ها را پاک کند، پس فقط از این آیفون حذف شدند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefon aramaları silemedi, bu yüzden yalnızca bu iPhone'dan kaldırıldılar." } }
+      }
+    },
+    "The bridge phone isn't connected, so deleted calls are removed from this iPhone only. The Android phone keeps them." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الهاتف الوسيط غير متصل، لذا تُحذف المكالمات المحذوفة من هذا الآيفون فقط، ويحتفظ بها هاتف أندرويد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل وصل نیست، پس تماس‌های حذف‌شده فقط از این آیفون پاک می‌شوند. گوشی اندروید آن‌ها را نگه می‌دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefon bağlı değil, bu yüzden silinen aramalar yalnızca bu iPhone'dan kaldırılır. Android telefon onları saklar." } }
+      }
+    },
+    "The messages stay on your Android phone, because Android lets only its default messaging app delete texts. A new message brings the conversation back here." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تبقى الرسائل على هاتف أندرويد، لأن أندرويد لا يسمح بحذف الرسائل النصية إلا لتطبيق الرسائل الافتراضي. وعند وصول رسالة جديدة تعود المحادثة إلى هنا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام‌ها روی گوشی اندرویدی شما می‌مانند، چون اندروید فقط به برنامه پیش‌فرض پیامک اجازه حذف پیامک‌ها را می‌دهد. با رسیدن پیام تازه، گفتگو دوباره اینجا نمایش داده می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar Android telefonunuzda kalır, çünkü Android kısa mesajları yalnızca varsayılan mesajlaşma uygulamasının silmesine izin verir. Yeni bir mesaj gelirse sohbet burada yeniden görünür." } }
+      }
+    },
+    "Unblock" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إلغاء الحظر" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "رفع انسداد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Engeli Kaldır" } }
+      }
+    },
+    "Unblock Contact" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إلغاء حظر جهة الاتصال" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "رفع انسداد مخاطب" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kişinin Engelini Kaldır" } }
+      }
+    },
+    "Unblocked." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم إلغاء الحظر." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انسداد برداشته شد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Engel kaldırıldı." } }
+      }
+    },
+    "Update Pairline Bridge on your Android phone to block numbers." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حدّث Pairline Bridge على هاتف أندرويد لتتمكن من حظر الأرقام." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای مسدود کردن شماره‌ها، Pairline Bridge را روی گوشی اندرویدی خود به‌روز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Numara engellemek için Android telefonunuzdaki Pairline Bridge'i güncelleyin." } }
+      }
+    },
+    "You blocked this number. Its texts and calls don't reach this iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لقد حظرت هذا الرقم. لا تصل رسائله ومكالماته إلى هذا الآيفون." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این شماره را مسدود کرده‌اید. پیامک‌ها و تماس‌هایش به این آیفون نمی‌رسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu numarayı engellediniz. Mesajları ve aramaları bu iPhone'a ulaşmaz." } }
+      }
+    },
     "–" : {
       "extractionState" : "stale",
       "localizations" : {

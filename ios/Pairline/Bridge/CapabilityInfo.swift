@@ -25,6 +25,8 @@ struct CapabilityInfo: Identifiable {
         case .contactsAdd: return "person.badge.plus"
         case .ussd: return "number"
         case .dualSIM: return "simcard.2"
+        case .calllogDelete: return "trash"
+        case .block: return "hand.raised"
         }
     }
 
@@ -43,6 +45,8 @@ struct CapabilityInfo: Identifiable {
         case .contactsAdd: return String(localized: "Add contacts from iPhone")
         case .ussd: return String(localized: "USSD codes")
         case .dualSIM: return String(localized: "Dual SIM")
+        case .calllogDelete: return String(localized: "Delete calls on the bridge phone")
+        case .block: return String(localized: "Block list")
         }
     }
 
@@ -71,6 +75,10 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Allow the phone permission in Pairline Bridge on your Android phone.")
         case .dualSIM:
             return String(localized: "This bridge phone has one active SIM.")
+        case .calllogDelete:
+            return String(localized: "Allow the call history permission in Pairline Bridge on your Android phone. Until then, calls you delete are removed from this iPhone only.")
+        case .block:
+            return String(localized: "Update Pairline Bridge on your Android phone to block numbers.")
         }
     }
 }

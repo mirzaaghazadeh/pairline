@@ -162,6 +162,10 @@ struct ContactDetailView: View {
     @EnvironmentObject private var bridge: BridgeController
     @EnvironmentObject private var db: AppDatabase
     @EnvironmentObject private var calls: CallCenter
+    @State private var blockRequest: BlockRequest?
+
+    private var numbers: [String] { contact.numbers.map(\.n).filter { !$0.isEmpty } }
+    private var anyBlocked: Bool { numbers.contains { bridge.isBlocked($0) } }
 
     var body: some View {
         List {
@@ -246,6 +250,25 @@ struct ContactDetailView: View {
                 }
             }
 
+            if bridge.has(.block) && !numbers.isEmpty {
+                Section {
+                    if anyBlocked {
+                        Button {
+                            BlockActions.run(app: app, bridge: bridge, numbers: numbers, block: false)
+                        } label: {
+                            Label("Unblock Contact", systemImage: "hand.raised.slash")
+                        }
+                    } else {
+                        Button(role: .destructive) {
+                            blockRequest = BlockRequest(numbers: numbers, contactName: contact.name)
+                        } label: {
+                            Label("Block Contact", systemImage: "hand.raised")
+                                .foregroundStyle(Color.brandRed)
+                        }
+                    }
+                }
+            }
+
             Section {
                 Label("Synced from your bridge phone. Kept only on this iPhone.", systemImage: "lock.shield")
                     .font(.footnote)
@@ -253,6 +276,7 @@ struct ContactDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .blockPrompt($blockRequest)
     }
 
     private func message(_ number: String) {

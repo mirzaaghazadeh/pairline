@@ -193,6 +193,12 @@ struct CallStateEvent: Codable, Equatable {
     var sim: Int?
 }
 
+/// One entry of the bridge's block list (D-043): a number or sender name, and when it was added (ms).
+struct BlockedNumber: Codable, Equatable, Hashable {
+    var n: String
+    var time: Int64?
+}
+
 struct USSDResult: Equatable {
     var ok: Bool
     var text: String?
@@ -241,6 +247,8 @@ enum InboundMessage {
     case contactsSync(ContactsSyncReply)
     case calllogSync(CallLogSyncReply)
     case ussdResult(USSDResult)
+    /// The reply to `block.list` / `block.set`, or (without an `id`) the list after it changed on the bridge.
+    case blockList([BlockedNumber])
     case unknown
 }
 
@@ -288,6 +296,7 @@ struct Inbound {
         var full: Bool?
     }
     private struct USSDBody: Decodable { var ok: Bool?; var text: String?; var error: String? }
+    private struct BlockListBody: Decodable { var numbers: LossyList<BlockedNumber>? }
 
     static func decode(_ data: Data) throws -> Inbound {
         let decoder = JSONDecoder()
@@ -332,6 +341,8 @@ struct Inbound {
         case "ussd.result":
             let b = try body(USSDBody.self)
             message = .ussdResult(USSDResult(ok: b.ok ?? false, text: b.text, error: b.error))
+        case "block.list":
+            message = .blockList(try body(BlockListBody.self).numbers?.elements ?? [])
         default:
             message = .unknown
         }
@@ -427,6 +438,18 @@ struct Outbound {
     static func ussdRun(sim: Int?, code: String) -> Outbound {
         Outbound("ussd.run", ["sim": optional(sim), "code": code])
     }
+
+    /// Deletes these call-log entries on the bridge phone (needs `calllog.delete`).
+    static func calllogDelete(keys: [String]) -> Outbound { Outbound("calllog.delete", ["keys": keys]) }
+
+    /// Deletes the bridge phone's whole call log (needs `calllog.delete`).
+    static var calllogDeleteAll: Outbound { Outbound("calllog.delete", ["all": true]) }
+
+    static var blockList: Outbound { Outbound("block.list") }
+
+    static func blockSet(add: [String], remove: [String]) -> Outbound {
+        Outbound("block.set", ["add": add, "remove": remove])
+    }
 }
 
 /// Capability names from `status.caps`.
@@ -444,6 +467,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case contactsAdd = "contacts.add"
     case ussd = "ussd"
     case dualSIM = "dualsim"
+    case calllogDelete = "calllog.delete"
+    case block = "block"
 
     var id: String { rawValue }
 }

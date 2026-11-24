@@ -123,6 +123,20 @@ struct SettingsTab: View {
                     Label("Pair a bridge phone", systemImage: "qrcode.viewfinder")
                 }
             }
+            if app.pairedPeer != nil || bridge.isDemo {
+                NavigationLink {
+                    BlockedNumbersView()
+                } label: {
+                    HStack {
+                        Label("Blocked numbers", systemImage: "hand.raised")
+                        Spacer()
+                        if !bridge.blockedNumbers.isEmpty {
+                            Text(verbatim: bridge.blockedNumbers.count.formatted())
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
             if bridge.isDemo {
                 Button {
                     app.exitDemo()

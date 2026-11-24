@@ -56,6 +56,9 @@ struct CallLogView: View {
     @State private var items: [CallLogItem] = []
     @State private var filter: Filter = .all
     @State private var detail: Contact?
+    @State private var confirmDelete: CallLogItem?
+    @State private var confirmClear = false
+    @State private var blockRequest: BlockRequest?
 
     private var shown: [CallLogItem] {
         filter == .all ? items : items.filter { $0.type == .missed || $0.type == .rejected }
@@ -87,16 +90,92 @@ struct CallLogView: View {
                     CallLogRow(item: item, showContact: { detail = $0 }) {
                         calls.startCall(number: item.number, sim: item.sim ?? bridge.defaultSim(forSMS: false))
                     }
+                    .swipeActions(edge: .trailing) {
+                        Button {
+                            confirmDelete = item
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        .tint(Color.brandRed)
+                    }
+                    .contextMenu {
+                        if bridge.has(.block) && !item.number.isEmpty {
+                            if bridge.isBlocked(item.number) {
+                                Button {
+                                    BlockActions.run(app: app, bridge: bridge, numbers: [item.number], block: false)
+                                } label: { Label("Unblock", systemImage: "hand.raised.slash") }
+                            } else {
+                                Button(role: .destructive) {
+                                    blockRequest = BlockRequest(numbers: [item.number])
+                                } label: { Label("Block", systemImage: "hand.raised") }
+                            }
+                        }
+                        Button(role: .destructive) {
+                            confirmDelete = item
+                        } label: { Label("Delete", systemImage: "trash") }
+                    }
                 }
             }
         }
         .listStyle(.plain)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                if !items.isEmpty {
+                    Menu {
+                        Button(role: .destructive) {
+                            confirmClear = true
+                        } label: { Label("Clear All Calls", systemImage: "trash") }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                    .accessibilityLabel(Text("More"))
+                }
+            }
+        }
+        .blockPrompt($blockRequest)
+        .confirmationDialog(Text("Delete this call?"),
+                            isPresented: Binding(get: { confirmDelete != nil }, set: { if !$0 { confirmDelete = nil } }),
+                            titleVisibility: .visible, presenting: confirmDelete) { item in
+            Button("Delete", role: .destructive) {
+                confirmDelete = nil
+                Task { report(await bridge.deleteCalls([item.key])) }
+            }
+        } message: { _ in
+            deletionNote
+        }
+        .confirmationDialog(Text("Clear all calls?"), isPresented: $confirmClear, titleVisibility: .visible) {
+            Button("Clear All", role: .destructive) {
+                Task { report(await bridge.clearCallHistory()) }
+            }
+        } message: {
+            deletionNote
+        }
         .navigationDestination(isPresented: Binding(get: { detail != nil }, set: { if !$0 { detail = nil } })) {
             if let detail { ContactDetailView(contact: detail) }
         }
         .refreshable { await bridge.sync() }
         .onAppear { items = db.calls() }
         .onValueChange(db.revision) { _ in items = db.calls() }
+    }
+
+    /// Says where deleted calls go before the user confirms (D-043).
+    private var deletionNote: Text {
+        if bridge.deletesCallsOnBridge {
+            return Text("Deleted calls are also removed from the Android phone's call history.")
+        } else if !bridge.phase.isConnected {
+            return Text("The bridge phone isn't connected, so deleted calls are removed from this iPhone only. The Android phone keeps them.")
+        } else if bridge.canUseLink && !bridge.has(.calllogDelete) {
+            return Text("Deleted calls are removed from this iPhone only. To delete them on the Android phone too, allow the call history permission in Pairline Bridge.")
+        } else {
+            return Text("Deleted calls are removed from this iPhone only. The Android phone keeps them.")
+        }
+    }
+
+    private func report(_ outcome: BridgeController.CallDeletion) {
+        Haptics.success()
+        if outcome == .bridgeFailed {
+            app.toast = String(localized: "The bridge phone couldn't delete the calls, so they were removed from this iPhone only.")
+        }
     }
 
     @ViewBuilder private var emptyState: some View {
