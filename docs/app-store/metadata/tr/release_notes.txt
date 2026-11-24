@@ -1,1 +1,0 @@
-Demo modu artık uygulamanın tamamını gösteriyor: iPhone’dan konuşma ve İnternet paylaşımı hazır görünüyor, yanıtlanan bir demo aramasında ses iPhone’da gösteriliyor. Küçük düzeltmeler.

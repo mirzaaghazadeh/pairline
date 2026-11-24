@@ -1,1 +1,0 @@
-Demo mode now shows the whole app: Talk on iPhone and internet sharing appear ready, and an answered demo call shows its audio on the iPhone. Small fixes.

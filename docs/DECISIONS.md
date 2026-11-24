@@ -759,3 +759,16 @@ apps still never contact the site (rule 2).
 
 The iPhone app's version string becomes **1.0.0** (it was "1.0"); the unreleased App Store version was renamed to
 match, and build 5 is the first 1.0.0 build.
+
+### D-052 — The first App Store version is 1.0.1 (build 6); the demo is a fully set-up bridge (2026-11-24)
+
+Supersedes the version part of D-051. Build 5 (1.0.0) was in App Review when two things turned up: demo mode showed
+"Hear calls on iPhone", "Talk from iPhone" and internet sharing as not available, and the paywall screenshot (website
+gallery, in-app purchase review screenshots) still had the old two-phones logo. Build 6 fixes the demo and was
+uploaded as 1.0.1, because a build for an update after 1.0.0 can't carry 1.0.0. The maintainer chose to cancel build
+5's review and submit build 6 instead, so the unreleased App Store version was renamed to **1.0.1** and goes to review
+with build 6 and the two in-app purchases (7-day Trial, Full Access).
+
+Demo mode now reports every capability: the Bridge tab ticks them all, an answered demo call shows "Audio on this
+iPhone" (no audio is played), and Internet sharing shows sample proxy details. Before, the demo deliberately left call
+audio out to show how a missing capability is explained; seeing everything ready is what people trying the app expect.
