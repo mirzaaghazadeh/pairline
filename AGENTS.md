@@ -180,7 +180,7 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
   `origin` (`github.com/mirzaaghazadeh/pairline`, private until D-014's conditions are met). Don't
   hold a long session's work back for one big commit at the end. Check that the build and tests pass
   before each push; CI (`.github/workflows/`) runs on every push to `main`.
-- The website and its backend (`pairline.navid.tr`) live in a separate private repo, `pairline-web`,
+- The website and its backend (`getpairline.com`, formerly `pairline.navid.tr`) live in a separate private repo, `pairline-web`,
   never in this one. The apps never call it (rule 2).
 
 ## Open items before the first public release

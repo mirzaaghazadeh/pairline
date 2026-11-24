@@ -600,11 +600,11 @@ struct Version: Comparable {
 enum AppInfo {
     /// Oldest bridge app this iPhone app works well with. Raise when the protocol gains features the app relies on.
     static let minimumBridgeVersion = "0.1.0"
-    static let website = URL(string: "https://pairline.navid.tr")!
-    static let privacyURL = URL(string: "https://pairline.navid.tr/privacy")!
-    static let termsURL = URL(string: "https://pairline.navid.tr/terms")!
+    static let website = URL(string: "https://getpairline.com")!
+    static let privacyURL = URL(string: "https://getpairline.com/privacy")!
+    static let termsURL = URL(string: "https://getpairline.com/terms")!
     static let sourceURL = URL(string: "https://github.com/mirzaaghazadeh/pairline")!
-    static let downloadURL = URL(string: "https://pairline.navid.tr")!
+    static let downloadURL = URL(string: "https://getpairline.com")!
 
     static var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"

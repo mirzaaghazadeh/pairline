@@ -22,7 +22,7 @@ PRIVATE BY DESIGN
 • The source code is public, so anyone can check these promises
 
 HOW IT WORKS
-1. Install the free Pairline Bridge app on the Android phone (Android 9 or later), from pairline.navid.tr
+1. Install the free Pairline Bridge app on the Android phone (Android 9 or later), from getpairline.com
 2. Open Pairline on your iPhone and scan the pairing code the Android phone shows
 3. Keep the two phones within Bluetooth range
 

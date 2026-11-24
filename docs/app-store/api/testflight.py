@@ -16,7 +16,7 @@ GROUP_NAME = "Public Beta"
 DESCRIPTION = ("Pairline puts the SIM card of your Android phone on your iPhone or iPad: texts, one-time codes, "
                "calls, contacts, call history and USSD codes, over an end-to-end encrypted Bluetooth link between "
                "your own two phones. Install the free Pairline Bridge app on the Android phone from "
-               "https://pairline.navid.tr/download, then pair the two phones with the QR code. No Android phone "
+               "https://getpairline.com/download, then pair the two phones with the QR code. No Android phone "
                "at hand? Demo mode shows the whole app with sample data.")
 WHAT_TO_TEST = ("First beta. Please try: pairing with the QR code; receiving and sending SMS; copying one-time "
                 "codes; incoming calls while the iPhone is locked; calling from the iPhone; contacts and call "
@@ -40,7 +40,7 @@ if not all(contact.values()):
 # 1. Test information (what testers see), English.
 locs = ok(*request("GET", f"/v1/apps/{APP}/betaAppLocalizations"), "beta localizations")["data"]
 attrs = {"description": DESCRIPTION, "feedbackEmail": contact["contactEmail"],
-         "marketingUrl": "https://pairline.navid.tr", "privacyPolicyUrl": "https://pairline.navid.tr/privacy"}
+         "marketingUrl": "https://getpairline.com", "privacyPolicyUrl": "https://getpairline.com/privacy"}
 en = next((l for l in locs if l["attributes"]["locale"] == "en-US"), None)
 if en:
     ok(*request("PATCH", f"/v1/betaAppLocalizations/{en['id']}",

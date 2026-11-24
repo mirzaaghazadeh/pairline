@@ -12,8 +12,8 @@ end-to-end encrypted link between your own two phones.
 
 | App | Get it | Needs |
 |-----|--------|-------|
-| **Pairline Bridge** for the Android phone with the SIM (free) | **[Download the latest APK](https://pairline.navid.tr/download/android)** · [latest release on GitHub](https://github.com/mirzaaghazadeh/pairline/releases/latest) · [all versions](https://github.com/mirzaaghazadeh/pairline/releases) | Android 9 or later |
-| **Pairline** for iPhone | Coming soon to the App Store · [pairline.navid.tr](https://pairline.navid.tr/download) | iOS 16 or later |
+| **Pairline Bridge** for the Android phone with the SIM (free) | **[Download the latest APK](https://getpairline.com/download/android)** · [latest release on GitHub](https://github.com/mirzaaghazadeh/pairline/releases/latest) · [all versions](https://github.com/mirzaaghazadeh/pairline/releases) | Android 9 or later |
+| **Pairline** for iPhone | Coming soon to the App Store · [getpairline.com](https://getpairline.com/download) | iOS 16 or later |
 
 Both links always point to the newest release. Each release's notes list the APK's SHA-256, its signing
 certificate and its [VirusTotal](https://www.virustotal.com) report; see [Verifying releases](#verifying-releases).

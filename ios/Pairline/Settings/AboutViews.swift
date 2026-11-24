@@ -114,7 +114,7 @@ struct AboutView: View {
                 }
                 Link(destination: AppInfo.website) {
                     Label {
-                        Text(verbatim: "pairline.navid.tr")
+                        Text(verbatim: "getpairline.com")
                     } icon: {
                         Image(systemName: "globe")
                     }

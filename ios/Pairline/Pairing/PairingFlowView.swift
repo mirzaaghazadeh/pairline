@@ -79,7 +79,7 @@ struct PairingFlowView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
-                    Text(verbatim: "pairline.navid.tr")
+                    Text(verbatim: "getpairline.com")
                         .font(.title3.weight(.semibold).monospaced())
                         .foregroundStyle(Color.brandBlue)
                         .environment(\.layoutDirection, .leftToRight)

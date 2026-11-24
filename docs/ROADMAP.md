@@ -143,14 +143,14 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [x] 3-day trial through a free "3-day Trial" non-consumable (D-017, D-025); both products created in App Store
       Connect (`docs/app-store/api/iap.py`)
 - [x] Demo mode with sample data (D-020), in English, Persian, Arabic and Turkish
-- [x] Website at pairline.navid.tr with privacy policy and support pages (separate repo, D-021), deployed on Coolify
+- [x] Website at getpairline.com (was pairline.navid.tr, D-051) with privacy policy and support pages (separate repo, D-021), deployed on Coolify
 - [x] Android release signing; reproducible-build instructions; publish hash and certificate fingerprint (D-037;
       `android-release.yml`, SECURITY.md; 1.0.0–1.0.2 published with VirusTotal reports, D-039)
 - [x] Privacy policy page generated from PRIVACY.md; App Store privacy label "Data Not Collected" (published)
 - [x] App Store listing (EN/AR/TR text, screenshots for iPhone and iPad, header and search images) — `docs/app-store/`
 - [x] App Store submission: version 1.0 (build 1) and both in-app purchases submitted 2026-11-24, **manual release**
       (D-034): release only after the Android APK is downloadable and the real-device tests pass
-- [x] Android APK on the website: pairline.navid.tr mirrors each GitHub release after checking its hash and
+- [x] Android APK on the website: getpairline.com mirrors each GitHub release after checking its hash and
       certificate (pairline-web)
 - [ ] External review of PROTOCOL.md
 

@@ -747,3 +747,15 @@ GitHub (`network-code-check.sh`).
   numbers), and Settings › Blocked numbers (add by hand, swipe to unblock). Blocking asks first; unblocking doesn't.
 - History pages on the bridge skip a blocked sender's texts by reading on (up to 20 rounds of `limit + 200` rows)
   so a page is never empty while more remain; with no blocked numbers it's the same single query as before.
+
+### D-051 — The website moves to getpairline.com; the iPhone app ships as 1.0.0 (2026-11-24)
+
+The maintainer moved the website from `pairline.navid.tr` to **`getpairline.com`** (Coolify updated). Every link now
+points there: the iPhone app (website, privacy, terms and download links, the help and pairing screens, the StoreKit
+test file), the App Store listing (marketing, support and privacy URLs per language — Turkish now uses `/tr` pages —
+and the install step in the descriptions), TestFlight test information, README, AGENTS.md and PRIVACY.md. Earlier
+entries in this log keep the old name. The Android app links to no website, so it needs no release for this. The
+apps still never contact the site (rule 2).
+
+The iPhone app's version string becomes **1.0.0** (it was "1.0"); the unreleased App Store version was renamed to
+match, and build 5 is the first 1.0.0 build.

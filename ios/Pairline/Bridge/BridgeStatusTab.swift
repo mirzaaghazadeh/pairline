@@ -120,7 +120,7 @@ struct BridgeStatusTab: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Link(destination: AppInfo.downloadURL) {
-                    Text(verbatim: "pairline.navid.tr")
+                    Text(verbatim: "getpairline.com")
                         .font(.subheadline.weight(.semibold))
                 }
             }

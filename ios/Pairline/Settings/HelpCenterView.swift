@@ -75,7 +75,7 @@ struct HelpCenterView: View {
                 }
                 Link(destination: AppInfo.website) {
                     Label {
-                        Text(verbatim: "pairline.navid.tr")
+                        Text(verbatim: "getpairline.com")
                     } icon: {
                         Image(systemName: "safari")
                     }
@@ -119,7 +119,7 @@ struct HelpArticleView: View {
             Text("Set up the Android phone").font(.largeTitle.weight(.bold))
             TwoPhonesIllustration(state: .connected, height: 110).padding(.horizontal, 30)
             Step(number: 1, title: Text("Install Pairline Bridge"),
-                 text: Text("On the Android phone that holds your SIM, open pairline.navid.tr and download Pairline Bridge. It's free."))
+                 text: Text("On the Android phone that holds your SIM, open getpairline.com and download Pairline Bridge. It's free."))
             Step(number: 2, title: Text("Allow what it asks for"),
                  text: Text("Pairline Bridge asks for SMS, phone, Bluetooth and notification access so it can relay messages and calls. Each permission is explained in the app."))
             Step(number: 3, title: Text("Keep it running"),

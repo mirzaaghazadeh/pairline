@@ -6618,24 +6618,24 @@
         }
       }
     },
-    "On the Android phone that holds your SIM, open pairline.navid.tr and download Pairline Bridge. It's free." : {
+    "On the Android phone that holds your SIM, open getpairline.com and download Pairline Bridge. It's free." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "على هاتف أندرويد الذي توجد فيه شريحتك، افتح pairline.navid.tr ونزّل Pairline Bridge. إنه مجاني."
+            "value" : "على هاتف أندرويد الذي توجد فيه شريحتك، افتح getpairline.com ونزّل Pairline Bridge. إنه مجاني."
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "روی گوشی اندرویدی‌ای که سیم‌کارت شما در آن است، pairline.navid.tr را باز کنید و Pairline Bridge را دانلود کنید. رایگان است."
+            "value" : "روی گوشی اندرویدی‌ای که سیم‌کارت شما در آن است، getpairline.com را باز کنید و Pairline Bridge را دانلود کنید. رایگان است."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SIM kartınızın takılı olduğu Android telefonda pairline.navid.tr adresini açın ve Pairline Bridge'i indirin. Ücretsizdir."
+            "value" : "SIM kartınızın takılı olduğu Android telefonda getpairline.com adresini açın ve Pairline Bridge'i indirin. Ücretsizdir."
           }
         }
       }
