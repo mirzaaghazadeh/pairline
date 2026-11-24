@@ -59,6 +59,9 @@ jobs:
       # Ad-hoc signing ("Sign to Run Locally", no certificate or team): the tests use the Keychain, which fails
       # with errSecMissingEntitlement in an unsigned simulator app.
       - name: Build and test (Debug)
+        env:
+          # Passed to the tests as CI: StoreKitTests skip when the runner can't serve StoreKit test products.
+          TEST_RUNNER_CI: 'true'
         run: >
           xcodebuild -scheme Pairline -destination "id=${{ steps.sim.outputs.udid }}"
           -derivedDataPath build -resultBundlePath build/Tests.xcresult
