@@ -1,6 +1,10 @@
 # Roadmap
 
-**Current milestone: M0 — Project setup**
+**Current milestone: real-device testing of M1–M4, then M7 — Payments and first release**
+
+M0–M4 are built and tested on the Android emulator and the iOS Simulator over the debug TCP link (D-018). Bluetooth,
+CallKit's system UI, the camera scanner, dual SIM and real USSD still need a real Android phone and iPhone. M5, M6 and
+M8 are not started; the transport interface and the media/bulk channel keys are ready for them.
 
 Agents: tick checkboxes as work lands, and move the "Current milestone" line when a milestone is done.
 
@@ -52,7 +56,8 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
       sends multipart SMS and reports sent/delivered per message
 - [x] Message history sync (paged) — initial and incremental, older pages on demand, 30 KB pages that never split
       messages with the same time
-- [ ] One-time-code detection with a "Copy" action in the iPhone notification — **iOS done** (EN/FA/AR and more)
+- [x] One-time-code detection with a "Copy" action in the iPhone notification — iOS (EN/FA/AR and more); verified
+      end to end with the Android emulator bridge (2026-11-24)
 
 ## M3 — Calls (control only; audio stays on Android)
 
@@ -107,7 +112,8 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [x] 3-day trial through a free "3-day Trial" non-consumable (D-017, D-025); products still to be created in App
       Store Connect
 - [x] Demo mode with sample data (D-020), in English, Persian and Arabic
-- [ ] Website at pairline.navid.tr with privacy policy and support pages (separate repo, D-021)
+- [ ] Website at pairline.navid.tr with privacy policy and support pages (separate repo, D-021) — built in
+      `pairline-web` (EN/FA/AR, release mirroring, Coolify compose); deployment on Coolify pending
 - [ ] Android release signing; reproducible-build instructions; publish hash and certificate fingerprint
 - [ ] Privacy policy page generated from PRIVACY.md; App Store privacy label "Data Not Collected"
 - [ ] App Store submission; Android APK on the website

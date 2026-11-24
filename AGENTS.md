@@ -139,7 +139,12 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 ## Development machine
 
 - macOS with Xcode 27.2, JDK 17, Gradle and XcodeGen (Homebrew)
-- Android SDK at `~/Library/Android/sdk` (platforms 33 and 36; build-tools 33.0.1, 35.0.0, 36.0.0)
+- Android SDK at `~/Library/Android/sdk` (platforms 33, 36 and 37.0; build-tools 33.0.1, 35.0.0, 36.0.0, 37.0.0),
+  with emulators `pairline-30` (Android 11) and `pairline-36` (Android 16):
+  `~/Library/Android/sdk/emulator/emulator -avd pairline-36`
+- iOS Simulator "iPhone 18 Pro" (iOS 27). Full two-app test: run the Android debug build on the emulator,
+  `adb forward tcp:47800 tcp:47800`, read the pairing link from the devtools provider (see Commands), then
+  `xcrun simctl launch booted app.pairline.ios -PairlineAccess purchased -PairlinePairLink "<link>"`
 - Bluetooth, real carrier SMS/calls and CallKit need **real devices**. Everything above the transport can be
   tested on the Android emulator and the iOS Simulator through the debug-only TCP link (D-018):
   `adb forward tcp:47800 tcp:47800`, then fake SMS and calls with `adb emu sms send <number> <text>` and
