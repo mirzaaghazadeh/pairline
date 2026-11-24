@@ -512,3 +512,61 @@ Also added: M9, an Android **client** mode so two Android phones can pair (maint
 SMS and call history from the iPhone. Decision numbers reserved for the parallel work: D-042–D-043 (delete, block
 list, update check details), D-044–D-045 (M5 Wi-Fi link, files), D-046–D-047 (M6 call audio, Shizuku),
 D-048 (M8), D-049 (M9).
+
+### D-044 — The Wi-Fi link is a full link of its own, next to Bluetooth (2026-11-24)
+
+The Galaxy Note 8 can't hold a Bluetooth link with Apple devices (D-040), and call audio (M6) needs a low-latency
+channel. So the Wi-Fi link (M5) is not an add-on to the Bluetooth session but a **complete session**: each Wi-Fi TCP
+connection runs the same pairing, handshake and records as Bluetooth, with its own keys (PROTOCOL.md, "Wi-Fi").
+- **Two sessions at once.** With both up, the bridge keeps one session per transport. Events go to Bluetooth while it
+  is up — iOS wakes Pairline for Bluetooth but not for sockets — and move to Wi-Fi when it drops; replies go back on
+  the session the request came from; the iPhone sends the bulk sync requests over Wi-Fi. This makes `link.switch`
+  unnecessary, so it isn't used. The other option, Wi-Fi channels keyed from the Bluetooth session, would have left
+  phones without working Bluetooth with nothing.
+- **Media and bulk keys** come from the Wi-Fi session's own `okm` (the derivation in PROTOCOL.md is unchanged). Media
+  is one record per UDP datagram (≤ 1200 bytes of payload, a 64-record replay window, probes to open the path); the
+  UDP port travels in a new `wifi.media` message. File data uses a new frame type `BULK` (0x21) on the Wi-Fi TCP
+  connection. Neither needs a version bump: an older app never receives them (a bridge sends `BULK` only for a
+  transfer the iPhone accepted, and media only after `wifi.media`, which older iPhones ignore).
+- **Finding the bridge:** the pairing QR code carries the bridge's local addresses and port (optional parameters;
+  old links still work), the bridge advertises `_pairline._tcp` over DNS-SD with a random name (never the phone's
+  name or the device id), and `wifi.offer` over Bluetooth repeats the addresses and, while it runs, the hotspot's
+  name and passphrase. The iPhone pairs over whichever transport reaches the bridge first.
+- **Local only.** The bridge binds one listener per local address of its Wi-Fi and hotspot interfaces — never mobile
+  data or VPN interfaces, even when they have a private address — and drops peers that aren't private, link-local or
+  unique-local. The media socket is bound to the session's address and its Android `Network`, because unbound UDP
+  sockets leave on the default network (often mobile data when the Wi-Fi has no internet); accepted TCP sockets
+  already follow their network. The listener can be turned off in Settings (on by default).
+- **Keep-alive:** ping after 15 s of silence, close after 45 s, so a Wi-Fi drop moves traffic back to Bluetooth fast.
+- **Hotspot (best effort):** Android's local-only hotspot, started by the user from Settings — Android starts one
+  only for an app in the foreground, and needs `NEARBY_WIFI_DEVICES` on 13+ or location permission with Location on
+  for 9–12. Band choice uses `startLocalOnlyHotspotWithConfiguration` + `SoftApConfiguration.Builder.setChannels`,
+  public only since Android 16 (API 36); older versions let Android choose. The iPhone joins with
+  `NEHotspotConfiguration` (Hotspot Configuration entitlement; the App ID on team 7Y68TERDUC needs that capability
+  before the next archive).
+- **Known limit:** over Wi-Fi alone, the iPhone app is suspended in the background like any app with only a socket,
+  so messages and calls arrive while it's open or recently used. Apple's Local Push Connectivity
+  (`NEAppPushProvider`) could fix that later without any server.
+- **Emulator testing:** the emulator's NAT (`adb emu redir`) delivers to its emulated mobile-data interface, so a
+  debug build on an emulator accepts that interface, and the debug manifest adds `CHANGE_NETWORK_STATE` so the media
+  socket may bind to it. Neither is in release builds.
+
+### D-045 — Files: both ways over the Wi-Fi session, accepted automatically, 1 GiB at most (2026-11-24)
+
+- **Over Wi-Fi only.** Offers, answers and data travel on the Wi-Fi session (`file.offer` / `file.answer` /
+  `file.done` / `file.cancel`, data in `BULK` records of 48 KiB). Bluetooth would take minutes for a photo, and
+  splitting control (Bluetooth) from data (Wi-Fi) would leave half a transfer behind when either drops. A transfer
+  fails when its Wi-Fi session ends; there's no resume in v0. Files shared while Wi-Fi is down wait for it.
+- **No prompt on the receiving phone.** Both phones belong to the person who started the transfer, so the receiver
+  accepts on its own unless the file is over 1 GiB, there's no room, or 4 files are already arriving. 1 GiB covers
+  photos, videos and documents without needing resumable transfers.
+- **Where files land.** Android 10+: Downloads/Pairline through MediaStore, with no storage permission. Android 9:
+  Pairline's own folder in shared storage (no `WRITE_EXTERNAL_STORAGE`), opened from the notification through a
+  FileProvider. iPhone: `Documents/Received`, shown in the Files app (`UIFileSharingEnabled`); received files are
+  included in device backups like any document.
+- **Sending.** Android: "Send to iPhone" in every share sheet (it accepts only `content:` URIs, never a `file:` path
+  that could point into Pairline's own data) and "Send a file to iPhone" on Home. iPhone: a Share extension, "Send to
+  bridge phone", which copies the files into the app group's outbox and wakes the app with a Darwin notification;
+  the app sends them over the Wi-Fi link and deletes them after delivery. The extension never talks to the bridge
+  itself, so it needs no keys.
+- File names are shown on the phones (notifications, the transfer list) but never logged.
