@@ -892,6 +892,21 @@ Testing on a Galaxy Note 3 running Android 10 and reports from a tester's Samsun
   handing the audio back to the Android phone. When iOS stops the engine for a route change (AirPods, car, speaker,
   CallKit), a fresh engine starts in the same session (at most 6 times per call). An iPhone-side failure gets its
   own alert (microphone permission) instead of the bridge one.
+
+### D-057 — The iPhone app declares the `voip` background mode (2026-11-25)
+
+A tester's diagnostics report showed CallKit refusing every incoming call ("CallKit didn't show the call",
+`com.apple.CallKit.error`) and every call placed from the iPhone (`requesttransaction` errors), so calls never rang on
+the iPhone. CallKit's generic error `CXErrorCodeMissingVoIPBackgroundMode` is what an app gets when `voip` is missing
+from `UIBackgroundModes`, and Pairline had only `audio` and `bluetooth-central` (D-027 left `voip` out because there
+was no PushKit and no call audio). Pairline now declares `voip`. It still uses no PushKit and no server (rule 2): calls
+arrive over the link to the bridge phone, and iOS wakes the app for them through `bluetooth-central` as before. This
+supersedes D-027's first point.
+- If CallKit still declines a call (Focus) while Pairline is in the background, a local notification says who is
+  calling and opens the in-app call screen; it's removed when the call ends.
+- The diagnostics report redacted the error codes away: its number rule matched across line breaks (an error code,
+  the line break and the next line's time stamp). Numbers no longer span lines, and the report keeps each line's time
+  stamp.
 - **Incoming calls while the iPhone is locked.** iOS keeps only Bluetooth links alive in the background, and doesn't
   relaunch an app the user swiped away. The iPhone's Bridge tab now says so when the link is over Wi-Fi only, and
   when the user swipes Pairline away (while iOS still runs it) a local notification says calls and messages are

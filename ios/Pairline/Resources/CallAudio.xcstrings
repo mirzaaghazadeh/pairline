@@ -1,6 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Incoming call" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مكالمة واردة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Incoming call" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس ورودی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gelen arama" } }
+      }
+    },
+    "%@ is calling your Android number. Open Pairline to answer." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "%@ يتصل برقم أندرويد الخاص بك. افتح Pairline للرد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ is calling your Android number. Open Pairline to answer." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "%@ با شمارهٔ اندروید شما تماس گرفته است. برای جواب دادن Pairline را باز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ Android numaranızı arıyor. Yanıtlamak için Pairline’ı açın." } }
+      }
+    },
     "This iPhone couldn't start the call's audio. Check that Pairline may use the microphone (iPhone Settings › Pairline), then try another call." : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يتمكن هذا الآيفون من تشغيل صوت المكالمة. تأكد من السماح لـ Pairline باستخدام الميكروفون (إعدادات الآيفون › Pairline)، ثم جرّب مكالمة أخرى." } },

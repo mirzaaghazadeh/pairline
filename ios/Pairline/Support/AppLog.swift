@@ -8,13 +8,28 @@ enum Redactor {
             (#"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}"#, "[email]"),
             (#"\b[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\b"#, "[id]"),
             (#"\b(?:[0-9A-Fa-f]{2}[:\-]){5}[0-9A-Fa-f]{2}\b"#, "[mac]"),
-            // Five or more digits, optionally with a leading + and separators: phone numbers and codes.
-            (#"\+?\d(?:[\d\s\-().]*\d){4,}"#, "[number]"),
+            // Five or more digits, optionally with a leading + and separators: phone numbers and codes. Spaces and
+            // tabs only, never a line break, so one line's number can't swallow the next line's time stamp.
+            (#"\+?\d(?:[\d \t\-().]*\d){4,}"#, "[number]"),
         ]
         return patterns.compactMap { pattern, template in
             (try? NSRegularExpression(pattern: pattern)).map { ($0, template) }
         }
     }()
+
+    /// A log line's leading time stamp ("2026-11-24T18:28:03Z ") isn't personal data: it's kept as it is.
+    private static let timestamp = try? NSRegularExpression(pattern: #"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z "#)
+
+    /// Redacts a whole report line by line, keeping each line's time stamp.
+    static func redactLines(_ text: String) -> String {
+        text.split(separator: "\n", omittingEmptySubsequences: false).map { line -> String in
+            let line = String(line)
+            let range = NSRange(line.startIndex..., in: line)
+            guard let match = timestamp?.firstMatch(in: line, range: range),
+                  let end = Range(match.range, in: line)?.upperBound else { return redact(line) }
+            return String(line[..<end]) + redact(String(line[end...]))
+        }.joined(separator: "\n")
+    }
 
     static func redact(_ text: String) -> String {
         var out = text

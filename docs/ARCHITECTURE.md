@@ -142,6 +142,8 @@ Everything above `BridgeLink` is shared by the real link and demo mode. The tran
 
 **Link in the background**
 - Uses the `bluetooth-central` background mode with state preservation and restoration, so iOS wakes or relaunches the app for Bluetooth events.
+- Declares the `voip` background mode, without PushKit: CallKit refuses to report incoming calls from an app that
+  doesn't (`CXErrorCodeMissingVoIPBackgroundMode`, D-057).
 - Known iOS limit: if the user force-quits the app from the app switcher, iOS won't relaunch it until it's opened again. The UI must explain this.
 
 **Calls**

@@ -84,7 +84,7 @@ struct DiagnosticsView: View {
         lines.append("— Log (last 7 days) —")
         let text = log.text()
         lines.append(text.isEmpty ? "(empty)" : text)
-        report = Redactor.redact(lines.joined(separator: "\n"))
+        report = Redactor.redactLines(lines.joined(separator: "\n"))
     }
 
     private func describe(_ access: AccessState) -> String {

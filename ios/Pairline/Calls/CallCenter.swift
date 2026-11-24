@@ -170,7 +170,11 @@ final class CallCenter: ObservableObject {
                 if self.current?.id == call.id {
                     // Fall back to the in-app call screen (also the case in the Simulator, which has no CallKit UI).
                     self.current?.inCallKit = false
-                    if UIApplication.shared.applicationState == .active { self.showCallScreen = true }
+                    self.showCallScreen = true
+                    // In the background nobody would see it: say so in a notification that opens the call screen.
+                    if UIApplication.shared.applicationState != .active {
+                        Notifier.shared.notifyIncomingCall(from: call.name ?? call.number)
+                    }
                 }
             }
         } else {
@@ -240,6 +244,7 @@ final class CallCenter: ObservableObject {
         if call.inCallKit {
             adapter?.reportEnded(call.id, reason: endReason(event.reason, call: call))
         }
+        Notifier.shared.clearIncomingCall()
         if let message = endNotice(event.reason, call: call) { notice = message }
         current = call
         stopRelay(callEnded: true)

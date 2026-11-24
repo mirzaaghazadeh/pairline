@@ -76,6 +76,16 @@ final class RedactorTests: XCTestCase {
         XCTAssertTrue(out.contains("[id]"))
     }
 
+    func testReportKeepsTimeStampsAndErrorCodes() {
+        let report = "2026-11-24T18:27:55Z WARN [calls] CallKit transaction failed: (com.apple.CallKit.error.requesttransaction error 1.)\n" +
+            "2026-11-24T18:28:03Z INFO [calls] Call ended: local\n" +
+            "2026-11-24T18:28:04Z INFO [sms] To +98 912 123 4567"
+        let out = Redactor.redactLines(report)
+        XCTAssertTrue(out.contains("requesttransaction error 1.)\n2026-11-24T18:28:03Z INFO [calls] Call ended"), out)
+        XCTAssertTrue(out.hasPrefix("2026-11-24T18:27:55Z WARN"), out)
+        XCTAssertFalse(out.contains("4567"), out)
+    }
+
     func testKeepsUsefulText() {
         let line = "2026-11-24T01:00:00Z INFO [link] Session established over ble (v0, 3 caps)"
         XCTAssertEqual(Redactor.redact("Session established over ble (v0, 3 caps)"), "Session established over ble (v0, 3 caps)")

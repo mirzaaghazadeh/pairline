@@ -15,6 +15,7 @@ final class Notifier: NSObject, ObservableObject {
     static let markReadAction = "mark-read"
     static let trialReminderID = "trial.reminder"
     static let callsPausedID = "calls.paused"
+    static let incomingCallID = "calls.incoming"
 
     @Published private(set) var authorization: UNAuthorizationStatus = .notDetermined
 
@@ -85,6 +86,20 @@ final class Notifier: NSObject, ObservableObject {
         content.body = String(localized: "\(count) new messages arrived while you were away.")
         content.sound = .default
         center.add(UNNotificationRequest(identifier: "sms-catchup", content: content, trigger: nil))
+    }
+
+    /// iOS didn't show the incoming call screen (Focus, or CallKit unavailable) while Pairline is in the background.
+    func notifyIncomingCall(from caller: String) {
+        guard authorization == .authorized else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Incoming call", table: "CallAudio")
+        content.body = String(localized: "\(caller) is calling your Android number. Open Pairline to answer.", table: "CallAudio")
+        content.sound = .default
+        center.add(UNNotificationRequest(identifier: Self.incomingCallID, content: content, trigger: nil))
+    }
+
+    func clearIncomingCall() {
+        center.removeDeliveredNotifications(withIdentifiers: [Self.incomingCallID])
     }
 
     /// Pairline was swiped away in the app switcher (see AppDelegate.applicationWillTerminate).
