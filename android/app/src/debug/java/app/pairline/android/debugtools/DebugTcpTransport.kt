@@ -93,7 +93,8 @@ class DebugTcpTransport(
             } catch (e: Exception) {
                 reason = if (closed) "closed" else "read error (${e.javaClass.simpleName})"
             } finally {
-                close()
+                closed = true
+                runCatching { socket.close() }
                 writer.shutdown()
                 listener.onClosed(this, reason)
                 if (current == this) current = null
@@ -108,14 +109,21 @@ class DebugTcpTransport(
                     out.write(TcpFraming.encode(frame))
                     out.flush()
                 } catch (_: IOException) {
-                    close()
+                    closed = true
+                    runCatching { socket.close() }
                 }
             }
         }
 
+        /** Closes after frames already queued (such as a final `unpair`) are written, or after 2 s at most. */
         override fun close() {
+            if (closed) return
             closed = true
-            runCatching { socket.close() }
+            runCatching { writer.execute { runCatching { socket.close() } } }
+            Thread({
+                Thread.sleep(2_000)
+                runCatching { socket.close() }
+            }, "pairline-$label-close").apply { isDaemon = true }.start()
         }
     }
 

@@ -309,7 +309,7 @@ class BleTransport(
 
         override fun send(frame: ByteArray) {
             handler.post {
-                if (!connections.containsKey(device.address)) return@post
+                if (closing || !connections.containsKey(device.address)) return@post
                 // ATT payload is MTU − 3; never below the BLE minimum.
                 val payload = maxOf(BleFragmenter.MIN_ATT_PAYLOAD, mtu - 3)
                 queue.addAll(BleFragmenter.fragment(frame, payload))
@@ -317,8 +317,24 @@ class BleTransport(
             }
         }
 
+        private var closing = false
+
+        /** Disconnects once frames already queued (such as a final `unpair`) are sent, or after 2 s at most. */
         override fun close() {
-            handler.post { runCatching { server?.cancelConnection(device) } }
+            handler.post {
+                if (closing) return@post
+                closing = true
+                if (queue.isEmpty() && !inFlight) {
+                    disconnect()
+                } else {
+                    handler.postDelayed({ disconnect() }, 2_000)
+                }
+            }
+        }
+
+        private fun disconnect() {
+            queue.clear()
+            runCatching { server?.cancelConnection(device) }
         }
 
         fun onFragment(bytes: ByteArray) {
@@ -359,10 +375,11 @@ class BleTransport(
             inFlight = false
             if (status != BluetoothGatt.GATT_SUCCESS) {
                 Log.w(TAG, "$label: notification failed ($status)")
-                close()
+                disconnect()
                 return
             }
             pump()
+            if (closing && queue.isEmpty() && !inFlight) disconnect()
         }
     }
 
