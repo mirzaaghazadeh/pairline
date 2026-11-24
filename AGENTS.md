@@ -126,6 +126,13 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
   (`CODE_SIGN_IDENTITY=-`) because the Keychain needs an entitlement. `StoreKitTests` skip on CI when the runner's
   StoreKit test session serves no products, so **run them locally before every release**
 - Running from Xcode uses `Pairline/Store/Pairline.storekit`, so the trial and purchase work without Apple's servers.
+- On a real iPhone (team 7Y68TERDUC in `project.yml`):
+  `xcodebuild -scheme Pairline -destination 'id=<udid>' -allowProvisioningUpdates build`, then
+  `xcrun devicectl device install app --device <udid> <derived data>/Build/Products/Debug-iphoneos/Pairline.app` and launch
+  once with `xcrun devicectl device process launch --device <udid> app.pairline.ios -- -PairlineAccess purchased`
+  (`xcrun devicectl list devices` shows the UDID). Debug builds remember that override until `-PairlineAccess reset`,
+  because outside Xcode's ⌘R (home screen, background relaunch) the StoreKit file doesn't apply and the App Store
+  products don't exist until App Store Connect is set up.
 - End to end on the Simulator against the fake bridge (no Android device needed), debug builds only (D-029):
   `python3 -I protocol/tools/fake_bridge.py --port 47810 --control-port 47811`, then
   `xcrun simctl launch booted app.pairline.ios -PairlineAccess purchased -PairlineTCPPort 47810 -PairlinePairLink "<printed link>"`,

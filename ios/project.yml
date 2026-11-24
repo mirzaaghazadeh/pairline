@@ -17,8 +17,8 @@ settings:
     SWIFT_STRICT_CONCURRENCY: minimal
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
-    # Set your own team to run on a device; CI builds without signing.
-    DEVELOPMENT_TEAM: ""
+    # The maintainer's team (forks: set your own to run on a device). CI builds without signing.
+    DEVELOPMENT_TEAM: "7Y68TERDUC"
     CODE_SIGN_STYLE: Automatic
     TARGETED_DEVICE_FAMILY: "1"
     SUPPORTS_MACCATALYST: NO

@@ -102,12 +102,24 @@ final class PurchaseManager: ObservableObject {
     }
 
     #if DEBUG
-    /// Debug builds only: `-PairlineAccess purchased|trial|expired|none` fakes the access state, so the Simulator can
-    /// be tested end to end without App Store sandbox purchases.
+    /// Debug builds only: `-PairlineAccess purchased|trial|expired|none` fakes the access state, so the Simulator and a
+    /// test iPhone can be used end to end without App Store sandbox purchases. The value is remembered for later
+    /// launches (from the home screen, or by iOS in the background, where Xcode's StoreKit file doesn't apply) until
+    /// the app is launched with `-PairlineAccess reset`. Unit tests ignore the remembered value.
     private static func debugAccessOverride(now: Date) -> AccessState? {
+        let key = "debug.accessOverride"
+        let defaults = UserDefaults.standard
         let args = ProcessInfo.processInfo.arguments
-        guard let index = args.firstIndex(of: "-PairlineAccess"), index + 1 < args.count else { return nil }
-        switch args[index + 1] {
+        let value: String?
+        if let index = args.firstIndex(of: "-PairlineAccess"), index + 1 < args.count {
+            value = args[index + 1] == "reset" ? nil : args[index + 1]
+            defaults.set(value, forKey: key)
+        } else if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            value = defaults.string(forKey: key)
+        } else {
+            value = nil
+        }
+        switch value ?? "" {
         case "purchased": return .purchased
         case "trial": return .trial(endsAt: now.addingTimeInterval(26 * 3600))
         case "expired": return .expired(endedAt: now.addingTimeInterval(-3600))
