@@ -61,10 +61,15 @@ except ImportError:
 VERSION = 0
 ROLE_R, ROLE_B = 0x52, 0x42  # 'R', 'B'
 DIR_B_TO_R, DIR_R_TO_B = 1, 2
-CONTROL_CHANNEL = 0
-F_PAIR_HELLO, F_PAIR_OK, F_PAIR_FAIL, F_HELLO, F_RECORD = 0x01, 0x02, 0x03, 0x10, 0x20
+CONTROL_CHANNEL, MEDIA_CHANNEL, BULK_CHANNEL = 0, 1, 2
+F_PAIR_HELLO, F_PAIR_OK, F_PAIR_FAIL, F_HELLO, F_RECORD, F_BULK = 0x01, 0x02, 0x03, 0x10, 0x20, 0x21
 FRAME_NAMES = {F_PAIR_HELLO: "PAIR_HELLO", F_PAIR_OK: "PAIR_OK", F_PAIR_FAIL: "PAIR_FAIL",
-               F_HELLO: "HELLO", F_RECORD: "RECORD"}
+               F_HELLO: "HELLO", F_RECORD: "RECORD", F_BULK: "BULK"}
+MEDIA_MAX_PAYLOAD = 1200      # PROTOCOL.md, "Media channel (UDP)"
+REPLAY_WINDOW = 64
+FILE_CHUNK = 49152            # PROTOCOL.md, "File transfer"
+FILE_MAX = 1 << 30
+WIFI_PING_AFTER, WIFI_IDLE_LIMIT = 15, 45
 MAX_FRAME = 65535
 MAX_PLAINTEXT = MAX_FRAME - 1 - 8 - 16  # frame type, counter, GCM tag
 HELLO_LEN = 99
@@ -157,6 +162,11 @@ def fingerprint(public: bytes) -> str:
     return hashlib.sha256(public).hexdigest()[:16]
 
 
+def wifi_params(ips, port) -> str:
+    """The optional Wi-Fi part of a pair link (PROTOCOL.md, "Pairing over Wi-Fi")."""
+    return f"&ip={','.join(ips)}&port={port}" if ips and port else ""
+
+
 def pairing_uri(device_id: bytes, pub_b: bytes, ps: bytes) -> str:
     return f"pairline://pair?v=0&id={b64u(device_id)}&k={b64u(pub_b)}&s={b64u(ps)}"
 
@@ -215,9 +225,32 @@ def session_keys(ikm: bytes, hello_r: bytes, hello_b: bytes):
 
 
 def channel_keys(okm: bytes, name: str):
-    """Wi-Fi channel keys (not used by this tool; checked by --self-test). Returns (B→R, R→B)."""
+    """Wi-Fi channel keys ("media" or "bulk") of a Wi-Fi session. Returns (B→R, R→B)."""
     k = hkdf(okm, b"", b"pairline v0 " + name.encode(), 64)
     return k[:32], k[32:]
+
+
+class ReplayWindow:
+    """The media channel's 64-record sliding replay window (PROTOCOL.md, "Records")."""
+
+    def __init__(self):
+        self.top, self.mask = None, 0
+
+    def may_accept(self, counter: int) -> bool:
+        if self.top is None or counter > self.top:
+            return True
+        offset = self.top - counter
+        return offset < REPLAY_WINDOW and not (self.mask >> offset) & 1
+
+    def mark(self, counter: int):
+        if self.top is None:
+            self.top, self.mask = counter, 1
+        elif counter > self.top:
+            shift = counter - self.top
+            self.mask = ((self.mask << shift) | 1) & ((1 << REPLAY_WINDOW) - 1) if shift < REPLAY_WINDOW else 1
+            self.top = counter
+        else:
+            self.mask |= 1 << (self.top - counter)
 
 
 def nonce(direction: int, counter: int) -> bytes:
@@ -606,24 +639,29 @@ class Store:
 # --- One connection --------------------------------------------------------------------------------
 
 class Link:
-    """One TCP connection from the iPhone app: optional pairing, the handshake, then records."""
+    """One TCP connection from the iPhone app: optional pairing, the handshake, then records. `kind` is "tcp" (the
+    debug link, standing in for Bluetooth) or "wifi" (the M5 Wi-Fi link: also BULK frames and the media channel)."""
 
-    def __init__(self, bridge, reader, writer):
-        self.b, self.reader, self.writer = bridge, reader, writer
+    def __init__(self, bridge, reader, writer, kind="tcp"):
+        self.b, self.reader, self.writer, self.kind = bridge, reader, writer, kind
         peer = writer.get_extra_info("peername") or ("?", 0)
-        self.name = f"{peer[0]}:{peer[1]}"
+        self.peer_ip = peer[0]
+        self.name = f"{kind} {peer[0]}:{peer[1]}"
         self.k_tx = self.k_rx = None
         self.tx, self.rx = 0, -1  # next counter to send; last counter accepted
+        self.bulk_tx_key = self.bulk_rx_key = self.media_keys = None
+        self.bulk_tx, self.bulk_rx = 0, -1
         self.ready = self.closed = False
         self.tasks = []
         self.ping_id, self.pings = 0, {}
+        self.last_rx = time.monotonic()
 
     async def run(self):
         why = "ended"
         try:
             ftype, body = await self.recv(HANDSHAKE_TIMEOUT)
             if ftype == F_PAIR_HELLO:
-                log("← PAIR_HELLO")
+                log(f"← PAIR_HELLO ({self.kind})")
                 ok, reply, detail = self.b.pair(body)
                 self.send_frame(F_PAIR_OK if ok else F_PAIR_FAIL, dumps(reply))
                 log(f"→ {'PAIR_OK' if ok else 'PAIR_FAIL reason=' + reply['reason']}  ({detail})")
@@ -635,9 +673,13 @@ class Link:
             await self.handshake(body)
             while not self.closed:
                 ftype, body = await self.recv(None)
-                if ftype != F_RECORD:
+                self.last_rx = time.monotonic()
+                if ftype == F_BULK and self.kind == "wifi":
+                    self.on_bulk(body)
+                elif ftype != F_RECORD:
                     raise ProtocolError(f"unexpected {FRAME_NAMES[ftype]} after the handshake")
-                self.on_record(body)
+                else:
+                    self.on_record(body)
         except asyncio.IncompleteReadError:
             why = "the iPhone closed the connection"
         except asyncio.TimeoutError:
@@ -665,7 +707,10 @@ class Link:
         hello_b = make_hello(ROLE_B, pub_bytes(e_b), secrets.token_bytes(32))
         self.send_frame(F_HELLO, hello_b)
         log("→ HELLO")
-        _, _, self.k_tx, self.k_rx = session_keys(bridge_ikm(self.b.identity, e_b, peer, e_r), hello_r, hello_b)
+        _, okm, self.k_tx, self.k_rx = session_keys(bridge_ikm(self.b.identity, e_b, peer, e_r), hello_r, hello_b)
+        if self.kind == "wifi":
+            self.bulk_tx_key, self.bulk_rx_key = channel_keys(okm, "bulk")
+            self.media_keys = channel_keys(okm, "media")
         self.send_record(b"")
         log("→ confirm")
         ftype, body = await self.recv(HANDSHAKE_TIMEOUT)
@@ -678,12 +723,44 @@ class Link:
         if counter != 0 or plaintext:
             raise ProtocolError("bad confirm (counter must be 0, plaintext empty)")
         self.rx, self.ready = 0, True
-        log(f"← confirm ok: session ready with iPhone {fingerprint(peer)}")
+        log(f"← confirm ok: {self.kind} session ready with iPhone {fingerprint(peer)}")
         self.send({"t": "device.info", "name": "Pixel 8 (fake)", "platform": "android", "os": "15",
                    "app": self.b.app_version, "proto": VERSION})
         self.send(self.b.status())
-        self.tasks = [asyncio.create_task(self.every(STATUS_EVERY, lambda: self.send(self.b.status()))),
-                      asyncio.create_task(self.every(PING_EVERY, self.ping))]
+        # Periodic status goes on the event session only; the Wi-Fi session has its own faster keep-alive.
+        self.tasks = [asyncio.create_task(self.every(STATUS_EVERY,
+                                                     lambda: self.b.link is self and self.send(self.b.status())))]
+        if self.kind == "wifi":
+            self.tasks.append(asyncio.create_task(self.every(5, self.wifi_keepalive)))
+        else:
+            self.tasks.append(asyncio.create_task(self.every(PING_EVERY, self.ping)))
+        self.b.session_ready(self)
+
+    def wifi_keepalive(self):
+        """PROTOCOL.md, "Wi-Fi": ping after 15 s without receiving anything, close after 45 s of silence."""
+        idle = time.monotonic() - self.last_rx
+        if idle > WIFI_IDLE_LIMIT:
+            self.close(f"nothing received over Wi-Fi for {idle:.0f} s")
+        elif idle > WIFI_PING_AFTER:
+            self.ping()
+
+    def on_bulk(self, body):
+        """A BULK frame: ordered like control records; anything wrong closes the connection."""
+        if len(body) < 8 + 16:
+            raise ProtocolError("bulk record too short")
+        counter = struct.unpack(">Q", body[:8])[0]
+        if counter <= self.bulk_rx:
+            raise ProtocolError(f"replayed or reordered bulk record (counter {counter})")
+        try:
+            _, plaintext = open_record(self.bulk_rx_key, DIR_R_TO_B, BULK_CHANNEL, body)
+        except InvalidTag:
+            raise ProtocolError(f"bulk record {counter} doesn't decrypt") from None
+        self.bulk_rx = counter
+        self.b.files.on_bulk(self, plaintext)
+
+    def send_bulk(self, plaintext: bytes):
+        self.send_frame(F_BULK, seal(self.bulk_tx_key, DIR_B_TO_R, self.bulk_tx, BULK_CHANNEL, plaintext))
+        self.bulk_tx += 1
 
     def on_record(self, body):
         if len(body) < 8 + 16:
@@ -729,7 +806,7 @@ class Link:
             log(f"! {msg.get('t')} is {len(plaintext)} bytes, too large for one frame; not sent")
             return False
         self.send_record(plaintext)
-        log(f"→ {describe(msg)}  ({len(plaintext)} B)")
+        log(f"→ {describe(msg)}  ({len(plaintext)} B{', ' + self.kind if self.b.wifi_port else ''})")
         return True
 
     async def every(self, seconds, fn):
@@ -751,11 +828,230 @@ class Link:
     def close(self, why):
         if self.closed:
             return
+        was_ready = self.ready
         self.closed, self.ready = True, False
         for task in self.tasks:
             task.cancel()
         self.writer.close()
+        if was_ready:
+            self.b.session_closed(self)
         log(f"connection {self.name} closed: {why}")
+
+
+# --- Wi-Fi: media channel and files (M5) ----------------------------------------------------------
+
+def plain_ip(ip: str) -> str:
+    return ip[7:] if ip.startswith("::ffff:") else ip
+
+
+class MediaServer(asyncio.DatagramProtocol):
+    """The UDP media channel (PROTOCOL.md, "Media channel (UDP)") of the current Wi-Fi session: authenticates with its
+    media keys and a 64-record replay window, learns the iPhone's address from authentic datagrams, answers probes
+    with probes and (by default) echoes every packet back, so the app's MediaChannel can be checked end to end."""
+
+    def __init__(self, bridge):
+        self.b, self.transport, self.echo = bridge, None, True
+        self.reset(None)
+
+    def reset(self, link):
+        self.link = link
+        self.keys = link.media_keys if link else None
+        self.window, self.tx, self.peer, self.open = ReplayWindow(), 0, None, False
+        self.packets = self.echoed = self.dropped = self.probes = 0
+        self.probe_times = []
+
+    def connection_made(self, transport):
+        self.transport = transport
+
+    def datagram_received(self, data, addr):
+        link = self.link
+        if not self.keys or link is None or not link.ready or plain_ip(addr[0]) != plain_ip(link.peer_ip):
+            self.dropped += 1
+            return
+        if not 24 <= len(data) <= MEDIA_MAX_PAYLOAD + 24:
+            self.dropped += 1
+            return
+        counter = struct.unpack(">Q", data[:8])[0]
+        if counter >= COUNTER_LIMIT or not self.window.may_accept(counter):
+            self.dropped += 1
+            return
+        try:
+            _, plaintext = open_record(self.keys[1], DIR_R_TO_B, MEDIA_CHANNEL, data)
+        except (InvalidTag, ValueError):
+            self.dropped += 1
+            return
+        self.window.mark(counter)
+        self.peer = addr
+        if not self.open:
+            self.open = True
+            log("media: channel open (first authentic datagram from the iPhone)")
+        if not plaintext:
+            self.probes += 1
+            now = time.monotonic()
+            self.probe_times = [t for t in self.probe_times if now - t < 1] + [now]
+            if len(self.probe_times) <= 10:  # at most 10 probe answers per second
+                self.send(b"")
+            return
+        self.packets += 1
+        if self.packets in (1, 10, 50) or self.packets % 500 == 0:
+            log(f"media: {self.packets} packet(s) from the iPhone ({len(plaintext)} B last)")
+        if self.echo:
+            self.send(plaintext)
+            self.echoed += 1
+
+    def send(self, payload: bytes) -> bool:
+        if self.peer is None or self.transport is None or self.keys is None or self.tx >= COUNTER_LIMIT:
+            return False
+        self.transport.sendto(seal(self.keys[0], DIR_B_TO_R, self.tx, MEDIA_CHANNEL, payload), self.peer)
+        self.tx += 1
+        return True
+
+    def summary(self) -> str:
+        if self.link is None:
+            return "media: no Wi-Fi session"
+        return (f"media: {'open' if self.open else 'waiting for the first probe'}; from iPhone {self.packets} packets, "
+                f"{self.probes} probes, {self.dropped} dropped; sent {self.tx}; echo {'on' if self.echo else 'off'}")
+
+
+class FileTransfers:
+    """Files both ways over the Wi-Fi session (PROTOCOL.md, "File transfer"): file.* messages, data in BULK records."""
+
+    def __init__(self, bridge, folder):
+        self.b, self.folder = bridge, Path(folder).expanduser()
+        self.incoming, self.outgoing = {}, {}  # fid -> state
+        self.next_fid = secrets.randbelow(1000) + 1
+
+    def on_message(self, link, msg) -> bool:
+        t, fid = msg["t"], msg.get("fid")
+        if t not in ("file.offer", "file.answer", "file.done", "file.cancel"):
+            return False
+        if not is_int(fid) or not 0 <= fid <= 0xFFFFFFFF:
+            log(f"  {t} without a valid fid ignored")
+            return True
+        if t == "file.offer":
+            self.offered(link, msg, fid)
+        elif t == "file.answer":
+            out = self.outgoing.get(fid)
+            if out and msg.get("accept") is True:
+                log(f"  the iPhone accepted file {fid}; sending {out['size']} bytes")
+                out["task"] = asyncio.create_task(self.stream(link, fid))
+            elif out:
+                log(f"  the iPhone declined file {fid}: {msg.get('reason')}")
+                self.outgoing.pop(fid, None)
+        elif t == "file.done":
+            out = self.outgoing.pop(fid, None)
+            if out:
+                log(f"  file {fid} {'delivered' if msg.get('ok') else 'failed: ' + str(msg.get('reason'))} "
+                    f"(sha256 {out['sha']})")
+        elif t == "file.cancel":
+            item = self.incoming.pop(fid, None)
+            if item:
+                item["f"].close()
+                item["path"].unlink(missing_ok=True)
+                log(f"  the iPhone cancelled file {fid}")
+        return True
+
+    def offered(self, link, msg, fid):
+        name, size = msg.get("name"), msg.get("size")
+        if not isinstance(name, str) or not is_int(size) or not 0 <= size <= FILE_MAX:
+            link.send({"t": "file.answer", "fid": fid, "accept": False, "reason": "too_large"})
+            return
+        safe = re.sub(r"[/\\\x00-\x1f]", "", name).lstrip(".") or "file"
+        self.folder.mkdir(parents=True, exist_ok=True)
+        path = self.folder / safe
+        n = 2
+        while path.exists():
+            path = self.folder / f"{Path(safe).stem} ({n}){Path(safe).suffix}"
+            n += 1
+        self.incoming[fid] = {"path": path, "f": open(path, "wb"), "size": size, "got": 0, "sha": hashlib.sha256()}
+        link.send({"t": "file.answer", "fid": fid, "accept": True})
+        log(f"  receiving file {fid}: {size} bytes -> {path}")
+        if size == 0:
+            self.finish(link, fid)
+
+    def on_bulk(self, link, plaintext):
+        if len(plaintext) < 14 or plaintext[0] != 0x01:
+            return  # unknown bulk records are ignored
+        fid, offset = struct.unpack(">IQ", plaintext[1:13])
+        item = self.incoming.get(fid)
+        if item is None:
+            return
+        data = plaintext[13:]
+        if offset != item["got"] or item["got"] + len(data) > item["size"]:
+            log(f"  file {fid}: bad offset or too much data")
+            self.incoming.pop(fid)
+            item["f"].close()
+            item["path"].unlink(missing_ok=True)
+            link.send({"t": "file.done", "fid": fid, "ok": False, "reason": "failed"})
+            return
+        item["f"].write(data)
+        item["sha"].update(data)
+        item["got"] += len(data)
+        if item["got"] == item["size"]:
+            self.finish(link, fid)
+
+    def finish(self, link, fid):
+        item = self.incoming.pop(fid)
+        item["f"].close()
+        link.send({"t": "file.done", "fid": fid, "ok": True})
+        log(f"  received file {fid}: {item['size']} bytes, sha256 {item['sha'].hexdigest()} -> {item['path']}")
+
+    def send(self, link, path: Path) -> str:
+        data = path.read_bytes()
+        if len(data) > FILE_MAX:
+            raise CommandError("files up to 1 GiB")
+        fid = self.next_fid
+        self.next_fid += 1
+        self.outgoing[fid] = {"data": data, "size": len(data), "sha": hashlib.sha256(data).hexdigest(), "task": None}
+        link.send({"t": "file.offer", "fid": fid, "name": path.name, "size": len(data), "type": None})
+        return f"offered file {fid} ({len(data)} bytes, sha256 {self.outgoing[fid]['sha']})"
+
+    async def stream(self, link, fid):
+        out = self.outgoing.get(fid)
+        offset = 0
+        while out is not None and offset < out["size"] and link.ready:
+            chunk = out["data"][offset:offset + FILE_CHUNK]
+            link.send_bulk(bytes([0x01]) + struct.pack(">IQ", fid, offset) + chunk)
+            offset += len(chunk)
+            await link.writer.drain()
+        log(f"  file {fid}: all {offset} bytes written; waiting for file.done")
+
+    def cancel(self, link) -> str:
+        if not self.outgoing:
+            return "nothing being sent"
+        fid = next(iter(self.outgoing))
+        out = self.outgoing.pop(fid)
+        if out["task"]:
+            out["task"].cancel()
+        link.send({"t": "file.cancel", "fid": fid, "reason": "cancelled"})
+        return f"cancelled file {fid}"
+
+    def session_closed(self, link):
+        for fid, item in list(self.incoming.items()):
+            item["f"].close()
+            item["path"].unlink(missing_ok=True)
+            log(f"  file {fid} failed: the Wi-Fi session closed")
+        self.incoming.clear()
+        for out in self.outgoing.values():
+            if out["task"]:
+                out["task"].cancel()
+        self.outgoing.clear()
+
+
+def lan_address() -> str | None:
+    """This Mac's private address on the default route (no packet is sent)."""
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("10.255.255.255", 1))
+        ip = s.getsockname()[0]
+    except OSError:
+        return None
+    finally:
+        s.close()
+    first, second = (int(x) for x in ip.split(".")[:2])
+    private = first == 10 or (first == 172 and 16 <= second <= 31) or (first, second) in ((192, 168), (169, 254))
+    return ip if private else None
 
 
 # --- The fake bridge phone -------------------------------------------------------------------------
@@ -776,7 +1072,11 @@ HELP = """commands (console or control socket):
   version <x.y.z>              bridge app version -> status + device.info
   delcontact <key>             delete a contact (shows in contacts.sync "deleted")
   unpair                       send unpair, close and forget the iPhone
-  disconnect                   close the current connection
+  disconnect [tcp|wifi]        close the connections (or just one)
+  offer                        send wifi.offer again (Wi-Fi mode)
+  sendfile <path>              offer a file to the iPhone over Wi-Fi (file.offer, then BULK records)
+  cancelfile                   cancel the file being sent
+  media [echo on|off|burst]    media channel state; echo on/off; burst sends 20 packets to the iPhone
   quit                         stop the fake bridge"""
 
 
@@ -788,11 +1088,23 @@ class Bridge:
         self.store = Store(args.single_sim)
         self.sims = [dict(s) for s in SIM_SLOTS[:1 if args.single_sim else 2]]
         self.all_caps = [c for c in ALL_CAPS if not (args.single_sim and c == "dualsim")]
+        self.wifi_port = args.wifi_port or None
+        if self.wifi_port:
+            self.all_caps += ["wifi", "files"]
         self.caps = list(self.all_caps)
         self.battery = {"level": 82, "charging": False}
         self.app_version = args.app_version
         self.pairing = None
-        self.link = None
+        # Debug TCP stands in for Bluetooth; "wifi" is the M5 Wi-Fi link. One established session per transport.
+        self.links = {"tcp": None, "wifi": None}
+        if args.wifi_offer_ip == "auto":
+            self.wifi_ips = [ip for ip in [lan_address()] if ip]
+        else:
+            self.wifi_ips = [ip for ip in (args.wifi_offer_ip or "").split(",") if ip]
+        self.hotspot = args.hotspot.split(":", 1) if args.hotspot else None
+        self.media = MediaServer(self)
+        self.media_port = None
+        self.files = FileTransfers(self, args.files_dir)
         self.calls, self.call_seq = {}, 0
         self.ussd_busy = False
         self.followups, self.in_request = [], False
@@ -842,11 +1154,42 @@ class Bridge:
         self.write_state(self.identity, self.device_id, None)
         log(f"forgot the paired iPhone ({why})")
 
+    @property
+    def link(self):
+        """The event session (PROTOCOL.md, "Two sessions at once"): debug TCP (for Bluetooth) when up, else Wi-Fi."""
+        tcp, wifi = self.links["tcp"], self.links["wifi"]
+        if tcp and tcp.ready:
+            return tcp
+        if wifi and wifi.ready:
+            return wifi
+        return tcp or wifi
+
     # Pairing
     def new_pairing(self) -> str:
         ps = secrets.token_bytes(32)
         self.pairing = {"ps": ps, "created": time.monotonic(), "used": False}
-        return pairing_uri(self.device_id, self.pub, ps)
+        uri = pairing_uri(self.device_id, self.pub, ps) + wifi_params(self.wifi_ips, self.wifi_port)
+        if self.hotspot:
+            uri += f"&ssid={b64u(self.hotspot[0].encode())}&pw={b64u(self.hotspot[1].encode())}"
+        return uri
+
+    def wifi_offer(self) -> dict:
+        ssid, password = self.hotspot if self.hotspot else (None, None)
+        return {"t": "wifi.offer", "ip": self.wifi_ips, "port": self.wifi_port, "ssid": ssid, "password": password,
+                "band": None}
+
+    def session_ready(self, link):
+        """After device.info and status on a new session: wifi.media on Wi-Fi, wifi.offer on the event session."""
+        if link.kind == "wifi":
+            self.media.reset(link)
+            link.send({"t": "wifi.media", "port": self.media_port})
+        if self.wifi_port and self.link is link:
+            link.send(self.wifi_offer())
+
+    def session_closed(self, link):
+        if link.kind == "wifi" and self.media.link is link:
+            self.media.reset(None)
+            self.files.session_closed(link)
 
     @staticmethod
     def banner(uri) -> str:
@@ -874,17 +1217,26 @@ class Bridge:
         return True, reply, f"paired; pinned iPhone {fingerprint(pub_r)}"
 
     # Connections
-    async def on_connect(self, reader, writer):
-        link = Link(self, reader, writer)
-        if self.link:
-            self.link.close("replaced by a new connection")
-        self.link = link
+    async def on_connect(self, reader, writer, kind="tcp"):
+        link = Link(self, reader, writer, kind)
+        if kind == "wifi" and not plain_ip(link.peer_ip).startswith(("127.", "10.", "192.168.", "169.254.", "fe80", "fd", "fc")) \
+                and not re.match(r"172\.(1[6-9]|2\d|3[01])\.", plain_ip(link.peer_ip)) and link.peer_ip != "::1":
+            log(f"refused a Wi-Fi connection from outside the local network ({link.peer_ip})")
+            writer.close()
+            return
+        old = self.links[kind]
+        if old:
+            old.close("replaced by a new connection")
+        self.links[kind] = link
         log(f"connection from {link.name}")
         try:
             await link.run()
         finally:
-            if self.link is link:
-                self.link = None
+            if self.links[kind] is link:
+                self.links[kind] = None
+
+    async def on_connect_wifi(self, reader, writer):
+        await self.on_connect(reader, writer, "wifi")
 
     def send_event(self, ev):
         if self.link and self.link.ready:
@@ -913,7 +1265,7 @@ class Bridge:
     # Messages from the iPhone
     def on_message(self, link, msg):
         t, mid = msg["t"], msg.get("id")
-        log(f"← {describe(msg)}")
+        log(f"← {describe(msg)}{'  (' + link.kind + ')' if self.wifi_port else ''}")
         if t == "pong":
             link.on_pong(mid)
             return
@@ -923,7 +1275,11 @@ class Bridge:
             return
         if t == "unpair":
             self.forget_peer("the iPhone sent unpair")
-            link.close("unpaired by the iPhone")
+            for other in list(self.links.values()):
+                if other:
+                    other.close("unpaired by the iPhone")
+            return
+        if link.kind == "wifi" and self.files.on_message(link, msg):
             return
         handler = self.handlers.get(t)
         if handler is None:
@@ -1122,7 +1478,7 @@ class Bridge:
         text = ussd_text(code, sim)
         reply = {"t": "ussd.result", "id": mid, "ok": text is not None}
         reply.update({"text": text} if text else {"error": "USSD code not recognized"})
-        if link is self.link and link.ready:
+        if link.ready and not link.closed:  # replies follow their request's session
             link.send(reply)
         else:
             log("  (connection gone: ussd.result dropped)")
@@ -1151,11 +1507,14 @@ class Bridge:
         return text if source != "stdin" else ""
 
     def cmd_status(self, rest, source):
-        link, b = self.link, self.battery
+        b = self.battery
         calls = ", ".join(f"{c['id']} {c['state']}" for c in self.calls.values()) or "none"
+        links = [("session ready with " if link.ready else "handshaking with ") + link.name
+                 for link in self.links.values() if link]
         lines = [
             f"paired: {'yes, iPhone ' + fingerprint(self.peer) if self.peer else 'no'}",
-            "link: " + (("session ready with " if link.ready else "handshaking with ") + link.name if link else "none"),
+            "links: " + ("; ".join(links) or "none") + (f" (events on {self.link.kind})" if self.link else ""),
+            self.media.summary() if self.wifi_port else "wifi: off",
             f"battery {b['level']}%{' charging' if b['charging'] else ''}; "
             + "; ".join(f"SIM{s['slot']} {s['carrier']} signal {s['signal']} {s['net']}" for s in self.sims),
             f"caps: {', '.join(self.caps) or '(none)'}",
@@ -1273,16 +1632,55 @@ class Bridge:
         link = self.link
         if link and link.ready:
             link.send({"t": "unpair"})
-        if link:
-            link.close("unpair command")
+        for other in list(self.links.values()):
+            if other:
+                other.close("unpair command")
         self.forget_peer("unpair command")
         return "unpaired; run `pair` for a new pairing link"
 
     def cmd_disconnect(self, rest, source):
-        if not self.link:
-            return "not connected"
-        self.link.close("disconnect command")
-        return "disconnected"
+        kinds = [rest] if rest in ("tcp", "wifi") else ["tcp", "wifi"]
+        closed = []
+        for kind in kinds:
+            if self.links[kind]:
+                self.links[kind].close("disconnect command")
+                closed.append(kind)
+        return f"disconnected {', '.join(closed)}" if closed else "not connected"
+
+    def wifi_link(self):
+        link = self.links["wifi"]
+        if not (link and link.ready):
+            raise CommandError("no Wi-Fi session")
+        return link
+
+    def cmd_offer(self, rest, source):
+        if not self.wifi_port:
+            raise CommandError("start with --wifi-port")
+        if not (self.link and self.link.ready):
+            raise CommandError("no session")
+        self.link.send(self.wifi_offer())
+        return f"wifi.offer sent on {self.link.kind}"
+
+    def cmd_sendfile(self, rest, source):
+        path = Path(rest).expanduser()
+        if not rest or not path.is_file():
+            raise CommandError("usage: sendfile <path to a file>")
+        return self.files.send(self.wifi_link(), path)
+
+    def cmd_cancelfile(self, rest, source):
+        return self.files.cancel(self.wifi_link())
+
+    def cmd_media(self, rest, source):
+        if rest in ("echo on", "echo off"):
+            self.media.echo = rest == "echo on"
+        elif rest == "burst":
+            if not self.media.open:
+                raise CommandError("the media channel isn't open")
+            sent = sum(self.media.send(b"burst" + struct.pack(">I", n) + bytes(155)) for n in range(20))
+            return f"sent {sent} packets to the iPhone"
+        elif rest:
+            raise CommandError("usage: media [echo on|off|burst]")
+        return self.media.summary()
 
     def cmd_quit(self, rest, source):
         self.stopped.set()
@@ -1331,8 +1729,17 @@ def stdin_loop(loop, bridge):
 
 async def amain(args) -> int:
     bridge = Bridge(args)
+    servers = []
+    udp = None
     try:
-        server = await asyncio.start_server(bridge.on_connect, args.host, args.port)
+        if not args.no_tcp:
+            servers.append(await asyncio.start_server(bridge.on_connect, args.host, args.port))
+        if args.wifi_port:
+            # TCP and UDP on the same port number (separate port spaces); fails here if either is taken.
+            servers.append(await asyncio.start_server(bridge.on_connect_wifi, args.wifi_host, args.wifi_port))
+            udp, _ = await asyncio.get_running_loop().create_datagram_endpoint(
+                lambda: bridge.media, local_addr=(args.wifi_host, args.wifi_port))
+            bridge.media_port = args.wifi_port
         control = (await asyncio.start_server(bridge.on_control, "127.0.0.1", args.control_port)
                    if args.control_port else None)
     except OSError as e:
@@ -1341,7 +1748,12 @@ async def amain(args) -> int:
     print(f"Pairline fake bridge (role B, protocol v{VERSION}). Dev tool only; all data is made up.")
     print(f"  state file:  {bridge.state_path}")
     print(f"  identity:    {fingerprint(bridge.pub)}   device id: {b64u(bridge.device_id)}")
-    print(f"  link:        tcp {args.host}:{args.port}")
+    print(f"  link:        {'off (--no-tcp)' if args.no_tcp else f'tcp {args.host}:{args.port} (debug link, stands in for Bluetooth)'}")
+    if args.wifi_port:
+        print(f"  wifi:        tcp+udp {args.wifi_host}:{args.wifi_port}; offered addresses: "
+              f"{', '.join(bridge.wifi_ips) or 'none'}; received files go to {bridge.files.folder}")
+        if args.wifi_host not in ("127.0.0.1", "::1"):
+            print("  note:        the Wi-Fi listener is reachable from your local network while this runs")
     print(f"  control:     {'tcp 127.0.0.1:%d (nc 127.0.0.1 %d)' % (args.control_port, args.control_port) if control else 'off'}")
     print(f"  paired with: {'iPhone ' + fingerprint(bridge.peer) + ' (the app can reconnect without pairing)' if bridge.peer else 'nobody yet'}")
     print(bridge.banner(bridge.new_pairing()))
@@ -1350,9 +1762,13 @@ async def amain(args) -> int:
     if use_stdin:
         threading.Thread(target=stdin_loop, args=(asyncio.get_running_loop(), bridge), daemon=True).start()
     await bridge.stopped.wait()
-    if bridge.link:
-        bridge.link.close("quitting")
-    server.close()
+    for link in list(bridge.links.values()):
+        if link:
+            link.close("quitting")
+    for server in servers:
+        server.close()
+    if udp:
+        udp.close()
     if control:
         control.close()
     await asyncio.sleep(0.05)  # let the transports flush and close
@@ -1428,7 +1844,7 @@ def self_test() -> int:
     check("confirm B->R", seal(k_br, DIR_B_TO_R, 0, 0, b"").hex(), s["confirm_b_to_r"])
     check("confirm R->B opens", open_record(k_rb, DIR_R_TO_B, 0, H(s["confirm_r_to_b"])), (0, b""))
 
-    named = {"k_br": k_br, "k_rb": k_rb, "media_k_br": media[0]}
+    named = {"k_br": k_br, "k_rb": k_rb, "media_k_br": media[0], "media_k_rb": media[1], "bulk_k_br": bulk[0]}
     for r in v["records"]:
         pt = r["plaintext_utf8"].encode() if "plaintext_utf8" in r else H(r["plaintext_hex"])
         check(f"nonce {r['key']} #{r['counter']}", nonce(r["direction"], r["counter"]).hex(), r["nonce"])
@@ -1437,6 +1853,29 @@ def self_test() -> int:
     for r in v["must_fail"]:
         must_raise(f"must fail: {r['why']}",
                    lambda r=r: open_record(named[r["key"]], r["direction"], r["channel"], H(r["wire"])), InvalidTag)
+
+    # M5: media replay window, bulk file data, the Wi-Fi pair link
+    w, window, results = v["media_replay_window"], ReplayWindow(), []
+    for step in w["steps"]:
+        data = H(step["wire"])
+        counter = struct.unpack(">Q", data[:8])[0]
+        ok = window.may_accept(counter)
+        if ok:
+            try:
+                open_record(named[w["key"]], w["direction"], w["channel"], data)
+                window.mark(counter)
+            except InvalidTag:
+                ok = False
+        results.append(ok)
+    check("media replay window", results, [s["accept"] for s in w["steps"]])
+    bf = v["bulk_file_data"]
+    frame = H(bf["frame"])
+    check("bulk frame type", frame[0], F_BULK)
+    check("bulk record opens", open_record(bulk[0], DIR_B_TO_R, BULK_CHANNEL, frame[1:]), (0, H(bf["plaintext"])))
+    check("bulk data layout", struct.unpack(">IQ", H(bf["plaintext"])[1:13]), (bf["fid"], bf["offset"]))
+    pw = v["pair_uri_wifi"]
+    check("pair link with Wi-Fi", pairing_uri(H(pr["device_id"]), P["sB"], ps) + wifi_params(pw["ip"], pw["port"])
+          + f"&ssid={b64u(pw['ssid'].encode())}&pw={b64u(pw['pw'].encode())}", pw["uri"])
 
     f = v["framing"]
     check("TCP framing (write)", tcp_frame(H(f["frame"])).hex(), f["tcp"])
@@ -1466,6 +1905,17 @@ def main():
     p.add_argument("--app-version", default="0.1.0", help="bridge app version to report (default: %(default)s)")
     p.add_argument("--single-sim", action="store_true", help="one SIM, no dualsim capability")
     p.add_argument("--no-stdin", action="store_true", help="don't read commands from the console")
+    p.add_argument("--wifi-port", type=int, default=0,
+                   help="also run the M5 Wi-Fi link: TCP and UDP (media) on this port, e.g. 47812; 0 = off")
+    p.add_argument("--wifi-host", default="127.0.0.1",
+                   help="Wi-Fi listen address (default: %(default)s; 0.0.0.0 to be found by DNS-SD from the LAN)")
+    p.add_argument("--wifi-offer-ip", default=None,
+                   help="comma-separated addresses for wifi.offer and the pair link, or 'auto' (this Mac's LAN address)")
+    p.add_argument("--hotspot", default=None, metavar="SSID:PASSWORD",
+                   help="pretend the bridge hotspot is on: ssid/password in wifi.offer and the pair link")
+    p.add_argument("--files-dir", default="/tmp/pairline-fake-bridge-files", help="where received files go (default: %(default)s)")
+    p.add_argument("--no-tcp", action="store_true",
+                   help="no debug TCP link (Wi-Fi only, like a bridge that can't hold a Bluetooth link)")
     p.add_argument("--self-test", action="store_true", help="check the helpers against protocol/test-vectors/v0.json")
     args = p.parse_args()
     if args.self_test:
