@@ -1,6 +1,54 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Why is the audio on the Android phone?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لماذا الصوت على هاتف أندرويد؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Why is the audio on the Android phone?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "چرا صدا روی گوشی اندرویدی است؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses neden Android telefonda?" } }
+      }
+    },
+    "Talk on iPhone is set up, but this iPhone isn't linked to the Android phone over Wi-Fi, which carries the call audio. Put both phones on the same Wi-Fi or join the Android phone's own hotspot. Already on the same Wi-Fi? Check iPhone Settings › Pairline › Local Network is on; guest Wi-Fi often keeps devices apart." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "«التحدث عبر الآيفون» مُعدّ، لكن هذا الآيفون غير متصل بهاتف أندرويد عبر الواي فاي، الذي ينقل صوت المكالمة. ضع الهاتفين على شبكة الواي فاي نفسها أو اتصل بنقطة الاتصال الخاصة بهاتف أندرويد. هما على الشبكة نفسها بالفعل؟ تأكد من تفعيل إعدادات الآيفون › Pairline › الشبكة المحلية؛ وغالبًا ما تفصل شبكات الضيوف بين الأجهزة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Talk on iPhone is set up, but this iPhone isn't linked to the Android phone over Wi-Fi, which carries the call audio. Put both phones on the same Wi-Fi or join the Android phone's own hotspot. Already on the same Wi-Fi? Check iPhone Settings › Pairline › Local Network is on; guest Wi-Fi often keeps devices apart." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» راه‌اندازی شده، اما این آیفون از راه وای‌فای به گوشی اندرویدی وصل نیست، که صدای تماس از آن منتقل می‌شود. هر دو گوشی را به یک وای‌فای وصل کنید یا به هات‌اسپات خودِ گوشی اندرویدی وصل شوید. از قبل روی یک وای‌فای هستند؟ بررسی کنید تنظیمات آیفون › Pairline › شبکهٔ محلی (Local Network) روشن باشد؛ وای‌فای مهمان معمولاً دستگاه‌ها را از هم جدا نگه می‌دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan konuşma kurulu, ancak bu iPhone, arama sesini taşıyan Wi-Fi üzerinden Android telefona bağlı değil. İki telefonu aynı Wi-Fi ağına koyun ya da Android telefonun kendi erişim noktasına bağlanın. Zaten aynı Wi-Fi’de misiniz? iPhone Ayarlar › Pairline › Yerel Ağ’ın açık olduğunu kontrol edin; misafir Wi-Fi ağları genellikle cihazları birbirinden ayırır." } }
+      }
+    },
+    "How to fix" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كيفية الإصلاح" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "How to fix" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "چطور درستش کنم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Nasıl düzeltilir" } }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حسنًا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "باشه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tamam" } }
+      }
+    },
+    "Don't show again" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا تعرض هذا مجددًا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Don't show again" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دیگر نشان نده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bir daha gösterme" } }
+      }
+    },
+    "Audio on your Android phone: no Wi-Fi link to it" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد: لا يوجد اتصال واي فاي به" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio on your Android phone: no Wi-Fi link to it" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی است: اتصال وای‌فای به آن نیست" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonda: ona Wi-Fi bağlantısı yok" } }
+      }
+    },
     "After the Android phone restarts" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "بعد إعادة تشغيل هاتف أندرويد" } },

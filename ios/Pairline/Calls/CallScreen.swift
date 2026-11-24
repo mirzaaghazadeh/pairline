@@ -14,7 +14,10 @@ struct CallScreen: View {
         case .iphone(talk: true): return Text("Audio on this iPhone", tableName: "CallAudio")
         case .iphone(talk: false): return Text("Listening here · talk on your Android phone", tableName: "CallAudio")
         case .connecting: return Text("Moving audio to this iPhone…", tableName: "CallAudio")
-        case .bridge: return Text("Audio plays on your Android phone")
+        case .bridge:
+            // Set up on the bridge, but without Wi-Fi between the phones the audio can't come over: say so.
+            if calls.audioNeedsWiFi { return Text("Audio on your Android phone: no Wi-Fi link to it", tableName: "CallAudio") }
+            return Text("Audio plays on your Android phone")
         }
     }
 
@@ -41,6 +44,18 @@ struct CallScreen: View {
         .onAppear { calls.callScreenVisible = true }
         .onDisappear { calls.callScreenVisible = false }
         .sheet(isPresented: $showAudioInfo) { CallAudioInfoSheet() }
+        // Talk on iPhone is set up, but the phones aren't on the same Wi-Fi: say why the audio is on the other phone.
+        .alert(Text("Why is the audio on the Android phone?", tableName: "CallAudio"), isPresented: $calls.wifiAlert) {
+            Button { showAudioInfo = true } label: { Text("How to fix", tableName: "CallAudio") }
+            Button(role: .cancel) {} label: { Text("OK", tableName: "CallAudio") }
+            Button {
+                UserDefaults.standard.set(true, forKey: CallCenter.wifiAlertMutedKey)
+            } label: {
+                Text("Don't show again", tableName: "CallAudio")
+            }
+        } message: {
+            Text("Talk on iPhone is set up, but this iPhone isn't linked to the Android phone over Wi-Fi, which carries the call audio. Put both phones on the same Wi-Fi or join the Android phone's own hotspot. Already on the same Wi-Fi? Check iPhone Settings › Pairline › Local Network is on; guest Wi-Fi often keeps devices apart.", tableName: "CallAudio")
+        }
     }
 
     private func content(_ call: ActiveCall) -> some View {

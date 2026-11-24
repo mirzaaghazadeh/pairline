@@ -149,6 +149,8 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
                 icon = if (p?.canTalk == true) PIcons.CheckCircle else PIcons.Info,
                 iconTone = if (p?.canTalk == true) Tone.GOOD else Tone.NEUTRAL,
             )
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+            WifiLinkRow()
         }
     }
     if (state == State.READY || state == State.IDLE) {
@@ -324,6 +326,40 @@ private fun CommandBox(command: String) {
     }
 }
 
+/**
+ * Call audio travels over the Wi-Fi link (D-047): with the iPhone linked over Bluetooth only, Talk on iPhone is set
+ * up but the audio stays here. Says so, and offers Android's own hotspot (it also gives the iPhone internet).
+ */
+@Composable
+private fun WifiLinkRow() {
+    val context = LocalContext.current
+    val link by AppGraph.link.state.collectAsState()
+    val overWifi = app.pairline.android.link.TransportKind.WIFI in link.transports
+    when {
+        overWifi -> ListRow(
+            title = stringResource(R.string.talk_wifi_yes),
+            icon = PIcons.CheckCircle,
+            iconTone = Tone.GOOD,
+        )
+        link.connected -> Column {
+            ListRow(
+                title = stringResource(R.string.talk_wifi_no),
+                subtitle = stringResource(R.string.talk_wifi_no_sub),
+                icon = PIcons.Warning,
+                iconTone = Tone.WARN,
+            )
+            Row(Modifier.fillMaxWidth().padding(start = 72.dp, end = 16.dp, bottom = 12.dp)) {
+                SecondaryButton(stringResource(R.string.settings_tether), { SystemActions.openTetherSettings(context) })
+            }
+        }
+        else -> ListRow(
+            title = stringResource(R.string.talk_wifi_unknown),
+            icon = PIcons.Info,
+            iconTone = Tone.NEUTRAL,
+        )
+    }
+}
+
 @Composable
 private fun ManageCard() {
     SectionCard(title = stringResource(R.string.talk_manage)) {
@@ -331,6 +367,13 @@ private fun ManageCard() {
             title = stringResource(R.string.talk_tip_restart),
             subtitle = stringResource(R.string.talk_tip_restart_sub),
             icon = PIcons.Refresh,
+            showChevron = false,
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        ListRow(
+            title = stringResource(R.string.talk_tip_hotspot),
+            subtitle = stringResource(R.string.talk_tip_hotspot_sub),
+            icon = PIcons.Hotspot,
             showChevron = false,
         )
         HorizontalDivider(Modifier.padding(horizontal = 16.dp))

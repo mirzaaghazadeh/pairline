@@ -105,6 +105,23 @@ final class CallCenter: ObservableObject {
     var audioOnIPhone: Bool { if case .iphone = audioRoute { return true } else { return false } }
     /// The bridge can relay this call's audio and the Wi-Fi media channel is open.
     var canRelayAudio: Bool { bridge?.has(.callMedia) == true && (mediaTransport?()?.isOpen ?? false) }
+    /// Talk on iPhone is set up on the bridge, but the phones aren't linked over Wi-Fi, which carries the audio.
+    var audioNeedsWiFi: Bool {
+        audioRoute == .bridge && bridge?.has(.callMedia) == true && !(mediaTransport?()?.isOpen ?? false)
+    }
+
+    /// The call screen explains why the audio stayed on the Android phone (no Wi-Fi between the phones).
+    @Published var wifiAlert = false
+    private var wifiExplained = Set<UUID>()
+    static let wifiAlertMutedKey = "calls.wifiAlertMuted"
+
+    /// Once per call, unless the user chose "Don't show again".
+    private func explainMissingWiFiIfNeeded(_ call: ActiveCall) {
+        guard audioNeedsWiFi, !wifiExplained.contains(call.id),
+              !UserDefaults.standard.bool(forKey: Self.wifiAlertMutedKey) else { return }
+        wifiExplained.insert(call.id)
+        wifiAlert = true
+    }
 
     // MARK: - Bridge events
 
@@ -184,8 +201,13 @@ final class CallCenter: ObservableObject {
         }
         current = call
         // Taken on this iPhone (answered here, or dialed from here): bring the audio over if the bridge can. The
-        // bridge's own "active" event is the cue, since it only relays a call it sees in progress.
-        if newState == .active, call.answeredHere { startRelayIfPossible() }
+        // bridge relays a call it sees in progress, which includes dialing: a call placed here moves over while it
+        // rings, so the ringback plays here too. If that start fails, "active" tries again.
+        let dialedHere = newState == .dialing && call.isOutgoing
+        if newState == .active || dialedHere, call.answeredHere {
+            explainMissingWiFiIfNeeded(call)
+            startRelayIfPossible()
+        }
     }
 
     private func handleEnded(_ event: CallStateEvent) {

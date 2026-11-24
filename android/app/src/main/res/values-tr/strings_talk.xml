@@ -62,6 +62,10 @@
     <string name="talk_listen_no">Bu telefon, Pairline’ın yardımcısının arama sesini almasına izin vermiyor</string>
     <string name="talk_talk_yes">iPhone’daki sesiniz aramaya iletilebilir</string>
     <string name="talk_talk_no">Bu telefon aramaya ses aktaramıyor: aramaları iPhone’da duyar, bu telefondan konuşursunuz</string>
+    <string name="talk_wifi_yes">iPhone, arama sesini taşıyan Wi-Fi üzerinden bağlı</string>
+    <string name="talk_wifi_no">iPhone Wi-Fi üzerinden bağlı değil, bu yüzden arama sesi burada kalıyor</string>
+    <string name="talk_wifi_no_sub">Yalnızca Bluetooth ile bağlı. Arama sesi için telefonlar arasında Wi-Fi gerekir: ikisini aynı Wi-Fi ağına bağlayın ya da Android’in kendi erişim noktasını açıp iPhone’u ona bağlayın (bu, iPhone’a internet de verir). Zaten aynı Wi-Fi’de mi? iPhone’da Ayarlar › Pairline › Yerel Ağ’ın açık olduğunu kontrol edin; misafir Wi-Fi ağları genellikle cihazları birbirinden ayırır.</string>
+    <string name="talk_wifi_unknown">iPhone şu an bağlı değil. Arama sesi için iki telefonun aynı Wi-Fi ağında olması gerekir.</string>
     <string name="talk_switch">iPhone’dan konuşma</string>
     <string name="talk_switch_sub">iPhone’da yanıtladığınızda aramanın sesi iPhone’a geçer. iPhone’dan tuş takımı, sessiz ve hoparlörü de açar.</string>
     <string name="talk_reset">Arama sesini baştan başlat</string>
@@ -70,6 +74,8 @@
     <string name="talk_manage">Bilmekte fayda var</string>
     <string name="talk_tip_restart">Yeniden başlatmadan sonra</string>
     <string name="talk_tip_restart_sub">Android, telefon yeniden başlayınca Kablosuz hata ayıklamayı kapatır. Tekrar açın; Pairline yardımcısını kendiliğinden başlatır. Pairline size bir bildirimle hatırlatır.</string>
+    <string name="talk_tip_hotspot">Bu telefonun erişim noktasını kullanmak</string>
+    <string name="talk_tip_hotspot_sub">Kablosuz hata ayıklama yalnızca bu telefon bir Wi-Fi ağına bağlıyken çalışır; bu yüzden erişim noktasını açmak (veya Wi-Fi’yi kapatmak) onu kapatır. Pairline’ın yardımcısını önce Wi-Fi’deyken başlatın: erişim noktasına geçtikten sonra da telefon yeniden başlayana kadar çalışır.</string>
     <string name="talk_tip_banking">Banka uygulamaları</string>
     <string name="talk_tip_banking_sub">Bazı banka uygulamaları Kablosuz hata ayıklama açıkken açılmaz. Pairline’ın yardımcısı çalışmaya başladıktan sonra Kablosuz hata ayıklamayı yeniden kapatabilirsiniz: aramalar telefon yeniden başlayana kadar iPhone’da çalmaya devam eder.</string>
     <string name="talk_forget">Eşlemeyi unut</string>

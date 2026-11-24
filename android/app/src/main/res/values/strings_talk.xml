@@ -65,6 +65,10 @@
     <string name="talk_listen_no">This phone doesn’t let Pairline’s helper capture call audio</string>
     <string name="talk_talk_yes">Your voice from the iPhone can go into the call</string>
     <string name="talk_talk_no">This phone can’t feed audio into a call: you’ll hear calls on the iPhone and talk on this phone</string>
+    <string name="talk_wifi_yes">The iPhone is linked over Wi-Fi, which carries call audio</string>
+    <string name="talk_wifi_no">The iPhone isn’t linked over Wi-Fi, so call audio stays here</string>
+    <string name="talk_wifi_no_sub">It’s connected over Bluetooth only. Call audio needs Wi-Fi between the phones: connect both to the same Wi-Fi, or turn on Android’s own hotspot and join it on the iPhone (that also gives the iPhone internet). Already on the same Wi-Fi? On the iPhone, check Settings › Pairline › Local Network is on; guest Wi-Fi often keeps devices apart.</string>
+    <string name="talk_wifi_unknown">The iPhone isn’t connected now. Call audio needs both phones on the same Wi-Fi.</string>
     <string name="talk_switch">Talk on iPhone</string>
     <string name="talk_switch_sub">When you answer on the iPhone, the call’s audio moves to the iPhone. Also turns on the keypad, mute and speaker from the iPhone.</string>
     <string name="talk_reset">Start call audio over</string>
@@ -74,6 +78,8 @@
     <string name="talk_manage">Good to know</string>
     <string name="talk_tip_restart">After a restart</string>
     <string name="talk_tip_restart_sub">Android turns Wireless debugging off when the phone restarts. Turn it on again and Pairline starts its helper by itself. Pairline reminds you with a notification.</string>
+    <string name="talk_tip_hotspot">Using this phone’s hotspot</string>
+    <string name="talk_tip_hotspot_sub">Wireless debugging works only while this phone is on a Wi-Fi network, so turning on its hotspot (or Wi-Fi off) turns it off. Start Pairline’s helper on Wi-Fi first: it keeps running after you switch to the hotspot, until the phone restarts.</string>
     <string name="talk_tip_banking">Banking apps</string>
     <string name="talk_tip_banking_sub">Some banking apps won’t open while Wireless debugging is on. Once Pairline’s helper runs, you can turn Wireless debugging off again: calls keep playing on the iPhone until the phone restarts.</string>
     <string name="talk_forget">Forget pairing</string>
