@@ -154,6 +154,9 @@ class CallTracker(
             return
         }
         if (mapped == t.state) return
+        // A call never goes back to ringing or dialing once it's connected. A companion service that binds late
+        // can hand us a stale snapshot after the telephony path already saw the call answered.
+        if (CallMapping.isBackwards(t.state, mapped)) return
         t.state = mapped
         t.since = System.currentTimeMillis()
         if (mapped == CallMapping.RINGING) t.wasRinging = true
@@ -298,26 +301,42 @@ class CallTracker(
 
     @SuppressLint("MissingPermission")
     @Suppress("DEPRECATION")
-    fun answer(id: String) = onCall(id) { t ->
-        val call = t.telecom
+    fun answer(id: String) {
+        val call = onCall(id) { t -> t.telecom }
         if (call != null) {
             call.answer(VideoProfile.STATE_AUDIO_ONLY)
         } else {
             requirePermission(Manifest.permission.ANSWER_PHONE_CALLS)
-            telecom().acceptRingingCall()
+            val tm = telecom()
+            // Telephony reports ringing a moment before Telecom has finished screening the call, and answering in
+            // that gap does nothing. Retry briefly until the call leaves the ringing state.
+            for (attempt in 0 until 8) {
+                tm.acceptRingingCall()
+                Thread.sleep(400)
+                val state = onCall(id) { it.state }
+                if (state != CallMapping.RINGING) return
+            }
         }
     }
 
     @SuppressLint("MissingPermission")
     @Suppress("DEPRECATION")
-    fun reject(id: String) = onCall(id) { t ->
-        t.weRejected = true
-        val call = t.telecom
+    fun reject(id: String) {
+        val call = onCall(id) { t ->
+            t.weRejected = true
+            t.telecom
+        }
         if (call != null) {
             call.reject(false, null)
         } else {
             requirePermission(Manifest.permission.ANSWER_PHONE_CALLS)
-            if (!telecom().endCall()) throw RequestException(ErrorCode.FAILED, "Android refused to end the call")
+            val tm = telecom()
+            // endCall() returns false while Telecom is still screening the call; retry briefly (see answer()).
+            for (attempt in 0 until 15) {
+                if (tm.endCall()) return
+                Thread.sleep(200)
+            }
+            throw RequestException(ErrorCode.FAILED, "Android refused to end the call")
         }
     }
 
@@ -364,13 +383,13 @@ class CallTracker(
         }
     }
 
-    private fun onCall(id: String, block: (Tracked) -> Unit) {
-        val result = executor.submit<Unit> {
+    private fun <R> onCall(id: String, block: (Tracked) -> R): R {
+        val result = executor.submit {
             val t = calls[id] ?: throw RequestException(ErrorCode.INVALID, "no such call")
             block(t)
         }
         try {
-            result.get(5, TimeUnit.SECONDS)
+            return result.get(5, TimeUnit.SECONDS)
         } catch (e: java.util.concurrent.ExecutionException) {
             throw e.cause ?: e
         }

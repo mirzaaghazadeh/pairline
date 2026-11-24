@@ -1012,17 +1012,18 @@ def act_audio(s: Session, a: argparse.Namespace) -> None:
 
 
 def act_contacts(s: Session, a: argparse.Namespace) -> None:
-    contacts, replies = fetch_pages(s, a, "contacts.sync", "contacts", {"since": None}, since_cursor)
-    deleted = sum(len(r.get("deleted") or []) for r in replies)
+    contacts, replies = fetch_pages(s, a, "contacts.sync", "contacts", {"since": a.since}, since_cursor)
+    deleted = [k for r in replies for k in (r.get("deleted") or [])]
     cursor = replies[-1].get("cursor") if replies else None
-    s.out.note(f"contacts.sync: {len(contacts)} contacts, {deleted} deleted, in {len(replies)} page(s); "
-               f"cursor {cursor!r}")
+    full = any(r.get("full") for r in replies)
+    s.out.note(f"contacts.sync: {len(contacts)} contacts, {len(deleted)} deleted {deleted[:5]}, in {len(replies)} "
+               f"page(s); full={full}; cursor {cursor!r}")
     show_samples(s, contacts, lambda c: f"{c.get('key')} {c.get('name')} " + ", ".join(
         str(n.get("n")) for n in c.get("numbers") or [] if isinstance(n, dict)))
 
 
 def act_calllog(s: Session, a: argparse.Namespace) -> None:
-    calls, replies = fetch_pages(s, a, "calllog.sync", "calls", {"since": None}, since_cursor)
+    calls, replies = fetch_pages(s, a, "calllog.sync", "calls", {"since": a.since}, since_cursor)
     cursor = replies[-1].get("cursor") if replies else None
     s.out.note(f"calllog.sync: {len(calls)} calls in {len(replies)} page(s); cursor {cursor!r}")
     show_samples(s, calls, lambda c: f"{c.get('key')} {c.get('type')} {c.get('number')} {c.get('name') or ''} "
@@ -1154,6 +1155,7 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--max-pages", type=positive(int), default=10, metavar="N",
                    help="most pages to fetch per paged action (default 10)")
     g.add_argument("--thread", type=int, metavar="T", help="history: thread id (default: all threads)")
+    g.add_argument("--since", metavar="CURSOR", help="contacts/calllog: continue from this cursor (default: full sync)")
     g.add_argument("--to", metavar="NUMBER", help="send-sms: recipient")
     g.add_argument("--body", metavar="TEXT", help="send-sms: message text")
     g.add_argument("--sim", type=int, metavar="N", help="0-based SIM slot (default: null = bridge default)")

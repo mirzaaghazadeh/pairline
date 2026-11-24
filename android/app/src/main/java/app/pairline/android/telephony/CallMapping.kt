@@ -25,6 +25,10 @@ object CallMapping {
         else -> null // DISCONNECTING: wait for DISCONNECTED
     }
 
+    /** True for a change that would take a connected call back to ringing or dialing. */
+    fun isBackwards(from: String, to: String): Boolean =
+        (from == ACTIVE || from == HELD) && (to == RINGING || to == DIALING)
+
     /**
      * `call.state.reason` when a call ends.
      * [wasRinging]: the call never got past ringing. [incoming]: the call's direction.

@@ -170,6 +170,15 @@ class TelephonyLogicTest {
     }
 
     @Test
+    fun connectedCallsNeverGoBackToRinging() {
+        assertEquals(true, CallMapping.isBackwards("active", "ringing"))
+        assertEquals(true, CallMapping.isBackwards("held", "dialing"))
+        assertEquals(false, CallMapping.isBackwards("ringing", "active"))
+        assertEquals(false, CallMapping.isBackwards("active", "held"))
+        assertEquals(false, CallMapping.isBackwards("dialing", "active"))
+    }
+
+    @Test
     fun endReasons() {
         fun r(cause: Int?, ringing: Boolean = false, incoming: Boolean = true, rejected: Boolean = false, ended: Boolean = false) =
             CallMapping.endReason(cause, ringing, incoming, rejected, ended)
