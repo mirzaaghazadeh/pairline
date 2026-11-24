@@ -23,6 +23,9 @@ xcuserdata/
 *.dSYM
 *.dSYM.zip
 
+# Python bytecode (protocol/tools, docs/app-store/api): it records the local path of the source
+__pycache__/
+*.pyc
 # Signing material and secrets — never commit
 *.keystore
 *.jks
