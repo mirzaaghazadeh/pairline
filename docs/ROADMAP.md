@@ -1,7 +1,7 @@
 # Roadmap
 
 **Current milestones (2026-11-24): M5 Wi-Fi link, M6 call audio, M4 leftovers (delete, block list), update
-check; then M8 and M9.** The maintainer asked to finish every milestone.
+check; M8 next.** The maintainer asked to finish every milestone; M9 (Android client mode) was dropped (D-050).
 
 M0–M4 are built and tested on the emulator and Simulator, and M1–M3 now on real phones too: pairing, SMS and
 call control work between an iPhone and an Android 15 bridge (Pairline Bridge 1.0.2). The Galaxy Note 8 can't
@@ -155,18 +155,10 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
 - [x] `netshare` package is allowed to open non-local connections (network-code-check.sh), only for the iPhone's
       own traffic; PRIVACY.md updated
 
-## M9 — Android client mode (two Android phones)
+## M9 — Android client mode: dropped (D-050)
 
-The same Android app runs as a **bridge** (holds the SIM) or a **client** (uses the bridge's SIM), so two Android
-phones can pair the way an iPhone and an Android phone do. Free, like the rest of the Android app.
-
-- [ ] First launch asks: "This phone has the SIM I want to use" (bridge) or "Use another phone's SIM" (client);
-      switchable later in Settings (switching unpairs)
-- [ ] Client: scan the bridge's QR code, BLE central role, the same session and records as the iPhone (PROTOCOL.md)
-- [ ] Client: SMS threads and sending, contacts, call history, USSD, bridge status
-- [ ] Client: incoming and outgoing bridged calls with Android's own call screen (self-managed `ConnectionService`)
-- [ ] Client: Wi-Fi link and call audio once M5/M6 land
-- [ ] Shared test vectors pass in client mode too
+Two Android phones pairing with each other isn't planned; the started work is archived on
+`archive/m9-android-client-start`.
 
 ## Later
 
