@@ -103,8 +103,9 @@ Frames are at most 65,535 bytes. Unknown frame types close the connection.
   - `rx` `15347F70-79F0-40C4-92DE-ED6612B4CE5F`: write without response, R → B
   - `tx` `8A38CBD3-5771-4174-9C10-7EB7FD219E6B`: notify, B → R
   - `id` `CFFC7A8D-1012-4A2D-B52F-50A9E32F8B32`: read, returns the 8-byte device id
-- Use the largest MTU. The fragment size is the ATT payload: `MTU − 3` on Android, and
-  `maximumWriteValueLength(for: .withoutResponse)` on iOS.
+- Use the largest MTU. The fragment size is the ATT payload, capped at 512 bytes (the longest attribute value):
+  `min(MTU − 3, 512)` on Android, and `min(maximumWriteValueLength(for: .withoutResponse), 512)` on iOS. An iPhone
+  negotiates MTU 517, and Android 13+ rejects longer notifications. Receivers accept any fragment size.
 - Each fragment starts with a 1-byte header (bit 0 = first, bit 1 = last). The first fragment adds the frame's
   2-byte big-endian total length. A frame that fits in one fragment has header `0x03`.
 - Flow control: Android sends the next notification only after `onNotificationSent`. iOS writes only while

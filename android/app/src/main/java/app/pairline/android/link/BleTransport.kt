@@ -158,9 +158,41 @@ class BleTransport(
                 Log.w(TAG, "advertising failed (code $errorCode)")
                 onStatus(BluetoothStatus.ADVERTISE_FAILED, false)
                 // Some chips can't advertise while connected; retry later.
-                handler.postDelayed({ if (server != null && !advertising) startAdvertising() }, 30_000)
+                handler.postDelayed({ resumeAdvertisingIfIdle() }, 30_000)
             }
         }
+    }
+
+    /** Every LE link of this phone (the GATT server hears all of them), and those that used the Pairline service. */
+    private val links = HashSet<String>()
+    private val claimed = HashSet<String>()
+
+    /**
+     * Stops advertising while a phone is connected. Android advertises again right after a connection, under a new
+     * random address. An iPhone still looking for its bridge takes that for another bridge and connects to it too,
+     * and some phones (Galaxy Note 8, Android 9) then drop the first link, over and over (D-039). Advertising
+     * resumes when the link ends, or after [UNCLAIMED_LINK_MS] if the link never used the Pairline service (a watch
+     * or earbuds connecting to this phone mustn't hide the bridge).
+     */
+    private fun onLinkUp(device: BluetoothDevice) {
+        if (server == null) return
+        links += device.address
+        if (advertising) {
+            runCatching { advertiser?.stopAdvertising(advertiseCallback) }
+            advertising = false
+            onStatus(BluetoothStatus.ON, false)
+        }
+        handler.postDelayed({ resumeAdvertisingIfIdle() }, UNCLAIMED_LINK_MS)
+    }
+
+    /** The device read `id`, subscribed or wrote: it's a Pairline central, so stay hidden while it's connected. */
+    private fun claim(device: BluetoothDevice) {
+        if (device.address in links) claimed += device.address
+    }
+
+    private fun resumeAdvertisingIfIdle() {
+        if (server == null || advertising || claimed.isNotEmpty()) return
+        startAdvertising()
     }
 
     private fun stopInternal() {
@@ -170,6 +202,8 @@ class BleTransport(
         for (c in connections.values.toList()) c.disconnect("Bluetooth link stopped")
         connections.clear()
         subscribed.clear()
+        links.clear()
+        claimed.clear()
         runCatching { server?.close() }
         server = null
         txCharacteristic = null
@@ -202,17 +236,26 @@ class BleTransport(
         }
 
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
-            if (newState != BluetoothProfile.STATE_DISCONNECTED) return // sessions start on first use
-            handler.post {
-                subscribed.remove(device.address)
-                mtus.remove(device.address)
-                connections[device.address]?.disconnect("Bluetooth disconnected (status $status)", linkGone = true)
-                if (!advertising && server != null) startAdvertising()
+            // Sessions start on first use; a new link only pauses advertising.
+            when (newState) {
+                BluetoothProfile.STATE_CONNECTED -> handler.post { onLinkUp(device) }
+                BluetoothProfile.STATE_DISCONNECTED -> handler.post {
+                    subscribed.remove(device.address)
+                    mtus.remove(device.address)
+                    links.remove(device.address)
+                    claimed.remove(device.address)
+                    connections[device.address]?.disconnect("Bluetooth disconnected (status $status)", linkGone = true)
+                    resumeAdvertisingIfIdle()
+                }
             }
         }
 
         override fun onMtuChanged(device: BluetoothDevice, mtu: Int) {
             handler.post { mtus[device.address] = mtu }
+        }
+
+        override fun onPhyUpdate(device: BluetoothDevice, txPhy: Int, rxPhy: Int, status: Int) {
+            Log.d(TAG, "PHY update: tx $txPhy, rx $rxPhy (status $status)")
         }
 
         override fun onCharacteristicReadRequest(
@@ -223,6 +266,7 @@ class BleTransport(
         ) {
             val s = server ?: return
             if (characteristic.uuid == ID_UUID) {
+                handler.post { claim(device) }
                 val id = deviceId()
                 val value = if (offset < id.size) id.copyOfRange(offset, id.size) else ByteArray(0)
                 s.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
@@ -252,7 +296,10 @@ class BleTransport(
             }
             if (!ok) return
             val bytes = value!!.copyOf()
-            handler.post { connectionFor(device)?.onFragment(bytes) }
+            handler.post {
+                claim(device)
+                connectionFor(device)?.onFragment(bytes)
+            }
         }
 
         override fun onDescriptorReadRequest(
@@ -291,6 +338,7 @@ class BleTransport(
             if (!ok) return
             val enable = (value!![0].toInt() and 0x01) != 0
             handler.post {
+                claim(device)
                 if (enable) {
                     subscribed += device.address
                     connectionFor(device)?.pump()
@@ -334,10 +382,15 @@ class BleTransport(
         override fun send(frame: ByteArray) {
             handler.post {
                 if (closing || !current) return@post
-                // ATT payload is MTU − 3; never below the BLE minimum.
-                val mtu = mtus[device.address] ?: 23
-                val payload = maxOf(BleFragmenter.MIN_ATT_PAYLOAD, mtu - 3)
-                queue.addAll(BleFragmenter.fragment(frame, payload))
+                val payload = BleFragmenter.payloadFor(mtus[device.address] ?: 23)
+                val fragments = try {
+                    BleFragmenter.fragment(frame, payload)
+                } catch (e: IllegalArgumentException) {
+                    Log.w(TAG, "$label: can't send a frame of ${frame.size} bytes", e)
+                    disconnect("frame too large")
+                    return@post
+                }
+                queue.addAll(fragments)
                 pump()
             }
         }
@@ -393,13 +446,20 @@ class BleTransport(
             val next = queue.firstOrNull() ?: return
             val s = server ?: return
             val tx = txCharacteristic ?: return
-            val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                s.notifyCharacteristicChanged(device, tx, false, next) == BluetoothStatusCodes.SUCCESS
-            } else {
-                @Suppress("DEPRECATION")
-                tx.value = next
-                @Suppress("DEPRECATION")
-                s.notifyCharacteristicChanged(device, tx, false)
+            val ok = try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    s.notifyCharacteristicChanged(device, tx, false, next) == BluetoothStatusCodes.SUCCESS
+                } else {
+                    @Suppress("DEPRECATION")
+                    tx.value = next
+                    @Suppress("DEPRECATION")
+                    s.notifyCharacteristicChanged(device, tx, false)
+                }
+            } catch (e: RuntimeException) {
+                // A rejected notification (bad length, link gone, permission revoked) ends this link, not the app.
+                Log.w(TAG, "$label: notification rejected", e)
+                disconnect("notification rejected")
+                return
             }
             if (ok) {
                 queue.removeFirst()
@@ -425,6 +485,7 @@ class BleTransport(
 
     companion object {
         private const val TAG = "ble"
+        private const val UNCLAIMED_LINK_MS = 8_000L
         val SERVICE_UUID: UUID = UUID.fromString("8CC09D09-4084-4E91-A358-A153EB79D422")
         val RX_UUID: UUID = UUID.fromString("15347F70-79F0-40C4-92DE-ED6612B4CE5F")
         val TX_UUID: UUID = UUID.fromString("8A38CBD3-5771-4174-9C10-7EB7FD219E6B")

@@ -43,6 +43,18 @@ class FramingAndMessagesTest {
     }
 
     @Test
+    fun fragmentSizeStaysWithinOneAttributeValue() {
+        assertEquals(20, BleFragmenter.payloadFor(23))
+        assertEquals(20, BleFragmenter.payloadFor(0))
+        assertEquals(182, BleFragmenter.payloadFor(185))
+        assertEquals(512, BleFragmenter.payloadFor(515))
+        // An iPhone negotiates MTU 517; Android 13+ rejects notifications longer than 512 bytes.
+        assertEquals(512, BleFragmenter.payloadFor(517))
+        val fragments = BleFragmenter.fragment(ByteArray(5_000) { it.toByte() }, BleFragmenter.payloadFor(517))
+        assertEquals(512, fragments.maxOf { it.size })
+    }
+
+    @Test
     fun reassemblerRejectsMalformedInput() {
         assertThrows(ProtocolException::class.java) { BleReassembler().accept(byteArrayOf(0x00, 1, 2)) }
         assertThrows(ProtocolException::class.java) { BleReassembler().accept(byteArrayOf(0x03, 0, 0)) }

@@ -39,6 +39,30 @@ object Log {
     fun w(tag: String, message: String, error: Throwable? = null) = add(Level.WARN, tag, message, error)
     fun e(tag: String, message: String, error: Throwable? = null) = add(Level.ERROR, tag, message, error)
 
+    /**
+     * Records an uncaught exception before the process dies, so it shows in diagnostics after the restart. Written
+     * synchronously; the stack trace holds only code locations, and the messages go through [Redactor].
+     */
+    fun crash(thread: String, error: Throwable) {
+        val text = buildString {
+            append("crash in thread ").append(thread).append(": ")
+            var cause: Throwable? = error
+            var depth = 0
+            while (cause != null && depth < 4) {
+                if (depth > 0) append("\n  caused by: ")
+                append(cause.javaClass.name)
+                cause.message?.let { append(": ").append(it) }
+                for (frame in cause.stackTrace.take(if (depth == 0) 25 else 10)) append("\n    at ").append(frame)
+                cause = cause.cause.takeIf { it !== cause }
+                depth++
+            }
+        }
+        val line = "${timestamp()} E/crash: ${Redactor.redact(text)}"
+        synchronized(recent) { recent.addLast(line) }
+        if (echoToLogcat) logcat(Level.ERROR, "crash", line)
+        append(line)
+    }
+
     /** The newest lines, oldest first. Already redacted. */
     fun recentLines(): List<String> = synchronized(recent) { recent.toList() }
 

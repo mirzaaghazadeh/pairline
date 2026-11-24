@@ -341,7 +341,7 @@ final class BLETransport: FrameTransport {
 
     func send(_ frame: Data) {
         guard !closed else { return }
-        let payload = peripheral.maximumWriteValueLength(for: .withoutResponse)
+        let payload = min(peripheral.maximumWriteValueLength(for: .withoutResponse), BLEFragmenter.maximumPayload)
         guard payload >= BLEFragmenter.minimumPayload, frame.count <= WireProtocol.maxFrameLength else {
             log.error("ble", "Can't send a frame of \(frame.count) bytes with payload \(payload)")
             close()

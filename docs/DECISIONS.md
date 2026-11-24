@@ -466,3 +466,29 @@ to 10 minutes) and puts a "VirusTotal" row in the draft's notes: the report link
   positive from one or two engines, so a detection is a reason to look, not an automatic stop.
 - Releases made before this (1.0.0, 1.0.1) can be scanned with the manual `virustotal.yml` workflow, which adds the
   same row to the existing release notes.
+
+### D-040 — Bluetooth link fixes from the first real-phone tests: fragment cap, quiet while connected, crash log (2026-11-24)
+
+The emulator tests run over the debug TCP link, so the Bluetooth path first met real phones this week. Three
+findings, each fixed in Pairline Bridge 1.0.2:
+- **Crash after pairing on Android 13+ (a tester's Android 15 phone).** An iPhone negotiates ATT MTU 517, so the
+  bridge cut frames into 514-byte fragments (MTU − 3). Android 13+ throws `IllegalArgumentException` for a
+  notification longer than 512 bytes (the longest attribute value), on the Bluetooth thread, which killed the app as
+  soon as the first large message (the sync after pairing) went out. Fragments are now `min(MTU − 3, 512)` on both
+  sides (PROTOCOL.md; receivers already accept any size, so this is not a wire-format change and needs no version
+  bump). A rejected notification now ends that link instead of the app, and an oversized frame is logged and dropped.
+- **Reconnect loop.** Android keeps advertising after a phone connects, under a new random address. The iPhone app,
+  still looking for its bridge, takes that for another bridge and connects to it too; the Galaxy Note 8 then drops the
+  first link (HCI reason 0x08), every ~0.5 s. Reproduced from a Mac acting like the iPhone. The bridge now stops
+  advertising when a phone connects and starts again when it disconnects, or after 8 s if the link never touched the
+  Pairline service (a watch or earbuds must not hide the bridge).
+- **Crashes are now visible.** An uncaught exception is written to the local log (code locations; messages go through
+  the redactor) before the process dies, so diagnostics shows it after the restart (rule 9; PRIVACY.md updated).
+
+**The Galaxy Note 8 (Android 9) still doesn't finish connecting to Apple devices.** With the loop gone, a Mac
+connects and both sides exchange features and versions, then macOS waits for a link-layer step that never
+completes ("PHYReady: no" in its log); no GATT request reaches the bridge, and the Note 8's controller drops the
+link 40 s later (LL procedure timeout). The iPhone's links end the same way from the bridge's side: up for a few
+seconds, no GATT request, closed by the iPhone. Asking for the 1M PHY on connection completed on the Note 8 but
+didn't change this, so it was taken out again. It happens below Android's APIs, in the Bluetooth chip's firmware,
+and the app has no lever on it. Other Android 9 phones may be fine; until more are tested, the minimum stays Android 9.

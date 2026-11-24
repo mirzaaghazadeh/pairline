@@ -7,6 +7,9 @@ enum BLEFragmenter {
     static let headerLast: UInt8 = 0x02
     /// Header, length and at least one byte of frame.
     static let minimumPayload = 4
+    /// The longest attribute value. iOS allows MTU − 3 (514 bytes at MTU 517) for writes without response, but a
+    /// bridge on Android 13+ rejects attribute values longer than 512 bytes.
+    static let maximumPayload = 512
 
     static func fragments(of frame: Data, attPayload: Int) -> [Data] {
         precondition(attPayload >= minimumPayload, "ATT payload too small")

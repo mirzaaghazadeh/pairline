@@ -30,7 +30,7 @@ Any change that adds or changes a data flow or permission must update this file 
 | Pairing code (the QR code's one-time secret) | Only as the QR code on your screen | — | Bridge app memory only, never on disk or in logs | 5 minutes, or until used once |
 | SMS on the bridge | — | — | Pairline keeps no copy: it reads Android's own SMS store when the iPhone asks, and Android stores messages sent from the iPhone in its Sent box as usual | — |
 | Purchases | Yes | Apple (App Store) | Apple | Apple's policy. Pairline only checks Apple-signed transactions on the device |
-| App logs | Only if you choose to share them | Wherever you send them | On the device, last 7 days, readable by you | Rolling |
+| App logs, including a crash's code locations | Only if you choose to share them | Wherever you send them | On the device, last 7 days, readable by you | Rolling |
 | Backups of the Android app's data | No | — | The Android app opts out of Google cloud backup and of copying to a new phone | — |
 
 ### On the iPhone

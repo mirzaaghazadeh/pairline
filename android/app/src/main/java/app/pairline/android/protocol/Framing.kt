@@ -15,6 +15,16 @@ object BleFragmenter {
     /** The smallest ATT payload (default MTU 23 − 3). */
     const val MIN_ATT_PAYLOAD: Int = 20
 
+    /** The largest fragment: 512 bytes, the longest attribute value, even when MTU − 3 is larger. */
+    const val MAX_ATT_PAYLOAD: Int = 512
+
+    /**
+     * The fragment size for a negotiated ATT MTU: MTU − 3, at least [MIN_ATT_PAYLOAD] and at most
+     * [MAX_ATT_PAYLOAD]. An iPhone negotiates MTU 517 (514 bytes), and Android 13+ throws for a notification
+     * longer than 512 bytes.
+     */
+    fun payloadFor(mtu: Int): Int = (mtu - 3).coerceIn(MIN_ATT_PAYLOAD, MAX_ATT_PAYLOAD)
+
     fun fragment(frame: ByteArray, attPayload: Int): List<ByteArray> {
         require(attPayload >= 4) { "ATT payload too small" }
         require(frame.isNotEmpty() && frame.size <= Proto.MAX_FRAME) { "bad frame size" }
