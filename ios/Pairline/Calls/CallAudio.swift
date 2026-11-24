@@ -117,13 +117,21 @@ final class JitterBuffer: @unchecked Sendable {
 final class CallAudioEngine {
     private let engine = AVAudioEngine()
     private let transport: AudioPacketTransport
+    /// Echo cancellation (Apple's voice processing). Some routes and devices refuse to start with it; the call
+    /// center then tries a fresh engine without it rather than giving the audio back to the Android phone.
+    let voiceProcessing: Bool
     private let jitter = JitterBuffer()
     private let state = OSAllocatedUnfairLock(initialState: SendState())
     private var converter: AVAudioConverter?
     private var sourceNode: AVAudioSourceNode?
     private var playFrame: [Int16] = []
     private var playIndex = 0
+    private var configurationObserver: NSObjectProtocol?
     private(set) var isRunning = false
+
+    /// iOS stopped the engine because the audio route or format changed (headset, car, speaker, a CallKit
+    /// interruption). Called on the main queue; the call center builds a fresh engine.
+    var onConfigurationChange: (() -> Void)?
 
     private struct SendState {
         var pending: [Int16] = []
@@ -132,8 +140,9 @@ final class CallAudioEngine {
         var sent = 0
     }
 
-    init(transport: AudioPacketTransport) {
+    init(transport: AudioPacketTransport, voiceProcessing: Bool = true) {
         self.transport = transport
+        self.voiceProcessing = voiceProcessing
     }
 
     var muted: Bool {
@@ -143,8 +152,30 @@ final class CallAudioEngine {
 
     func start() throws {
         guard !isRunning else { return }
+        do {
+            try startEngine()
+        } catch {
+            // Leave nothing half-built behind: the caller may try a fresh engine next.
+            transport.onPacket = nil
+            engine.inputNode.removeTap(onBus: 0)
+            engine.stop()
+            if let sourceNode { engine.detach(sourceNode) }
+            sourceNode = nil
+            if voiceProcessing { try? engine.inputNode.setVoiceProcessingEnabled(false) }
+            throw error
+        }
+        configurationObserver = NotificationCenter.default.addObserver(
+            forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main
+        ) { [weak self] _ in
+            guard let self, self.isRunning else { return }
+            log.info("audio", "Audio route changed; restarting call audio")
+            self.onConfigurationChange?()
+        }
+    }
+
+    private func startEngine() throws {
         let input = engine.inputNode
-        try input.setVoiceProcessingEnabled(true)
+        if voiceProcessing { try input.setVoiceProcessingEnabled(true) }
         let inputFormat = input.outputFormat(forBus: 0)
         guard inputFormat.sampleRate > 0, inputFormat.channelCount > 0,
               let wire = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: AudioPackets.sampleRate,
@@ -174,18 +205,20 @@ final class CallAudioEngine {
         engine.prepare()
         try engine.start()
         isRunning = true
-        log.info("audio", "Call audio on this iPhone: mic \(Int(inputFormat.sampleRate)) Hz")
+        log.info("audio", "Call audio on this iPhone: mic \(Int(inputFormat.sampleRate)) Hz, echo cancellation \(voiceProcessing ? "on" : "off")")
     }
 
     func stop() {
         guard isRunning else { return }
         isRunning = false
+        if let configurationObserver { NotificationCenter.default.removeObserver(configurationObserver) }
+        configurationObserver = nil
         transport.onPacket = nil
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
         if let sourceNode { engine.detach(sourceNode) }
         sourceNode = nil
-        try? engine.inputNode.setVoiceProcessingEnabled(false)
+        if voiceProcessing { try? engine.inputNode.setVoiceProcessingEnabled(false) }
         let sent = state.withLock { $0.sent }
         log.info("audio", "Call audio stopped: sent \(sent) frames")
     }

@@ -61,7 +61,9 @@ struct CallScreen: View {
             Button { showAudioInfo = true } label: { Text("How to fix", tableName: "CallAudio") }
             Button(role: .cancel) {} label: { Text("OK", tableName: "CallAudio") }
         } message: {
-            Text("Pairline Bridge couldn't move this call's audio to the iPhone. Update Pairline Bridge and try another call. If it keeps happening, open Pairline Bridge › Settings › Diagnostics, share the report and send it to us.", tableName: "CallAudio")
+            (calls.relayFailureOnIPhone
+                ? Text("This iPhone couldn't start the call's audio. Check that Pairline may use the microphone (iPhone Settings › Pairline), then try another call.", tableName: "CallAudio")
+                : Text("Pairline Bridge couldn't move this call's audio to the iPhone. Update Pairline Bridge and try another call. If it keeps happening, open Pairline Bridge › Settings › Diagnostics, share the report and send it to us.", tableName: "CallAudio"))
                 + Text(verbatim: calls.relayFailureReason.map { "\n\n\($0)" } ?? "")
         }
     }

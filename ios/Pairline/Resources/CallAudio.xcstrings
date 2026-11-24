@@ -1,6 +1,14 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "This iPhone couldn't start the call's audio. Check that Pairline may use the microphone (iPhone Settings › Pairline), then try another call." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يتمكن هذا الآيفون من تشغيل صوت المكالمة. تأكد من السماح لـ Pairline باستخدام الميكروفون (إعدادات الآيفون › Pairline)، ثم جرّب مكالمة أخرى." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This iPhone couldn't start the call's audio. Check that Pairline may use the microphone (iPhone Settings › Pairline), then try another call." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این آیفون نتوانست صدای تماس را راه بیندازد. مطمئن شوید Pairline اجازهٔ استفاده از میکروفون را دارد (تنظیمات آیفون › Pairline)، سپس با تماس دیگری امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone aramanın sesini başlatamadı. Pairline’ın mikrofonu kullanma izni olduğundan emin olun (iPhone Ayarlar › Pairline), ardından başka bir arama deneyin." } }
+      }
+    },
     "The audio stayed on the Android phone" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "بقي الصوت على هاتف أندرويد" } },

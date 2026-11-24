@@ -66,6 +66,10 @@ final class CallCenter: ObservableObject {
     private var relayAccepted = false
     private var relayTalk = false
     private var relayStartedAt: Date?
+    private var engineStartedAt: Date?
+    private var engineRestarts = 0
+    private var echoCancellationFailed = false
+    private static let maxEngineRestarts = 6
 
     init(useCallKit: Bool) {
         self.useCallKit = useCallKit
@@ -127,12 +131,15 @@ final class CallCenter: ObservableObject {
     /// A toast would sit behind the call screen, where nobody sees it.
     @Published var relayFailureAlert = false
     private(set) var relayFailureReason: String?
+    /// The iPhone itself couldn't start the audio (not the bridge).
+    private(set) var relayFailureOnIPhone = false
     private var relayFailureExplained = Set<UUID>()
 
-    private func explainRelayFailure(_ reason: String?) {
+    private func explainRelayFailure(_ reason: String?, onIPhone: Bool = false) {
         guard let call = current, !relayFailureExplained.contains(call.id) else { return }
         relayFailureExplained.insert(call.id)
         relayFailureReason = reason
+        relayFailureOnIPhone = onIPhone
         if callScreenVisible {
             relayFailureAlert = true
         } else {
@@ -347,19 +354,56 @@ final class CallCenter: ObservableObject {
     private func startEngineIfReady() {
         guard relayAccepted, audioSessionActive, audioEngine == nil,
               let transport = mediaTransport?(), transport.isOpen else { return }
-        let engine = CallAudioEngine(transport: transport)
         do {
-            try engine.start()
+            let engine = try startedEngine(transport)
             engine.muted = current?.muted ?? false
             if current?.speaker == true { engine.setSpeaker(true) }
+            engine.onConfigurationChange = { [weak self, weak engine] in
+                guard let self, let engine else { return }
+                self.restartEngine(after: engine)
+            }
             audioEngine = engine
-            relayStartedAt = Date()
+            engineStartedAt = Date()
+            relayStartedAt = relayStartedAt ?? Date()
             audioRoute = .iphone(talk: relayTalk)
         } catch {
             log.warning("audio", "Couldn't start call audio here: \(error.localizedDescription)")
-            notice = error.localizedDescription
+            explainRelayFailure(error.localizedDescription, onIPhone: true)
             stopRelay(callEnded: false)
         }
+    }
+
+    /// Echo cancellation first; if the engine won't start with it (some routes and devices refuse), a fresh engine
+    /// without it, so the call's audio still comes here. Remembered for the rest of the call.
+    private func startedEngine(_ transport: AudioPacketTransport) throws -> CallAudioEngine {
+        if !echoCancellationFailed {
+            let engine = CallAudioEngine(transport: transport, voiceProcessing: true)
+            do {
+                try engine.start()
+                return engine
+            } catch {
+                log.warning("audio", "Call audio didn't start with echo cancellation (\(error.localizedDescription)); trying without")
+                echoCancellationFailed = true
+            }
+        }
+        let engine = CallAudioEngine(transport: transport, voiceProcessing: false)
+        try engine.start()
+        return engine
+    }
+
+    /// iOS stopped the engine for a route or format change: build a fresh one in the same audio session. Capped, so
+    /// a device that keeps changing can't loop.
+    private func restartEngine(after engine: CallAudioEngine) {
+        guard audioEngine === engine else { return }
+        if let engineStartedAt, Date().timeIntervalSince(engineStartedAt) < 1 { return }
+        guard engineRestarts < Self.maxEngineRestarts else {
+            log.warning("audio", "Audio route keeps changing; leaving call audio as it is")
+            return
+        }
+        engineRestarts += 1
+        engine.stop()
+        audioEngine = nil
+        startEngineIfReady()
     }
 
     private func stopEngine() {
@@ -376,6 +420,9 @@ final class CallCenter: ObservableObject {
         }
         relayAccepted = false
         relayStartedAt = nil
+        engineStartedAt = nil
+        engineRestarts = 0
+        if callEnded { echoCancellationFailed = false }   // try echo cancellation again on the next call
         audioRoute = .bridge
         if !useCallKit || current?.inCallKit == false {
             try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
