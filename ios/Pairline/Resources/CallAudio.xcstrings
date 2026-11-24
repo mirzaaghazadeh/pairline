@@ -121,6 +121,14 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şimdi değil" } }
       }
     },
+    "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It needs the free Shizuku app and the same Wi-Fi." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختياري: فعّل «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط لتسمع المكالمات وتردّ عليها بهذا الآيفون. يحتاج إلى تطبيق Shizuku المجاني وشبكة الواي فاي نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It needs the free Shizuku app and the same Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اختیاری: «مکالمه با آیفون» را در برنامهٔ پل راه بیندازید تا تماس‌ها را با همین آیفون بشنوید و جواب بدهید. به برنامهٔ رایگان Shizuku و یک وای‌فای مشترک نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İsteğe bağlı: aramaları bu iPhone ile duyup yanıtlamak için köprü uygulamasında “iPhone’dan konuşma”yı kurun. Ücretsiz Shizuku uygulaması ve aynı Wi-Fi ağı gerekir." } }
+      }
+    },
     "On the Android phone, open Pairline Bridge › Settings › Talk on iPhone." : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "على هاتف أندرويد، افتح Pairline Bridge › الإعدادات › التحدث عبر الآيفون." } },
