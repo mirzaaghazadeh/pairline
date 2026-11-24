@@ -31,3 +31,6 @@ xcuserdata/
 *.mobileprovision
 .env
 .env.*
+
+# App Store images rendered by docs/app-store/render.sh
+docs/app-store/out/

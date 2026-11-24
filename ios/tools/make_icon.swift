@@ -15,8 +15,11 @@ enum Style { case icon, darkIcon, tintedIcon, launchMark }
 
 func render(size: Int, style: Style) -> Data {
     let space = CGColorSpace(name: CGColorSpace.sRGB)!
+    // Only the launch mark needs transparency. The icons are opaque and must be written without an alpha channel:
+    // App Store Connect rejects an app icon that has one, even when every pixel is opaque (ITMS-90717).
+    let alpha: CGImageAlphaInfo = style == .launchMark ? .premultipliedLast : .noneSkipLast
     let ctx = CGContext(data: nil, width: size, height: size, bitsPerComponent: 8, bytesPerRow: 0, space: space,
-                        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+                        bitmapInfo: alpha.rawValue)!
     let s = CGFloat(size) / 1024
     ctx.scaleBy(x: s, y: s)
 

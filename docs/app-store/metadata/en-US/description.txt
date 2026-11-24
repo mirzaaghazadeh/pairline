@@ -1,0 +1,32 @@
+Pairline puts the SIM card of your Android phone on your iPhone. Leave the Android phone in your bag or on your desk, and use its number from the iPhone you carry.
+
+MESSAGES AND CODES
+• Read and send SMS with the Android phone's number
+• Verification codes are spotted automatically, with a Copy button
+• A notification on your iPhone for every new message
+
+CALLS
+• Calls to the Android number ring on your iPhone, with the familiar iPhone call screen
+• Answer, decline or hang up from the iPhone, and dial out from its keypad
+• For now, the call audio plays on the Android phone
+
+CONTACTS, CALL HISTORY AND MORE
+• Contacts and call history synced from the Android phone, kept on this iPhone only
+• Dual SIM: choose which SIM sends a message or places a call
+• USSD codes: check your balance or top up
+• The Android phone's battery and signal at a glance, also in a widget
+
+PRIVATE BY DESIGN
+• The two phones talk directly over Bluetooth, encrypted end to end
+• No Pairline servers, no accounts, no analytics, no ads, no tracking
+• The source code is public, so anyone can check these promises
+
+HOW IT WORKS
+1. Install the free Pairline Bridge app on the Android phone (Android 11 or later), from pairline.navid.tr
+2. Open Pairline on your iPhone and scan the pairing code the Android phone shows
+3. Keep the two phones within Bluetooth range
+
+PRICE
+Try every feature free for 3 days, then buy Pairline once to keep using it. There's no subscription, and nothing is charged automatically. Messages you've already synced stay readable either way.
+
+Demo mode is always free: it shows the whole app with sample data, no Android phone needed.

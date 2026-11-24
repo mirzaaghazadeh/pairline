@@ -1,0 +1,139 @@
+<!doctype html>
+<!--
+  App Store screenshots for the iPhone app, rendered by render.sh at 1320 x 2868 (iPhone with Dynamic Island, large
+  display) and scaled to 1206 x 2622 (medium display, the size App Store Connect requires).
+  Open slides.html#lang=en&s=1 in a browser at 1320 x 2868 to preview one slide. Screens come from docs/screenshots/ios.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pairline App Store slide</title>
+<style>
+  @font-face { font-family: "Estedad"; src: url("../../ios/Shared/Fonts/Estedad-Bold.ttf"); font-weight: 700; }
+  @font-face { font-family: "Estedad"; src: url("../../ios/Shared/Fonts/Estedad-Medium.ttf"); font-weight: 500; }
+  @font-face { font-family: "Vazirmatn"; src: url("fonts/vazirmatn-nl-wght.woff2"); font-weight: 100 900; }
+
+  :root {
+    --navy: #0b1d3d;
+    --blue: #1f5fbf;
+    --sky: #6f9cf0;
+    --green: #12b886;
+    --ink-soft: #cddcfa;
+    --latin: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  }
+  html, body { margin: 0; width: 1320px; height: 2868px; overflow: hidden; }
+  body {
+    font-family: var(--latin);
+    color: #fff;
+    background:
+      radial-gradient(1100px 820px at 50% 1500px, rgba(111, 156, 240, 0.42), transparent 70%),
+      radial-gradient(900px 600px at 50% -120px, rgba(18, 184, 134, 0.20), transparent 70%),
+      linear-gradient(172deg, #0a1a38 0%, #12346f 46%, #1f5fbf 100%);
+    -webkit-font-smoothing: antialiased;
+  }
+  body[data-lang="ar"] { font-family: "Vazirmatn", var(--latin); }
+  body[data-lang="fa"] { font-family: "Estedad", var(--latin); }
+
+  /* The pairing motif: a faint dotted link across the canvas behind the phone. */
+  .link {
+    position: absolute; left: 0; right: 0; top: 1640px; height: 6px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 3px, transparent 3.5px) 0 0 / 34px 6px repeat-x;
+  }
+  .node { position: absolute; top: 1626px; width: 34px; height: 34px; border-radius: 50%; background: var(--green);
+          box-shadow: 0 0 0 10px rgba(18, 184, 134, 0.22); }
+  .node.l { left: 92px; } .node.r { right: 92px; }
+
+  header {
+    position: absolute; top: 150px; left: 90px; right: 90px; height: 520px;
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 34px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 16px;
+    padding: 14px 30px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10); border: 2px solid rgba(255, 255, 255, 0.16);
+    font-size: 38px; font-weight: 600; letter-spacing: 0.02em; color: #e6eeff;
+  }
+  .eyebrow::before { content: ""; width: 18px; height: 18px; border-radius: 50%; background: var(--green); }
+  h1 {
+    margin: 0; white-space: pre-line;
+    font-size: 122px; line-height: 1.04; font-weight: 800; letter-spacing: -0.025em;
+  }
+  body[data-lang="ar"] h1, body[data-lang="fa"] h1 { font-size: 112px; line-height: 1.28; letter-spacing: 0; font-weight: 700; }
+  p.sub {
+    margin: 0; max-width: 1060px;
+    font-size: 50px; line-height: 1.32; font-weight: 500; color: var(--ink-soft);
+  }
+  body[data-lang="ar"] p.sub, body[data-lang="fa"] p.sub { font-size: 46px; line-height: 1.6; }
+
+  /* The phone: a thin dark bezel around the real screen, with the Dynamic Island drawn on top. */
+  .device {
+    position: absolute; left: 50%; top: 742px; transform: translateX(-50%);
+    width: 961px; height: 2028px; box-sizing: border-box; padding: 26px;
+    border-radius: 152px; background: #05070c;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16), 0 70px 140px rgba(2, 8, 24, 0.55);
+  }
+  .screen { position: relative; width: 909px; height: 1976px; border-radius: 126px; overflow: hidden; background: #000; }
+  .screen img { display: block; width: 100%; height: 100%; }
+  .island {
+    position: absolute; top: 25px; left: 50%; transform: translateX(-50%);
+    width: 282px; height: 84px; border-radius: 42px; background: #000;
+  }
+</style>
+</head>
+<body>
+  <div class="link"></div><div class="node l"></div><div class="node r"></div>
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+  <div class="device"><div class="screen"><img id="shot" alt=""><div class="island"></div></div></div>
+
+<script>
+// One entry per slide: the screen to show and its copy in each language. App Store Connect has no Persian
+// localization; the Persian set is for the website and social media.
+const SLIDES = [
+  { shot: "04-messages",
+    en: ["Messages", "Your Android SIM,\non your iPhone", "Texts, calls and codes from the phone that holds your SIM."],
+    ar: ["الرسائل", "شريحة أندرويد\nعلى آيفونك", "الرسائل والمكالمات والرموز من الهاتف الذي يحمل شريحتك."],
+    fa: ["پیامک‌ها", "سیم‌کارت اندرویدتان،\nروی آیفون", "پیامک، تماس و کدها از گوشی‌ای که سیم‌کارتتان در آن است."] },
+  { shot: "06-incoming-call",
+    en: ["Calls", "Answer calls\non your iPhone", "Calls to your Android number ring right on your iPhone."],
+    ar: ["المكالمات", "أجب على المكالمات\nمن آيفونك", "مكالمات رقمك على أندرويد ترنّ على آيفونك مباشرةً."],
+    fa: ["تماس‌ها", "جواب تماس‌ها\nروی آیفون", "تماس‌های شمارهٔ اندرویدتان روی آیفون زنگ می‌خورد."] },
+  { shot: "05-one-time-code",
+    en: ["One-time codes", "Codes in\none tap", "Verification codes are spotted and ready to copy."],
+    ar: ["رموز التحقق", "الرموز\nبلمسة واحدة", "تُكتشف رموز التحقق وتصبح جاهزة للنسخ."],
+    fa: ["کدهای یک‌بارمصرف", "کدها\nبا یک لمس", "کدهای تأیید شناسایی می‌شوند و آمادهٔ کپی‌اند."] },
+  { shot: "07-contacts",
+    en: ["Contacts", "Your contacts\ncome along", "Contacts and call history, synced from your Android phone."],
+    ar: ["جهات الاتصال", "جهات اتصالك\nمعك دائمًا", "جهات الاتصال وسجل المكالمات متزامنة من هاتف أندرويد."],
+    fa: ["مخاطبین", "مخاطبانتان\nهمراهتان", "مخاطبین و سابقهٔ تماس‌ها از گوشی اندرویدتان همگام می‌شود."] },
+  { shot: "08-bridge-status",
+    en: ["Bridge", "Your bridge\nat a glance", "Battery, signal and both SIM cards, live."],
+    ar: ["الهاتف الوسيط", "الهاتف الوسيط\nفي لمحة", "البطارية والإشارة وكلتا الشريحتين، مباشرةً."],
+    fa: ["گوشی پل", "گوشی پل\nدر یک نگاه", "باتری، آنتن و هر دو سیم‌کارت، به‌صورت زنده."] },
+  { shot: "09-privacy",
+    en: ["Privacy", "Private\nby design", "End-to-end encrypted. No servers, no accounts, no tracking."],
+    ar: ["الخصوصية", "الخصوصية\nفي الأساس", "تشفير تام بين هاتفيك. بلا خوادم ولا حسابات ولا تتبّع."],
+    fa: ["حریم خصوصی", "حریم خصوصی\nاز پایه", "رمزگذاری سرتاسری بین دو گوشی شما. بدون سرور، بدون حساب، بدون ردیابی."] },
+  { shot: "02-start-options",
+    en: ["One-time purchase", "Pay once.\nKeep it.", "Try it free for 3 days. No subscription, ever."],
+    ar: ["شراء لمرة واحدة", "ادفع مرة واحدة\nواحتفظ به", "جرّبه مجانًا لمدة 3 أيام. بلا اشتراك أبدًا."],
+    fa: ["خرید یک‌باره", "یک بار بخرید،\nبرای همیشه", "سه روز رایگان امتحان کنید. بدون اشتراک."] },
+];
+
+const params = new URLSearchParams(location.hash.slice(1));
+const lang = params.get("lang") || "en";
+const slide = SLIDES[(parseInt(params.get("s") || "1", 10) - 1)] || SLIDES[0];
+const [eyebrow, title, sub] = slide[lang];
+document.documentElement.lang = lang;
+document.documentElement.dir = lang === "en" ? "ltr" : "rtl";
+document.body.dataset.lang = lang;
+document.getElementById("eyebrow").textContent = eyebrow;
+document.getElementById("title").textContent = title;
+document.getElementById("sub").textContent = sub;
+document.getElementById("shot").src = `../screenshots/ios/${lang}/${slide.shot}.png`;
+</script>
+</body>
+</html>
