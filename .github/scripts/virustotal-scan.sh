@@ -34,30 +34,51 @@ fi
 # curl retries timeouts and HTTP 408/429/5xx. The key goes in a header and GitHub masks it in logs.
 vt() { curl -sS --fail --retry 3 --retry-delay 20 --max-time 300 -H "x-apikey: $VT_API_KEY" "$@"; }
 
+# The result, as {stats, results}, from a finished analysis of our upload, else from the report VirusTotal already
+# has for this file (it answers 409 to a second upload of a file it's still busy with, and a re-scan needs no upload).
+result=""
+
 upload_url="$api/files"
 if [ "$(wc -c < "$file")" -gt 32000000 ]; then # bigger files need a one-time upload URL
-  upload_url="$(vt "$api/files/upload_url" | jq -er .data)" ||
-    finish "not scanned (upload failed)" "Couldn't get a VirusTotal upload URL."
+  upload_url="$(vt "$api/files/upload_url" | jq -er .data)" || upload_url=""
 fi
-analysis="$(vt -X POST -F "file=@$file" "$upload_url" | jq -er .data.id)" ||
-  finish "not scanned (upload failed)" "Uploading the APK to VirusTotal failed."
-echo "Uploaded $(basename "$file") (SHA-256 $sha), analysis $analysis"
+analysis=""
+if [ -n "$upload_url" ]; then
+  analysis="$(vt -X POST -F "file=@$file" "$upload_url" | jq -er .data.id)" || analysis=""
+fi
 
-status=""
-for _ in $(seq "$polls"); do
-  sleep "$interval"
-  json="$(vt "$api/analyses/$analysis")" || continue
-  status="$(jq -r '.data.attributes.status // empty' <<<"$json")"
-  echo "Status: $status"
-  [ "$status" = completed ] && break
-done
+if [ -n "$analysis" ]; then
+  echo "Uploaded $(basename "$file") (SHA-256 $sha), analysis $analysis"
+  for _ in $(seq "$polls"); do
+    sleep "$interval"
+    json="$(vt "$api/analyses/$analysis")" || continue
+    status="$(jq -r '.data.attributes.status // empty' <<<"$json")"
+    echo "Status: $status"
+    if [ "$status" = completed ]; then
+      result="$(jq -c '.data.attributes | {stats, results}' <<<"$json")"
+      break
+    fi
+  done
+else
+  echo "Upload failed; looking for an earlier VirusTotal report of the same file"
+fi
 
-if [ "$status" != completed ]; then
+if [ -z "$result" ] && json="$(vt "$api/files/$sha" 2>/dev/null)" &&
+  [ -n "$(jq -r '.data.attributes.last_analysis_date // empty' <<<"$json")" ]; then
+  echo "Using VirusTotal's latest report for this file"
+  result="$(jq -c '.data.attributes | {stats: .last_analysis_stats, results: .last_analysis_results}' <<<"$json")"
+fi
+
+if [ -z "$result" ]; then
+  if [ -z "$analysis" ]; then
+    finish "not scanned (upload failed)" "Uploading the APK to VirusTotal failed, and VirusTotal has no report for it yet."
+  fi
   finish "[report]($report) (the scan hadn't finished when this release was built)" \
     "The VirusTotal scan didn't finish in $((polls * interval / 60)) minutes. Check the report before publishing: $report"
 fi
+json="$result"
 
-stats="$(jq -r '.data.attributes.stats | [.malicious, .suspicious, .malicious + .suspicious + .undetected + .harmless]
+stats="$(jq -r '.stats | [.malicious, .suspicious, .malicious + .suspicious + .undetected + .harmless]
   | map(. // 0) | @tsv' <<<"$json")" ||
   finish "[report]($report)" "Couldn't read the VirusTotal results. Check the report before publishing: $report"
 read -r malicious suspicious total <<<"$stats"
@@ -67,7 +88,7 @@ if [ "$suspicious" -gt 0 ]; then cell="$cell, $suspicious marked it suspicious";
 
 if [ $((malicious + suspicious)) -gt 0 ]; then
   # e.g. "Ikarus: malicious (Trojan.AndroidOS.X)"; the names tell a known false positive from a real problem.
-  engines="$(jq -r '[.data.attributes.results // {} | to_entries[]
+  engines="$(jq -r '[.results // {} | to_entries[]
     | select(.value.category == "malicious" or .value.category == "suspicious")
     | "\(.key): \(.value.category) (\(.value.result // "no name"))"] | join("; ")' <<<"$json" || true)"
   finish "$cell" "$malicious engine(s) flagged the APK as malicious and $suspicious as suspicious${engines:+ ($engines)}. Read the report before publishing: $report"
