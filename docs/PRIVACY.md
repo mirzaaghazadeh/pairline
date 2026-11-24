@@ -18,7 +18,7 @@ Any change that adds or changes a data flow or permission must update this file 
 | SMS (text, numbers, time) | Yes, encrypted | Your paired iPhone only | Android's own SMS store, as usual; on iPhone, Pairline's local database | Until you delete it or unpair |
 | Contacts | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until unpair |
 | Call log | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until unpair |
-| Contacts you add on the iPhone (opt-in, M4) | Yes, encrypted | Your bridge phone only | Android Contacts | Until you delete them |
+| Contacts you add on the iPhone (opt-in, off until you turn it on in the bridge app) | Yes, encrypted | Your bridge phone only | Android Contacts | Until you delete them |
 | Files you send (M5) | Yes, encrypted | The other paired phone only | Where you save them | Until you delete them |
 | Your iPhone's internet traffic, only while internet sharing is on (M8) | Yes | Through your bridge phone (and its VPN, if one is on) to the sites your iPhone visits | Not stored, not logged | — |
 | Call events (who's calling) | Yes, encrypted | Your paired iPhone only | iPhone Recents only if you turn that setting on (Recents can sync to iCloud) | Per iOS settings |

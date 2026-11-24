@@ -116,7 +116,7 @@
     <!-- Pairing -->
     <string name="pair_title">جفت کردن آیفون</string>
     <string name="pair_step_1">برنامهٔ Pairline را روی آیفون نصب کنید و بازش کنید.</string>
-    <string name="pair_step_2">روی «جفت شدن با گوشی اندروید» بزنید.</string>
+    <string name="pair_step_2">روی «جفت کردن گوشی پل» بزنید.</string>
     <string name="pair_step_3">دوربین آیفون را رو به این کد بگیرید.</string>
     <string name="pair_expires">کد تا %1$s دیگر معتبر است</string>
     <string name="pair_new_code">کد جدید</string>
@@ -272,7 +272,7 @@
     <string name="help_q_iphone">روی آیفون به چه چیزی نیاز دارم؟</string>
     <string name="help_a_iphone">برنامهٔ Pairline برای آیفون (iOS ۱۶ یا جدیدتر) و بلوتوث روشن. دو گوشی باید در محدودهٔ بلوتوث هم باشند؛ معمولاً در یک اتاق یا چند اتاق آن‌طرف‌تر.</string>
     <string name="help_q_pair">چطور دو گوشی را جفت کنم؟</string>
-    <string name="help_a_pair">در این گوشی، «جفت کردن آیفون» را باز کنید تا کدی نمایش داده شود. در آیفون، Pairline را باز کنید، روی «جفت شدن با گوشی اندروید» بزنید و کد را اسکن کنید. کد فقط یک بار کار می‌کند و بعد از ۵ دقیقه باطل می‌شود.</string>
+    <string name="help_a_pair">در این گوشی، «جفت کردن آیفون» را باز کنید تا کدی نمایش داده شود. در آیفون، Pairline را باز کنید، روی «جفت کردن گوشی پل» بزنید و کد را اسکن کنید. کد فقط یک بار کار می‌کند و بعد از ۵ دقیقه باطل می‌شود.</string>
     <string name="help_q_spare">می‌توانم از گوشی اندروید اصلی‌ام استفاده کنم؟</string>
     <string name="help_a_spare">بله. البته ساده‌ترین حالت یک گوشی اضافه است که فقط نقش پل را دارد: می‌تواند همیشه به شارژ باشد و هیچ برنامهٔ دیگری روی آن نیست که سر باتری یا مجوزها با Pairline رقابت کند.</string>
     <string name="help_q_default_sms">باید Pairline را برنامهٔ پیش‌فرض پیامک کنم؟</string>

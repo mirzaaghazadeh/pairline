@@ -117,7 +117,7 @@
     <!-- Pairing -->
     <string name="pair_title">Pair your iPhone</string>
     <string name="pair_step_1">Install Pairline on your iPhone and open it.</string>
-    <string name="pair_step_2">Tap \"Pair with Android phone\".</string>
+    <string name="pair_step_2">Tap \"Pair a bridge phone\".</string>
     <string name="pair_step_3">Point your iPhone\'s camera at this code.</string>
     <string name="pair_expires">Code expires in %1$s</string>
     <string name="pair_new_code">New code</string>
@@ -272,7 +272,7 @@
     <string name="help_q_iphone">What do I need on the iPhone?</string>
     <string name="help_a_iphone">The Pairline app for iPhone (iOS 16 or later) and Bluetooth turned on. The two phones need to be within Bluetooth range, usually the same room or a few rooms apart.</string>
     <string name="help_q_pair">How do I pair?</string>
-    <string name="help_a_pair">On this phone, open Pair iPhone to show a code. On your iPhone, open Pairline, tap \"Pair with Android phone\" and scan the code. The code works once and expires after 5 minutes.</string>
+    <string name="help_a_pair">On this phone, open Pair iPhone to show a code. On your iPhone, open Pairline, tap \"Pair a bridge phone\" and scan the code. The code works once and expires after 5 minutes.</string>
     <string name="help_q_spare">Can I use my everyday Android phone?</string>
     <string name="help_a_spare">Yes. A spare phone that only serves as the bridge is simplest, though: it can stay on the charger, and nothing else on it competes for battery or permissions.</string>
     <string name="help_q_default_sms">Do I have to make Pairline my SMS app?</string>

@@ -117,7 +117,7 @@
     <!-- Pairing -->
     <string name="pair_title">إقران آيفونك</string>
     <string name="pair_step_1">ثبّت Pairline على آيفونك وافتحه.</string>
-    <string name="pair_step_2">اضغط على «الإقران مع هاتف أندرويد».</string>
+    <string name="pair_step_2">اضغط على «إقران هاتف وسيط».</string>
     <string name="pair_step_3">وجّه كاميرا آيفونك نحو هذا الرمز.</string>
     <string name="pair_expires">تنتهي صلاحية الرمز خلال %1$s</string>
     <string name="pair_new_code">رمز جديد</string>
@@ -272,7 +272,7 @@
     <string name="help_q_iphone">ما الذي أحتاجه على الآيفون؟</string>
     <string name="help_a_iphone">تطبيق Pairline للآيفون (iOS ١٦ أو أحدث)، مع تشغيل البلوتوث. ويجب أن يكون الهاتفان ضمن نطاق البلوتوث، أي عادةً في الغرفة نفسها أو على بُعد بضع غرف.</string>
     <string name="help_q_pair">كيف أُجري الإقران؟</string>
-    <string name="help_a_pair">على هذا الهاتف، افتح «إقران آيفون» لعرض رمز. وعلى آيفونك، افتح Pairline واضغط على «الإقران مع هاتف أندرويد» ثم امسح الرمز. يعمل الرمز مرة واحدة وتنتهي صلاحيته بعد ٥ دقائق.</string>
+    <string name="help_a_pair">على هذا الهاتف، افتح «إقران آيفون» لعرض رمز. وعلى آيفونك، افتح Pairline واضغط على «إقران هاتف وسيط» ثم امسح الرمز. يعمل الرمز مرة واحدة وتنتهي صلاحيته بعد ٥ دقائق.</string>
     <string name="help_q_spare">هل يمكنني استخدام هاتف أندرويد الذي أستخدمه يوميًا؟</string>
     <string name="help_a_spare">نعم. لكن الأسهل هو هاتف احتياطي يعمل جسرًا فقط: إذ يمكن أن يبقى على الشاحن، ولا ينافسه أي تطبيق آخر عليه على البطارية أو الأذونات.</string>
     <string name="help_q_default_sms">هل يجب أن أجعل Pairline تطبيق الرسائل الافتراضي؟</string>
