@@ -19,6 +19,9 @@ concurrency:
 
 env:
   BUILD_TOOLS: 37.0.0
+  # Pairing with Wireless debugging is native code (D-054); keep in step with android/app/build.gradle.kts.
+  NDK: 27.1.12297006
+  CMAKE: 3.22.1
 
 jobs:
   release:
@@ -42,11 +45,12 @@ jobs:
           # Release builds start clean: nothing cached by earlier runs goes into a release.
           cache-disabled: true
 
-      - name: Install build-tools ${{ env.BUILD_TOOLS }}
+      - name: Install build-tools ${{ env.BUILD_TOOLS }}, NDK ${{ env.NDK }} and CMake ${{ env.CMAKE }}
         run: |
-          if [ ! -d "$ANDROID_HOME/build-tools/$BUILD_TOOLS" ]; then
-            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;$BUILD_TOOLS" > /dev/null
-          fi
+          sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -d "$ANDROID_HOME/build-tools/$BUILD_TOOLS" ] || yes | "$sdk" "build-tools;$BUILD_TOOLS" > /dev/null
+          [ -d "$ANDROID_HOME/ndk/$NDK" ] || yes | "$sdk" "ndk;$NDK" > /dev/null
+          [ -d "$ANDROID_HOME/cmake/$CMAKE" ] || yes | "$sdk" "cmake;$CMAKE" > /dev/null
 
       - name: Check the tag matches versionName
         run: |
@@ -118,7 +122,7 @@ jobs:
             echo "| APK SHA-256 | \`$sum\` |"
             echo "| Signing certificate SHA-256 | \`$cert\` |"
             echo "| VirusTotal | $vt |"
-            echo "| Toolchain | Temurin JDK 17, Gradle wrapper, build-tools $BUILD_TOOLS, ubuntu-24.04 |"
+            echo "| Toolchain | Temurin JDK 17, Gradle wrapper, build-tools $BUILD_TOOLS, NDK $NDK, CMake $CMAKE, ubuntu-24.04 |"
             echo
             echo "How to verify: [SECURITY.md](../../blob/$GITHUB_SHA/SECURITY.md#verifying-a-release)."
           } > "$RUNNER_TEMP/notes.md"

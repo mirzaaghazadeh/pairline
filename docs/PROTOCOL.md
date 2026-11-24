@@ -286,7 +286,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events |
 | `call.dtmf` | R→B | M3 | `id`, `call`, `digit` (needs capability `call.dtmf`) |
 | `call.audio` | R→B | M3 | `id`, `call`, `mute`, `speaker` (either optional; needs `call.audio`) |
-| `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true) → `ok` once audio flows, or `error` (`unsupported`: not set up, no Shizuku or no Wi-Fi link; `failed`: capture didn't start). Needs `call.media` |
+| `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true) → `ok` once audio flows, or `error` (`unsupported`: not set up, the bridge's helper isn't running or no Wi-Fi link; `failed`: capture didn't start). Needs `call.media` |
 | `call.media.stop` | R→B | M6 | `id`, `call` → `ok`. The relay also stops by itself when the call ends or the Wi-Fi link drops |
 | `call.media.state` | B→R | M6 | `call`, `state` (`active` / `stopped` / `failed`), `listen`, `talk`, `reason` (English, for diagnostics) |
 | `call.media.feedback` | R→B | M6 | `id`, `heard` (the iPhone heard the caller), `heardMe` (the caller heard the iPhone); either may be null → `ok`. The bridge uses it to pick the capture source and mic handling that work on this phone |
@@ -314,7 +314,7 @@ version supports it. The iPhone hides or explains anything missing instead of gu
 
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
 `call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `call.media` (call audio can
-be relayed to the iPhone: "Talk on iPhone" is on and Shizuku is ready), `call.media.talk` (the iPhone's microphone
+be relayed to the iPhone: "Talk on iPhone" is on and the bridge's helper is running, D-054), `call.media.talk` (the iPhone's microphone
 can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone), `net.share`
 (the bridge's user allows internet sharing, M8), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),

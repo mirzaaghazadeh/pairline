@@ -62,7 +62,7 @@ class CallAudioRelay(
     fun start(callId: String, wantTalk: Boolean) {
         if (!prefs.talkOnIphone) throw RequestException(ErrorCode.UNSUPPORTED, "Talk on iPhone is off on the bridge")
         val service = privileged.service
-            ?: throw RequestException(ErrorCode.UNSUPPORTED, "Shizuku isn't running on the bridge")
+            ?: throw RequestException(ErrorCode.UNSUPPORTED, "Pairline's helper isn't running on the bridge")
         if (!canListen) throw RequestException(ErrorCode.UNSUPPORTED, "this phone doesn't allow capturing call audio")
         val t = transport?.takeIf { it.isOpen }
             ?: throw RequestException(ErrorCode.UNSUPPORTED, "call audio needs the Wi-Fi link")

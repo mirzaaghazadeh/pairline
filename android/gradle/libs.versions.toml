@@ -10,8 +10,9 @@ coreKtx = "1.19.1"
 coroutines = "1.9.0"
 lifecycle = "2.10.0"
 zxing = "3.5.4"
-# Shizuku client library (Apache-2.0, D-046): binder IPC to the user's Shizuku app, no network code.
-shizuku = "13.1.5"
+# BoringSSL as an NDK prefab package (OpenSSL/ISC licenses, D-054): only its SPAKE2 is used, for pairing with
+# Wireless debugging. A crypto library; no network code.
+boringssl = "20251124"
 junit = "4.13.2"
 orgJson = "20260814"
 
@@ -26,8 +27,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
-shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
-shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
+boringssl = { group = "io.github.vvb2060.ndk", name = "boringssl", version.ref = "boringssl" }
 # Test-only: JVM unit tests can't use the platform's org.json (android.jar ships stubs).
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 org-json = { group = "org.json", name = "json", version.ref = "orgJson" }

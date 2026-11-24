@@ -20,7 +20,8 @@ class PairlineApp : Application() {
         Notifications.createChannels(this)
         FileNotifications(this).createChannel()
         Log.i("app", "Pairline ${BuildConfig.VERSION_NAME} started on Android ${android.os.Build.VERSION.SDK_INT}")
-        // Only listens for Shizuku (if the user has it); starts nothing privileged by itself (D-046).
+        // Watches Developer options and Wireless debugging, and starts Pairline's helper only if the user set up Talk
+        // on iPhone and Wireless debugging is on (D-054). Changes no settings.
         AppGraph.privileged.start()
         if (AppGraph.prefs.setupDone) LinkService.start(this, "app start")
     }

@@ -9,36 +9,36 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra" } }
       }
     },
-    "After the Android phone restarts, start Shizuku on it again; the bridge app reminds you with a notification. Until then calls ring here and the audio stays on the Android phone." : {
+    "After the Android phone restarts, turn on Wireless debugging on it again: the bridge app then starts its helper by itself and reminds you with a notification. Until then calls ring here and the audio stays on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بعد إعادة تشغيل هاتف أندرويد، شغّل Shizuku عليه من جديد؛ يذكّرك تطبيق الهاتف الوسيط بإشعار. وحتى ذلك الحين ترنّ المكالمات هنا ويبقى الصوت على هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "After the Android phone restarts, start Shizuku on it again; the bridge app reminds you with a notification. Until then calls ring here and the audio stays on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعد از روشن‌شدن دوبارهٔ گوشی اندرویدی، Shizuku را روی آن دوباره اجرا کنید؛ برنامهٔ پل با یک اعلان یادآوری می‌کند. تا آن موقع تماس‌ها اینجا زنگ می‌خورند و صدا روی گوشی اندرویدی می‌ماند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra Shizuku’yu onda yeniden başlatın; köprü uygulaması bir bildirimle hatırlatır. O zamana kadar aramalar burada çalar, ses Android telefonda kalır." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بعد إعادة تشغيل هاتف أندرويد، فعّل عليه «تصحيح الأخطاء اللاسلكي» من جديد: يشغّل تطبيق الهاتف الوسيط مساعده تلقائيًا ويذكّرك بإشعار. وحتى ذلك الحين ترنّ المكالمات هنا ويبقى الصوت على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "After the Android phone restarts, turn on Wireless debugging on it again: the bridge app then starts its helper by itself and reminds you with a notification. Until then calls ring here and the audio stays on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعد از روشن‌شدن دوبارهٔ گوشی اندرویدی، «اشکال‌زدایی بی‌سیم» را روی آن دوباره روشن کنید: برنامهٔ پل دستیارش را خودش اجرا می‌کند و با یک اعلان یادآوری می‌کند. تا آن موقع تماس‌ها اینجا زنگ می‌خورند و صدا روی گوشی اندرویدی می‌ماند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra onda Kablosuz hata ayıklamayı yeniden açın: köprü uygulaması yardımcısını kendiliğinden başlatır ve bir bildirimle hatırlatır. O zamana kadar aramalar burada çalar, ses Android telefonda kalır." } }
       }
     },
-    "Android keeps call audio away from apps, so this needs Android 10 or later and Shizuku. Some phones only allow listening; then you hear the call here and talk on the Android phone." : {
+    "Android keeps call audio away from apps, so this needs Android 10 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يحتاج هذا إلى أندرويد 10 أو أحدث وإلى Shizuku. بعض الهواتف تسمح بالاستماع فقط؛ عندها تسمع المكالمة هنا وتتحدث من هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android keeps call audio away from apps, so this needs Android 10 or later and Shizuku. Some phones only allow listening; then you hear the call here and talk on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین این کار به اندروید ۱۰ یا جدیدتر و Shizuku نیاز دارد. بعضی گوشی‌ها فقط اجازهٔ شنیدن می‌دهند؛ آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android arama sesini uygulamalardan uzak tutar; bu yüzden Android 10 veya üstü ve Shizuku gerekir. Bazı telefonlar yalnızca dinlemeye izin verir; o zaman aramayı burada duyar, Android telefondan konuşursunuz." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يحتاج هذا إلى أندرويد 10 أو أحدث و«تصحيح الأخطاء اللاسلكي» على هاتف أندرويد (بلا تطبيق إضافي ولا روت). بعض الهواتف تسمح بالاستماع فقط؛ عندها تسمع المكالمة هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android keeps call audio away from apps, so this needs Android 10 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین این کار به اندروید ۱۰ یا جدیدتر و «اشکال‌زدایی بی‌سیم» روی گوشی اندرویدی نیاز دارد (بدون برنامهٔ اضافه و بدون روت). بعضی گوشی‌ها فقط اجازهٔ شنیدن می‌دهند؛ آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android arama sesini uygulamalardan uzak tutar; bu yüzden Android 10 veya üstü ve Android telefonda Kablosuz hata ayıklama gerekir (ek uygulama ve root gerekmez). Bazı telefonlar yalnızca dinlemeye izin verir; o zaman aramayı burada duyar, Android telefondan konuşursunuz." } }
       }
     },
-    "Android stops Shizuku at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and start Shizuku again. Calls keep ringing here meanwhile." : {
+    "Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Calls keep ringing here meanwhile." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد Shizuku عند كل إعادة تشغيل، فيعود صوت المكالمات إلى هاتف أندرويد. يعرض تطبيق الهاتف الوسيط إشعارًا: اضغط عليه وشغّل Shizuku من جديد. وفي الأثناء تظل المكالمات ترنّ هنا." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android stops Shizuku at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and start Shizuku again. Calls keep ringing here meanwhile." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید با هر بار روشن‌شدن دوباره Shizuku را متوقف می‌کند، پس صدای تماس به گوشی اندرویدی برمی‌گردد. برنامهٔ پل یک اعلان نشان می‌دهد: روی آن بزنید و Shizuku را دوباره اجرا کنید. در این فاصله تماس‌ها اینجا زنگ می‌خورند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android her yeniden başlatmada Shizuku’yu durdurur, bu yüzden arama sesi Android telefona döner. Köprü uygulaması bir bildirim gösterir: dokunup Shizuku’yu yeniden başlatın. Bu arada aramalar burada çalmaya devam eder." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد «تصحيح الأخطاء اللاسلكي» عند كل إعادة تشغيل، فيعود صوت المكالمات إلى هاتف أندرويد. يعرض تطبيق الهاتف الوسيط إشعارًا: اضغط عليه وفعّل «تصحيح الأخطاء اللاسلكي» من جديد، فيشغّل الهاتف الوسيط مساعده تلقائيًا. وفي الأثناء تظل المكالمات ترنّ هنا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Calls keep ringing here meanwhile." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید با هر بار روشن‌شدن دوباره «اشکال‌زدایی بی‌سیم» را خاموش می‌کند، پس صدای تماس به گوشی اندرویدی برمی‌گردد. برنامهٔ پل یک اعلان نشان می‌دهد: روی آن بزنید و «اشکال‌زدایی بی‌سیم» را دوباره روشن کنید تا پل دستیارش را خودش اجرا کند. در این فاصله تماس‌ها اینجا زنگ می‌خورند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android her yeniden başlatmada Kablosuz hata ayıklamayı kapatır, bu yüzden arama sesi Android telefona döner. Köprü uygulaması bir bildirim gösterir: dokunup Kablosuz hata ayıklamayı yeniden açın; köprü yardımcısını kendiliğinden başlatır. Bu arada aramalar burada çalmaya devam eder." } }
       }
     },
-    "Android stops Shizuku every time the Android phone restarts. The bridge app then shows a notification; tap it and start Shizuku again. Some phones also only allow listening: then you hear calls here and talk on the Android phone." : {
+    "Android turns Wireless debugging off every time the Android phone restarts. The bridge app then shows a notification; tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Some phones also only allow listening: then you hear calls here and talk on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد Shizuku في كل مرة يُعاد فيها تشغيل هاتف أندرويد. عندها يعرض تطبيق الهاتف الوسيط إشعارًا؛ اضغط عليه وشغّل Shizuku من جديد. كما أن بعض الهواتف تسمح بالاستماع فقط: عندها تسمع المكالمات هنا وتتحدث من هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android stops Shizuku every time the Android phone restarts. The bridge app then shows a notification; tap it and start Shizuku again. Some phones also only allow listening: then you hear calls here and talk on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید هر بار که گوشی اندرویدی دوباره روشن می‌شود Shizuku را متوقف می‌کند. آن‌وقت برنامهٔ پل یک اعلان نشان می‌دهد؛ روی آن بزنید و Shizuku را دوباره اجرا کنید. بعضی گوشی‌ها هم فقط اجازهٔ شنیدن می‌دهند: آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android, Android telefon her yeniden başladığında Shizuku’yu durdurur. Köprü uygulaması o zaman bir bildirim gösterir; dokunup Shizuku’yu yeniden başlatın. Bazı telefonlar ayrıca yalnızca dinlemeye izin verir: o zaman aramaları burada duyar, Android telefondan konuşursunuz." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد «تصحيح الأخطاء اللاسلكي» في كل مرة يُعاد فيها تشغيل هاتف أندرويد. عندها يعرض تطبيق الهاتف الوسيط إشعارًا؛ اضغط عليه وفعّل «تصحيح الأخطاء اللاسلكي» من جديد، فيشغّل الهاتف الوسيط مساعده تلقائيًا. كما أن بعض الهواتف تسمح بالاستماع فقط: عندها تسمع المكالمات هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android turns Wireless debugging off every time the Android phone restarts. The bridge app then shows a notification; tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Some phones also only allow listening: then you hear calls here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید هر بار که گوشی اندرویدی دوباره روشن می‌شود «اشکال‌زدایی بی‌سیم» را خاموش می‌کند. آن‌وقت برنامهٔ پل یک اعلان نشان می‌دهد؛ روی آن بزنید و «اشکال‌زدایی بی‌سیم» را دوباره روشن کنید تا پل دستیارش را خودش اجرا کند. بعضی گوشی‌ها هم فقط اجازهٔ شنیدن می‌دهند: آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android, Android telefon her yeniden başladığında Kablosuz hata ayıklamayı kapatır. Köprü uygulaması o zaman bir bildirim gösterir; dokunup Kablosuz hata ayıklamayı yeniden açın, köprü yardımcısını kendiliğinden başlatır. Bazı telefonlar ayrıca yalnızca dinlemeye izin verir: o zaman aramaları burada duyar, Android telefondan konuşursunuz." } }
       }
     },
     "Answer here; talk here too with Talk on iPhone" : {
@@ -113,12 +113,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Karşı tarafı duyamadım" } }
       }
     },
-    "Install and start Shizuku, a free app, and allow Pairline in it. The bridge app shows each step." : {
+    "Turn on Wireless debugging in Developer options and pair it with the code on screen. The bridge app shows each step; no extra app is needed." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ثبّت Shizuku، وهو تطبيق مجاني، وشغّله واسمح لـ Pairline فيه. يعرض تطبيق الهاتف الوسيط كل خطوة." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Install and start Shizuku, a free app, and allow Pairline in it. The bridge app shows each step." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برنامهٔ رایگان Shizuku را نصب و اجرا کنید و در آن به Pairline اجازه بدهید. برنامهٔ پل همهٔ مراحل را نشان می‌دهد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ücretsiz bir uygulama olan Shizuku’yu yükleyip başlatın ve içinde Pairline’a izin verin. Köprü uygulaması her adımı gösterir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «تصحيح الأخطاء اللاسلكي» في «خيارات المطوّرين» واقرنه بالرمز الظاهر على الشاشة. يعرض تطبيق الهاتف الوسيط كل خطوة؛ ولا حاجة إلى تطبيق إضافي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Wireless debugging in Developer options and pair it with the code on screen. The bridge app shows each step; no extra app is needed." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«اشکال‌زدایی بی‌سیم» را در «گزینه‌های برنامه‌نویس» روشن کنید و با کدی که روی صفحه است مرتبطش کنید. برنامهٔ پل همهٔ مراحل را نشان می‌دهد؛ به برنامهٔ اضافه نیازی نیست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Geliştirici seçenekleri’nde Kablosuz hata ayıklamayı açın ve ekrandaki kodla eşleyin. Köprü uygulaması her adımı gösterir; ek uygulama gerekmez." } }
       }
     },
     "Keep both phones on the same Wi-Fi. Calls you take on this iPhone then use its microphone and speaker." : {
@@ -169,12 +169,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şimdi değil" } }
       }
     },
-    "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It needs the free Shizuku app and the same Wi-Fi." : {
+    "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It uses Wireless debugging on the Android phone (no extra app) and the same Wi-Fi." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختياري: فعّل «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط لتسمع المكالمات وتردّ عليها بهذا الآيفون. يحتاج إلى تطبيق Shizuku المجاني وشبكة الواي فاي نفسها." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It needs the free Shizuku app and the same Wi-Fi." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اختیاری: «مکالمه با آیفون» را در برنامهٔ پل راه بیندازید تا تماس‌ها را با همین آیفون بشنوید و جواب بدهید. به برنامهٔ رایگان Shizuku و یک وای‌فای مشترک نیاز دارد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İsteğe bağlı: aramaları bu iPhone ile duyup yanıtlamak için köprü uygulamasında “iPhone’dan konuşma”yı kurun. Ücretsiz Shizuku uygulaması ve aynı Wi-Fi ağı gerekir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختياري: فعّل «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط لتسمع المكالمات وتردّ عليها بهذا الآيفون. يستخدم «تصحيح الأخطاء اللاسلكي» على هاتف أندرويد (بلا تطبيق إضافي) وشبكة الواي فاي نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It uses Wireless debugging on the Android phone (no extra app) and the same Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اختیاری: «مکالمه با آیفون» را در برنامهٔ پل راه بیندازید تا تماس‌ها را با همین آیفون بشنوید و جواب بدهید. از «اشکال‌زدایی بی‌سیم» روی گوشی اندرویدی (بدون برنامهٔ اضافه) و یک وای‌فای مشترک استفاده می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İsteğe bağlı: aramaları bu iPhone ile duyup yanıtlamak için köprü uygulamasında “iPhone’dan konuşma”yı kurun. Android telefonda Kablosuz hata ayıklamayı (ek uygulama gerekmez) ve aynı Wi-Fi ağını kullanır." } }
       }
     },
     "On the Android phone, open Pairline Bridge › Settings › Talk on iPhone." : {
@@ -249,20 +249,20 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu aramanın sesi Android telefonunuzda çalıyor." } }
       }
     },
-    "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Shizuku)." : {
+    "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Wireless debugging)." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد (يحتاج إلى أندرويد 12 أو أحدث وإلى Shizuku)." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Shizuku)." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید (به اندروید ۱۲ یا جدیدتر و Shizuku نیاز دارد)." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın (Android 12 veya üstü ve Shizuku gerekir)." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد (يحتاج إلى أندرويد 12 أو أحدث و«تصحيح الأخطاء اللاسلكي»)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Wireless debugging)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید (به اندروید ۱۲ یا جدیدتر و «اشکال‌زدایی بی‌سیم» نیاز دارد)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın (Android 12 veya üstü ve Kablosuz hata ayıklama gerekir)." } }
       }
     },
-    "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, the free Shizuku app, and both phones on the same Wi-Fi." : {
+    "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد. يحتاج إلى أندرويد 10 أو أحدث وتطبيق Shizuku المجاني، وأن يكون الهاتفان على شبكة الواي فاي نفسها." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, the free Shizuku app, and both phones on the same Wi-Fi." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید. به اندروید ۱۰ یا جدیدتر، برنامهٔ رایگان Shizuku و اتصال هر دو گوشی به یک وای‌فای نیاز دارد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın. Android 10 veya üstü, ücretsiz Shizuku uygulaması ve iki telefonun aynı Wi-Fi ağında olması gerekir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد. يحتاج إلى أندرويد 10 أو أحدث و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي)، وأن يكون الهاتفان على شبكة الواي فاي نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید. به اندروید ۱۰ یا جدیدتر، «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın. Android 10 veya üstü, Kablosuz hata ayıklama (ek uygulama gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir." } }
       }
     },
     "You hear this call here. Talk on your Android phone: it can't take audio from the iPhone." : {
@@ -281,12 +281,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses nerede" } }
       }
     },
-    "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, the free Shizuku app, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." : {
+    "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عادةً تتحكم في المكالمات من الآيفون وتتحدث من هاتف أندرويد. ومع إعداد «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط (أندرويد 10 أو أحدث، وتطبيق Shizuku المجاني، والواي فاي نفسه)، تستخدم المكالمات التي تردّ عليها هنا ميكروفون هذا الآيفون ومكبّر صوته." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, the free Shizuku app, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "معمولاً تماس‌ها را از آیفون کنترل می‌کنید و با گوشی اندرویدی صحبت می‌کنید. با راه‌اندازی «مکالمه با آیفون» در برنامهٔ پل (اندروید ۱۰ یا جدیدتر، برنامهٔ رایگان Shizuku و یک وای‌فای مشترک)، تماس‌هایی که اینجا جواب می‌دهید از میکروفون و بلندگوی همین آیفون استفاده می‌کنند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Normalde aramaları iPhone’dan yönetir, Android telefondan konuşursunuz. Köprü uygulamasında iPhone’dan konuşma kuruluysa (Android 10 veya üstü, ücretsiz Shizuku uygulaması, aynı Wi-Fi), burada aldığınız aramalar bu iPhone’un mikrofonunu ve hoparlörünü kullanır." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عادةً تتحكم في المكالمات من الآيفون وتتحدث من هاتف أندرويد. ومع إعداد «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط (أندرويد 10 أو أحدث، و«تصحيح الأخطاء اللاسلكي»، والواي فاي نفسه)، تستخدم المكالمات التي تردّ عليها هنا ميكروفون هذا الآيفون ومكبّر صوته." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "معمولاً تماس‌ها را از آیفون کنترل می‌کنید و با گوشی اندرویدی صحبت می‌کنید. با راه‌اندازی «مکالمه با آیفون» در برنامهٔ پل (اندروید ۱۰ یا جدیدتر، «اشکال‌زدایی بی‌سیم» و یک وای‌فای مشترک)، تماس‌هایی که اینجا جواب می‌دهید از میکروفون و بلندگوی همین آیفون استفاده می‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Normalde aramaları iPhone’dan yönetir, Android telefondan konuşursunuz. Köprü uygulamasında iPhone’dan konuşma kuruluysa (Android 10 veya üstü, Kablosuz hata ayıklama, aynı Wi-Fi), burada aldığınız aramalar bu iPhone’un mikrofonunu ve hoparlörünü kullanır." } }
       }
     },
     "Why does call audio go back to the Android phone sometimes?" : {
@@ -297,12 +297,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi neden bazen Android telefona dönüyor?" } }
       }
     },
-    "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, the free Shizuku app (no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." : {
+    "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، مع «التحدث عبر الآيفون»: أعدّه في تطبيق الهاتف الوسيط من الإعدادات › التحدث عبر الآيفون. يحتاج إلى أندرويد 10 أو أحدث، وتطبيق Shizuku المجاني (من دون روت)، وأن يكون الهاتفان على شبكة الواي فاي نفسها. ومن دونه تردّ هنا وتتحدث من هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, the free Shizuku app (no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، با «مکالمه با آیفون»: آن را در برنامهٔ پل از تنظیمات › مکالمه با آیفون راه بیندازید. به اندروید ۱۰ یا جدیدتر، برنامهٔ رایگان Shizuku (بدون روت) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد. بدون آن، اینجا جواب می‌دهید و با گوشی اندرویدی صحبت می‌کنید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, iPhone’dan konuşma ile: köprü uygulamasında Ayarlar › iPhone’dan konuşma’dan kurun. Android 10 veya üstü, ücretsiz Shizuku uygulaması (root gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir. Olmadan burada yanıtlar, Android telefondan konuşursunuz." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، مع «التحدث عبر الآيفون»: أعدّه في تطبيق الهاتف الوسيط من الإعدادات › التحدث عبر الآيفون. يحتاج إلى أندرويد 10 أو أحدث، و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي ولا روت)، وأن يكون الهاتفان على شبكة الواي فاي نفسها. ومن دونه تردّ هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، با «مکالمه با آیفون»: آن را در برنامهٔ پل از تنظیمات › مکالمه با آیفون راه بیندازید. به اندروید ۱۰ یا جدیدتر، «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه و بدون روت) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد. بدون آن، اینجا جواب می‌دهید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, iPhone’dan konuşma ile: köprü uygulamasında Ayarlar › iPhone’dan konuşma’dan kurun. Android 10 veya üstü, Kablosuz hata ayıklama (ek uygulama ve root gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir. Olmadan burada yanıtlar, Android telefondan konuşursunuz." } }
       }
     },
     "Your answer helps Pairline pick what works on your Android phone. Nothing else is sent." : {

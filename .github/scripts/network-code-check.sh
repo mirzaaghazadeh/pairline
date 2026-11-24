@@ -7,11 +7,12 @@
 # - app/pairline/android/update/   the update check and APK download, to GitHub only (hosts checked below)
 # - app/pairline/android/link/wifi/  the Wi-Fi link to the paired iPhone, local addresses only
 # - app/pairline/android/netshare/   opt-in internet sharing (M8): forwards only the iPhone's own traffic
+# - app/pairline/android/privileged/adb/  this phone's own Wireless debugging, on 127.0.0.1 only (D-054)
 # Debug-only code (src/debug) is exempt: it never ships (D-018).
 set -euo pipefail
 cd "$(dirname "$0")/../../android/app/src/main/java"
 
-allowed='^app/pairline/android/(update|link/wifi|netshare)/'
+allowed='^app/pairline/android/(update|link/wifi|netshare|privileged/adb)/'
 # Classes and calls that open or prepare connections.
 pattern='java\.net\.(Socket|ServerSocket|DatagramSocket|MulticastSocket|URL|HttpURLConnection|InetSocketAddress)|javax\.net\.ssl|\bHttpsURLConnection\b|\bopenConnection\(|\bSocketChannel\b|\bDatagramChannel\b|\bServerSocketChannel\b|okhttp|ktor|retrofit|volley|cronet'
 fail=0
@@ -35,5 +36,5 @@ if [[ -d app/pairline/android/update ]]; then
   done < <(grep -rhoE 'https?://[^"[:space:]]+' app/pairline/android/update || true)
 fi
 
-[[ "$fail" -eq 0 ]] && echo "Network code is confined to update/, link/wifi/ and netshare/."
+[[ "$fail" -eq 0 ]] && echo "Network code is confined to update/, link/wifi/, netshare/ and privileged/adb/."
 exit "$fail"

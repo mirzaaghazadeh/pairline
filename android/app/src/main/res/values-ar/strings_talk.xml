@@ -1,52 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- "Talk on iPhone": call audio through Pairline's own helper (D-046, D-047, D-054). -->
 <resources>
     <string name="talk_title">التحدث عبر الآيفون</string>
-    <string name="talk_body">استمع إلى المكالمات وتحدّث بميكروفون الآيفون ومكبّر صوته. يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يحتاج هذا إلى Shizuku، وهو تطبيق مجاني يمنح Pairline صلاحيات إضافية بإذنك. ويجب أن يكون الهاتفان على شبكة الواي فاي نفسها.</string>
+    <string name="talk_body">استمع إلى المكالمات وتحدّث بميكروفون الآيفون ومكبّر صوته. يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يشغّل Pairline مساعدًا صغيرًا عبر «تصحيح الأخطاء اللاسلكي»، وهو مفتاح في «خيارات المطوّرين» تفعّله أنت. لا حاجة إلى تطبيق إضافي ولا إلى روت. ويجب أن يكون الهاتفان على شبكة الواي فاي نفسها.</string>
     <string name="settings_talk">التحدث عبر الآيفون</string>
     <string name="talk_summary_on">مفعّل</string>
     <string name="talk_summary_off">متوقف</string>
-    <string name="talk_summary_needs_shizuku">يحتاج إلى Shizuku</string>
+    <string name="talk_summary_not_set_up">غير مُعدّ</string>
+    <string name="talk_summary_needs_wireless">فعّل «تصحيح الأخطاء اللاسلكي»</string>
+    <string name="talk_summary_needs_computer">شغّله من كمبيوتر</string>
+    <string name="talk_summary_starting">جارٍ التشغيل…</string>
+    <string name="talk_summary_failed">لم يبدأ</string>
     <string name="talk_summary_unsupported">يحتاج إلى أندرويد 10 أو أحدث</string>
     <string name="talk_android_too_old">يعمل هذا الهاتف بأندرويد %1$s. صوت المكالمات على الآيفون يحتاج إلى أندرويد 10 أو أحدث. ستظل المكالمات ترنّ على الآيفون، وتتحدث من هذا الهاتف.</string>
     <string name="talk_steps">الإعداد</string>
-    <string name="talk_step_install">ثبّت Shizuku</string>
-    <string name="talk_step_install_sub">تطبيق مجاني مفتوح المصدر من Play Store أو GitHub.</string>
-    <string name="talk_get_shizuku">احصل على Shizuku</string>
-    <string name="talk_step_start">شغّل Shizuku</string>
-    <string name="talk_step_outdated">حدّث Shizuku إلى الإصدار 13 أو أحدث</string>
-    <string name="talk_step_start_sub">في Shizuku، اضغط Start أسفل «Start via Wireless debugging» واتبع خطواته. أنت من يفعّل «تصحيح الأخطاء اللاسلكي» في «خيارات المطوّرين»، ولا يفعل Pairline ذلك أبدًا. بعد إعادة تشغيل الهاتف، شغّل Shizuku من جديد.</string>
-    <string name="talk_step_start_sub_q">في أندرويد 10، يُشغَّل Shizuku مرة واحدة من حاسوب، ويعرض تطبيق Shizuku الأمر اللازم. بعد إعادة تشغيل الهاتف، شغّله من جديد.</string>
-    <string name="talk_open_shizuku">افتح Shizuku</string>
-    <string name="talk_open_developer">خيارات المطوّرين</string>
-    <string name="talk_step_allow">اسمح لـ Pairline في Shizuku</string>
-    <string name="talk_step_allow_sub">يسألك Shizuku إن كان Pairline يستطيع استخدامه. يستخدمه Pairline فقط لصوت المكالمات ولوحة المفاتيح وكتم الصوت ومكبّر الصوت أثناء المكالمة.</string>
-    <string name="talk_allow_denied">رفضت ذلك من قبل. افتح Shizuku، ثم Authorized apps، وفعّل Pairline.</string>
-    <string name="talk_allow">السماح</string>
+
+    <string name="talk_step_dev">فعّل «خيارات المطوّرين»</string>
+    <string name="talk_step_dev_done">«خيارات المطوّرين» مفعّلة.</string>
+    <string name="talk_open_about">افتح «لمحة عن الهاتف»</string>
+    <string name="talk_step_wireless">فعّل «تصحيح الأخطاء اللاسلكي»</string>
+    <string name="talk_step_wireless_sub">صِل هذا الهاتف بشبكة واي فاي. ثم فعّل «تصحيح الأخطاء اللاسلكي» في «خيارات المطوّرين» واضغط «سماح». لا يستطيع Pairline تفعيله بدلًا منك؛ القرار لك.</string>
+    <string name="talk_step_wireless_done">«تصحيح الأخطاء اللاسلكي» مفعّل.</string>
+    <string name="talk_open_developer">افتح «خيارات المطوّرين»</string>
+    <string name="talk_step_pair">اقرن Pairline بـ«تصحيح الأخطاء اللاسلكي»</string>
+    <string name="talk_step_pair_sub">اضغط «إقران». في «تصحيح الأخطاء اللاسلكي» اضغط «إقران الجهاز باستخدام رمز الإقران». سيظهر إشعار Pairline: اضغط «إدخال الرمز» واكتب الأرقام الستة الظاهرة على الشاشة. إن فاتك الإشعار، اسحب من أعلى الشاشة وافتح إشعار Pairline. تفعل هذا مرة واحدة فقط.</string>
+    <string name="talk_pair">إقران</string>
+    <string name="talk_pair_waiting">الآن اضغط «إقران الجهاز باستخدام رمز الإقران» في «تصحيح الأخطاء اللاسلكي».</string>
+    <string name="talk_pair_found">اضغط «إدخال الرمز» في إشعار Pairline واكتب الأرقام الستة. اسحب من أعلى الشاشة إن لم تره.</string>
+    <string name="talk_pair_pairing">جارٍ الإقران…</string>
+    <string name="talk_pair_wrong">لم يعمل هذا الرمز. اكتب الرمز الظاهر على الشاشة الآن؛ فهو يتغير كلما فُتحت شاشة الإقران.</string>
+    <string name="talk_pair_failed">لم يكتمل الإقران. أبقِ «إقران الجهاز باستخدام رمز الإقران» مفتوحًا وحاول مجددًا.</string>
+    <string name="talk_pair_done">تم الإقران. يعرض أندرويد Pairline في «تصحيح الأخطاء اللاسلكي ← الأجهزة المقترنة».</string>
+    <string name="talk_pair_notifications">اسمح بإشعارات Pairline أولًا: يُكتب رمز الإقران في أحدها.</string>
+    <string name="talk_allow_notifications">السماح بالإشعارات</string>
+    <string name="talk_step_start">يشغّل Pairline مساعده</string>
+    <string name="talk_start_auto">يحدث تلقائيًا بعد الخطوات أعلاه.</string>
+    <string name="talk_start_idle">يبدأ عندما يكون «التحدث عبر الآيفون» مفعّلًا.</string>
+    <string name="talk_start_starting">جارٍ التشغيل…</string>
+    <string name="talk_start_running">يعمل. ويبقى يعمل حتى إعادة تشغيل الهاتف.</string>
+    <string name="talk_start_no_service">لم يجد Pairline «تصحيح الأخطاء اللاسلكي». تأكد من أنه مفعّل وأن هذا الهاتف متصل بالواي فاي، ثم حاول مجددًا.</string>
+    <string name="talk_start_failed">لم يبدأ المساعد. حاول مجددًا. وإن تكرر ذلك، أوقف «تصحيح الأخطاء اللاسلكي» ثم فعّله.</string>
+    <string name="talk_try_again">حاول مجددًا</string>
+
+    <string name="dev_steps_samsung">الإعدادات ← لمحة عن الهاتف ← معلومات البرنامج: اضغط «رقم الإصدار» ٧ مرات ثم أدخل رمز القفل. تظهر «خيارات المطوّرين» في أسفل الإعدادات.</string>
+    <string name="dev_steps_xiaomi">الإعدادات ← حول الهاتف: اضغط «إصدار النظام» (HyperOS أو MIUI) ٧ مرات. «خيارات المطوّرين» في الإعدادات ← إعدادات إضافية.</string>
+    <string name="dev_steps_oppo">الإعدادات ← حول الجهاز ← الإصدار: اضغط «رقم الإصدار» ٧ مرات. «خيارات المطوّرين» في الإعدادات ← إعدادات إضافية.</string>
+    <string name="dev_steps_vivo">الإعدادات ← حول الهاتف ← إصدار البرنامج: اضغطه ٧ مرات. «خيارات المطوّرين» في الإعدادات ← إدارة النظام.</string>
+    <string name="dev_steps_other">الإعدادات ← لمحة عن الهاتف: اضغط «رقم الإصدار» ٧ مرات ثم أدخل رمز القفل. «خيارات المطوّرين» في الإعدادات ← النظام.</string>
+
+    <string name="talk_q_step_usb">فعّل «تصحيح أخطاء USB»</string>
+    <string name="talk_q_step_usb_sub">فعّل «تصحيح أخطاء USB» في «خيارات المطوّرين». صِل هذا الهاتف بكمبيوتر فيه أداة adb الخاصة بأندرويد واضغط «سماح» على الهاتف.</string>
+    <string name="talk_q_step_run">شغّل هذا على الكمبيوتر</string>
+    <string name="talk_q_step_run_sub">مرة واحدة بعد كل إعادة تشغيل لهذا الهاتف. ثم يبقى مساعد Pairline يعمل حتى إعادة التشغيل التالية.</string>
+    <string name="talk_computer_title">شغّله من كمبيوتر بدلًا من ذلك</string>
+    <string name="talk_computer_sub">بلا واي فاي، أو إن لم ينجح الإقران: فعّل «تصحيح أخطاء USB»، وصِل كمبيوترًا فيه adb، وشغّل هذا الأمر مرة بعد كل إعادة تشغيل.</string>
+    <string name="talk_copy_command">نسخ الأمر</string>
+    <string name="talk_command_copied">تم نسخ الأمر</string>
+
     <string name="talk_this_phone">على هذا الهاتف</string>
     <string name="talk_listen_yes">يستطيع الآيفون سماع مكالماتك</string>
-    <string name="talk_listen_no">لا يسمح هذا الهاتف لـ Shizuku بالتقاط صوت المكالمات</string>
+    <string name="talk_listen_no">لا يسمح هذا الهاتف لمساعد Pairline بالتقاط صوت المكالمات</string>
     <string name="talk_talk_yes">يمكن أن يصل صوتك من الآيفون إلى المكالمة</string>
     <string name="talk_talk_no">لا يستطيع هذا الهاتف إدخال الصوت في المكالمة: ستسمع المكالمات على الآيفون وتتحدث من هذا الهاتف</string>
     <string name="talk_switch">التحدث عبر الآيفون</string>
     <string name="talk_switch_sub">عند الرد على الآيفون، ينتقل صوت المكالمة إلى الآيفون. ويفعّل أيضًا لوحة المفاتيح وكتم الصوت ومكبّر الصوت من الآيفون.</string>
     <string name="talk_reset">ابدأ صوت المكالمات من جديد</string>
     <string name="talk_reset_sub">يتعلّم Pairline ما ينجح على هذا الهاتف من إجاباتك بعد المكالمات. هذا الخيار ينساها.</string>
+
+    <string name="talk_manage">من المفيد أن تعرف</string>
+    <string name="talk_tip_restart">بعد إعادة التشغيل</string>
+    <string name="talk_tip_restart_sub">يوقف أندرويد «تصحيح الأخطاء اللاسلكي» عند إعادة تشغيل الهاتف. فعّله من جديد وسيشغّل Pairline مساعده تلقائيًا. ويذكّرك Pairline بإشعار.</string>
+    <string name="talk_tip_banking">تطبيقات البنوك</string>
+    <string name="talk_tip_banking_sub">بعض تطبيقات البنوك لا تفتح عندما يكون «تصحيح الأخطاء اللاسلكي» مفعّلًا. بعد أن يعمل مساعد Pairline يمكنك إيقافه مجددًا: تظل المكالمات تُسمع على الآيفون حتى إعادة تشغيل الهاتف.</string>
+    <string name="talk_forget">إلغاء الإقران</string>
+    <string name="talk_forget_sub">يوقف المساعد ويحذف مفتاح Pairline. احذف أيضًا «Pairline» من «تصحيح الأخطاء اللاسلكي ← الأجهزة المقترنة».</string>
     <string name="talk_wifi_note">ينتقل صوت المكالمة عبر شبكة الواي فاي لديك بتشفير تام بين الطرفين، ولا يُسجَّل أو يُحفظ أبدًا.</string>
+
     <string name="talk_setup_title">التحدث عبر الآيفون (اختياري)</string>
     <string name="talk_setup_later">الإعداد لاحقًا</string>
+
+    <string name="pair_channel">الإقران مع «تصحيح الأخطاء اللاسلكي»</string>
+    <string name="pair_n_waiting_title">اقرن Pairline بـ«تصحيح الأخطاء اللاسلكي»</string>
+    <string name="pair_n_waiting_text">في «تصحيح الأخطاء اللاسلكي» اضغط «إقران الجهاز باستخدام رمز الإقران». ثم اكتب الرمز المكوّن من ٦ أرقام هنا.</string>
+    <string name="pair_n_found_title">اكتب رمز الإقران</string>
+    <string name="pair_n_found_text">اضغط «إدخال الرمز» واكتب الأرقام الستة الظاهرة على الشاشة.</string>
+    <string name="pair_n_pairing_title">جارٍ الإقران…</string>
+    <string name="pair_n_pairing_text">أبقِ شاشة الإقران مفتوحة لحظة.</string>
+    <string name="pair_n_wrong_title">لم يعمل هذا الرمز</string>
+    <string name="pair_n_wrong_text">تحقق من الرمز المكوّن من ٦ أرقام على الشاشة وحاول مجددًا. يتغير كلما فُتحت شاشة الإقران.</string>
+    <string name="pair_n_failed_title">لم يكتمل الإقران</string>
+    <string name="pair_n_failed_text">أبقِ «إقران الجهاز باستخدام رمز الإقران» مفتوحًا واكتب الرمز مجددًا.</string>
+    <string name="pair_n_done_title">تم الإقران مع «تصحيح الأخطاء اللاسلكي»</string>
+    <string name="pair_n_done_text">يشغّل Pairline مساعده. من الآن تُسمع على الآيفون المكالمات التي تجيب عنها هناك.</string>
+    <string name="pair_n_enter">إدخال الرمز</string>
+    <string name="pair_n_code_hint">رمز من ٦ أرقام</string>
+    <string name="pair_n_cancel">إلغاء</string>
+
     <string name="talk_reminder_channel">التحدث عبر الآيفون</string>
-    <string name="talk_reminder_title">عاد صوت المكالمات إلى هذا الهاتف</string>
-    <string name="talk_reminder_text">توقف Shizuku عند إعادة تشغيل الهاتف. اضغط لفتح Shizuku وتشغيله من جديد، لتُسمع المكالمات على الآيفون. وفي الأثناء تظل المكالمات ترنّ على الآيفون.</string>
+    <string name="talk_reminder_title">فعّل «تصحيح الأخطاء اللاسلكي»</string>
+    <string name="talk_reminder_text">أُعيد تشغيل الهاتف، فعاد صوت المكالمات إلى هذا الهاتف. اضغط وفعّل «تصحيح الأخطاء اللاسلكي»: يشغّل Pairline مساعده تلقائيًا. وفي الأثناء تظل المكالمات ترنّ على الآيفون.</string>
+    <string name="talk_reminder_title_q">شغّل مساعد Pairline</string>
+    <string name="talk_reminder_text_q">أُعيد تشغيل الهاتف، فعاد صوت المكالمات إلى هذا الهاتف. شغّل الأمر الموجود في «التحدث عبر الآيفون» على الكمبيوتر مرة واحدة. وفي الأثناء تظل المكالمات ترنّ على الآيفون.</string>
+
     <string name="help_section_talk">التحدث عبر الآيفون</string>
-    <string name="help_q_shizuku">ما هو Shizuku؟ وهل يحتاج إلى روت؟</string>
-    <string name="help_a_shizuku">Shizuku تطبيق مجاني مفتوح المصدر يمنح Pairline بإذنك صلاحيات أداة التصحيح الخاصة بأندرويد. لا يحتاج إلى روت. يستخدمه Pairline فقط لنقل صوت المكالمات ولوحة المفاتيح وكتم الصوت ومكبّر الصوت أثناء المكالمة. يمكنك سحب هذا الإذن من Shizuku في أي وقت.</string>
+    <string name="help_q_shizuku">ما دور «تصحيح الأخطاء اللاسلكي» هنا؟ هل يحتاج إلى روت؟</string>
+    <string name="help_a_shizuku">لا يسمح أندرويد بالوصول إلى صوت المكالمات إلا لأداة تصحيح الأخطاء الخاصة به. مع تفعيل «تصحيح الأخطاء اللاسلكي» يشغّل Pairline مساعدًا صغيرًا بصلاحيات تلك الأداة ومن داخل تطبيقه نفسه: بلا تطبيق إضافي ولا روت. لا ينقل المساعد إلا صوت المكالمات، ويتولى لوحة المفاتيح وكتم الصوت ومكبّر الصوت أثناء المكالمة. يتوقف عند إعادة تشغيل الهاتف، و«إلغاء الإقران» يزيل وصول Pairline نهائيًا.</string>
     <string name="help_q_restart">لماذا يعود صوت المكالمات إلى هذا الهاتف بعد إعادة تشغيله؟</string>
-    <string name="help_a_restart">يوقف أندرويد «تصحيح الأخطاء اللاسلكي» في كل مرة يُعاد فيها تشغيل الهاتف، وهذا يوقف Shizuku. عندها يعرض Pairline إشعارًا: اضغط عليه وشغّل Shizuku من جديد، فتعود المكالمات إلى الآيفون. وحتى ذلك الحين تظل المكالمات ترنّ وتعمل على الآيفون، والصوت على هذا الهاتف. على الهاتف الذي فيه روت يمكن أن يبدأ Shizuku تلقائيًا.</string>
+    <string name="help_a_restart">يوقف أندرويد «تصحيح الأخطاء اللاسلكي» في كل مرة يُعاد فيها تشغيل الهاتف، فيتوقف المساعد معه. عندها يعرض Pairline إشعارًا: اضغطه وفعّل «تصحيح الأخطاء اللاسلكي»، فيشغّل Pairline مساعده تلقائيًا. وحتى ذلك الحين تظل المكالمات ترنّ وتعمل على الآيفون، والصوت على هذا الهاتف.</string>
     <string name="help_q_debugging">تطبيق يشتكي من أن تصحيح الأخطاء مفعّل</string>
-    <string name="help_a_debugging">بعض تطبيقات البنوك والدفع ترفض العمل عندما تكون «خيارات المطوّرين» أو «تصحيح الأخطاء اللاسلكي» مفعّلة. لا يفعّلها Pairline بنفسه أبدًا. أوقف «تصحيح الأخطاء اللاسلكي» أثناء استخدام مثل هذا التطبيق؛ قد يتوقف Shizuku، فتشغّله لاحقًا من أجل صوت المكالمات.</string>
+    <string name="help_a_debugging">بعض تطبيقات البنوك والدفع ترفض العمل عندما تكون «خيارات المطوّرين» أو «تصحيح الأخطاء اللاسلكي» مفعّلة. لا يفعّلها Pairline بنفسه أبدًا. بعد أن يعمل مساعد Pairline يمكنك إيقاف «تصحيح الأخطاء اللاسلكي»؛ تظل المكالمات تُسمع على الآيفون حتى إعادة التشغيل التالية.</string>
     <string name="help_q_listen_only">أسمع المكالمات على الآيفون، لكن الطرف الآخر لا يسمعني</string>
     <string name="help_a_listen_only">بعض الهواتف لا تسمح لأي تطبيق بإدخال الصوت في المكالمة. عندها تسمع المكالمات على الآيفون وتتحدث من هذا الهاتف. بعد كل مكالمة يسألك الآيفون عن جودة الصوت؛ تساعد إجاباتك Pairline على تجربة طريقة أخرى في المكالمة التالية.</string>
-    <string name="cap_missing_talk">اختياري: اسمع المكالمات وأجب عنها على الآيفون نفسه. يحتاج إلى تطبيق Shizuku المجاني.</string>
+
+    <string name="cap_missing_talk">اختياري: اسمع المكالمات وأجب عنها على الآيفون نفسه. يُعدّ مرة واحدة عبر «تصحيح الأخطاء اللاسلكي»، بلا تطبيق إضافي.</string>
     <string name="cap_missing_dtmf_talk">تأتي مع «التحدث عبر الآيفون».</string>
+    <string name="cap_dtmf_next_call">تعمل في مكالمتك التالية.</string>
     <string name="action_set_up">إعداد</string>
 </resources>

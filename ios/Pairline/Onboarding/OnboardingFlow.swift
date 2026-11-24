@@ -164,7 +164,7 @@ private struct HowItWorksPage: View {
                 // Optional call audio on the iPhone (M6, D-047); its strings live in CallAudio.xcstrings.
                 OnboardingPoint(symbol: "phone.and.waveform.fill", tint: .brandGreen,
                                 title: Text("Talk on your iPhone", tableName: "CallAudio"),
-                                text: Text("Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It needs the free Shizuku app and the same Wi-Fi.", tableName: "CallAudio"))
+                                text: Text("Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It uses Wireless debugging on the Android phone (no extra app) and the same Wi-Fi.", tableName: "CallAudio"))
             }
         }
         .padding(.horizontal, 28)

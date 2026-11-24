@@ -399,7 +399,7 @@
     <string name="help_q_no_sms">Mesajlar iPhone\'uma ulaşmıyor</string>
     <string name="help_a_no_sms">İzinler bölümünde \"SMS mesajları\" izninin verildiğinden ve ana ekranda \"Bağlı\" yazdığından emin olun. Bağlantı kesikken gelen mesajlar, yeniden bağlanıldığında iPhone\'da görünür.</string>
     <string name="help_q_call_audio">Arama sırasında nereden konuşurum?</string>
-    <string name="help_a_call_audio">iPhone’dan konuşmayı kurmadıysanız bu Android telefondan (Ayarlar › iPhone’dan konuşma). Kurduğunuzda iPhone’da yanıtladığınız veya başlattığınız aramalar iPhone’un mikrofonunu ve hoparlörünü kullanır. Android 10 veya üstü, ücretsiz Shizuku uygulaması ve iki telefonun aynı Wi-Fi ağında olması gerekir.</string>
+    <string name="help_a_call_audio">iPhone’dan konuşmayı kurmadıysanız bu Android telefondan (Ayarlar › iPhone’dan konuşma). Kurduğunuzda iPhone’da yanıtladığınız veya başlattığınız aramalar iPhone’un mikrofonunu ve hoparlörünü kullanır. Android 10 veya üstü, Kablosuz hata ayıklama (birkaç adımda bir kez kurulur, ek uygulama gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir.</string>
     <string name="help_q_dtmf">Neden iPhone\'umdan tuş takımını kullanamıyor veya sesi kapatamıyorum?</string>
     <string name="help_a_dtmf">Android, devam eden bir aramayı yalnızca birkaç uygulamanın kontrol etmesine izin verir. Yardım olmadan Pairline aramaları yanıtlayıp sonlandırabilir, ancak tuş sesleri gönderemez veya sesi kapatamaz. iPhone’dan konuşmayı kurun (Ayarlar › iPhone’dan konuşma, Android 12 veya üstü), Pairline ikisini de yapabilsin.</string>
     <string name="help_q_restricted">Android \"Kısıtlanmış ayar\" diyor</string>

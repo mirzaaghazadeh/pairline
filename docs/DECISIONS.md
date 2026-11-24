@@ -794,3 +794,47 @@ versions still launch. Its relevance score is the lowest, so calls, timers and o
 Review risk, accepted by the maintainer: Apple's guidelines describe Live Activities as tasks with a start and an end; a
 reviewer could object to a status display that's always there. If that happens, the fallback is to show it only
 during calls (the same views, started when a call begins).
+
+### D-054 — Pairline's own helper replaces Shizuku; BoringSSL for pairing with Wireless debugging (2026-11-24)
+
+Supersedes the Shizuku parts of D-046 and changes AGENTS.md rules 2 and 7 (the maintainer's decision: "built-in
+only"). Shizuku itself only connects to the phone's Wireless debugging and starts a process with shell rights;
+Pairline Bridge now does the same from its own APK, so users install no second app and never "allow Pairline in
+Shizuku".
+
+- **Pairing (Android 11+), once:** the user turns on Developer options and Wireless debugging (Pairline only opens
+  the screens; rule 5), taps Pair, then "Pair device with pairing code". Pairline finds the pairing service with
+  mDNS and pops up a notification; the 6-digit code is typed into it (Android closes the code screen if the user
+  leaves it). The protocol is adb's own: TLS 1.3, RFC 5705 keying material, SPAKE2 with the code, then each side's
+  public key under AES-128-GCM with an HKDF key. Pairline's 2048-bit RSA key is stored encrypted with an Android
+  Keystore key in no-backup storage; Android lists it as "Pairline" under Paired devices.
+- **Starting:** Pairline connects to this phone's own adbd on 127.0.0.1 (TLS with its key) and runs one command:
+  `app_process` from Pairline's APK as the shell user, detached with `setsid` (the shell waits a second so adbd
+  doesn't end it, and prints a marker; Pairline retries if adbd dropped the command). `HelperMain` hosts the
+  unchanged `PrivilegedService` and hands its binder to the app through `HelperProvider` (INTERACT_ACROSS_USERS_FULL,
+  shell or root caller only). The four allowlisted operations and the caller-uid check are unchanged.
+- **Lifecycle:** the helper runs while Talk on iPhone is on or its setup screen is open, and is stopped otherwise
+  (when Pairline can start it again). It keeps running when Wireless debugging is turned off (so banking apps that
+  refuse to open with it on still work) and re-attaches when Pairline's process restarts; it exits when Pairline is
+  updated or removed, after 10 minutes without Pairline, and at every reboot. After a reboot Pairline notices
+  Wireless debugging coming back on and starts the helper by itself; a once-per-boot notification asks for that.
+- **Android 10** has no Wireless debugging: the user runs one `adb shell sh …/start-helper.sh` command from a
+  computer after each restart (also offered on 11+ as "Start from a computer instead"). Android 9 stays unsupported.
+- **Native code and its dependency:** SPAKE2 isn't in Android's crypto APIs, and Android's API for TLS keying
+  material exists only from Android 12 (Android 11 blocks the platform method for apps, checked on the emulator).
+  So pairing uses BoringSSL's SPAKE2 and TLS through a small JNI bridge (`src/main/cpp`); HKDF and AES-GCM stay in
+  Kotlin with JCA, and connecting uses the platform TLS. BoringSSL comes as the NDK prefab package
+  `io.github.vvb2060.ndk:boringssl` 20251124 (built from Google's BoringSSL; OpenSSL/ISC licenses, the same package
+  Shizuku builds with). It is a crypto and TLS library with no network code of its own; Pairline's native code opens
+  one connection, to 127.0.0.1. Rule 8 is about Pairline's own protocol; this follows adb's, using BoringSSL, not
+  home-made crypto. The APK grows by about 1 MB per processor type. CI installs NDK 27.1.12297006 and CMake 3.22.1;
+  the native build passes `-ffile-prefix-map` and no build ID, so builds stay reproducible.
+- **Network fence:** `privileged/adb/` joins the allowed packages (local mDNS lookups for this phone's own
+  `_adb-tls-pairing._tcp` / `_adb-tls-connect._tcp` services, and 127.0.0.1). PRIVACY.md lists the pairing key, the
+  notification and the helper's rights.
+- **Limits:** Wireless debugging needs this phone on a Wi-Fi network, so a phone that only shares its hotspot must
+  start the helper while on Wi-Fi (it then keeps running until a reboot) or from a computer. Before Android 14 one
+  NsdManager resolves one service at a time and stale announcements can block it, so each service is resolved on its
+  own NsdManager. Verified on the Android 11 and 16 emulators; real phones (Samsung, Xiaomi) still to test.
+- Removed: the Shizuku libraries, its provider and `<queries>` entry, and every Shizuku string; help and setup texts
+  in EN/FA/AR/TR describe Wireless debugging instead.

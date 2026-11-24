@@ -67,10 +67,15 @@ class AppPrefs(context: Context) {
         get() = prefs.getLong(COMPANION_BOUND, 0)
         set(value) = edit { putLong(COMPANION_BOUND, value) }
 
-    /** "Talk on iPhone" is turned on: relay call audio through Shizuku when the iPhone asks (D-047). */
+    /** "Talk on iPhone" is turned on: relay call audio through Pairline's helper when the iPhone asks (D-047, D-054). */
     var talkOnIphone: Boolean
         get() = prefs.getBoolean(TALK_ON_IPHONE, false)
         set(value) = edit { putBoolean(TALK_ON_IPHONE, value) }
+
+    /** Pairline is paired with this phone's Wireless debugging (D-054); cleared when adbd stops accepting its key. */
+    var adbPaired: Boolean
+        get() = prefs.getBoolean(ADB_PAIRED, false)
+        set(value) = edit { putBoolean(ADB_PAIRED, value) }
 
     /**
      * Which capture source relays the caller's voice: VOICE_DOWNLINK (3, default) or VOICE_CALL (4). Switches when
@@ -133,6 +138,7 @@ class AppPrefs(context: Context) {
         const val LAST_SEEN = "last_seen"
         const val COMPANION_BOUND = "companion_bound_at"
         const val TALK_ON_IPHONE = "talk_on_iphone"
+        const val ADB_PAIRED = "adb_paired"
         const val AUDIO_SOURCE = "audio_capture_source"
         const val AUDIO_MUTE_MIC = "audio_mute_bridge_mic"
         const val AUDIO_TALK_FAILURES = "audio_talk_failures"

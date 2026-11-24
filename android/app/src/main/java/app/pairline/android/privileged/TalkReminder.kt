@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -13,9 +14,10 @@ import app.pairline.android.MainActivity
 import app.pairline.android.R
 
 /**
- * After a restart Android turns Wireless debugging off, which stops Shizuku, so call audio falls back to the
- * Android phone. With Talk on iPhone on, this tells the user once per boot and opens Shizuku on tap. Pairline never
- * starts Shizuku or turns debugging on itself (AGENTS.md rule 5, D-046).
+ * After a restart Android turns Wireless debugging off and Pairline's helper is gone, so call audio falls back to
+ * the Android phone. With Talk on iPhone on, this tells the user once per boot. On Android 11+ a tap opens Wireless
+ * debugging; as soon as the user turns it on, Pairline starts the helper by itself. On Android 10 it opens Pairline,
+ * which shows the computer command. Pairline never turns debugging on itself (AGENTS.md rule 5, D-054).
  */
 object TalkReminder {
     private const val CHANNEL = "talk"
@@ -32,19 +34,20 @@ object TalkReminder {
         context.getSystemService(NotificationManager::class.java)?.createNotificationChannel(
             NotificationChannel(CHANNEL, context.getString(R.string.talk_reminder_channel), NotificationManager.IMPORTANCE_DEFAULT),
         )
-        val open = context.packageManager.getLaunchIntentForPackage(PrivilegedManager.SHIZUKU_PACKAGE)
-            ?: Intent(context, MainActivity::class.java)
+        val wireless = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+        val open = if (wireless) DeveloperSettings.wirelessDebugging() else Intent(context, MainActivity::class.java)
         val tap = PendingIntent.getActivity(
             context,
             ID,
             open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
+        val text = context.getString(if (wireless) R.string.talk_reminder_text else R.string.talk_reminder_text_q)
         val notification = NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_pairline)
-            .setContentTitle(context.getString(R.string.talk_reminder_title))
-            .setContentText(context.getString(R.string.talk_reminder_text))
-            .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.talk_reminder_text)))
+            .setContentTitle(context.getString(if (wireless) R.string.talk_reminder_title else R.string.talk_reminder_title_q))
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setContentIntent(tap)
             .setAutoCancel(true)
             .build()

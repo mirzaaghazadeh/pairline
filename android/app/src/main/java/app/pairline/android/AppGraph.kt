@@ -92,9 +92,9 @@ object AppGraph {
         }
     }
 
-    /** Shizuku and the privileged service ("Talk on iPhone", D-046). Started by [PairlineApp]. */
+    /** Pairline's helper with shell rights ("Talk on iPhone", D-046, D-054). Started by [PairlineApp]. */
     val privileged: PrivilegedManager by lazy {
-        PrivilegedManager(app).also { manager ->
+        PrivilegedManager(app, prefs).also { manager ->
             manager.onChange = {
                 router.statusChanged()
                 when (manager.state.value) {
@@ -104,8 +104,11 @@ object AppGraph {
                         // gives the iPhone the keypad, mute and speaker (Android 12+).
                         if (prefs.talkOnIphone) io.execute { manager.allowOngoingCalls() }
                     }
-                    // Shizuku stopped (usually a restart): tell the user once per boot how to get call audio back.
-                    PrivilegedManager.State.NOT_RUNNING -> if (prefs.talkOnIphone) TalkReminder.maybeShow(app)
+                    // The helper is gone (usually a restart turned Wireless debugging off): tell the user once per
+                    // boot how to get call audio back.
+                    PrivilegedManager.State.NEEDS_WIRELESS_DEBUGGING ->
+                        if (prefs.talkOnIphone && manager.paired) TalkReminder.maybeShow(app)
+                    PrivilegedManager.State.NEEDS_COMPUTER -> if (prefs.talkOnIphone) TalkReminder.maybeShow(app)
                     else -> Unit
                 }
             }

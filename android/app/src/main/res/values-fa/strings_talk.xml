@@ -1,52 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- "Talk on iPhone": call audio through Pairline's own helper (D-046, D-047, D-054). -->
 <resources>
     <string name="talk_title">مکالمه با آیفون</string>
-    <string name="talk_body">تماس‌ها را با میکروفون و بلندگوی خودِ آیفون بشنوید و صحبت کنید. اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین این کار به Shizuku نیاز دارد؛ برنامه‌ای رایگان که با اجازهٔ شما دسترسی بیشتری به Pairline می‌دهد. هر دو گوشی هم باید به یک وای‌فای وصل باشند.</string>
+    <string name="talk_body">تماس‌ها را با میکروفون و بلندگوی خودِ آیفون بشنوید و صحبت کنید. اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین Pairline از راه «اشکال‌زدایی بی‌سیم» یک دستیار کوچک اجرا می‌کند؛ کلیدی در «گزینه‌های برنامه‌نویس» که خودتان روشنش می‌کنید. بدون برنامهٔ اضافه و بدون روت. هر دو گوشی هم باید به یک وای‌فای وصل باشند.</string>
     <string name="settings_talk">مکالمه با آیفون</string>
     <string name="talk_summary_on">روشن</string>
     <string name="talk_summary_off">خاموش</string>
-    <string name="talk_summary_needs_shizuku">به Shizuku نیاز دارد</string>
+    <string name="talk_summary_not_set_up">راه‌اندازی نشده</string>
+    <string name="talk_summary_needs_wireless">اشکال‌زدایی بی‌سیم را روشن کنید</string>
+    <string name="talk_summary_needs_computer">از کامپیوتر اجرایش کنید</string>
+    <string name="talk_summary_starting">در حال اجرا…</string>
+    <string name="talk_summary_failed">اجرا نشد</string>
     <string name="talk_summary_unsupported">به اندروید ۱۰ یا جدیدتر نیاز دارد</string>
     <string name="talk_android_too_old">این گوشی اندروید %1$s دارد. صدای تماس روی آیفون به اندروید ۱۰ یا جدیدتر نیاز دارد. تماس‌ها همچنان روی آیفون زنگ می‌خورند و شما با همین گوشی صحبت می‌کنید.</string>
     <string name="talk_steps">راه‌اندازی</string>
-    <string name="talk_step_install">نصب Shizuku</string>
-    <string name="talk_step_install_sub">برنامه‌ای رایگان و متن‌باز از Play Store یا GitHub.</string>
-    <string name="talk_get_shizuku">دریافت Shizuku</string>
-    <string name="talk_step_start">اجرای Shizuku</string>
-    <string name="talk_step_outdated">Shizuku را به نسخهٔ ۱۳ یا جدیدتر به‌روز کنید</string>
-    <string name="talk_step_start_sub">در Shizuku، زیر «Start via Wireless debugging» روی Start بزنید و مراحلش را دنبال کنید. اشکال‌زدایی بی‌سیم را خودتان در «گزینه‌های برنامه‌نویس» روشن می‌کنید؛ Pairline هرگز این کار را نمی‌کند. بعد از هر بار روشن‌شدن دوبارهٔ گوشی، Shizuku را دوباره اجرا کنید.</string>
-    <string name="talk_step_start_sub_q">در اندروید ۱۰، Shizuku یک بار از روی کامپیوتر اجرا می‌شود؛ خودِ برنامهٔ Shizuku دستورش را نشان می‌دهد. بعد از هر بار روشن‌شدن دوبارهٔ گوشی، دوباره اجرایش کنید.</string>
-    <string name="talk_open_shizuku">باز کردن Shizuku</string>
-    <string name="talk_open_developer">گزینه‌های برنامه‌نویس</string>
-    <string name="talk_step_allow">اجازه به Pairline در Shizuku</string>
-    <string name="talk_step_allow_sub">Shizuku می‌پرسد آیا Pairline می‌تواند از آن استفاده کند. Pairline فقط برای صدای تماس و صفحه‌کلید، بی‌صدا و بلندگوی تماس از آن استفاده می‌کند.</string>
-    <string name="talk_allow_denied">قبلاً اجازه ندادید. Shizuku را باز کنید، به Authorized apps بروید و Pairline را روشن کنید.</string>
-    <string name="talk_allow">اجازه دادن</string>
+
+    <string name="talk_step_dev">«گزینه‌های برنامه‌نویس» را روشن کنید</string>
+    <string name="talk_step_dev_done">«گزینه‌های برنامه‌نویس» روشن است.</string>
+    <string name="talk_open_about">باز کردن «درباره تلفن»</string>
+    <string name="talk_step_wireless">«اشکال‌زدایی بی‌سیم» را روشن کنید</string>
+    <string name="talk_step_wireless_sub">این گوشی را به وای‌فای وصل کنید. بعد در «گزینه‌های برنامه‌نویس»، «اشکال‌زدایی بی‌سیم» را روشن کنید و «اجازه دادن» را بزنید. Pairline نمی‌تواند این کار را به‌جای شما انجام دهد؛ تصمیمش با خودتان است.</string>
+    <string name="talk_step_wireless_done">«اشکال‌زدایی بی‌سیم» روشن است.</string>
+    <string name="talk_open_developer">باز کردن «گزینه‌های برنامه‌نویس»</string>
+    <string name="talk_step_pair">Pairline را با «اشکال‌زدایی بی‌سیم» مرتبط کنید</string>
+    <string name="talk_step_pair_sub">«مرتبط کردن» را بزنید. در «اشکال‌زدایی بی‌سیم»، «مرتبط کردن دستگاه با کد مرتبط‌سازی» را بزنید. اعلان Pairline ظاهر می‌شود: «وارد کردن کد» را بزنید و کد ۶ رقمی روی صفحه را بنویسید. اگر اعلان را ندیدید، از بالای صفحه به پایین بکشید و اعلان Pairline را باز کنید. این کار فقط یک بار لازم است.</string>
+    <string name="talk_pair">مرتبط کردن</string>
+    <string name="talk_pair_waiting">حالا در «اشکال‌زدایی بی‌سیم»، «مرتبط کردن دستگاه با کد مرتبط‌سازی» را بزنید.</string>
+    <string name="talk_pair_found">در اعلان Pairline «وارد کردن کد» را بزنید و ۶ رقم را بنویسید. اگر اعلان را نمی‌بینید، از بالای صفحه به پایین بکشید.</string>
+    <string name="talk_pair_pairing">در حال مرتبط‌سازی…</string>
+    <string name="talk_pair_wrong">این کد درست نبود. کدی را بنویسید که الان روی صفحه است؛ هر بار که صفحهٔ مرتبط‌سازی باز می‌شود عوض می‌شود.</string>
+    <string name="talk_pair_failed">مرتبط‌سازی تمام نشد. «مرتبط کردن دستگاه با کد مرتبط‌سازی» را باز نگه دارید و دوباره امتحان کنید.</string>
+    <string name="talk_pair_done">مرتبط شد. اندروید Pairline را در «اشکال‌زدایی بی‌سیم ← دستگاه‌های مرتبط‌شده» نشان می‌دهد.</string>
+    <string name="talk_pair_notifications">اول اعلان‌های Pairline را مجاز کنید: کد مرتبط‌سازی در یک اعلان نوشته می‌شود.</string>
+    <string name="talk_allow_notifications">مجاز کردن اعلان‌ها</string>
+    <string name="talk_step_start">Pairline دستیارش را اجرا می‌کند</string>
+    <string name="talk_start_auto">بعد از مراحل بالا خودبه‌خود انجام می‌شود.</string>
+    <string name="talk_start_idle">وقتی «مکالمه با آیفون» روشن باشد اجرا می‌شود.</string>
+    <string name="talk_start_starting">در حال اجرا…</string>
+    <string name="talk_start_running">در حال اجرا. تا روشن‌شدن دوبارهٔ گوشی اجرا می‌ماند.</string>
+    <string name="talk_start_no_service">Pairline «اشکال‌زدایی بی‌سیم» را پیدا نکرد. مطمئن شوید روشن است و این گوشی به وای‌فای وصل است، بعد دوباره امتحان کنید.</string>
+    <string name="talk_start_failed">دستیار اجرا نشد. دوباره امتحان کنید. اگر باز هم نشد، «اشکال‌زدایی بی‌سیم» را خاموش و دوباره روشن کنید.</string>
+    <string name="talk_try_again">دوباره امتحان کنید</string>
+
+    <string name="dev_steps_samsung">«تنظیمات ← درباره تلفن ← اطلاعات نرم‌افزار»: ۷ بار روی «شماره ساخت» بزنید و رمز قفل را وارد کنید. «گزینه‌های برنامه‌نویس» پایین «تنظیمات» ظاهر می‌شود.</string>
+    <string name="dev_steps_xiaomi">«تنظیمات ← درباره تلفن»: ۷ بار روی «نسخهٔ سیستم‌عامل» (HyperOS یا MIUI) بزنید. «گزینه‌های برنامه‌نویس» در «تنظیمات ← تنظیمات بیشتر» است.</string>
+    <string name="dev_steps_oppo">«تنظیمات ← درباره دستگاه ← نسخه»: ۷ بار روی «شماره ساخت» بزنید. «گزینه‌های برنامه‌نویس» در «تنظیمات ← تنظیمات بیشتر» است.</string>
+    <string name="dev_steps_vivo">«تنظیمات ← درباره تلفن ← نسخهٔ نرم‌افزار»: ۷ بار رویش بزنید. «گزینه‌های برنامه‌نویس» در «تنظیمات ← مدیریت سیستم» است.</string>
+    <string name="dev_steps_other">«تنظیمات ← درباره تلفن»: ۷ بار روی «شماره ساخت» بزنید و رمز قفل را وارد کنید. «گزینه‌های برنامه‌نویس» در «تنظیمات ← سیستم» است.</string>
+
+    <string name="talk_q_step_usb">«اشکال‌زدایی USB» را روشن کنید</string>
+    <string name="talk_q_step_usb_sub">در «گزینه‌های برنامه‌نویس»، «اشکال‌زدایی USB» را روشن کنید. این گوشی را به کامپیوتری که ابزار adb اندروید را دارد وصل کنید و روی گوشی «اجازه دادن» را بزنید.</string>
+    <string name="talk_q_step_run">این را روی کامپیوتر اجرا کنید</string>
+    <string name="talk_q_step_run_sub">بعد از هر بار روشن‌شدن دوبارهٔ این گوشی، یک بار. بعد دستیار Pairline تا روشن‌شدن بعدی اجرا می‌ماند.</string>
+    <string name="talk_computer_title">به‌جایش از کامپیوتر اجرا کنید</string>
+    <string name="talk_computer_sub">بدون وای‌فای، یا اگر مرتبط‌سازی جواب نداد: «اشکال‌زدایی USB» را روشن کنید، کامپیوتری با adb وصل کنید و بعد از هر بار روشن‌شدن گوشی این فرمان را یک بار اجرا کنید.</string>
+    <string name="talk_copy_command">کپی فرمان</string>
+    <string name="talk_command_copied">فرمان کپی شد</string>
+
     <string name="talk_this_phone">روی این گوشی</string>
     <string name="talk_listen_yes">آیفون می‌تواند صدای تماس‌هایتان را بشنود</string>
-    <string name="talk_listen_no">این گوشی اجازه نمی‌دهد Shizuku صدای تماس را بگیرد</string>
+    <string name="talk_listen_no">این گوشی اجازه نمی‌دهد دستیار Pairline صدای تماس را بگیرد</string>
     <string name="talk_talk_yes">صدای شما از آیفون می‌تواند به تماس برسد</string>
     <string name="talk_talk_no">این گوشی نمی‌تواند صدا را وارد تماس کند: تماس را روی آیفون می‌شنوید و با همین گوشی صحبت می‌کنید</string>
     <string name="talk_switch">مکالمه با آیفون</string>
     <string name="talk_switch_sub">وقتی روی آیفون جواب می‌دهید، صدای تماس به آیفون منتقل می‌شود. صفحه‌کلید، بی‌صدا و بلندگو را هم روی آیفون فعال می‌کند.</string>
     <string name="talk_reset">شروع دوبارهٔ صدای تماس</string>
     <string name="talk_reset_sub">Pairline از جواب‌های شما بعد از تماس‌ها یاد می‌گیرد چه چیزی روی این گوشی کار می‌کند. این گزینه آن‌ها را فراموش می‌کند.</string>
+
+    <string name="talk_manage">خوب است بدانید</string>
+    <string name="talk_tip_restart">بعد از روشن‌شدن دوبارهٔ گوشی</string>
+    <string name="talk_tip_restart_sub">اندروید با روشن‌شدن دوبارهٔ گوشی، «اشکال‌زدایی بی‌سیم» را خاموش می‌کند. دوباره روشنش کنید تا Pairline دستیارش را خودش اجرا کند. Pairline با یک اعلان یادآوری می‌کند.</string>
+    <string name="talk_tip_banking">برنامه‌های بانکی</string>
+    <string name="talk_tip_banking_sub">بعضی برنامه‌های بانکی وقتی «اشکال‌زدایی بی‌سیم» روشن است باز نمی‌شوند. وقتی دستیار Pairline اجرا شد، می‌توانید «اشکال‌زدایی بی‌سیم» را دوباره خاموش کنید: تماس‌ها تا روشن‌شدن دوبارهٔ گوشی روی آیفون پخش می‌شوند.</string>
+    <string name="talk_forget">فراموش کردن مرتبط‌سازی</string>
+    <string name="talk_forget_sub">دستیار را متوقف و کلید Pairline را حذف می‌کند. «Pairline» را از «اشکال‌زدایی بی‌سیم ← دستگاه‌های مرتبط‌شده» هم حذف کنید.</string>
     <string name="talk_wifi_note">صدای تماس از طریق وای‌فای شما و با رمزگذاری سرتاسری منتقل می‌شود. هرگز ضبط یا ذخیره نمی‌شود.</string>
+
     <string name="talk_setup_title">مکالمه با آیفون (اختیاری)</string>
     <string name="talk_setup_later">بعداً راه‌اندازی می‌کنم</string>
+
+    <string name="pair_channel">مرتبط‌سازی با «اشکال‌زدایی بی‌سیم»</string>
+    <string name="pair_n_waiting_title">Pairline را با «اشکال‌زدایی بی‌سیم» مرتبط کنید</string>
+    <string name="pair_n_waiting_text">در «اشکال‌زدایی بی‌سیم»، «مرتبط کردن دستگاه با کد مرتبط‌سازی» را بزنید. بعد کد ۶ رقمی را همین‌جا بنویسید.</string>
+    <string name="pair_n_found_title">کد مرتبط‌سازی را بنویسید</string>
+    <string name="pair_n_found_text">«وارد کردن کد» را بزنید و ۶ رقمی را که روی صفحه است بنویسید.</string>
+    <string name="pair_n_pairing_title">در حال مرتبط‌سازی…</string>
+    <string name="pair_n_pairing_text">صفحهٔ مرتبط‌سازی را چند لحظه باز نگه دارید.</string>
+    <string name="pair_n_wrong_title">این کد درست نبود</string>
+    <string name="pair_n_wrong_text">کد ۶ رقمی روی صفحه را بررسی کنید و دوباره امتحان کنید. هر بار که صفحهٔ مرتبط‌سازی باز می‌شود عوض می‌شود.</string>
+    <string name="pair_n_failed_title">مرتبط‌سازی تمام نشد</string>
+    <string name="pair_n_failed_text">«مرتبط کردن دستگاه با کد مرتبط‌سازی» را باز نگه دارید و کد را دوباره بنویسید.</string>
+    <string name="pair_n_done_title">با «اشکال‌زدایی بی‌سیم» مرتبط شد</string>
+    <string name="pair_n_done_text">Pairline دستیارش را اجرا می‌کند. از حالا تماس‌هایی که روی آیفون جواب می‌دهید آنجا پخش می‌شوند.</string>
+    <string name="pair_n_enter">وارد کردن کد</string>
+    <string name="pair_n_code_hint">کد ۶ رقمی</string>
+    <string name="pair_n_cancel">لغو</string>
+
     <string name="talk_reminder_channel">مکالمه با آیفون</string>
-    <string name="talk_reminder_title">صدای تماس به این گوشی برگشت</string>
-    <string name="talk_reminder_text">Shizuku با روشن‌شدن دوبارهٔ گوشی متوقف شد. بزنید تا Shizuku باز شود و دوباره اجرایش کنید تا تماس‌ها روی آیفون پخش شوند. در این فاصله تماس‌ها همچنان روی آیفون زنگ می‌خورند.</string>
+    <string name="talk_reminder_title">«اشکال‌زدایی بی‌سیم» را روشن کنید</string>
+    <string name="talk_reminder_text">گوشی دوباره روشن شد و صدای تماس به این گوشی برگشت. بزنید و «اشکال‌زدایی بی‌سیم» را روشن کنید: Pairline دستیارش را خودش اجرا می‌کند. در این فاصله تماس‌ها همچنان روی آیفون زنگ می‌خورند.</string>
+    <string name="talk_reminder_title_q">دستیار Pairline را اجرا کنید</string>
+    <string name="talk_reminder_text_q">گوشی دوباره روشن شد و صدای تماس به این گوشی برگشت. فرمانِ صفحهٔ «مکالمه با آیفون» را یک بار روی کامپیوتر اجرا کنید. در این فاصله تماس‌ها همچنان روی آیفون زنگ می‌خورند.</string>
+
     <string name="help_section_talk">مکالمه با آیفون</string>
-    <string name="help_q_shizuku">Shizuku چیست؟ به روت نیاز دارد؟</string>
-    <string name="help_a_shizuku">Shizuku برنامه‌ای رایگان و متن‌باز است که با اجازهٔ شما، دسترسیِ ابزار اشکال‌زدایی خودِ اندروید را به Pairline قرض می‌دهد. به روت نیازی نیست. Pairline فقط برای انتقال صدای تماس و صفحه‌کلید، بی‌صدا و بلندگوی تماس از آن استفاده می‌کند. هر وقت بخواهید می‌توانید این اجازه را در Shizuku پس بگیرید.</string>
+    <string name="help_q_shizuku">«اشکال‌زدایی بی‌سیم» اینجا چه کار می‌کند؟ به روت نیاز دارد؟</string>
+    <string name="help_a_shizuku">اندروید فقط به ابزار اشکال‌زدایی خودش اجازه می‌دهد به صدای تماس دسترسی داشته باشد. با «اشکال‌زدایی بی‌سیم» روشن، Pairline یک دستیار کوچک با همان اجازه‌ها و از درون برنامهٔ خودش اجرا می‌کند: بدون برنامهٔ اضافه و بدون روت. این دستیار فقط صدای تماس را منتقل می‌کند و صفحه‌کلید، بی‌صدا و بلندگوی تماس را مدیریت می‌کند. با روشن‌شدن دوبارهٔ گوشی متوقف می‌شود و «فراموش کردن مرتبط‌سازی» دسترسی Pairline را برای همیشه برمی‌دارد.</string>
     <string name="help_q_restart">چرا بعد از روشن‌شدن دوبارهٔ گوشی، صدای تماس به این گوشی برمی‌گردد؟</string>
-    <string name="help_a_restart">اندروید هر بار که گوشی دوباره روشن می‌شود اشکال‌زدایی بی‌سیم را خاموش می‌کند و همین Shizuku را متوقف می‌کند. آن‌وقت Pairline یک اعلان نشان می‌دهد: روی آن بزنید و Shizuku را دوباره اجرا کنید تا تماس‌ها باز روی آیفون پخش شوند. تا آن موقع تماس‌ها همچنان روی آیفون زنگ می‌خورند و کار می‌کنند و صدا روی همین گوشی است. روی گوشیِ روت‌شده Shizuku می‌تواند خودش اجرا شود.</string>
+    <string name="help_a_restart">اندروید هر بار که گوشی دوباره روشن می‌شود «اشکال‌زدایی بی‌سیم» را خاموش می‌کند و دستیار هم با آن متوقف می‌شود. بعد Pairline یک اعلان نشان می‌دهد: بزنید و «اشکال‌زدایی بی‌سیم» را روشن کنید تا Pairline دستیارش را خودش اجرا کند. تا آن موقع تماس‌ها روی آیفون زنگ می‌خورند و کار می‌کنند، و صدایشان روی این گوشی است.</string>
     <string name="help_q_debugging">یک برنامه می‌گوید اشکال‌زدایی روشن است</string>
-    <string name="help_a_debugging">بعضی برنامه‌های بانکی و پرداخت وقتی «گزینه‌های برنامه‌نویس» یا اشکال‌زدایی بی‌سیم روشن باشد باز نمی‌شوند. Pairline هرگز خودش این‌ها را روشن نمی‌کند. هنگام کار با چنین برنامه‌ای اشکال‌زدایی بی‌سیم را خاموش کنید؛ ممکن است Shizuku متوقف شود و بعداً برای صدای تماس دوباره اجرایش کنید.</string>
+    <string name="help_a_debugging">بعضی برنامه‌های بانکی و پرداخت وقتی «گزینه‌های برنامه‌نویس» یا «اشکال‌زدایی بی‌سیم» روشن باشد باز نمی‌شوند. Pairline هرگز خودش این‌ها را روشن نمی‌کند. وقتی دستیار Pairline اجرا شد می‌توانید «اشکال‌زدایی بی‌سیم» را خاموش کنید؛ تماس‌ها تا روشن‌شدن بعدی گوشی روی آیفون پخش می‌شوند.</string>
     <string name="help_q_listen_only">تماس را روی آیفون می‌شنوم، اما طرف مقابل صدایم را نمی‌شنود</string>
     <string name="help_a_listen_only">بعضی گوشی‌ها به هیچ برنامه‌ای اجازه نمی‌دهند صدا را وارد تماس کند. آن‌وقت تماس را روی آیفون می‌شنوید و با همین گوشی صحبت می‌کنید. بعد از هر تماس، آیفون می‌پرسد صدا چطور بود؛ جواب‌های شما به Pairline کمک می‌کند در تماس بعدی روش دیگری را امتحان کند.</string>
-    <string name="cap_missing_talk">اختیاری: تماس‌ها را روی خود آیفون بشنوید و جواب دهید. به برنامهٔ رایگان Shizuku نیاز دارد.</string>
+
+    <string name="cap_missing_talk">اختیاری: تماس‌ها را روی خود آیفون بشنوید و جواب دهید. یک بار با «اشکال‌زدایی بی‌سیم» راه‌اندازی می‌شود؛ بدون برنامهٔ اضافه.</string>
     <string name="cap_missing_dtmf_talk">با «مکالمه با آیفون» فعال می‌شود.</string>
+    <string name="cap_dtmf_next_call">در تماس بعدی فعال می‌شود.</string>
     <string name="action_set_up">راه‌اندازی</string>
 </resources>

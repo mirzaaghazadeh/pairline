@@ -20,8 +20,8 @@ import kotlin.system.exitProcess
 import org.json.JSONObject
 
 /**
- * Pairline's only code with shell rights (AGENTS.md rule 7, D-046). Shizuku starts it in its own process as the
- * shell user (or root, if the user runs Shizuku with root); the app talks to it through [IPrivilegedService].
+ * Pairline's only code with shell rights (AGENTS.md rule 7, D-046, D-054). It runs in Pairline's helper process
+ * ([HelperMain]) as the shell user; the app talks to it through [IPrivilegedService].
  *
  * - Only Pairline's own uid may call it ([checkCaller]); every argument is checked against a fixed list.
  * - It can do four things: report what the phone allows, turn on Pairline's MANAGE_ONGOING_CALLS app-op, capture
@@ -46,8 +46,10 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
     private var micMuteBefore: Boolean? = null
 
     override fun destroy() {
+        checkCaller()
         synchronized(lock) { stopLocked() }
-        exitProcess(0)
+        // Reply first, then end the helper process.
+        Thread { Thread.sleep(100); exitProcess(0) }.start()
     }
 
     override fun version(): Int = VERSION

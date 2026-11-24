@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -24,23 +26,34 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
+import androidx.core.app.NotificationManagerCompat
 import app.pairline.android.AppGraph
 import app.pairline.android.R
 import app.pairline.android.link.LinkService
+import app.pairline.android.privileged.DeveloperSettings
+import app.pairline.android.privileged.HelperCommand
 import app.pairline.android.privileged.PrivilegedManager
+import app.pairline.android.privileged.PrivilegedManager.Pairing
 import app.pairline.android.privileged.PrivilegedManager.State
+import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
+import app.pairline.android.ui.SystemActions
 import app.pairline.android.ui.components.ListRow
 import app.pairline.android.ui.components.NoteBox
 import app.pairline.android.ui.components.PairlineTopBar
@@ -49,7 +62,7 @@ import app.pairline.android.ui.components.SectionCard
 import app.pairline.android.ui.components.Tone
 import app.pairline.android.ui.refreshTick
 
-/** Settings › Talk on iPhone (D-046, D-047). */
+/** Settings › Talk on iPhone (D-046, D-047, D-054). */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TalkScreen(back: () -> Unit) {
@@ -76,80 +89,51 @@ fun TalkScreen(back: () -> Unit) {
     }
 }
 
-/** Short label for the Settings row: on, off, or what's missing. */
+/** Short label for the Settings and home rows: on, off, or what's missing. */
 @Composable
 fun talkSummary(): String {
     val state by AppGraph.privileged.state.collectAsState()
     val prefsTick by AppGraph.prefs.changes.collectAsState()
     val on = remember(prefsTick) { AppGraph.prefs.talkOnIphone }
-    return when {
-        state == State.UNSUPPORTED -> stringResource(R.string.talk_summary_unsupported)
-        state != State.READY -> stringResource(R.string.talk_summary_needs_shizuku)
-        on -> stringResource(R.string.talk_summary_on)
-        else -> stringResource(R.string.talk_summary_off)
-    }
+    return stringResource(
+        when (state) {
+            State.UNSUPPORTED -> R.string.talk_summary_unsupported
+            State.READY, State.IDLE -> if (on) R.string.talk_summary_on else R.string.talk_summary_off
+            State.STARTING -> R.string.talk_summary_starting
+            State.FAILED -> R.string.talk_summary_failed
+            State.NEEDS_COMPUTER -> if (on) R.string.talk_summary_needs_computer else R.string.talk_summary_not_set_up
+            State.NEEDS_WIRELESS_DEBUGGING ->
+                if (AppGraph.privileged.paired) R.string.talk_summary_needs_wireless else R.string.talk_summary_not_set_up
+            State.NEEDS_DEVELOPER_OPTIONS, State.NEEDS_PAIRING -> R.string.talk_summary_not_set_up
+        },
+    )
 }
 
 /**
- * The checklist shared by setup and Settings: Android version, Shizuku installed, started, Pairline allowed, then
- * what this phone supports and the switch. Every step is done by the user; Pairline only opens the right screen.
+ * The checklist shared by setup and Settings. Each step ticks itself as the user finishes it; Pairline only opens the
+ * right screen and never changes a setting (AGENTS.md rule 5). Then: what this phone supports, the switch, and tips.
  */
 @Composable
 fun ColumnScope.TalkSetupContent(showReset: Boolean) {
-    val context = LocalContext.current
     val manager = AppGraph.privileged
     val state by manager.state.collectAsState()
     val probe by manager.probe.collectAsState()
+    val pairing by manager.pairing.collectAsState()
     val prefsTick by AppGraph.prefs.changes.collectAsState()
     val tick = refreshTick()
     LaunchedEffect(tick) { manager.refresh() }
+    // While this screen is open the helper may run for its checks, even with Talk on iPhone off.
+    DisposableEffect(Unit) {
+        manager.setupOpen = true
+        onDispose { manager.setupOpen = false }
+    }
     val on = remember(prefsTick) { AppGraph.prefs.talkOnIphone }
 
     if (state == State.UNSUPPORTED) {
         NoteBox(stringResource(R.string.talk_android_too_old, Build.VERSION.RELEASE ?: "9"), Tone.WARN, PIcons.Warning)
         return
     }
-
-    SectionCard(title = stringResource(R.string.talk_steps)) {
-        val installed = state != State.NOT_INSTALLED
-        StepRow(
-            done = installed,
-            title = stringResource(R.string.talk_step_install),
-            subtitle = stringResource(R.string.talk_step_install_sub),
-            action = if (!installed) stringResource(R.string.talk_get_shizuku) else null,
-            onAction = { openShizukuDownload(context) },
-        )
-        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
-        val running = installed && state != State.NOT_RUNNING
-        StepRow(
-            done = running && state != State.OUTDATED,
-            title = stringResource(if (state == State.OUTDATED) R.string.talk_step_outdated else R.string.talk_step_start),
-            subtitle = stringResource(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) R.string.talk_step_start_sub else R.string.talk_step_start_sub_q,
-            ),
-            action = if (installed && !running) stringResource(R.string.talk_open_shizuku) else null,
-            onAction = { openShizuku(context) },
-            secondary = if (installed && !running && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                stringResource(R.string.talk_open_developer)
-            } else {
-                null
-            },
-            onSecondary = { openDeveloperOptions(context) },
-        )
-        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
-        val allowed = state == State.READY || state == State.CONNECTING
-        StepRow(
-            done = allowed,
-            title = stringResource(R.string.talk_step_allow),
-            subtitle = stringResource(if (state == State.DENIED) R.string.talk_allow_denied else R.string.talk_step_allow_sub),
-            action = when (state) {
-                State.NEEDS_PERMISSION -> stringResource(R.string.talk_allow)
-                State.DENIED -> stringResource(R.string.talk_open_shizuku)
-                else -> null
-            },
-            onAction = { if (state == State.DENIED) openShizuku(context) else manager.requestPermission() },
-        )
-    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) WirelessSteps(state, pairing, tick) else ComputerSteps(state)
 
     if (state == State.READY) {
         val p = probe
@@ -166,6 +150,9 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
                 iconTone = if (p?.canTalk == true) Tone.GOOD else Tone.NEUTRAL,
             )
         }
+    }
+    if (state == State.READY || state == State.IDLE) {
+        val context = LocalContext.current
         SectionCard {
             ListRow(
                 title = stringResource(R.string.talk_switch),
@@ -173,7 +160,9 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
                 icon = PIcons.Phone,
                 onClick = { setTalk(context, !on) },
                 showChevron = false,
-                trailing = { Switch(checked = on, onCheckedChange = { setTalk(context, it) }, enabled = p?.canListen == true) },
+                trailing = {
+                    Switch(checked = on, onCheckedChange = { setTalk(context, it) }, enabled = state == State.IDLE || probe?.canListen == true)
+                },
             )
             if (showReset && on) {
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
@@ -187,7 +176,188 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
             }
         }
     }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && (manager.paired || state == State.READY)) ManageCard()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && state != State.READY) ComputerAlternative()
     NoteBox(stringResource(R.string.talk_wifi_note), Tone.NEUTRAL, PIcons.Lock)
+}
+
+/** Android 11+: Developer options, Wireless debugging, pairing, then the helper starts by itself. */
+@Composable
+private fun WirelessSteps(state: State, pairing: Pairing, tick: Int) {
+    val context = LocalContext.current
+    val manager = AppGraph.privileged
+    val ready = state == State.READY
+    val developer = ready || state != State.NEEDS_DEVELOPER_OPTIONS
+    val wireless = ready || (developer && state != State.NEEDS_WIRELESS_DEBUGGING)
+    val paired = ready || manager.paired
+    val notifications = remember(tick) { NotificationManagerCompat.from(context).areNotificationsEnabled() }
+    val maker = remember { Maker.detect() }
+
+    SectionCard(title = stringResource(R.string.talk_steps)) {
+        StepRow(
+            done = developer,
+            title = stringResource(R.string.talk_step_dev),
+            subtitle = stringResource(if (developer) R.string.talk_step_dev_done else devSteps(maker)),
+            action = if (!developer) stringResource(R.string.talk_open_about) else null,
+            onAction = { start(context, DeveloperSettings.aboutPhone()) },
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        StepRow(
+            done = wireless,
+            title = stringResource(R.string.talk_step_wireless),
+            subtitle = stringResource(if (wireless) R.string.talk_step_wireless_done else R.string.talk_step_wireless_sub),
+            action = if (developer && !wireless) stringResource(R.string.talk_open_developer) else null,
+            onAction = { openWirelessDebugging(context) },
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        val pairSub = when {
+            paired -> R.string.talk_pair_done
+            !notifications -> R.string.talk_pair_notifications
+            pairing == Pairing.WAITING -> R.string.talk_pair_waiting
+            pairing == Pairing.FOUND -> R.string.talk_pair_found
+            pairing == Pairing.PAIRING -> R.string.talk_pair_pairing
+            pairing == Pairing.WRONG_CODE -> R.string.talk_pair_wrong
+            pairing == Pairing.FAILED -> R.string.talk_pair_failed
+            else -> R.string.talk_step_pair_sub
+        }
+        StepRow(
+            done = paired,
+            title = stringResource(R.string.talk_step_pair),
+            subtitle = stringResource(pairSub),
+            action = when {
+                paired || !wireless || pairing == Pairing.PAIRING -> null
+                !notifications -> stringResource(R.string.talk_allow_notifications)
+                else -> stringResource(R.string.talk_pair)
+            },
+            onAction = {
+                if (!notifications) {
+                    start(context, Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
+                } else {
+                    manager.beginPairing()
+                    openWirelessDebugging(context)
+                }
+            },
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        StepRow(
+            done = ready,
+            title = stringResource(R.string.talk_step_start),
+            subtitle = stringResource(
+                when {
+                    ready -> R.string.talk_start_running
+                    state == State.STARTING -> R.string.talk_start_starting
+                    state == State.FAILED && manager.failure == PrivilegedManager.Failure.NO_SERVICE -> R.string.talk_start_no_service
+                    state == State.FAILED -> R.string.talk_start_failed
+                    state == State.IDLE -> R.string.talk_start_idle
+                    else -> R.string.talk_start_auto
+                },
+            ),
+            action = if (state == State.FAILED) stringResource(R.string.talk_try_again) else null,
+            onAction = { manager.retry() },
+        )
+    }
+}
+
+/** Android 10 has no Wireless debugging: USB debugging and one command from a computer after each restart. */
+@Composable
+private fun ComputerSteps(state: State) {
+    val context = LocalContext.current
+    val ready = state == State.READY
+    val maker = remember { Maker.detect() }
+    val command = remember { HelperCommand.computerCommand(context) }
+    SectionCard(title = stringResource(R.string.talk_steps)) {
+        StepRow(
+            done = ready,
+            title = stringResource(R.string.talk_q_step_usb),
+            subtitle = stringResource(devSteps(maker)) + "\n" + stringResource(R.string.talk_q_step_usb_sub),
+            action = if (!ready) stringResource(R.string.talk_open_developer) else null,
+            onAction = { start(context, Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)) },
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        StepRow(
+            done = ready,
+            title = stringResource(R.string.talk_q_step_run),
+            subtitle = stringResource(if (ready) R.string.talk_start_running else R.string.talk_q_step_run_sub),
+            action = null,
+            onAction = {},
+        )
+        if (!ready && command != null) CommandBox(command)
+    }
+}
+
+/** Android 11+ fallback: the same computer command, for phones without Wi-Fi or when pairing doesn't work. */
+@Composable
+private fun ComputerAlternative() {
+    val context = LocalContext.current
+    var open by rememberSaveable { mutableStateOf(false) }
+    val command = remember(open) { if (open) HelperCommand.computerCommand(context) else null }
+    SectionCard {
+        ListRow(
+            title = stringResource(R.string.talk_computer_title),
+            subtitle = if (open) stringResource(R.string.talk_computer_sub) else null,
+            icon = PIcons.Code,
+            onClick = { open = !open },
+            showChevron = false,
+            trailing = null,
+        )
+        if (open && command != null) CommandBox(command)
+    }
+}
+
+@Composable
+private fun CommandBox(command: String) {
+    val context = LocalContext.current
+    val copied = stringResource(R.string.talk_command_copied)
+    Column(Modifier.fillMaxWidth().padding(start = 72.dp, end = 16.dp, bottom = 12.dp)) {
+        SelectionContainer {
+            Text(
+                command,
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace, textDirection = TextDirection.Ltr),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        Spacer(Modifier.padding(top = 8.dp))
+        SecondaryButton(stringResource(R.string.talk_copy_command), {
+            SystemActions.copyText(context, "Pairline", command)
+            Toast.makeText(context, copied, Toast.LENGTH_SHORT).show()
+        }, icon = PIcons.Copy)
+    }
+}
+
+@Composable
+private fun ManageCard() {
+    SectionCard(title = stringResource(R.string.talk_manage)) {
+        ListRow(
+            title = stringResource(R.string.talk_tip_restart),
+            subtitle = stringResource(R.string.talk_tip_restart_sub),
+            icon = PIcons.Refresh,
+            showChevron = false,
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        ListRow(
+            title = stringResource(R.string.talk_tip_banking),
+            subtitle = stringResource(R.string.talk_tip_banking_sub),
+            icon = PIcons.Shield,
+            showChevron = false,
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        ListRow(
+            title = stringResource(R.string.talk_forget),
+            subtitle = stringResource(R.string.talk_forget_sub),
+            icon = PIcons.Delete,
+            iconTone = Tone.WARN,
+            onClick = { AppGraph.privileged.forget() },
+            showChevron = false,
+        )
+    }
+}
+
+private fun devSteps(maker: Maker): Int = when (maker) {
+    Maker.SAMSUNG -> R.string.dev_steps_samsung
+    Maker.XIAOMI -> R.string.dev_steps_xiaomi
+    Maker.OPPO -> R.string.dev_steps_oppo
+    Maker.VIVO -> R.string.dev_steps_vivo
+    Maker.HUAWEI, Maker.OTHER -> R.string.dev_steps_other
 }
 
 @Composable
@@ -197,8 +367,6 @@ private fun StepRow(
     subtitle: String,
     action: String?,
     onAction: () -> Unit,
-    secondary: String? = null,
-    onSecondary: () -> Unit = {},
 ) {
     Column {
         ListRow(
@@ -207,16 +375,13 @@ private fun StepRow(
             icon = if (done) PIcons.CheckCircle else PIcons.Info,
             iconTone = if (done) Tone.GOOD else Tone.NEUTRAL,
         )
-        if (action != null || secondary != null) {
+        if (action != null) {
             Row(
                 Modifier.fillMaxWidth().padding(start = 72.dp, end = 16.dp, bottom = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (action != null) SecondaryButton(action, onAction)
-                if (secondary != null) {
-                    Spacer(Modifier.width(8.dp))
-                    SecondaryButton(secondary, onSecondary)
-                }
+                SecondaryButton(action, onAction)
+                Spacer(Modifier.width(8.dp))
             }
         }
     }
@@ -226,30 +391,17 @@ private fun setTalk(context: Context, on: Boolean) {
     val prefs = AppGraph.prefs
     if (prefs.talkOnIphone == on) return
     prefs.talkOnIphone = on
-    if (on && AppGraph.privileged.state.value == PrivilegedManager.State.READY) {
+    if (on && AppGraph.privileged.state.value == State.READY) {
         AppGraph.io.execute { AppGraph.privileged.allowOngoingCalls() }
     }
     if (!on) AppGraph.audioRelay.stop(null, "turned off")
+    AppGraph.privileged.refresh()
     LinkService.refresh(context)
 }
 
-/** Shizuku is on the Play Store; where there's no Play Store, its download page opens in the browser. */
-private fun openShizukuDownload(context: Context) {
-    if (!start(context, Intent(Intent.ACTION_VIEW, "market://details?id=${PrivilegedManager.SHIZUKU_PACKAGE}".toUri()))) {
-        start(context, Intent(Intent.ACTION_VIEW, "https://shizuku.rikka.app/download/".toUri()))
-    }
-}
-
-private fun openShizuku(context: Context) {
-    val launch = context.packageManager.getLaunchIntentForPackage(PrivilegedManager.SHIZUKU_PACKAGE)
-    if (launch == null || !start(context, launch)) openShizukuDownload(context)
-}
-
 /** The user turns Wireless debugging on there themselves; Pairline never changes it (AGENTS.md rule 5). */
-private fun openDeveloperOptions(context: Context) {
-    if (!start(context, Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS))) {
-        start(context, Intent(Settings.ACTION_DEVICE_INFO_SETTINGS))
-    }
+private fun openWirelessDebugging(context: Context) {
+    if (!start(context, DeveloperSettings.wirelessDebugging())) start(context, DeveloperSettings.aboutPhone())
 }
 
 private fun start(context: Context, intent: Intent): Boolean = try {

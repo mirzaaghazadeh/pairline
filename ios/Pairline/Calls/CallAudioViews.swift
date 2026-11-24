@@ -22,16 +22,16 @@ struct CallAudioInfoSheet: View {
                 if !calls.audioOnIPhone {
                     Section {
                         step(1, "On the Android phone, open Pairline Bridge › Settings › Talk on iPhone.")
-                        step(2, "Install and start Shizuku, a free app, and allow Pairline in it. The bridge app shows each step.")
+                        step(2, "Turn on Wireless debugging in Developer options and pair it with the code on screen. The bridge app shows each step; no extra app is needed.")
                         step(3, "Keep both phones on the same Wi-Fi. Calls you take on this iPhone then use its microphone and speaker.")
                     } header: {
                         t("Talk on your iPhone")
                     } footer: {
-                        t("Android keeps call audio away from apps, so this needs Android 10 or later and Shizuku. Some phones only allow listening; then you hear the call here and talk on the Android phone.")
+                        t("Android keeps call audio away from apps, so this needs Android 10 or later and Wireless debugging on the Android phone (no extra app, no root). Some phones only allow listening; then you hear the call here and talk on the Android phone.")
                     }
                 }
                 Section {
-                    t("After the Android phone restarts, start Shizuku on it again; the bridge app reminds you with a notification. Until then calls ring here and the audio stays on the Android phone.")
+                    t("After the Android phone restarts, turn on Wireless debugging on it again: the bridge app then starts its helper by itself and reminds you with a notification. Until then calls ring here and the audio stays on the Android phone.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                     t("Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored.")

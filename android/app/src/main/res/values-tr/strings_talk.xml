@@ -1,52 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- "Talk on iPhone": call audio through Pairline's own helper (D-046, D-047, D-054). -->
 <resources>
     <string name="talk_title">iPhone’dan konuşun</string>
-    <string name="talk_body">Aramaları iPhone’un kendi mikrofonu ve hoparlörüyle duyun ve konuşun. Android, arama sesini uygulamalardan uzak tutar; bu yüzden bunun için Shizuku gerekir: izninizle Pairline’a ek erişim veren ücretsiz bir uygulama. İki telefonun da aynı Wi-Fi ağında olması gerekir.</string>
+    <string name="talk_body">Aramaları iPhone’un kendi mikrofonu ve hoparlörüyle duyun ve konuşun. Android, arama sesini uygulamalardan uzak tutar; bu yüzden Pairline, Kablosuz hata ayıklama üzerinden küçük bir yardımcı başlatır. Kablosuz hata ayıklama, Geliştirici seçenekleri’nde sizin açtığınız bir anahtardır. Ek uygulama ve root gerekmez. İki telefonun da aynı Wi-Fi ağında olması gerekir.</string>
     <string name="settings_talk">iPhone’dan konuşma</string>
     <string name="talk_summary_on">Açık</string>
     <string name="talk_summary_off">Kapalı</string>
-    <string name="talk_summary_needs_shizuku">Shizuku gerekli</string>
+    <string name="talk_summary_not_set_up">Kurulmadı</string>
+    <string name="talk_summary_needs_wireless">Kablosuz hata ayıklamayı açın</string>
+    <string name="talk_summary_needs_computer">Bilgisayardan başlatın</string>
+    <string name="talk_summary_starting">Başlatılıyor…</string>
+    <string name="talk_summary_failed">Başlamadı</string>
     <string name="talk_summary_unsupported">Android 10 veya üstü gerekli</string>
     <string name="talk_android_too_old">Bu telefonda Android %1$s var. iPhone’da arama sesi için Android 10 veya üstü gerekir. Aramalar yine iPhone’da çalar, konuşmayı bu telefondan yaparsınız.</string>
     <string name="talk_steps">Kurulum</string>
-    <string name="talk_step_install">Shizuku’yu yükleyin</string>
-    <string name="talk_step_install_sub">Play Store’dan veya GitHub’dan ücretsiz, açık kaynaklı bir uygulama.</string>
-    <string name="talk_get_shizuku">Shizuku’yu edinin</string>
-    <string name="talk_step_start">Shizuku’yu başlatın</string>
-    <string name="talk_step_outdated">Shizuku’yu 13 veya üstü bir sürüme güncelleyin</string>
-    <string name="talk_step_start_sub">Shizuku’da “Start via Wireless debugging” altındaki Start’a dokunun ve adımlarını izleyin. Kablosuz hata ayıklamayı Geliştirici seçenekleri’nde siz açarsınız; Pairline bunu asla yapmaz. Telefon yeniden başladıktan sonra Shizuku’yu tekrar başlatın.</string>
-    <string name="talk_step_start_sub_q">Android 10’da Shizuku bir kez bilgisayardan başlatılır; komutu Shizuku uygulaması gösterir. Telefon yeniden başladıktan sonra tekrar başlatın.</string>
-    <string name="talk_open_shizuku">Shizuku’yu aç</string>
-    <string name="talk_open_developer">Geliştirici seçenekleri</string>
-    <string name="talk_step_allow">Shizuku’da Pairline’a izin verin</string>
-    <string name="talk_step_allow_sub">Shizuku, Pairline’ın onu kullanıp kullanamayacağını sorar. Pairline onu yalnızca arama sesi ve aramadaki tuş takımı, sessiz ve hoparlör için kullanır.</string>
-    <string name="talk_allow_denied">Daha önce izin vermediniz. Shizuku’yu açın, Authorized apps’e gidin ve Pairline’ı açın.</string>
-    <string name="talk_allow">İzin ver</string>
+
+    <string name="talk_step_dev">Geliştirici seçenekleri’ni açın</string>
+    <string name="talk_step_dev_done">Geliştirici seçenekleri açık.</string>
+    <string name="talk_open_about">Telefon hakkında’yı aç</string>
+    <string name="talk_step_wireless">Kablosuz hata ayıklamayı açın</string>
+    <string name="talk_step_wireless_sub">Bu telefonu Wi-Fi’ye bağlayın. Ardından Geliştirici seçenekleri’nde Kablosuz hata ayıklamayı açın ve İzin ver’e dokunun. Pairline bunu sizin yerinize açamaz; karar sizindir.</string>
+    <string name="talk_step_wireless_done">Kablosuz hata ayıklama açık.</string>
+    <string name="talk_open_developer">Geliştirici seçenekleri’ni aç</string>
+    <string name="talk_step_pair">Pairline’ı Kablosuz hata ayıklama ile eşleyin</string>
+    <string name="talk_step_pair_sub">Eşle’ye dokunun. Kablosuz hata ayıklamada “Cihazı eşleme koduyla eşle”ye dokunun. Pairline bildirimi açılır: “Kodu girin”e dokunup ekrandaki 6 haneyi yazın. Bildirimi kaçırırsanız ekranın üstünden aşağı kaydırıp Pairline bildirimini açın. Bunu yalnızca bir kez yaparsınız.</string>
+    <string name="talk_pair">Eşle</string>
+    <string name="talk_pair_waiting">Şimdi Kablosuz hata ayıklamada “Cihazı eşleme koduyla eşle”ye dokunun.</string>
+    <string name="talk_pair_found">Pairline bildiriminde “Kodu girin”e dokunup 6 haneyi yazın. Görmüyorsanız ekranın üstünden aşağı kaydırın.</string>
+    <string name="talk_pair_pairing">Eşleniyor…</string>
+    <string name="talk_pair_wrong">Bu kod çalışmadı. Şu an ekrandaki kodu yazın; eşleme ekranı her açıldığında değişir.</string>
+    <string name="talk_pair_failed">Eşleme tamamlanmadı. “Cihazı eşleme koduyla eşle”yi açık tutup tekrar deneyin.</string>
+    <string name="talk_pair_done">Eşlendi. Android, Pairline’ı Kablosuz hata ayıklama › Eşlenen cihazlar altında gösterir.</string>
+    <string name="talk_pair_notifications">Önce Pairline bildirimlerine izin verin: eşleme kodu bir bildirime yazılır.</string>
+    <string name="talk_allow_notifications">Bildirimlere izin ver</string>
+    <string name="talk_step_start">Pairline yardımcısını başlatır</string>
+    <string name="talk_start_auto">Yukarıdaki adımlardan sonra kendiliğinden olur.</string>
+    <string name="talk_start_idle">iPhone’dan konuşma açıkken başlar.</string>
+    <string name="talk_start_starting">Başlatılıyor…</string>
+    <string name="talk_start_running">Çalışıyor. Telefon yeniden başlayana kadar çalışmaya devam eder.</string>
+    <string name="talk_start_no_service">Pairline Kablosuz hata ayıklamayı bulamadı. Açık olduğunu ve bu telefonun Wi-Fi’ye bağlı olduğunu kontrol edip tekrar deneyin.</string>
+    <string name="talk_start_failed">Yardımcı başlamadı. Tekrar deneyin. Yine olmazsa Kablosuz hata ayıklamayı kapatıp açın.</string>
+    <string name="talk_try_again">Tekrar dene</string>
+
+    <string name="dev_steps_samsung">Ayarlar → Telefon hakkında → Yazılım bilgileri: “Yapım numarası”na 7 kez dokunun, ardından kilit kodunuzu girin. Geliştirici seçenekleri Ayarlar’ın en altında çıkar.</string>
+    <string name="dev_steps_xiaomi">Ayarlar → Telefon hakkında: “İşletim sistemi sürümü”ne (HyperOS veya MIUI) 7 kez dokunun. Geliştirici seçenekleri Ayarlar → Ek ayarlar altındadır.</string>
+    <string name="dev_steps_oppo">Ayarlar → Cihaz hakkında → Sürüm: “Derleme numarası”na 7 kez dokunun. Geliştirici seçenekleri Ayarlar → Ek ayarlar altındadır.</string>
+    <string name="dev_steps_vivo">Ayarlar → Telefon hakkında → Yazılım sürümü: 7 kez dokunun. Geliştirici seçenekleri Ayarlar → Sistem yönetimi altındadır.</string>
+    <string name="dev_steps_other">Ayarlar → Telefon hakkında: “Derleme numarası”na 7 kez dokunun, ardından kilit kodunuzu girin. Geliştirici seçenekleri Ayarlar → Sistem altındadır.</string>
+
+    <string name="talk_q_step_usb">USB hata ayıklamayı açın</string>
+    <string name="talk_q_step_usb_sub">Geliştirici seçenekleri’nde USB hata ayıklamayı açın. Bu telefonu, Android’in adb aracı olan bir bilgisayara bağlayın ve telefonda İzin ver’e dokunun.</string>
+    <string name="talk_q_step_run">Bunu bilgisayarda çalıştırın</string>
+    <string name="talk_q_step_run_sub">Bu telefon her yeniden başladıktan sonra bir kez. Ardından Pairline’ın yardımcısı bir sonraki yeniden başlatmaya kadar çalışır.</string>
+    <string name="talk_computer_title">Bunun yerine bilgisayardan başlatın</string>
+    <string name="talk_computer_sub">Wi-Fi yoksa veya eşleme işe yaramazsa: USB hata ayıklamayı açın, adb olan bir bilgisayar bağlayın ve her yeniden başlatmadan sonra bu komutu bir kez çalıştırın.</string>
+    <string name="talk_copy_command">Komutu kopyala</string>
+    <string name="talk_command_copied">Komut kopyalandı</string>
+
     <string name="talk_this_phone">Bu telefonda</string>
     <string name="talk_listen_yes">iPhone aramalarınızı duyabilir</string>
-    <string name="talk_listen_no">Bu telefon, Shizuku’nun arama sesini almasına izin vermiyor</string>
+    <string name="talk_listen_no">Bu telefon, Pairline’ın yardımcısının arama sesini almasına izin vermiyor</string>
     <string name="talk_talk_yes">iPhone’daki sesiniz aramaya iletilebilir</string>
     <string name="talk_talk_no">Bu telefon aramaya ses aktaramıyor: aramaları iPhone’da duyar, bu telefondan konuşursunuz</string>
     <string name="talk_switch">iPhone’dan konuşma</string>
     <string name="talk_switch_sub">iPhone’da yanıtladığınızda aramanın sesi iPhone’a geçer. iPhone’dan tuş takımı, sessiz ve hoparlörü de açar.</string>
     <string name="talk_reset">Arama sesini baştan başlat</string>
     <string name="talk_reset_sub">Pairline, aramalardan sonraki yanıtlarınızdan bu telefonda neyin işe yaradığını öğrenir. Bu seçenek onları unutur.</string>
+
+    <string name="talk_manage">Bilmekte fayda var</string>
+    <string name="talk_tip_restart">Yeniden başlatmadan sonra</string>
+    <string name="talk_tip_restart_sub">Android, telefon yeniden başlayınca Kablosuz hata ayıklamayı kapatır. Tekrar açın; Pairline yardımcısını kendiliğinden başlatır. Pairline size bir bildirimle hatırlatır.</string>
+    <string name="talk_tip_banking">Banka uygulamaları</string>
+    <string name="talk_tip_banking_sub">Bazı banka uygulamaları Kablosuz hata ayıklama açıkken açılmaz. Pairline’ın yardımcısı çalışmaya başladıktan sonra Kablosuz hata ayıklamayı yeniden kapatabilirsiniz: aramalar telefon yeniden başlayana kadar iPhone’da çalmaya devam eder.</string>
+    <string name="talk_forget">Eşlemeyi unut</string>
+    <string name="talk_forget_sub">Yardımcıyı durdurur ve Pairline’ın anahtarını siler. Kablosuz hata ayıklama › Eşlenen cihazlar altından da “Pairline”ı kaldırın.</string>
     <string name="talk_wifi_note">Arama sesi Wi-Fi ağınız üzerinden uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz.</string>
+
     <string name="talk_setup_title">iPhone’dan konuşun (isteğe bağlı)</string>
     <string name="talk_setup_later">Sonra kur</string>
+
+    <string name="pair_channel">Kablosuz hata ayıklama ile eşleme</string>
+    <string name="pair_n_waiting_title">Pairline’ı Kablosuz hata ayıklama ile eşleyin</string>
+    <string name="pair_n_waiting_text">Kablosuz hata ayıklamada “Cihazı eşleme koduyla eşle”ye dokunun. Ardından 6 haneli kodu buraya yazın.</string>
+    <string name="pair_n_found_title">Eşleme kodunu yazın</string>
+    <string name="pair_n_found_text">“Kodu girin”e dokunup ekranda görünen 6 haneyi yazın.</string>
+    <string name="pair_n_pairing_title">Eşleniyor…</string>
+    <string name="pair_n_pairing_text">Eşleme ekranını bir an açık tutun.</string>
+    <string name="pair_n_wrong_title">Bu kod çalışmadı</string>
+    <string name="pair_n_wrong_text">Ekrandaki 6 haneli kodu kontrol edip tekrar deneyin. Eşleme ekranı her açıldığında değişir.</string>
+    <string name="pair_n_failed_title">Eşleme tamamlanmadı</string>
+    <string name="pair_n_failed_text">“Cihazı eşleme koduyla eşle”yi açık tutup kodu yeniden yazın.</string>
+    <string name="pair_n_done_title">Kablosuz hata ayıklama ile eşlendi</string>
+    <string name="pair_n_done_text">Pairline yardımcısını başlatıyor. iPhone’da yanıtladığınız aramalar artık orada çalabilir.</string>
+    <string name="pair_n_enter">Kodu girin</string>
+    <string name="pair_n_code_hint">6 haneli kod</string>
+    <string name="pair_n_cancel">İptal</string>
+
     <string name="talk_reminder_channel">iPhone’dan konuşma</string>
-    <string name="talk_reminder_title">Arama sesi bu telefona döndü</string>
-    <string name="talk_reminder_text">Telefon yeniden başlayınca Shizuku durdu. Aramaların iPhone’da çalması için dokunup Shizuku’yu açın ve yeniden başlatın. Bu arada aramalar yine iPhone’da çalar.</string>
+    <string name="talk_reminder_title">Kablosuz hata ayıklamayı açın</string>
+    <string name="talk_reminder_text">Telefon yeniden başladı, bu yüzden arama sesi bu telefona döndü. Dokunun ve Kablosuz hata ayıklamayı açın: Pairline yardımcısını kendiliğinden başlatır. Bu arada aramalar yine iPhone’da çalar.</string>
+    <string name="talk_reminder_title_q">Pairline’ın yardımcısını başlatın</string>
+    <string name="talk_reminder_text_q">Telefon yeniden başladı, bu yüzden arama sesi bu telefona döndü. iPhone’dan konuşma ekranındaki komutu bilgisayarda bir kez çalıştırın. Bu arada aramalar yine iPhone’da çalar.</string>
+
     <string name="help_section_talk">iPhone’dan konuşma</string>
-    <string name="help_q_shizuku">Shizuku nedir? Root gerekir mi?</string>
-    <string name="help_a_shizuku">Shizuku, izninizle Android’in kendi hata ayıklama aracının yetkilerini Pairline’a ödünç veren ücretsiz, açık kaynaklı bir uygulamadır. Root gerekmez. Pairline onu yalnızca arama sesini taşımak ve aramadaki tuş takımı, sessiz ve hoparlör için kullanır. İzni Shizuku’dan istediğiniz zaman geri alabilirsiniz.</string>
+    <string name="help_q_shizuku">Kablosuz hata ayıklama burada ne işe yarıyor? Root gerekir mi?</string>
+    <string name="help_a_shizuku">Android, arama sesine yalnızca kendi hata ayıklama aracının erişmesine izin verir. Kablosuz hata ayıklama açıkken Pairline, kendi uygulamasından bu aracın haklarıyla küçük bir yardımcı başlatır: ek uygulama ve root gerekmez. Yardımcı yalnızca arama sesini taşır ve aramadaki tuş takımı, sessiz ve hoparlörü yönetir. Telefon yeniden başlayınca durur; “Eşlemeyi unut” ise Pairline’ın erişimini tamamen kaldırır.</string>
     <string name="help_q_restart">Telefon yeniden başlayınca arama sesi neden bu telefona dönüyor?</string>
-    <string name="help_a_restart">Android, telefon her yeniden başladığında Kablosuz hata ayıklamayı kapatır ve bu Shizuku’yu durdurur. Pairline o zaman bir bildirim gösterir: dokunup Shizuku’yu yeniden başlatın, aramalar yine iPhone’da çalsın. O zamana kadar aramalar iPhone’da çalar ve çalışır, ses bu telefonda olur. Root’lu bir telefonda Shizuku kendiliğinden başlayabilir.</string>
+    <string name="help_a_restart">Android, telefon her yeniden başladığında Kablosuz hata ayıklamayı kapatır ve yardımcı da onunla durur. Pairline bunun üzerine bir bildirim gösterir: dokunup Kablosuz hata ayıklamayı açın, Pairline yardımcısını kendiliğinden başlatır. O zamana kadar aramalar iPhone’da çalar ve çalışır, ses bu telefonda olur.</string>
     <string name="help_q_debugging">Bir uygulama hata ayıklamanın açık olduğundan şikâyet ediyor</string>
-    <string name="help_a_debugging">Bazı banka ve ödeme uygulamaları Geliştirici seçenekleri veya Kablosuz hata ayıklama açıkken açılmaz. Pairline bunları asla kendiliğinden açmaz. Böyle bir uygulamayı kullanırken Kablosuz hata ayıklamayı kapatın; Shizuku durabilir, arama sesi için onu daha sonra yeniden başlatırsınız.</string>
+    <string name="help_a_debugging">Bazı banka ve ödeme uygulamaları Geliştirici seçenekleri veya Kablosuz hata ayıklama açıkken açılmaz. Pairline bunları asla kendiliğinden açmaz. Pairline’ın yardımcısı çalışmaya başladıktan sonra Kablosuz hata ayıklamayı kapatabilirsiniz; aramalar bir sonraki yeniden başlatmaya kadar iPhone’da çalmaya devam eder.</string>
     <string name="help_q_listen_only">Aramaları iPhone’da duyuyorum ama karşı taraf beni duymuyor</string>
     <string name="help_a_listen_only">Bazı telefonlar hiçbir uygulamanın aramaya ses aktarmasına izin vermez. O zaman aramaları iPhone’da duyar, bu telefondan konuşursunuz. Her aramadan sonra iPhone sesin nasıl olduğunu sorar; yanıtlarınız Pairline’ın bir sonraki aramada başka bir yol denemesine yardımcı olur.</string>
-    <string name="cap_missing_talk">İsteğe bağlı: aramaları iPhone’un kendisinde duyun ve yanıtlayın. Ücretsiz Shizuku uygulaması gerekir.</string>
+
+    <string name="cap_missing_talk">İsteğe bağlı: aramaları iPhone’un kendisinde duyun ve yanıtlayın. Kablosuz hata ayıklama ile bir kez kurulur; ek uygulama gerekmez.</string>
     <string name="cap_missing_dtmf_talk">iPhone’dan konuşma ile birlikte gelir.</string>
+    <string name="cap_dtmf_next_call">Bir sonraki aramanızda açılır.</string>
     <string name="action_set_up">Kur</string>
 </resources>

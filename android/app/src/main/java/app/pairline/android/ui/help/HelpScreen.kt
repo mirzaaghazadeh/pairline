@@ -77,7 +77,7 @@ private val sections = listOf(
             Faq(R.string.help_q_restricted, R.string.help_a_restricted),
         ),
     ),
-    // Talk on iPhone (Shizuku, D-046/D-047) and internet sharing (D-048).
+    // Talk on iPhone (Wireless debugging and Pairline's helper, D-047/D-054) and internet sharing (D-048).
     FaqSection(
         R.string.help_section_talk,
         PIcons.Phone,

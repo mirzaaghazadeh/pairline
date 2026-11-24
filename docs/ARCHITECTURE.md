@@ -9,7 +9,7 @@ Pairline is two native apps that talk only to each other.
  │  telephony ── LinkService ── BLE ─┼───────────────┼─ CoreBluetooth ── CallKit     │
  │  (SMS, calls,  (sessions,         │               │                   Messages    │
  │   contacts)     crypto)  Wi-Fi ───┼───────────────┼─ Wi-Fi (M5)       StoreKit 2  │
- │  privileged (Shizuku, optional)   │  local Wi-Fi  │                               │
+ │  privileged (own helper, opt.)    │  local Wi-Fi  │                               │
  └───────────────────────────────────┘               └───────────────────────────────┘
 ```
 
@@ -27,7 +27,7 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 | `files` | File transfer over the Wi-Fi session (M5): queue, `BULK` data, Downloads/Pairline, notifications, the "Send to iPhone" share target |
 | `protocol` | Message models, handshake, AEAD records. Pure Kotlin, unit-tested against `protocol/test-vectors/` |
 | `telephony` | SMS, calls, contacts, call log, USSD, SIM info |
-| `privileged` | Optional Shizuku-backed operations, behind an allowlist |
+| `privileged` | Optional shell-rights helper ("Talk on iPhone"), behind an allowlist; `privileged/adb` pairs with and connects to this phone's own Wireless debugging (D-054) |
 | `netshare` | Opt-in internet sharing for the iPhone (M8); the only code allowed to open non-local connections |
 
 **SMS**
@@ -57,8 +57,18 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 - The setup wizard asks the user, through Android's own dialog, to exempt Pairline from battery optimization, and shows autostart tips for Xiaomi, Oppo/Realme, Vivo, Huawei and Samsung.
 - Settings are never changed without the user (AGENTS.md rule 5).
 
-**Privileged access**
-- Uses Shizuku only if the user installed and enabled it; root is an alternative provider behind the same interface.
+**Privileged access (D-054)**
+- Pairline's own helper process, no third-party app. On Android 11+ the user turns on Developer options and
+  Wireless debugging and pairs Pairline once with the 6-digit code (typed into a Pairline notification). Pairline
+  then connects to this phone's own adbd on 127.0.0.1 and runs one command: `app_process` from Pairline's APK as
+  the shell user (`privileged/HelperMain`). The helper hands its binder to the app through `HelperProvider` (only
+  the shell or root user can call it) and serves only `IPrivilegedService`.
+- Pairing is adb's own protocol: TLS 1.3 + RFC 5705 keying material + SPAKE2 (BoringSSL, native, `src/main/cpp`),
+  then HKDF and AES-GCM (JCA). Connecting uses the platform's TLS with Pairline's key.
+- The helper runs only while Talk on iPhone is on (or its setup screen is open), survives Wireless debugging being
+  turned off and Pairline's process restarting, and ends at every reboot, when Pairline is updated, or after 10
+  minutes without Pairline. After a reboot Pairline starts it again by itself once the user turns Wireless
+  debugging back on. Android 10 has no Wireless debugging: the user starts it from a computer with one command.
 - Allowlisted operations only:
   - call-audio capture and injection (M6)
   - hotspot start/stop and band choice (M5)
@@ -66,7 +76,7 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 
 **Setup experience (M1)**
 - Setup is the hardest part for users, so each step has a short EN/FA video bundled in the app.
-- The videos play in picture-in-picture while the user is in Android Settings: battery, autostart, Shizuku.
+- The videos play in picture-in-picture while the user is in Android Settings: battery, autostart, Wireless debugging.
   Until they're recorded, each wizard step has an animated illustration drawn in Compose (D-031).
 - A diagnostics screen shows a readable report; "Share report" shows the exact text before it's sent anywhere.
 
@@ -168,7 +178,7 @@ Connectivity (`NEAppPushProvider`, a separate entitlement) could close that gap 
 | Option | How | Pros | Cons |
 |--------|-----|------|------|
 | A. Audio stays on Android | iPhone controls the call; the user talks on the Android phone | No privileges, works everywhere | Not the full experience. **Default until M6.** |
-| B. Shizuku (shell) | Capture and inject in-call audio with shell privileges | No root | Depends on chip and maker; needs Wireless debugging setup |
+| B. Shell rights (Pairline's helper through Wireless debugging; Shizuku until D-054) | Capture and inject in-call audio with shell privileges | No root, no extra app | Depends on chip and maker; needs Wireless debugging on after each restart |
 | C. Root | Direct audio paths | Works on more chips | Few users are rooted |
 | D. Carrier call forwarding to VoIP | Forward calls to a SIP number reachable on the iPhone | No device hacks | Needs a third-party VoIP provider (privacy impact) and carrier support |
 

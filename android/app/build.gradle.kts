@@ -20,8 +20,15 @@ android {
         targetSdk = 36
         // A release tag must be android-v<versionName>; the release workflow checks this.
         // Raise versionCode for every release.
-        versionCode = 5
-        versionName = "1.1.1"
+        versionCode = 6
+        versionName = "1.2.0"
+
+        externalNativeBuild {
+            cmake {
+                // Static C++ runtime: the library is self-contained.
+                arguments += "-DANDROID_STL=c++_static"
+            }
+        }
     }
 
     androidResources {
@@ -58,6 +65,17 @@ android {
         buildConfig = true
         // The privileged service's interface (privileged/IPrivilegedService.aidl, D-046).
         aidl = true
+        // BoringSSL comes as an NDK prefab package (D-054).
+        prefab = true
+    }
+
+    // The SPAKE2 step of pairing with Wireless debugging (privileged/adb, D-054), with BoringSSL's implementation.
+    ndkVersion = "27.1.12297006"
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 
     testOptions {
@@ -84,8 +102,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.zxing.core)
-    implementation(libs.shizuku.api)
-    implementation(libs.shizuku.provider)
+    implementation(libs.boringssl)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

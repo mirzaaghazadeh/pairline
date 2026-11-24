@@ -1,9 +1,9 @@
-// The privileged service: Pairline's only code that runs with shell rights, started through Shizuku
-// (AGENTS.md rule 7, D-046). Every method is on this allowlist; nothing else can be asked of it.
+// The privileged service: Pairline's only code that runs with shell rights, in Pairline's own helper process
+// (AGENTS.md rule 7, D-046, D-054). Every method is on this allowlist; nothing else can be asked of it.
 package app.pairline.android.privileged;
 
 interface IPrivilegedService {
-    /** Shizuku's reserved transaction for stopping the service process. */
+    /** Stops the helper process. */
     void destroy() = 16777114;
 
     /** This interface's version, so the app can replace a service left over from an older install. */

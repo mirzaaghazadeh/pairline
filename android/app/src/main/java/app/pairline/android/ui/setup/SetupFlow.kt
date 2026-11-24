@@ -81,7 +81,7 @@ sealed interface SetupStep {
     data class Autostart(val maker: Maker) : SetupStep
     data object Pair : SetupStep
 
-    /** Optional: call audio on the iPhone through Shizuku (D-047). Android 10+ only. */
+    /** Optional: call audio on the iPhone through Pairline's helper (D-047, D-054). Android 10+ only. */
     data object Talk : SetupStep
     data object Done : SetupStep
 

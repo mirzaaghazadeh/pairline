@@ -1,42 +1,62 @@
 package app.pairline.android.privileged
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.ServiceConnection
-import android.content.pm.PackageManager
+import android.database.ContentObserver
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import app.pairline.android.BuildConfig
+import android.provider.Settings
+import app.pairline.android.AppPrefs
 import app.pairline.android.log.Log
+import app.pairline.android.privileged.adb.AdbConnection
+import app.pairline.android.privileged.adb.AdbKey
+import app.pairline.android.privileged.adb.AdbNotPairedException
+import app.pairline.android.privileged.adb.AdbPairingClient
+import app.pairline.android.privileged.adb.AdbServiceFinder
+import app.pairline.android.privileged.adb.AdbWrongCodeException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
-import rikka.shizuku.Shizuku
 
 /**
- * Pairline's side of Shizuku (D-046). Shizuku is a separate app the user installs and starts (with Wireless
- * debugging, a computer, or root); Pairline never starts it, never turns debugging on (AGENTS.md rule 5) and works
- * fully without it. With it, the [PrivilegedService] can relay call audio and enable the companion call service.
+ * Pairline's helper with shell rights, for "Talk on iPhone" (D-047, D-054; it replaced Shizuku). On Android 11+
+ * Pairline pairs once with the phone's own Wireless debugging (the user types the 6-digit code), then starts the
+ * helper through it whenever it's needed and Wireless debugging is on. On Android 10 the user starts it from a
+ * computer. Pairline never turns Developer options or Wireless debugging on itself (AGENTS.md rule 5): it watches
+ * those settings and opens the right screen.
+ *
+ * The helper runs only while it's needed: Talk on iPhone is on, or its setup screen is open.
  */
-class PrivilegedManager(private val context: Context) {
+class PrivilegedManager(private val context: Context, private val prefs: AppPrefs) {
 
     enum class State {
-        /** Android 9: the shell user has no call-audio rights there, so Shizuku wouldn't help. */
+        /** Android 9: the shell user has no call-audio rights there. */
         UNSUPPORTED,
-        NOT_INSTALLED,
 
-        /** Installed but not started (it needs starting again after every reboot unless it runs with root). */
-        NOT_RUNNING,
+        /** Android 10 has no Wireless debugging: the helper is started from a computer, once per restart. */
+        NEEDS_COMPUTER,
+        NEEDS_DEVELOPER_OPTIONS,
 
-        /** A Shizuku older than version 13, which can't host Pairline's service. */
-        OUTDATED,
-        NEEDS_PERMISSION,
-        DENIED,
-        CONNECTING,
+        /** Off, which is also how Android leaves it after every restart. */
+        NEEDS_WIRELESS_DEBUGGING,
+        NEEDS_PAIRING,
+
+        /** Ready to start, but not needed now (Talk on iPhone is off). */
+        IDLE,
+        STARTING,
         READY,
+
+        /** It didn't start; [failure] says why. */
+        FAILED,
     }
+
+    enum class Failure { NO_SERVICE, NO_HELPER, OTHER }
+
+    enum class Pairing { IDLE, WAITING, FOUND, PAIRING, WRONG_CODE, FAILED, DONE }
 
     /** What the shell user may do on this phone, from [PrivilegedService.probe]. */
     data class Probe(
@@ -53,10 +73,15 @@ class PrivilegedManager(private val context: Context) {
     }
 
     private val main = Handler(Looper.getMainLooper())
-    private val _state = MutableStateFlow(State.NOT_INSTALLED)
+    private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-helper-start") }
+    private val _state = MutableStateFlow(if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) State.UNSUPPORTED else State.NEEDS_PAIRING)
     private val _probe = MutableStateFlow<Probe?>(null)
+    private val _pairing = MutableStateFlow(Pairing.IDLE)
     private var started = false
-    private var bound = false
+
+    @Volatile private var starting = false
+    @Volatile private var attached: CountDownLatch? = null
+    @Volatile private var pairingFinder: AdbServiceFinder? = null
 
     @Volatile
     var service: IPrivilegedService? = null
@@ -64,133 +89,306 @@ class PrivilegedManager(private val context: Context) {
 
     val state: StateFlow<State> = _state
     val probe: StateFlow<Probe?> = _probe
+    val pairing: StateFlow<Pairing> = _pairing
 
-    /** Called on every change, so the bridge can resend its capabilities. */
+    /** Why the last start failed (shown on the setup screen). */
+    @Volatile
+    var failure: Failure? = null
+        private set
+
+    /** Called on every state change, so the bridge can resend its capabilities. */
     var onChange: (() -> Unit)? = null
 
-    private val args by lazy {
-        Shizuku.UserServiceArgs(ComponentName(context.packageName, PrivilegedService::class.java.name))
-            .daemon(false)
-            .processNameSuffix("privileged")
-            .debuggable(BuildConfig.DEBUG)
-            .version(BuildConfig.VERSION_CODE * 100 + PrivilegedService.VERSION)
-    }
-
-    private val connection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-            val s = binder?.takeIf { it.pingBinder() }?.let { IPrivilegedService.Stub.asInterface(it) }
-            service = s
-            if (s == null) {
-                Log.w(TAG, "privileged service connected without a live binder")
-                set(State.NOT_RUNNING)
-                return
-            }
-            val p = runCatching { parseProbe(s.probe()) }
-                .onFailure { Log.w(TAG, "privileged probe failed", it) }
-                .getOrNull()
-            _probe.value = p
-            Log.i(TAG, "privileged service ready (sdk ${p?.sdk}, listen ${p?.canListen}, talk ${p?.canTalk}, root ${p?.root})")
-            set(State.READY)
+    /** The Talk on iPhone setup screen is open: run the helper for its checks even while Talk is off. */
+    var setupOpen: Boolean = false
+        set(value) {
+            field = value
+            main.post { refresh() }
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
-            service = null
-            bound = false
-            Log.i(TAG, "privileged service disconnected")
-            refresh()
-        }
-    }
-
-    private val binderReceived = Shizuku.OnBinderReceivedListener { main.post { refresh() } }
-    private val binderDead = Shizuku.OnBinderDeadListener {
-        main.post {
-            service = null
-            bound = false
-            refresh()
-        }
-    }
-    private val permissionResult = Shizuku.OnRequestPermissionResultListener { code, result ->
-        if (code == REQUEST_CODE) {
-            main.post {
-                Log.i(TAG, "Shizuku permission ${if (result == PackageManager.PERMISSION_GRANTED) "granted" else "denied"}")
-                refresh()
-            }
-        }
-    }
+    private val wanted: Boolean get() = prefs.talkOnIphone || setupOpen
 
     fun start() {
         if (started) return
         started = true
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            set(State.UNSUPPORTED)
-            return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
+        HelperInbox.listen(::attach)
+        val observer = object : ContentObserver(main) {
+            // A setting changed (e.g. Wireless debugging came back on after a restart): try again from scratch.
+            override fun onChange(selfChange: Boolean) {
+                if (_state.value == State.FAILED) failure = null
+                refresh()
+            }
         }
-        Shizuku.addBinderReceivedListenerSticky(binderReceived, main)
-        Shizuku.addBinderDeadListener(binderDead, main)
-        Shizuku.addRequestPermissionResultListener(permissionResult, main)
+        val resolver = context.contentResolver
+        for (key in listOf(Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, ADB_WIFI_ENABLED)) {
+            runCatching { resolver.registerContentObserver(Settings.Global.getUriFor(key), false, observer) }
+        }
         refresh()
     }
 
-    /** Re-reads Shizuku's state and binds the service when everything is in place. Main thread. */
+    /** Re-reads the settings and starts or stops the helper as needed. Main thread. */
     fun refresh() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return set(State.UNSUPPORTED)
-        if (!isShizukuInstalled()) return set(State.NOT_INSTALLED)
-        if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) return set(State.NOT_RUNNING)
-        if (runCatching { Shizuku.isPreV11() || Shizuku.getVersion() < 13 }.getOrDefault(true)) return set(State.OUTDATED)
-        val granted = runCatching { Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED }.getOrDefault(false)
-        if (!granted) {
-            val denied = runCatching { Shizuku.shouldShowRequestPermissionRationale() }.getOrDefault(false)
-            return set(if (denied) State.DENIED else State.NEEDS_PERMISSION)
+        val s = service
+        if (s != null && s.asBinder().pingBinder()) {
+            // Not needed any more: stop it, but only if Pairline can start it again by itself.
+            if (!wanted && canRestart()) {
+                stopHelper()
+                return set(nextWithoutHelper())
+            }
+            return set(State.READY)
         }
-        if (service != null) return set(State.READY)
-        set(State.CONNECTING)
-        if (!bound) {
-            bound = true
-            runCatching { Shizuku.bindUserService(args, connection) }.onFailure {
-                bound = false
-                Log.w(TAG, "couldn't start the privileged service", it)
-                set(State.NOT_RUNNING)
+        set(nextWithoutHelper())
+        if (_state.value == State.IDLE && wanted) startHelper()
+    }
+
+    private fun nextWithoutHelper(): State = when {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.R -> State.NEEDS_COMPUTER
+        !developerOptionsOn() -> State.NEEDS_DEVELOPER_OPTIONS
+        wirelessDebuggingOn() == false -> State.NEEDS_WIRELESS_DEBUGGING
+        !paired -> State.NEEDS_PAIRING
+        starting -> State.STARTING
+        _state.value == State.FAILED && failure != null -> State.FAILED
+        else -> State.IDLE
+    }
+
+    val paired: Boolean get() = prefs.adbPaired && AdbKey.exists(context)
+
+    private fun canRestart(): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && paired && wirelessDebuggingOn() != false
+
+    /** "Try again" after a failure. */
+    fun retry() {
+        failure = null
+        set(State.IDLE)
+        refresh()
+    }
+
+    private fun startHelper() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || starting) return
+        starting = true
+        failure = null
+        set(State.STARTING)
+        worker.execute {
+            val result = runCatching { launch() }
+            starting = false
+            main.post {
+                result.onFailure { e ->
+                    when (e) {
+                        is AdbNotPairedException -> {
+                            Log.i(TAG, "Wireless debugging no longer accepts Pairline's key; pairing again is needed")
+                            prefs.adbPaired = false
+                        }
+                        is StartException -> {
+                            Log.w(TAG, "helper didn't start: ${e.failure}")
+                            failure = e.failure
+                        }
+                        else -> {
+                            Log.w(TAG, "helper didn't start", e)
+                            failure = Failure.OTHER
+                        }
+                    }
+                }
+                if (service == null && failure != null) set(State.FAILED) else refresh()
             }
         }
     }
 
-    /** Shows Shizuku's own permission dialog. The user decides there; Pairline can't grant itself anything. */
-    fun requestPermission() {
-        runCatching { Shizuku.requestPermission(REQUEST_CODE) }.onFailure { Log.w(TAG, "permission request failed", it) }
+    /** Worker thread: finds Wireless debugging, runs the start command and waits for the helper to attach. */
+    private fun launch() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+        val key = AdbKey.loadOrCreate(context)
+        val finder = AdbServiceFinder(context, AdbServiceFinder.CONNECT)
+        val port = try {
+            finder.start()
+            finder.await(FIND_TIMEOUT_MS)
+        } finally {
+            finder.stop()
+        }
+        port ?: throw StartException(Failure.NO_SERVICE)
+        val latch = CountDownLatch(1)
+        attached = latch
+        AdbConnection(port, key).use { adb ->
+            adb.connect()
+            // Right after Wireless debugging comes on, adbd can close a command without running it. The command ends
+            // by printing a marker, so a missing marker means "try again". The helper's own output goes to /dev/null;
+            // anything else printed is the shell's (e.g. a missing tool).
+            for (attempt in 1..START_ATTEMPTS) {
+                val printed = adb.shell(HelperCommand.forShell(context) + " echo $STARTED_MARKER").trim()
+                if (printed.contains(STARTED_MARKER)) {
+                    val other = printed.replace(STARTED_MARKER, "").trim()
+                    if (other.isNotEmpty()) Log.w(TAG, "start command said: ${other.take(300)}")
+                    break
+                }
+                if (attempt == START_ATTEMPTS) throw StartException(Failure.NO_HELPER)
+                Thread.sleep(1_000)
+            }
+            // Stay connected until the helper has handed itself over: adbd ends what the command started when the
+            // connection closes, and the helper needs a moment to detach into its own session.
+            if (!latch.await(ATTACH_TIMEOUT_MS, TimeUnit.MILLISECONDS)) throw StartException(Failure.NO_HELPER)
+        }
+    }
+
+    /** The helper handed over its binder ([HelperProvider]); any thread. */
+    private fun attach(binder: IBinder) {
+        val s = IPrivilegedService.Stub.asInterface(binder)
+        val version = runCatching { s.version() }.getOrDefault(-1)
+        if (version != PrivilegedService.VERSION) {
+            // A helper from another Pairline version: replace it.
+            runCatching { s.destroy() }
+            return
+        }
+        val p = runCatching { parseProbe(s.probe()) }.onFailure { Log.w(TAG, "helper probe failed", it) }.getOrNull()
+        runCatching {
+            binder.linkToDeath({
+                main.post {
+                    if (service?.asBinder() == binder) {
+                        service = null
+                        _probe.value = null
+                        Log.i(TAG, "helper stopped")
+                        refresh()
+                    }
+                }
+            }, 0)
+        }
+        service = s
+        _probe.value = p
+        Log.i(TAG, "helper ready (sdk ${p?.sdk}, listen ${p?.canListen}, talk ${p?.canTalk})")
+        attached?.countDown()
+        main.post {
+            failure = null
+            refresh()
+        }
+    }
+
+    private fun stopHelper() {
+        val s = service ?: return
+        service = null
+        _probe.value = null
+        worker.execute { runCatching { s.destroy() } }
+        Log.i(TAG, "helper stopped (not needed)")
     }
 
     /**
      * Turns on the MANAGE_ONGOING_CALLS app-op so Android binds the companion call service on the next call (keypad,
-     * mute and speaker from the iPhone). Only when the user sets up "Talk on iPhone". Off the main thread.
+     * mute and speaker from the iPhone). Only when the user turns on "Talk on iPhone". Off the main thread.
      */
     fun allowOngoingCalls(): Boolean {
         val s = service ?: return false
-        return runCatching { s.allowOngoingCalls(BuildConfig.APPLICATION_ID) }
+        return runCatching { s.allowOngoingCalls(context.packageName) }
             .onFailure { Log.w(TAG, "couldn't enable the companion call service", it) }
             .getOrDefault(false)
     }
 
-    fun isShizukuInstalled(): Boolean = try {
-        context.packageManager.getPackageInfo(SHIZUKU_PACKAGE, 0)
-        true
-    } catch (_: PackageManager.NameNotFoundException) {
-        // Sui (Shizuku inside a root module) has no app but still delivers a binder.
-        runCatching { Shizuku.pingBinder() }.getOrDefault(false)
+    // region Pairing
+
+    /** Starts looking for "Pair device with pairing code" and shows the notification the code is typed into. */
+    fun beginPairing() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+        if (pairingFinder == null) {
+            pairingFinder = AdbServiceFinder(context, AdbServiceFinder.PAIRING).also { finder ->
+                finder.onChange = { port ->
+                    main.post {
+                        val now = _pairing.value
+                        if (port != null && (now == Pairing.WAITING || now == Pairing.FAILED)) setPairing(Pairing.FOUND)
+                    }
+                }
+                finder.start()
+            }
+        }
+        setPairing(if (pairingFinder?.port != null) Pairing.FOUND else Pairing.WAITING)
+        main.removeCallbacks(pairingTimeout)
+        main.postDelayed(pairingTimeout, PAIRING_TIMEOUT_MS)
     }
 
-    private fun set(s: State) {
-        if (s != State.READY) {
-            if (_state.value == State.READY) Log.i(TAG, "privileged service: $s")
+    private val pairingTimeout = Runnable { cancelPairing() }
+
+    /** The code the user typed into the notification. Worker thread (from [PairingCodeReceiver]). */
+    fun submitPairingCode(typed: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+        val code = typed.filter(Char::isDigit)
+        if (code.length != 6) {
+            setPairing(Pairing.WRONG_CODE)
+            return
         }
+        val finder = pairingFinder ?: run { beginPairing(); pairingFinder } ?: return
+        setPairing(Pairing.PAIRING)
+        val port = finder.await(FIND_TIMEOUT_MS)
+        if (port == null) {
+            setPairing(Pairing.FAILED)
+            return
+        }
+        try {
+            AdbPairingClient(port, code, AdbKey.loadOrCreate(context)).pair()
+            prefs.adbPaired = true
+            // The user set this up to hear calls on the iPhone: turn it on (the switch is on the same screen).
+            prefs.talkOnIphone = true
+            Log.i(TAG, "paired with Wireless debugging")
+            finishPairing(Pairing.DONE)
+            main.post {
+                failure = null
+                refresh()
+            }
+        } catch (_: AdbWrongCodeException) {
+            setPairing(Pairing.WRONG_CODE)
+        } catch (e: Exception) {
+            Log.w(TAG, "pairing failed", e)
+            setPairing(Pairing.FAILED)
+        }
+    }
+
+    fun cancelPairing() = finishPairing(Pairing.IDLE)
+
+    private fun finishPairing(result: Pairing) {
+        main.removeCallbacks(pairingTimeout)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) pairingFinder?.stop()
+        pairingFinder = null
+        setPairing(result)
+    }
+
+    private fun setPairing(p: Pairing) {
+        _pairing.value = p
+        PairingNotification.show(context, p)
+    }
+
+    /** "Forget pairing": stops the helper and deletes Pairline's key. */
+    fun forget() {
+        cancelPairing()
+        stopHelper()
+        prefs.adbPaired = false
+        worker.execute { AdbKey.delete(context) }
+        refresh()
+    }
+
+    // endregion
+
+    fun developerOptionsOn(): Boolean =
+        runCatching { Settings.Global.getInt(context.contentResolver, Settings.Global.DEVELOPMENT_SETTINGS_ENABLED) == 1 }
+            .getOrDefault(false)
+
+    /** Null when Android doesn't let apps read it; then Pairline just tries. */
+    fun wirelessDebuggingOn(): Boolean? =
+        runCatching { Settings.Global.getInt(context.contentResolver, ADB_WIFI_ENABLED, 0) == 1 }.getOrNull()
+
+    private fun set(s: State) {
         val changed = _state.value != s
+        if (changed && (s == State.READY || _state.value == State.READY)) Log.i(TAG, "helper: $s")
         _state.value = s
         if (changed) onChange?.invoke()
     }
 
+    private class StartException(val failure: Failure) : Exception(failure.name)
+
     companion object {
         private const val TAG = "privileged"
-        private const val REQUEST_CODE = 4701
-        const val SHIZUKU_PACKAGE = "moe.shizuku.privileged.api"
+        private const val ADB_WIFI_ENABLED = "adb_wifi_enabled"
+        private const val FIND_TIMEOUT_MS = 8_000L
+        // The first start after an install can be slow (Android verifies the APK's code for the new process).
+        private const val ATTACH_TIMEOUT_MS = 20_000L
+        private const val START_ATTEMPTS = 3
+        private const val STARTED_MARKER = "pairline-helper-launched"
+        private const val PAIRING_TIMEOUT_MS = 10 * 60_000L
 
         fun parseProbe(json: String): Probe {
             val o = JSONObject(json)

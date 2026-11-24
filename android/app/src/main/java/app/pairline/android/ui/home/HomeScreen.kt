@@ -430,7 +430,7 @@ private fun SignalBars(level: Int) {
 sealed interface Fix {
     data class Permission(val group: PermissionGroup) : Fix
     data object Settings : Fix
-    /** Talk on iPhone's setup (Shizuku, D-047). Optional, so its rows offer "Set up" instead of a warning. */
+    /** Talk on iPhone's setup (Wireless debugging, D-054). Optional, so its rows offer "Set up" instead of a warning. */
     data object Talk : Fix
 }
 
@@ -451,7 +451,7 @@ private val features = listOf(
         if (talkSupported) R.string.cap_missing_talk else R.string.talk_summary_unsupported,
         if (talkSupported) Fix.Talk else null,
     ),
-    // The keypad, mute and speaker come with the same Shizuku setup (it allows Pairline's in-call service).
+    // The keypad, mute and speaker come with the same setup (Pairline's helper allows its in-call service).
     Feature(
         Caps.CALL_DTMF, R.string.cap_call_dtmf,
         if (talkSupported) R.string.cap_missing_dtmf_talk else R.string.cap_missing_companion,
@@ -469,26 +469,32 @@ private val features = listOf(
 private fun CapabilitiesCard(caps: List<String>, onFix: (Fix) -> Unit) {
     val prefsTick by AppGraph.prefs.changes.collectAsState()
     val talkOn = remember(prefsTick) { AppGraph.prefs.talkOnIphone }
+    val helper by AppGraph.privileged.state.collectAsState()
     SectionCard(title = stringResource(R.string.home_supports), contentPadding = PaddingValues(vertical = 4.dp)) {
         features.forEachIndexed { i, f ->
             if (i > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp))
             val ok = f.cap in caps
-            val needsFix = f.fix != null && f.fix != Fix.Talk
+            // Talk on iPhone is set up; Android binds the call service (keypad, mute, speaker) on the next call.
+            val nextCall = !ok && f.cap == Caps.CALL_DTMF && talkSupported && talkOn &&
+                helper == app.pairline.android.privileged.PrivilegedManager.State.READY
+            val fix = if (nextCall) null else f.fix
+            val needsFix = fix != null && fix != Fix.Talk
             ListRow(
                 title = stringResource(f.title),
                 subtitle = when {
                     ok -> null
-                    // Turned on but not working, e.g. Shizuku stopped after a restart: say what's missing.
+                    nextCall -> stringResource(R.string.cap_dtmf_next_call)
+                    // Turned on but not working, e.g. the helper stopped after a restart: say what's missing.
                     f.cap == Caps.CALL_MEDIA && talkSupported && talkOn -> app.pairline.android.ui.talk.talkSummary()
                     else -> stringResource(f.missing)
                 },
                 icon = if (ok) PIcons.CheckCircle else if (needsFix) PIcons.Warning else PIcons.Info,
                 iconTone = if (ok) Tone.GOOD else if (needsFix) Tone.WARN else Tone.NEUTRAL,
                 showChevron = false,
-                trailing = if (!ok && f.fix != null) {
+                trailing = if (!ok && fix != null) {
                     {
-                        TextButton(onClick = { onFix(f.fix) }) {
-                            Text(stringResource(if (f.fix == Fix.Talk) R.string.action_set_up else R.string.action_fix))
+                        TextButton(onClick = { onFix(fix) }) {
+                            Text(stringResource(if (fix == Fix.Talk) R.string.action_set_up else R.string.action_fix))
                         }
                     }
                 } else {

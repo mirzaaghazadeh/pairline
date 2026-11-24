@@ -65,7 +65,7 @@ object Caps {
     const val WIFI = "wifi"
     const val FILES = "files"
 
-    /** Call audio can be heard on the iPhone ("Talk on iPhone" set up, Shizuku ready, capture allowed). D-047. */
+    /** Call audio can be heard on the iPhone ("Talk on iPhone" set up, Pairline's helper running, capture allowed). D-047. */
     const val CALL_MEDIA = "call.media"
 
     /** …and the iPhone's microphone can be fed into the call. */

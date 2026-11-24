@@ -30,6 +30,9 @@ concurrency:
 
 env:
   BUILD_TOOLS: 37.0.0
+  # Pairing with Wireless debugging is native code (D-054); keep in step with android/app/build.gradle.kts.
+  NDK: 27.1.12297006
+  CMAKE: 3.22.1
 
 jobs:
   build:
@@ -51,11 +54,12 @@ jobs:
       # Also validates the Gradle wrapper checksum.
       - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
 
-      - name: Install build-tools ${{ env.BUILD_TOOLS }}
+      - name: Install build-tools ${{ env.BUILD_TOOLS }}, NDK ${{ env.NDK }} and CMake ${{ env.CMAKE }}
         run: |
-          if [ ! -d "$ANDROID_HOME/build-tools/$BUILD_TOOLS" ]; then
-            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;$BUILD_TOOLS" > /dev/null
-          fi
+          sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -d "$ANDROID_HOME/build-tools/$BUILD_TOOLS" ] || yes | "$sdk" "build-tools;$BUILD_TOOLS" > /dev/null
+          [ -d "$ANDROID_HOME/ndk/$NDK" ] || yes | "$sdk" "ndk;$NDK" > /dev/null
+          [ -d "$ANDROID_HOME/cmake/$CMAKE" ] || yes | "$sdk" "cmake;$CMAKE" > /dev/null
 
       - name: Build, test and lint
         run: ./gradlew assembleDebug assembleRelease test lint

@@ -29,7 +29,8 @@ one, stop and ask the maintainer instead of working around it.
    outside parties are Apple (App Store / StoreKit) on the iPhone and, on Android, GitHub for the daily
    update check, which the user can turn off (D-041; it sends nothing about the user). The opt-in
    internet-sharing feature (M8, `netshare`) forwards the iPhone's own traffic. Android network code lives
-   only in `update/`, `link/wifi/` and `netshare/` (`.github/scripts/network-code-check.sh`).
+   only in `update/`, `link/wifi/`, `netshare/` and `privileged/adb/` (this phone's own Wireless debugging,
+   127.0.0.1 only, D-054) (`.github/scripts/network-code-check.sh`).
 3. **No analytics, ads, crash-reporting, attribution or IP-geolocation code.** No Firebase, Sentry,
    AppsFlyer, ipinfo-style lookups, etc.
 4. **`docs/PRIVACY.md` lists every data flow and permission.** A change that adds or changes a data
@@ -41,9 +42,12 @@ one, stop and ask the maintainer instead of working around it.
    debugging or Wireless debugging after the user turns them off; detect it and explain instead.
 6. **Never install updates silently.** Android updates go through the system package-installer
    confirmation. Privileged (shell/root) access must never be used for `pm install`.
-7. **Privileged access is optional and fenced.** Shell access comes through Shizuku; root is
-   optional and never required. All privileged calls live in one small module with an explicit
-   allowlist of operations, validate every argument, and accept calls only from our own UID.
+7. **Privileged access is optional and fenced.** Shell access comes only through Pairline's own helper,
+   started through Wireless debugging that the user turned on and paired (or from the user's computer),
+   never through a third-party app (D-054, replacing Shizuku); root is never required. All privileged
+   calls live in one small module (`privileged/`) with an explicit allowlist of operations, validate every
+   argument, and accept calls only from our own UID. The helper runs only while Talk on iPhone needs it and
+   stops at every restart.
 8. **Crypto only as specified in `docs/PROTOCOL.md`,** using platform primitives (Android JCA,
    iOS CryptoKit). No home-made algorithms. Any wire-format change bumps the protocol version and
    updates `PROTOCOL.md` and the shared test vectors.
@@ -71,7 +75,7 @@ one, stop and ask the maintainer instead of working around it.
 | Minimum OS     | Android 9 (API 28; D-038)                           | iOS 16                                         |
 | Target         | latest (API 36)                                     | latest                                         |
 | Build          | Gradle, Kotlin DSL + version catalog, JDK 17        | Xcode + XcodeGen (`ios/project.yml`)           |
-| Key frameworks | Telephony/SmsManager, InCallService (companion), BLE GATT server, Shizuku (optional) | CallKit, CoreBluetooth, AVAudioSession, CryptoKit, StoreKit 2 |
+| Key frameworks | Telephony/SmsManager, InCallService (companion), BLE GATT server, Wireless debugging helper (optional; BoringSSL for its pairing) | CallKit, CoreBluetooth, AVAudioSession, CryptoKit, StoreKit 2 |
 
 Every new dependency gets an entry in `docs/DECISIONS.md`: why it's needed, its license, and
 confirmation that it makes no network calls of its own.
@@ -150,8 +154,10 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 ## Development machine
 
 - macOS with Xcode 27.2, JDK 17, Gradle and XcodeGen (Homebrew)
-- Android SDK at `~/Library/Android/sdk` (platforms 33, 36 and 37.0; build-tools 33.0.1, 35.0.0, 36.0.0, 37.0.0),
-  with emulators `pairline-30` (Android 11) and `pairline-36` (Android 16):
+- Android SDK at `~/Library/Android/sdk` (platforms 33, 36 and 37.0; build-tools 33.0.1, 35.0.0, 36.0.0, 37.0.0;
+  NDK 27.1.12297006 and CMake 3.22.1 for the Wireless debugging pairing code, D-054),
+  with emulators `pairline-30` (Android 11) and `pairline-36` (Android 16). Both can test Talk on iPhone's helper:
+  turn on Wireless debugging in their Developer options (the network prompt may need Tab/Enter instead of a tap):
   `~/Library/Android/sdk/emulator/emulator -avd pairline-36`
 - iOS Simulator "iPhone 18 Pro" (iOS 27). Full two-app test: run the Android debug build on the emulator,
   `adb forward tcp:47800 tcp:47800`, read the pairing link from the devtools provider (see Commands), then

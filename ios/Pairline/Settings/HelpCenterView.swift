@@ -165,9 +165,9 @@ struct HelpArticleView: View {
             HelpCard(symbol: "phone.arrow.down.left", title: Text("Incoming calls"),
                      text: Text("Calls to your Android number ring on this iPhone with the normal iPhone call screen, even when it's locked. Answer or decline here."))
             HelpCard(symbol: "speaker.wave.2", title: Text("Where the audio is", tableName: "CallAudio"),
-                     text: Text("Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, the free Shizuku app, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker.", tableName: "CallAudio"))
+                     text: Text("Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker.", tableName: "CallAudio"))
             HelpCard(symbol: "arrow.clockwise", title: Text("After the Android phone restarts", tableName: "CallAudio"),
-                     text: Text("Android stops Shizuku at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and start Shizuku again. Calls keep ringing here meanwhile.", tableName: "CallAudio"))
+                     text: Text("Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Calls keep ringing here meanwhile.", tableName: "CallAudio"))
             HelpCard(symbol: "phone.arrow.up.right", title: Text("Making calls"),
                      text: Text("Call from the keypad, contacts or recents. Choose the SIM on dual-SIM phones."))
             HelpCard(symbol: "clock.arrow.circlepath", title: Text("iPhone Recents"),
@@ -232,10 +232,10 @@ struct FAQ: Identifiable {
         FAQ(id: 3, question: "Do I need both phones nearby?",
             answer: "Yes. The link uses Bluetooth, so keep the phones within about 10 meters. Leaving the Android phone at home while you're out isn't supported yet."),
         FAQ(id: 4, question: "Can I talk on the iPhone during calls?",
-            answer: "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, the free Shizuku app (no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone.",
+            answer: "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone.",
             table: "CallAudio"),
         FAQ(id: 9, question: "Why does call audio go back to the Android phone sometimes?",
-            answer: "Android stops Shizuku every time the Android phone restarts. The bridge app then shows a notification; tap it and start Shizuku again. Some phones also only allow listening: then you hear calls here and talk on the Android phone.",
+            answer: "Android turns Wireless debugging off every time the Android phone restarts. The bridge app then shows a notification; tap it and turn Wireless debugging on again, and the bridge starts its helper by itself. Some phones also only allow listening: then you hear calls here and talk on the Android phone.",
             table: "CallAudio"),
         FAQ(id: 10, question: "Can this iPhone use the Android phone's internet?",
             answer: "Yes. Turn on Internet sharing in the bridge app, then use Settings › Internet sharing here: it gives a link for your Wi-Fi proxy settings and a one-tap Telegram setting. Traffic goes through the Android phone and its VPN, if one is on.",

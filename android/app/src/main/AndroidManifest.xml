@@ -49,8 +49,8 @@
     <!-- Only to delete call-log entries the user deletes on the iPhone (calllog.delete, D-043). -->
     <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
     <!-- Android 12+ binds the companion call service (keypad, mute, speaker from the iPhone) only for apps holding
-         this app-op. Nobody gets it at install: Pairline turns it on through Shizuku only when the user sets up
-         "Talk on iPhone" (D-046). -->
+         this app-op. Nobody gets it at install: Pairline's helper turns it on only when the user sets up
+         "Talk on iPhone" (D-046, D-054). -->
     <uses-permission
         android:name="android.permission.MANAGE_ONGOING_CALLS"
         tools:ignore="ProtectedPermissions" />
@@ -68,11 +68,6 @@
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
-
-    <!-- Only to see whether the Shizuku app is installed ("Talk on iPhone" setup, D-046). -->
-    <queries>
-        <package android:name="moe.shizuku.privileged.api" />
-    </queries>
 
     <!-- allowBackup="false" and the extraction rules keep messages, contacts and keys out of
          Google cloud backup and device-to-device transfer (AGENTS.md rule 1). -->
@@ -120,15 +115,21 @@
             </intent-filter>
         </service>
 
-        <!-- Shizuku hands its binder to the app through this provider. Only the shell or system user can call it
-             (INTERACT_ACROSS_USERS_FULL is a signature permission). D-046. -->
+        <!-- Pairline's helper hands its binder to the app through this provider. Only the shell or system user can
+             call it (INTERACT_ACROSS_USERS_FULL is a signature permission, and the provider checks the caller too).
+             D-054. -->
         <provider
-            android:name="rikka.shizuku.ShizukuProvider"
-            android:authorities="${applicationId}.shizuku"
+            android:name=".privileged.HelperProvider"
+            android:authorities="${applicationId}.helper"
             android:enabled="true"
             android:exported="true"
             android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <!-- The Wireless debugging pairing code typed into Pairline's notification (D-054). -->
+        <receiver
+            android:name=".privileged.PairingCodeReceiver"
+            android:exported="false" />
 
         <!-- Only the system's SMS stack can send this (BROADCAST_SMS). -->
         <receiver
