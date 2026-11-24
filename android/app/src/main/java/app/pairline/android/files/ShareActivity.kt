@@ -20,6 +20,7 @@ class ShareActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val uris = sharedUris(intent)
+        Log.i(TAG, "share sheet: ${uris.size} item(s)")
         if (!AppGraph.peers.paired.value) {
             toast(R.string.share_not_paired)
             finish()
