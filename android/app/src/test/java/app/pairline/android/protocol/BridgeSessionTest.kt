@@ -215,6 +215,64 @@ class BridgeSessionTest {
         }
     }
 
+    @Test
+    fun wifiSessionCarriesBulkRecordsAndHandsOutMediaKeys() {
+        val rec = Recorder(pinned = TestVectors.publicKey("sR"))
+        val bulk = ArrayList<ByteArray>()
+        val callbacks = object : SessionCallbacks by rec {
+            override fun onBulk(plaintext: ByteArray) {
+                bulk += plaintext
+            }
+        }
+        val s = BridgeSession(
+            identity = TestVectors.key("sB"),
+            pairing = Gate(null),
+            callbacks = callbacks,
+            random = FixedRandom(hex("session.rand_b")),
+            newEphemeral = { TestVectors.key("eB") },
+            wifiChannels = true,
+        )
+        assertNull("no media keys before the handshake", s.takeMediaKeys())
+        s.onFrame(hex("session.hello_r_frame"))
+        s.onFrame(frame(FrameType.RECORD, hex("session.confirm_r_to_b")))
+        assertTrue(rec.established)
+
+        // R→B bulk record, counter 0, sealed with bulk_k_rb.
+        val data = FileData(7, 0, "abc".toByteArray()).encode()
+        val wire = Records.seal(hex("session.bulk_k_rb"), Proto.DIR_REMOTE_TO_BRIDGE, 0, Proto.CHANNEL_BULK, data)
+        s.onFrame(frame(FrameType.BULK, wire))
+        assertNull(rec.closedReason)
+        assertArrayEquals(data, bulk.single())
+
+        // Our bulk records start at counter 0 with bulk_k_br: the vector's record.
+        val vector = TestVectors.json.getJSONObject("bulk_file_data")
+        val out = s.sealBulk(Hex.decode(vector.getString("plaintext")))!!
+        assertEquals(vector.getString("frame"), Hex.encode(out))
+
+        val (seal, open) = s.takeMediaKeys()!!
+        assertEquals(TestVectors.string("session.media_k_br"), Hex.encode(seal))
+        assertEquals(TestVectors.string("session.media_k_rb"), Hex.encode(open))
+        assertNull("handed out once", s.takeMediaKeys())
+
+        // A replayed bulk record closes the connection, like on the control channel.
+        s.onFrame(frame(FrameType.BULK, wire))
+        assertNotNull(rec.closedReason)
+    }
+
+    @Test
+    fun bulkFrameOutsideWifiCloses() {
+        val rec = Recorder(pinned = TestVectors.publicKey("sR"))
+        val s = session(Gate(null), rec)
+        s.onFrame(hex("session.hello_r_frame"))
+        s.onFrame(frame(FrameType.RECORD, hex("session.confirm_r_to_b")))
+        assertTrue(rec.established)
+        assertNull(s.sealBulk(byteArrayOf(1)))
+        assertNull(s.takeMediaKeys())
+        val wire = Records.seal(hex("session.bulk_k_rb"), Proto.DIR_REMOTE_TO_BRIDGE, 0, Proto.CHANNEL_BULK, byteArrayOf(1))
+        s.onFrame(frame(FrameType.BULK, wire))
+        assertNotNull(rec.closedReason)
+    }
+
     private fun assertPairFail(rec: Recorder, reason: String) {
         val f = Frame.decode(rec.frames.single())
         assertEquals(FrameType.PAIR_FAIL, f.type)

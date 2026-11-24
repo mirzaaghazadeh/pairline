@@ -31,6 +31,12 @@ object Msg {
     const val CONTACTS_ADD = "contacts.add"
     const val USSD_RUN = "ussd.run"
     const val USSD_RESULT = "ussd.result"
+    const val WIFI_OFFER = "wifi.offer"
+    const val WIFI_MEDIA = "wifi.media"
+    const val FILE_OFFER = "file.offer"
+    const val FILE_ANSWER = "file.answer"
+    const val FILE_DONE = "file.done"
+    const val FILE_CANCEL = "file.cancel"
 }
 
 /** Capabilities in `status.caps` (PROTOCOL.md, "Capabilities"). */
@@ -48,11 +54,13 @@ object Caps {
     const val CONTACTS_ADD = "contacts.add"
     const val USSD = "ussd"
     const val DUALSIM = "dualsim"
+    const val WIFI = "wifi"
+    const val FILES = "files"
 
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM,
+        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, WIFI, FILES,
     )
 }
 
@@ -88,6 +96,42 @@ object Messages {
         .put("os", os)
         .put("app", app)
         .put("proto", Proto.VERSION)
+
+    /** Where the iPhone can reach this bridge over Wi-Fi; `ip: []` when there's no Wi-Fi now (M5). */
+    fun wifiOffer(hint: WifiHint?, band: String?): JSONObject = JSONObject()
+        .put("t", Msg.WIFI_OFFER)
+        .put("ip", JSONArray(hint?.addresses.orEmpty()))
+        .putNullable("port", hint?.port)
+        .putNullable("ssid", hint?.ssid)
+        .putNullable("password", hint?.password)
+        .putNullable("band", band)
+
+    /** The UDP port of this Wi-Fi session's media channel, or null when there is none. */
+    fun wifiMedia(port: Int?): JSONObject = JSONObject().put("t", Msg.WIFI_MEDIA).putNullable("port", port)
+
+    fun fileOffer(fid: Long, name: String, size: Long, mime: String?): JSONObject = JSONObject()
+        .put("t", Msg.FILE_OFFER)
+        .put("fid", fid)
+        .put("name", name)
+        .put("size", size)
+        .putNullable("type", mime)
+
+    fun fileAnswer(fid: Long, accept: Boolean, reason: String? = null): JSONObject = JSONObject()
+        .put("t", Msg.FILE_ANSWER)
+        .put("fid", fid)
+        .put("accept", accept)
+        .putNullable("reason", reason)
+
+    fun fileDone(fid: Long, ok: Boolean, reason: String? = null): JSONObject = JSONObject()
+        .put("t", Msg.FILE_DONE)
+        .put("fid", fid)
+        .put("ok", ok)
+        .putNullable("reason", reason)
+
+    fun fileCancel(fid: Long, reason: String? = null): JSONObject = JSONObject()
+        .put("t", Msg.FILE_CANCEL)
+        .put("fid", fid)
+        .putNullable("reason", reason)
 }
 
 /** The message type, or null if it's missing. */

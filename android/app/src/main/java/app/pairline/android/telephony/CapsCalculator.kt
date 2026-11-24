@@ -12,6 +12,8 @@ data class CapsInput(
     /** The companion InCallService is bound now, or has been bound on this phone before. */
     val inCallService: Boolean,
     val contactsAddEnabled: Boolean,
+    /** The Wi-Fi link is switched on (M5): files can go both ways over a Wi-Fi session. */
+    val wifiLink: Boolean = false,
 )
 
 /**
@@ -42,6 +44,10 @@ object CapsCalculator {
         if (has(Manifest.permission.READ_CALL_LOG)) caps += Caps.CALLLOG
         if (input.contactsAddEnabled && has(Manifest.permission.WRITE_CONTACTS)) caps += Caps.CONTACTS_ADD
         if (input.activeSims >= 2) caps += Caps.DUALSIM
+        if (input.wifiLink) {
+            caps += Caps.WIFI
+            caps += Caps.FILES
+        }
         return Caps.ALL.filter { it in caps }
     }
 }

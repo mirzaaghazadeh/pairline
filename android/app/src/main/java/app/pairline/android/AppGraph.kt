@@ -1,11 +1,14 @@
 package app.pairline.android
 
 import android.app.Application
+import app.pairline.android.files.FileNotifications
+import app.pairline.android.files.FileTransfers
 import app.pairline.android.link.IdentityStore
 import app.pairline.android.link.LinkManager
 import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
 import app.pairline.android.link.PrefsPeerKeyStore
+import app.pairline.android.link.wifi.BridgeHotspot
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
 import app.pairline.android.telephony.SimDirectory
@@ -36,9 +39,16 @@ object AppGraph {
             deviceId = { identity.deviceId },
             identityPublicKey = { identity.identity().publicKey },
             peers = peers,
+            wifiHint = { link.state.value.wifiHint },
         )
     }
-    val link by lazy { LinkManager({ identity.identity() }, pairing, peers, prefs) }
+    val link: LinkManager by lazy { LinkManager({ identity.identity() }, pairing, peers, prefs) }
+
+    /** The bridge's own hotspot for the iPhone (M5, user-started). */
+    val hotspot by lazy { BridgeHotspot(app) }
+
+    /** File transfers over the Wi-Fi link (M5). */
+    val files by lazy { FileTransfers(app, link).also { it.notifications = FileNotifications(app) } }
 
     val sims: SimDirectory by lazy { SimDirectory(app) }
     val smsStore: SmsStore by lazy { SmsStore(app, sims) }
@@ -50,6 +60,6 @@ object AppGraph {
         StatusMonitor(app, sims, prefs, BuildConfig.VERSION_NAME) { calls.inCallServiceAvailable }
     }
     val router: MessageRouter by lazy {
-        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd)
+        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, files)
     }
 }

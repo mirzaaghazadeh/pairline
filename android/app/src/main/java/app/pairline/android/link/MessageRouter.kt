@@ -4,6 +4,7 @@ import android.os.Build
 import app.pairline.android.AppPrefs
 import app.pairline.android.BuildConfig
 import app.pairline.android.log.Log
+import app.pairline.android.protocol.Caps
 import app.pairline.android.protocol.ErrorCode
 import app.pairline.android.protocol.Messages
 import app.pairline.android.protocol.Msg
@@ -47,6 +48,7 @@ class MessageRouter(
     private val calls: CallTracker,
     private val contacts: ContactsSync,
     private val ussd: UssdRunner,
+    private val files: FileMessageHandler,
 ) : MessageHandler {
 
     private val scope = CoroutineScope(
@@ -57,13 +59,41 @@ class MessageRouter(
     private val lastStatusSent = AtomicLong(0)
     private var statusPushPending: Job? = null
 
-    /** Called when a session is ready: device.info and status, then calls in progress. */
-    override fun onEstablished() {
+    /**
+     * Called when a session is ready: device.info and status on that session; if it now carries events, also
+     * calls in progress and where the iPhone can find us on Wi-Fi.
+     */
+    override fun onEstablished(token: Long, kind: TransportKind, carriesEvents: Boolean) {
         scope.launch {
-            link.send(Messages.deviceInfo(deviceName(), Build.VERSION.RELEASE ?: "", BuildConfig.VERSION_NAME))
+            link.reply(token, Messages.deviceInfo(deviceName(), Build.VERSION.RELEASE ?: "", BuildConfig.VERSION_NAME))
+            if (carriesEvents) {
+                sendStatus(force = true)
+                calls.replay()
+                wifiChanged()
+            } else {
+                link.reply(token, status.build())
+            }
+        }
+        startTicker()
+    }
+
+    /** Bluetooth dropped and Wi-Fi stayed (or the reverse): the new event session gets the current state. */
+    override fun onEventSessionChanged(token: Long) {
+        scope.launch {
             sendStatus(force = true)
             calls.replay()
+            wifiChanged()
         }
+    }
+
+    /** The Wi-Fi addresses, port or hotspot changed: tell the iPhone (`wifi.offer`, PROTOCOL.md "Wi-Fi"). */
+    fun wifiChanged() {
+        if (!link.isConnected) return
+        val s = link.state.value
+        link.send(Messages.wifiOffer(s.wifiHint, s.hotspotBand))
+    }
+
+    private fun startTicker() {
         ticker?.cancel()
         ticker = scope.launch {
             // At least every 60 s (PROTOCOL.md): wake when the last status turns 60 s old.
@@ -106,11 +136,16 @@ class MessageRouter(
         return copy.toString().hashCode().toLong()
     }
 
-    override fun onMessage(message: JSONObject) {
+    /** The session of the message being handled. Set and read on the link thread only. */
+    private var currentToken = 0L
+
+    override fun onMessage(message: JSONObject, token: Long) {
         val type = message.type ?: return
+        currentToken = token
         when (type) {
             Msg.DEVICE_INFO -> onDeviceInfo(message)
-            Msg.PING -> message.requestId?.let { link.send(Messages.pong(it)) }
+            Msg.PING -> message.requestId?.let { link.reply(token, Messages.pong(it)) }
+            Msg.FILE_OFFER, Msg.FILE_ANSWER, Msg.FILE_DONE, Msg.FILE_CANCEL -> files.onMessage(message, token)
             Msg.PONG -> Unit
             Msg.UNPAIR -> link.onRemoteUnpair()
             Msg.STATUS_GET -> request(message) { id -> status.build(id) }
@@ -147,27 +182,24 @@ class MessageRouter(
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }
             Msg.CONTACTS_ADD -> request(message) { id -> contactsAdd(id, message) }
-            Msg.USSD_RUN -> {
-                val generation = link.generation
-                request(message) { id ->
-                    ussd.run(id, sim(message), message.stringOrNull("code") ?: invalid("code missing")) {
-                        link.reply(generation, it)
-                    }
-                    null // the reply is the ussd.result with the same id, sent when the network answers
+            Msg.USSD_RUN -> request(message) { id ->
+                ussd.run(id, sim(message), message.stringOrNull("code") ?: invalid("code missing")) {
+                    link.reply(token, it)
                 }
+                null // the reply is the ussd.result with the same id, sent when the network answers
             }
             else -> message.requestId?.let { id ->
                 // Unknown request: answer so the iPhone doesn't wait (PROTOCOL.md clarifications).
-                link.send(Messages.error(id, ErrorCode.UNSUPPORTED, "unknown type"))
+                link.reply(token, Messages.error(id, ErrorCode.UNSUPPORTED, "unknown type"))
             }
         }
     }
 
-    /** Runs a request off the link thread and answers with its reply or an `error`. */
+    /** Runs a request off the link thread and answers with its reply or an `error`, on the session that asked. */
     private fun request(message: JSONObject, handler: (Long) -> JSONObject?) {
         val id = message.requestId ?: return // a request without an id can't be answered
         val type = message.type
-        val generation = link.generation // on the link thread: the session that asked
+        val token = currentToken // on the link thread: the session that asked
         scope.launch {
             val reply = try {
                 handler(id)
@@ -181,7 +213,7 @@ class MessageRouter(
                 Log.e(TAG, "$type failed", e)
                 Messages.error(id, ErrorCode.FAILED, "internal error")
             }
-            reply?.let { link.reply(generation, it) }
+            reply?.let { link.reply(token, it) }
         }
     }
 
@@ -220,6 +252,9 @@ class MessageRouter(
         prefs.peerName = m.stringOrNull("name")?.take(60)
         prefs.peerOs = m.stringOrNull("os")?.take(20)
         prefs.peerApp = m.stringOrNull("app")?.take(20)
+        val caps = m.optJSONArray("caps")
+        link.peerAcceptsFiles = caps != null && (0 until caps.length()).any { caps.opt(it) == Caps.FILES }
+        files.onPeerCaps()
         Log.i(TAG, "iPhone app ${prefs.peerApp ?: "?"}, iOS ${prefs.peerOs ?: "?"}, protocol ${m.opt("proto")}")
     }
 

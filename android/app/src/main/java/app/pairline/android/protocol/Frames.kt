@@ -39,6 +39,24 @@ object Proto {
     val SESSION_INFO: ByteArray = "pairline v0 session".toByteArray(Charsets.US_ASCII)
     val MEDIA_INFO: ByteArray = "pairline v0 media".toByteArray(Charsets.US_ASCII)
     val BULK_INFO: ByteArray = "pairline v0 bulk".toByteArray(Charsets.US_ASCII)
+
+    /** Media datagrams carry at most this much plaintext, so one fits any Wi-Fi path unfragmented. */
+    const val MEDIA_MAX_PLAINTEXT: Int = 1200
+
+    /** Record overhead: 8-byte counter and 16-byte tag. */
+    const val RECORD_OVERHEAD: Int = 8 + TAG_LENGTH
+
+    /** The media channel's sliding replay window, in records. */
+    const val MEDIA_REPLAY_WINDOW: Int = 64
+
+    /** File data per `BULK` record (PROTOCOL.md, "File transfer"). */
+    const val FILE_CHUNK: Int = 49_152
+
+    /** Largest file either side sends or accepts. */
+    const val FILE_MAX_SIZE: Long = 1L shl 30
+
+    /** First byte of a `BULK` plaintext that carries file data. */
+    const val BULK_FILE_DATA: Int = 0x01
 }
 
 enum class FrameType(val code: Int) {
@@ -46,7 +64,10 @@ enum class FrameType(val code: Int) {
     PAIR_OK(0x02),
     PAIR_FAIL(0x03),
     HELLO(0x10),
-    RECORD(0x20);
+    RECORD(0x20),
+
+    /** A record on the bulk channel (M5): Wi-Fi TCP only, after the handshake. */
+    BULK(0x21);
 
     companion object {
         fun of(code: Int): FrameType? = entries.firstOrNull { it.code == code }

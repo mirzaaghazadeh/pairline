@@ -9,6 +9,19 @@
          code opens a connection. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- The Wi-Fi link (M5): see which networks are Wi-Fi (the link never listens on mobile data or VPNs). -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- The bridge hotspot (M5, only when the user starts it): Android's local-only hotspot needs CHANGE_WIFI_STATE,
+         plus NEARBY_WIFI_DEVICES on Android 13+ (never used for location) or location on Android 9–12. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission
+        android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="33" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="32" />
+
     <!-- The Bluetooth link. Android 11 grants these at install; Android 12+ asks ("Nearby devices"). -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
@@ -102,6 +115,39 @@
         <receiver
             android:name=".telephony.SmsResultReceiver"
             android:exported="false" />
+
+        <!-- "Send to iPhone" in the share sheet (M5): files go to the paired iPhone over the Wi-Fi link. -->
+        <activity
+            android:name=".files.ShareActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/share_label"
+            android:icon="@mipmap/ic_launcher"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
+        <!-- Cancel action of a file-transfer notification; reached only through our PendingIntents. -->
+        <receiver
+            android:name=".files.FileActionReceiver"
+            android:exported="false" />
+
+        <!-- Android 9 only: opens received files, which live in Pairline's own Download folder there. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <receiver
             android:name=".link.BootReceiver"

@@ -1,6 +1,9 @@
 package app.pairline.android.ui.home
 
+import android.os.Build
 import android.text.format.DateUtils
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -46,9 +49,12 @@ import androidx.compose.ui.unit.dp
 import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
 import app.pairline.android.R
+import app.pairline.android.files.TransferItem
+import app.pairline.android.files.TransferPhase
 import app.pairline.android.link.BluetoothStatus
 import app.pairline.android.link.LinkSnapshot
 import app.pairline.android.link.TransportKind
+import app.pairline.android.link.WifiLinkStatus
 import app.pairline.android.protocol.Caps
 import app.pairline.android.telephony.Perms
 import app.pairline.android.telephony.SimSnapshot
@@ -122,6 +128,8 @@ fun HomeScreen(navigate: (Route) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             LinkCard(link, paired, prefsTick, now, navigate, onAllowBluetooth = { requestPermission(PermissionGroup.BLUETOOTH) })
+
+            if (paired && link.wifi != WifiLinkStatus.OFF) FilesCard()
 
             PhoneCard(facts)
 
@@ -210,9 +218,11 @@ private fun LinkCard(
     val peer = prefs.peerName ?: stringResource(R.string.generic_iphone_name)
     val btProblem = link.bluetooth == BluetoothStatus.OFF || link.bluetooth == BluetoothStatus.NO_PERMISSION ||
         link.bluetooth == BluetoothStatus.UNSUPPORTED
+    // With the Wi-Fi link listening, a Bluetooth problem isn't a dead end: the iPhone can still come over Wi-Fi.
+    val wifiReady = link.wifi == WifiLinkStatus.LISTENING
     val (visual, tone, pill) = when {
         link.connected -> Triple(LinkVisual.CONNECTED, Tone.GOOD, R.string.state_connected)
-        btProblem && !link.debugTcpListening -> Triple(LinkVisual.PROBLEM, Tone.BAD, R.string.state_problem)
+        btProblem && !link.debugTcpListening && !wifiReady -> Triple(LinkVisual.PROBLEM, Tone.BAD, R.string.state_problem)
         !paired -> Triple(LinkVisual.NOT_PAIRED, Tone.NEUTRAL, R.string.state_not_paired)
         else -> Triple(LinkVisual.SEARCHING, Tone.WARN, R.string.state_searching)
     }
@@ -226,12 +236,16 @@ private fun LinkCard(
             StatusPill(stringResource(pill), tone)
             val (title, body) = when {
                 link.connected -> stringResource(R.string.home_connected_title, peer) to stringResource(
-                    if (link.transport == TransportKind.DEBUG_TCP && !ScreenshotMode.enabled) {
-                        R.string.home_connected_body_tcp
-                    } else {
-                        R.string.home_connected_body
+                    when {
+                        link.transport == TransportKind.DEBUG_TCP && !ScreenshotMode.enabled && TransportKind.WIFI !in link.transports ->
+                            R.string.home_connected_body_tcp
+                        TransportKind.WIFI in link.transports && link.transports.size > 1 -> R.string.home_connected_body_both
+                        TransportKind.WIFI in link.transports -> R.string.home_connected_body_wifi
+                        else -> R.string.home_connected_body
                     },
                 )
+                link.bluetooth == BluetoothStatus.OFF && wifiReady && paired ->
+                    stringResource(R.string.home_waiting_title, peer) to stringResource(R.string.home_bt_off_wifi_body)
                 link.bluetooth == BluetoothStatus.OFF -> stringResource(R.string.notif_bt_off_title) to stringResource(R.string.home_bt_off_body)
                 link.bluetooth == BluetoothStatus.NO_PERMISSION -> stringResource(R.string.home_bt_perm_title) to stringResource(R.string.home_bt_perm_body)
                 link.bluetooth == BluetoothStatus.UNSUPPORTED -> stringResource(R.string.home_bt_unsupported_title) to stringResource(R.string.home_bt_unsupported_body)
@@ -247,6 +261,85 @@ private fun LinkCard(
             }
         }
     }
+}
+
+/** "Send a file to iPhone" and the latest transfers (M5). Received files are announced in notifications. */
+@Composable
+private fun FilesCard() {
+    val context = LocalContext.current
+    val items by AppGraph.files.items.collectAsState()
+    val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isNotEmpty()) {
+            val app = context.applicationContext
+            Thread({ runCatching { AppGraph.files.send(uris, null) } }, "pairline-pick").start()
+            android.widget.Toast.makeText(
+                app,
+                if (AppGraph.link.wifiToken != null) R.string.share_sending else R.string.share_waiting,
+                android.widget.Toast.LENGTH_LONG,
+            ).show()
+        }
+    }
+    SectionCard(title = stringResource(R.string.home_files)) {
+        ListRow(
+            title = stringResource(R.string.home_send_file),
+            subtitle = stringResource(
+                if (Build.VERSION.SDK_INT >= 29) R.string.home_send_file_sub else R.string.home_send_file_sub_legacy,
+            ),
+            icon = PIcons.File,
+            onClick = { pick.launch(arrayOf("*/*")) },
+        )
+        for (item in items.take(3)) {
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+            ListRow(
+                title = item.name,
+                subtitle = transferText(item),
+                icon = if (item.outgoing) PIcons.Share else PIcons.File,
+                iconTone = when (item.phase) {
+                    TransferPhase.DONE -> Tone.GOOD
+                    TransferPhase.FAILED -> Tone.BAD
+                    TransferPhase.CANCELLED -> Tone.NEUTRAL
+                    else -> Tone.ACCENT
+                },
+                onClick = when {
+                    item.phase == TransferPhase.DONE && item.uri != null -> {
+                        { openReceived(context, item) }
+                    }
+                    item.phase in setOf(TransferPhase.WAITING, TransferPhase.OFFERED, TransferPhase.ACTIVE) -> {
+                        { AppGraph.files.cancel(item.id) }
+                    }
+                    else -> null
+                },
+                showChevron = false,
+            )
+        }
+    }
+}
+
+@Composable
+private fun transferText(item: TransferItem): String = when (item.phase) {
+    TransferPhase.WAITING -> stringResource(R.string.file_waiting_wifi)
+    TransferPhase.OFFERED, TransferPhase.ACTIVE -> {
+        val label = stringResource(if (item.outgoing) R.string.file_sending else R.string.file_receiving)
+        if (item.size > 0 && item.transferred > 0) "$label ${item.transferred * 100 / item.size}%" else label
+    }
+    TransferPhase.DONE -> stringResource(
+        when {
+            item.outgoing -> R.string.file_sent
+            Build.VERSION.SDK_INT >= 29 -> R.string.file_received
+            else -> R.string.file_received_legacy
+        },
+    )
+    TransferPhase.CANCELLED -> stringResource(R.string.file_cancelled)
+    TransferPhase.FAILED -> stringResource(if (item.outgoing) R.string.file_failed_send else R.string.file_failed_receive)
+}
+
+private fun openReceived(context: android.content.Context, item: TransferItem) {
+    val uri = item.uri ?: return
+    val type = runCatching { context.contentResolver.getType(uri) }.getOrNull() ?: "*/*"
+    val view = android.content.Intent(android.content.Intent.ACTION_VIEW)
+        .setDataAndType(uri, type)
+        .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    runCatching { context.startActivity(android.content.Intent.createChooser(view, null)) }
 }
 
 @Composable

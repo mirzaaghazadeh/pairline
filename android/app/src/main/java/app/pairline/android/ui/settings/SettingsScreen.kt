@@ -45,6 +45,9 @@ import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
 import app.pairline.android.R
 import app.pairline.android.link.LinkService
+import app.pairline.android.link.WifiLinkStatus
+import app.pairline.android.link.wifi.HotspotFailure
+import app.pairline.android.link.wifi.HotspotState
 import app.pairline.android.telephony.Perms
 import app.pairline.android.ui.GrantState
 import app.pairline.android.ui.LocaleHelper
@@ -170,6 +173,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                 }
             }
 
+            WifiSection(prefsTick)
+
             SectionCard(title = stringResource(R.string.home_keep_running)) {
                 ListRow(
                     title = stringResource(R.string.settings_background),
@@ -286,6 +291,110 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
             },
             dismissButton = { TextButton(onClick = { confirmSetup = false }) { Text(stringResource(R.string.action_cancel)) } },
         )
+    }
+}
+
+/**
+ * The Wi-Fi link switch (on by default) and the bridge hotspot (M5). The hotspot starts only from here: Android
+ * starts a local-only hotspot only for an app in the foreground, and only when the user asks.
+ */
+@Composable
+private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
+    val context = LocalContext.current
+    val prefs = AppGraph.prefs
+    val link by AppGraph.link.state.collectAsState()
+    val hotspotState by AppGraph.hotspot.state.collectAsState()
+    val hotspot = AppGraph.hotspot
+    val enabled = prefs.wifiLinkEnabled
+    val askPermissions = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+        if (result.values.all { it }) hotspot.start(prefs.hotspotBand)
+    }
+    SectionCard(title = stringResource(R.string.settings_wifi)) {
+        ListRow(
+            title = stringResource(R.string.settings_wifi_link),
+            subtitle = stringResource(R.string.settings_wifi_link_sub),
+            icon = PIcons.Wifi,
+            onClick = {
+                prefs.wifiLinkEnabled = !enabled
+                LinkService.refresh(context)
+            },
+            trailing = { Switch(checked = enabled, onCheckedChange = null) },
+        )
+        if (!enabled) return@SectionCard
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        val listening = link.wifi == WifiLinkStatus.LISTENING
+        ListRow(
+            title = stringResource(if (listening) R.string.settings_wifi_listening else R.string.settings_wifi_no_network),
+            icon = PIcons.Wifi,
+            iconTone = if (listening) Tone.GOOD else Tone.NEUTRAL,
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        val on = hotspotState as? HotspotState.On
+        ListRow(
+            title = stringResource(R.string.settings_hotspot),
+            subtitle = when (val s = hotspotState) {
+                is HotspotState.On -> stringResource(R.string.settings_hotspot_on, ltr(s.ssid)) + "\n" +
+                    stringResource(R.string.settings_hotspot_iphone)
+                HotspotState.Starting -> stringResource(R.string.settings_hotspot_starting)
+                is HotspotState.Failed -> stringResource(
+                    when (s.reason) {
+                        HotspotFailure.PERMISSION -> R.string.hotspot_failed_permission
+                        HotspotFailure.LOCATION_OFF -> R.string.hotspot_failed_location
+                        HotspotFailure.INCOMPATIBLE -> R.string.hotspot_failed_incompatible
+                        HotspotFailure.DISALLOWED -> R.string.hotspot_failed_disallowed
+                        HotspotFailure.GENERIC -> R.string.hotspot_failed_generic
+                    },
+                )
+                HotspotState.Off -> stringResource(R.string.settings_hotspot_sub)
+            },
+            icon = PIcons.Hotspot,
+            iconTone = if (on != null) Tone.GOOD else if (hotspotState is HotspotState.Failed) Tone.WARN else Tone.ACCENT,
+            trailing = {
+                TextButton(onClick = {
+                    when {
+                        on != null || hotspotState == HotspotState.Starting -> hotspot.stop()
+                        Perms.allGranted(context, hotspot.requiredPermissions()) -> hotspot.start(prefs.hotspotBand)
+                        else -> {
+                            prefs.markRequested(hotspot.requiredPermissions())
+                            askPermissions.launch(hotspot.requiredPermissions().toTypedArray())
+                        }
+                    }
+                }) {
+                    Text(
+                        stringResource(
+                            if (on != null || hotspotState == HotspotState.Starting) {
+                                R.string.settings_hotspot_stop
+                            } else {
+                                R.string.settings_hotspot_start
+                            },
+                        ),
+                    )
+                }
+            },
+        )
+        if (hotspot.bandChoiceSupported) {
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+            ListRow(
+                title = stringResource(R.string.settings_hotspot_band),
+                subtitle = stringResource(
+                    when (prefs.hotspotBand) {
+                        "2.4" -> R.string.settings_hotspot_band_24
+                        "5" -> R.string.settings_hotspot_band_5
+                        else -> R.string.settings_hotspot_band_auto
+                    },
+                ),
+                icon = PIcons.Hotspot,
+                iconTone = Tone.NEUTRAL,
+                // Takes effect the next time the hotspot starts.
+                onClick = {
+                    prefs.hotspotBand = when (prefs.hotspotBand) {
+                        "auto" -> "2.4"
+                        "2.4" -> "5"
+                        else -> "auto"
+                    }
+                },
+            )
+        }
     }
 }
 

@@ -29,11 +29,16 @@ interface SessionCallbacks {
     fun onPaired() {}
     fun onEstablished() {}
     fun onMessage(message: JSONObject)
+
+    /** An authentic `BULK` record's plaintext (Wi-Fi sessions only). */
+    fun onBulk(plaintext: ByteArray) {}
 }
 
 /**
  * The bridge (B) side of one connection: pairing, the session handshake and records
  * (docs/PROTOCOL.md). Transport-independent and single-threaded; BLE and TCP feed it whole frames.
+ *
+ * A Wi-Fi session ([wifiChannels]) also derives the media and bulk keys and accepts `BULK` frames (M5).
  */
 class BridgeSession(
     private val identity: StaticKey,
@@ -41,6 +46,7 @@ class BridgeSession(
     private val callbacks: SessionCallbacks,
     private val random: SecureRandom = SecureRandom(),
     private val newEphemeral: () -> StaticKey = { SoftwareKey.generate(random) },
+    private val wifiChannels: Boolean = false,
 ) {
     enum class State { AWAIT_FIRST, AWAIT_HELLO, AWAIT_CONFIRM, ESTABLISHED, CLOSED }
 
@@ -53,6 +59,9 @@ class BridgeSession(
 
     private var sealer: RecordSealer? = null
     private var opener: RecordOpener? = null
+    private var bulkSealer: RecordSealer? = null
+    private var bulkOpener: RecordOpener? = null
+    private var mediaKeys: Pair<ByteArray, ByteArray>? = null
 
     fun onFrame(bytes: ByteArray) {
         if (state == State.CLOSED) return
@@ -62,6 +71,7 @@ class BridgeSession(
                 FrameType.PAIR_HELLO -> onPairHello(frame.body)
                 FrameType.HELLO -> onHello(frame.body)
                 FrameType.RECORD -> onRecord(frame.body)
+                FrameType.BULK -> onBulk(frame.body)
                 FrameType.PAIR_OK, FrameType.PAIR_FAIL -> fail("unexpected ${frame.type} from the remote")
             }
         } catch (e: ProtocolException) {
@@ -89,11 +99,35 @@ class BridgeSession(
         return true
     }
 
+    /** Seals one `BULK` record (Wi-Fi sessions, after the handshake). Returns the frame, or null if not possible. */
+    fun sealBulk(plaintext: ByteArray): ByteArray? {
+        if (state != State.ESTABLISHED) return null
+        val s = bulkSealer ?: return null
+        if (s.exhausted) {
+            fail("bulk counter limit reached; reconnecting to rekey")
+            return null
+        }
+        return Frame(FrameType.BULK, s.seal(plaintext)).encode()
+    }
+
+    /**
+     * The media keys of this Wi-Fi session (B→R to seal, R→B to open), handed out once after the handshake.
+     * The caller owns and wipes them.
+     */
+    fun takeMediaKeys(): Pair<ByteArray, ByteArray>? {
+        if (state != State.ESTABLISHED) return null
+        return mediaKeys.also { mediaKeys = null }
+    }
+
     fun close(reason: String) {
         if (state == State.CLOSED) return
         state = State.CLOSED
         sealer?.wipe()
         opener?.wipe()
+        bulkSealer?.wipe()
+        bulkOpener?.wipe()
+        mediaKeys?.let { (a, b) -> a.wipe(); b.wipe() }
+        mediaKeys = null
         callbacks.close(reason)
     }
 
@@ -145,6 +179,12 @@ class BridgeSession(
         val keys = SessionKeys.forBridge(identity, ephemeral, remoteStatic, helloR, helloB)
         sealer = RecordSealer(keys.bridgeToRemote, Proto.DIR_BRIDGE_TO_REMOTE, Proto.CHANNEL_CONTROL)
         opener = RecordOpener(keys.remoteToBridge, Proto.DIR_REMOTE_TO_BRIDGE, Proto.CHANNEL_CONTROL)
+        if (wifiChannels) {
+            val wifi = WifiKeys.from(keys)
+            bulkSealer = RecordSealer(wifi.bulkBridgeToRemote, Proto.DIR_BRIDGE_TO_REMOTE, Proto.CHANNEL_BULK)
+            bulkOpener = RecordOpener(wifi.bulkRemoteToBridge, Proto.DIR_REMOTE_TO_BRIDGE, Proto.CHANNEL_BULK)
+            mediaKeys = wifi.mediaBridgeToRemote to wifi.mediaRemoteToBridge
+        }
         keys.wipe()
         callbacks.sendFrame(Frame(FrameType.HELLO, helloB.encode()).encode())
         // Our confirm: counter 0, empty plaintext.
@@ -172,6 +212,14 @@ class BridgeSession(
             }
             else -> throw ProtocolException("record in the wrong state")
         }
+    }
+
+    private fun onBulk(body: ByteArray) {
+        if (!wifiChannels) throw ProtocolException("bulk frame outside a Wi-Fi session")
+        if (state != State.ESTABLISHED) throw ProtocolException("bulk frame before the handshake")
+        val o = bulkOpener ?: throw ProtocolException("no bulk keys")
+        val (_, plaintext) = o.open(body)
+        callbacks.onBulk(plaintext)
     }
 
     private fun fail(reason: String) = close(reason)

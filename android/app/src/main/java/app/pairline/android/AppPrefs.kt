@@ -26,6 +26,16 @@ class AppPrefs(context: Context) {
         get() = prefs.getBoolean(CONTACTS_ADD, false)
         set(value) = edit { putBoolean(CONTACTS_ADD, value) }
 
+    /** The Wi-Fi link (M5): listen on the local network for the paired iPhone. On by default (PRIVACY.md). */
+    var wifiLinkEnabled: Boolean
+        get() = prefs.getBoolean(WIFI_LINK, true)
+        set(value) = edit { putBoolean(WIFI_LINK, value) }
+
+    /** The band asked for when the bridge hotspot starts: "auto", "2.4" or "5" (Android 16+ only). */
+    var hotspotBand: String
+        get() = prefs.getString(HOTSPOT_BAND, "auto") ?: "auto"
+        set(value) = edit { putString(HOTSPOT_BAND, value) }
+
     /** Per-app language tag on Android 11–12 ("" = follow the system). Android 13+ uses LocaleManager. */
     var languageTag: String
         get() = prefs.getString(LANGUAGE, "") ?: ""
@@ -80,6 +90,8 @@ class AppPrefs(context: Context) {
     private companion object {
         const val SETUP_DONE = "setup_done"
         const val CONTACTS_ADD = "contacts_add"
+        const val WIFI_LINK = "wifi_link"
+        const val HOTSPOT_BAND = "hotspot_band"
         const val LANGUAGE = "language"
         const val PEER_NAME = "peer_name"
         const val PEER_OS = "peer_os"

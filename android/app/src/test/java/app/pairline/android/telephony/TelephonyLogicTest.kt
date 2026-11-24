@@ -29,7 +29,8 @@ class TelephonyLogicTest {
         sims: Int = 1,
         inCall: Boolean = false,
         add: Boolean = false,
-    ) = CapsCalculator.compute(CapsInput(granted, messaging, calling, sims, inCall, add))
+        wifi: Boolean = false,
+    ) = CapsCalculator.compute(CapsInput(granted, messaging, calling, sims, inCall, add, wifi))
 
     @Test
     fun allPermissionsSingleSim() {
@@ -44,7 +45,7 @@ class TelephonyLogicTest {
 
     @Test
     fun everythingIncludingOptionalOnes() {
-        assertEquals(Caps.ALL, caps(sims = 2, inCall = true, add = true))
+        assertEquals(Caps.ALL, caps(sims = 2, inCall = true, add = true, wifi = true))
     }
 
     @Test

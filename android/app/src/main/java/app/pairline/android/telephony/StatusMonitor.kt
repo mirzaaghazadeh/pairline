@@ -155,6 +155,7 @@ class StatusMonitor(
                 activeSims = sims.activeCount(),
                 inCallService = inCallServiceAvailable(),
                 contactsAddEnabled = prefs.contactsAddEnabled,
+                wifiLink = prefs.wifiLinkEnabled,
             ),
         )
     }

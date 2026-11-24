@@ -12,6 +12,8 @@ import android.telephony.TelephonyManager
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import app.pairline.android.AppGraph
+import app.pairline.android.link.wifi.HotspotState
+import app.pairline.android.link.wifi.WifiTransport
 import app.pairline.android.log.Log
 import app.pairline.android.ui.LocaleHelper
 import app.pairline.android.ui.Notifications
@@ -21,6 +23,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
@@ -31,6 +34,7 @@ class LinkService : Service() {
     private val graph = AppGraph
     private var transports: List<LinkTransport> = emptyList()
     private var ble: BleTransport? = null
+    private var wifi: WifiTransport? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun attachBaseContext(newBase: Context) {
@@ -48,6 +52,7 @@ class LinkService : Service() {
         Log.i(TAG, "link service started")
         val link = graph.link
         link.handler = graph.router
+        link.wifiListener = graph.files
         link.start()
 
         val bleTransport = BleTransport(this, link, { graph.identity.deviceId }) { bt, advertising ->
@@ -56,6 +61,20 @@ class LinkService : Service() {
         ble = bleTransport
         transports = listOf(bleTransport) + ExtraTransports.create(this, link)
         transports.forEach { it.start() }
+        applyWifiSetting()
+
+        // Where the iPhone finds us on Wi-Fi changed: tell it (wifi.offer) and refresh a QR code on screen.
+        scope.launch {
+            link.state.map { it.wifiHint to it.hotspotBand }.distinctUntilChanged().collect {
+                graph.router.wifiChanged()
+                graph.pairing.refreshWifi()
+            }
+        }
+        scope.launch {
+            graph.hotspot.state.collect { s ->
+                link.updateState { it.copy(hotspotBand = (s as? HotspotState.On)?.band) }
+            }
+        }
 
         graph.status.onChange = graph.router::statusChanged
         graph.status.onCallState = graph.calls::onTelephonyState
@@ -87,9 +106,29 @@ class LinkService : Service() {
             // Permissions or settings may have changed. start() is a no-op while the GATT server runs, so a
             // live connection isn't disturbed; it retries if Bluetooth wasn't usable before.
             ble?.start()
+            applyWifiSetting()
             graph.status.refresh()
         }
         return START_STICKY
+    }
+
+    /** Starts or stops the Wi-Fi link to match Settings (on by default). */
+    private fun applyWifiSetting() {
+        val link = graph.link
+        if (graph.prefs.wifiLinkEnabled) {
+            if (wifi != null) return
+            val transport = WifiTransport(this, link, graph.hotspot) { status, hint ->
+                link.updateState { it.copy(wifi = status, wifiHint = hint) }
+            }
+            wifi = transport
+            transport.start()
+        } else {
+            val transport = wifi ?: return
+            wifi = null
+            transport.stop()
+            graph.hotspot.stop()
+            link.updateState { it.copy(wifi = WifiLinkStatus.OFF, wifiHint = null) }
+        }
     }
 
     override fun onDestroy() {
@@ -99,6 +138,8 @@ class LinkService : Service() {
         graph.status.stop()
         transports.forEach { it.stop() }
         transports = emptyList()
+        wifi?.stop()
+        wifi = null
         graph.link.stop()
         scope.cancel()
         super.onDestroy()

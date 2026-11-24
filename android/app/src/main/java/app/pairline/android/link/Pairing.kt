@@ -9,6 +9,7 @@ import app.pairline.android.protocol.PairingClaim
 import app.pairline.android.protocol.PairingGate
 import app.pairline.android.protocol.PairingUri
 import app.pairline.android.protocol.Proto
+import app.pairline.android.protocol.WifiHint
 import app.pairline.android.protocol.wipe
 import java.security.SecureRandom
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,6 +62,8 @@ class PairingManager(
     private val onPairedHook: () -> Unit = {},
     private val clock: () -> Long = System::currentTimeMillis,
     private val random: SecureRandom = SecureRandom(),
+    /** Where the iPhone can reach us over Wi-Fi right now; goes into the QR code so it can pair without Bluetooth. */
+    private val wifiHint: () -> WifiHint? = { null },
 ) : PairingGate {
 
     private var secret: ByteArray? = null
@@ -87,10 +90,20 @@ class PairingManager(
         used = false
         badMacs = 0
         _outcome.value = PairingOutcome.NONE
-        val offer = PairingOffer(PairingUri(deviceId(), identityPublicKey(), s).encode(), now, expiresAt)
+        val offer = PairingOffer(PairingUri(deviceId(), identityPublicKey(), s, wifiHint()).encode(), now, expiresAt)
         _offer.value = offer
         Log.i(TAG, "pairing code shown")
         return offer
+    }
+
+    /** The Wi-Fi addresses changed while a code is on screen: same secret and expiry, new addresses in the QR. */
+    @Synchronized
+    fun refreshWifi() {
+        val current = _offer.value ?: return
+        val s = secret ?: return
+        if (used) return
+        val uri = PairingUri(deviceId(), identityPublicKey(), s, wifiHint()).encode()
+        if (uri != current.uri) _offer.value = PairingOffer(uri, current.createdAt, current.expiresAt)
     }
 
     /** The current offer if it's still usable, else a new one (debug tools). */

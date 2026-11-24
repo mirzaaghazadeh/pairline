@@ -90,7 +90,14 @@ object DiagnosticsReport {
             if (f.paired) appendLine("iPhone app: ${f.peerApp ?: "?"}, iOS ${f.peerOs ?: "?"}")
             appendLine("Link service: ${if (l.running) "running" else "stopped"}")
             appendLine("Bluetooth: ${l.bluetooth.name.lowercase()}, advertising: ${yes(l.advertising)}")
-            appendLine("Connected: ${if (l.connected) "yes, via ${l.transport?.name?.lowercase()} since ${t(l.connectedSince)}" else "no, last seen ${t(f.lastSeen)}"}")
+            appendLine("Connected: ${if (l.connected) "yes, via ${l.transports.joinToString(" + ") { it.name.lowercase() }} since ${t(l.connectedSince)}" else "no, last seen ${t(f.lastSeen)}"}")
+            if (l.connected) appendLine("Events go over: ${l.transport?.name?.lowercase()}")
+            // Counts only: addresses and the hotspot's name and passphrase never go into the report.
+            appendLine(
+                "Wi-Fi link: ${l.wifi.name.lowercase()}, local addresses: ${l.wifiHint?.addresses?.size ?: 0}, " +
+                    "hotspot: ${if (l.wifiHint?.ssid != null) "on" else "off"}${l.hotspotBand?.let { " ($it GHz)" } ?: ""}, " +
+                    "media channel: ${if (l.mediaOpen) "open" else "closed"}",
+            )
             if (f.buildType == "debug") appendLine("Debug TCP transport listening: ${yes(l.debugTcpListening)}")
             appendLine("Background running allowed: ${yes(f.batteryExempt)}")
             appendLine()
