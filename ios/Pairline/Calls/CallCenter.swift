@@ -271,6 +271,11 @@ final class CallCenter: ObservableObject {
     }
 
     private func startRelayIfPossible() {
+        // Demo mode has no audio to relay; the call screen still shows how a call looks with Talk on iPhone set up.
+        if let bridge, bridge.isDemo, audioRoute == .bridge, bridge.has(.callMedia) {
+            audioRoute = .iphone(talk: bridge.has(.callMediaTalk))
+            return
+        }
         guard audioRoute == .bridge, !relayAccepted, canRelayAudio,
               let bridge, let bridgeID = current?.bridgeID else { return }
         audioRoute = .connecting

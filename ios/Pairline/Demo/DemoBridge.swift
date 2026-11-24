@@ -21,6 +21,7 @@ final class DemoBridge: BridgeLink {
     private var contacts: [ContactRecord] = []
     private var calls: [CallLogRecord] = []
     private var blocked: [BlockedNumber] = []
+    private var netShareOn = false
     private var nextKey = 1000
     private var activeCall: (id: Int64, number: String, dir: String, state: String)?
     private var nextCallID: Int64 = 1
@@ -96,9 +97,9 @@ final class DemoBridge: BridgeLink {
                  "net": "LTE", "roaming": false, "defaultSms": false, "defaultVoice": false],
             ],
             "app": "0.1.0",
-            // Demo mode has no audio relay: calls stay "audio on the Android phone".
-            "caps": Capability.allCases.filter { ![.callAudio, .callMedia, .callMediaTalk, .netShare].contains($0) }
-                .map(\.rawValue),
+            // Everything a fully set-up bridge can do, so the demo shows Talk on iPhone and internet sharing as
+            // ready. Demo calls show their audio on this iPhone without playing any (CallCenter).
+            "caps": Capability.allCases.map(\.rawValue),
             "time": Date().milliseconds,
         ]
         if let id { body["id"] = id }
@@ -181,6 +182,13 @@ final class DemoBridge: BridgeLink {
                 calls.removeAll { keys.contains($0.key) }
             }
             return ["t": "ok", "id": id]
+        case "net.share":
+            netShareOn = f["on"] as? Bool ?? false
+            guard netShareOn else { return ["t": "net.share", "id": id, "on": false] }
+            // Sample details from a typical hotspot address; nothing listens there.
+            return ["t": "net.share", "id": id, "on": true, "host": "192.168.43.1", "port": 47830,
+                    "user": "pairline", "pass": "demo-k7f2q9", "pac": "http://192.168.43.1:47830/proxy.pac",
+                    "vpn": false]
         case "block.list":
             return blockListBody(id: id)
         case "block.set":

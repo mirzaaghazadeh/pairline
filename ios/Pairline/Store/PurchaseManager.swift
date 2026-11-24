@@ -31,6 +31,14 @@ final class PurchaseManager: ObservableObject {
 
     func start() {
         guard updatesTask == nil else { return }
+        #if DEBUG
+        // Store screenshots make no StoreKit calls, so the Simulator's "Sign in to Apple Account" prompt can't cover
+        // the screen; the price shown is the list price and access comes from `-PairlineAccess`.
+        if DebugSettings.marketingScreenshots {
+            evaluate()
+            return
+        }
+        #endif
         updatesTask = Task { [weak self] in
             for await result in Transaction.updates {
                 guard let self else { return }
