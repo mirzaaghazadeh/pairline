@@ -370,7 +370,7 @@ Extends D-019 at the maintainer's request.
 - **Turkish (`tr`) in both apps:** every iPhone string catalog (app and widget, through the XLIFF workflow of D-028),
   Android `values-tr`, Android's language picker and `locales_config.xml`, and Turkish demo data (made-up names,
   +90 555 numbers, lira amounts). Turkish is left to right and uses the system font.
-- **App Store listing:** screenshots and text in English (`en-US`), Arabic (`ar-SA`) and Turkish (`tr-TR`) only
+- **App Store listing:** screenshots and text in English (`en-US`), Arabic (`ar-SA`) and Turkish (`tr`) only
   (`docs/app-store/`). No Persian screenshots or text in the listing.
 - **The iPhone app doesn't name its languages on its own screens.** The Settings footer only points to iPhone Settings ›
   Pairline › Language, where iOS lists every language the app has (from `CFBundleLocalizations`), Persian included.

@@ -19,13 +19,15 @@ here=${0:A:h}
 # deliver reads one folder per locale and tells the display size from each image's pixel size.
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
-for locale in en-US ar-SA tr-TR; do
+for locale in en-US ar-SA tr; do
   mkdir -p "$stage/$locale"
   for size in large medium; do
     for f in $here/out/$locale/$size/*.png; do cp "$f" "$stage/$locale/$size-${f:t}"; done
   done
 done
 
+# deliver only runs non-interactively from a folder that holds metadata/ (otherwise it offers to set itself up).
+cd "$here"
 fastlane deliver \
   --api_key_path "$ASC_API_KEY_JSON" \
   --app_identifier app.pairline.ios \

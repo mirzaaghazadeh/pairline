@@ -3,7 +3,7 @@
 #   out/<locale>/large/NN.png   1320 x 2868  (iPhone with Dynamic Island, large display)
 #   out/<locale>/medium/NN.png  1206 x 2622  (iPhone with Dynamic Island, medium display: the required size)
 # and the in-app purchase promotional images from iap.html: out/iap/{full,trial}.png (1024 x 1024).
-# Locales: en-US, ar-SA and tr-TR (App Store Connect locale codes).
+# Locales: en-US, ar-SA and tr (App Store Connect locale codes; Turkish has no region).
 # Every output is flattened: App Store Connect rejects images with an alpha channel.
 set -eu
 here=${0:A:h}
@@ -29,7 +29,7 @@ shoot() { # url width height output
   return 1
 }
 
-typeset -A locales=(en en-US ar ar-SA tr tr-TR)
+typeset -A locales=(en en-US ar ar-SA tr tr)
 for lang locale in ${(kv)locales}; do
   mkdir -p "$out/$locale/large" "$out/$locale/medium"
   for s in 1 2 3 4 5 6 7; do

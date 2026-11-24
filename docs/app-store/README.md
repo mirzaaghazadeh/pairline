@@ -9,6 +9,11 @@ Everything the App Store product page needs, kept as source so it can be regener
 | `render.sh` | Renders everything into `out/` (git-ignored) with headless Chrome and ImageMagick |
 | `metadata/` | Name, subtitle, promotional text, description, keywords, URLs, categories, review notes (fastlane `deliver` layout) |
 | `upload.sh` | Uploads `metadata/` and the screenshots to App Store Connect with `fastlane deliver` |
+| `api/` | Small App Store Connect API scripts (Python standard library + `openssl`): `iap.py` sets up the two in-app purchases, `app_setup.py` the price, availability and content rights. Both are idempotent |
+
+**Credentials** stay outside the repo. The API scripts read `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_PATH` (the
+`.p8` file); `upload.sh` reads `ASC_API_KEY_JSON`, a fastlane key file with the key's contents (`key_id`, `issuer_id`,
+`key`), kept at `~/.appstoreconnect/pairline.json` with mode 600.
 | `fonts/` | Vazirmatn (SIL OFL 1.1) for the Arabic slides; English and Turkish use the system font (SF Pro) |
 
 The app screens come from `docs/screenshots/ios/<lang>/` (captured on the iPhone 18 Pro Simulator in demo mode with
@@ -16,7 +21,7 @@ The app screens come from `docs/screenshots/ios/<lang>/` (captured on the iPhone
 
 ## Outputs
 
-- `out/en-US/`, `out/ar-SA/`, `out/tr-TR/`: `large/` 1320 x 2868 ("iPhone with Dynamic Island, large display",
+- `out/en-US/`, `out/ar-SA/`, `out/tr/`: `large/` 1320 x 2868 ("iPhone with Dynamic Island, large display",
   iPhone 18 Pro Max) and `medium/` 1206 x 2622 ("medium display", the size App Store Connect requires). Seven slides
   each.
 - The App Store listing is in English, Arabic and Turkish only (D-033). Other app languages see the English page.
