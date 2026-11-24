@@ -102,8 +102,150 @@
       "ad": "0001",
       "plaintext_hex": "00000000000000000000",
       "wire": "000000000000000506458afa2122577efe9b7acb9268018aa45a654d2c8674c79a5e"
+    },
+    {
+      "key": "media_k_rb",
+      "direction": 2,
+      "counter": 0,
+      "channel": 1,
+      "nonce": "000000020000000000000000",
+      "ad": "0001",
+      "plaintext_hex": "",
+      "wire": "00000000000000007508accdcca38fd6f6ce2f354b794836"
+    },
+    {
+      "key": "bulk_k_br",
+      "direction": 1,
+      "counter": 0,
+      "channel": 2,
+      "nonce": "000000010000000000000000",
+      "ad": "0002",
+      "plaintext_hex": "0100000007000000000000c00066696c65206461746120e29c93",
+      "wire": "0000000000000000ff63d8a0900e1faa4d76c24343ab603b4ec8ffb0fdb28bf7f9f8fba459bb05aca28838947e4b45419b65"
     }
   ],
+  "media_replay_window": {
+    "key": "media_k_br",
+    "direction": 1,
+    "channel": 1,
+    "size": 64,
+    "steps": [
+      {
+        "counter": 5,
+        "wire": "000000000000000506458afa2122577bee49ff22cd34bcb4361626508cc317c6",
+        "accept": true,
+        "plaintext_hex": "0000000000000005"
+      },
+      {
+        "counter": 3,
+        "wire": "00000000000000033919d3c1c425dc3e5e1d6479cf149d3971daf31013c25520",
+        "accept": true,
+        "plaintext_hex": "0000000000000003"
+      },
+      {
+        "counter": 5,
+        "wire": "000000000000000506458afa2122577bee49ff22cd34bcb4361626508cc317c6",
+        "accept": false,
+        "plaintext_hex": null
+      },
+      {
+        "counter": 70,
+        "wire": "00000000000000468d0c104033a0c38941a32e62bb2ce9ee6b25a871c1669f32",
+        "accept": true,
+        "plaintext_hex": "0000000000000046"
+      },
+      {
+        "counter": 6,
+        "wire": "0000000000000006b85c7ad2e68add14ab0156cc0b5582353f56557e620f7ee1",
+        "accept": false,
+        "plaintext_hex": null
+      },
+      {
+        "counter": 7,
+        "wire": "00000000000000074932a5afaca3cd9616fdf196562bd5fe6e24862654f4d1a4",
+        "accept": true,
+        "plaintext_hex": "0000000000000007"
+      },
+      {
+        "counter": 7,
+        "wire": "00000000000000074932a5afaca3cd9616fdf196562bd5fe6e24862654f4d1a4",
+        "accept": false,
+        "plaintext_hex": null
+      },
+      {
+        "counter": 69,
+        "wire": "000000000000004561ae985057e48ed5a45d51a523cad6b10011e023f8c83463",
+        "accept": true,
+        "plaintext_hex": "0000000000000045"
+      },
+      {
+        "counter": 200,
+        "wire": "00000000000000c8efa6f838c56b99d9d0dda74dd71a44fbb31ec875c4f6803d",
+        "accept": false,
+        "plaintext_hex": null
+      },
+      {
+        "counter": 71,
+        "wire": "00000000000000479b6100de4a5a2bfcfbe3b5e2d7da6a52418e828f3f654fcf",
+        "accept": true,
+        "plaintext_hex": "0000000000000047"
+      },
+      {
+        "counter": 200,
+        "wire": "00000000000000c8efa6f838c56b99d9d0dda74dd71a44fbb31ec875c4f6803c",
+        "accept": true,
+        "plaintext_hex": "00000000000000c8"
+      },
+      {
+        "counter": 136,
+        "wire": "000000000000008824120bc9e6055717e762406b5f346bf00bc096bac768d174",
+        "accept": false,
+        "plaintext_hex": null
+      },
+      {
+        "counter": 137,
+        "wire": "0000000000000089e26b0db06eb12ea05f7d057f042d75077d4cf04a601424bd",
+        "accept": true,
+        "plaintext_hex": "0000000000000089"
+      },
+      {
+        "counter": 137,
+        "wire": "0000000000000089e26b0db06eb12ea05f7d057f042d75077d4cf04a601424bd",
+        "accept": false,
+        "plaintext_hex": null
+      },
+      {
+        "counter": 0,
+        "wire": "0000000000000000fea04481b99b88d353530d8a3165781e1df7180ede2febe6",
+        "accept": false,
+        "plaintext_hex": null
+      },
+      {
+        "counter": 201,
+        "wire": "00000000000000c9fbb97d969dd7d9e8e62491b17356dbe2360d39e924c97e05",
+        "accept": true,
+        "plaintext_hex": "00000000000000c9"
+      }
+    ]
+  },
+  "bulk_file_data": {
+    "fid": 7,
+    "offset": 49152,
+    "data_utf8": "file data ✓",
+    "plaintext": "0100000007000000000000c00066696c65206461746120e29c93",
+    "frame": "210000000000000000ff63d8a0900e1faa4d76c24343ab603b4ec8ffb0fdb28bf7f9f8fba459bb05aca28838947e4b45419b65",
+    "tcp": "00000033210000000000000000ff63d8a0900e1faa4d76c24343ab603b4ec8ffb0fdb28bf7f9f8fba459bb05aca28838947e4b45419b65"
+  },
+  "pair_uri_wifi": {
+    "uri": "pairline://pair?v=0&id=obLD1OX2Bxg&k=BMFsdl_Cv9ICFPZCaC7GYdjB09xa6od52g2idP9YxYsGiCAMGGL1RyeNUEZz7Tqo-lwHosQs_a2xeNKY9yfRrTQ&s=RckDaSOwfAzcD1hyQhuXOt7zUoCYIJD-JzmMNjaFz9s&ip=192.168.1.23,fd12:3456:789a::1&port=47820&ssid=QW5kcm9pZFNoYXJlXzQ4MjE&pw=azN5IHdpdGggc3BhY2VzICYg4pyT",
+    "ip": [
+      "192.168.1.23",
+      "fd12:3456:789a::1"
+    ],
+    "port": 47820,
+    "ssid": "AndroidShare_4821",
+    "pw": "k3y with spaces & ✓"
+  },
   "must_fail": [
     {
       "why": "tag altered",

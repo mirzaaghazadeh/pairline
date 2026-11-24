@@ -42,6 +42,21 @@
 
 Seeing the QR code on the bridge screen is the trust anchor. Someone who didn't see it can't pair.
 
+**Pairing over Wi-Fi (M5, D-044).** The link may carry B's local Wi-Fi addresses, so an iPhone can pair and connect
+without Bluetooth (some phones can't hold a BLE link with Apple devices, D-040). All of these parameters are
+optional; a receiver that doesn't know them ignores them, so older links keep working:
+
+| Parameter | Value |
+|-----------|-------|
+| `ip` | Comma-separated addresses of B on its Wi-Fi and hotspot interfaces: IPv4 dotted quads, or IPv6 without brackets or zone. Only private (RFC 1918), link-local IPv4 (169.254/16) and unique-local IPv6 (fc00::/7) addresses; at most 4 |
+| `port` | B's Wi-Fi TCP port (decimal) |
+| `ssid`, `pw` | Only while B's own hotspot is on: its network name and passphrase, base64url of the UTF-8 text |
+
+R pairs over whichever transport reaches B first: BLE (checking the `id` characteristic) or a TCP connection to one of
+the `ip` addresses on `port`. The pairing secret is single-use, so only one of them can pair; the other then
+connects with the normal handshake. Over Wi-Fi there's no `id` characteristic: the MACs alone prove that B is the
+bridge that showed the code. R never sends `PAIR_HELLO` to an address it didn't get from the link.
+
 **Debug builds only:** the iPhone app also accepts the same `pairline://pair?...` link through its URL scheme or a
 paste field, because the Simulator has no camera. Release builds accept pairing links only from the camera, so
 another app or a message can't make the iPhone pair with someone else's bridge.
@@ -69,16 +84,27 @@ Only the pinned peer can derive the keys, because both static keys are mixed in.
 - **AEAD:** AES-256-GCM with a 16-byte tag.
 - **Nonce (12 bytes):** a 4-byte big-endian direction label (`B→R` = `00000001`, `R→B` = `00000002`) followed by an
   8-byte big-endian counter.
-- **Associated data (2 bytes):** protocol version ‖ channel (0 = control on BLE or the debug TCP link, 1 = Wi-Fi
-  media, 2 = Wi-Fi bulk).
+- **Associated data (2 bytes):** protocol version ‖ channel (0 = control, on every transport including the Wi-Fi
+  TCP link; 1 = Wi-Fi media; 2 = Wi-Fi bulk).
 - **Record on the wire:** counter (8 bytes, big-endian) ‖ ciphertext ‖ tag.
 - **Replay:**
   - The control channel is ordered, so the receiver rejects any counter ≤ the last one it accepted and drops the connection.
-  - The UDP media channel uses a 64-record sliding replay window instead.
+  - The bulk channel is ordered too (it shares the Wi-Fi TCP connection) and follows the same rule.
+  - The UDP media channel uses a 64-record sliding replay window instead (below).
 - **Rekeying:** new keys on every reconnect, and the connection is closed and re-established before any counter
   reaches 2³².
 - **Wi-Fi channel keys:** `HKDF-SHA256(okm, salt = empty, info, L = 64)` with info `"pairline v0 media"` or
-  `"pairline v0 bulk"`; the first 32 bytes are B→R, the last 32 R→B.
+  `"pairline v0 bulk"`; the first 32 bytes are B→R, the last 32 R→B. `okm` is the one of the **Wi-Fi TCP session**
+  the channel belongs to (M5, D-044): each Wi-Fi connection runs its own handshake, and its media and bulk keys die
+  with it.
+- **Counters per channel:** each direction of each channel has its own counter, starting at 0. On the control
+  channel counter 0 is the confirm; on the bulk and media channels counter 0 is an ordinary record.
+- **Media replay window (64 records):** the receiver keeps the highest counter it has accepted (`top`) and a 64-bit
+  mask of which of `top − 63 … top` it has seen. A record whose counter is ≤ `top − 64`, or already marked, is dropped
+  before decryption; a record that fails authentication is dropped and changes nothing; an authentic record with a
+  counter above `top` slides the window up to it, otherwise it sets its bit. The window starts empty (the first
+  authentic record of any counter is accepted). Drops are silent: UDP is easy to spoof, so a bad datagram never
+  closes anything. `protocol/test-vectors/v0.json` (`media_replay_window`) has a sequence with the expected results.
 
 ## Frames
 
@@ -90,9 +116,13 @@ A frame is one complete unit after transport reassembly. Its first byte is the f
 | `0x02` | `PAIR_OK` | UTF-8 JSON |
 | `0x03` | `PAIR_FAIL` | UTF-8 JSON |
 | `0x10` | `HELLO` | 99-byte hello body |
-| `0x20` | `RECORD` | encrypted record |
+| `0x20` | `RECORD` | encrypted record (control channel) |
+| `0x21` | `BULK` | encrypted record on the bulk channel (M5): Wi-Fi TCP only, after the handshake |
 
-Frames are at most 65,535 bytes. Unknown frame types close the connection.
+Frames are at most 65,535 bytes. Unknown frame types close the connection. `BULK` is new in M5 but needs no version
+bump: a side sends it only for a file transfer the peer accepted with `file.answer`, which an older app never sends.
+A `BULK` frame on BLE or the debug TCP link, before the handshake, or one that doesn't authenticate closes the
+connection.
 
 ## Transports
 
@@ -121,6 +151,78 @@ For development on the Android emulator and the iOS Simulator, which have no sha
 - The Android debug build listens on `127.0.0.1:47800` inside the emulator. On the Mac,
   `adb forward tcp:47800 tcp:47800` makes it reachable, and the iOS Simulator connects to `127.0.0.1:47800`.
 - Pairing, handshake and records are exactly the same as on BLE. Release builds contain no TCP transport.
+
+### Wi-Fi (M5, production; D-044)
+
+Both phones on the same Wi-Fi network, or the iPhone on the bridge's own hotspot. A Wi-Fi connection is a **full
+link** on its own (pairing, handshake, control messages), so it works without Bluetooth, and it adds the media and
+bulk channels.
+
+**Listening (B).**
+- TCP port 47820, or any free port if that one is taken; the port travels in the pair link, `wifi.offer` and the
+  DNS-SD record.
+- B binds one listening socket per private address of its **Wi-Fi and hotspot interfaces** — RFC 1918, 169.254/16,
+  unique-local fc00::/7 and link-local fe80::/10 — and re-binds when the networks change. Never on cellular, VPN or
+  public addresses.
+- B closes a connection at once if the peer's address isn't private, link-local or unique-local (RFC 1918,
+  169.254/16, fe80::/10, fc00::/7).
+- Framing as on the debug TCP link: each frame is preceded by its 4-byte big-endian length.
+- B accepts up to 4 connections that haven't finished the handshake. An established Wi-Fi session replaces an older
+  Wi-Fi session (newest wins, as on BLE).
+- **Keep-alive:** each side sends `ping` after 15 s without receiving anything on a Wi-Fi session and closes the
+  session after 45 s of silence, so a Wi-Fi drop is noticed quickly.
+
+**Discovery (R).**
+- B registers a DNS-SD (mDNS) service `_pairline._tcp` on its Wi-Fi port with a random instance name (`pairline-`
+  and 8 random hex digits, new each time the service starts) and the TXT record `v=0`. Never the user's or the
+  phone's name, and never the device id.
+- R tries, in order: the address that worked last, the addresses from the last `wifi.offer` and from the pair link,
+  then every `_pairline._tcp` service it finds by browsing. A candidate whose handshake fails because the keys don't
+  match (someone else's bridge) is skipped for 10 minutes. R only connects to private, link-local or unique-local
+  addresses, retries with backoff (1, 2, 4 … 30 s) while paired, and tries again at once when its own network changes
+  or a `wifi.offer` arrives.
+
+**Two sessions at once.**
+- With BLE (or the debug TCP link) and Wi-Fi both up there are two independent sessions with the same pinned peer.
+  B keeps at most one established session per transport.
+- B sends **events** (`status`, `sms.*`, `call.*`, `wifi.offer`) on its BLE session when one is established,
+  otherwise on the Wi-Fi session. `wifi.media` and the `file.*` messages always go on the Wi-Fi session.
+- R picks a session for each **request**; B answers on the session the request arrived on and drops the reply if that
+  session has closed.
+- R sends the bulk requests (`sms.threads`, `sms.history`, `contacts.sync`, `calllog.sync`) on the Wi-Fi session when
+  it's established, and everything else on BLE when it's established (iOS wakes the app for Bluetooth, not for
+  sockets), otherwise on whichever is up. A bulk request whose Wi-Fi session closes before the reply arrives is sent
+  again on BLE.
+- `link.switch` isn't used: replies follow their request (D-044).
+- After each handshake each side sends `device.info`, and B sends `status`, on that session. B re-sends calls in
+  progress (`call.incoming` / `call.state`) only when its event session changes.
+
+**Media channel (UDP).** For call audio (M6): low latency; loss and reordering are fine.
+- Right after a Wi-Fi session is established, B binds a UDP socket on the local address of that TCP connection (port
+  47820 when free, otherwise any) and sends `wifi.media` `{"port": <udp port>}` on the Wi-Fi session
+  (`"port": null`: no media channel this time).
+- Keys: the media keys of that Wi-Fi session. A **datagram is exactly one record**: counter (8 bytes) ‖ ciphertext ‖
+  tag, with associated data version ‖ 1. The plaintext is 0–1200 bytes, so a datagram is at most 1224 bytes and fits
+  any Wi-Fi path without IP fragmentation. Shorter (< 24 bytes) or longer datagrams are dropped.
+- Each side numbers every datagram it sends (from 0, +1 each, probes included) and stops sending before 2³² (the Wi-Fi
+  session must reconnect to rekey). Receivers use the 64-record replay window above.
+- An empty plaintext is a **probe**: it checks the path and isn't handed to the app.
+- **Path:** R sends probes from one UDP socket to B's address (the remote address of its Wi-Fi TCP connection) at the
+  `wifi.media` port: one at once, then one every second until an authentic datagram from B arrives, then one whenever
+  it has sent nothing for 5 s (this keeps NAT mappings alive, as in the Android emulator). B answers each authentic
+  probe with a probe (at most 10 per second), sends everything to the source address and port of the latest authentic
+  datagram from R, and ignores datagrams from any IP other than its Wi-Fi TCP peer's.
+- The channel is **open** on a side once that side has received an authentic datagram from the other, and closes with
+  its Wi-Fi session. Nothing is retransmitted, and senders never block: a datagram the socket can't take is dropped.
+
+**Hotspot.** The user can start Android's local-only hotspot on the bridge. While it runs, B lists the hotspot
+interface's address in `wifi.offer` `ip` and adds `ssid` and `password` (and `ssid`/`pw` in the pair link). R asks
+iOS to join it (`NEHotspotConfiguration`; iOS asks the user first), then connects as on any Wi-Fi network.
+
+**Debug builds only:** the Android emulator's own NAT forwards `adb emu redir add tcp:47820:47820` and
+`udp:47820:47820` to its emulated *cellular* interface, so a debug build accepts that interface when it runs on an
+emulator (never on a phone, never in release). The iPhone debug build can be pointed at a fixed address with
+`-PairlineWiFiHost 127.0.0.1 -PairlineWiFiPort 47820`.
 
 ## Messages
 
@@ -159,7 +261,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 
 | Type | Direction | Milestone | Body |
 |------|-----------|-----------|------|
-| `device.info` | either | M1 | `name`, `platform` (`android`/`ios`), `os`, `app` (version), `proto` (0) |
+| `device.info` | either | M1 | `name`, `platform` (`android`/`ios`), `os`, `app` (version), `proto` (0), `caps` (R only, M5: what R can receive, see below) |
 | `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `time`. Sent after the handshake, on every change, and at least every 60 s |
 | `status.get` | R→B | M1 | `id` → `status` with the same `id` |
 | `ping` / `pong` | either | M1 | `id`. Keep-alive; also used to measure latency |
@@ -182,9 +284,13 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
 | `ussd.run` | R→B | M4 | `id`, `sim`, `code` |
 | `ussd.result` | B→R | M4 | `id`, `ok`, `text`, `error` |
-| `wifi.offer` | B→R | M5 | ssid, password, band, ip, port |
-| `link.switch` | either | M5 | move bulk traffic to Wi-Fi / back to BLE |
-| `file.offer`, `file.answer` | either | M5 | name, size, type / accept or decline (data goes over the bulk channel) |
+| `wifi.offer` | B→R | M5 | `ip` [address], `port`, `ssid` and `password` (only while B's hotspot is on, else null), `band` (`"2.4"` / `"5"` / `"6"` or null). Sent on B's event session after `status` and whenever any of it changes; `ip: []` means B has no Wi-Fi now |
+| `wifi.media` | B→R | M5 | `port` (UDP) or null. On each Wi-Fi session, right after the handshake |
+| `link.switch` | — | M5 | Not used: replies follow their request's session (D-044) |
+| `file.offer` | either | M5 | `fid`, `name`, `size`, `type` (MIME or null). Wi-Fi session only; see "File transfer" |
+| `file.answer` | either | M5 | `fid` (the peer's), `accept`, `reason` (`too_large` / `no_space` / `busy` / `declined` / `failed`, when not accepted) |
+| `file.done` | either | M5 | `fid` (the peer's), `ok`, `reason` (`cancelled` / `failed` / `no_space`, when not ok) |
+| `file.cancel` | either | M5 | `fid` (the sender's own), `reason` |
 | `net.share` | R→B, B→R | M8 | start or stop internet sharing / proxy address, ports, per-session credentials |
 
 ### Capabilities (`status.caps`)
@@ -193,7 +299,35 @@ The bridge lists only what this phone can do right now: the permission is grante
 version supports it. The iPhone hides or explains anything missing instead of guessing from the Android version.
 
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
-`call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`
+`call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `wifi` (M5: the bridge's Wi-Fi
+link is switched on), `files` (M5: it can send and receive files over a Wi-Fi session)
+
+R lists what it can receive in its own `device.info` as `caps` (M5): `["files"]` when it accepts `file.offer`. B
+offers files only to an R that listed `files`; R offers only to a B whose `status.caps` has `files`.
+
+### File transfer (M5, D-045)
+
+Both directions, over the **Wi-Fi session only**: the `file.*` messages are control records on it, and the data goes
+in `BULK` frames on the same connection. Without a Wi-Fi session, no transfer starts.
+
+- **`fid`** is a 32-bit unsigned integer the sender picks, unique among its own transfers in the session. The sender's
+  messages (`file.offer`, `file.cancel`, data) carry its own fid; the receiver's (`file.answer`, `file.done`) answer
+  about the sender's fid. So every message type says whose fid it is.
+- **`file.offer`:** `name` is the base file name in UTF-8, at most 255 bytes; receivers strip path separators and
+  control characters and pick a free name when one is taken. `size` is in bytes, 0 to 1 GiB (1,073,741,824). `type`
+  is a MIME type or null.
+- **`file.answer`:** the receiver accepts automatically (both phones belong to the user who sent it) unless the file is
+  too large, there's no room, or it's already receiving 4 files; then `accept: false` with a `reason`.
+- **Data:** after `accept: true` the sender sends `BULK` records whose plaintext is
+  `0x01 ‖ fid (4 bytes, big-endian) ‖ offset (8 bytes, big-endian) ‖ 1 to 49,152 bytes of the file`, offsets from 0
+  with no gaps. A side sends one file at a time and finishes it before starting the next.
+- **End:** when the receiver has all `size` bytes it saves the file and sends `file.done` `ok: true`. A data record
+  with the wrong offset, an unknown fid or more than `size` bytes ends that transfer with `file.done` `ok: false`
+  `reason: "failed"` (the connection stays up).
+- **Cancel:** the sender sends `file.cancel` and stops; the receiver cancels with `file.done` `ok: false`
+  `reason: "cancelled"`. Both drop partial data, and data that arrives for a finished fid is ignored.
+- When the Wi-Fi session closes, its transfers fail; there's no resume in v0.
+- Other first bytes in a `BULK` plaintext are reserved; receivers ignore records they don't know.
 
 ### Clarifications (v0)
 
@@ -277,8 +411,8 @@ Found while implementing the Android bridge (2026-11-24). Additive only; the wir
 ## Test vectors
 
 `protocol/test-vectors/v0.json` holds fixed keys and inputs with the expected ECDH results, HKDF outputs, pairing
-MACs, hello bodies, session keys, confirm records, encrypted records, records that must fail, BLE fragments and
-TCP framing. It is generated by an independent Python implementation (`protocol/tools/gen_vectors.py`). Unit tests
+MACs, hello bodies, session keys, confirm records, encrypted records (control, media and bulk), records that must
+fail, the media replay window, a pair link with the Wi-Fi parameters, BLE fragments and TCP framing. It is generated by an independent Python implementation (`protocol/tools/gen_vectors.py`). Unit tests
 in both apps must reproduce every value.
 
 ## Open questions for review

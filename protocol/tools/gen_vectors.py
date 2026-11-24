@@ -22,6 +22,7 @@ VERSION = 0
 ROLE_R, ROLE_B = 0x52, 0x42  # 'R', 'B'
 DIR_B_TO_R, DIR_R_TO_B = 1, 2
 FRAME_PAIR_HELLO, FRAME_PAIR_OK, FRAME_PAIR_FAIL, FRAME_HELLO, FRAME_RECORD = 0x01, 0x02, 0x03, 0x10, 0x20
+FRAME_BULK = 0x21
 
 
 def hx(b: bytes) -> str:
@@ -64,6 +65,52 @@ def nonce(direction: int, counter: int) -> bytes:
 def seal(key: bytes, direction: int, counter: int, channel: int, plaintext: bytes) -> bytes:
     ad = bytes([VERSION, channel])
     return struct.pack(">Q", counter) + AESGCM(key).encrypt(nonce(direction, counter), plaintext, ad)
+
+
+class ReplayWindow:
+    """The media channel's 64-record sliding replay window (PROTOCOL.md, "Records")."""
+
+    SIZE = 64
+
+    def __init__(self):
+        self.top = None  # highest accepted counter
+        self.mask = 0    # bit i set: counter top - i was accepted
+
+    def may_accept(self, counter: int) -> bool:
+        if self.top is None or counter > self.top:
+            return True
+        offset = self.top - counter
+        return offset < self.SIZE and not (self.mask >> offset) & 1
+
+    def mark(self, counter: int):
+        if self.top is None:
+            self.top, self.mask = counter, 1
+        elif counter > self.top:
+            shift = counter - self.top
+            self.mask = ((self.mask << shift) | 1) & ((1 << self.SIZE) - 1) if shift < self.SIZE else 1
+            self.top = counter
+        else:
+            self.mask |= 1 << (self.top - counter)
+
+
+def replay_window_steps(key: bytes) -> list:
+    """Datagrams B→R on the media channel and whether the receiver accepts each, in order."""
+    window = ReplayWindow()
+    steps = []
+    # counter, authentic (False: the tag is altered)
+    for counter, authentic in [(5, True), (3, True), (5, True), (70, True), (6, True), (7, True), (7, True),
+                               (69, True), (200, False), (71, True), (200, True), (136, True), (137, True),
+                               (137, True), (0, True), (201, True)]:
+        plaintext = struct.pack(">Q", counter)
+        wire = bytearray(seal(key, DIR_B_TO_R, counter, 1, plaintext))
+        if not authentic:
+            wire[-1] ^= 0x01
+        accept = window.may_accept(counter) and authentic
+        if accept:
+            window.mark(counter)
+        steps.append({"counter": counter, "wire": hx(bytes(wire)), "accept": accept,
+                      "plaintext_hex": hx(plaintext) if accept else None})
+    return steps
 
 
 def fragments(frame: bytes, att_payload: int) -> list:
@@ -112,7 +159,13 @@ def main():
     record_b = seal(k_br, DIR_B_TO_R, 1, 0, status)
     record_r = seal(k_rb, DIR_R_TO_B, 1, 0, send)
     media_rec = seal(media[:32], DIR_B_TO_R, 5, 1, b"\x00" * 10)
+    media_probe_r = seal(media[32:], DIR_R_TO_B, 0, 1, b"")  # an empty media record is a probe
+    bulk_plain = bytes([0x01]) + struct.pack(">IQ", 7, 49152) + "file data ✓".encode()
+    bulk_rec = seal(bulk[:32], DIR_B_TO_R, 0, 2, bulk_plain)
+    bulk_frame = bytes([FRAME_BULK]) + bulk_rec
     frame_b = bytes([FRAME_RECORD]) + record_b
+    qr_wifi = (qr + "&ip=192.168.1.23,fd12:3456:789a::1&port=47820"
+               f"&ssid={b64u('AndroidShare_4821'.encode())}&pw={b64u('k3y with spaces & ✓'.encode())}")
 
     tampered = bytearray(record_b)
     tampered[-1] ^= 0x01
@@ -160,7 +213,21 @@ def main():
             {"key": "media_k_br", "direction": DIR_B_TO_R, "counter": 5, "channel": 1,
              "nonce": hx(nonce(DIR_B_TO_R, 5)), "ad": hx(bytes([VERSION, 1])),
              "plaintext_hex": "00" * 10, "wire": hx(media_rec)},
+            {"key": "media_k_rb", "direction": DIR_R_TO_B, "counter": 0, "channel": 1,
+             "nonce": hx(nonce(DIR_R_TO_B, 0)), "ad": hx(bytes([VERSION, 1])),
+             "plaintext_hex": "", "wire": hx(media_probe_r)},
+            {"key": "bulk_k_br", "direction": DIR_B_TO_R, "counter": 0, "channel": 2,
+             "nonce": hx(nonce(DIR_B_TO_R, 0)), "ad": hx(bytes([VERSION, 2])),
+             "plaintext_hex": hx(bulk_plain), "wire": hx(bulk_rec)},
         ],
+        # Media datagrams B→R (key media_k_br) in arrival order; "accept" is what a receiver with a fresh
+        # 64-record window must do with each. Rejected ones carry no plaintext.
+        "media_replay_window": {"key": "media_k_br", "direction": DIR_B_TO_R, "channel": 1, "size": 64,
+                                "steps": replay_window_steps(media[:32])},
+        "bulk_file_data": {"fid": 7, "offset": 49152, "data_utf8": "file data ✓", "plaintext": hx(bulk_plain),
+                           "frame": hx(bulk_frame), "tcp": hx(struct.pack(">I", len(bulk_frame)) + bulk_frame)},
+        "pair_uri_wifi": {"uri": qr_wifi, "ip": ["192.168.1.23", "fd12:3456:789a::1"], "port": 47820,
+                          "ssid": "AndroidShare_4821", "pw": "k3y with spaces & ✓"},
         "must_fail": [
             {"why": "tag altered", "key": "k_br", "direction": DIR_B_TO_R, "channel": 0, "wire": hx(bytes(tampered))},
             {"why": "wrong channel in associated data", "key": "k_br", "direction": DIR_B_TO_R, "channel": 1,
