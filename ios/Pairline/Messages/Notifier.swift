@@ -14,6 +14,7 @@ final class Notifier: NSObject, ObservableObject {
     static let copyCodeAction = "copy-code"
     static let markReadAction = "mark-read"
     static let trialReminderID = "trial.reminder"
+    static let callsPausedID = "calls.paused"
 
     @Published private(set) var authorization: UNAuthorizationStatus = .notDetermined
 
@@ -84,6 +85,22 @@ final class Notifier: NSObject, ObservableObject {
         content.body = String(localized: "\(count) new messages arrived while you were away.")
         content.sound = .default
         center.add(UNNotificationRequest(identifier: "sms-catchup", content: content, trigger: nil))
+    }
+
+    /// Pairline was swiped away in the app switcher (see AppDelegate.applicationWillTerminate).
+    func notifyCallsPaused() {
+        guard authorization == .authorized else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Calls and messages paused", table: "Hotspot")
+        content.body = String(localized: "Pairline was closed, so calls and messages from your Android phone can't reach this iPhone. Open Pairline to get them again, and next time leave it in the background instead of swiping it away.", table: "Hotspot")
+        content.sound = .default
+        center.add(UNNotificationRequest(identifier: Self.callsPausedID, content: content,
+                                         trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)))
+    }
+
+    func clearCallsPaused() {
+        center.removePendingNotificationRequests(withIdentifiers: [Self.callsPausedID])
+        center.removeDeliveredNotifications(withIdentifiers: [Self.callsPausedID])
     }
 
     func notifyLowBattery(level: Int) {

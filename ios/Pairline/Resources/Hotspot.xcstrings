@@ -1,6 +1,38 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Calls and messages paused" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "توقفت المكالمات والرسائل مؤقتًا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls and messages paused" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها و پیام‌ها متوقف شدند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar ve mesajlar duraklatıldı" } }
+      }
+    },
+    "Pairline was closed, so calls and messages from your Android phone can't reach this iPhone. Open Pairline to get them again, and next time leave it in the background instead of swiping it away." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أُغلق Pairline، لذا لا تصل المكالمات والرسائل من هاتف أندرويد إلى هذا الآيفون. افتح Pairline لتصلك من جديد، وفي المرة القادمة اتركه في الخلفية بدل سحبه لإغلاقه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairline was closed, so calls and messages from your Android phone can't reach this iPhone. Open Pairline to get them again, and next time leave it in the background instead of swiping it away." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline بسته شد، پس تماس‌ها و پیام‌های گوشی اندرویدی به این آیفون نمی‌رسند. Pairline را باز کنید تا دوباره برسند، و دفعهٔ بعد به‌جای بستن با کشیدن به بالا، آن را در پس‌زمینه بگذارید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline kapatıldı; bu yüzden Android telefonunuzdan gelen aramalar ve mesajlar bu iPhone’a ulaşamıyor. Yeniden almak için Pairline’ı açın; bir dahaki sefere kaydırarak kapatmak yerine arka planda bırakın." } }
+      }
+    },
+    "Linked over Wi-Fi only" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "متصل عبر الواي فاي فقط" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Linked over Wi-Fi only" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فقط با وای‌فای وصل است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yalnızca Wi-Fi ile bağlı" } }
+      }
+    },
+    "iOS pauses Wi-Fi links while Pairline is in the background, so calls and messages reach this iPhone only while Pairline is open. Over Bluetooth they keep coming while the iPhone is locked: keep Bluetooth on on both phones and the phones within about 10 meters." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف iOS اتصالات الواي فاي مؤقتًا ما دام Pairline في الخلفية، لذا لا تصل المكالمات والرسائل إلى هذا الآيفون إلا وPairline مفتوح. أما عبر البلوتوث فتستمر في الوصول والآيفون مقفل: أبقِ البلوتوث مفعّلًا على الهاتفين، والهاتفين على بُعد 10 أمتار تقريبًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "iOS pauses Wi-Fi links while Pairline is in the background, so calls and messages reach this iPhone only while Pairline is open. Over Bluetooth they keep coming while the iPhone is locked: keep Bluetooth on on both phones and the phones within about 10 meters." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی Pairline در پس‌زمینه است، iOS اتصال وای‌فای را متوقف می‌کند؛ پس تماس‌ها و پیام‌ها فقط وقتی Pairline باز است به این آیفون می‌رسند. با بلوتوث، حتی وقتی آیفون قفل است هم می‌رسند: بلوتوث را روی هر دو گوشی روشن نگه دارید و گوشی‌ها را در فاصلهٔ حدود ۱۰ متری هم بگذارید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iOS, Pairline arka plandayken Wi-Fi bağlantılarını duraklatır; bu yüzden aramalar ve mesajlar bu iPhone’a yalnızca Pairline açıkken ulaşır. Bluetooth üzerinden iPhone kilitliyken de gelmeye devam eder: iki telefonda da Bluetooth’u açık tutun ve telefonları yaklaşık 10 metre içinde bulundurun." } }
+      }
+    },
     "iOS says “No Internet Connection” on the Android phone’s hotspot" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "يعرض iOS «لا يوجد اتصال بالإنترنت» على نقطة اتصال هاتف أندرويد" } },

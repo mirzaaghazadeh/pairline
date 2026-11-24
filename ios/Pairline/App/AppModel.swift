@@ -194,6 +194,7 @@ final class AppModel: ObservableObject {
     // MARK: - Lifecycle
 
     func didBecomeActive() {
+        Notifier.shared.clearCallsPaused()
         link.reconnectNow()
         link.files.collectOutbox()
         if !Self.isTestHost { BridgeLiveActivity.shared.appBecameActive() }

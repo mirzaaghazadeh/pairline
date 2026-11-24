@@ -34,4 +34,13 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         _ = AppModel.shared
         return true
     }
+
+    /// The user swiped Pairline away: iOS won't relaunch it for Bluetooth until it's opened again, so calls and
+    /// messages stop reaching this iPhone. Say so while iOS still lets us (it doesn't call this for a suspended app).
+    func applicationWillTerminate(_ application: UIApplication) {
+        let model = AppModel.shared
+        guard model.isPaired, !model.isDemo else { return }
+        log.info("app", "Closed by the user")
+        Notifier.shared.notifyCallsPaused()
+    }
 }

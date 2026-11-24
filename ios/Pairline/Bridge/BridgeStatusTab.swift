@@ -16,6 +16,7 @@ struct BridgeStatusTab: View {
                         if bridge.protocolMismatch || bridge.bridgeNeedsUpdate {
                             updateNotice
                         }
+                        if wifiOnly { wifiOnlyNotice }
                         batteryCard
                         simCards
                         capabilitiesCard
@@ -106,6 +107,27 @@ struct BridgeStatusTab: View {
     }
 
     // MARK: - Cards
+
+    /// Linked over Wi-Fi alone: iOS keeps only Bluetooth links alive in the background, so calls and messages arrive
+    /// only while Pairline is open or was just used (ARCHITECTURE.md, "The Wi-Fi link and iOS background").
+    private var wifiOnly: Bool {
+        bridge.phase.isConnected && !bridge.isDemo && !DebugSettings.marketingScreenshots && shownTransports == [.wifi]
+    }
+
+    private var wifiOnlyNotice: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "wifi.exclamationmark")
+                .font(.title2)
+                .foregroundStyle(Color.brandAmber)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Linked over Wi-Fi only", tableName: "Hotspot").font(.headline)
+                Text("iOS pauses Wi-Fi links while Pairline is in the background, so calls and messages reach this iPhone only while Pairline is open. Over Bluetooth they keep coming while the iPhone is locked: keep Bluetooth on on both phones and the phones within about 10 meters.", tableName: "Hotspot")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .card()
+    }
 
     private var updateNotice: some View {
         HStack(alignment: .top, spacing: 12) {
