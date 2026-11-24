@@ -1,12 +1,52 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "After the Android phone restarts" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بعد إعادة تشغيل هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "After the Android phone restarts" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعد از روشن‌شدن دوبارهٔ گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra" } }
+      }
+    },
+    "After the Android phone restarts, start Shizuku on it again; the bridge app reminds you with a notification. Until then calls ring here and the audio stays on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بعد إعادة تشغيل هاتف أندرويد، شغّل Shizuku عليه من جديد؛ يذكّرك تطبيق الهاتف الوسيط بإشعار. وحتى ذلك الحين ترنّ المكالمات هنا ويبقى الصوت على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "After the Android phone restarts, start Shizuku on it again; the bridge app reminds you with a notification. Until then calls ring here and the audio stays on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعد از روشن‌شدن دوبارهٔ گوشی اندرویدی، Shizuku را روی آن دوباره اجرا کنید؛ برنامهٔ پل با یک اعلان یادآوری می‌کند. تا آن موقع تماس‌ها اینجا زنگ می‌خورند و صدا روی گوشی اندرویدی می‌ماند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yeniden başladıktan sonra Shizuku’yu onda yeniden başlatın; köprü uygulaması bir bildirimle hatırlatır. O zamana kadar aramalar burada çalar, ses Android telefonda kalır." } }
+      }
+    },
     "Android keeps call audio away from apps, so this needs Android 10 or later and Shizuku. Some phones only allow listening; then you hear the call here and talk on the Android phone." : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يحتاج هذا إلى أندرويد 10 أو أحدث وإلى Shizuku. بعض الهواتف تسمح بالاستماع فقط؛ عندها تسمع المكالمة هنا وتتحدث من هاتف أندرويد." } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Android keeps call audio away from apps, so this needs Android 10 or later and Shizuku. Some phones only allow listening; then you hear the call here and talk on the Android phone." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین این کار به اندروید ۱۰ یا جدیدتر و Shizuku نیاز دارد. بعضی گوشی‌ها فقط اجازهٔ شنیدن می‌دهند؛ آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android arama sesini uygulamalardan uzak tutar; bu yüzden Android 10 veya üstü ve Shizuku gerekir. Bazı telefonlar yalnızca dinlemeye izin verir; o zaman aramayı burada duyar, Android telefondan konuşursunuz." } }
+      }
+    },
+    "Android stops Shizuku at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and start Shizuku again. Calls keep ringing here meanwhile." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد Shizuku عند كل إعادة تشغيل، فيعود صوت المكالمات إلى هاتف أندرويد. يعرض تطبيق الهاتف الوسيط إشعارًا: اضغط عليه وشغّل Shizuku من جديد. وفي الأثناء تظل المكالمات ترنّ هنا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android stops Shizuku at every restart, so call audio goes back to the Android phone. The bridge app shows a notification: tap it and start Shizuku again. Calls keep ringing here meanwhile." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید با هر بار روشن‌شدن دوباره Shizuku را متوقف می‌کند، پس صدای تماس به گوشی اندرویدی برمی‌گردد. برنامهٔ پل یک اعلان نشان می‌دهد: روی آن بزنید و Shizuku را دوباره اجرا کنید. در این فاصله تماس‌ها اینجا زنگ می‌خورند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android her yeniden başlatmada Shizuku’yu durdurur, bu yüzden arama sesi Android telefona döner. Köprü uygulaması bir bildirim gösterir: dokunup Shizuku’yu yeniden başlatın. Bu arada aramalar burada çalmaya devam eder." } }
+      }
+    },
+    "Android stops Shizuku every time the Android phone restarts. The bridge app then shows a notification; tap it and start Shizuku again. Some phones also only allow listening: then you hear calls here and talk on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يوقف أندرويد Shizuku في كل مرة يُعاد فيها تشغيل هاتف أندرويد. عندها يعرض تطبيق الهاتف الوسيط إشعارًا؛ اضغط عليه وشغّل Shizuku من جديد. كما أن بعض الهواتف تسمح بالاستماع فقط: عندها تسمع المكالمات هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android stops Shizuku every time the Android phone restarts. The bridge app then shows a notification; tap it and start Shizuku again. Some phones also only allow listening: then you hear calls here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اندروید هر بار که گوشی اندرویدی دوباره روشن می‌شود Shizuku را متوقف می‌کند. آن‌وقت برنامهٔ پل یک اعلان نشان می‌دهد؛ روی آن بزنید و Shizuku را دوباره اجرا کنید. بعضی گوشی‌ها هم فقط اجازهٔ شنیدن می‌دهند: آن‌وقت تماس را اینجا می‌شنوید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android, Android telefon her yeniden başladığında Shizuku’yu durdurur. Köprü uygulaması o zaman bir bildirim gösterir; dokunup Shizuku’yu yeniden başlatın. Bazı telefonlar ayrıca yalnızca dinlemeye izin verir: o zaman aramaları burada duyar, Android telefondan konuşursunuz." } }
+      }
+    },
+    "Answer here; talk here too with Talk on iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ردّ هنا، وتحدّث هنا أيضًا مع «التحدث عبر الآيفون»" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Answer here; talk here too with Talk on iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اینجا جواب بدهید؛ با «مکالمه با آیفون» اینجا صحبت هم کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Burada yanıtlayın; iPhone’dan konuşma ile burada konuşun da" } }
       }
     },
     "Audio on this iPhone" : {
@@ -39,6 +79,14 @@
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس از طریق وای‌فای شما و با رمزگذاری سرتاسری بین دو گوشی‌تان جابه‌جا می‌شود. هرگز ضبط یا ذخیره نمی‌شود." } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi iki telefonunuz arasında Wi-Fi ağınız üzerinden uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz." } }
+      }
+    },
+    "Can I talk on the iPhone during calls?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل يمكنني التحدث من الآيفون أثناء المكالمات؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can I talk on the iPhone during calls?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "می‌توانم هنگام تماس با آیفون صحبت کنم؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalarda iPhone’dan konuşabilir miyim?" } }
       }
     },
     "Hear calls on iPhone" : {
@@ -223,6 +271,38 @@
         "en" : { "stringUnit" : { "state" : "translated", "value" : "You hear this call here. Talk on your Android phone: it can't take audio from the iPhone." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "این تماس را اینجا می‌شنوید. با گوشی اندرویدی صحبت کنید؛ آن گوشی نمی‌تواند صدا را از آیفون بگیرد." } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu aramayı burada duyuyorsunuz. Android telefondan konuşun: o telefon iPhone’dan ses alamıyor." } }
+      }
+    },
+    "Where the audio is" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أين يكون الصوت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Where the audio is" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا کجاست" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses nerede" } }
+      }
+    },
+    "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, the free Shizuku app, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عادةً تتحكم في المكالمات من الآيفون وتتحدث من هاتف أندرويد. ومع إعداد «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط (أندرويد 10 أو أحدث، وتطبيق Shizuku المجاني، والواي فاي نفسه)، تستخدم المكالمات التي تردّ عليها هنا ميكروفون هذا الآيفون ومكبّر صوته." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 10 or later, the free Shizuku app, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "معمولاً تماس‌ها را از آیفون کنترل می‌کنید و با گوشی اندرویدی صحبت می‌کنید. با راه‌اندازی «مکالمه با آیفون» در برنامهٔ پل (اندروید ۱۰ یا جدیدتر، برنامهٔ رایگان Shizuku و یک وای‌فای مشترک)، تماس‌هایی که اینجا جواب می‌دهید از میکروفون و بلندگوی همین آیفون استفاده می‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Normalde aramaları iPhone’dan yönetir, Android telefondan konuşursunuz. Köprü uygulamasında iPhone’dan konuşma kuruluysa (Android 10 veya üstü, ücretsiz Shizuku uygulaması, aynı Wi-Fi), burada aldığınız aramalar bu iPhone’un mikrofonunu ve hoparlörünü kullanır." } }
+      }
+    },
+    "Why does call audio go back to the Android phone sometimes?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لماذا يعود صوت المكالمات أحيانًا إلى هاتف أندرويد؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Why does call audio go back to the Android phone sometimes?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "چرا صدای تماس گاهی به گوشی اندرویدی برمی‌گردد؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi neden bazen Android telefona dönüyor?" } }
+      }
+    },
+    "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, the free Shizuku app (no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، مع «التحدث عبر الآيفون»: أعدّه في تطبيق الهاتف الوسيط من الإعدادات › التحدث عبر الآيفون. يحتاج إلى أندرويد 10 أو أحدث، وتطبيق Shizuku المجاني (من دون روت)، وأن يكون الهاتفان على شبكة الواي فاي نفسها. ومن دونه تردّ هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 10 or later, the free Shizuku app (no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، با «مکالمه با آیفون»: آن را در برنامهٔ پل از تنظیمات › مکالمه با آیفون راه بیندازید. به اندروید ۱۰ یا جدیدتر، برنامهٔ رایگان Shizuku (بدون روت) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد. بدون آن، اینجا جواب می‌دهید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, iPhone’dan konuşma ile: köprü uygulamasında Ayarlar › iPhone’dan konuşma’dan kurun. Android 10 veya üstü, ücretsiz Shizuku uygulaması (root gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir. Olmadan burada yanıtlar, Android telefondan konuşursunuz." } }
       }
     },
     "Your answer helps Pairline pick what works on your Android phone. Nothing else is sent." : {

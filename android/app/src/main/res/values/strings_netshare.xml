@@ -10,4 +10,6 @@
     <string name="netshare_vpn_off">No VPN on this phone: the iPhone’s traffic goes out through this phone’s own connection.</string>
     <string name="netshare_direct_iran">Iranian sites (.ir) go direct</string>
     <string name="netshare_direct_iran_sub">Sites ending in .ir skip this phone and its VPN.</string>
+    <string name="help_q_netshare">How do I use this phone’s internet on the iPhone?</string>
+    <string name="help_a_netshare">Turn on Settings › Internet sharing here, then on the iPhone open Pairline › Settings › Internet sharing. It gives a link for the iPhone’s Wi-Fi proxy settings and a one-tap setting for Telegram. Traffic then goes out through this phone, and through its VPN if one is on. Both phones need the same Wi-Fi, or the iPhone joined to this phone’s hotspot.</string>
 </resources>

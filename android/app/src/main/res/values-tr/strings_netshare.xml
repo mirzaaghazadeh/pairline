@@ -9,4 +9,6 @@
     <string name="netshare_vpn_off">Bu telefonda VPN yok: iPhone’un trafiği bu telefonun kendi bağlantısından çıkar.</string>
     <string name="netshare_direct_iran">İran siteleri (.ir) doğrudan</string>
     <string name="netshare_direct_iran_sub">.ir ile biten siteler bu telefonu ve VPN’ini atlar.</string>
+    <string name="help_q_netshare">Bu telefonun internetini iPhone’da nasıl kullanırım?</string>
+    <string name="help_a_netshare">Burada Ayarlar › İnternet paylaşımı’nı açın, ardından iPhone’da Pairline › Ayarlar › İnternet paylaşımı’nı açın. Orada iPhone’un Wi-Fi proxy ayarları için bir bağlantı ve Telegram için tek dokunuşluk bir ayar bulunur. Trafik o zaman bu telefondan, açıksa VPN’inden çıkar. İki telefonun aynı Wi-Fi ağında olması ya da iPhone’un bu telefonun erişim noktasına bağlanması gerekir.</string>
 </resources>

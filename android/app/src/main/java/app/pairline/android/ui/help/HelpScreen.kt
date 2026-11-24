@@ -77,6 +77,18 @@ private val sections = listOf(
             Faq(R.string.help_q_restricted, R.string.help_a_restricted),
         ),
     ),
+    // Talk on iPhone (Shizuku, D-046/D-047) and internet sharing (D-048).
+    FaqSection(
+        R.string.help_section_talk,
+        PIcons.Phone,
+        listOf(
+            Faq(R.string.help_q_shizuku, R.string.help_a_shizuku),
+            Faq(R.string.help_q_restart, R.string.help_a_restart),
+            Faq(R.string.help_q_listen_only, R.string.help_a_listen_only),
+            Faq(R.string.help_q_debugging, R.string.help_a_debugging),
+            Faq(R.string.help_q_netshare, R.string.help_a_netshare),
+        ),
+    ),
     FaqSection(
         R.string.help_section_permissions,
         PIcons.Lock,

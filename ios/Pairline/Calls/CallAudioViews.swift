@@ -31,6 +31,9 @@ struct CallAudioInfoSheet: View {
                     }
                 }
                 Section {
+                    t("After the Android phone restarts, start Shizuku on it again; the bridge app reminds you with a notification. Until then calls ring here and the audio stays on the Android phone.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                     t("Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)

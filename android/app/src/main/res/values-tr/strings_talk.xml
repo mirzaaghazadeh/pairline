@@ -34,4 +34,16 @@
     <string name="talk_wifi_note">Arama sesi Wi-Fi ağınız üzerinden uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz.</string>
     <string name="talk_setup_title">iPhone’dan konuşun (isteğe bağlı)</string>
     <string name="talk_setup_later">Sonra kur</string>
+    <string name="talk_reminder_channel">iPhone’dan konuşma</string>
+    <string name="talk_reminder_title">Arama sesi bu telefona döndü</string>
+    <string name="talk_reminder_text">Telefon yeniden başlayınca Shizuku durdu. Aramaların iPhone’da çalması için dokunup Shizuku’yu açın ve yeniden başlatın. Bu arada aramalar yine iPhone’da çalar.</string>
+    <string name="help_section_talk">iPhone’dan konuşma</string>
+    <string name="help_q_shizuku">Shizuku nedir? Root gerekir mi?</string>
+    <string name="help_a_shizuku">Shizuku, izninizle Android’in kendi hata ayıklama aracının yetkilerini Pairline’a ödünç veren ücretsiz, açık kaynaklı bir uygulamadır. Root gerekmez. Pairline onu yalnızca arama sesini taşımak ve aramadaki tuş takımı, sessiz ve hoparlör için kullanır. İzni Shizuku’dan istediğiniz zaman geri alabilirsiniz.</string>
+    <string name="help_q_restart">Telefon yeniden başlayınca arama sesi neden bu telefona dönüyor?</string>
+    <string name="help_a_restart">Android, telefon her yeniden başladığında Kablosuz hata ayıklamayı kapatır ve bu Shizuku’yu durdurur. Pairline o zaman bir bildirim gösterir: dokunup Shizuku’yu yeniden başlatın, aramalar yine iPhone’da çalsın. O zamana kadar aramalar iPhone’da çalar ve çalışır, ses bu telefonda olur. Root’lu bir telefonda Shizuku kendiliğinden başlayabilir.</string>
+    <string name="help_q_debugging">Bir uygulama hata ayıklamanın açık olduğundan şikâyet ediyor</string>
+    <string name="help_a_debugging">Bazı banka ve ödeme uygulamaları Geliştirici seçenekleri veya Kablosuz hata ayıklama açıkken açılmaz. Pairline bunları asla kendiliğinden açmaz. Böyle bir uygulamayı kullanırken Kablosuz hata ayıklamayı kapatın; Shizuku durabilir, arama sesi için onu daha sonra yeniden başlatırsınız.</string>
+    <string name="help_q_listen_only">Aramaları iPhone’da duyuyorum ama karşı taraf beni duymuyor</string>
+    <string name="help_a_listen_only">Bazı telefonlar hiçbir uygulamanın aramaya ses aktarmasına izin vermez. O zaman aramaları iPhone’da duyar, bu telefondan konuşursunuz. Her aramadan sonra iPhone sesin nasıl olduğunu sorar; yanıtlarınız Pairline’ın bir sonraki aramada başka bir yol denemesine yardımcı olur.</string>
 </resources>

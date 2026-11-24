@@ -298,9 +298,9 @@
     <string name="help_q_no_sms">Mesajlar iPhone\'uma ulaşmıyor</string>
     <string name="help_a_no_sms">İzinler bölümünde \"SMS mesajları\" izninin verildiğinden ve ana ekranda \"Bağlı\" yazdığından emin olun. Bağlantı kesikken gelen mesajlar, yeniden bağlanıldığında iPhone\'da görünür.</string>
     <string name="help_q_call_audio">Arama sırasında nereden konuşurum?</string>
-    <string name="help_a_call_audio">Şimdilik bu Android telefondan. Aramaları iPhone\'unuzdan yanıtlayabilir, reddedebilir ve sonlandırabilirsiniz, ancak arama sesi Android telefonda kalır. iPhone\'da ses desteği planlanıyor.</string>
+    <string name="help_a_call_audio">iPhone’dan konuşmayı kurmadıysanız bu Android telefondan (Ayarlar › iPhone’dan konuşma). Kurduğunuzda iPhone’da yanıtladığınız veya başlattığınız aramalar iPhone’un mikrofonunu ve hoparlörünü kullanır. Android 10 veya üstü, ücretsiz Shizuku uygulaması ve iki telefonun aynı Wi-Fi ağında olması gerekir.</string>
     <string name="help_q_dtmf">Neden iPhone\'umdan tuş takımını kullanamıyor veya sesi kapatamıyorum?</string>
-    <string name="help_a_dtmf">Android, devam eden bir aramayı yalnızca birkaç uygulamanın kontrol etmesine izin verir. Çoğu telefonda Pairline aramaları yanıtlayıp sonlandırabilir, ancak tuş sesleri gönderemez veya sesi kapatamaz. Telefonunuz izin verdiğinde Pairline bu özelliği otomatik olarak kullanır.</string>
+    <string name="help_a_dtmf">Android, devam eden bir aramayı yalnızca birkaç uygulamanın kontrol etmesine izin verir. Yardım olmadan Pairline aramaları yanıtlayıp sonlandırabilir, ancak tuş sesleri gönderemez veya sesi kapatamaz. iPhone’dan konuşmayı kurun (Ayarlar › iPhone’dan konuşma, Android 12 veya üstü), Pairline ikisini de yapabilsin.</string>
     <string name="help_q_restricted">Android \"Kısıtlanmış ayar\" diyor</string>
     <string name="help_a_restricted">Android 13 ve sonraki sürümler, uygulama mağazası dışından yüklenen uygulamalar için bazı izinleri sınırlar. Pairline için Uygulama bilgileri ekranını açın, üstteki ⋮ simgesine dokunun ve \"Kısıtlanmış ayarlara izin ver\" seçeneğini belirleyin, ardından izni tekrar verin.</string>
 

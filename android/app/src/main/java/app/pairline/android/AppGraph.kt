@@ -5,6 +5,7 @@ import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.link.IdentityStore
 import app.pairline.android.netshare.NetShare
 import app.pairline.android.privileged.PrivilegedManager
+import app.pairline.android.privileged.TalkReminder
 import app.pairline.android.link.LinkManager
 import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
@@ -77,10 +78,16 @@ object AppGraph {
         PrivilegedManager(app).also { manager ->
             manager.onChange = {
                 router.statusChanged()
-                // The user turned on Talk on iPhone: also let Android bind the companion call service, which gives
-                // the iPhone the keypad, mute and speaker (Android 12+).
-                if (prefs.talkOnIphone && manager.state.value == PrivilegedManager.State.READY) {
-                    io.execute { manager.allowOngoingCalls() }
+                when (manager.state.value) {
+                    PrivilegedManager.State.READY -> {
+                        TalkReminder.cancel(app)
+                        // The user turned on Talk on iPhone: also let Android bind the companion call service, which
+                        // gives the iPhone the keypad, mute and speaker (Android 12+).
+                        if (prefs.talkOnIphone) io.execute { manager.allowOngoingCalls() }
+                    }
+                    // Shizuku stopped (usually a restart): tell the user once per boot how to get call audio back.
+                    PrivilegedManager.State.NOT_RUNNING -> if (prefs.talkOnIphone) TalkReminder.maybeShow(app)
+                    else -> Unit
                 }
             }
         }
