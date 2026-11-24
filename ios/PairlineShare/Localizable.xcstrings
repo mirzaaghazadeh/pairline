@@ -1,0 +1,62 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Cancel" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إلغاء" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "لغو" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Vazgeç" } }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تمام" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bitti" } }
+      }
+    },
+    "Ready to go. Pairline sends it when it's connected to your bridge phone over Wi-Fi. Open Pairline if it isn't running." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جاهز. يرسله Pairline عندما يتصل بهاتفك الوسيط عبر Wi-Fi. افتح Pairline إن لم يكن يعمل." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آماده است. Pairline وقتی از طریق وای‌فای به گوشی پل وصل باشد آن را می‌فرستد. اگر Pairline باز نیست، آن را باز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hazır. Pairline, köprü telefonunuza Wi-Fi üzerinden bağlandığında gönderir. Çalışmıyorsa Pairline'ı açın." } }
+      }
+    },
+    "Send" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إرسال" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ارسال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gönder" } }
+      }
+    },
+    "Send to bridge phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إرسال إلى الهاتف الوسيط" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ارسال به گوشی پل" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefona gönder" } }
+      }
+    },
+    "Send to your bridge phone over Wi-Fi. Files go only between your two phones, encrypted." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أرسل إلى هاتفك الوسيط عبر Wi-Fi. تنتقل الملفات مشفّرة بين هاتفيك فقط." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق وای‌فای به گوشی پل بفرستید. فایل‌ها رمزنگاری‌شده و فقط بین دو گوشی شما جابه‌جا می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Wi-Fi üzerinden köprü telefonunuza gönderin. Dosyalar şifreli olarak yalnızca iki telefonunuz arasında gider." } }
+      }
+    },
+    "Some items couldn't be added. Files up to 1 GB can be sent." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّرت إضافة بعض العناصر. يمكن إرسال ملفات حتى 1 غيغابايت." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برخی موارد اضافه نشدند. فایل‌های تا ۱ گیگابایت را می‌توان فرستاد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bazı öğeler eklenemedi. En fazla 1 GB'lık dosyalar gönderilebilir." } }
+      }
+    },
+    "This couldn't be added. Files up to 1 GB can be sent." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّرت إضافة هذا. يمكن إرسال ملفات حتى 1 غيغابايت." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این مورد اضافه نشد. فایل‌های تا ۱ گیگابایت را می‌توان فرستاد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu eklenemedi. En fazla 1 GB'lık dosyalar gönderilebilir." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

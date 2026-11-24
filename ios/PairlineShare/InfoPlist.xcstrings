@@ -1,0 +1,26 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name: the share sheet shows it under Pairline's icon",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إرسال إلى الهاتف الوسيط" } },
+        "en" : { "stringUnit" : { "state" : "new", "value" : "Send to bridge phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ارسال به گوشی پل" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefona gönder" } }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "PairlineShare" } },
+        "en" : { "stringUnit" : { "state" : "new", "value" : "PairlineShare" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "PairlineShare" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "PairlineShare" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

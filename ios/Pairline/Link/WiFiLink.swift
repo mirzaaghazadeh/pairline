@@ -212,6 +212,7 @@ final class WiFiConnector: LinkConnector {
     }
 
     func cancel() {
+        stopBrowsing()
         candidateTimer?.invalidate()
         candidateTimer = nil
         waitTimer?.invalidate()
@@ -246,6 +247,12 @@ final class WiFiConnector: LinkConnector {
         guard !tried.contains(key) else { return }
         tried.insert(key)
         queue.append((service, nil, "service"))
+    }
+
+    /// Browsing runs only while an attempt is looking for the bridge (mDNS traffic costs battery).
+    private func stopBrowsing() {
+        browser?.cancel()
+        browser = nil
     }
 
     private func startBrowsing() {
@@ -363,6 +370,7 @@ final class WiFiConnector: LinkConnector {
         transport.startReceiving()
         log.info("wifi", "Connected to a bridge candidate (\(label))")
         queue = []
+        stopBrowsing()
         let callback = completion
         completion = nil
         callback?(.success((transport, nil)))
@@ -371,6 +379,7 @@ final class WiFiConnector: LinkConnector {
     private func fail() {
         waitTimer?.invalidate()
         waitTimer = nil
+        stopBrowsing()
         let callback = completion
         completion = nil
         callback?(.failure(ConnectError.failed))

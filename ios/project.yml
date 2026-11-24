@@ -62,6 +62,9 @@ targets:
       - target: PairlineWidget
         embed: true
         codeSign: true
+      - target: PairlineShare
+        embed: true
+        codeSign: true
       - sdk: CallKit.framework
       - sdk: CoreBluetooth.framework
       - sdk: StoreKit.framework
@@ -86,6 +89,25 @@ targets:
     dependencies:
       - sdk: WidgetKit.framework
       - sdk: SwiftUI.framework
+
+  # "Send to bridge phone" in the share sheet (M5, D-045). It only copies the shared files into the app group's
+  # outbox; the app sends them over the Wi-Fi link.
+  PairlineShare:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PairlineShare
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios.share
+        PRODUCT_NAME: PairlineShare
+        INFOPLIST_FILE: PairlineShare/Info.plist
+        CODE_SIGN_ENTITLEMENTS: PairlineShare/PairlineShare.entitlements
+        SKIP_INSTALL: YES
+    dependencies:
+      - sdk: SwiftUI.framework
+      - sdk: UniformTypeIdentifiers.framework
 
   PairlineTests:
     type: bundle.unit-test

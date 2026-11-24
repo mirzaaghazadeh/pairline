@@ -107,7 +107,8 @@ final class FileTransferManager: ObservableObject {
             try? current.handle?.close()
             outgoing = nil
             update(current.id) { $0.state = .failed(String(localized: "The Wi-Fi connection dropped.")) }
-            finishSource(current.id)
+            // A shared file stays in the outbox and goes again with the next Wi-Fi session.
+            finishSource(current.id, keepOutboxFile: true)
         }
         for (_, item) in incoming {
             try? item.handle.close()
@@ -115,6 +116,10 @@ final class FileTransferManager: ObservableObject {
             update(item.id) { $0.state = .failed(String(localized: "The Wi-Fi connection dropped.")) }
         }
         incoming.removeAll()
+        if !outboxFiles.isEmpty || SharedOutbox.directory != nil {
+            // Queued shares wait in the outbox; collect them again for the next session.
+            collectOutbox()
+        }
     }
 
     // MARK: - Sending
@@ -270,9 +275,9 @@ final class FileTransferManager: ObservableObject {
     }
 
     /// Stops security-scoped access and removes a share-extension file once it's sent (or given up on).
-    private func finishSource(_ id: UUID) {
+    private func finishSource(_ id: UUID, keepOutboxFile: Bool = false) {
         scoped.removeValue(forKey: id)?.stopAccessingSecurityScopedResource()
-        if let url = outboxFiles.removeValue(forKey: id) { try? fileManager.removeItem(at: url) }
+        if let url = outboxFiles.removeValue(forKey: id), !keepOutboxFile { try? fileManager.removeItem(at: url) }
     }
 
     // MARK: - Receiving
@@ -480,17 +485,5 @@ final class FileTransferManager: ObservableObject {
         case "cancelled"?: return String(localized: "Cancelled on the other phone.")
         default: return String(localized: "The transfer failed.")
         }
-    }
-}
-
-/// The app group folder the Share extension leaves files in.
-enum SharedOutbox {
-    static let appGroup = "group.app.pairline.ios"
-    /// Posted (Darwin notification) by the Share extension after it queued files.
-    static let darwinNotification = "app.pairline.ios.outbox"
-
-    static var directory: URL? {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)?
-            .appendingPathComponent("Outbox", isDirectory: true)
     }
 }
