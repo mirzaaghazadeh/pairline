@@ -38,6 +38,8 @@ final class BridgeController: ObservableObject {
     @Published private(set) var syncing = false
     @Published private(set) var latency: TimeInterval?
     @Published var banner: String?
+    /// Internet sharing through the bridge (M8): the last `net.share` reply or event.
+    @Published var netShare: NetShareInfo?
     /// Set by the app: whether link features are allowed (trial or purchase). Demo mode is always allowed.
     @Published var canUseLink = true
 
@@ -159,6 +161,9 @@ final class BridgeController: ObservableObject {
             calls.handleState(event)
         case .callMediaState(let event):
             calls.handleMediaState(event)
+        case .netShare(let info) where inbound.id == nil:
+            // The bridge stopped sharing by itself (its user turned it off).
+            netShare = info
         default:
             break
         }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Internet sharing for the iPhone (M8, D-048). -->
+<resources>
+    <string name="netshare_title">Internet sharing</string>
+    <string name="netshare_allow">Let the iPhone use this phone’s internet</string>
+    <string name="netshare_allow_sub">Only while you turn it on from the iPhone. Its traffic then goes out through this phone’s connection and VPN, over your Wi-Fi or this phone’s hotspot.</string>
+    <string name="netshare_active">Sharing now</string>
+    <string name="netshare_idle">Not sharing right now</string>
+    <string name="netshare_vpn_on">A VPN is on: the iPhone’s traffic goes through it. Tap to stop sharing.</string>
+    <string name="netshare_vpn_off">No VPN on this phone: the iPhone’s traffic goes out through this phone’s own connection.</string>
+    <string name="netshare_direct_iran">Iranian sites (.ir) go direct</string>
+    <string name="netshare_direct_iran_sub">Sites ending in .ir skip this phone and its VPN.</string>
+</resources>

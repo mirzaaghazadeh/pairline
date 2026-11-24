@@ -202,6 +202,11 @@ struct SettingsTab: View {
                     Label("SIM for messages", systemImage: "message")
                 }
             }
+            NavigationLink {
+                NetShareView()
+            } label: {
+                Label { Text("Internet sharing", tableName: "NetShare") } icon: { Image(systemName: "network") }
+            }
         } header: {
             Text("Calls")
         } footer: {

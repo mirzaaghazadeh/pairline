@@ -20,7 +20,8 @@ Any change that adds or changes a data flow or permission must update this file 
 | Call log | Yes, encrypted | Your paired iPhone only | iPhone: local cache | Until unpair |
 | Contacts you add on the iPhone (opt-in, off until you turn it on in the bridge app) | Yes, encrypted | Your bridge phone only | Android Contacts | Until you delete them |
 | Files you send (M5) | Yes, encrypted | The other paired phone only | Where you save them | Until you delete them |
-| Your iPhone's internet traffic, only while internet sharing is on (M8) | Yes | Through your bridge phone (and its VPN, if one is on) to the sites your iPhone visits | Not stored, not logged | — |
+| Your iPhone's internet traffic, only while internet sharing is on (M8) | Yes | Through your bridge phone (and its VPN, if one is on) to the sites your iPhone visits. Off until you allow it in the bridge app; then the iPhone turns it on and off. Sites you choose to send direct (e.g. `.ir`) skip the bridge | Not stored, not logged (the log keeps only how many connections were served) | — |
+| Proxy credentials for internet sharing (M8) | Yes, encrypted | Your paired iPhone only | Bridge memory only; new for every start | Until sharing stops |
 | Call events (who's calling) | Yes, encrypted | Your paired iPhone only | iPhone Recents only if you turn that setting on (Recents can sync to iCloud) | Per iOS settings |
 | Call audio, only with "Talk on iPhone" on and only during a call you take on the iPhone (M6) | Yes, encrypted | Streamed live between your two phones over your local Wi-Fi: the caller's voice to the iPhone, your iPhone's microphone into the call | Not stored, not recorded; logs keep only frame counts and loudness levels | — |
 | Shizuku permission state (M6) | No | — | Shizuku (a separate app you install) remembers that you allowed Pairline | Until you revoke it in Shizuku |
@@ -92,6 +93,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | `READ_CONTACTS` | Caller names and contacts on the iPhone | Setup, optional |
 | `WRITE_CONTACTS` | Add contacts from the iPhone | Only when you turn on "Add contacts from iPhone" in Settings (off by default) |
 | `ACCESS_WIFI_STATE`, `CHANGE_WIFI_STATE`; `NEARBY_WIFI_DEVICES` (Android 13+) (M5) | Create the hotspot the iPhone joins | When you turn on the Wi-Fi link |
+| `ACCESS_NETWORK_STATE` | Internet sharing (M8): shows whether this phone's traffic goes through a VPN, read locally (no lookups) | Install |
 | `BLUETOOTH_ADVERTISE`, `BLUETOOTH_CONNECT` (Android 12+, "Nearby devices"); `BLUETOOTH`, `BLUETOOTH_ADMIN` (Android 9–11, at install) | The Bluetooth link. The advertisement carries only Pairline's service id: no name or number | Setup |
 | `ACCESS_FINE_LOCATION` | **Not requested.** The bridge only advertises and accepts connections, which doesn't need location on any supported Android version | — |
 | `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_CONNECTED_DEVICE` | Keep the link running | Install |

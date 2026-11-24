@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="netshare_title">İnternet paylaşımı</string>
+    <string name="netshare_allow">iPhone bu telefonun internetini kullanabilsin</string>
+    <string name="netshare_allow_sub">Yalnızca iPhone’dan açtığınızda. iPhone’un trafiği o zaman Wi-Fi ağınız veya bu telefonun erişim noktası üzerinden, bu telefonun bağlantısı ve VPN’i aracılığıyla çıkar.</string>
+    <string name="netshare_active">Şu anda paylaşılıyor</string>
+    <string name="netshare_idle">Şu anda paylaşım yok</string>
+    <string name="netshare_vpn_on">Bir VPN açık: iPhone’un trafiği onun üzerinden gider. Paylaşımı durdurmak için dokunun.</string>
+    <string name="netshare_vpn_off">Bu telefonda VPN yok: iPhone’un trafiği bu telefonun kendi bağlantısından çıkar.</string>
+    <string name="netshare_direct_iran">İran siteleri (.ir) doğrudan</string>
+    <string name="netshare_direct_iran_sub">.ir ile biten siteler bu telefonu ve VPN’ini atlar.</string>
+</resources>

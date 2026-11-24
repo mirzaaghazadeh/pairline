@@ -5,6 +5,7 @@ import app.pairline.android.AppPrefs
 import app.pairline.android.BuildConfig
 import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.log.Log
+import app.pairline.android.netshare.NetShare
 import app.pairline.android.protocol.ErrorCode
 import app.pairline.android.protocol.Messages
 import app.pairline.android.protocol.Msg
@@ -49,7 +50,33 @@ class MessageRouter(
     private val contacts: ContactsSync,
     private val ussd: UssdRunner,
     private val audio: CallAudioRelay,
+    private val netShare: NetShare,
 ) : MessageHandler {
+
+    /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
+    fun netShareReply(id: Long?): JSONObject {
+        val s = netShare.session.value
+        return JSONObject()
+            .put("t", Msg.NET_SHARE)
+            .apply { if (id != null) put("id", id) }
+            .put("on", s != null)
+            .apply {
+                if (s != null) {
+                    put("host", s.host)
+                    put("port", s.port)
+                    put("user", s.username)
+                    put("pass", s.password)
+                    put("pac", s.pacUrl)
+                    put("vpn", netShare.vpnActive())
+                    put("direct", JSONArray(netShare.directSuffixes()))
+                }
+            }
+    }
+
+    /** Sharing was stopped on the bridge (the user turned it off): tell the iPhone. */
+    fun netShareChanged() {
+        if (netShare.session.value == null) link.send(netShareReply(null))
+    }
 
     private val scope = CoroutineScope(
         SupervisorJob() + Dispatchers.IO + CoroutineExceptionHandler { _, e -> Log.e(TAG, "router task failed", e) },
@@ -160,6 +187,11 @@ class MessageRouter(
             Msg.CALL_MEDIA_FEEDBACK -> request(message) { id ->
                 audio.feedback(message.boolOrNull("heard"), message.boolOrNull("heardMe"))
                 Messages.ok(id)
+            }
+            Msg.NET_SHARE -> request(message) { id ->
+                // Sharing keeps running across link drops; it stops when the iPhone or the user turns it off.
+                if (message.boolOrNull("on") == false) netShare.stop("stopped by the iPhone") else netShare.start()
+                netShareReply(id)
             }
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }

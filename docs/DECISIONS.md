@@ -550,3 +550,26 @@ Android 9). Shizuku is the established, open-source way for a user to lend an ap
   and the user talks on the bridge phone.
 - **Tested:** unit tests (packets, jitter buffer, resampling, caps), builds incl. release/R8. Real calls still need a
   real Android 10+ phone with Shizuku (the first tester has Android 15); the emulator has no real call audio.
+
+### D-048 — Internet sharing: one SOCKS5 + HTTP proxy port on the local network, PAC for iOS (2026-11-24)
+
+- **Why a proxy and not plain tethering:** Android sends hotspot clients' traffic around its own VPN, so tethering
+  alone doesn't give the iPhone the bridge's VPN. A proxy's outbound connections are the bridge app's own, so they
+  follow Android's default network, which is the VPN when one is on.
+- **One port, both protocols:** the first byte tells SOCKS5 (`0x05`) from HTTP. SOCKS5 (CONNECT only, RFC 1929
+  username/password) for Telegram, which takes a one-tap `tg://socks` link. HTTP CONNECT and absolute-form requests
+  (one request per connection) for iOS's Wi-Fi proxy settings, plus `GET /proxy.pac`.
+- **Safety:** bound to the bridge's Wi-Fi/hotspot address only, never all interfaces; only private/link-local
+  clients; port and credentials new on every start and kept in memory only. HTTP needs the password too, except from
+  the paired iPhone's Wi-Fi-link address once M5 knows it (iOS's automatic proxy settings can't carry a password).
+  The PAC file holds no secret. Logs keep only a connection count.
+- **Off by default, two switches:** the bridge's user must allow sharing (`net.share` capability), then the iPhone
+  starts and stops it. It survives link drops (so browsing doesn't break when Bluetooth blinks) and stops when either
+  side turns it off. Disallowing on the bridge stops it and tells the iPhone (`net.share` event).
+- **Split routing in the PAC file:** local addresses always direct; `.ir` direct when the user turns that on (the
+  list ships in the app, D-013); everything else `PROXY` with no `DIRECT` fallback, so a dropped bridge stops
+  traffic instead of quietly bypassing the VPN.
+- **VPN shown, app name not:** `ACCESS_NETWORK_STATE` tells whether a VPN network exists; Android doesn't reveal which
+  app owns it, and we do no IP lookups.
+- **Tested:** JVM tests run the proxy on loopback against an echo server (SOCKS5 with/without password, HTTP 407 and
+  CONNECT, PAC contents, parsing). A real iPhone↔bridge test needs the M5 Wi-Fi link.

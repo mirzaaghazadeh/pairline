@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Strings for call audio live in their own table, `CallAudio.xcstrings` (D-047).
-private func t(_ key: LocalizedStringKey) -> Text { Text(key, tableName: "CallAudio") }
+/// Strings for call audio live in their own table, `CallAudio.xcstrings` (D-047). Keys are plain strings so Xcode
+/// doesn't also extract them into the shared Localizable catalog.
+private func t(_ key: String) -> Text { Text(LocalizedStringKey(key), tableName: "CallAudio") }
 
 /// Explains where call audio is and how to get it on this iPhone ("Talk on iPhone", D-047).
 struct CallAudioInfoSheet: View {
@@ -60,7 +61,7 @@ struct CallAudioInfoSheet: View {
         }
     }
 
-    private func step(_ number: Int, _ text: LocalizedStringKey) -> some View {
+    private func step(_ number: Int, _ text: String) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text(verbatim: "\(number)")
                 .font(.rounded(.subheadline, weight: .bold))

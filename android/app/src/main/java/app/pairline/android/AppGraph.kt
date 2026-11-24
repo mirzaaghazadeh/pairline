@@ -3,6 +3,7 @@ package app.pairline.android
 import android.app.Application
 import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.link.IdentityStore
+import app.pairline.android.netshare.NetShare
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.link.LinkManager
 import app.pairline.android.link.MessageRouter
@@ -63,7 +64,12 @@ object AppGraph {
         )
     }
     val router: MessageRouter by lazy {
-        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay)
+        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare)
+    }
+
+    /** Internet sharing for the paired iPhone (M8, D-048). */
+    val netShare: NetShare by lazy {
+        NetShare(app, prefs).also { share -> share.onChange = { router.netShareChanged() } }
     }
 
     /** Shizuku and the privileged service ("Talk on iPhone", D-046). Started by [PairlineApp]. */

@@ -160,6 +160,7 @@ class StatusMonitor(
                 contactsAddEnabled = prefs.contactsAddEnabled,
                 mediaListen = mediaListen,
                 mediaTalk = mediaTalk,
+                netShare = prefs.netShareAllowed,
             ),
         )
     }

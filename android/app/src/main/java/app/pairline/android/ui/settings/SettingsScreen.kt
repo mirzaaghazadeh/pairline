@@ -177,6 +177,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                 }
             }
 
+            app.pairline.android.ui.netshare.NetShareSettings()
+
             SectionCard(title = stringResource(R.string.home_keep_running)) {
                 ListRow(
                     title = stringResource(R.string.settings_background),

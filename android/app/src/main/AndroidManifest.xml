@@ -8,6 +8,8 @@
          api.github.com (Settings can turn it off). CI (.github/scripts/network-code-check.sh) fails if any other
          code opens a connection. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Internet sharing (M8): tells whether this phone's traffic goes through a VPN, read locally. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- The Bluetooth link. Android 11 grants these at install; Android 12+ asks ("Nearby devices"). -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />

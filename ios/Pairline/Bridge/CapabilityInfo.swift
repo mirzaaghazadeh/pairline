@@ -27,6 +27,7 @@ struct CapabilityInfo: Identifiable {
         case .dualSIM: return "simcard.2"
         case .callMedia: return "ear"
         case .callMediaTalk: return "mic"
+        case .netShare: return "network"
         }
     }
 
@@ -47,6 +48,7 @@ struct CapabilityInfo: Identifiable {
         case .dualSIM: return String(localized: "Dual SIM")
         case .callMedia: return String(localized: "Hear calls on iPhone", table: "CallAudio")
         case .callMediaTalk: return String(localized: "Talk from iPhone", table: "CallAudio")
+        case .netShare: return String(localized: "Internet sharing", table: "NetShare")
         }
     }
 
@@ -67,6 +69,8 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 10 or later, the free Shizuku app, and both phones on the same Wi-Fi.", table: "CallAudio")
         case .callMediaTalk:
             return String(localized: "This bridge phone can't feed audio into calls. You hear calls on the iPhone and talk on the Android phone.", table: "CallAudio")
+        case .netShare:
+            return String(localized: "Turn on Internet sharing in Pairline Bridge › Settings on your Android phone.", table: "NetShare")
         case .contacts:
             return String(localized: "Turn on contacts sync in Pairline Bridge on your Android phone.")
         case .calllog:

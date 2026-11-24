@@ -182,6 +182,19 @@ struct CallIncomingEvent: Codable, Equatable {
     var name: String?
 }
 
+/// `net.share`: internet sharing through the bridge phone (M8, D-048). Reply to a request, or an event when the bridge
+/// stops sharing by itself.
+struct NetShareInfo: Codable, Equatable {
+    var on: Bool
+    var host: String?
+    var port: Int?
+    var user: String?
+    var pass: String?
+    var pac: String?
+    var vpn: Bool?
+    var direct: [String]?
+}
+
 /// `call.media.state`: the bridge started, stopped or failed to relay call audio (M6, D-047).
 struct CallMediaStateEvent: Codable, Equatable {
     var call: OpaqueValue
@@ -248,6 +261,7 @@ enum InboundMessage {
     case callIncoming(CallIncomingEvent)
     case callState(CallStateEvent)
     case callMediaState(CallMediaStateEvent)
+    case netShare(NetShareInfo)
     case contactsSync(ContactsSyncReply)
     case calllogSync(CallLogSyncReply)
     case ussdResult(USSDResult)
@@ -331,6 +345,7 @@ struct Inbound {
         case "call.incoming": message = .callIncoming(try body(CallIncomingEvent.self))
         case "call.state": message = .callState(try body(CallStateEvent.self))
         case "call.media.state": message = .callMediaState(try body(CallMediaStateEvent.self))
+        case "net.share": message = .netShare(try body(NetShareInfo.self))
         case "contacts.sync":
             let b = try body(ContactsBody.self)
             message = .contactsSync(ContactsSyncReply(contacts: b.contacts?.elements ?? [],
@@ -431,6 +446,11 @@ struct Outbound {
         Outbound("call.media.stop", ["call": call.jsonObject])
     }
 
+    /// Turns internet sharing through the bridge on or off (M8). The reply is `net.share` with the proxy details.
+    static func netShare(on: Bool) -> Outbound {
+        Outbound("net.share", ["on": on])
+    }
+
     /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
     static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {
         Outbound("call.media.feedback", ["heard": optional(heard), "heardMe": optional(heardMe)])
@@ -473,6 +493,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case callMedia = "call.media"
     /// …and can feed this iPhone's microphone into the call.
     case callMediaTalk = "call.media.talk"
+    /// The bridge's user allows internet sharing for this iPhone (M8).
+    case netShare = "net.share"
 
     var id: String { rawValue }
 }

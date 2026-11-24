@@ -80,6 +80,16 @@ class AppPrefs(context: Context) {
         get() = prefs.getInt(AUDIO_TALK_FAILURES, 0)
         set(value) = edit { putInt(AUDIO_TALK_FAILURES, value) }
 
+    /** The user lets the paired iPhone use this phone's internet (M8, D-048). Off by default. */
+    var netShareAllowed: Boolean
+        get() = prefs.getBoolean(NET_SHARE_ALLOWED, false)
+        set(value) = edit { putBoolean(NET_SHARE_ALLOWED, value) }
+
+    /** While sharing, Iranian (.ir) sites go direct instead of through this phone's VPN. */
+    var netShareDirectIran: Boolean
+        get() = prefs.getBoolean(NET_SHARE_DIRECT_IR, false)
+        set(value) = edit { putBoolean(NET_SHARE_DIRECT_IR, value) }
+
     /** Permissions we've asked for at least once, to tell "never asked" from "don't ask again". */
     fun wasRequested(permission: String): Boolean = prefs.getBoolean("asked:$permission", false)
 
@@ -114,5 +124,7 @@ class AppPrefs(context: Context) {
         const val AUDIO_SOURCE = "audio_capture_source"
         const val AUDIO_MUTE_MIC = "audio_mute_bridge_mic"
         const val AUDIO_TALK_FAILURES = "audio_talk_failures"
+        const val NET_SHARE_ALLOWED = "net_share_allowed"
+        const val NET_SHARE_DIRECT_IR = "net_share_direct_ir"
     }
 }

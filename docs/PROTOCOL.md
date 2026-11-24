@@ -189,7 +189,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `wifi.offer` | B→R | M5 | ssid, password, band, ip, port |
 | `link.switch` | either | M5 | move bulk traffic to Wi-Fi / back to BLE |
 | `file.offer`, `file.answer` | either | M5 | name, size, type / accept or decline (data goes over the bulk channel) |
-| `net.share` | R→B, B→R | M8 | start or stop internet sharing / proxy address, ports, per-session credentials |
+| `net.share` | R→B, B→R | M8 | request: `id`, `on` / reply (same `id`) or event (no `id`, when the bridge's user stops it): `on`, and while on `host`, `port` (one port for SOCKS5 and HTTP), `user`, `pass` (new for every start), `pac` (`http://host:port/proxy.pac`), `vpn` (the bridge's traffic goes through a VPN), `direct` [domain suffix]. `error` `permission` while the bridge's user hasn't allowed sharing. Needs `net.share` |
 
 ### Capabilities (`status.caps`)
 
@@ -199,7 +199,8 @@ version supports it. The iPhone hides or explains anything missing instead of gu
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
 `call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `call.media` (call audio can
 be relayed to the iPhone: "Talk on iPhone" is on and Shizuku is ready), `call.media.talk` (the iPhone's microphone
-can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone)
+can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone), `net.share`
+(the bridge's user allows internet sharing, M8)
 
 ### Call audio (M6)
 

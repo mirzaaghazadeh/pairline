@@ -141,15 +141,17 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 
 After the first release so it doesn't delay it; move it earlier if it matters more (D-013).
 
-- [ ] Proxy on the bridge hotspot so the iPhone can use the Android phone's connection, including its VPN
+- [x] Proxy on the bridge's Wi-Fi/hotspot address so the iPhone can use the Android phone's connection, including
+      its VPN (`netshare/ShareProxy`, D-048) — real-network test pending (needs the M5 Wi-Fi link)
   - SOCKS5 for apps like Telegram (one-tap `tg://socks` link)
   - HTTP proxy plus a PAC file for iOS Wi-Fi proxy settings
-- [ ] Listens only on the hotspot interface, with credentials generated per session
-- [ ] Split routing: chosen domains and IP ranges go direct, the rest through the VPN. Lists ship inside the
-      app and update only with app releases
-- [ ] Shows which VPN app is active on the bridge phone, read locally (no IP lookups)
-- [ ] `netshare` package is the only code allowed to open non-local connections, and only for the iPhone's
-      own traffic; CI and PRIVACY.md updated
+- [x] Listens only on a local Wi-Fi/hotspot address, accepts only local clients, credentials generated per session
+- [x] Split routing: local addresses always direct; `.ir` sites direct on request; the rest through the bridge, with
+      no silent direct fallback. Lists ship inside the app — more lists can follow
+- [x] Shows whether a VPN is active on the bridge phone, read locally (no IP lookups). Which VPN app: Android
+      doesn't tell other apps
+- [x] `netshare` package is allowed to open non-local connections (network-code-check.sh), only for the iPhone's
+      own traffic; PRIVACY.md updated
 
 ## M9 — Android client mode (two Android phones)
 

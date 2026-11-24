@@ -16,6 +16,8 @@ data class CapsInput(
     val mediaListen: Boolean = false,
     /** …and the iPhone's voice can be fed into the call. */
     val mediaTalk: Boolean = false,
+    /** The user allows internet sharing (M8). */
+    val netShare: Boolean = false,
 )
 
 /**
@@ -50,6 +52,7 @@ object CapsCalculator {
         if (has(Manifest.permission.READ_CALL_LOG)) caps += Caps.CALLLOG
         if (input.contactsAddEnabled && has(Manifest.permission.WRITE_CONTACTS)) caps += Caps.CONTACTS_ADD
         if (input.activeSims >= 2) caps += Caps.DUALSIM
+        if (input.netShare) caps += Caps.NET_SHARE
         return Caps.ALL.filter { it in caps }
     }
 }
