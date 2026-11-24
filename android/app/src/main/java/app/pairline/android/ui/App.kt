@@ -19,6 +19,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -57,9 +60,19 @@ fun PairlineAppUi() {
     }
 }
 
+private val allRoutes: List<Route> = listOf(
+    Route.Home, Route.Pairing, Route.Settings, Route.Permissions, Route.KeepAlive, Route.Diagnostics, Route.Help,
+)
+
+/** Keeps the back stack across activity recreation (e.g. a language change on Android 11–12). */
+private val RouteStackSaver = listSaver<SnapshotStateList<Route>, Int>(
+    save = { stack -> stack.map { allRoutes.indexOf(it) } },
+    restore = { saved -> mutableStateListOf(*saved.mapNotNull { allRoutes.getOrNull(it) }.ifEmpty { listOf(Route.Home) }.toTypedArray()) },
+)
+
 @Composable
 private fun MainNavigation() {
-    val stack = remember { mutableStateListOf<Route>(Route.Home) }
+    val stack = rememberSaveable(saver = RouteStackSaver) { mutableStateListOf<Route>(Route.Home) }
     val navigate: (Route) -> Unit = { if (stack.last() != it) stack.add(it) }
     val back: () -> Unit = { if (stack.size > 1) stack.removeAt(stack.lastIndex) }
     BackHandler(enabled = stack.size > 1) { back() }
