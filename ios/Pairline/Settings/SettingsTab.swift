@@ -18,6 +18,7 @@ struct SettingsTab: View {
                 callsSection
                 languageSection
                 helpSection
+                telegramSection
                 aboutSection
                 #if DEBUG
                 DebugSection()
@@ -249,6 +250,21 @@ struct SettingsTab: View {
             }
         } header: {
             Text("Help")
+        }
+    }
+
+    private var telegramSection: some View {
+        Section {
+            Link(destination: AppInfo.telegramChannelURL) {
+                Label("News on Telegram", systemImage: "paperplane")
+            }
+            Link(destination: AppInfo.telegramGroupURL) {
+                Label("Help group on Telegram", systemImage: "bubble.left.and.bubble.right")
+            }
+        } header: {
+            Text("Telegram")
+        } footer: {
+            Text("News and help in your language. The group is public, so never post your phone number, messages or codes there.")
         }
     }
 

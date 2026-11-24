@@ -66,10 +66,14 @@ the Wi-Fi link (addresses on your local network only) and internet sharing (M8, 
 **Debug builds only** (never the release APK): the bridge also listens on `127.0.0.1:47800` inside the phone or
 emulator, so developers can connect a test iPhone app through `adb forward` (D-018); it isn't reachable from any
 network. Setup videos, routing lists and the known-device list ship inside the app, so nothing else is downloaded.
+Links you tap in Settings (the source code, Pairline's Telegram news channel and help group for your language) are
+handed to your browser or the Telegram app; the bridge doesn't open them itself.
 
 **iPhone app:** it makes no network requests of its own; the only outside party is Apple (StoreKit, App Store
 purchases and restores). Links you tap — the bridge download page `pairline.navid.tr`, the privacy policy, the terms,
-the source code, or a link inside a message — open in Safari, only when you tap them. **Debug builds only** (never
+the source code, Pairline's Telegram news channel and help group (`t.me`, for the app's language), or a link inside a
+message — open in Safari or the Telegram app, only when you tap them. The Telegram help group is public, and the app
+says so next to the link. **Debug builds only** (never
 release builds, checked by CI with `ios-policy-check.sh`): the app can connect to a test bridge on `127.0.0.1`
 (loopback, D-018) instead of Bluetooth.
 

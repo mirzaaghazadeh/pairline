@@ -235,6 +235,12 @@
     <string name="settings_version">Sürüm</string>
     <string name="settings_license">Lisans: FSL-1.1-ALv2</string>
     <string name="settings_license_sub">Kullanımı ücretsizdir. Kod herkese açıktır, böylece herkes ne yaptığını inceleyebilir; her sürüm, yayımlanmasından iki yıl sonra Apache-2.0 lisansına geçer.</string>
+    <string name="settings_telegram_channel">Telegram’da haberler</string>
+    <string name="settings_telegram_channel_sub">Yeni sürümler ve ipuçları, Türkçe</string>
+    <string name="settings_telegram_group">Telegram yardım grubu</string>
+    <string name="settings_telegram_group_sub">Diğer Pairline kullanıcılarına ve geliştiriciye sorun. Grup herkese açıktır; telefon numaranızı, mesajlarınızı veya kodlarınızı asla oraya yazmayın.</string>
+    <string name="telegram_channel_url">https://t.me/pairline_tr</string>
+    <string name="telegram_group_url">https://t.me/pairline_groups/7</string>
     <string name="settings_source">Kaynak kodu</string>
     <string name="settings_source_sub">github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">Gizlilik</string>
