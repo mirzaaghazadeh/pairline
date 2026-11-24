@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "Talk on iPhone": call audio through Shizuku (D-046, D-047). -->
+<resources>
+    <string name="talk_title">Talk on your iPhone</string>
+    <string name="talk_body">Hear calls and talk with your iPhone’s own microphone and speaker. Android keeps call audio away from apps, so this needs Shizuku, a free app that gives Pairline extra access with your permission. Both phones also need to be on the same Wi-Fi.</string>
+    <string name="settings_talk">Talk on iPhone</string>
+    <string name="talk_summary_on">On</string>
+    <string name="talk_summary_off">Off</string>
+    <string name="talk_summary_needs_shizuku">Needs Shizuku</string>
+    <string name="talk_summary_unsupported">Needs Android 10 or later</string>
+    <string name="talk_android_too_old">This phone runs Android %1$s. Call audio on the iPhone needs Android 10 or later. Calls still ring on the iPhone, and you talk on this phone.</string>
+    <string name="talk_steps">Set up</string>
+    <string name="talk_step_install">Install Shizuku</string>
+    <string name="talk_step_install_sub">A free, open-source app from the Play Store or GitHub.</string>
+    <string name="talk_get_shizuku">Get Shizuku</string>
+    <string name="talk_step_start">Start Shizuku</string>
+    <string name="talk_step_outdated">Update Shizuku to version 13 or later</string>
+    <string name="talk_step_start_sub">In Shizuku, tap Start under “Start via Wireless debugging” and follow its steps. You turn on Wireless debugging yourself in Developer options; Pairline never does. After the phone restarts, start Shizuku again.</string>
+    <string name="talk_step_start_sub_q">On Android 10, Shizuku is started from a computer once; the Shizuku app shows the command. After the phone restarts, start it again.</string>
+    <string name="talk_open_shizuku">Open Shizuku</string>
+    <string name="talk_open_developer">Developer options</string>
+    <string name="talk_step_allow">Allow Pairline in Shizuku</string>
+    <string name="talk_step_allow_sub">Shizuku asks whether Pairline may use it. Pairline uses it only for call audio and the call keypad, mute and speaker.</string>
+    <string name="talk_allow_denied">You said no before. Open Shizuku, go to Authorized apps and turn on Pairline.</string>
+    <string name="talk_allow">Allow</string>
+    <string name="talk_this_phone">On this phone</string>
+    <string name="talk_listen_yes">The iPhone can hear your calls</string>
+    <string name="talk_listen_no">This phone doesn’t let Shizuku capture call audio</string>
+    <string name="talk_talk_yes">Your voice from the iPhone can go into the call</string>
+    <string name="talk_talk_no">This phone can’t feed audio into a call: you’ll hear calls on the iPhone and talk on this phone</string>
+    <string name="talk_switch">Talk on iPhone</string>
+    <string name="talk_switch_sub">When you answer on the iPhone, the call’s audio moves to the iPhone. Also turns on the keypad, mute and speaker from the iPhone.</string>
+    <string name="talk_reset">Start call audio over</string>
+    <string name="talk_reset_sub">Pairline learns what works on this phone from your answers after calls. This forgets them.</string>
+    <string name="talk_wifi_note">Call audio goes over your Wi-Fi, encrypted end to end. It’s never recorded or stored.</string>
+    <string name="talk_setup_title">Talk on your iPhone (optional)</string>
+    <string name="talk_setup_later">Set up later</string>
+</resources>

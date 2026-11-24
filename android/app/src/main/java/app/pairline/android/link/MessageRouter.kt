@@ -3,6 +3,7 @@ package app.pairline.android.link
 import android.os.Build
 import app.pairline.android.AppPrefs
 import app.pairline.android.BuildConfig
+import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.log.Log
 import app.pairline.android.protocol.ErrorCode
 import app.pairline.android.protocol.Messages
@@ -47,6 +48,7 @@ class MessageRouter(
     private val calls: CallTracker,
     private val contacts: ContactsSync,
     private val ussd: UssdRunner,
+    private val audio: CallAudioRelay,
 ) : MessageHandler {
 
     private val scope = CoroutineScope(
@@ -78,6 +80,7 @@ class MessageRouter(
     override fun onDisconnected() {
         ticker?.cancel()
         ticker = null
+        audio.stop(null, "link closed")
     }
 
     /** Something in the status may have changed; sends it if it really did (at most every 2 s). */
@@ -142,6 +145,20 @@ class MessageRouter(
             }
             Msg.CALL_AUDIO -> request(message) { id ->
                 calls.audio(callId(message), message.boolOrNull("mute"), message.boolOrNull("speaker"))
+                Messages.ok(id)
+            }
+            Msg.CALL_MEDIA_START -> request(message) { id ->
+                val call = callId(message)
+                if (!calls.isInProgress(call)) invalid("call isn't in progress")
+                audio.start(call, wantTalk = message.boolOrNull("talk") ?: true)
+                Messages.ok(id)
+            }
+            Msg.CALL_MEDIA_STOP -> request(message) { id ->
+                audio.stop(callId(message), "stopped by the iPhone")
+                Messages.ok(id)
+            }
+            Msg.CALL_MEDIA_FEEDBACK -> request(message) { id ->
+                audio.feedback(message.boolOrNull("heard"), message.boolOrNull("heardMe"))
                 Messages.ok(id)
             }
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }

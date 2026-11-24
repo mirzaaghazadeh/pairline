@@ -39,6 +39,8 @@ class StatusMonitor(
     private val prefs: AppPrefs,
     private val appVersion: String,
     private val inCallServiceAvailable: () -> Boolean,
+    /** Call audio relay readiness: (listen, talk). D-047. */
+    private val mediaCaps: () -> Pair<Boolean, Boolean> = { false to false },
 ) {
     /** Called (on a background thread) whenever something in the status may have changed. */
     var onChange: (() -> Unit)? = null
@@ -147,6 +149,7 @@ class StatusMonitor(
         } else {
             hasTelephony
         }
+        val (mediaListen, mediaTalk) = mediaCaps()
         return CapsCalculator.compute(
             CapsInput(
                 granted = Perms.grantedSet(context),
@@ -155,6 +158,8 @@ class StatusMonitor(
                 activeSims = sims.activeCount(),
                 inCallService = inCallServiceAvailable(),
                 contactsAddEnabled = prefs.contactsAddEnabled,
+                mediaListen = mediaListen,
+                mediaTalk = mediaTalk,
             ),
         )
     }

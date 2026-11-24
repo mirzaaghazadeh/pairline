@@ -56,6 +56,8 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        // The privileged service's interface (privileged/IPrivilegedService.aidl, D-046).
+        aidl = true
     }
 
     testOptions {
@@ -82,6 +84,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.zxing.core)
+    implementation(libs.shizuku.api)
+    implementation(libs.shizuku.provider)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

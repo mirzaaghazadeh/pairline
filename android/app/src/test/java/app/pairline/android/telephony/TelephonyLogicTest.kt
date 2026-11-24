@@ -29,7 +29,9 @@ class TelephonyLogicTest {
         sims: Int = 1,
         inCall: Boolean = false,
         add: Boolean = false,
-    ) = CapsCalculator.compute(CapsInput(granted, messaging, calling, sims, inCall, add))
+        listen: Boolean = false,
+        talk: Boolean = false,
+    ) = CapsCalculator.compute(CapsInput(granted, messaging, calling, sims, inCall, add, listen, talk))
 
     @Test
     fun allPermissionsSingleSim() {
@@ -44,7 +46,14 @@ class TelephonyLogicTest {
 
     @Test
     fun everythingIncludingOptionalOnes() {
-        assertEquals(Caps.ALL, caps(sims = 2, inCall = true, add = true))
+        assertEquals(Caps.ALL, caps(sims = 2, inCall = true, add = true, listen = true, talk = true))
+    }
+
+    @Test
+    fun callAudioCapsNeedListenFirstAndCalling() {
+        assertEquals(false, Caps.CALL_MEDIA_TALK in caps(talk = true))
+        assertEquals(listOf(true, false), caps(listen = true).let { listOf(Caps.CALL_MEDIA in it, Caps.CALL_MEDIA_TALK in it) })
+        assertEquals(false, Caps.CALL_MEDIA in caps(calling = false, listen = true, talk = true))
     }
 
     @Test

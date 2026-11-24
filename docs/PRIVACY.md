@@ -22,7 +22,8 @@ Any change that adds or changes a data flow or permission must update this file 
 | Files you send (M5) | Yes, encrypted | The other paired phone only | Where you save them | Until you delete them |
 | Your iPhone's internet traffic, only while internet sharing is on (M8) | Yes | Through your bridge phone (and its VPN, if one is on) to the sites your iPhone visits | Not stored, not logged | — |
 | Call events (who's calling) | Yes, encrypted | Your paired iPhone only | iPhone Recents only if you turn that setting on (Recents can sync to iCloud) | Per iOS settings |
-| Call audio (M6) | Yes, encrypted | Streamed live to your iPhone | Not stored | — |
+| Call audio, only with "Talk on iPhone" on and only during a call you take on the iPhone (M6) | Yes, encrypted | Streamed live between your two phones over your local Wi-Fi: the caller's voice to the iPhone, your iPhone's microphone into the call | Not stored, not recorded; logs keep only frame counts and loudness levels | — |
+| Shizuku permission state (M6) | No | — | Shizuku (a separate app you install) remembers that you allowed Pairline | Until you revoke it in Shizuku |
 | USSD results | Yes, encrypted | Your paired iPhone only | Not stored | — |
 | Phone status (battery, signal, carrier, your SIM numbers if Android knows them) | Yes, encrypted | Your paired iPhone only | Not stored | — |
 | Device model and system version (`device.info`: e.g. "Google Pixel 7", Android 16, app version; on the iPhone side the generic model "iPhone") | Yes, encrypted | The other paired phone only | Bridge app settings: the iPhone's model and iOS/app version, to show them on screen | Until unpair |
@@ -95,7 +96,8 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Lets Pairline open Android's own dialog asking you to keep it running | Setup, optional |
 | `INTERNET` | The Wi-Fi link (local addresses only) and the daily update check against GitHub, which you can turn off (D-041) | Install |
 | `INTERNET` (**debug builds only**) | The local test transport on `127.0.0.1:47800` (D-018) | Install |
-| `MANAGE_ONGOING_CALLS` (**debug builds only**) | Lets developers test the companion call service on an emulator. Never granted unless a developer runs `adb shell appops set … MANAGE_ONGOING_CALLS allow` | — |
+| `MANAGE_ONGOING_CALLS` | Lets Android bind Pairline's companion call service, which gives the iPhone the keypad, mute and speaker during calls (Android 12+). Declared by every build but granted to nobody at install: Pairline turns on this app-op through Shizuku only when you turn on "Talk on iPhone" (D-046) | Only with Talk on iPhone |
+| Shizuku access (a separate, optional app) | Call audio on the iPhone: capture the caller's voice and feed your iPhone's microphone into the call, in a small service that runs with Android's shell rights and does only those things (AGENTS.md rule 7, D-046). Shizuku asks you first; you start Shizuku yourself and Pairline never turns on Wireless debugging | When you set up Talk on iPhone |
 
 ### iOS
 

@@ -18,6 +18,8 @@ class PairlineApp : Application() {
         AppGraph.init(this)
         Notifications.createChannels(this)
         Log.i("app", "Pairline ${BuildConfig.VERSION_NAME} started on Android ${android.os.Build.VERSION.SDK_INT}")
+        // Only listens for Shizuku (if the user has it); starts nothing privileged by itself (D-046).
+        AppGraph.privileged.start()
         if (AppGraph.prefs.setupDone) LinkService.start(this, "app start")
     }
 }

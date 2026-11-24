@@ -12,6 +12,10 @@ data class CapsInput(
     /** The companion InCallService is bound now, or has been bound on this phone before. */
     val inCallService: Boolean,
     val contactsAddEnabled: Boolean,
+    /** Call audio can be relayed to the iPhone ("Talk on iPhone" ready, D-047). */
+    val mediaListen: Boolean = false,
+    /** …and the iPhone's voice can be fed into the call. */
+    val mediaTalk: Boolean = false,
 )
 
 /**
@@ -37,6 +41,10 @@ object CapsCalculator {
                 caps += Caps.CALL_AUDIO
             }
             if (has(Manifest.permission.CALL_PHONE) && phoneState) caps += Caps.USSD
+            if (input.mediaListen && phoneState) {
+                caps += Caps.CALL_MEDIA
+                if (input.mediaTalk) caps += Caps.CALL_MEDIA_TALK
+            }
         }
         if (has(Manifest.permission.READ_CONTACTS)) caps += Caps.CONTACTS
         if (has(Manifest.permission.READ_CALL_LOG)) caps += Caps.CALLLOG

@@ -6,14 +6,8 @@
     <!-- The debug TCP transport listens on 127.0.0.1:47800 for the emulator and the iOS Simulator. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Lets testers check the companion InCallService path on an emulator: Android 12+ binds companion
-         call services only for apps holding this (signature|appop|role). Granted only by hand, with
-         `adb shell appops set app.pairline.android.debug MANAGE_ONGOING_CALLS allow`. Whether release builds
-         declare it is an open decision (ROADMAP M3 spike). -->
-    <uses-permission
-        android:name="android.permission.MANAGE_ONGOING_CALLS"
-        xmlns:tools="http://schemas.android.com/tools"
-        tools:ignore="ProtectedPermissions" />
+    <!-- MANAGE_ONGOING_CALLS is now declared by every build (main manifest, D-046). Testers can still grant it by
+         hand: `adb shell appops set app.pairline.android.debug MANAGE_ONGOING_CALLS allow`. -->
 
     <application>
         <!-- Pairing link and state for adb-driven tests. Checks that the caller is adb (shell) itself. -->

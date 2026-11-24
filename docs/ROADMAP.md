@@ -65,8 +65,8 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [ ] Spike: companion `InCallService` binding on Android 9–16 and major makers — first finding (API 36 emulator):
       Telecom skips binding a companion `InCallService` unless the app holds `MANAGE_ONGOING_CALLS`
       (signature|appop|role). With the app-op allowed through adb it binds, and DTMF, mute and speaker work. Without
-      it the bridge falls back to telephony callbacks plus `TelecomManager` answer/end. Real phones still to test;
-      how to grant it for users (Shizuku, companion-device role) is an open decision
+      it the bridge falls back to telephony callbacks plus `TelecomManager` answer/end. Real phones still to test.
+      Granting it: through Shizuku when the user turns on "Talk on iPhone" (D-046)
 - [x] Incoming call → CallKit on the iPhone; answer, reject and end from the iPhone (emulator-verified on Android;
       real-device test pending)
 - [x] Dial from the iPhone, choosing the SIM
@@ -102,14 +102,24 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 ## M6 — Call audio on the iPhone
 
 - [ ] Spike: Shizuku-based capture and injection on 3–5 devices (Qualcomm, MediaTek, Samsung Exynos);
-      compatibility matrix in `docs/`
-- [ ] `privileged` package with allowlisted operations (AGENTS.md rule 7)
-- [ ] Audio streaming over the Wi-Fi link; choose a codec (Opus vs AAC-ELD)
-- [ ] Packet-loss concealment (fill short gaps instead of silence) and an echo self-test
-- [ ] Test call with "Did you hear it?" feedback; automatic choice of the audio method; known-device list
+      compatibility matrix in `docs/` — first tester: an Android 15 phone; the shell user holds
+      `CAPTURE_AUDIO_OUTPUT`, `MODIFY_AUDIO_ROUTING` and `MODIFY_PHONE_STATE` on Android 16 (emulator) but not on
+      Android 9 (Galaxy Note 8), so Android 10+ only
+- [x] `privileged` package with allowlisted operations (AGENTS.md rule 7): `PrivilegedService` behind Shizuku —
+      probe, MANAGE_ONGOING_CALLS for Pairline itself, call capture (`VOICE_DOWNLINK`/`VOICE_CALL`), injection
+      through the telephony output; caller-uid check, argument allowlists (D-046)
+- [x] Audio streaming over the Wi-Fi link: 16 kHz PCM in 20 ms packets on the media channel (no codec needed on a
+      local network; PROTOCOL.md "Call audio", D-047) — waits for the M5 media channel to be wired in
+- [x] Packet-loss concealment (jitter buffer, repeat-and-fade) — echo self-test still open
+- [ ] Test call with "Did you hear it?" feedback; automatic choice of the audio method (`call.media.feedback`
+      flips capture source and bridge-mic muting — bridge side done, iPhone prompt pending); known-device list
       shipped inside the app (never fetched)
-- [ ] Root mode (option C) for devices where Shizuku isn't enough
-- [ ] Clean fallback to "audio on the Android phone" when a device isn't supported
+- [ ] Root mode (option C) for devices where Shizuku isn't enough — Shizuku started with root (or Sui) already runs
+      the same service as root
+- [x] Clean fallback to "audio on the Android phone" when a device isn't supported: caps `call.media` /
+      `call.media.talk` say exactly what works; "listen only" when injection isn't possible
+- [x] Android setup: optional "Talk on iPhone" step after pairing and a Settings page (Shizuku install, start,
+      permission, what this phone supports, switch)
 
 ## M7 — Payments and first release
 

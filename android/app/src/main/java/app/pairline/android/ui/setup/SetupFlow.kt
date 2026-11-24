@@ -69,6 +69,7 @@ import app.pairline.android.ui.grantState
 import app.pairline.android.ui.pairing.PairingContent
 import app.pairline.android.ui.refreshTick
 import app.pairline.android.ui.rememberPermissionRequester
+import app.pairline.android.ui.talk.TalkSetupContent
 
 /** One screen of the setup wizard. */
 sealed interface SetupStep {
@@ -79,6 +80,9 @@ sealed interface SetupStep {
     data object Battery : SetupStep
     data class Autostart(val maker: Maker) : SetupStep
     data object Pair : SetupStep
+
+    /** Optional: call audio on the iPhone through Shizuku (D-047). Android 10+ only. */
+    data object Talk : SetupStep
     data object Done : SetupStep
 
     companion object {
@@ -90,6 +94,7 @@ sealed interface SetupStep {
             add(Battery)
             if (maker != Maker.OTHER) add(Autostart(maker))
             add(Pair)
+            if (sdk >= Build.VERSION_CODES.Q) add(Talk)
             add(Done)
         }
     }
@@ -147,6 +152,7 @@ fun SetupFlow(onFinished: () -> Unit) {
                     SetupStep.Battery -> BatteryStep(next)
                     is SetupStep.Autostart -> AutostartStep(s.maker, next)
                     SetupStep.Pair -> PairStep(next)
+                    SetupStep.Talk -> TalkStep(next)
                     SetupStep.Done -> DoneStep(onFinished)
                 }
             }
@@ -353,6 +359,21 @@ private fun AutostartStep(maker: Maker, next: () -> Unit) {
             QuietButton(stringResource(R.string.action_done_continue), next)
         },
         extra = { NoteBox(stringResource(maker.steps), Tone.NEUTRAL, PIcons.Info) },
+    )
+}
+
+/** Optional "Talk on iPhone" step: everything can be finished later in Settings. */
+@Composable
+private fun TalkStep(next: () -> Unit) {
+    StepScaffold(
+        illustration = { PulseIcon(PIcons.Phone, Tone.ACCENT) },
+        title = stringResource(R.string.talk_setup_title),
+        body = stringResource(R.string.talk_body),
+        buttons = {
+            PrimaryButton(stringResource(R.string.action_continue), next)
+            QuietButton(stringResource(R.string.talk_setup_later), next)
+        },
+        extra = { TalkSetupContent(showReset = false) },
     )
 }
 

@@ -177,6 +177,10 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events |
 | `call.dtmf` | R→B | M3 | `id`, `call`, `digit` (needs capability `call.dtmf`) |
 | `call.audio` | R→B | M3 | `id`, `call`, `mute`, `speaker` (either optional; needs `call.audio`) |
+| `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true) → `ok` once audio flows, or `error` (`unsupported`: not set up, no Shizuku or no Wi-Fi link; `failed`: capture didn't start). Needs `call.media` |
+| `call.media.stop` | R→B | M6 | `id`, `call` → `ok`. The relay also stops by itself when the call ends or the Wi-Fi link drops |
+| `call.media.state` | B→R | M6 | `call`, `state` (`active` / `stopped` / `failed`), `listen`, `talk`, `reason` (English, for diagnostics) |
+| `call.media.feedback` | R→B | M6 | `id`, `heard` (the iPhone heard the caller), `heardMe` (the caller heard the iPhone); either may be null → `ok`. The bridge uses it to pick the capture source and mic handling that work on this phone |
 | `contacts.sync` | R→B, B→R | M4 | request: `id`, `since` (cursor or null) / reply: `id`, `contacts` [Contact], `deleted` [key], `cursor`, `more` |
 | `calllog.sync` | R→B, B→R | M4 | request: `id`, `since` / reply: `id`, `calls` [Call-log entry], `cursor`, `more` |
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
@@ -193,7 +197,28 @@ The bridge lists only what this phone can do right now: the permission is grante
 version supports it. The iPhone hides or explains anything missing instead of guessing from the Android version.
 
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
-`call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`
+`call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `call.media` (call audio can
+be relayed to the iPhone: "Talk on iPhone" is on and Shizuku is ready), `call.media.talk` (the iPhone's microphone
+can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone)
+
+### Call audio (M6)
+
+Call audio travels only on the Wi-Fi link's **media channel** (UDP, channel 1, media keys, 64-record replay window;
+see "Records"). Each media record's plaintext is one packet:
+
+| Bytes | Field |
+|-------|-------|
+| 1 | kind: `0x01` = 16-bit little-endian mono PCM at 16 kHz, one 20 ms frame |
+| 2 | sequence number, big-endian, +1 per frame, wraps at 65 536 |
+| 640 | 320 samples (kind `0x01`) |
+
+- Both directions use the same format; packets are sent every 20 ms while the relay is active. Receivers drop
+  unknown kinds and wrong sizes, play frames in sequence order behind a 60 ms jitter buffer, and cover a lost frame by
+  repeating the previous one at half volume (twice at most), then silence.
+- Uncompressed PCM (32 KB/s each way) is fine on a local network and needs no codec on either side; a compressed kind
+  can be added later without breaking older receivers.
+- R starts the relay with `call.media.start` once the call is in progress and its media channel is open, and plays
+  silence (not nothing) while muted, so B's jitter buffer stays steady. Audio is never stored on either phone.
 
 ### Clarifications (v0)
 

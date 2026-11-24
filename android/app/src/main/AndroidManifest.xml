@@ -27,6 +27,12 @@
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <uses-permission android:name="android.permission.CALL_COMPANION_APP" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <!-- Android 12+ binds the companion call service (keypad, mute, speaker from the iPhone) only for apps holding
+         this app-op. Nobody gets it at install: Pairline turns it on through Shizuku only when the user sets up
+         "Talk on iPhone" (D-046). -->
+    <uses-permission
+        android:name="android.permission.MANAGE_ONGOING_CALLS"
+        tools:ignore="ProtectedPermissions" />
 
     <!-- Contacts: read for caller names and sync; write only when the user turns on "Add contacts from iPhone". -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -41,6 +47,11 @@
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
+    <!-- Only to see whether the Shizuku app is installed ("Talk on iPhone" setup, D-046). -->
+    <queries>
+        <package android:name="moe.shizuku.privileged.api" />
+    </queries>
 
     <!-- allowBackup="false" and the extraction rules keep messages, contacts and keys out of
          Google cloud backup and device-to-device transfer (AGENTS.md rule 1). -->
@@ -87,6 +98,16 @@
                 <action android:name="android.telecom.InCallService" />
             </intent-filter>
         </service>
+
+        <!-- Shizuku hands its binder to the app through this provider. Only the shell or system user can call it
+             (INTERACT_ACROSS_USERS_FULL is a signature permission). D-046. -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:enabled="true"
+            android:exported="true"
+            android:multiprocess="false"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <!-- Only the system's SMS stack can send this (BROADCAST_SMS). -->
         <receiver

@@ -153,6 +153,13 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(
+                    title = stringResource(R.string.settings_talk),
+                    subtitle = app.pairline.android.ui.talk.talkSummary(),
+                    icon = PIcons.Phone,
+                    onClick = { navigate(Route.Talk) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                ListRow(
                     title = stringResource(if (paired) R.string.home_pair_new else R.string.home_pair),
                     icon = PIcons.Qr,
                     onClick = { navigate(Route.Pairing) },

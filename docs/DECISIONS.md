@@ -512,3 +512,41 @@ Also added: M9, an Android **client** mode so two Android phones can pair (maint
 SMS and call history from the iPhone. Decision numbers reserved for the parallel work: D-042–D-043 (delete, block
 list, update check details), D-044–D-045 (M5 Wi-Fi link, files), D-046–D-047 (M6 call audio, Shizuku),
 D-048 (M8), D-049 (M9).
+
+### D-046 — Shizuku for privileged access: `dev.rikka.shizuku:api` + `provider` 13.1.5 (2026-11-24)
+
+Android gives normal apps no way to hear a phone call or speak into it; the shell user can on Android 10+
+(`CAPTURE_AUDIO_OUTPUT`, `MODIFY_PHONE_STATE`, `MODIFY_AUDIO_ROUTING` — checked on the Android 16 emulator; missing on
+Android 9). Shizuku is the established, open-source way for a user to lend an app shell rights without root.
+- **Library:** `dev.rikka.shizuku:api` and `:provider` 13.1.5, Apache-2.0. Binder IPC to the user's Shizuku app
+  only; no network code (the CI network fence scans our sources; the library opens no sockets).
+- **Fenced (AGENTS.md rule 7):** everything privileged runs in `privileged/PrivilegedService`, a Shizuku user service
+  in its own process, behind `IPrivilegedService.aidl`, which has exactly four operations: `probe`,
+  `allowOngoingCalls` (Pairline's own package only), `startCapture` (`VOICE_DOWNLINK`/`VOICE_CALL` at 8/16/48 kHz),
+  `startInject` (16-bit PCM to the telephony output, optional bridge-mic mute restored on stop). Every call checks
+  that the caller's uid is Pairline's; every argument is checked against a fixed list. Audio is attributed to the
+  shell package (`createPackageContext("com.android.shell")`), which is what the process really is.
+- **User in control (rule 5):** Pairline never installs or starts Shizuku and never turns on Wireless debugging; the
+  setup screen only opens Shizuku, the Play Store and Developer options for the user. Shizuku shows its own permission
+  dialog. Everything else in Pairline works without it.
+- **`MANAGE_ONGOING_CALLS`** moves from the debug manifest to every build (answers the M3 open question). It's an
+  app-op nobody gets at install; the privileged service turns it on for Pairline when the user turns on "Talk on
+  iPhone", which lets Android bind the companion `InCallService` → keypad, mute and speaker from the iPhone.
+- R8 keeps `PrivilegedService(Context)` because Shizuku instantiates it by name.
+
+### D-047 — Call audio on the iPhone: uncompressed 16 kHz PCM over the Wi-Fi media channel (2026-11-24)
+
+- **Path:** caller's voice ← `VOICE_DOWNLINK` capture (the far end only, so the iPhone user doesn't hear themselves;
+  `VOICE_CALL` as the fallback) → 20 ms frames → Wi-Fi media channel (UDP, AES-GCM, PROTOCOL.md "Call audio") →
+  iPhone; iPhone microphone → same channel → 60 ms jitter buffer → telephony output (the call's uplink), paced one
+  frame per 20 ms by the app so the pipe to the service can't build delay.
+- **No codec:** 32 KB/s each way is nothing on a local network, needs nothing on either side and adds no latency.
+  The packet has a kind byte so a compressed format can come later.
+- **Learning what works:** after a relayed call the iPhone can send `call.media.feedback`. "Couldn't hear the
+  caller" switches the capture source; "they couldn't hear me" first stops muting the bridge's microphone, then
+  after two more failures reports talking as unsupported (`call.media.talk` disappears). Settings can reset this.
+- **Honest capabilities:** `call.media` only when the user turned on Talk on iPhone, Shizuku is ready and capture is
+  allowed; `call.media.talk` only when a telephony output exists too. Without talk the iPhone still hears the call
+  and the user talks on the bridge phone.
+- **Tested:** unit tests (packets, jitter buffer, resampling, caps), builds incl. release/R8. Real calls still need a
+  real Android 10+ phone with Shizuku (the first tester has Android 15); the emulator has no real call audio.
