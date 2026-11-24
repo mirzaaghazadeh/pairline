@@ -59,6 +59,13 @@
 		<key>UIImageName</key>
 		<string>LaunchMark</string>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Estedad-Regular.ttf</string>
+		<string>Estedad-Medium.ttf</string>
+		<string>Estedad-SemiBold.ttf</string>
+		<string>Estedad-Bold.ttf</string>
+	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>arm64</string>

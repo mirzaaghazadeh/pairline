@@ -117,15 +117,36 @@ private struct WelcomePage: View {
     }
 }
 
+/// Centers a page's content vertically and scrolls it when it doesn't fit (small iPhones, large Dynamic Type,
+/// Persian's taller lines), instead of letting the stack squeeze and truncate the text.
+private struct CenteredPageScroll<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollView(showsIndicators: false) {
+                content
+                    .padding(.vertical, 16)
+                    .frame(maxWidth: .infinity, minHeight: proxy.size.height)
+            }
+        }
+    }
+}
+
 private struct HowItWorksPage: View {
     var body: some View {
+        CenteredPageScroll {
+            howItWorks
+        }
+    }
+
+    private var howItWorks: some View {
         VStack(spacing: 26) {
-            Spacer()
             TwoPhonesIllustration(state: .connected, height: 170)
                 .padding(.horizontal, 36)
             VStack(spacing: 8) {
                 Text("Two phones, one line")
-                    .font(.system(.title, design: .rounded).weight(.bold))
+                    .font(.rounded(.title, weight: .bold))
                 Text("Your Android phone keeps the SIM. Your iPhone shows the messages and calls.")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -141,7 +162,6 @@ private struct HowItWorksPage: View {
                                 title: Text("Your iPhone"),
                                 text: Text("Messages, calls, contacts and USSD codes appear here, with notifications."))
             }
-            Spacer()
         }
         .padding(.horizontal, 28)
     }
@@ -149,8 +169,13 @@ private struct HowItWorksPage: View {
 
 private struct PrivacyPage: View {
     var body: some View {
+        CenteredPageScroll {
+            privacy
+        }
+    }
+
+    private var privacy: some View {
         VStack(spacing: 26) {
-            Spacer()
             ZStack {
                 Circle().fill(Color.brandGreen.opacity(0.14)).frame(width: 150, height: 150)
                 Circle().fill(Color.brandGreen.opacity(0.14)).frame(width: 110, height: 110)
@@ -160,7 +185,7 @@ private struct PrivacyPage: View {
             }
             VStack(spacing: 8) {
                 Text("Nothing leaves your two phones")
-                    .font(.system(.title, design: .rounded).weight(.bold))
+                    .font(.rounded(.title, weight: .bold))
                     .multilineTextAlignment(.center)
                 Text("Pairline is built so your messages and calls stay yours.")
                     .foregroundStyle(.secondary)
@@ -175,7 +200,6 @@ private struct PrivacyPage: View {
                                 title: Text("Open for inspection"),
                                 text: Text("The source code is public, so anyone can check these promises."))
             }
-            Spacer()
         }
         .padding(.horizontal, 28)
     }
@@ -191,7 +215,7 @@ private struct ChoicePage: View {
             VStack(spacing: 18) {
                 Spacer(minLength: 24)
                 Text("How would you like to start?")
-                    .font(.system(.title, design: .rounded).weight(.bold))
+                    .font(.rounded(.title, weight: .bold))
                     .multilineTextAlignment(.center)
                 switch purchases.access {
                 case .purchased:

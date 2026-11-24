@@ -67,7 +67,7 @@ struct CallScreen: View {
                     LTRText(call.number)
                 }
             }
-            .font(.system(.largeTitle, design: .rounded).weight(.semibold))
+            .font(.rounded(.largeTitle, weight: .semibold))
             .foregroundStyle(.white)
             .lineLimit(1)
             .minimumScaleFactor(0.6)

@@ -62,7 +62,7 @@ struct Avatar: View {
             switch content {
             case .initials(let text):
                 Text(verbatim: text)
-                    .font(.system(size: size * 0.38, weight: .semibold, design: .rounded))
+                    .font(.rounded(size: size * 0.38, weight: .semibold))
                     .foregroundStyle(.white)
                     .minimumScaleFactor(0.5)
             case .symbol(let symbol):

@@ -4927,6 +4927,22 @@
         }
       }
     },
+    "Persian text is set in Estedad, an open-source typeface by the Estedad Project, under the SIL Open Font License 1.1." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُعرض النص الفارسي بخط Estedad (استعداد)، وهو خط مفتوح المصدر من مشروع Estedad، بموجب رخصة SIL Open Font License 1.1."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متن فارسی با قلم استعداد نوشته شده است؛ قلمی متن‌باز از پروژهٔ استعداد، با مجوز SIL Open Font License 1.1."
+          }
+        }
+      }
+    },
     "Pairline warns you when the bridge phone's battery runs low." : {
       "localizations" : {
         "ar" : {

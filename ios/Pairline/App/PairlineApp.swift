@@ -10,6 +10,8 @@ struct PairlineApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                // Text without its own font uses Estedad in Persian, the system body font otherwise (D-032).
+                .environment(\.font, AppFont.usesEstedad ? .body : nil)
                 .environmentObject(model)
                 .environmentObject(model.purchases)
                 .environmentObject(model.settings)
@@ -27,6 +29,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         if launchOptions?[.bluetoothCentrals] != nil {
             log.info("app", "Launched by iOS for a Bluetooth event")
         }
+        AppFontAppearance.apply()
         // Creates the link (and the Bluetooth central, for state restoration) as early as possible.
         _ = AppModel.shared
         return true

@@ -68,7 +68,7 @@ struct PaywallView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
                 .shadow(color: Color.brandBlue.opacity(0.35), radius: 16, y: 8)
             Text("Pairline Full Access")
-                .font(.system(.title, design: .rounded).weight(.bold))
+                .font(.rounded(.title, weight: .bold))
                 .multilineTextAlignment(.center)
             Text("Your Android SIM on your iPhone. Pay once, keep it for good.")
                 .font(.headline.weight(.regular))
@@ -187,7 +187,7 @@ struct PaywallView: View {
             }
             Spacer()
             Text(verbatim: purchases.priceText)
-                .font(.system(.title, design: .rounded).weight(.bold))
+                .font(.rounded(.title, weight: .bold))
                 .foregroundStyle(Color.brandBlue)
         }
         .card(padding: 18)

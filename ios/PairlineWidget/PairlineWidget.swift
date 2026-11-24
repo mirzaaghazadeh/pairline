@@ -126,7 +126,7 @@ struct BridgeStatusWidgetView: View {
             Spacer(minLength: 0)
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Image(systemName: batterySymbol).font(.title3).foregroundStyle(batteryColor)
-                Text(batteryText).font(.system(.title, design: .rounded).weight(.bold)).minimumScaleFactor(0.7)
+                Text(batteryText).font(.rounded(.title, weight: .bold)).minimumScaleFactor(0.7)
             }
             ForEach(snapshot?.sims.prefix(2).map { $0 } ?? []) { sim in
                 HStack(spacing: 6) {
@@ -151,7 +151,7 @@ struct BridgeStatusWidgetView: View {
                 }
                 Spacer(minLength: 0)
                 Image(systemName: batterySymbol).font(.title2).foregroundStyle(batteryColor)
-                Text(batteryText).font(.system(.largeTitle, design: .rounded).weight(.bold)).minimumScaleFactor(0.6)
+                Text(batteryText).font(.rounded(.largeTitle, weight: .bold)).minimumScaleFactor(0.6)
                 if let updated = snapshot?.updated {
                     Text(updated, style: .relative).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
                 }

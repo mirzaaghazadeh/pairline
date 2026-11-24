@@ -26,6 +26,13 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Estedad-Regular.ttf</string>
+		<string>Estedad-Medium.ttf</string>
+		<string>Estedad-SemiBold.ttf</string>
+		<string>Estedad-Bold.ttf</string>
+	</array>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>

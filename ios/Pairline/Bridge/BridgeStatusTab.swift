@@ -137,7 +137,7 @@ struct BridgeStatusTab: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Battery").font(.subheadline).foregroundStyle(.secondary)
                 Text(level.map { (Double($0) / 100).formatted(.percent.precision(.fractionLength(0))) } ?? "–")
-                    .font(.system(.title, design: .rounded).weight(.bold))
+                    .font(.rounded(.title, weight: .bold))
                     .monospacedDigit()
                 Text(charging ? "Charging" : (level ?? 100) <= 20 ? "Charge soon to stay connected" : "On battery")
                     .font(.footnote)
