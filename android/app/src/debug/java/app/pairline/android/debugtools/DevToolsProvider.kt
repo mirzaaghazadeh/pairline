@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Process
 import app.pairline.android.AppGraph
+import app.pairline.android.link.wifi.HotspotState
 import app.pairline.android.log.Log
 import app.pairline.android.ui.ScreenshotMode
 
@@ -69,7 +70,12 @@ class DevToolsProvider : ContentProvider() {
                         s.wifiHint?.addresses?.joinToString(",") ?: "",
                         s.wifiHint?.port ?: 0,
                         s.mediaOpen,
-                        AppGraph.hotspot.state.value.toString(),
+                        // Never the passphrase, even here.
+                        when (val h = AppGraph.hotspot.state.value) {
+                            is HotspotState.On -> "on" + (h.band?.let { " ($it GHz)" } ?: "")
+                            is HotspotState.Failed -> "failed: ${h.reason}"
+                            else -> h.javaClass.simpleName.lowercase()
+                        },
                     ),
                 )
             }
