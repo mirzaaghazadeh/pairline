@@ -56,11 +56,13 @@ jobs:
           sys.exit("no iPhone simulator available")')"
           echo "udid=$udid" >> "$GITHUB_OUTPUT"
 
+      # Ad-hoc signing ("Sign to Run Locally", no certificate or team): the tests use the Keychain, which fails
+      # with errSecMissingEntitlement in an unsigned simulator app.
       - name: Build and test (Debug)
         run: >
           xcodebuild -scheme Pairline -destination "id=${{ steps.sim.outputs.udid }}"
           -derivedDataPath build -resultBundlePath build/Tests.xcresult
-          CODE_SIGNING_ALLOWED=NO test
+          CODE_SIGN_IDENTITY=- test
 
       - name: Build Release
         run: >

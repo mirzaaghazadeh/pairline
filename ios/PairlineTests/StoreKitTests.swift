@@ -13,8 +13,9 @@ final class StoreKitTests: XCTestCase {
         session.resetToDefaultState()
         session.disableDialogs = true
         session.clearTransactions()
-        // The test environment takes a moment to serve the configuration's products.
-        for _ in 0..<20 {
+        // The test environment takes a moment to serve the configuration's products; on a cold simulator or a CI
+        // runner that can be well over 4 s.
+        for _ in 0..<75 {
             let products = try await Product.products(for: [PurchaseManager.trialID, PurchaseManager.fullID])
             if products.count == 2 { break }
             try await Task.sleep(nanoseconds: 200_000_000)
