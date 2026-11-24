@@ -24,7 +24,9 @@ tagged commit. Each release note links the build run. Process: [docs/RELEASING.m
    `shasum -a 256 pairline-<version>.apk`
 2. Check the signing certificate:
    `apksigner verify --print-certs pairline-<version>.apk`
-   The "certificate SHA-256 digest" must match **[published with the first release]**.
+   The "certificate SHA-256 digest" must match
+   **`958c4cca6cd6d2b073a403ad86649d34faff992172d2c600cee625d17c8945c7`** (the Pairline Bridge signing key,
+   used since 1.0.0).
 3. Reproducible build: build the tagged commit with the documented toolchain and compare the result
    (instructions come with the first release).
 
