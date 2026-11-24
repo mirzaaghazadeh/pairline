@@ -24,7 +24,8 @@ WHAT_TO_TEST = ("Please try: pairing with the QR code; receiving and sending SMS
                 "debugging, and both phones on the same Wi-Fi; if the audio stays on the Android phone, the call "
                 "screen now says why); internet sharing; sending files; deleting messages and calls; the block list; "
                 "contacts and call history; USSD codes; and leaving both phones for an hour and checking that "
-                "messages still arrive. New: the bridge's signal, network and battery on the Lock Screen and in the "
+                "messages still arrive. New in this build: incoming calls ring on the iPhone's own call screen "
+                "(CallKit), also while it's locked; please check this first. Also new: the bridge's signal, network and battery on the Lock Screen and in the "
                 "Dynamic Island (Settings > Bridge status on Lock Screen); check that it follows the bridge while "
                 "the iPhone is locked and comes back after you open Pairline. Demo mode shows Talk on iPhone and "
                 "internet sharing as ready. Send feedback with a screenshot from TestFlight.")
