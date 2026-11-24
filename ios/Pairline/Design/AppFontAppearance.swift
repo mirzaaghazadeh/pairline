@@ -15,13 +15,27 @@ enum AppFontAppearance {
             UIBarButtonItem.appearance().setTitleTextAttributes(barButton, for: state)
         }
 
-        let tab = [NSAttributedString.Key.font: font("Estedad-Medium", 10, .caption2)]
-        UITabBarItem.appearance().setTitleTextAttributes(tab, for: .normal)
-        UITabBarItem.appearance().setTitleTextAttributes(tab, for: .selected)
+        UITabBar.appearance().standardAppearance = tabBarAppearance()
 
         let segment = [NSAttributedString.Key.font: font("Estedad-Medium", 13, .subheadline)]
         UISegmentedControl.appearance().setTitleTextAttributes(segment, for: .normal)
         UISegmentedControl.appearance().setTitleTextAttributes(segment, for: .selected)
+    }
+
+    /// Tab bar labels. The tab bar draws them from its `UITabBarAppearance`, which ignores the older
+    /// `UITabBarItem.appearance()` title attributes. Only the font is set, so the colors and the default background
+    /// stay; `scrollEdgeAppearance` stays nil, so UIKit still derives the transparent look at the scroll edge.
+    private static func tabBarAppearance() -> UITabBarAppearance {
+        let title = [NSAttributedString.Key.font: font("Estedad-Medium", 10, .caption2)]
+        let item = UITabBarItemAppearance()
+        for state in [item.normal, item.selected, item.disabled, item.focused] {
+            state.titleTextAttributes = title
+        }
+        let appearance = UITabBarAppearance()
+        appearance.stackedLayoutAppearance = item
+        appearance.inlineLayoutAppearance = item
+        appearance.compactInlineLayoutAppearance = item
+        return appearance
     }
 
     private static func font(_ name: String, _ size: CGFloat, _ style: UIFont.TextStyle) -> UIFont {
