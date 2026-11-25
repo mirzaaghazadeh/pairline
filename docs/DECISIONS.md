@@ -1150,3 +1150,10 @@ captured open, in English and Arabic, and checked:
   (above each other on an upright iPad), so no button sits on the fold; still a sheet on a phone.
 - iPad gets the same layouts (split views, two-column Bridge, side-by-side Calls in landscape, full-screen paywall).
   The App Store iPhone Duo slides lost the drawn fold line.
+
+### D-071 — Licensor named; no trademark filing (2026-11-26)
+
+- **Licensor:** Navid Mirzaaghazadeh, in `LICENSE.md`'s notice. The repo is already public, and the licensor named
+  there is who a store takedown of a copy (a competing use under FSL-1.1) is filed for.
+- **No trademark filing,** the maintainer's decision. This replaces D-001's "do a proper trademark search before
+  launch". The name and logo stay outside the license (its Trademarks clause, README), so a copy may not use them.

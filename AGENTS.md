@@ -198,7 +198,5 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 
 ## Open items before the first public release
 
-- Licensor name in `LICENSE.md`.
 - Domain, final package IDs and bundle ID (D-007).
-- Trademark check for the name "Pairline" (D-001).
 - Security contact address in `SECURITY.md`.

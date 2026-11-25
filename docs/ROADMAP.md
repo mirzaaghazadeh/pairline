@@ -28,7 +28,7 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
       `ios-policy-check.sh`
 - [x] Android release workflow: tag → signed APK on a draft GitHub Release (D-015, `docs/RELEASING.md`)
 - [x] Replace the "Commands" section in AGENTS.md with the real commands
-- [ ] Fill in the licensor name in LICENSE.md
+- [x] Fill in the licensor name in LICENSE.md (Navid Mirzaaghazadeh, D-071)
 
 ## M1 — Pairing and encrypted link
 

@@ -6,7 +6,7 @@ FSL-1.1-ALv2
 
 ## Notice
 
-Copyright 2026 [Licensor name — fill in before the first public release]
+Copyright 2026 Navid Mirzaaghazadeh
 
 ## Terms and Conditions
 
