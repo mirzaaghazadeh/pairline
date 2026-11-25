@@ -82,90 +82,130 @@ struct CallScreen: View {
         }
     }
 
+    /// One column on a phone. On a large display (iPhone Duo open, iPad) the caller and the controls get a pane each,
+    /// on either side of the fold, or the caller above and the controls below when the screen is taller than wide.
     private func content(_ call: ActiveCall) -> some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button {
-                    calls.showCallScreen = false
-                } label: {
-                    Image(systemName: "chevron.down")
-                        .font(.title3.weight(.semibold))
-                        .frame(width: 44, height: 44)
+        FoldAwarePanes {
+            VStack(spacing: 0) {
+                header(call)
+                Spacer(minLength: 12)
+                callerInfo(call, avatarSize: 96)
+                Spacer(minLength: 12)
+            }
+        } second: {
+            // The keypad and the call buttons stack when they fit, and sit side by side in a short pane.
+            ViewThatFits(in: .vertical) {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 12)
+                    middleControls(call)
+                    Spacer(minLength: 16)
+                    actions(call)
+                        .padding(.bottom, 24)
                 }
-                .accessibilityLabel(Text("Hide call screen"))
-                Spacer()
-                HStack(spacing: 6) {
-                    if bridge.isDemo && !DebugSettings.marketingScreenshots {
-                        Text("Demo").font(.caption.weight(.bold)).foregroundStyle(Color.brandAmber)
-                    }
-                    if let sim = call.sim, bridge.isDualSIM {
-                        SIMBadge(slot: sim)
-                        Text(bridge.simLabel(sim))
-                    } else {
-                        Text("Pairline")
-                    }
+                HStack(spacing: 36) {
+                    middleControls(call)
+                    actions(call)
                 }
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.7))
-                Spacer()
-                Color.clear.frame(width: 44, height: 44)
+                .frame(maxHeight: .infinity)
             }
             .padding(.horizontal, 12)
-            .foregroundStyle(.white)
+        } single: {
+            VStack(spacing: 0) {
+                header(call)
+                Spacer(minLength: 12)
+                callerInfo(call, avatarSize: 104)
+                Spacer(minLength: 16)
+                middleControls(call)
+                Spacer(minLength: 16)
+                actions(call)
+                    .padding(.bottom, 36)
+            }
+        }
+    }
 
-            Spacer(minLength: 12)
-            Avatar(name: call.name ?? call.number, size: 104)
-                .shadow(color: .black.opacity(0.3), radius: 16, y: 8)
-            Group {
-                if let name = call.name, !name.isEmpty {
-                    Text(verbatim: name)
-                } else if call.number.isEmpty {
-                    Text("Unknown caller")
+    private func header(_ call: ActiveCall) -> some View {
+        HStack {
+            Button {
+                calls.showCallScreen = false
+            } label: {
+                Image(systemName: "chevron.down")
+                    .font(.title3.weight(.semibold))
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel(Text("Hide call screen"))
+            Spacer()
+            HStack(spacing: 6) {
+                if bridge.isDemo && !DebugSettings.marketingScreenshots {
+                    Text("Demo").font(.caption.weight(.bold)).foregroundStyle(Color.brandAmber)
+                }
+                if let sim = call.sim, bridge.isDualSIM {
+                    SIMBadge(slot: sim)
+                    Text(bridge.simLabel(sim))
                 } else {
-                    LTRText(call.number)
+                    Text("Pairline")
                 }
             }
-            .font(.rounded(.largeTitle, weight: .semibold))
-            .foregroundStyle(.white)
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-            .padding(.horizontal, 24)
-            .padding(.top, 18)
-            if call.name != nil, !call.number.isEmpty {
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.white.opacity(0.7))
+            Spacer()
+            Color.clear.frame(width: 44, height: 44)
+        }
+        .padding(.horizontal, 12)
+        .foregroundStyle(.white)
+    }
+
+    /// The caller, the call's state and where its audio is.
+    @ViewBuilder private func callerInfo(_ call: ActiveCall, avatarSize: CGFloat) -> some View {
+        Avatar(name: call.name ?? call.number, size: avatarSize)
+            .shadow(color: .black.opacity(0.3), radius: 16, y: 8)
+        Group {
+            if let name = call.name, !name.isEmpty {
+                Text(verbatim: name)
+            } else if call.number.isEmpty {
+                Text("Unknown caller")
+            } else {
                 LTRText(call.number)
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.65))
-                    .padding(.top, 2)
             }
-            statusLine(call)
-                .font(.headline.weight(.medium))
-                .foregroundStyle(.white.opacity(0.8))
-                .padding(.top, 10)
+        }
+        .font(.rounded(.largeTitle, weight: .semibold))
+        .foregroundStyle(.white)
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
+        .padding(.horizontal, 24)
+        .padding(.top, 18)
+        if call.name != nil, !call.number.isEmpty {
+            LTRText(call.number)
+                .font(.subheadline)
+                .foregroundStyle(.white.opacity(0.65))
+                .padding(.top, 2)
+        }
+        statusLine(call)
+            .font(.headline.weight(.medium))
+            .foregroundStyle(.white.opacity(0.8))
+            .padding(.top, 10)
 
-            // Where the call's audio is: on this iPhone when the bridge relays it (call.media, D-047), otherwise on
-            // the Android phone. Tapping explains how to set up Talk on iPhone.
-            Button {
-                showAudioInfo = true
-            } label: {
-                Label { audioLabel } icon: { Image(systemName: audioSymbol) }
-                    .font(.footnote.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.85))
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(Capsule().fill(.white.opacity(0.12)))
-            }
-            .buttonStyle(.plain)
-            .padding(.top, 18)
-            Spacer(minLength: 16)
+        // Where the call's audio is: on this iPhone when the bridge relays it (call.media, D-047), otherwise on
+        // the Android phone. Tapping explains how to set up Talk on iPhone.
+        Button {
+            showAudioInfo = true
+        } label: {
+            Label { audioLabel } icon: { Image(systemName: audioSymbol) }
+                .font(.footnote.weight(.medium))
+                .foregroundStyle(.white.opacity(0.85))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Capsule().fill(.white.opacity(0.12)))
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 18)
+    }
 
-            if showKeypad && call.state == .active {
-                keypad
-            } else if call.state != .ringing || call.isOutgoing {
-                controls(call)
-            }
-            Spacer(minLength: 16)
-            actions(call)
-                .padding(.bottom, 36)
+    /// The keypad while it's open, otherwise mute, keypad and speaker (not while an incoming call rings).
+    @ViewBuilder private func middleControls(_ call: ActiveCall) -> some View {
+        if showKeypad && call.state == .active {
+            keypad
+        } else if call.state != .ringing || call.isOutgoing {
+            controls(call)
         }
     }
 

@@ -104,9 +104,9 @@ struct ContactsTab: View {
                             app.toast = CapabilityInfo(.contactsAdd).missingText
                         }
                     } label: {
-                        Image(systemName: "person.badge.plus")
+                        // A title as well as the symbol, for overflow menus and iPhone Duo's side bar (D-063).
+                        Label("Add contact", systemImage: "person.badge.plus")
                     }
-                    .accessibilityLabel(Text("Add contact"))
                 }
             }
             .refreshable { await bridge.sync() }

@@ -39,12 +39,11 @@ struct DiagnosticsView: View {
                         Label("Clear log", systemImage: "trash")
                     }
                 } label: {
-                    Image(systemName: "ellipsis.circle")
+                    Label("More", systemImage: "ellipsis.circle")
                 }
                 ShareLink(item: report) {
-                    Image(systemName: "square.and.arrow.up")
+                    Label("Share report", systemImage: "square.and.arrow.up")
                 }
-                .accessibilityLabel(Text("Share report"))
             }
         }
         .confirmationDialog(Text("Clear the log?"), isPresented: $confirmClear) {

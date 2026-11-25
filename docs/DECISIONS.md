@@ -1000,6 +1000,37 @@ pickers inside Settings › Calls ("Bridge default", SIM 1, SIM 2), so nobody fo
 - **The Bridge tab's "Calls" and "Messages" tags** mark the SIM this iPhone's calls and messages go out on, not only
   Android's default. One call or message can still use the other SIM (the dialer and composer pickers start on it).
 
+### D-063 — iPhone Duo: two panes on the big display, nothing to tap on the fold (2026-11-25)
+
+The maintainer asked whether the iPhone app follows Apple's iPhone Duo design (HIG "Designing for iPhone Duo") and to
+fix what doesn't, using their `iphone-duo-skills` (installed for this checkout only, under `.claude/`, not committed).
+The app is built with the iOS 27.2 SDK, so on iPhone Duo it already fills both displays and its bars run down the side;
+`TabView`, `NavigationStack`, lists, sheets and alerts adapt by themselves. What didn't:
+- **Call screen, keypad and onboarding** centred their buttons, so on the open display, folded like a book, the End
+  button, the keys and Continue sat in the fold. On a large regular-width display (iPhone Duo open, iPad) they now use
+  two panes (`FoldAwarePanes`): caller | call buttons, number | keys, artwork | words and buttons. The gap sits on the
+  fold's division region (iOS 27.1 `reservedRegions`, read also while the device lies flat, so nothing moves when it
+  bends), or in the middle without one. Held upright, the call screen and keypad put the content above and the
+  controls below (laptop pose), and the keys shrink to fit. On a phone the layouts are unchanged. The call screen with
+  its keypad open also no longer overflows a short landscape screen.
+- **Messages** was one list stretched across the display. On a large display it now shows the conversations and the
+  open conversation side by side (`NavigationSplitView`): the same hierarchy with one more level showing. The open
+  conversation stays open when the device opens or closes, and unsent text is kept per conversation, in memory only.
+- **Toolbar items** carry a title as well as a symbol, for overflow menus and the side bar. Text items (Edit/Done,
+  Delete) no longer share a slot with a symbol item, so nothing jumps between the top bar and the side bar. Call
+  history's one-item "More" menu is now a "Clear All Calls" button (it still asks first).
+- **The ongoing-call bar** sat a fixed 56 pt above the bottom, to clear a bottom tab bar. It now sits in each tab's safe
+  area, so it clears the tab bar wherever it is (on the side on iPhone Duo), and lists and the composer stay above it.
+- **Onboarding's pairing** opens as a sheet on a large display, since sheets keep off the fold by themselves.
+- Not changed: the QR scanner (VisionKit turns it with the device); call history, contacts, Bridge and Settings stay
+  single lists, which may scroll across the fold. `ArrangementView` (iOS 27.1) wasn't used, because that path can't run
+  on the iOS 27.0 simulator here; `FoldAwarePanes` reads the same fold region and also works on iPad and iOS 16.
+- Checked on iPhone and iPad mini simulators, with renders of each screen at the iPhone Duo display sizes (fold band
+  clear of every control) and unit tests of the split. Not yet seen on screen: the ongoing-call bar in its new place,
+  onboarding's two panes, and right-to-left two-pane layouts. Not yet seen on the iPhone Duo simulator, which needs the
+  iOS 27.2 simulator runtime: check every pose there (closed, open, book, laptop, Split View on both sides) before the
+  next TestFlight build.
+
 ### D-064 — Pairing Talk on iPhone, made easier from a walk-through on a tester's phone (2026-11-25)
 
 The maintainer asked to find where a normal user gets stuck. Talk on iPhone's setup was run, remotely, on a tester's

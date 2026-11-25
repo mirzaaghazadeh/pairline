@@ -32,9 +32,9 @@ struct CallsTab: View {
                     NavigationLink {
                         USSDView()
                     } label: {
-                        Image(systemName: "number.square")
+                        // A title as well as the symbol, for overflow menus and iPhone Duo's side bar (D-063).
+                        Label("USSD codes", systemImage: "number.square")
                     }
-                    .accessibilityLabel(Text("USSD codes"))
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -121,14 +121,10 @@ struct CallLogView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 if !items.isEmpty {
-                    Menu {
-                        Button(role: .destructive) {
-                            confirmClear = true
-                        } label: { Label("Clear All Calls", systemImage: "trash") }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                    .accessibilityLabel(Text("More"))
+                    // Asks first (the dialog below); the ellipsis is left to the system's overflow menu.
+                    Button(role: .destructive) {
+                        confirmClear = true
+                    } label: { Label("Clear All Calls", systemImage: "trash") }
                 }
             }
         }
@@ -292,90 +288,39 @@ struct DialerView: View {
         ("*", ""), ("0", "+"), ("#", ""),
     ]
 
+    /// One column on a phone. On a large display (iPhone Duo open, iPad) the number gets one pane and the keys the other,
+    /// on either side of the fold, so no key lands in its curve; the keys shrink to fit when the pane is short.
     var body: some View {
-        VStack(spacing: 0) {
-            BridgeBanners()
-            Spacer(minLength: 8)
-            VStack(spacing: 6) {
-                Text(verbatim: number.isEmpty ? " " : number)
-                    .font(.system(size: number.count > 13 ? 28 : 36, weight: .regular, design: .rounded))
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .environment(\.layoutDirection, .leftToRight)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 24)
-                    .contextMenu {
-                        Button {
-                            if let pasted = UIPasteboard.general.string { number = PhoneNumber.dialable(pasted) }
-                        } label: { Label("Paste", systemImage: "doc.on.clipboard") }
-                    }
-                Group {
-                    if let name = db.knownName(for: number), number.count >= 5 {
-                        Text(verbatim: name)
-                    } else if PhoneNumber.isUSSD(number) {
-                        Text("USSD code")
-                    } else {
-                        Text(verbatim: " ")
-                    }
-                }
-                .font(.subheadline)
-                .foregroundStyle(Color.brandBlue)
+        FoldAwarePanes {
+            VStack(spacing: 0) {
+                BridgeBanners()
+                Spacer(minLength: 8)
+                numberDisplay
+                Spacer(minLength: 8)
             }
-            Spacer(minLength: 8)
-            // The keypad keeps its phone layout in right-to-left languages.
-            LazyVGrid(columns: Array(repeating: GridItem(.fixed(84), spacing: 22), count: 3), spacing: 16) {
-                ForEach(keys, id: \.0) { key in
-                    DialKey(digit: key.0, letters: key.1) {
-                        number.append(key.0)
-                        Haptics.tap()
-                    } onLongPress: {
-                        number.append("+")
-                        Haptics.tap()
-                    }
+        } second: {
+            GeometryReader { proxy in
+                let key = Self.keySize(fitting: proxy.size)
+                VStack(spacing: 0) {
+                    Spacer(minLength: 8)
+                    keypad(key: key)
+                    callRow(key: key)
+                        .padding(.top, 12 * key / Self.fullKey)
+                        .padding(.bottom, 16)
                 }
+                .frame(width: proxy.size.width, height: proxy.size.height)
             }
-            .environment(\.layoutDirection, .leftToRight)
-            HStack(spacing: 22) {
-                Group {
-                    if bridge.isDualSIM {
-                        simPicker
-                    } else {
-                        Color.clear
-                    }
-                }
-                .frame(width: 84, height: 84)
-                Button(action: primaryAction) {
-                    ZStack {
-                        Circle().fill(Color.brandGreen)
-                        if runningUSSD {
-                            ProgressView().tint(.white)
-                        } else {
-                            Image(systemName: PhoneNumber.isUSSD(number) ? "number" : "phone.fill")
-                                .font(.system(size: 30, weight: .semibold))
-                                .foregroundStyle(.white)
-                        }
-                    }
-                    .frame(width: 78, height: 78)
-                }
-                .disabled(number.isEmpty || runningUSSD)
-                .accessibilityLabel(PhoneNumber.isUSSD(number) ? Text("Run code") : Text("Call"))
-                Button {
-                    if !number.isEmpty { number.removeLast() }
-                    Haptics.tap()
-                } label: {
-                    Image(systemName: "delete.left.fill")
-                        .font(.system(size: 26))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 84, height: 84)
-                }
-                .opacity(number.isEmpty ? 0 : 1)
-                .simultaneousGesture(LongPressGesture().onEnded { _ in number = "" })
-                .accessibilityLabel(Text("Delete"))
+        } single: {
+            VStack(spacing: 0) {
+                BridgeBanners()
+                Spacer(minLength: 8)
+                numberDisplay
+                Spacer(minLength: 8)
+                keypad(key: Self.fullKey)
+                callRow(key: Self.fullKey)
+                    .padding(.top, 12)
+                    .padding(.bottom, 24)
             }
-            .environment(\.layoutDirection, .leftToRight)
-            .padding(.top, 12)
-            .padding(.bottom, 24)
         }
         .onAppear {
             if sim == nil {
@@ -385,6 +330,108 @@ struct DialerView: View {
         .sheet(item: $ussdResult) { item in
             USSDResultSheet(item: item)
         }
+    }
+
+    /// The size of a key on a phone.
+    static let fullKey: CGFloat = 78
+
+    /// The largest key, up to a phone's, that fits four rows of keys and the call row in `size`.
+    static func keySize(fitting size: CGSize) -> CGFloat {
+        // Height: 5 key rows plus spacing that scales with the key (3 × 16 + 12) and 30 pt of fixed padding.
+        let byHeight = (size.height - 30) / (5 + 60 / fullKey)
+        // Width: 3 keys of key + 6 plus 2 × 22 scaled spacing, with 24 pt to spare.
+        let byWidth = (size.width - 42) / (3 + 44 / fullKey)
+        return max(44, min(fullKey, byHeight, byWidth))
+    }
+
+    private var numberDisplay: some View {
+        VStack(spacing: 6) {
+            Text(verbatim: number.isEmpty ? " " : number)
+                .font(.system(size: number.count > 13 ? 28 : 36, weight: .regular, design: .rounded))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .environment(\.layoutDirection, .leftToRight)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 24)
+                .contextMenu {
+                    Button {
+                        if let pasted = UIPasteboard.general.string { number = PhoneNumber.dialable(pasted) }
+                    } label: { Label("Paste", systemImage: "doc.on.clipboard") }
+                }
+            Group {
+                if let name = db.knownName(for: number), number.count >= 5 {
+                    Text(verbatim: name)
+                } else if PhoneNumber.isUSSD(number) {
+                    Text("USSD code")
+                } else {
+                    Text(verbatim: " ")
+                }
+            }
+            .font(.subheadline)
+            .foregroundStyle(Color.brandBlue)
+        }
+    }
+
+    /// The keys, `key` points wide. The keypad keeps its phone layout in right-to-left languages.
+    private func keypad(key: CGFloat) -> some View {
+        let scale = key / Self.fullKey
+        return LazyVGrid(columns: Array(repeating: GridItem(.fixed(key + 6), spacing: 22 * scale), count: 3),
+                         spacing: 16 * scale) {
+            ForEach(keys, id: \.0) { item in
+                DialKey(digit: item.0, letters: item.1, size: key) {
+                    number.append(item.0)
+                    Haptics.tap()
+                } onLongPress: {
+                    number.append("+")
+                    Haptics.tap()
+                }
+            }
+        }
+        .environment(\.layoutDirection, .leftToRight)
+    }
+
+    /// SIM choice, call (or run the USSD code) and delete, under the keys.
+    private func callRow(key: CGFloat) -> some View {
+        let scale = key / Self.fullKey
+        return HStack(spacing: 22 * scale) {
+            Group {
+                if bridge.isDualSIM {
+                    simPicker
+                } else {
+                    Color.clear
+                }
+            }
+            .frame(width: key + 6, height: key + 6)
+            Button(action: primaryAction) {
+                ZStack {
+                    Circle().fill(Color.brandGreen)
+                    if runningUSSD {
+                        ProgressView().tint(.white)
+                    } else {
+                        Image(systemName: PhoneNumber.isUSSD(number) ? "number" : "phone.fill")
+                            .font(.system(size: 30 * scale, weight: .semibold))
+                            .foregroundStyle(.white)
+                    }
+                }
+                .frame(width: key, height: key)
+            }
+            .disabled(number.isEmpty || runningUSSD)
+            .accessibilityLabel(PhoneNumber.isUSSD(number) ? Text("Run code") : Text("Call"))
+            Button {
+                if !number.isEmpty { number.removeLast() }
+                Haptics.tap()
+            } label: {
+                Image(systemName: "delete.left.fill")
+                    .font(.system(size: 26 * scale))
+                    .foregroundStyle(.secondary)
+                    .frame(width: key + 6, height: key + 6)
+            }
+            .opacity(number.isEmpty ? 0 : 1)
+            .simultaneousGesture(LongPressGesture().onEnded { _ in number = "" })
+            .accessibilityLabel(Text("Delete"))
+        }
+        .environment(\.layoutDirection, .leftToRight)
     }
 
     private var simPicker: some View {
@@ -432,6 +479,8 @@ struct DialerView: View {
 struct DialKey: View {
     let digit: String
     let letters: String
+    /// The key's width and height; the labels scale with it.
+    var size: CGFloat = DialerView.fullKey
     let action: () -> Void
     var onLongPress: () -> Void = {}
     @State private var longPressed = false
@@ -447,15 +496,15 @@ struct DialKey: View {
         } label: {
             VStack(spacing: 0) {
                 Text(verbatim: digit)
-                    .font(.system(size: 34, weight: .regular, design: .rounded))
+                    .font(.system(size: 34 * size / DialerView.fullKey, weight: .regular, design: .rounded))
                 if !letters.isEmpty {
                     Text(verbatim: letters)
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: max(8, 10 * size / DialerView.fullKey), weight: .bold))
                         .tracking(1.5)
                         .foregroundStyle(.secondary)
                 }
             }
-            .frame(width: 78, height: 78)
+            .frame(width: size, height: size)
             .background(Circle().fill(Color.secondary.opacity(0.13)))
         }
         .buttonStyle(DialKeyStyle())

@@ -191,9 +191,12 @@ struct USSDResultSheet: View {
                         settings.savedUSSDCodes = list
                         Haptics.selection()
                     } label: {
-                        Image(systemName: isSaved ? "star.fill" : "star")
+                        Label {
+                            isSaved ? Text("Remove from saved codes") : Text("Save code")
+                        } icon: {
+                            Image(systemName: isSaved ? "star.fill" : "star")
+                        }
                     }
-                    .accessibilityLabel(isSaved ? Text("Remove from saved codes") : Text("Save code"))
                 }
             }
         }

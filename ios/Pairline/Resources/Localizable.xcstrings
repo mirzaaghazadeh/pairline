@@ -2746,6 +2746,50 @@
         }
       }
     },
+    "Choose a conversation" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر محادثة"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "یک گفتگو را انتخاب کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir sohbet seçin"
+          }
+        }
+      }
+    },
+    "Its messages show here." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ستظهر رسائلها هنا."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "پیام‌هایش اینجا نمایش داده می‌شوند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajları burada görünür."
+          }
+        }
+      }
+    },
     "Choose SIM" : {
       "localizations" : {
         "ar" : {

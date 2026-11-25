@@ -2,6 +2,9 @@ import SwiftUI
 
 struct ThreadView: View {
     let thread: Int64
+    /// Set when the conversation is the detail pane of Messages' list-and-conversation layout on a large display
+    /// (D-063): the tab bar stays, and deleting the conversation calls this instead of going back.
+    var closeInSplitView: (() -> Void)?
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var bridge: BridgeController
     @EnvironmentObject private var db: AppDatabase
@@ -82,7 +85,7 @@ struct ThreadView: View {
             }
         }
         .background(Color(.systemBackground))
-        .toolbar(.hidden, for: .tabBar)
+        .toolbar(closeInSplitView == nil ? .hidden : .automatic, for: .tabBar)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -99,9 +102,9 @@ struct ThreadView: View {
                     Button {
                         calls.startCall(number: address, sim: bridge.defaultSim(forSMS: false))
                     } label: {
-                        Image(systemName: "phone")
+                        // A title as well as the symbol, for overflow menus and iPhone Duo's side bar (D-063).
+                        Label("Call", systemImage: "phone")
                     }
-                    .accessibilityLabel(Text("Call"))
                 }
                 Menu {
                     if bridge.has(.block) && !address.isEmpty {
@@ -119,9 +122,8 @@ struct ThreadView: View {
                         confirmDeleteConversation = true
                     } label: { Label("Delete Conversation", systemImage: "trash") }
                 } label: {
-                    Image(systemName: "ellipsis.circle")
+                    Label("More", systemImage: "ellipsis.circle")
                 }
-                .accessibilityLabel(Text("More"))
             }
         }
         .blockPrompt($blockRequest)
@@ -130,7 +132,7 @@ struct ThreadView: View {
             Button("Delete", role: .destructive) {
                 bridge.deleteConversations([thread])
                 Haptics.success()
-                dismiss()
+                if let closeInSplitView { closeInSplitView() } else { dismiss() }
             }
         } message: {
             Text("The messages stay on your Android phone, because Android lets only its default messaging app delete texts. A new message brings the conversation back here.")
@@ -298,15 +300,37 @@ struct MessageBubble: View {
     }
 }
 
+/// Unsent text per conversation, kept in memory only (never stored on disk or sent anywhere), so a draft survives
+/// leaving the conversation and iPhone Duo opening or closing, which shows it in the other Messages layout (D-063).
+@MainActor enum ComposerDrafts {
+    private static var drafts: [Int64: String] = [:]
+
+    static func text(for thread: Int64?) -> String {
+        thread.flatMap { drafts[$0] } ?? ""
+    }
+
+    static func set(_ text: String, for thread: Int64?) {
+        guard let thread else { return }
+        drafts[thread] = text.isEmpty ? nil : text
+    }
+}
+
 struct Composer: View {
     let thread: Int64?
     let address: String
     var onSend: () -> Void = {}
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var bridge: BridgeController
-    @State private var draft = ""
+    @State private var draft: String
     @State private var sim: Int?
     @FocusState private var focused: Bool
+
+    init(thread: Int64?, address: String, onSend: @escaping () -> Void = {}) {
+        self.thread = thread
+        self.address = address
+        self.onSend = onSend
+        _draft = State(initialValue: ComposerDrafts.text(for: thread))
+    }
 
     private var segments: SMSSegments.Info { SMSSegments.info(for: draft) }
     private var canSend: Bool { !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !address.isEmpty }
@@ -364,6 +388,7 @@ struct Composer: View {
         .onAppear {
             sim = bridge.effectiveSim(forSMS: true)
         }
+        .onValueChange(draft) { ComposerDrafts.set($0, for: thread) }
     }
 
     private var simMenu: some View {

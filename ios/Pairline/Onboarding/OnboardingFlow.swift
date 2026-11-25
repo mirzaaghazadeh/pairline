@@ -5,8 +5,10 @@ import SwiftUI
 struct OnboardingFlow: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var purchases: PurchaseManager
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var page = OnboardingFlow.initialPage
     @State private var showPairing = false
+    @State private var pairingAsSheet = false
     private let pageCount = 4
 
     private static var initialPage: Int {
@@ -22,37 +24,71 @@ struct OnboardingFlow: View {
     var body: some View {
         ZStack {
             background.ignoresSafeArea()
-            VStack(spacing: 0) {
-                TabView(selection: $page) {
-                    WelcomePage().tag(0)
-                    HowItWorksPage().tag(1)
-                    PrivacyPage().tag(2)
-                    ChoicePage(onPair: { showPairing = true }).tag(3)
+            // On a large display held wide (iPhone Duo open, iPad in landscape) each page's artwork gets one pane and
+            // its words and buttons the other, so no button lies across the fold (D-063).
+            FoldAwarePanes(axes: .horizontal) {
+                OnboardingHero(page: page)
+                    .animation(.easeInOut, value: page)
+            } second: {
+                VStack(spacing: 0) {
+                    pager(showsHero: false)
+                    bottomBar
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .animation(.easeInOut, value: page)
-
-                if page < pageCount - 1 {
-                    VStack(spacing: 18) {
-                        PageDots(count: pageCount, current: page)
-                        Button {
-                            Haptics.tap()
-                            withAnimation { page += 1 }
-                        } label: {
-                            Text(page == 0 ? "Get started" : "Continue")
-                        }
-                        .buttonStyle(PrimaryButtonStyle())
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 20)
+            } single: {
+                VStack(spacing: 0) {
+                    pager(showsHero: true)
+                    bottomBar
                 }
+                // A phone-sized column on a large display held upright, rather than stretched buttons.
+                .frame(maxWidth: 600)
+                .frame(maxWidth: .infinity)
             }
         }
-        .fullScreenCover(isPresented: $showPairing) {
-            PairingFlowView(isOnboarding: true)
-                .environmentObject(app)
-                .environmentObject(purchases)
-                .environmentObject(app.settings)
+        .fullScreenCover(isPresented: Binding(get: { showPairing && !pairingAsSheet }, set: { showPairing = $0 })) {
+            pairing
+        }
+        // On a large display a sheet, which keeps itself off iPhone Duo's fold. Chosen when pairing starts, so the
+        // flow isn't dismissed and restarted if the device opens or closes meanwhile.
+        .sheet(isPresented: Binding(get: { showPairing && pairingAsSheet }, set: { showPairing = $0 })) {
+            pairing
+        }
+    }
+
+    private var pairing: some View {
+        PairingFlowView(isOnboarding: true)
+            .environmentObject(app)
+            .environmentObject(purchases)
+            .environmentObject(app.settings)
+    }
+
+    private func pager(showsHero: Bool) -> some View {
+        TabView(selection: $page) {
+            WelcomePage(showsHero: showsHero).tag(0)
+            HowItWorksPage(showsHero: showsHero).tag(1)
+            PrivacyPage(showsHero: showsHero).tag(2)
+            ChoicePage(onPair: {
+                pairingAsSheet = sizeClass == .regular
+                showPairing = true
+            }).tag(3)
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .animation(.easeInOut, value: page)
+    }
+
+    @ViewBuilder private var bottomBar: some View {
+        if page < pageCount - 1 {
+            VStack(spacing: 18) {
+                PageDots(count: pageCount, current: page)
+                Button {
+                    Haptics.tap()
+                    withAnimation { page += 1 }
+                } label: {
+                    Text(page == 0 ? "Get started" : "Continue")
+                }
+                .buttonStyle(PrimaryButtonStyle())
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 20)
         }
     }
 
@@ -80,19 +116,67 @@ private struct PageDots: View {
     }
 }
 
+/// Each page's artwork, in the other pane when the onboarding is laid out in two (D-063).
+private struct OnboardingHero: View {
+    let page: Int
+
+    var body: some View {
+        Group {
+            switch page {
+            case 1:
+                TwoPhonesIllustration(state: .connected, height: 220)
+                    .padding(.horizontal, 36)
+            case 2:
+                PrivacyShield(scale: 1.4)
+            default:
+                BrandMarkImage(size: 160)
+            }
+        }
+        .id(page)
+        .transition(.opacity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityHidden(true)
+    }
+}
+
+private struct BrandMarkImage: View {
+    let size: CGFloat
+
+    var body: some View {
+        Image("BrandMark")
+            .resizable()
+            .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * 28 / 120, style: .continuous))
+            .shadow(color: Color.brandBlue.opacity(0.35), radius: 24, y: 12)
+    }
+}
+
+private struct PrivacyShield: View {
+    var scale: CGFloat = 1
+
+    var body: some View {
+        ZStack {
+            Circle().fill(Color.brandGreen.opacity(0.14)).frame(width: 150 * scale, height: 150 * scale)
+            Circle().fill(Color.brandGreen.opacity(0.14)).frame(width: 110 * scale, height: 110 * scale)
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: 56 * scale))
+                .foregroundStyle(Color.brandGreen)
+        }
+    }
+}
+
 private struct WelcomePage: View {
+    var showsHero = true
     @State private var appeared = false
 
     var body: some View {
         VStack(spacing: 22) {
             Spacer()
-            Image("BrandMark")
-                .resizable()
-                .frame(width: 120, height: 120)
-                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-                .shadow(color: Color.brandBlue.opacity(0.35), radius: 24, y: 12)
-                .scaleEffect(appeared ? 1 : 0.85)
-                .opacity(appeared ? 1 : 0)
+            if showsHero {
+                BrandMarkImage(size: 120)
+                    .scaleEffect(appeared ? 1 : 0.85)
+                    .opacity(appeared ? 1 : 0)
+            }
             VStack(spacing: 10) {
                 Text(verbatim: "Pairline")
                     .font(.system(size: 44, weight: .bold, design: .rounded))
@@ -134,6 +218,8 @@ private struct CenteredPageScroll<Content: View>: View {
 }
 
 private struct HowItWorksPage: View {
+    var showsHero = true
+
     var body: some View {
         CenteredPageScroll {
             howItWorks
@@ -142,8 +228,10 @@ private struct HowItWorksPage: View {
 
     private var howItWorks: some View {
         VStack(spacing: 26) {
-            TwoPhonesIllustration(state: .connected, height: 170)
-                .padding(.horizontal, 36)
+            if showsHero {
+                TwoPhonesIllustration(state: .connected, height: 170)
+                    .padding(.horizontal, 36)
+            }
             VStack(spacing: 8) {
                 Text("Two phones, one line")
                     .font(.rounded(.title, weight: .bold))
@@ -172,6 +260,8 @@ private struct HowItWorksPage: View {
 }
 
 private struct PrivacyPage: View {
+    var showsHero = true
+
     var body: some View {
         CenteredPageScroll {
             privacy
@@ -180,12 +270,8 @@ private struct PrivacyPage: View {
 
     private var privacy: some View {
         VStack(spacing: 26) {
-            ZStack {
-                Circle().fill(Color.brandGreen.opacity(0.14)).frame(width: 150, height: 150)
-                Circle().fill(Color.brandGreen.opacity(0.14)).frame(width: 110, height: 110)
-                Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 56))
-                    .foregroundStyle(Color.brandGreen)
+            if showsHero {
+                PrivacyShield()
             }
             VStack(spacing: 8) {
                 Text("Nothing leaves your two phones")

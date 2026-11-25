@@ -44,19 +44,24 @@ struct MainView: View {
     var body: some View {
         TabView(selection: $app.tab) {
             MessagesTab()
+                .modifier(ongoingCallBar)
                 .tabItem { Label("Messages", systemImage: "message.fill") }
                 .badge(unreadBadge)
                 .tag(AppTab.messages)
             CallsTab()
+                .modifier(ongoingCallBar)
                 .tabItem { Label("Calls", systemImage: "phone.fill") }
                 .tag(AppTab.calls)
             ContactsTab()
+                .modifier(ongoingCallBar)
                 .tabItem { Label("Contacts", systemImage: "person.crop.circle.fill") }
                 .tag(AppTab.contacts)
             BridgeStatusTab()
+                .modifier(ongoingCallBar)
                 .tabItem { Label("Bridge", systemImage: "iphone.gen2.radiowaves.left.and.right") }
                 .tag(AppTab.bridge)
             SettingsTab()
+                .modifier(ongoingCallBar)
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
                 .tag(AppTab.settings)
         }
@@ -70,14 +75,6 @@ struct MainView: View {
                 .environmentObject(bridge.db)
         }
         .modifier(CallAudioFeedbackModifier(calls: calls))
-        .overlay(alignment: .bottom) {
-            // Keyed on what's actually on screen, so a dropped presentation never leaves a call without controls.
-            if let call = calls.current, !calls.callScreenVisible {
-                OngoingCallBar(call: call) { presentCallScreen() }
-                    .padding(.bottom, 56)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
         .onValueChange(calls.showCallScreen) { show in
             guard show, !retriedCallScreen else { return }
             // SwiftUI silently drops a fullScreenCover requested during another presentation or a transition.
@@ -102,6 +99,10 @@ struct MainView: View {
         }
     }
 
+    private var ongoingCallBar: OngoingCallInset {
+        OngoingCallInset(calls: calls) { presentCallScreen() }
+    }
+
     /// Shows the call screen, re-requesting it when the flag is stuck on true after a dropped presentation.
     private func presentCallScreen() {
         guard calls.showCallScreen else {
@@ -115,6 +116,25 @@ struct MainView: View {
     private var unreadBadge: Int {
         _ = bridge.db.revision
         return bridge.db.unreadCount
+    }
+}
+
+/// Puts the ongoing-call bar at the bottom of a tab's own safe area: above the tab bar when it's at the bottom, and
+/// beside it when iPhone Duo puts it on the side (D-063). Lists scroll above the bar instead of under it.
+struct OngoingCallInset: ViewModifier {
+    @ObservedObject var calls: CallCenter
+    let open: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                // Keyed on what's actually on screen, so a dropped presentation never leaves a call without controls.
+                if let call = calls.current, !calls.callScreenVisible {
+                    OngoingCallBar(call: call, open: open)
+                        .padding(.vertical, 8)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
     }
 }
 
