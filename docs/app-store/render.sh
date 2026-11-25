@@ -42,6 +42,22 @@ for lang locale in ${(kv)locales}; do
   done
 done
 
+# The same slides for iPad 13-inch and iPhone Duo (inner display, open), from docs/screenshots/{ipad,duo}:
+#   out/<locale>/ipad/NN.png  2064 x 2752     out/<locale>/duo/NN.png  2853 x 2007
+typeset -A sizes=(ipad "2064 2752" duo "2853 2007")
+for lang locale in ${(kv)locales}; do
+  for device in ipad duo; do
+    [[ -d $here/../screenshots/$device/$lang ]] || continue
+    mkdir -p "$out/$locale/$device"
+    read w h <<< "${sizes[$device]}"
+    for s in 1 2 3 4 5 6 7; do
+      n=$(printf "%02d" $s)
+      shoot "file://$here/slides.html#lang=$lang&s=$s&device=$device" $w $h "$out/$locale/$device/$n.png"
+    done
+    echo "$locale $device"
+  done
+done
+
 for lang locale in ${(kv)locales}; do
   mkdir -p "$out/$locale/assets"
   shoot "file://$here/assets.html#lang=$lang&kind=header" 3840 1646 "$out/$locale/assets/header.png"

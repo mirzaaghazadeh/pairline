@@ -4,14 +4,15 @@ Everything the App Store product page needs, kept as source so it can be regener
 
 | Path | What |
 |------|------|
-| `slides.html` | The 7 screenshot slides (headline, subtitle, the real app screen in a phone frame), copy in EN/AR/TR |
+| `slides.html` | The 7 screenshot slides (headline, subtitle, the real app screen in a device frame), copy in EN/AR/TR; `#device=ipad` and `#device=duo` lay the same slides out for iPad 13-inch and iPhone Duo |
 | `iap.html` | Promotional images for the two in-app purchases (1024 x 1024, no text, as Apple asks) |
 | `render.sh` | Renders everything into `out/` (git-ignored) with headless Chrome and ImageMagick |
 | `metadata/` | Name, subtitle, promotional text, description, keywords, URLs, categories, review notes (fastlane `deliver` layout) |
 | `upload.sh` | Uploads `metadata/` and the screenshots to App Store Connect with `fastlane deliver` |
 | `assets.html`, `upload-assets.sh` | The iOS 27 product-page header and search-results images per locale, uploaded and placed with the `asc` CLI |
 | `privacy.json` | The App Privacy declaration ("Data Not Collected"), applied and published with `asc web privacy` (needs an `asc web auth login` session) |
-| `../screenshots/ipad/<lang>/` | Real iPad Pro 12.9" captures (2048 x 2732, flattened), uploaded with `asc screenshots upload --device-type APP_IPAD_PRO_3GEN_129` |
+| `../screenshots/ipad/<lang>/` | iPad Pro 13-inch (M5) Simulator captures (2064 x 2752, flattened), framed by `slides.html#device=ipad` |
+| `../screenshots/duo/<lang>/` | iPhone Duo Simulator captures of the inner display, open, in landscape (2853 x 2007), framed by `slides.html#device=duo` |
 | `api/` | Small App Store Connect API scripts (Python standard library + `openssl`): `iap.py` sets up the two in-app purchases, `app_setup.py` the price, availability and content rights. Both are idempotent |
 
 **Credentials** stay outside the repo. The API scripts read `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_PATH` (the
@@ -27,6 +28,12 @@ The app screens come from `docs/screenshots/ios/<lang>/` (captured on the iPhone
 - `out/en-US/`, `out/ar-SA/`, `out/tr/`: `large/` 1320 x 2868 ("iPhone with Dynamic Island, large display",
   iPhone 18 Pro Max) and `medium/` 1206 x 2622 ("medium display", the size App Store Connect requires). Seven slides
   each.
+- `out/<locale>/ipad/`: 2064 x 2752 (iPad 13-inch, `APP_IPAD_PRO_3GEN_129`). `out/<locale>/duo/`: 2853 x 2007
+  (iPhone Duo inner display, `APP_IPHONE_DUO`; required from April 2027 for apps built with the iOS 27.1 SDK or later,
+  and they add the "made for iPhone Duo" badge to the product page). Upload each with
+  `asc screenshots upload --app 6838659501 --version <v> --locale <locale> --path out/<locale>/<device> --device-type <type> --replace --confirm`.
+- Capturing: demo mode with `-PairlineMarketing` and the status bar at 9:41 (`xcrun simctl status_bar … override`).
+  The iPhone Duo screens are taken with the device open in Device Hub (`simctl io … screenshot --display=<inner>`).
 - The App Store listing is in English, Arabic and Turkish only (D-033). Other app languages see the English page.
 - `out/iap/full.png`, `out/iap/trial.png`: the in-app purchase promotional images.
 

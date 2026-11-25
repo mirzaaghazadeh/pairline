@@ -1,8 +1,10 @@
 <!doctype html>
 <!--
-  App Store screenshots for the iPhone app, rendered by render.sh at 1320 x 2868 (iPhone with Dynamic Island, large
-  display) and scaled to 1206 x 2622 (medium display, the size App Store Connect requires).
-  Open slides.html#lang=en&s=1 in a browser at 1320 x 2868 to preview one slide. Screens come from docs/screenshots/ios.
+  App Store screenshots, rendered by render.sh. One template, three devices (#device=…):
+    iphone (default)  1320 x 2868, also scaled to 1206 x 2622; screens from docs/screenshots/ios
+    ipad              2064 x 2752 (iPad 13-inch); screens from docs/screenshots/ipad
+    duo               2853 x 2007 (iPhone Duo, inner display, open); screens from docs/screenshots/duo
+  Open slides.html#lang=en&s=1&device=duo in a browser at the device's size to preview one slide.
 -->
 <html>
 <head>
@@ -77,6 +79,56 @@
     position: absolute; top: 25px; left: 50%; transform: translateX(-50%);
     width: 282px; height: 84px; border-radius: 42px; background: #000;
   }
+
+  /* iPad 13-inch, portrait: the same layout, a wider canvas and a thinner, squarer frame without the island. */
+  html.ipad, html.ipad body { width: 2064px; height: 2752px; }
+  html.ipad body {
+    background:
+      radial-gradient(1500px 1000px at 50% 1650px, rgba(111, 156, 240, 0.42), transparent 70%),
+      radial-gradient(1300px 700px at 50% -120px, rgba(18, 184, 134, 0.20), transparent 70%),
+      linear-gradient(172deg, #0a1a38 0%, #12346f 46%, #1f5fbf 100%);
+  }
+  html.ipad .link { top: 1722px; }
+  html.ipad .node { top: 1708px; }
+  html.ipad header { top: 140px; left: 140px; right: 140px; height: 600px; gap: 38px; }
+  html.ipad .eyebrow { font-size: 50px; padding: 16px 36px; }
+  html.ipad h1 { font-size: 156px; }
+  html.ipad body[data-lang="ar"] h1 { font-size: 140px; }
+  html.ipad body[data-lang="tr"] h1 { font-size: 144px; }
+  html.ipad p.sub, html.duo p.sub { text-wrap: balance; }
+  html.ipad p.sub { font-size: 62px; max-width: 1640px; }
+  html.ipad body[data-lang="ar"] p.sub { font-size: 58px; }
+  html.ipad .device { top: 842px; width: 1352px; height: 1785px; padding: 26px; border-radius: 76px; }
+  html.ipad .screen { width: 1300px; height: 1733px; border-radius: 50px; }
+  html.ipad .island { display: none; }
+
+  /* iPhone Duo, open: the inner display in landscape, the copy on one line above it and the fold down the middle. */
+  html.duo, html.duo body { width: 2853px; height: 2007px; }
+  html.duo body {
+    background:
+      radial-gradient(1900px 900px at 50% 1250px, rgba(111, 156, 240, 0.42), transparent 70%),
+      radial-gradient(1600px 520px at 50% -120px, rgba(18, 184, 134, 0.20), transparent 70%),
+      linear-gradient(172deg, #0a1a38 0%, #12346f 46%, #1f5fbf 100%);
+  }
+  html.duo .link { top: 1234px; }
+  html.duo .node { top: 1220px; }
+  html.duo .node.l { left: 150px; } html.duo .node.r { right: 150px; }
+  html.duo header { top: 96px; left: 160px; right: 160px; height: 420px; gap: 28px; }
+  html.duo .eyebrow { font-size: 44px; padding: 14px 32px; }
+  html.duo h1 { font-size: 132px; white-space: normal; }
+  html.duo body[data-lang="ar"] h1 { font-size: 118px; line-height: 1.2; }
+  html.duo body[data-lang="tr"] h1 { font-size: 124px; }
+  html.duo p.sub { font-size: 56px; max-width: 2300px; }
+  html.duo body[data-lang="ar"] p.sub { font-size: 52px; line-height: 1.5; }
+  html.duo .device { top: 560px; width: 1912px; height: 1360px; padding: 26px; border-radius: 84px; }
+  html.duo .screen { width: 1860px; height: 1308px; border-radius: 58px; }
+  html.duo .island { display: none; }
+  /* The fold: a faint crease down the middle of the inner display. */
+  html.duo .screen::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 24px; transform: translateX(-50%);
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.06) 40%, rgba(255, 255, 255, 0.10) 55%, transparent);
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -115,7 +167,7 @@ const SLIDES = [
     en: ["Privacy", "Private\nby design", "End-to-end encrypted. No servers, no accounts, no tracking."],
     ar: ["الخصوصية", "الخصوصية\nفي الأساس", "تشفير تام بين هاتفيك. بلا خوادم ولا حسابات ولا تتبّع."],
     tr: ["Gizlilik", "Gizlilik\nen baştan", "Uçtan uca şifreli. Sunucu yok, hesap yok, izleme yok."] },
-  { shot: "02-start-options",
+  { shot: "03-paywall",
     en: ["One-time purchase", "Pay once.\nKeep it.", "Try it free for a week. No subscription, ever."],
     ar: ["شراء لمرة واحدة", "ادفع مرة واحدة\nواحتفظ به", "جرّبه مجانًا لمدة أسبوع. بلا اشتراك أبدًا."],
     tr: ["Tek seferlik satın alma", "Bir kez ödeyin,\nsizin olsun", "Bir hafta ücretsiz deneyin. Abonelik yok."] },
@@ -123,15 +175,19 @@ const SLIDES = [
 
 const params = new URLSearchParams(location.hash.slice(1));
 const lang = params.get("lang") || "en";
+const device = ["ipad", "duo"].includes(params.get("device")) ? params.get("device") : "iphone";
 const slide = SLIDES[(parseInt(params.get("s") || "1", 10) - 1)] || SLIDES[0];
 const [eyebrow, title, sub] = slide[lang];
 document.documentElement.lang = lang;
 document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+document.documentElement.classList.add(device);
 document.body.dataset.lang = lang;
 document.getElementById("eyebrow").textContent = eyebrow;
-document.getElementById("title").textContent = title;
+// The wide iPhone Duo canvas has room for the headline on one line.
+document.getElementById("title").textContent = device === "duo" ? title.replace("\n", " ") : title;
 document.getElementById("sub").textContent = sub;
-document.getElementById("shot").src = `../screenshots/ios/${lang}/${slide.shot}.png`;
+const folder = { iphone: "ios", ipad: "ipad", duo: "duo" }[device];
+document.getElementById("shot").src = `../screenshots/${folder}/${lang}/${slide.shot}.png`;
 </script>
 </body>
 </html>
