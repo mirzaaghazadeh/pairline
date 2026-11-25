@@ -1081,3 +1081,20 @@ holds MODIFY_PHONE_STATE), right away and twice more within a second, because Te
 started. It's the volume key's silence, not a setting change: the call still rings on the iPhone and can be answered
 on either phone. It needs Talk on iPhone's helper (version 5 adds the call); without it both phones ring, and the
 setting says so. PRIVACY.md lists it with the helper's rights.
+
+### D-067 — Caller shown, numbers written with +, and Ring only on the iPhone made to work (2026-11-25)
+
+From the next round of test calls on the tester's phones:
+- **Ring only on the iPhone didn't silence anything.** Telecom checks the calling package against the calling uid, and
+  the helper's TelecomManager came from the system context, which names the wrong package, so `silenceRinger` was
+  refused and the refusal swallowed. The helper now makes its TelecomManager for the shell identity, as it does its
+  AudioManager (D-060), and a failure reaches the app's log. Helper version 6.
+- **Incoming calls showed "Unknown" on the iPhone.** Android 12+'s call-state callback carries no number, so a call it
+  saw first was announced without one; the companion call service brings the number a moment later, but the bridge
+  only sent an update when the call's state changed. It now sends the number and name as soon as they arrive, and the
+  iPhone updates its call screen (it already handled a late number).
+- **Numbers written 0098… are shown as +98….** "00" is the international prefix in Iran, Turkey and most countries;
+  the iPhone writes it as "+" for a call's number (incoming, outgoing and calls placed on the Android phone). Same
+  number, dialed the same; contacts still match on the last nine digits.
+- The relay's learned settings are reset once more: on the tester's phone the post-call question had been answered
+  "they couldn't hear me" twice during the broken builds, which turns talking off.
