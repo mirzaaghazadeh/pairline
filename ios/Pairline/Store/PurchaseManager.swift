@@ -129,7 +129,7 @@ final class PurchaseManager: ObservableObject {
             value = args[index + 1] == "reset" ? nil : args[index + 1]
             defaults.set(value, forKey: key)
         } else if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
-            value = defaults.string(forKey: key)
+            value = defaults.string(forKey: key) ?? testerAccess
         } else {
             value = nil
         }
@@ -140,6 +140,16 @@ final class PurchaseManager: ObservableObject {
         case "none": return .notStarted
         default: return nil
         }
+    }
+
+    /// A debug build made for a remote tester's iPhone, where nobody can pass `-PairlineAccess` at launch, is built with
+    /// `PAIRLINE_TESTER_UNLOCKED` among `SWIFT_ACTIVE_COMPILATION_CONDITIONS` and starts as purchased.
+    private static var testerAccess: String? {
+        #if PAIRLINE_TESTER_UNLOCKED
+        return "purchased"
+        #else
+        return nil
+        #endif
     }
     #endif
 

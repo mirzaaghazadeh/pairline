@@ -140,7 +140,9 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
   `xcodebuild -scheme Pairline -destination 'id=<udid>' -allowProvisioningUpdates build`, then
   `xcrun devicectl device install app --device <udid> <derived data>/Build/Products/Debug-iphoneos/Pairline.app` and launch
   once with `xcrun devicectl device process launch --device <udid> app.pairline.ios -- -PairlineAccess purchased`
-  (`xcrun devicectl list devices` shows the UDID). Debug builds remember that override until `-PairlineAccess reset`,
+  (`xcrun devicectl list devices` shows the UDID). For a tester's iPhone reached remotely, where no launch argument can
+  be passed, build with `SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) PAIRLINE_TESTER_UNLOCKED'` (starts as purchased;
+  debug builds only). Debug builds remember that override until `-PairlineAccess reset`,
   because outside Xcode's ⌘R (home screen, background relaunch) the StoreKit file doesn't apply and the App Store
   products don't exist until App Store Connect is set up.
 - End to end on the Simulator against the fake bridge (no Android device needed), debug builds only (D-029):
