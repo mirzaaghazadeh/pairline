@@ -4,6 +4,9 @@
     <string name="talk_title">التحدث عبر الآيفون</string>
     <string name="talk_body">استمع إلى المكالمات وتحدّث بميكروفون الآيفون ومكبّر صوته. يُبعد أندرويد صوت المكالمات عن التطبيقات، لذلك يشغّل Pairline مساعدًا صغيرًا عبر «تصحيح الأخطاء اللاسلكي»، وهو مفتاح في «خيارات المطوّرين» تفعّله أنت. لا حاجة إلى تطبيق إضافي ولا إلى روت. ويجب أن يكون الهاتفان على شبكة الواي فاي نفسها.</string>
     <string name="settings_talk">التحدث عبر الآيفون</string>
+    <string name="settings_ring_iphone_only">الرنين على الآيفون فقط</string>
+    <string name="settings_ring_iphone_only_sub">ما دام الآيفون متصلًا، ترنّ المكالمات الواردة عليه ويبقى هذا الهاتف صامتًا. ويمكنك الرد هنا أيضًا.</string>
+    <string name="settings_ring_iphone_only_needs_talk">يعمل بعد إعداد «التحدث عبر الآيفون»: فمساعده هو من يُسكت رنين هذا الهاتف. وحتى ذلك الحين يرنّ الهاتفان.</string>
     <string name="talk_summary_on">مفعّل</string>
     <string name="talk_summary_off">متوقف</string>
     <string name="talk_summary_not_set_up">غير مُعدّ</string>

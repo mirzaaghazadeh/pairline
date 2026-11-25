@@ -177,6 +177,24 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     onClick = { navigate(Route.Talk) },
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                // D-066: while the iPhone is linked, this phone stays quiet for calls that ring there.
+                val ringOnIphone = remember(prefsTick) { prefs.ringOnIphoneOnly }
+                val helper by AppGraph.privileged.state.collectAsState()
+                ListRow(
+                    title = stringResource(R.string.settings_ring_iphone_only),
+                    subtitle = stringResource(
+                        if (helper == PrivilegedManager.State.READY || !ringOnIphone) {
+                            R.string.settings_ring_iphone_only_sub
+                        } else {
+                            R.string.settings_ring_iphone_only_needs_talk
+                        },
+                    ),
+                    icon = PIcons.Notifications,
+                    iconTone = if (ringOnIphone && helper != PrivilegedManager.State.READY) Tone.WARN else Tone.ACCENT,
+                    onClick = { prefs.ringOnIphoneOnly = !ringOnIphone },
+                    trailing = { Switch(checked = ringOnIphone, onCheckedChange = null) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(
                     title = stringResource(R.string.block_title),
                     subtitle = stringResource(R.string.block_settings_sub),

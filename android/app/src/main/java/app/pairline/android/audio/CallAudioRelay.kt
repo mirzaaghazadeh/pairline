@@ -231,8 +231,15 @@ class CallAudioRelay(
                             captureRate = rate
                             opened = source
                             if (source != preferred) {
-                                prefs.audioCaptureSource = source
-                                Log.i(TAG, "capture source $preferred didn't open; using $source from now on")
+                                val why = problems[preferred] ?: problem
+                                if (preferred == PrivilegedService.SOURCE_INTERCEPT) {
+                                    // Interception can fail for one call (e.g. while it's still dialing) and work
+                                    // for the next: keep asking it first (D-065).
+                                    Log.i(TAG, "interception didn't open ($why); this call uses ${sourceName(source)}")
+                                } else {
+                                    prefs.audioCaptureSource = source
+                                    Log.i(TAG, "capture source $preferred didn't open ($why); using $source from now on")
+                                }
                             }
                             break@capture
                         } catch (e: RuntimeException) {
@@ -370,7 +377,7 @@ class CallAudioRelay(
         private const val CALL_MODE_WAIT_MS = 4_000L
 
         /** See the `init` block: raise it when a helper fix makes the learned audio settings wrong. */
-        private const val LEARNING_EPOCH = 1
+        private const val LEARNING_EPOCH = 2
         private const val POLL_MS = 30L
 
         /** In-call audio modes: a mobile call, a VoIP call, and Android 11/13's screening and redirect modes. */

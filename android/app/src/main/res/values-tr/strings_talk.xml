@@ -4,6 +4,9 @@
     <string name="talk_title">iPhone’dan konuşun</string>
     <string name="talk_body">Aramaları iPhone’un kendi mikrofonu ve hoparlörüyle duyun ve konuşun. Android, arama sesini uygulamalardan uzak tutar; bu yüzden Pairline, Kablosuz hata ayıklama üzerinden küçük bir yardımcı başlatır. Kablosuz hata ayıklama, Geliştirici seçenekleri’nde sizin açtığınız bir anahtardır. Ek uygulama ve root gerekmez. İki telefonun da aynı Wi-Fi ağında olması gerekir.</string>
     <string name="settings_talk">iPhone’dan konuşma</string>
+    <string name="settings_ring_iphone_only">Yalnızca iPhone’da çalsın</string>
+    <string name="settings_ring_iphone_only_sub">iPhone’unuz bağlıyken gelen aramalar orada çalar, bu telefon sessiz kalır. Yine de buradan cevaplayabilirsiniz.</string>
+    <string name="settings_ring_iphone_only_needs_talk">iPhone’dan konuşma kurulunca çalışır: bu telefonun zil sesini onun yardımcısı susturur. O zamana kadar iki telefon da çalar.</string>
     <string name="talk_summary_on">Açık</string>
     <string name="talk_summary_off">Kapalı</string>
     <string name="talk_summary_not_set_up">Kurulmadı</string>

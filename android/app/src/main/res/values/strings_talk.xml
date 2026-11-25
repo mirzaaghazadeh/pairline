@@ -4,6 +4,9 @@
     <string name="talk_title">Talk on your iPhone</string>
     <string name="talk_body">Hear calls and talk with your iPhone’s own microphone and speaker. Android keeps call audio away from apps, so Pairline starts a small helper through Wireless debugging, a switch in Developer options that you turn on. No extra app and no root. Both phones also need to be on the same Wi-Fi.</string>
     <string name="settings_talk">Talk on iPhone</string>
+    <string name="settings_ring_iphone_only">Ring only on the iPhone</string>
+    <string name="settings_ring_iphone_only_sub">While your iPhone is connected, incoming calls ring there and this phone stays quiet. You can still answer here.</string>
+    <string name="settings_ring_iphone_only_needs_talk">Works once Talk on iPhone is set up: its helper silences this phone’s ringtone. Until then, both phones ring.</string>
     <string name="talk_summary_on">On</string>
     <string name="talk_summary_off">Off</string>
     <string name="talk_summary_not_set_up">Not set up</string>

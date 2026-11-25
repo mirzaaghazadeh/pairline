@@ -233,6 +233,36 @@ final class CallAudioEngine {
         log.info("audio", "Call audio on this iPhone: mic \(Int(inputFormat.sampleRate)) Hz, echo cancellation \(voiceProcessing ? "on" : "off")")
     }
 
+    /// After iOS stopped the engine for a configuration change: rebuild the microphone tap and the player for the new
+    /// formats and start the same engine again. Echo cancellation stays as it is: switching it on in a fresh engine is
+    /// itself a configuration change, so a fresh engine per change stopped again 0.15 s later, six times, and the call
+    /// stayed silent (seen on a tester's iPhone 14 Pro Max, D-065).
+    func restartAfterConfigurationChange() throws {
+        guard isRunning else { return }
+        let input = engine.inputNode
+        input.removeTap(onBus: 0)
+        let inputFormat = input.outputFormat(forBus: 0)
+        guard inputFormat.sampleRate > 0, inputFormat.channelCount > 0,
+              let wire = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: AudioPackets.sampleRate,
+                                       channels: 1, interleaved: true),
+              let converter = AVAudioConverter(from: inputFormat, to: wire),
+              let playFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: AudioPackets.sampleRate,
+                                             channels: 1, interleaved: false) else {
+            throw CallAudioError.noMicrophone
+        }
+        self.converter = converter
+        input.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
+            self?.captured(buffer, wire: wire)
+        }
+        if let sourceNode {
+            engine.disconnectNodeOutput(sourceNode)
+            engine.connect(sourceNode, to: engine.mainMixerNode, format: playFormat)
+        }
+        engine.prepare()
+        try engine.start()
+        log.info("audio", "Call audio restarted after a route change: mic \(Int(inputFormat.sampleRate)) Hz")
+    }
+
     func stop() {
         guard isRunning else { return }
         isRunning = false

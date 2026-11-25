@@ -370,6 +370,14 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
      * Turns on the MANAGE_ONGOING_CALLS app-op so Android binds the companion call service on the next call (keypad,
      * mute and speaker from the iPhone). Only when the user turns on "Talk on iPhone". Off the main thread.
      */
+    /** Silences this phone's ringtone and vibration for the ringing call (D-066). False without the helper. */
+    fun silenceRinger(): Boolean {
+        val s = service ?: return false
+        return runCatching { s.silenceRinger() }
+            .onFailure { Log.w(TAG, "couldn't silence the ringer", it) }
+            .getOrDefault(false)
+    }
+
     fun allowOngoingCalls(): Boolean {
         val s = service ?: return false
         return runCatching { s.allowOngoingCalls(context.packageName) }

@@ -263,6 +263,8 @@ class CallTracker(
         t.incomingSent = true
         if (t.name == null) t.name = lookupName(t.number)
         Log.i(TAG, "incoming call (${t.id})")
+        // Only calls that reach the iPhone: a blocked number still rings here.
+        onIncomingRinging?.invoke()
         emit(
             JSONObject()
                 .put("t", Msg.CALL_INCOMING)
@@ -342,6 +344,10 @@ class CallTracker(
     /** Called on the calls thread when a call ends; the audio relay stops with it. */
     @Volatile
     var onCallEnded: ((String) -> Unit)? = null
+
+    /** Called on the calls thread when an incoming call that reaches the iPhone starts ringing ("Ring only on the iPhone"). */
+    @Volatile
+    var onIncomingRinging: (() -> Unit)? = null
 
     /** Whether [id] is a call in progress (answered or dialing), for `call.media.start`. */
     fun isInProgress(id: String): Boolean = onCall(id) { t ->

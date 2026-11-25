@@ -43,4 +43,7 @@ interface IPrivilegedService {
 
     /** During a relayed call: silences ([on]) this phone's earpiece, or restores it. Also restored by stopAudio(). */
     boolean silenceEarpiece(boolean on) = 8;
+
+    /** Silences the ringing call's ringtone and vibration on this phone; the call itself rings on (D-066). */
+    boolean silenceRinger() = 9;
 }

@@ -13,6 +13,7 @@ import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
 import app.pairline.android.link.PrefsPeerKeyStore
 import app.pairline.android.link.wifi.BridgeHotspot
+import app.pairline.android.log.Log
 import app.pairline.android.telephony.BlockList
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
@@ -66,6 +67,7 @@ object AppGraph {
         CallTracker(app, sims, prefs, link::send) { router.statusChanged() }.also { tracker ->
             tracker.onCallEnded = { id -> audioRelay.stop(id, "call ended") }
             tracker.isBlocked = blockList::isBlocked
+            tracker.onIncomingRinging = ::ringOnIphoneOnly
         }
     }
     val contacts: ContactsSync by lazy { ContactsSync(app, sims, blockList::isBlocked) }
@@ -129,4 +131,23 @@ object AppGraph {
 
     /** The daily GitHub update check and the verified update (D-042). */
     val updates: UpdateManager by lazy { UpdateManager(app) }
+
+    /**
+     * "Ring only on the iPhone" (D-066, on by default): while the iPhone is linked, an incoming call that reaches it
+     * doesn't also ring here. The helper silences the ringtone and vibration; Telecom silences only a ring that has
+     * started, so it asks again as the ring starts. Without the helper (Talk on iPhone not set up) both phones ring.
+     */
+    private fun ringOnIphoneOnly() {
+        if (!prefs.ringOnIphoneOnly || !link.state.value.connected) return
+        if (privileged.state.value != PrivilegedManager.State.READY) return
+        io.execute {
+            for (wait in SILENCE_RETRIES_MS) {
+                if (wait > 0) Thread.sleep(wait)
+                privileged.silenceRinger()
+            }
+            Log.i("calls", "ringing only on the iPhone")
+        }
+    }
+
+    private val SILENCE_RETRIES_MS = longArrayOf(0, 300, 900)
 }

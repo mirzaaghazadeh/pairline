@@ -4,6 +4,9 @@
     <string name="talk_title">مکالمه با آیفون</string>
     <string name="talk_body">تماس‌ها را با میکروفون و بلندگوی خودِ آیفون بشنوید و صحبت کنید. اندروید صدای تماس را از برنامه‌ها دور نگه می‌دارد، برای همین Pairline از راه «اشکال‌زدایی بی‌سیم» یک دستیار کوچک اجرا می‌کند؛ کلیدی در «گزینه‌های برنامه‌نویس» که خودتان روشنش می‌کنید. بدون برنامهٔ اضافه و بدون روت. هر دو گوشی هم باید به یک وای‌فای وصل باشند.</string>
     <string name="settings_talk">مکالمه با آیفون</string>
+    <string name="settings_ring_iphone_only">زنگ فقط روی آیفون</string>
+    <string name="settings_ring_iphone_only_sub">تا وقتی آیفون وصل است، تماس‌های ورودی روی آیفون زنگ می‌خورند و این گوشی بی‌صدا می‌ماند. هنوز می‌توانید اینجا هم جواب بدهید.</string>
+    <string name="settings_ring_iphone_only_needs_talk">بعد از راه‌اندازی «مکالمه با آیفون» کار می‌کند: دستیار آن زنگ این گوشی را بی‌صدا می‌کند. تا آن موقع هر دو گوشی زنگ می‌خورند.</string>
     <string name="talk_summary_on">روشن</string>
     <string name="talk_summary_off">خاموش</string>
     <string name="talk_summary_not_set_up">راه‌اندازی نشده</string>

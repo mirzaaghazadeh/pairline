@@ -1049,3 +1049,35 @@ Daria phone (Android 15) as a first-time user would, twice. Found and fixed:
 - **"Forget pairing" acted at once;** undoing it means pairing again, so it asks first.
 - Seen in the same session and not changed here: with the iPhone app in the background, each Bluetooth wake-up
   reconnects Wi-Fi and iOS drops it again within about 30 seconds (wasted battery; a call wakes the app properly).
+
+### D-065 — Call audio was silent both ways on a tester's phones: three causes (2026-11-25)
+
+Test calls between a tester's Daria (Android 15) and iPhone 14 Pro Max, with both phones' logs read live:
+- **Android: the helper's recorders took the app's identity.** AudioRecord and AudioTrack made while a binder call is
+  handled take the caller's uid and pid as their client (native `AudioRecord::set`). The helper made them inside the
+  app's call, so the audio server saw uid 2000 claiming 10367, refused it ("tried to pass itself off as …") and
+  interception never started ("startInput failed"). The helper now makes them without the caller's identity
+  (`Binder.clearCallingIdentity`). Helper version 4 replaces a running older helper, which survives app updates.
+- **Android: a failed interception was remembered for good.** The relay then always started on the fallback source,
+  which carried no usable audio there. Interception is asked first on every call now (a failure is per call), the
+  fallback is remembered only between the other sources, and what was learned before these fixes is reset once
+  (`audioLearningEpoch`).
+- **iPhone: the call audio engine stopped 0.15 s after it started and never ran again.** Turning echo cancellation on
+  changes the audio configuration, and iOS stops the engine. Build 13 ignored changes in the first second; then a fresh
+  engine per change switched echo cancellation on again and stopped again, six times. Now, once changes settle
+  (0.3 s), the same engine is restarted for the new formats (tap and player rebuilt, echo cancellation left on), only
+  if iOS really stopped it, at most six times a call.
+- **iPhone: Speaker while the audio was still on its way to the iPhone went to the Android phone,** which played the
+  caller on its loudspeaker. Speaker now always means the iPhone's own once the relay has been asked for.
+- Also seen: a call whose far end hung up stayed up on both phones; Android itself had it active until the iPhone
+  ended it ("LOCAL"). The network never ended it; Pairline follows Android's call state.
+
+### D-066 — Ring only on the iPhone (2026-11-25)
+
+The maintainer asked that the Android phone not ring while the iPhone is connected. New setting in the bridge,
+Settings › "Ring only on the iPhone", on by default: when an incoming call that reaches the iPhone (not a blocked
+number) starts ringing while the iPhone is linked, the helper calls `TelecomManager.silenceRinger()` (the shell user
+holds MODIFY_PHONE_STATE), right away and twice more within a second, because Telecom silences only a ring that has
+started. It's the volume key's silence, not a setting change: the call still rings on the iPhone and can be answered
+on either phone. It needs Talk on iPhone's helper (version 5 adds the call); without it both phones ring, and the
+setting says so. PRIVACY.md lists it with the helper's rights.

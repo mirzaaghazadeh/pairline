@@ -17,6 +17,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.Process
+import android.telecom.TelecomManager
 import androidx.annotation.RequiresApi
 import app.pairline.android.BuildConfig
 import java.io.IOException
@@ -142,6 +143,20 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
                 capture = c
                 c.start()
             }
+        }
+    }
+
+    /**
+     * "Ring only on the iPhone" (D-066): stops this phone's ringtone and vibration for the ringing call, as the volume
+     * key does. The shell user holds MODIFY_PHONE_STATE, which Telecom requires; the call keeps ringing on the iPhone
+     * and can still be answered on either phone.
+     */
+    @SuppressLint("MissingPermission")
+    override fun silenceRinger(): Boolean {
+        checkCaller()
+        return asHelper {
+            val telecom = shell.getSystemService(TelecomManager::class.java)
+            telecom != null && runCatching { telecom.silenceRinger() }.isSuccess
         }
     }
 
@@ -440,8 +455,9 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         /**
          * Bump when [IPrivilegedService] or what the helper does changes, so the app replaces a running older helper
          * (one keeps running across app updates). 4: recorders and players made as the helper (D-065).
+         * 5: silenceRinger (D-066).
          */
-        const val VERSION = 4
+        const val VERSION = 5
 
         /** Not a MediaRecorder source: Android 13's call-audio interception API ([openInterceptRecord]). */
         const val SOURCE_INTERCEPT = 100

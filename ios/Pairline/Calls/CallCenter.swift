@@ -418,10 +418,18 @@ final class CallCenter: ObservableObject {
                 return
             }
             self.engineRestarts += 1
-            log.info("audio", "Call audio engine stopped by iOS; starting a fresh one (\(self.engineRestarts))")
-            engine.stop()
-            self.audioEngine = nil
-            self.startEngineIfReady()
+            log.info("audio", "Call audio engine stopped by iOS; restarting it (\(self.engineRestarts))")
+            do {
+                // The same engine, rebuilt for the new route: a fresh one switches echo cancellation on again, which
+                // makes iOS change the configuration and stop it again.
+                try engine.restartAfterConfigurationChange()
+                if self.current?.speaker == true { engine.setSpeaker(true) }
+            } catch {
+                log.warning("audio", "Couldn't restart call audio (\(error.localizedDescription)); starting a fresh engine")
+                engine.stop()
+                self.audioEngine = nil
+                self.startEngineIfReady()
+            }
         }
     }
 
@@ -515,7 +523,9 @@ final class CallCenter: ObservableObject {
     }
 
     func setSpeaker(_ on: Bool) {
-        if audioOnIPhone {
+        // On its way here counts too (D-065): sent to the bridge then, it put the Android phone on its loudspeaker,
+        // which played the caller out loud there. The engine applies it when it starts.
+        if audioOnIPhone || audioRoute == .connecting {
             audioEngine?.setSpeaker(on)
             current?.speaker = on
             return

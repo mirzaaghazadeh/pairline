@@ -121,6 +121,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getInt(AUDIO_LEARNING_EPOCH, 0)
         set(value) = edit { putInt(AUDIO_LEARNING_EPOCH, value) }
 
+    /** While the iPhone is linked, incoming calls ring only there (D-066). On by default; needs Talk on iPhone's helper. */
+    var ringOnIphoneOnly: Boolean
+        get() = prefs.getBoolean(RING_ON_IPHONE_ONLY, true)
+        set(value) = edit { putBoolean(RING_ON_IPHONE_ONLY, value) }
+
     /** The user lets the paired iPhone use this phone's internet (M8, D-048). Off by default. */
     var netShareAllowed: Boolean
         get() = prefs.getBoolean(NET_SHARE_ALLOWED, false)
@@ -180,6 +185,7 @@ class AppPrefs(context: Context) {
         const val AUDIO_SILENCE_EARPIECE = "audio_silence_earpiece"
         const val AUDIO_TALK_FAILURES = "audio_talk_failures"
         const val AUDIO_LEARNING_EPOCH = "audio_learning_epoch"
+        const val RING_ON_IPHONE_ONLY = "ring_on_iphone_only"
         const val NET_SHARE_ALLOWED = "net_share_allowed"
         const val NET_SHARE_DIRECT_IR = "net_share_direct_ir"
         const val NET_SHARE_CREDENTIALS = "net_share_credentials"
