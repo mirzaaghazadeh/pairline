@@ -75,6 +75,8 @@
     <string name="talk_tip_banking_sub">Bazı banka uygulamaları Geliştirici seçenekleri veya Kablosuz hata ayıklama açıkken açılmaz. Pairline, yardımcısının ihtiyacı olduğunda bunları yeniden açar; bu yüzden böyle bir uygulamayı kullanırken iPhone’dan konuşma’yı kapatın.</string>
     <string name="talk_forget">Eşlemeyi unut</string>
     <string name="talk_forget_sub">Yardımcıyı durdurur ve Pairline’ın anahtarını siler. Kablosuz hata ayıklama › Eşlenen cihazlar altından da “Pairline”ı kaldırın.</string>
+    <string name="talk_forget_confirm_title">Eşleştirme unutulsun mu?</string>
+    <string name="talk_forget_confirm_body">Pairline’ı Kablosuz hata ayıklama ile yeniden eşleştirene kadar iPhone’dan konuşma çalışmaz. Aramalar iPhone’da yine çalar ama sesleri bu telefonda kalır.</string>
     <string name="talk_wifi_note">Arama sesi Wi-Fi ağınız üzerinden uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz.</string>
 
     <string name="talk_setup_title">iPhone’dan konuşun (isteğe bağlı)</string>
@@ -85,6 +87,7 @@
     <string name="pair_n_waiting_text">Kablosuz hata ayıklamada “Cihazı eşleme koduyla eşle”ye dokunun. Ardından 6 haneli kodu buraya yazın.</string>
     <string name="pair_n_found_title">Eşleme kodunu yazın</string>
     <string name="pair_n_found_text">“Kodu girin”e dokunup ekranda görünen 6 haneyi yazın.</string>
+    <string name="pair_n_found_again_text">Kod hâlâ bekleniyor: “Kodu girin”e dokunup ekranda görünen 6 haneyi yazın.</string>
     <string name="pair_n_pairing_title">Eşleniyor…</string>
     <string name="pair_n_pairing_text">Eşleme ekranını bir an açık tutun.</string>
     <string name="pair_n_wrong_title">Bu kod çalışmadı</string>

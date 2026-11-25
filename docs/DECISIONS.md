@@ -999,3 +999,22 @@ pickers inside Settings › Calls ("Bridge default", SIM 1, SIM 2), so nobody fo
   which.
 - **The Bridge tab's "Calls" and "Messages" tags** mark the SIM this iPhone's calls and messages go out on, not only
   Android's default. One call or message can still use the other SIM (the dialer and composer pickers start on it).
+
+### D-064 — Pairing Talk on iPhone, made easier from a walk-through on a tester's phone (2026-11-25)
+
+The maintainer asked to find where a normal user gets stuck. Talk on iPhone's setup was run, remotely, on a tester's
+Daria phone (Android 15) as a first-time user would, twice. Found and fixed:
+- **"Pair" opened the long Developer options list,** with Wireless debugging highlighted near the bottom; the user had
+  to tap its name (its switch turns it off) and then find "Pair device with pairing code". It now opens the Wireless
+  debugging page itself, through the intent the Settings app answers for its Quick Settings tile's long-press
+  (`QS_TILE_PREFERENCES` with the WirelessDebugging tile's component), on Android 11+; where that fails it falls back
+  to the highlighted list, then About phone. Opens only; the user still turns things on (rule 5).
+- **The code notification was gone before people looked up from the code.** A pop-up lasts about 5 seconds. While
+  Pairline waits for the code it now pops up again every 8 seconds, at most four times, from a silent high-priority
+  channel. Android pops up an update only when its text changed, so the reminders alternate the wording ("Still
+  waiting for the code…"). Checked: Android holds updates back while the code is being typed, so typed digits stay.
+- **In the shade, Android folded it under the link's notification,** hiding "Enter code" behind two taps. It now has
+  its own notification group.
+- **"Forget pairing" acted at once;** undoing it means pairing again, so it asks first.
+- Seen in the same session and not changed here: with the iPhone app in the background, each Bluetooth wake-up
+  reconnects Wi-Fi and iOS drops it again within about 30 seconds (wasted battery; a call wakes the app properly).

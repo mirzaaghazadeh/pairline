@@ -18,12 +18,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -356,14 +358,32 @@ private fun ManageCard() {
             showChevron = false,
         )
         HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        var confirmForget by remember { mutableStateOf(false) }
         ListRow(
             title = stringResource(R.string.talk_forget),
             subtitle = stringResource(R.string.talk_forget_sub),
             icon = PIcons.Delete,
             iconTone = Tone.WARN,
-            onClick = { AppGraph.privileged.forget() },
+            // Undoing it means pairing with Wireless debugging again, so it asks first (D-064).
+            onClick = { confirmForget = true },
             showChevron = false,
         )
+        if (confirmForget) {
+            AlertDialog(
+                onDismissRequest = { confirmForget = false },
+                title = { Text(stringResource(R.string.talk_forget_confirm_title)) },
+                text = { Text(stringResource(R.string.talk_forget_confirm_body)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        confirmForget = false
+                        AppGraph.privileged.forget()
+                    }) { Text(stringResource(R.string.talk_forget), color = MaterialTheme.colorScheme.error) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { confirmForget = false }) { Text(stringResource(R.string.action_cancel)) }
+                },
+            )
+        }
     }
 }
 
@@ -414,8 +434,12 @@ private fun setTalk(context: Context, on: Boolean) {
     LinkService.refresh(context)
 }
 
-/** The user turns Wireless debugging on there themselves; Pairline never changes it (AGENTS.md rule 5). */
+/**
+ * The user turns Wireless debugging on, and pairs, there themselves (AGENTS.md rule 5). Its own page where the Settings
+ * app opens it (D-064), else Developer options scrolled to it, else About phone.
+ */
 private fun openWirelessDebugging(context: Context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && start(context, DeveloperSettings.wirelessDebuggingPage())) return
     if (!start(context, DeveloperSettings.wirelessDebugging())) start(context, DeveloperSettings.aboutPhone())
 }
 

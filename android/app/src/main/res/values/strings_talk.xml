@@ -79,6 +79,8 @@
     <string name="talk_tip_banking_sub">Some banking apps won’t open while Developer options or Wireless debugging are on. Pairline turns them back on whenever its helper needs them, so turn Talk on iPhone off while you use such an app.</string>
     <string name="talk_forget">Forget pairing</string>
     <string name="talk_forget_sub">Stops the helper and deletes Pairline’s key. Also remove “Pairline” under Wireless debugging › Paired devices.</string>
+    <string name="talk_forget_confirm_title">Forget the pairing?</string>
+    <string name="talk_forget_confirm_body">Talk on iPhone stops until you pair Pairline with Wireless debugging again. Calls still ring on the iPhone, but their audio stays on this phone.</string>
     <string name="talk_wifi_note">Call audio goes over your Wi-Fi, encrypted end to end. It’s never recorded or stored.</string>
 
     <string name="talk_setup_title">Talk on your iPhone (optional)</string>
@@ -90,6 +92,7 @@
     <string name="pair_n_waiting_text">In Wireless debugging, tap “Pair device with pairing code”. Then type the 6-digit code here.</string>
     <string name="pair_n_found_title">Type the pairing code</string>
     <string name="pair_n_found_text">Tap “Enter code” and type the 6 digits shown on screen.</string>
+    <string name="pair_n_found_again_text">Still waiting for the code: tap “Enter code” and type the 6 digits shown on screen.</string>
     <string name="pair_n_pairing_title">Pairing…</string>
     <string name="pair_n_pairing_text">Keep the pairing screen open for a moment.</string>
     <string name="pair_n_wrong_title">That code didn’t work</string>

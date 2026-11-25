@@ -75,6 +75,8 @@
     <string name="talk_tip_banking_sub">بعضی برنامه‌های بانکی وقتی «گزینه‌های برنامه‌نویس» یا «اشکال‌زدایی بی‌سیم» روشن است باز نمی‌شوند. Pairline هر وقت دستیارش لازم باشد آن‌ها را دوباره روشن می‌کند، پس هنگام استفاده از چنین برنامه‌ای «مکالمه با آیفون» را خاموش کنید.</string>
     <string name="talk_forget">فراموش کردن مرتبط‌سازی</string>
     <string name="talk_forget_sub">دستیار را متوقف و کلید Pairline را حذف می‌کند. «Pairline» را از «اشکال‌زدایی بی‌سیم ← دستگاه‌های مرتبط‌شده» هم حذف کنید.</string>
+    <string name="talk_forget_confirm_title">جفت‌سازی فراموش شود؟</string>
+    <string name="talk_forget_confirm_body">«مکالمه با آیفون» کار نمی‌کند تا وقتی Pairline را دوباره با «اشکال‌زدایی بی‌سیم» جفت کنید. تماس‌ها روی آیفون زنگ می‌خورند، ولی صدایشان روی همین گوشی می‌ماند.</string>
     <string name="talk_wifi_note">صدای تماس از طریق وای‌فای شما و با رمزگذاری سرتاسری منتقل می‌شود. هرگز ضبط یا ذخیره نمی‌شود.</string>
 
     <string name="talk_setup_title">مکالمه با آیفون (اختیاری)</string>
@@ -85,6 +87,7 @@
     <string name="pair_n_waiting_text">در «اشکال‌زدایی بی‌سیم»، «مرتبط کردن دستگاه با کد مرتبط‌سازی» را بزنید. بعد کد ۶ رقمی را همین‌جا بنویسید.</string>
     <string name="pair_n_found_title">کد مرتبط‌سازی را بنویسید</string>
     <string name="pair_n_found_text">«وارد کردن کد» را بزنید و ۶ رقمی را که روی صفحه است بنویسید.</string>
+    <string name="pair_n_found_again_text">هنوز منتظر کد هستیم: «وارد کردن کد» را بزنید و ۶ رقمی را که روی صفحه است بنویسید.</string>
     <string name="pair_n_pairing_title">در حال مرتبط‌سازی…</string>
     <string name="pair_n_pairing_text">صفحهٔ مرتبط‌سازی را چند لحظه باز نگه دارید.</string>
     <string name="pair_n_wrong_title">این کد درست نبود</string>

@@ -75,6 +75,8 @@
     <string name="talk_tip_banking_sub">بعض تطبيقات البنوك لا تفتح عندما تكون «خيارات المطوّرين» أو «تصحيح الأخطاء اللاسلكي» مفعّلة. يعيد Pairline تفعيلها كلما احتاج إليها مساعده، لذا أوقف «التحدث عبر الآيفون» أثناء استخدام تطبيق كهذا.</string>
     <string name="talk_forget">إلغاء الإقران</string>
     <string name="talk_forget_sub">يوقف المساعد ويحذف مفتاح Pairline. احذف أيضًا «Pairline» من «تصحيح الأخطاء اللاسلكي ← الأجهزة المقترنة».</string>
+    <string name="talk_forget_confirm_title">نسيان الاقتران؟</string>
+    <string name="talk_forget_confirm_body">يتوقف «التحدث عبر الآيفون» حتى تقرن Pairline مجددًا مع «تصحيح الأخطاء اللاسلكي». تظل المكالمات ترنّ على الآيفون، لكن صوتها يبقى على هذا الهاتف.</string>
     <string name="talk_wifi_note">ينتقل صوت المكالمة عبر شبكة الواي فاي لديك بتشفير تام بين الطرفين، ولا يُسجَّل أو يُحفظ أبدًا.</string>
 
     <string name="talk_setup_title">التحدث عبر الآيفون (اختياري)</string>
@@ -85,6 +87,7 @@
     <string name="pair_n_waiting_text">في «تصحيح الأخطاء اللاسلكي» اضغط «إقران الجهاز باستخدام رمز الإقران». ثم اكتب الرمز المكوّن من ٦ أرقام هنا.</string>
     <string name="pair_n_found_title">اكتب رمز الإقران</string>
     <string name="pair_n_found_text">اضغط «إدخال الرمز» واكتب الأرقام الستة الظاهرة على الشاشة.</string>
+    <string name="pair_n_found_again_text">ما زلنا ننتظر الرمز: اضغط «إدخال الرمز» واكتب الأرقام الستة الظاهرة على الشاشة.</string>
     <string name="pair_n_pairing_title">جارٍ الإقران…</string>
     <string name="pair_n_pairing_text">أبقِ شاشة الإقران مفتوحة لحظة.</string>
     <string name="pair_n_wrong_title">لم يعمل هذا الرمز</string>
