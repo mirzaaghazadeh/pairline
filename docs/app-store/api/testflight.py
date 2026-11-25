@@ -18,17 +18,16 @@ DESCRIPTION = ("Pairline puts the SIM card of your Android phone on your iPhone 
                "your own two phones. Install the free Pairline Bridge app on the Android phone from "
                "https://getpairline.com/download, then pair the two phones with the QR code. No Android phone "
                "at hand? Demo mode shows the whole app with sample data.")
-WHAT_TO_TEST = ("Please try: pairing with the QR code; receiving and sending SMS; copying one-time codes; incoming "
-                "calls while the iPhone is locked; calling from the iPhone; Talk on iPhone (call audio on the "
-                "iPhone, needs Pairline Bridge 1.2.2 on an Android 11 or later phone, set up once with Wireless "
-                "debugging, and both phones on the same Wi-Fi; if the audio stays on the Android phone, the call "
-                "screen now says why); internet sharing; sending files; deleting messages and calls; the block list; "
-                "contacts and call history; USSD codes; and leaving both phones for an hour and checking that "
-                "messages still arrive. New in this build: incoming calls ring on the iPhone's own call screen "
-                "(CallKit), also while it's locked; please check this first. Also new: the bridge's signal, network and battery on the Lock Screen and in the "
-                "Dynamic Island (Settings > Bridge status on Lock Screen); check that it follows the bridge while "
-                "the iPhone is locked and comes back after you open Pairline. Demo mode shows Talk on iPhone and "
-                "internet sharing as ready. Send feedback with a screenshot from TestFlight.")
+WHAT_TO_TEST = ("Use Pairline Bridge 1.3.1 on the Android phone with this build. New in build 14, please check first: "
+                "Talk on iPhone call audio both ways (answer on the iPhone and talk; the earlier silent calls are "
+                "fixed on both phones); Speaker on the iPhone's call screen stays on the iPhone; with Ring only on "
+                "the iPhone (bridge Settings, on by default) only the iPhone rings while it's connected; the "
+                "caller's number or name shows on the incoming call; numbers written 0098... show as +98...; "
+                "Settings > SIM cards to choose the SIM for calls and messages on a dual-SIM bridge; and the "
+                "Android phone's own hotspot away from Wi-Fi (join it on the iPhone: internet, messages and calls "
+                "should all work over it). Also try: pairing with the QR code; SMS both ways; one-time codes; "
+                "incoming calls while locked; internet sharing; sending files; the block list; USSD codes; and "
+                "leaving both phones for an hour. Send feedback with a screenshot from TestFlight.")
 
 
 def ok(status, data, what):
