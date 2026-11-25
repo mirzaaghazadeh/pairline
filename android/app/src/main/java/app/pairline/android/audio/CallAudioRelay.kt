@@ -377,7 +377,7 @@ class CallAudioRelay(
         private const val CALL_MODE_WAIT_MS = 4_000L
 
         /** See the `init` block: raise it when a helper fix makes the learned audio settings wrong. */
-        private const val LEARNING_EPOCH = 2
+        private const val LEARNING_EPOCH = 3
         private const val POLL_MS = 30L
 
         /** In-call audio modes: a mobile call, a VoIP call, and Android 11/13's screening and redirect modes. */

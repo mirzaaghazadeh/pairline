@@ -159,7 +159,7 @@ final class CallCenter: ObservableObject {
             log.info("calls", "Ignoring a second incoming call")
             return
         }
-        let number = event.from ?? ""
+        let number = PhoneNumber.international(event.from ?? "")
         let name = event.name ?? bridge?.db.knownName(for: number)
         let call = ActiveCall(id: UUID(), bridgeID: event.call, number: number, name: name, isOutgoing: false,
                               state: .ringing, sim: event.sim, inCallKit: useCallKit)
@@ -194,7 +194,7 @@ final class CallCenter: ObservableObject {
                 return handleIncoming(CallIncomingEvent(call: event.call, sim: event.sim, from: event.number, name: event.name))
             }
             // A call placed or answered on the Android phone itself: show it in the app, without CallKit.
-            let number = event.number ?? ""
+            let number = PhoneNumber.international(event.number ?? "")
             current = ActiveCall(id: UUID(), bridgeID: event.call, number: number,
                                  name: event.name ?? bridge?.db.knownName(for: number), isOutgoing: event.dir == "out",
                                  state: mapState(event.state), sim: event.sim,
@@ -226,7 +226,7 @@ final class CallCenter: ObservableObject {
         if let sim = event.sim, call.sim == nil { call.sim = sim }
         // The number can arrive after call.incoming (Android reads it from a later broadcast).
         if call.number.isEmpty, let number = event.number, !number.isEmpty {
-            call.number = number
+            call.number = PhoneNumber.international(number)
             if call.name == nil { call.name = bridge?.db.knownName(for: number) }
             if call.inCallKit { adapter?.updateCaller(call) }
         }
@@ -565,7 +565,7 @@ final class CallCenter: ObservableObject {
             notice = String(localized: "There's already a call in progress.")
             return
         }
-        let dialable = PhoneNumber.dialable(number)
+        let dialable = PhoneNumber.international(PhoneNumber.dialable(number))
         guard !dialable.isEmpty else { return }
         var call = ActiveCall(id: UUID(), bridgeID: nil, number: dialable, name: bridge.db.knownName(for: dialable),
                               isOutgoing: true, state: .dialing, sim: sim, inCallKit: useCallKit)

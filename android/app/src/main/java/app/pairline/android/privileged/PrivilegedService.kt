@@ -60,6 +60,18 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         }.getOrElse { shell.getSystemService(AudioManager::class.java) }
     }
 
+    /**
+     * Telecom checks the calling package against the calling uid, and a TelecomManager from the system context names
+     * the wrong package, so silenceRinger was refused (D-066). One made for [shell], like [audio].
+     */
+    private val telecom: TelecomManager? by lazy {
+        runCatching {
+            TelecomManager::class.java.getDeclaredConstructor(Context::class.java)
+                .apply { isAccessible = true }
+                .newInstance(shell)
+        }.getOrElse { shell.getSystemService(TelecomManager::class.java) }
+    }
+
     private val lock = Any()
     private var capture: Capture? = null
     private var inject: Inject? = null
@@ -155,8 +167,10 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
     override fun silenceRinger(): Boolean {
         checkCaller()
         return asHelper {
-            val telecom = shell.getSystemService(TelecomManager::class.java)
-            telecom != null && runCatching { telecom.silenceRinger() }.isSuccess
+            // Failures reach the app as exceptions, which it logs.
+            val t = telecom ?: throw IllegalStateException("no Telecom service")
+            t.silenceRinger()
+            true
         }
     }
 
@@ -455,9 +469,9 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         /**
          * Bump when [IPrivilegedService] or what the helper does changes, so the app replaces a running older helper
          * (one keeps running across app updates). 4: recorders and players made as the helper (D-065).
-         * 5: silenceRinger (D-066).
+         * 5: silenceRinger (D-066). 6: silenceRinger as the shell package.
          */
-        const val VERSION = 5
+        const val VERSION = 6
 
         /** Not a MediaRecorder source: Android 13's call-audio interception API ([openInterceptRecord]). */
         const val SOURCE_INTERCEPT = 100

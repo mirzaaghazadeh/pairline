@@ -135,6 +135,9 @@ class CallTracker(
                 (number == null || it.number == null || PhoneNumbers.sameNumber(it.number, number))
         }
         val t = adopted ?: newCall(incoming, number, sims.slotForAccount(details.accountHandle), state, null)
+        // Android 12+'s call-state callback carries no number, so a call it saw first was announced as "Unknown":
+        // pass the number on as soon as the companion service brings it (D-067).
+        val learnedNumber = adopted != null && t.number == null && number != null
         if (t.number == null) t.number = number
         t.telecom = call
         val cb = object : Call.Callback() {
@@ -142,6 +145,7 @@ class CallTracker(
             override fun onDetailsChanged(call: Call, details: Call.Details) = executor.execute {
                 if (t.number == null) {
                     t.number = details.handle?.schemeSpecificPart?.takeIf { it.isNotBlank() }
+                    if (t.number != null) callerLearned(t)
                 }
             }
         }
@@ -151,6 +155,7 @@ class CallTracker(
         if (adopted == null) {
             announce(t)
         } else {
+            if (learnedNumber) callerLearned(t)
             telecomStateChanged(t, call)
         }
     }
@@ -310,6 +315,13 @@ class CallTracker(
         val ended = runCatching { context.getSystemService(TelecomManager::class.java)?.endCall() == true }.getOrDefault(false)
         // Like reject(): Telecom refuses while it's still screening the call, so retry briefly.
         if (!ended && attempt < 15) executor.schedule({ declineBlocked(t, attempt + 1) }, 200, TimeUnit.MILLISECONDS)
+    }
+
+    /** The number arrived after the call was announced: name it and tell the iPhone, which updates its call screen. */
+    private fun callerLearned(t: Tracked) {
+        if (!calls.containsKey(t.id) || t.state == CallMapping.ENDED) return
+        if (t.name == null) t.name = lookupName(t.number)
+        sendState(t, null)
     }
 
     private fun stateJson(t: Tracked, reason: String?) = JSONObject()

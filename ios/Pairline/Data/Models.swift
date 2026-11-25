@@ -95,6 +95,15 @@ enum PhoneNumber {
         String(asciiDigits(text).filter { $0.isASCII && ($0.isNumber || "+*#".contains($0)) })
     }
 
+    /// "0098 912…" as "+98 912…" (D-067): "00" is the international prefix in Iran, Turkey and most of the world, and
+    /// "+" is how phones write it. The same number, dialed the same; contacts still match (they compare the last digits).
+    static func international(_ text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+        guard trimmed.hasPrefix("00"), trimmed.count > 6,
+              trimmed.dropFirst(2).first.map({ $0.isASCII && $0.isNumber && $0 != "0" }) == true else { return text }
+        return "+" + trimmed.dropFirst(2)
+    }
+
     /// A key for matching numbers written in different formats: the last 9 digits.
     static func matchKey(_ text: String) -> String? {
         let digits = asciiDigits(text).filter { $0.isASCII && $0.isNumber }
