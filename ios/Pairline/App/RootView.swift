@@ -3,6 +3,13 @@ import SwiftUI
 struct RootView: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var settings: AppSettings
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    /// The paywall as a sheet on a phone, full screen on a large display, where a centred sheet would sit across iPhone
+    /// Duo's fold with its buttons on it (D-063).
+    private func paywall(fullScreen: Bool) -> Binding<Bool> {
+        Binding(get: { app.showPaywall && (sizeClass == .regular) == fullScreen }, set: { app.showPaywall = $0 })
+    }
 
     var body: some View {
         Group {
@@ -17,7 +24,10 @@ struct RootView: View {
         }
         .animation(.easeInOut(duration: 0.35), value: settings.onboardingDone)
         .animation(.easeInOut(duration: 0.35), value: app.isDemo)
-        .sheet(isPresented: $app.showPaywall) {
+        .sheet(isPresented: paywall(fullScreen: false)) {
+            PaywallView()
+        }
+        .fullScreenCover(isPresented: paywall(fullScreen: true)) {
             PaywallView()
         }
         .sheet(isPresented: $app.showPairing) {

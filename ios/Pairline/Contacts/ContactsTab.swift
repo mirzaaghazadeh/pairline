@@ -7,6 +7,9 @@ struct ContactsTab: View {
     @State private var contacts: [Contact] = []
     @State private var search = ""
     @State private var showAdd = false
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    /// The contact open beside the list on a large display (D-063).
+    @State private var selected: Contact.ID?
 
     private var filtered: [Contact] {
         let q = search.trimmingCharacters(in: .whitespaces).lowercased()
@@ -33,7 +36,63 @@ struct ContactsTab: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
+            if sizeClass == .regular {
+                // A large display: the contacts and the chosen one side by side; on iPhone Duo each on its own half
+                // (D-063).
+                ListDetailSplit {
+                    contactList
+                } detail: {
+                    if let contact = contacts.first(where: { $0.id == selected }) {
+                        ContactDetailView(contact: contact)
+                            .id(contact.id)
+                    } else {
+                        EmptyStateView(symbol: "person.crop.circle", title: Text("Choose a contact"),
+                                       message: Text("Their details show here."))
+                    }
+                }
+            } else {
+                NavigationStack { contactList }
+            }
+        }
+        .sheet(isPresented: $showAdd) {
+            AddContactView()
+                .environmentObject(bridge)
+        }
+        .onAppear(perform: reload)
+        .onValueChange(db.revision) { _ in reload() }
+    }
+
+    private func reload() {
+        contacts = db.contacts()
+        // Beside the list there's room for a contact: start with the first favorite rather than an empty half.
+        if sizeClass == .regular, !contacts.contains(where: { $0.id == selected }) {
+            selected = (contacts.first(where: \.starred) ?? contacts.first)?.id
+        }
+    }
+
+    /// Opens the contact beside the list on a large display, or pushes it on a phone.
+    @ViewBuilder private func contactLink<Label: View>(_ contact: Contact, @ViewBuilder label: () -> Label) -> some View {
+        if sizeClass == .regular {
+            Button {
+                selected = contact.id
+            } label: {
+                label()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(selected == contact.id ? .isSelected : [])
+        } else {
+            NavigationLink {
+                ContactDetailView(contact: contact)
+            } label: {
+                label()
+            }
+        }
+    }
+
+    private var contactList: some View {
             List {
                 Section {
                     BridgeBanners()
@@ -52,9 +111,7 @@ struct ContactsTab: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
                                     ForEach(favorites) { contact in
-                                        NavigationLink {
-                                            ContactDetailView(contact: contact)
-                                        } label: {
+                                        contactLink(contact) {
                                             VStack(spacing: 6) {
                                                 Avatar(name: contact.name, size: 58)
                                                 Text(verbatim: contact.name.split(separator: " ").first.map(String.init) ?? contact.name)
@@ -75,11 +132,11 @@ struct ContactsTab: View {
                     ForEach(sections, id: \.title) { section in
                         Section {
                             ForEach(section.contacts) { contact in
-                                NavigationLink {
-                                    ContactDetailView(contact: contact)
-                                } label: {
+                                contactLink(contact) {
                                     ContactRow(contact: contact)
                                 }
+                                .listRowBackground(selected == contact.id && sizeClass == .regular
+                                                   ? Color.brandBlue.opacity(0.14) : nil)
                             }
                         } header: {
                             Text(verbatim: section.title)
@@ -110,13 +167,6 @@ struct ContactsTab: View {
                 }
             }
             .refreshable { await bridge.sync() }
-            .sheet(isPresented: $showAdd) {
-                AddContactView()
-                    .environmentObject(bridge)
-            }
-        }
-        .onAppear { contacts = db.contacts() }
-        .onValueChange(db.revision) { _ in contacts = db.contacts() }
     }
 
     @ViewBuilder private var emptyState: some View {

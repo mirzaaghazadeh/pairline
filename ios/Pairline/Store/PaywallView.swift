@@ -9,23 +9,33 @@ struct PaywallView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 22) {
-                    hero
-                    if !purchases.access.isPurchased { priceCard }
-                    features
-                    footer
+            // Full screen on a large display (D-063): what Pairline does in one pane, the price, the offer and its
+            // terms in the other (side by side, or above each other on a tall screen), so no button sits on iPhone
+            // Duo's fold and neither pane is left half empty. One column on a phone.
+            FoldAwarePanes {
+                CenteredScroll {
+                    VStack(spacing: 22) {
+                        hero
+                        features
+                    }
+                    .frame(maxWidth: 560)
+                    .padding(24)
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 16)
-            }
-            .safeAreaInset(edge: .bottom) {
-                // The offer stays visible without scrolling.
-                offer
-                    .padding(.horizontal, 20)
-                    .padding(.top, 14)
-                    .padding(.bottom, 6)
-                    .background(.regularMaterial)
+            } second: {
+                CenteredScroll {
+                    VStack(spacing: 18) {
+                        if !purchases.access.isPurchased { priceCard }
+                        offer
+                        footer
+                            .padding(.top, 8)
+                    }
+                    .frame(maxWidth: 480)
+                    .padding(24)
+                }
+            } single: {
+                singleColumn
+                    .frame(maxWidth: 600)
+                    .frame(maxWidth: .infinity)
             }
             .background(
                 LinearGradient(colors: [Color.brandBlue.opacity(0.16), Color(.systemBackground)], startPoint: .top,
@@ -61,6 +71,27 @@ struct PaywallView: View {
             }
         }
         .task { await purchases.loadProducts() }
+    }
+
+    private var singleColumn: some View {
+        ScrollView {
+            VStack(spacing: 22) {
+                hero
+                if !purchases.access.isPurchased { priceCard }
+                features
+                footer
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 16)
+        }
+        .safeAreaInset(edge: .bottom) {
+            // The offer stays visible without scrolling.
+            offer
+                .padding(.horizontal, 20)
+                .padding(.top, 14)
+                .padding(.bottom, 6)
+                .background(.regularMaterial)
+        }
     }
 
     private var hero: some View {

@@ -2746,6 +2746,50 @@
         }
       }
     },
+    "Choose a contact" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر جهة اتصال"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "یک مخاطب را انتخاب کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir kişi seçin"
+          }
+        }
+      }
+    },
+    "Their details show here." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تظهر تفاصيلها هنا."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جزئیاتش اینجا نمایش داده می‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayrıntıları burada görünür."
+          }
+        }
+      }
+    },
     "Choose a conversation" : {
       "localizations" : {
         "ar" : {

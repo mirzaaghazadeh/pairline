@@ -123,12 +123,6 @@
   html.duo .device { top: 560px; width: 1912px; height: 1360px; padding: 26px; border-radius: 84px; }
   html.duo .screen { width: 1860px; height: 1308px; border-radius: 58px; }
   html.duo .island { display: none; }
-  /* The fold: a faint crease down the middle of the inner display. */
-  html.duo .screen::after {
-    content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 24px; transform: translateX(-50%);
-    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.06) 40%, rgba(255, 255, 255, 0.10) 55%, transparent);
-    pointer-events: none;
-  }
 </style>
 </head>
 <body>

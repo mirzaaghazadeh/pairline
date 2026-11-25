@@ -9,9 +9,68 @@ struct SettingsTab: View {
     @ObservedObject private var notifier = Notifier.shared
     @ObservedObject private var liveActivity = BridgeLiveActivity.shared
     @State private var confirmUnpair = false
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    /// The page open beside the list on a large display (D-063); About until one is chosen.
+    @State private var page: Page?
+
+    enum Page: Hashable {
+        case blocked, netShare, help, diagnostics, privacy, about
+    }
 
     var body: some View {
-        NavigationStack {
+        if sizeClass == .regular {
+            // A large display: the settings and a page side by side; on iPhone Duo each on its own half (D-063).
+            ListDetailSplit {
+                settingsList
+            } detail: {
+                destination(page ?? .about)
+                    .id(page ?? .about)
+            }
+        } else {
+            NavigationStack { settingsList }
+        }
+    }
+
+    @ViewBuilder private func destination(_ page: Page) -> some View {
+        switch page {
+        case .blocked: BlockedNumbersView()
+        case .netShare: NetShareView()
+        case .help: HelpCenterView()
+        case .diagnostics: DiagnosticsView()
+        case .privacy: PrivacySummaryView()
+        case .about: AboutView()
+        }
+    }
+
+    /// Opens a page beside the list on a large display, or pushes it on a phone.
+    @ViewBuilder private func pageLink<Label: View>(_ target: Page, @ViewBuilder label: () -> Label) -> some View {
+        if sizeClass == .regular {
+            let isOpen = (page ?? .about) == target
+            Button {
+                page = target
+            } label: {
+                HStack {
+                    label()
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.forward")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .foregroundStyle(.primary)
+            .listRowBackground(isOpen ? Color.brandBlue.opacity(0.14) : nil)
+            .accessibilityAddTraits(isOpen ? .isSelected : [])
+        } else {
+            NavigationLink {
+                destination(target)
+            } label: {
+                label()
+            }
+        }
+    }
+
+    private var settingsList: some View {
             List {
                 purchaseSection
                 bridgeSection
@@ -41,7 +100,6 @@ struct SettingsTab: View {
                     Text("This iPhone forgets the bridge phone and removes what was synced from it. The bridge phone isn't connected, so also unpair in Pairline Bridge on the Android phone.")
                 }
             }
-        }
     }
 
     // MARK: - Sections
@@ -129,9 +187,7 @@ struct SettingsTab: View {
                 }
             }
             if app.pairedPeer != nil || bridge.isDemo {
-                NavigationLink {
-                    BlockedNumbersView()
-                } label: {
+                pageLink(.blocked) {
                     HStack {
                         Label("Blocked numbers", systemImage: "hand.raised")
                         Spacer()
@@ -233,9 +289,7 @@ struct SettingsTab: View {
             .onValueChange(settings.callsInRecents) { on in
                 app.real.calls.setIncludeInRecents(on)
             }
-            NavigationLink {
-                NetShareView()
-            } label: {
+            pageLink(.netShare) {
                 Label { Text("Internet sharing", tableName: "NetShare") } icon: { Image(systemName: "network") }
             }
         } header: {
@@ -269,19 +323,13 @@ struct SettingsTab: View {
 
     private var helpSection: some View {
         Section {
-            NavigationLink {
-                HelpCenterView()
-            } label: {
+            pageLink(.help) {
                 Label("Help center", systemImage: "questionmark.circle")
             }
-            NavigationLink {
-                DiagnosticsView()
-            } label: {
+            pageLink(.diagnostics) {
                 Label("Diagnostics", systemImage: "stethoscope")
             }
-            NavigationLink {
-                PrivacySummaryView()
-            } label: {
+            pageLink(.privacy) {
                 Label("Privacy", systemImage: "hand.raised")
             }
         } header: {
@@ -306,9 +354,7 @@ struct SettingsTab: View {
 
     private var aboutSection: some View {
         Section {
-            NavigationLink {
-                AboutView()
-            } label: {
+            pageLink(.about) {
                 Label("About Pairline", systemImage: "info.circle")
             }
             Link(destination: AppInfo.sourceURL) {

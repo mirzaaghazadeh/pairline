@@ -46,6 +46,39 @@ struct FoldAwarePanes<First: View, Second: View, Single: View>: View {
     }
 }
 
+/// A list beside its detail on a large display (D-063): conversations and the open one, contacts and a contact, settings
+/// and a settings page. The system split view, with its own column widths: the list stays narrow and the detail gets the
+/// rest (on iPhone Duo the fold runs through the detail, which is fine for reading while the device lies flat), and only
+/// the detail column gets iPhone Duo's vertical side bar. Only used on regular-width screens; phones push the detail.
+struct ListDetailSplit<ListContent: View, Detail: View>: View {
+    @ViewBuilder var list: ListContent
+    @ViewBuilder var detail: Detail
+
+    var body: some View {
+        NavigationSplitView {
+            list
+        } detail: {
+            NavigationStack { detail }
+        }
+        .navigationSplitViewStyle(.balanced)
+    }
+}
+
+/// A scroll view whose content sits in the middle of the pane when it's shorter than the pane, so a short pane has no
+/// empty end, and scrolls when it's taller.
+struct CenteredScroll<Content: View>: View {
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollView {
+                content
+                    .frame(maxWidth: .infinity, minHeight: proxy.size.height)
+            }
+        }
+    }
+}
+
 /// Where two panes meet in a given space: on the fold when there is one, otherwise in the middle.
 struct PaneSplit: Equatable {
     var axis: Axis

@@ -1130,3 +1130,23 @@ changes is when they're offered:
   allows. The user can always close the offer and keep looking around, and the demo stays free (D-020).
 - App Store screenshots: the start screen no longer shows prices, so the "Pay once" slide shows the paywall instead.
   `-PairlinePairingScan` (debug builds) opens pairing at its scan step.
+
+### D-070 — iPhone Duo, every screen looked at open: each tab in two parts (2026-11-26)
+
+Seen on the iPhone Duo simulator (iOS 27.2) for the first time, D-063's layouts weren't enough: the call screen's
+buttons sat in the bottom corner of an empty half, and Contacts, Calls, Bridge and Settings were one phone list
+stretched across the display with the fold through it. The maintainer asked for a full pass. Each screen was then
+captured open, in English and Arabic, and checked:
+- **Messages, Contacts, Settings:** the system split view with its own widths: the list stays narrow, the conversation,
+  contact or settings page gets the rest (on iPhone Duo the fold runs through it, which is fine for reading while the
+  device lies flat), and only that column gets the vertical side bar. Contacts and Settings open their first item
+  (a favorite; About) instead of an empty half. A list that ends exactly at the fold was tried and dropped: iOS either
+  folds such a list away, or (two side-by-side navigation stacks) keeps an empty 84 pt strip for a side bar in each.
+- **Calls:** recent calls and the keypad side by side in one navigation stack, split at the fold so no key sits on it;
+  the title on the leading side. The keypad shrinks its keys to fit any short space.
+- **Bridge:** two columns at the fold: the phone, battery and SIM cards; what it can do and the quick actions.
+- **Call screen:** caller and buttons each centred in their half, level with each other.
+- **Paywall:** full screen on a large display, the offer on one half and the price, buttons and terms on the other
+  (above each other on an upright iPad), so no button sits on the fold; still a sheet on a phone.
+- iPad gets the same layouts (split views, two-column Bridge, side-by-side Calls in landscape, full-screen paywall).
+  The App Store iPhone Duo slides lost the drawn fold line.

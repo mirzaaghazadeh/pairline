@@ -93,21 +93,20 @@ struct CallScreen: View {
                 Spacer(minLength: 12)
             }
         } second: {
-            // The keypad and the call buttons stack when they fit, and sit side by side in a short pane.
+            // The keypad or controls and the call buttons as one group, centred in their half, level with the caller:
+            // pushed to the bottom they left a short, wide half empty (D-063). They sit side by side when the half is
+            // too short to stack them.
             ViewThatFits(in: .vertical) {
-                VStack(spacing: 0) {
-                    Spacer(minLength: 12)
+                VStack(spacing: 32) {
                     middleControls(call)
-                    Spacer(minLength: 16)
                     actions(call)
-                        .padding(.bottom, 24)
                 }
                 HStack(spacing: 36) {
                     middleControls(call)
                     actions(call)
                 }
-                .frame(maxHeight: .infinity)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 12)
         } single: {
             VStack(spacing: 0) {

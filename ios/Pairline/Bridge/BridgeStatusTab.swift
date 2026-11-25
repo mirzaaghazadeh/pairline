@@ -6,27 +6,35 @@ struct BridgeStatusTab: View {
     @EnvironmentObject private var purchases: PurchaseManager
     @EnvironmentObject private var bridge: BridgeController
 
+    private var hasStatus: Bool { bridge.phase.isConnected || bridge.status != nil }
+
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    BridgeBanners().padding(.horizontal, -16)
-                    hero
-                    if bridge.phase.isConnected || bridge.status != nil {
-                        if bridge.protocolMismatch || bridge.bridgeNeedsUpdate {
-                            updateNotice
-                        }
-                        if wifiOnly { wifiOnlyNotice }
-                        if proxy == .leftOn || proxy == .outdated { proxyNotice }
-                        batteryCard
-                        simCards
+            // Two columns on a large display, one on each half of iPhone Duo (D-063): the phone, its battery and SIMs,
+            // and what it can do. One column on a phone.
+            FoldAwarePanes(axes: .horizontal) {
+                column {
+                    overview
+                }
+            } second: {
+                column {
+                    if hasStatus {
                         capabilitiesCard
                         quickActions
                     } else {
                         connectionHelp
                     }
                 }
-                .padding(16)
+            } single: {
+                column {
+                    overview
+                    if hasStatus {
+                        capabilitiesCard
+                        quickActions
+                    } else {
+                        connectionHelp
+                    }
+                }
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle(Text("Bridge"))
@@ -34,6 +42,30 @@ struct BridgeStatusTab: View {
             .onAppear(perform: readProxy)
             .onReceive(bridge.$netShare) { _ in readProxy() }
             .onValueChange(scenePhase) { if $0 == .active { readProxy() } }
+        }
+    }
+
+    private func column<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                content()
+            }
+            .padding(16)
+        }
+    }
+
+    /// The bridge phone itself: the link, then (once it has reported) notices, battery and SIM cards.
+    @ViewBuilder private var overview: some View {
+        BridgeBanners().padding(.horizontal, -16)
+        hero
+        if hasStatus {
+            if bridge.protocolMismatch || bridge.bridgeNeedsUpdate {
+                updateNotice
+            }
+            if wifiOnly { wifiOnlyNotice }
+            if proxy == .leftOn || proxy == .outdated { proxyNotice }
+            batteryCard
+            simCards
         }
     }
 

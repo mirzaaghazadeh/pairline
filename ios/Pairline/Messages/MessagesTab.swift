@@ -18,21 +18,19 @@ struct MessagesTab: View {
         Group {
             if sizeClass == .regular {
                 // A large display (iPhone Duo open, iPad): the conversations and the open one side by side, the same
-                // hierarchy with one more level showing (D-063).
-                NavigationSplitView {
+                // hierarchy with one more level showing; on iPhone Duo each on its own half (D-063).
+                ListDetailSplit {
                     conversationList(current: $current)
                 } detail: {
-                    NavigationStack {
-                        if let current {
-                            ThreadView(thread: current, closeInSplitView: { self.current = nil })
-                                .id(current)
-                        } else {
-                            EmptyStateView(symbol: "bubble.left.and.bubble.right", title: Text("Choose a conversation"),
-                                           message: Text("Its messages show here."))
-                        }
+                    if let current {
+                        ThreadView(thread: current, closeInSplitView: { self.current = nil })
+                            .id(current)
+                    } else {
+                        EmptyStateView(symbol: "bubble.left.and.bubble.right",
+                                       title: Text("Choose a conversation"),
+                                       message: Text("Its messages show here."))
                     }
                 }
-                .navigationSplitViewStyle(.balanced)
             } else {
                 NavigationStack(path: Binding(get: { current.map { [$0] } ?? [] }, set: { current = $0.last })) {
                     conversationList(current: nil)

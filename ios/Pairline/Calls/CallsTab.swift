@@ -7,38 +7,69 @@ struct CallsTab: View {
     }
 
     @EnvironmentObject private var bridge: BridgeController
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var section: Section = .recents
 
     var body: some View {
+        if sizeClass == .regular {
+            // A large display: recent calls and the keypad side by side, with the gap on iPhone Duo's fold so no key
+            // sits on it (D-063). One navigation bar, its title on the leading side rather than over the fold.
+            NavigationStack {
+                FoldAwarePanes(axes: .horizontal) {
+                    CallLogView()
+                } second: {
+                    DialerView()
+                } single: {
+                    sections
+                }
+                .toolbar { ussdItem }
+                .navigationTitle(Text("Calls"))
+                .navigationBarTitleDisplayMode(.large)
+            }
+        } else {
+            phone
+        }
+    }
+
+    private var ussdItem: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarTrailing) {
+            NavigationLink {
+                USSDView()
+            } label: {
+                // A title as well as the symbol, for overflow menus and iPhone Duo's side bar (D-063).
+                Label("USSD codes", systemImage: "number.square")
+            }
+        }
+    }
+
+    private var phone: some View {
         NavigationStack {
-            Group {
-                switch section {
-                case .recents: CallLogView()
-                case .keypad: DialerView()
-                }
+            sections
+                .toolbar { ussdItem }
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationTitle(Text("Calls"))
+        }
+    }
+
+    /// Recents or the keypad, switched in the bar: on a phone, and on a large display too narrow for both.
+    private var sections: some View {
+        Group {
+            switch section {
+            case .recents: CallLogView()
+            case .keypad: DialerView()
             }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Picker(selection: $section) {
-                        Text("Recents").tag(Section.recents)
-                        Text("Keypad").tag(Section.keypad)
-                    } label: {
-                        Text("Calls")
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 220)
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Picker(selection: $section) {
+                    Text("Recents").tag(Section.recents)
+                    Text("Keypad").tag(Section.keypad)
+                } label: {
+                    Text("Calls")
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink {
-                        USSDView()
-                    } label: {
-                        // A title as well as the symbol, for overflow menus and iPhone Duo's side bar (D-063).
-                        Label("USSD codes", systemImage: "number.square")
-                    }
-                }
+                .pickerStyle(.segmented)
+                .frame(width: 220)
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle(Text("Calls"))
         }
     }
 }
@@ -311,15 +342,21 @@ struct DialerView: View {
                 .frame(width: proxy.size.width, height: proxy.size.height)
             }
         } single: {
-            VStack(spacing: 0) {
-                BridgeBanners()
-                Spacer(minLength: 8)
-                numberDisplay
-                Spacer(minLength: 8)
-                keypad(key: Self.fullKey)
-                callRow(key: Self.fullKey)
-                    .padding(.top, 12)
-                    .padding(.bottom, 24)
+            // One column: full-size keys on a phone; smaller ones in a short space, like half of iPhone Duo (D-063).
+            GeometryReader { proxy in
+                let key = min(Self.fullKey, Self.keySize(fitting: CGSize(width: proxy.size.width,
+                                                                         height: proxy.size.height - Self.numberHeight)))
+                VStack(spacing: 0) {
+                    BridgeBanners()
+                    Spacer(minLength: 8)
+                    numberDisplay
+                    Spacer(minLength: 8)
+                    keypad(key: key)
+                    callRow(key: key)
+                        .padding(.top, 12 * key / Self.fullKey)
+                        .padding(.bottom, 24 * key / Self.fullKey)
+                }
+                .frame(width: proxy.size.width, height: proxy.size.height)
             }
         }
         .onAppear {
@@ -334,6 +371,8 @@ struct DialerView: View {
 
     /// The size of a key on a phone.
     static let fullKey: CGFloat = 78
+    /// Room the number, its name line, the SIM picker and the banners take above the keys in one column.
+    static let numberHeight: CGFloat = 150
 
     /// The largest key, up to a phone's, that fits four rows of keys and the call row in `size`.
     static func keySize(fitting size: CGSize) -> CGFloat {
