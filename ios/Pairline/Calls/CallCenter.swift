@@ -68,8 +68,11 @@ final class CallCenter: ObservableObject {
     private var relayStartedAt: Date?
     private var engineStartedAt: Date?
     private var engineRestarts = 0
+    private var restartPending = false
     private var echoCancellationFailed = false
     private static let maxEngineRestarts = 6
+    /// Route changes come in bursts (CallKit's session, then the route itself); look once they've settled.
+    private static let restartSettleDelay: TimeInterval = 0.3
 
     init(useCallKit: Bool) {
         self.useCallKit = useCallKit
@@ -396,19 +399,30 @@ final class CallCenter: ObservableObject {
         return engine
     }
 
-    /// iOS stopped the engine for a route or format change: build a fresh one in the same audio session. Capped, so
-    /// a device that keeps changing can't loop.
+    /// iOS changed the audio route or format: once the changes settle, build a fresh engine in the same audio session
+    /// if iOS stopped this one. Capped, so a device that keeps changing can't loop.
+    ///
+    /// Not ignored right after the start (D-065): on a tester's iPhone 14 Pro Max the route changed 0.1 s after the
+    /// engine started (CallKit's session settling) and iOS stopped the engine; ignoring that change left the whole call
+    /// silent both ways. Whether the change stopped the engine is what decides, not how old the engine is.
     private func restartEngine(after engine: CallAudioEngine) {
-        guard audioEngine === engine else { return }
-        if let engineStartedAt, Date().timeIntervalSince(engineStartedAt) < 1 { return }
-        guard engineRestarts < Self.maxEngineRestarts else {
-            log.warning("audio", "Audio route keeps changing; leaving call audio as it is")
-            return
+        guard audioEngine === engine, !restartPending else { return }
+        restartPending = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.restartSettleDelay) { [weak self, weak engine] in
+            guard let self else { return }
+            self.restartPending = false
+            guard let engine, self.audioEngine === engine else { return }
+            if engine.engineRunning { return }   // the change didn't stop it
+            guard self.engineRestarts < Self.maxEngineRestarts else {
+                log.warning("audio", "Audio route keeps changing; leaving call audio as it is")
+                return
+            }
+            self.engineRestarts += 1
+            log.info("audio", "Call audio engine stopped by iOS; starting a fresh one (\(self.engineRestarts))")
+            engine.stop()
+            self.audioEngine = nil
+            self.startEngineIfReady()
         }
-        engineRestarts += 1
-        engine.stop()
-        audioEngine = nil
-        startEngineIfReady()
     }
 
     private func stopEngine() {

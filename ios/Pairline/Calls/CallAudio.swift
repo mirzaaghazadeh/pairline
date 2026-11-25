@@ -150,6 +150,10 @@ final class CallAudioEngine {
     private var configurationObserver: NSObjectProtocol?
     private(set) var isRunning = false
 
+    /// Whether AVAudioEngine itself still runs. A configuration change may stop it while this object still counts as
+    /// running ([isRunning] says it was started and not stopped by us).
+    var engineRunning: Bool { engine.isRunning }
+
     /// iOS stopped the engine because the audio route or format changed (headset, car, speaker, a CallKit
     /// interruption). Called on the main queue; the call center builds a fresh engine.
     var onConfigurationChange: (() -> Void)?

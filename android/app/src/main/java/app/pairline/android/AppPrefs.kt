@@ -113,6 +113,14 @@ class AppPrefs(context: Context) {
         get() = prefs.getInt(AUDIO_TALK_FAILURES, 0)
         set(value) = edit { putInt(AUDIO_TALK_FAILURES, value) }
 
+    /**
+     * Which generation of the helper the learned audio settings above come from. Raised when a helper fix makes what
+     * was learned before wrong (D-065), so the relay starts again from its first-try settings once.
+     */
+    var audioLearningEpoch: Int
+        get() = prefs.getInt(AUDIO_LEARNING_EPOCH, 0)
+        set(value) = edit { putInt(AUDIO_LEARNING_EPOCH, value) }
+
     /** The user lets the paired iPhone use this phone's internet (M8, D-048). Off by default. */
     var netShareAllowed: Boolean
         get() = prefs.getBoolean(NET_SHARE_ALLOWED, false)
@@ -171,6 +179,7 @@ class AppPrefs(context: Context) {
         const val AUDIO_MUTE_MIC = "audio_mute_bridge_mic"
         const val AUDIO_SILENCE_EARPIECE = "audio_silence_earpiece"
         const val AUDIO_TALK_FAILURES = "audio_talk_failures"
+        const val AUDIO_LEARNING_EPOCH = "audio_learning_epoch"
         const val NET_SHARE_ALLOWED = "net_share_allowed"
         const val NET_SHARE_DIRECT_IR = "net_share_direct_ir"
         const val NET_SHARE_CREDENTIALS = "net_share_credentials"

@@ -46,6 +46,15 @@ class CallAudioRelay(
     /** Called when capabilities may have changed (e.g. talking turned out not to work here). */
     var onCapsChanged: (() -> Unit)? = null
 
+    init {
+        // Before the helper made its recorders as itself (D-065), interception failed on some phones and the relay
+        // "learned" a silent fallback and counted talk failures. Start over once.
+        if (prefs.audioLearningEpoch < LEARNING_EPOCH) {
+            resetLearning()
+            prefs.audioLearningEpoch = LEARNING_EPOCH
+        }
+    }
+
     /** The caller's voice can be relayed to the iPhone. */
     val canListen: Boolean
         get() = prefs.talkOnIphone &&
@@ -359,6 +368,9 @@ class CallAudioRelay(
         private const val MAX_TALK_FAILURES = 2
         private val CAPTURE_RATES = listOf(16_000, 48_000, 8_000)
         private const val CALL_MODE_WAIT_MS = 4_000L
+
+        /** See the `init` block: raise it when a helper fix makes the learned audio settings wrong. */
+        private const val LEARNING_EPOCH = 1
         private const val POLL_MS = 30L
 
         /** In-call audio modes: a mobile call, a VoIP call, and Android 11/13's screening and redirect modes. */

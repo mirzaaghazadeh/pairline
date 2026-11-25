@@ -133,32 +133,52 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         checkCaller()
         if (source !in CAPTURE_SOURCES) throw IllegalArgumentException("capture source $source isn't allowed")
         if (sampleRate !in SAMPLE_RATES) throw IllegalArgumentException("sample rate $sampleRate isn't allowed")
-        synchronized(lock) {
-            capture?.stop()
-            capture = null
-            val record = if (source == SOURCE_INTERCEPT) openInterceptRecord(sampleRate) else openRecord(source, sampleRate)
-            val c = Capture(record, sampleRate)
-            capture = c
-            return c.start()
+        return asHelper {
+            synchronized(lock) {
+                capture?.stop()
+                capture = null
+                val record = if (source == SOURCE_INTERCEPT) openInterceptRecord(sampleRate) else openRecord(source, sampleRate)
+                val c = Capture(record, sampleRate)
+                capture = c
+                c.start()
+            }
+        }
+    }
+
+    /**
+     * Runs [block] as the helper itself. AudioRecord and AudioTrack made while a binder call is being handled take the
+     * caller's uid and pid as their client (native `AudioRecord::set`), here Pairline's app, and the audio server
+     * refuses that as a disguise ("createRecord uid 2000 tried to pass itself off as …", then "startInput failed",
+     * seen on a tester's Android 15 phone, D-065): call audio never started. Without the caller's identity, the client
+     * is the shell user, whose permissions the capture needs.
+     */
+    private inline fun <T> asHelper(block: () -> T): T {
+        val token = Binder.clearCallingIdentity()
+        try {
+            return block()
+        } finally {
+            Binder.restoreCallingIdentity(token)
         }
     }
 
     override fun startInject(sampleRate: Int, muteMic: Boolean): ParcelFileDescriptor {
         checkCaller()
         if (sampleRate !in SAMPLE_RATES) throw IllegalArgumentException("sample rate $sampleRate isn't allowed")
-        synchronized(lock) {
-            inject?.stop()
-            inject = null
-            val am = audioManager()
-            // Android 13's uplink injection first, where the phone offers it; else the telephony output device.
-            val track = (if (interceptable()) openInterceptTrack(sampleRate) else null) ?: openTelephonyTrack(am, sampleRate)
-            if (muteMic && micMuteBefore == null) {
-                micMuteBefore = am.isMicrophoneMute
-                am.isMicrophoneMute = true
+        return asHelper {
+            synchronized(lock) {
+                inject?.stop()
+                inject = null
+                val am = audioManager()
+                // Android 13's uplink injection first, where the phone offers it; else the telephony output device.
+                val track = (if (interceptable()) openInterceptTrack(sampleRate) else null) ?: openTelephonyTrack(am, sampleRate)
+                if (muteMic && micMuteBefore == null) {
+                    micMuteBefore = am.isMicrophoneMute
+                    am.isMicrophoneMute = true
+                }
+                val i = Inject(track, sampleRate)
+                inject = i
+                i.start()
             }
-            val i = Inject(track, sampleRate)
-            inject = i
-            return i.start()
         }
     }
 
@@ -417,8 +437,11 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
     }
 
     companion object {
-        /** Bump when [IPrivilegedService] changes, so the app replaces a running older service. */
-        const val VERSION = 3
+        /**
+         * Bump when [IPrivilegedService] or what the helper does changes, so the app replaces a running older helper
+         * (one keeps running across app updates). 4: recorders and players made as the helper (D-065).
+         */
+        const val VERSION = 4
 
         /** Not a MediaRecorder source: Android 13's call-audio interception API ([openInterceptRecord]). */
         const val SOURCE_INTERCEPT = 100
