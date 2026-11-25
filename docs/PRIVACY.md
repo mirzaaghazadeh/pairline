@@ -32,7 +32,7 @@ Any change that adds or changes a data flow or permission must update this file 
 | Call audio, only with "Talk on iPhone" on and only during a call you take on the iPhone (M6) | Yes, encrypted | Streamed live between your two phones over your local Wi-Fi: the caller's voice to the iPhone, your iPhone's microphone into the call | Not stored, not recorded; logs keep only frame counts and loudness levels | — |
 | Wireless debugging pairing (Talk on iPhone, D-054) | No. Pairline connects only to this phone's own Wireless debugging, on 127.0.0.1; to find its port it looks for this phone's own `_adb-tls-*` announcements on the Wi-Fi network (mDNS), which every phone with Wireless debugging on sends anyway | Pairline's 2048-bit key in Pairline's no-backup storage, encrypted with an Android Keystore key; Android keeps the matching public key under Wireless debugging › Paired devices, named "Pairline". The 6-digit code you type goes only into that pairing and isn't stored | Until "Forget pairing" (and removing Pairline under Paired devices) |
 | USSD results | Yes, encrypted | Your paired iPhone only | Not stored | — |
-| Phone status (battery, signal, carrier, your SIM numbers if Android knows them) | Yes, encrypted | Your paired iPhone only | Not stored | — |
+| Phone status (battery, signal, carrier, which SIM Android uses for calls and for texts, your SIM numbers if Android knows them) | Yes, encrypted | Your paired iPhone only | Not stored | — |
 | Device model and system version (`device.info`: e.g. "Google Pixel 7", Android 16, app version; on the iPhone side the generic model "iPhone") | Yes, encrypted | The other paired phone only | Bridge app settings: the iPhone's model and iOS/app version, to show them on screen | Until unpair |
 | Pairing keys | No | — | Android Keystore-protected storage; iOS Secure Enclave or Keychain | Until unpair |
 | Pairing code (the QR code's one-time secret) | Only as the QR code on your screen | — | Bridge app memory only, never on disk or in logs | 5 minutes, or until used once |
@@ -57,7 +57,7 @@ Any change that adds or changes a data flow or permission must update this file 
 | Identity key and pinned bridge key | No | Secure Enclave key (or Keychain key on devices without one) and Keychain items, `AfterFirstUnlockThisDeviceOnly`, never synced or migrated | Until unpair (the bridge key) / app removal (the identity key) |
 | Trial clock | No | The latest trusted time seen (D-017), in the Keychain, so turning the clock back doesn't extend the trial | Until app removal |
 | Free first sync used | No | One flag in the Keychain (D-069), so pairing again doesn't give a second free sync. No content | Like the trial clock |
-| Preferences and saved USSD codes | No | iOS user defaults (no message content) | Until app removal |
+| Preferences (including the SIM for new calls and messages, D-062) and saved USSD codes | No | iOS user defaults (no message content) | Until app removal |
 | Demo mode data | No | Made-up sample data in memory only, never mixed with real data | Until you leave demo mode |
 | App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids or message text) | Last 7 days |
 | Pairing link (QR code) | No | Read from the camera and used once; the secret is never stored or logged | Until pairing ends |
@@ -72,13 +72,16 @@ Any change that adds or changes a data flow or permission must update this file 
 | iPhone app | Your bridge phone over Bluetooth LE and local Wi-Fi | The link |
 | iPhone app | Apple App Store (StoreKit) | Purchases |
 | Android bridge, only while internet sharing is on (M8) | The sites your iPhone visits | Forwards your iPhone's own traffic; Pairline starts no connections of its own |
+| Android bridge, only with Talk on iPhone | This phone's own Wireless debugging on `127.0.0.1`; its port is found from this phone's own `_adb-tls-*` announcements on the Wi-Fi network | Pairs with it once and starts Pairline's helper (D-054). Never connects to another device's Wireless debugging |
 
-Nothing else. The Android app's network code is confined by CI to three places: the update check (GitHub only),
-the Wi-Fi link (addresses on your local network only) and internet sharing (M8, only while you have it on).
+Nothing else. The Android app's network code is confined by CI to four places: the update check (GitHub only),
+the Wi-Fi link (addresses on your local network only), internet sharing (M8, only while you have it on) and Talk on
+iPhone's connection to this phone's own Wireless debugging (`127.0.0.1` only).
 **Debug builds only** (never the release APK): the bridge also listens on `127.0.0.1:47800` inside the phone or
 emulator, so developers can connect a test iPhone app through `adb forward` (D-018); it isn't reachable from any
 network. On an emulator (never on a phone), a debug build's Wi-Fi link also listens on the emulator's emulated
-mobile-data interface, the only one the Mac can reach through `adb emu redir`. Setup videos, routing lists and the
+mobile-data interface, the only one the Mac can reach through `adb emu redir`. Debug builds also copy each log line,
+already redacted, to Android's logcat, which a connected computer can read. Setup videos, routing lists and the
 known-device list ship inside the app, so nothing else is downloaded.
 Links you tap in Settings (the source code, Pairline's Telegram news channel and help group for your language) are
 handed to your browser or the Telegram app; the bridge doesn't open them itself.
@@ -89,7 +92,8 @@ the source code, Pairline's Telegram news channel and help group (`t.me`, for th
 message — open in Safari or the Telegram app, only when you tap them. The Telegram help group is public, and the app
 says so next to the link. **Debug builds only** (never
 release builds, checked by CI with `ios-policy-check.sh`): the app can connect to a test bridge on `127.0.0.1`
-(loopback, D-018) instead of Bluetooth.
+(loopback, D-018) instead of Bluetooth, can pair from a `pairline://pair` link instead of the camera, and copies each
+log line, already redacted, to the iPhone's system log, which a connected Mac can read.
 
 ## Permissions
 
@@ -152,4 +156,7 @@ release builds, checked by CI with `ios-policy-check.sh`): the app can connect t
 - Include analytics, advertising or tracking code.
 - Look up your IP address or location with third-party services.
 - Download routing lists, device lists or anything else from third-party sites.
-- Turn on debugging settings, or install updates, without asking you.
+- Install updates without asking you.
+- Change a system setting you didn't ask for. The one exception is Talk on iPhone: once you've set it up, and only
+  while it's on, Pairline turns Developer options, USB debugging and Wireless debugging back on when its helper needs
+  them (D-059). Turning Talk on iPhone off, or "Forget pairing", ends that.

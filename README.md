@@ -24,7 +24,9 @@ Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 - **Your data stays on your phones.** Messages, contacts, call history and call audio go only
   between your two paired phones. They never touch our servers — in version 1 we don't run any.
 - **No accounts, no analytics, no ads, no trackers.**
-- **We never force settings on.** Pairline won't turn USB or Wireless debugging back on behind your back.
+- **No settings changed behind your back.** Pairline changes no system setting you didn't ask for. The one
+  exception is Talk on iPhone: once you've set it up, and only while it's on, it turns Developer options and
+  debugging back on when its helper needs them. Turn Talk on iPhone off and that stops.
 - **No silent updates.** Android asks you before every update is installed.
 - **Check it yourself.** The full source is here. [docs/PRIVACY.md](docs/PRIVACY.md) lists every
   data flow and every permission, and why it's needed.
@@ -35,14 +37,20 @@ Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 2. Install **Pairline** on your iPhone.
 3. Pair them once by scanning a QR code. The two phones exchange keys; nobody else ever sees them.
 4. Incoming calls ring on your iPhone's normal call screen, and SMS arrive in the Pairline app.
+5. Optional, on Android 11 or later: set up **Talk on iPhone** once to hear and talk on the iPhone itself.
+   Pairline starts a small helper through the Android phone's own Wireless debugging: no root and no other app.
+   While the iPhone is linked, the Android phone stops ringing too ("Ring only on the iPhone", on by default).
 
-The phones talk over Bluetooth LE, plus local Wi-Fi for audio and files. Details:
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md).
+The phones talk over Bluetooth LE, plus local Wi-Fi (or the Android phone's own hotspot) for call audio and files.
+Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md).
+A three-minute intro video, in English, Persian, Turkish and Arabic, is on [getpairline.com](https://getpairline.com).
 
 ## Pricing
 
 - **Android app:** free.
-- **iPhone app:** free download with a free week, then a one-time $9.99 In-App Purchase. Demo mode is always free.
+- **iPhone app:** free download. Pair your Android phone first: the first sync of your messages, contacts and call
+  history is free, then a free week, then a one-time $9.99 In-App Purchase with free updates. No subscription.
+  Demo mode is always free.
 
 ## License
 
@@ -54,6 +62,16 @@ Pairline is **source-available** under the
 - You **may not** sell it, or use it to offer a competing product or service.
 - Each release automatically becomes **Apache-2.0** two years after it's published.
 - The name and logo are trademarks and aren't covered by the license.
+
+## Contributing and help
+
+Issues and pull requests are welcome; the maintainer reviews every change before it goes in. Read
+[AGENTS.md](AGENTS.md) first: its privacy and security rules apply to every change.
+
+Questions and news on Telegram: the [help group](https://t.me/pairline_groups) and the news channel in
+[English](https://t.me/pairline_en), [Persian](https://t.me/pairline_fa) or [Turkish](https://t.me/pairline_tr).
+
+Thanks to Sayyad Abbasi and Amirreza Azadmehr for testing on real phones and helping with the final debugging.
 
 ## Verifying releases
 
