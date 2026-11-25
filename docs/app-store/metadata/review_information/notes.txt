@@ -1,4 +1,4 @@
-Pairline is the iPhone half of a two-phone setup. It relays SMS, calls, contacts, call history and USSD codes from the user's own Android phone, which runs our free "Pairline Bridge" Android app, over an encrypted Bluetooth link between the two phones. There are no Pairline servers and no accounts.
+Pairline is the iPhone half of a two-phone setup. It relays SMS, calls, contacts, call history and USSD codes from the user's own Android phone, which runs our free "Pairline Bridge" Android app (getpairline.com), over an encrypted link between the two phones: Bluetooth, and optionally the local Wi-Fi network. There are no Pairline servers and no accounts.
 
 HOW TO REVIEW WITHOUT AN ANDROID PHONE
 1. Launch the app and tap Continue until "How would you like to start?".
@@ -8,10 +8,17 @@ HOW TO REVIEW WITHOUT AN ANDROID PHONE
 IN-APP PURCHASES (both non-consumable)
 - "7-day Trial" (free): starts a 7-day trial of all features. It needs no payment method.
 - "Pairline Full Access": unlocks Pairline permanently with one payment.
+Nothing is sold before the user pairs. The start screen offers "Pair your Android phone" and the demo. After pairing, the app syncs the Android phone's messages, contacts and call history once, for free; then it pauses the link and shows the paywall: Start 7-day free trial, Buy now, and the trial's length, what stops when it ends and the price, before the trial starts. It can be closed; sending, calls and further syncing then ask for the trial or the purchase, and what was synced stays readable. That first sync doesn't expire and happens only once.
+To see the paywall without an Android phone: in the demo, Settings > "Unlock Pairline".
 Restore Purchases is on the start screen, on the paywall and in Settings. Nothing renews or is charged automatically.
 
-CALLKIT
-CallKit is used only to show calls that ring on the user's own Android phone (the SIM is in that phone). Call audio stays on the Android phone in this version. The app is not offered in China mainland.
+CALLKIT AND CALL AUDIO
+CallKit shows calls that ring on the user's own Android phone (the SIM is in that phone). Optionally ("Talk on iPhone", set up in the Android app), the call's audio is carried between the two phones over the local Wi-Fi network: the iPhone plays the caller's voice and sends the user's microphone. Nothing is recorded or stored. The microphone is used only during such a call. The app is not offered in China mainland.
 
-BLUETOOTH
-The "bluetooth-central" background mode keeps the link to the user's own Android phone, so messages and calls reach the iPhone while Pairline is in the background.
+BACKGROUND MODES
+- "bluetooth-central" keeps the link to the user's own Android phone, so messages and calls reach the iPhone while Pairline is in the background.
+- "audio" keeps a relayed call's audio running while the iPhone is locked, during an active CallKit call only.
+- "voip": CallKit requires it to report incoming calls (without it iOS refuses them with CXErrorCodeMissingVoIPBackgroundMode). Pairline uses no PushKit and no server: calls arrive over the Bluetooth or local Wi-Fi link to the user's own Android phone, and are shown with CallKit only.
+
+LOCAL NETWORK
+The app finds and connects to the user's own Android phone on the local Wi-Fi (Bonjour service _pairline._tcp) for faster syncing, files and call audio. It never contacts the internet itself; links the user taps open in Safari.
