@@ -1098,3 +1098,12 @@ From the next round of test calls on the tester's phones:
   number, dialed the same; contacts still match on the last nine digits.
 - The relay's learned settings are reset once more: on the tester's phone the post-call question had been answered
   "they couldn't hear me" twice during the broken builds, which turns talking off.
+
+### D-068 — The phone's own hotspot, tested away from Wi-Fi (2026-11-25)
+
+On the tester's Daria (Android 15): Wi-Fi off, mobile data on, Android's own hotspot on; the iPhone (its own mobile
+data off) joined it. The iPhone had internet through it (no "No Internet Connection", websites load), Pairline linked
+over it by itself, calls relayed both ways over it, Ring only on the iPhone worked, and Talk on iPhone's helper kept
+running after Wireless debugging went off with the Wi-Fi. One fix: Android 15 lists the hotspot itself as a Wi-Fi
+network (with LOCAL_NETWORK), so "This phone's hotspot" took the phone for being on Wi-Fi and the status row said
+"Ready on this phone's Wi-Fi network"; such networks no longer count as Wi-Fi.

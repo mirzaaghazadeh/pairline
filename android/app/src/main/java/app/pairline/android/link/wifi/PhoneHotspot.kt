@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import androidx.core.content.ContextCompat
 
 /**
@@ -61,6 +62,9 @@ object PhoneHotspot {
                     val caps = cm.getNetworkCapabilities(network) ?: continue
                     when {
                         caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN) -> vpn = true
+                        // Android 15 lists the hotspot itself as a Wi-Fi network with LOCAL_NETWORK (seen on a
+                        // tester's phone): that's not this phone being on Wi-Fi.
+                        caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) && isLocalOnly(caps) -> Unit
                         caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
                             onWifi = true
                             if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) upstream = true
@@ -73,6 +77,10 @@ object PhoneHotspot {
         }
         return Info(on = on, upstream = upstream, vpn = vpn, onWifi = onWifi)
     }
+
+    private fun isLocalOnly(caps: NetworkCapabilities): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM &&
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_LOCAL_NETWORK)
 
     /** The last sticky broadcast for [action], without registering a receiver. */
     private fun sticky(context: Context, action: String): Intent? = runCatching {
