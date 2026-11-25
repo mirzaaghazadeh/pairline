@@ -157,6 +157,4 @@ log line, already redacted, to the iPhone's system log, which a connected Mac ca
 - Look up your IP address or location with third-party services.
 - Download routing lists, device lists or anything else from third-party sites.
 - Install updates without asking you.
-- Change a system setting you didn't ask for. The one exception is Talk on iPhone: once you've set it up, and only
-  while it's on, Pairline turns Developer options, USB debugging and Wireless debugging back on when its helper needs
-  them (D-059). Turning Talk on iPhone off, or "Forget pairing", ends that.
+- Change a system setting you didn't ask for. The one exception is Talk on iPhone: once you've set it up, and only while it's on, Pairline turns Developer options, USB debugging and Wireless debugging back on when its helper needs them; turning Talk on iPhone off, or "Forget pairing", ends that.
