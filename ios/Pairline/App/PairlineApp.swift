@@ -32,7 +32,20 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         AppFontAppearance.apply()
         // Creates the link (and the Bluetooth central, for state restoration) as early as possible.
         _ = AppModel.shared
+        #if DEBUG
+        RemoteSpike.runIfRequested()
+        #endif
         return true
+    }
+
+    // CloudKit picks the push token up by itself; these only record whether iOS gave one (never the token).
+    func application(_ application: UIApplication,
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        log.info("remote", "Registered for remote notifications")
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        log.info("remote", "Remote notifications unavailable: \((error as NSError).code)")
     }
 
     /// The user swiped Pairline away: iOS won't relaunch it for Bluetooth until it's opened again, so calls and
