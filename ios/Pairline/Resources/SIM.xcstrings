@@ -1,0 +1,46 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Choose SIMs for calls and messages" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختيار الشرائح للمكالمات والرسائل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose SIMs for calls and messages" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتخاب سیم‌کارت برای تماس و پیام" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar ve mesajlar için SIM seçin" } }
+      }
+    },
+    "New calls and messages from this iPhone go out on these SIMs. You can still pick the other SIM for one call or message. Android’s own defaults don’t change." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تخرج المكالمات والرسائل الجديدة من هذا الآيفون عبر هذه الشرائح. ويمكنك مع ذلك اختيار الشريحة الأخرى لمكالمة أو رسالة واحدة. ولا تتغير الإعدادات الافتراضية في أندرويد نفسه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New calls and messages from this iPhone go out on these SIMs. You can still pick the other SIM for one call or message. Android’s own defaults don’t change." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها و پیام‌های تازه از این آیفون با این سیم‌کارت‌ها فرستاده می‌شوند. باز هم می‌توانید برای یک تماس یا پیام، سیم‌کارت دیگر را انتخاب کنید. پیش‌فرض‌های خودِ اندروید تغییر نمی‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone’dan yeni aramalar ve mesajlar bu SIM’lerden çıkar. Tek bir arama veya mesaj için yine diğer SIM’i seçebilirsiniz. Android’in kendi varsayılanları değişmez." } }
+      }
+    },
+    "Only one SIM is active on the Android phone. With two, choose here which one calls and messages use." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شريحة واحدة فقط مفعّلة على هاتف أندرويد. ومع شريحتين، اختر هنا أيهما تستخدمه المكالمات والرسائل." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Only one SIM is active on the Android phone. With two, choose here which one calls and messages use." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی فقط یک سیم‌کارت فعال است. با دو سیم‌کارت، اینجا انتخاب کنید تماس‌ها و پیام‌ها از کدام استفاده کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonda yalnızca bir SIM etkin. İki SIM olduğunda aramaların ve mesajların hangisini kullanacağını buradan seçin." } }
+      }
+    },
+    "Same as the Android phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مثل هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Same as the Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مثل گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonla aynı" } }
+      }
+    },
+    "Same as the Android phone (%@)" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مثل هاتف أندرويد (%@)" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Same as the Android phone (%@)" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مثل گوشی اندرویدی (%@)" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonla aynı (%@)" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

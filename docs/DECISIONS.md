@@ -985,3 +985,17 @@ keep Pairline's hotspot as a fallback, out of the way:
   rejoin one without internet. The help answer leads with the phone's own hotspot.
 - Not done: starting or reading the phone's own hotspot (name, password) from Pairline. It needs system permissions,
   and the helper, which could, runs only after the phone was on Wi-Fi.
+
+### D-062 — Choosing the SIM for calls and messages, where people look for it (2026-11-25)
+
+The maintainer asked for a setting to choose which SIM calls and messages use. The iPhone had one, but only as two
+pickers inside Settings › Calls ("Bridge default", SIM 1, SIM 2), so nobody found it. Now:
+- **A "SIM cards" section in iPhone Settings,** shown once the bridge has reported its SIMs: "SIM for calls" and "SIM
+  for messages", each "Same as the Android phone (SIM n · carrier)" or a SIM. With one SIM it's greyed out and says
+  why. The Bridge tab links to the same choice under its SIM cards when there are two.
+- **It's Pairline's own choice, kept on the iPhone.** Android's default SIMs don't change: changing them needs a
+  system permission (the helper could, but it runs only for Talk on iPhone), and rule 5 keeps Pairline away from
+  system settings. Where Android asks every time, the bridge already uses the first active SIM, and the iPhone now says
+  which.
+- **The Bridge tab's "Calls" and "Messages" tags** mark the SIM this iPhone's calls and messages go out on, not only
+  Android's default. One call or message can still use the other SIM (the dialer and composer pickers start on it).

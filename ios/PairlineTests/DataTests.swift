@@ -260,6 +260,38 @@ final class DemoModeTests: XCTestCase {
         bridge.stop()
     }
 
+    /// D-062: the SIM chosen in Settings wins; otherwise Android's default, otherwise the first active SIM.
+    @MainActor
+    func testSIMChoiceFallsBackToAndroidDefault() async throws {
+        let bridge = DemoBridge(content: .english)
+        let controller = BridgeController(mode: .demo, link: bridge, db: .inMemory())
+        let settings = AppSettings.shared
+        let saved = (settings.defaultCallSim, settings.defaultSMSSim)
+        defer {
+            settings.defaultCallSim = saved.0
+            settings.defaultSMSSim = saved.1
+            bridge.stop()
+        }
+        bridge.start()
+        for _ in 0..<60 where controller.sims.count < 2 {
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        XCTAssertTrue(controller.isDualSIM)
+        settings.defaultCallSim = -1
+        settings.defaultSMSSim = -1
+        XCTAssertEqual(controller.androidDefaultSim(forSMS: false), 0)
+        XCTAssertEqual(controller.effectiveSim(forSMS: false), 0)
+        XCTAssertNil(controller.defaultSim(forSMS: false))
+
+        settings.defaultCallSim = 1
+        XCTAssertEqual(controller.effectiveSim(forSMS: false), 1)
+        XCTAssertEqual(controller.effectiveSim(forSMS: true), 0)
+
+        // A slot the bridge no longer has falls back to Android's default.
+        settings.defaultSMSSim = 5
+        XCTAssertEqual(controller.effectiveSim(forSMS: true), 0)
+    }
+
     func testDemoBlockListAndDeleting() async throws {
         let bridge = DemoBridge(content: .english)
         let controller = BridgeController(mode: .demo, link: bridge, db: .inMemory())

@@ -362,7 +362,7 @@ struct Composer: View {
         .padding(.vertical, 8)
         .background(.bar)
         .onAppear {
-            sim = bridge.defaultSim(forSMS: true) ?? bridge.sims.first(where: { $0.defaultSms == true })?.slot
+            sim = bridge.effectiveSim(forSMS: true)
         }
     }
 

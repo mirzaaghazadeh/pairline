@@ -379,7 +379,7 @@ struct DialerView: View {
         }
         .onAppear {
             if sim == nil {
-                sim = bridge.defaultSim(forSMS: false) ?? bridge.sims.first(where: { $0.defaultVoice == true })?.slot
+                sim = bridge.effectiveSim(forSMS: false)
             }
         }
         .sheet(item: $ussdResult) { item in

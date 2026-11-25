@@ -17,6 +17,8 @@ struct SettingsTab: View {
                 bridgeSection
                 liveActivitySection
                 notificationSection
+                // Shown once the bridge has reported its SIMs (D-062).
+                if !bridge.sims.isEmpty { SIMDefaultsSection() }
                 callsSection
                 languageSection
                 helpSection
@@ -230,24 +232,6 @@ struct SettingsTab: View {
             }
             .onValueChange(settings.callsInRecents) { on in
                 app.real.calls.setIncludeInRecents(on)
-            }
-            if bridge.isDualSIM {
-                Picker(selection: $settings.defaultCallSim) {
-                    Text("Bridge default").tag(-1)
-                    ForEach(bridge.sims) { sim in
-                        Text(bridge.simLabel(sim.slot)).tag(sim.slot)
-                    }
-                } label: {
-                    Label("SIM for calls", systemImage: "phone")
-                }
-                Picker(selection: $settings.defaultSMSSim) {
-                    Text("Bridge default").tag(-1)
-                    ForEach(bridge.sims) { sim in
-                        Text(bridge.simLabel(sim.slot)).tag(sim.slot)
-                    }
-                } label: {
-                    Label("SIM for messages", systemImage: "message")
-                }
             }
             NavigationLink {
                 NetShareView()

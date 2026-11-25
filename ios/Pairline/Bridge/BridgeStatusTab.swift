@@ -242,9 +242,10 @@ struct BridgeStatusTab: View {
                         }
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                        // The SIM this iPhone's calls and messages go out on (D-062), not only Android's default.
                         HStack(spacing: 6) {
-                            if sim.defaultSms == true { Tag(text: Text("Messages")) }
-                            if sim.defaultVoice == true { Tag(text: Text("Calls")) }
+                            if bridge.effectiveSim(forSMS: true) == sim.slot { Tag(text: Text("Messages")) }
+                            if bridge.effectiveSim(forSMS: false) == sim.slot { Tag(text: Text("Calls")) }
                             if sim.roaming == true { Tag(text: Text("Roaming"), tint: .brandAmber) }
                         }
                     }
@@ -258,6 +259,26 @@ struct BridgeStatusTab: View {
                 }
                 .card()
                 .accessibilityElement(children: .combine)
+            }
+            if bridge.isDualSIM {
+                NavigationLink {
+                    List { SIMDefaultsSection() }
+                        .navigationTitle(Text("SIM cards"))
+                        .navigationBarTitleDisplayMode(.inline)
+                } label: {
+                    HStack {
+                        Label { Text("Choose SIMs for calls and messages", tableName: "SIM") } icon: {
+                            Image(systemName: "simcard.2")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        Spacer()
+                        Image(systemName: "chevron.forward")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .card()
+                }
+                .buttonStyle(.plain)
             }
         }
     }

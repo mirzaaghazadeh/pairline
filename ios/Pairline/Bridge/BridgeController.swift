@@ -90,6 +90,16 @@ final class BridgeController: ObservableObject {
         return nil
     }
 
+    /// The SIM Android uses by default, or the first active SIM, which the bridge uses where Android asks every time.
+    func androidDefaultSim(forSMS: Bool) -> Int? {
+        sims.first(where: { (forSMS ? $0.defaultSms : $0.defaultVoice) == true })?.slot ?? sims.first?.slot
+    }
+
+    /// The SIM a new call or message from this iPhone goes out on: the one chosen in Settings, else Android's (D-062).
+    func effectiveSim(forSMS: Bool) -> Int? {
+        defaultSim(forSMS: forSMS) ?? androidDefaultSim(forSMS: forSMS)
+    }
+
     func simLabel(_ slot: Int?) -> String {
         guard let slot else { return String(localized: "Default SIM") }
         if let sim = sims.first(where: { $0.slot == slot }) {
