@@ -53,6 +53,7 @@ account, so almost every user will buy the official app.
 
 No accounts, analytics, crash reporting or license server. The only network party is Apple, via StoreKit.
 A future remote-mode relay must be opt-in and end-to-end encrypted, and must be documented in PRIVACY.md before it ships.
+(Superseded for remote mode by D-072: no relay; the user's own iCloud and a direct connection.)
 
 ### D-007 — Package IDs (2026-11-24)
 
@@ -1157,3 +1158,41 @@ captured open, in English and Arabic, and checked:
   there is who a store takedown of a copy (a competing use under FSL-1.1) is filed for.
 - **No trademark filing,** the maintainer's decision. This replaces D-001's "do a proper trademark search before
   launch". The name and logo stay outside the license (its Trademarks clause, README), so a copy may not use them.
+
+### D-072 — Remote mode: the user's own iCloud as doorbell and mailbox, a direct connection through the home router (2026-11-26)
+
+The maintainer's design. **Supersedes D-006's "future remote-mode relay" sentence:** there is still no Pairline
+server. The bridge stays at home (on charge, on home Wi-Fi) and the iPhone keeps getting calls, SMS and one-time codes,
+and makes calls and sends SMS, from anywhere. Only Apple and the user's own two phones take part: no third-party
+service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch as milestone M10.
+
+- **Doorbell and mailbox: CloudKit, the user's own private database** (container `iCloud.app.pairline.ios`). At
+  pairing, and whenever it expires, the iPhone fetches a CloudKit web auth token (`CKFetchWebAuthTokenOperation` with
+  the app's CloudKit API token) and sends it to the bridge over the encrypted link. The bridge reads and writes records
+  through CloudKit Web Services. Every record's payload is sealed with keys from the pairing's sessions as PROTOCOL.md
+  specifies (no new algorithms), so Apple stores only ciphertext. Records are deleted once handled.
+- **Waking the iPhone:** a CloudKit database subscription with mutable content; a Notification Service Extension
+  decrypts and shows the SMS or the caller. A call rings through CallKit with
+  `CXProvider.reportNewIncomingVoIPPushPayload` from the extension, which needs Apple's notification-filtering
+  entitlement (`com.apple.developer.usernotifications.filtering`); until Apple grants it, a time-sensitive
+  notification opens the call. The extension reads the keys from a shared Keychain access group, nowhere less
+  protected.
+- **Commands from the iPhone** go over the direct connection when it's up, otherwise as mailbox records, which the
+  bridge watches while remote mode is on.
+- **Direct connection** (call audio, and everything else while the app is awake): the bridge asks the home router to
+  open one port (NAT-PMP, then PCP, then UPnP IGD; small clients of our own, no new dependency), learns the public
+  IPv4, lists its global IPv6 addresses, and puts them in the mailbox. The iPhone connects out to them and runs the
+  same session as the Wi-Fi link. The public listener drops anything that doesn't complete the pairing-key handshake,
+  parses as little as possible before that, and rate-limits. Turning remote mode off, or forgetting the pairing,
+  closes the router mapping, stops the listener and deletes the CloudKit records.
+- **Audio:** a compressed audio kind, Opus (iOS `AVAudioConverter`, Android `MediaCodec`, whose encoder exists from
+  Android 10), next to the PCM kind; local links keep PCM.
+- **Android code** lives in `link/remote/`; `network-code-check.sh` lets it reach only CloudKit's web services host
+  and the local router. Any wire change bumps the protocol version, PROTOCOL.md and the shared vectors.
+- **What users are told** (a screen before turning it on, PRIVACY.md, README): no Pairline server; content locked
+  with keys only the two phones hold; Apple stores only locked records in the user's own iCloud; audio goes straight
+  between the phones; the home router opens one port only the paired iPhone can use; Apple and internet providers can
+  see that the phones talk, not what they say. Off by default. A status line shows "Direct connection" or "Via
+  iCloud"; the local log records connections, redacted (rule 9).
+- **First, three risky parts are proven** (Phase 0): the home router's port mapping, the CloudKit path from a
+  non-Apple client to a suspended iPhone, and the filtering entitlement request. Results are added below.

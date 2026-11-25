@@ -180,9 +180,28 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
 Two Android phones pairing with each other isn't planned; the started work is archived on
 `archive/m9-android-client-start`.
 
+## M10 — Remote mode (opt-in, paid add-on on the iPhone; D-072)
+
+The bridge stays at home; the iPhone gets calls, SMS and codes, and makes calls and sends SMS, from anywhere. Only
+Apple (the user's own iCloud) and the two phones take part. Built on the `remote-mode` branch.
+
+- [ ] Phase 0: home router port mapping checked (NAT-PMP, PCP, UPnP), read-only
+      (`protocol/tools/router_check.py`)
+- [ ] Phase 0: CloudKit container, API and management tokens; a record written through CloudKit Web Services from a
+      non-Apple client wakes a suspended iPhone; delay measured
+- [ ] Phase 0: notification-filtering entitlement requested
+- [ ] Protocol: mailbox records, remote session, Opus kind; version bump and shared vectors
+- [ ] Bridge mailbox: CloudKit Web Services client in `link/remote/`
+- [ ] iPhone: subscription and Notification Service Extension (SMS, codes, calls through CallKit)
+- [ ] Router mapping, public listener and direct session
+- [ ] Opus call audio on the direct connection
+- [ ] Settings, status line, the before-you-turn-it-on screen and "Check my home connection"
+- [ ] The remote-mode add-on purchase
+- [ ] PRIVACY.md, ARCHITECTURE.md, PROTOCOL.md, README and decision entries
+- [ ] Street tests on real phones
+
 ## Later
 
-- Remote mode through an end-to-end encrypted relay (paid, opt-in)
 - Mac app
 - Notification mirroring from chosen Android apps
 - MMS (picture messages)
