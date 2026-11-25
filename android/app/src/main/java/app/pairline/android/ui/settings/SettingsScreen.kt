@@ -1,6 +1,9 @@
 package app.pairline.android.ui.settings
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -21,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -29,18 +33,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
 import app.pairline.android.R
@@ -48,6 +57,8 @@ import app.pairline.android.link.LinkService
 import app.pairline.android.link.WifiLinkStatus
 import app.pairline.android.link.wifi.HotspotFailure
 import app.pairline.android.link.wifi.HotspotState
+import app.pairline.android.link.wifi.PhoneHotspot
+import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.telephony.Perms
 import app.pairline.android.ui.GrantState
 import app.pairline.android.ui.LocaleHelper
@@ -71,6 +82,7 @@ import app.pairline.android.ui.refreshTick
 import app.pairline.android.ui.rememberPermissionRequester
 import app.pairline.android.ui.update.UpdatesSection
 import java.util.Date
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -396,13 +408,43 @@ private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
         if (!enabled) return@SectionCard
         HorizontalDivider(Modifier.padding(horizontal = 16.dp))
         val listening = link.wifi == WifiLinkStatus.LISTENING
+        val phoneHotspot = rememberPhoneHotspot(pairlineHotspotOn = hotspotState is HotspotState.On)
         ListRow(
-            title = stringResource(if (listening) R.string.settings_wifi_listening else R.string.settings_wifi_no_network),
+            title = stringResource(
+                when {
+                    !listening -> R.string.settings_wifi_no_network
+                    phoneHotspot.on && !phoneHotspot.onWifi -> R.string.settings_wifi_listening_hotspot
+                    else -> R.string.settings_wifi_listening
+                },
+            ),
             icon = PIcons.Wifi,
             iconTone = if (listening) Tone.GOOD else Tone.NEUTRAL,
         )
         HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        PhoneHotspotRow(phoneHotspot)
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        // Pairline's own hotspot has no internet, so it waits behind this row (D-061), opened while it runs.
         val on = hotspotState as? HotspotState.On
+        var advanced by rememberSaveable { mutableStateOf(false) }
+        val expanded = advanced || hotspotState != HotspotState.Off
+        ListRow(
+            title = stringResource(R.string.settings_pairline_hotspot),
+            subtitle = stringResource(R.string.settings_pairline_hotspot_sub),
+            icon = PIcons.Hotspot,
+            iconTone = Tone.NEUTRAL,
+            onClick = { advanced = !advanced },
+            showChevron = false,
+            trailing = {
+                Icon(
+                    PIcons.ExpandMore,
+                    contentDescription = null,
+                    modifier = Modifier.rotate(if (expanded) 180f else 0f),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+        )
+        if (!expanded) return@SectionCard
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
         ListRow(
             title = stringResource(R.string.settings_hotspot),
             subtitle = when (val s = hotspotState) {
@@ -447,16 +489,6 @@ private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
                 ),
             )
         }
-        // Pairline's hotspot is local-only (Android lets apps share no internet through it); Android's own hotspot
-        // shares this phone's internet, and the Wi-Fi link works over it too.
-        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
-        ListRow(
-            title = stringResource(R.string.settings_tether),
-            subtitle = stringResource(R.string.settings_tether_sub),
-            icon = PIcons.OpenExternal,
-            iconTone = Tone.NEUTRAL,
-            onClick = { app.pairline.android.ui.SystemActions.openTetherSettings(context) },
-        )
         if (hotspot.bandChoiceSupported) {
             HorizontalDivider(Modifier.padding(horizontal = 16.dp))
             ListRow(
@@ -482,6 +514,70 @@ private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
         }
     }
 }
+
+/**
+ * Android's own hotspot (D-061), the way to link the phones away from Wi-Fi: it shares this phone's internet and the
+ * Wi-Fi link listens on it. The row opens Android's hotspot settings (only opens them; rule 5) and says whether the
+ * iPhone gets internet over it, and why not.
+ */
+@Composable
+private fun PhoneHotspotRow(info: PhoneHotspot.Info) {
+    val context = LocalContext.current
+    val helper by AppGraph.privileged.state.collectAsState()
+    // Talk on iPhone's helper starts through Wireless debugging, which Android runs only on a Wi-Fi network (D-054).
+    val helperNote = info.on && !info.onWifi && AppGraph.prefs.talkOnIphone && helper !in setOf(
+        PrivilegedManager.State.READY,
+        PrivilegedManager.State.STARTING,
+        PrivilegedManager.State.UNSUPPORTED,
+    )
+    val text = stringResource(
+        when {
+            !info.on -> R.string.settings_phone_hotspot_off
+            !info.upstream -> R.string.settings_phone_hotspot_no_internet
+            info.vpn -> R.string.settings_phone_hotspot_vpn
+            else -> R.string.settings_phone_hotspot_on
+        },
+    )
+    ListRow(
+        title = stringResource(R.string.settings_phone_hotspot),
+        subtitle = if (helperNote) text + "\n\n" + stringResource(R.string.settings_phone_hotspot_helper) else text,
+        icon = PIcons.Hotspot,
+        iconTone = when {
+            !info.on -> Tone.ACCENT
+            !info.upstream || info.vpn || helperNote -> Tone.WARN
+            else -> Tone.GOOD
+        },
+        onClick = { SystemActions.openTetherSettings(context) },
+        showChevron = false,
+        trailing = { Icon(PIcons.OpenExternal, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
+    )
+}
+
+/** [PhoneHotspot] while the screen shows it: again on every hotspot broadcast, and every few seconds for data and VPN. */
+@Composable
+private fun rememberPhoneHotspot(pairlineHotspotOn: Boolean): PhoneHotspot.Info {
+    val context = LocalContext.current
+    var info by remember { mutableStateOf(PhoneHotspot.read(context, pairlineHotspotOn)) }
+    DisposableEffect(pairlineHotspotOn) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(c: Context, intent: Intent) {
+                info = PhoneHotspot.read(context, pairlineHotspotOn)
+            }
+        }
+        // Protected system broadcasts; see WifiTransport for why the receiver is registered exported.
+        ContextCompat.registerReceiver(context, receiver, PhoneHotspot.filter(), ContextCompat.RECEIVER_EXPORTED)
+        onDispose { runCatching { context.unregisterReceiver(receiver) } }
+    }
+    LaunchedEffect(pairlineHotspotOn) {
+        while (true) {
+            delay(PHONE_HOTSPOT_REFRESH_MS)
+            info = PhoneHotspot.read(context, pairlineHotspotOn)
+        }
+    }
+    return info
+}
+
+private const val PHONE_HOTSPOT_REFRESH_MS = 4_000L
 
 /** A medium date in the user's language; Persian uses the Solar Hijri calendar, as Iranian users expect. */
 private fun localDate(ms: Long, locale: java.util.Locale): String {

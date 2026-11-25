@@ -64,4 +64,17 @@ final class HotspotJoiner {
     func reset() {
         asked.removeAll()
     }
+
+    /// Removes the bridge hotspots this app saved in iOS's known networks, except `keeping`: Android names its
+    /// local-only hotspot anew each time (AndroidShare_…), so without this old ones pile up in Settings › Wi-Fi, and
+    /// iOS may rejoin one with no internet (D-061). iOS lists only the networks this app added.
+    func forgetSaved(keeping ssid: String?) {
+        guard Self.isSupported else { return }
+        NEHotspotConfigurationManager.shared.getConfiguredSSIDs { saved in
+            let stale = saved.filter { $0 != ssid }
+            guard !stale.isEmpty else { return }
+            stale.forEach { NEHotspotConfigurationManager.shared.removeConfiguration(forSSID: $0) }
+            Task { @MainActor in log.info("wifi", "Forgot \(stale.count) old bridge hotspot(s)") }
+        }
+    }
 }

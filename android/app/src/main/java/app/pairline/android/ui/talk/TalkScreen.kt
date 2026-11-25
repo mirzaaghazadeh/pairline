@@ -321,7 +321,7 @@ private fun WifiLinkRow() {
                 iconTone = Tone.WARN,
             )
             Row(Modifier.fillMaxWidth().padding(start = 72.dp, end = 16.dp, bottom = 12.dp)) {
-                SecondaryButton(stringResource(R.string.settings_tether), { SystemActions.openTetherSettings(context) })
+                SecondaryButton(stringResource(R.string.settings_phone_hotspot_open), { SystemActions.openTetherSettings(context) })
             }
         }
         else -> ListRow(

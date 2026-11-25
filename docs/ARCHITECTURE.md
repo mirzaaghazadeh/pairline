@@ -102,8 +102,11 @@ Start as one `:app` module with these packages; split into Gradle modules only w
 - Media: after each Wi-Fi handshake a UDP socket is bound to that session's local address and its network, and the
   port goes to the iPhone in `wifi.media`. `LinkManager.media` (a `StateFlow<MediaChannel?>`) publishes it once the
   first authentic datagram arrives; call audio (M6) uses it.
-- Hotspot: Android's local-only hotspot, started by the user from Settings (Android starts one only for an app in
-  the foreground); band choice on Android 16+.
+- Hotspots (D-061): the phone's own hotspot is the one Settings leads with. `PhoneHotspot` reads whether it's on (the
+  sticky tethering broadcast) and whether the phone has a connection to share or a VPN, for the status text; the user
+  turns it on in Android's settings, and the listeners pick up its interface. Pairline's own hotspot, Android's
+  local-only one, sits behind a folded row: started by the user from Settings (Android starts one only for an app in
+  the foreground), no internet, band choice on Android 16+.
 
 **Sharing files (M5, D-045)**
 - Android: a share target, "Send to iPhone", appears in every app's share sheet; Home also has "Send a file to

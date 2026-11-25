@@ -965,3 +965,23 @@ only start while it's on.
 - **iPhone:** the in-app call screen turns off at the ear while the audio is on the earpiece, and a dial the bridge
   accepted but never reported ends after 30 s.
 - **Call-audio failures list every source tried** (with Android's audio mode), so one report from the iPhone says why.
+
+### D-061 — One hotspot to explain: the phone's own; Pairline's moves under a fold (2026-11-25)
+
+Testers found the hotspot setup hard. One had both on at once: Pairline's local-only hotspot (`AndroidShare_7069`) and
+the phone's own (`sayad's Z Fold3`), and the iPhone showed "No Internet Connection" on both. The maintainer chose to
+keep Pairline's hotspot as a fallback, out of the way:
+- **Bridge, Settings › Wi-Fi link:** "This phone's hotspot" is the main row. It opens Android's hotspot settings (only
+  opens them; rule 5) and says, from Android's sticky tethering broadcast and the phone's networks (read locally): off
+  (how to use it), on and sharing, on without internet (no mobile data), or on with a VPN, which Android routes hotspot
+  traffic around, so the iPhone gets no VPN, or no internet where only the VPN gets through; Internet sharing (M8) is
+  the way to use the VPN. With Talk on iPhone on and its helper not running while the phone isn't on Wi-Fi, it adds
+  that the helper starts only on Wi-Fi (D-054). The status row says "Ready on this phone's hotspot" when that's where
+  the link listens.
+- **Pairline's own hotspot** sits behind a folded row, "Pairline's own hotspot (no internet)", for carriers that block
+  tethering; it opens by itself while that hotspot runs or failed.
+- **iPhone:** it removes the bridge hotspots it saved in iOS's known networks (only those it added) when the bridge
+  offers no hotspot or another one, and on unpair, so old `AndroidShare_…` networks don't pile up and iOS doesn't
+  rejoin one without internet. The help answer leads with the phone's own hotspot.
+- Not done: starting or reading the phone's own hotspot (name, password) from Pairline. It needs system permissions,
+  and the helper, which could, runs only after the phone was on Wi-Fi.

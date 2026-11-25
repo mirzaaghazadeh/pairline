@@ -557,6 +557,7 @@ final class LinkManager: BridgeLink {
         (connectors[.wifi] as? WiFiConnector)?.forgetBad()
         bridgeCaps = []
         hotspot.reset()
+        hotspot.forgetSaved(keeping: nil)
         lanes.forEach { $0.retryAttempt = 0 }
         updatePhase()
         onPeerChange?()
@@ -786,6 +787,7 @@ final class LinkManager: BridgeLink {
             peer.wifi = hints
         }
         log.info("wifi", "The bridge offered Wi-Fi: \(addresses.count) address(es)\(offer.ssid != nil ? ", hotspot" : "")")
+        hotspot.forgetSaved(keeping: offer.ssid)
         if wifi.session == nil, !addresses.isEmpty { kickWiFi(reason: "wifi.offer") }
         hotspotTimer?.invalidate()
         hotspotTimer = nil

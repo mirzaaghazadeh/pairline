@@ -241,7 +241,7 @@ struct FAQ: Identifiable {
             answer: "Yes. Turn on Internet sharing in the bridge app, then use Settings › Internet sharing here: it gives a link for your Wi-Fi proxy settings and a one-tap Telegram setting. Traffic goes through the Android phone and its VPN, if one is on.",
             table: "NetShare"),
         FAQ(id: 11, question: "iOS says “No Internet Connection” on the Android phone’s hotspot",
-            answer: "The hotspot Pairline Bridge starts only links your two phones: Android doesn’t let apps share the internet through it, so iOS shows “No Internet Connection” and this iPhone uses its own mobile data. If it has none, turn on the Android phone’s own hotspot instead (Settings › Hotspot & tethering on Android) and join that: it shares the internet, and Pairline connects over it too.",
+            answer: "Use the Android phone’s normal hotspot (on Android: Settings › Hotspot & tethering, or Pairline Bridge › Settings › This phone’s hotspot) and join it here in Settings › Wi-Fi: it shares the Android phone’s internet, and Pairline connects over it too. Pairline’s own hotspot (named AndroidShare_…) only links the two phones, so iOS shows “No Internet Connection” on it. If the normal hotspot has no internet either, Pairline Bridge › Settings › This phone’s hotspot says why: mobile data is off there, or a VPN is on, which Android doesn’t share over a hotspot. For the VPN, use Settings › Internet sharing here.",
             table: "Hotspot"),
         FAQ(id: 5, question: "What happens after the free trial?",
             answer: "After 7 days, sending messages, calls, syncing and USSD stop until you buy Pairline once. Messages already on this iPhone stay readable, and demo mode, help and settings keep working."),
