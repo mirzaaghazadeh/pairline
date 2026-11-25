@@ -185,19 +185,22 @@ struct CallScreen: View {
             .padding(.top, 10)
 
         // Where the call's audio is: on this iPhone when the bridge relays it (call.media, D-047), otherwise on
-        // the Android phone. Tapping explains how to set up Talk on iPhone.
-        Button {
-            showAudioInfo = true
-        } label: {
-            Label { audioLabel } icon: { Image(systemName: audioSymbol) }
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(.white.opacity(0.85))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(Capsule().fill(.white.opacity(0.12)))
+        // the Android phone. Tapping explains how to set up Talk on iPhone. Left out of App Store screenshots, where
+        // the demo has no Wi-Fi link to bring the audio over (with Talk on iPhone it comes to the iPhone).
+        if !DebugSettings.marketingScreenshots {
+            Button {
+                showAudioInfo = true
+            } label: {
+                Label { audioLabel } icon: { Image(systemName: audioSymbol) }
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(Capsule().fill(.white.opacity(0.12)))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 18)
         }
-        .buttonStyle(.plain)
-        .padding(.top, 18)
     }
 
     /// The keypad while it's open, otherwise mute, keypad and speaker (not while an incoming call rings).
