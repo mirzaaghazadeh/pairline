@@ -56,6 +56,7 @@ Any change that adds or changes a data flow or permission must update this file 
 | Lock Screen / Dynamic Island status (Live Activity, D-053): link state, bridge name, battery, each SIM's carrier, network type and signal | No. Started and updated on the iPhone only; Pairline has no push server, so nothing goes through Apple's push service | iOS shows it on the Lock Screen and in the Dynamic Island while Settings › "Bridge status on Lock Screen" is on (the default). No messages, numbers or contacts | Ended when you turn the setting off or unpair; iOS ends it after 8 hours at most |
 | Identity key and pinned bridge key | No | Secure Enclave key (or Keychain key on devices without one) and Keychain items, `AfterFirstUnlockThisDeviceOnly`, never synced or migrated | Until unpair (the bridge key) / app removal (the identity key) |
 | Trial clock | No | The latest trusted time seen (D-017), in the Keychain, so turning the clock back doesn't extend the trial | Until app removal |
+| Free first sync used | No | One flag in the Keychain (D-069), so pairing again doesn't give a second free sync. No content | Like the trial clock |
 | Preferences and saved USSD codes | No | iOS user defaults (no message content) | Until app removal |
 | Demo mode data | No | Made-up sample data in memory only, never mixed with real data | Until you leave demo mode |
 | App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids or message text) | Last 7 days |

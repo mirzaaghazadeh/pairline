@@ -319,17 +319,12 @@ private struct ChoicePage: View {
                         onPair()
                     }
                 default:
-                    OptionCard(symbol: "gift.fill", tint: .brandFill, title: Text("Try free for 7 days"),
-                               text: Text("Everything works. Then \(purchases.priceText) once to keep it, or it stops connecting.")) {
-                        Task {
-                            if await purchases.startTrial() { onPair() }
-                        }
-                    }
-                    OptionCard(symbol: "bag.fill", tint: .brandGreen, title: Text("Buy once · \(purchases.priceText)"),
-                               text: Text("No subscription. Yours for good.")) {
-                        Task {
-                            if await purchases.buyFull() { onPair() }
-                        }
+                    // No prices on the first screen (D-069): the free week and the purchase are offered in the pairing
+                    // flow, right before scanning, with the trial's terms.
+                    OptionCard(symbol: "iphone.gen2.radiowaves.left.and.right", tint: .brandFill,
+                               title: Text("Pair your Android phone"),
+                               text: Text("Install the free bridge app on it, then scan one code.")) {
+                        onPair()
                     }
                 }
                 OptionCard(symbol: "sparkles", tint: .brandAmber, title: Text("Explore the demo"),
@@ -339,11 +334,6 @@ private struct ChoicePage: View {
                 if purchases.busy {
                     ProgressView().padding(.top, 4)
                 }
-                Text("The 7-day trial is free. When it ends, sending messages, calls, syncing and USSD stop until you buy Pairline for \(purchases.priceText) once. Messages already synced stay readable. Nothing is charged automatically.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 4)
                 HStack(spacing: 16) {
                     Button("Restore Purchases") { Task { await purchases.restore() } }
                     Link(destination: AppInfo.privacyURL) { Text("Privacy") }
@@ -363,7 +353,8 @@ private struct ChoicePage: View {
     }
 }
 
-private struct OptionCard: View {
+/// A tappable choice card: symbol, title and one line of text. Used on the start screen and in the pairing flow.
+struct OptionCard: View {
     let symbol: String
     let tint: Color
     let title: Text

@@ -4682,6 +4682,28 @@
         }
       }
     },
+    "Install the free bridge app on it, then scan one code." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ثبّت عليه التطبيق الوسيط المجاني، ثم امسح رمزًا واحدًا."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "برنامه رایگان پل را روی آن نصب کنید و بعد یک کد را اسکن کنید."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ücretsiz köprü uygulamasını ona yükleyin, ardından tek bir kodu tarayın."
+          }
+        }
+      }
+    },
     "iPhone" : {
       "localizations" : {
         "ar" : {
@@ -6995,6 +7017,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Şimdi eşleştir"
+          }
+        }
+      }
+    },
+    "Pair your Android phone" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أقرِن هاتف أندرويد"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "گوشی اندرویدی خود را جفت کنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android telefonunuzu eşleştirin"
           }
         }
       }

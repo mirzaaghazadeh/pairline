@@ -44,6 +44,11 @@ final class BridgeController: ObservableObject {
     @Published var netShare: NetShareInfo?
     /// Set by the app: whether link features are allowed (trial or purchase). Demo mode is always allowed.
     @Published var canUseLink = true
+    /// Set by the app before a trial or purchase (D-069): the link is up only for one sync after pairing. Sending,
+    /// calls and everything else still ask for the trial (`canUseLink` stays false).
+    @Published var firstSyncOnly = false
+    /// Called when that first sync has finished.
+    var onFirstSyncDone: (() -> Void)?
     /// A copy of the bridge's block list (D-043); the bridge's own list is the one that counts.
     @Published private(set) var blockedNumbers: [BlockedNumber] = []
 
@@ -179,7 +184,8 @@ final class BridgeController: ObservableObject {
             db.updateState(cid: event.cid, state: state, key: event.key, error: event.error)
             if state == .failed { Haptics.warning() }
         case .callIncoming(let event):
-            calls.handleIncoming(event)
+            // During the free first sync (D-069) calls aren't brought here: they need the trial or the purchase.
+            if canUseLink { calls.handleIncoming(event) }
         case .callState(let event):
             calls.handleState(event)
         case .callMediaState(let event):
@@ -273,13 +279,15 @@ final class BridgeController: ObservableObject {
 
     /// Pull-to-refresh and reconnects: new messages, contacts and call log.
     func sync() async {
-        guard canUseLink, phase.isConnected, !syncing else { return }
+        guard canUseLink || firstSyncOnly, phase.isConnected, !syncing else { return }
         syncing = true
         defer { syncing = false }
         if has(.smsHistory) { await syncMessages() }
         if has(.contacts) { await syncContacts() }
         if has(.calllog) { await syncCallLog() }
         updateBadge()
+        // The free first sync counts only once it ran to the end on a live link (D-069).
+        if firstSyncOnly, !canUseLink, phase.isConnected { onFirstSyncDone?() }
     }
 
     private func syncMessages() async {

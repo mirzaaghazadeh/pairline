@@ -16,6 +16,24 @@ final class TrialPolicyTests: XCTestCase {
         XCTAssertEqual(TrialPolicy.state(purchased: true, trialStart: nil, now: start), .purchased)
     }
 
+    /// D-069: before a trial, the link runs for one free first sync only; a trial or purchase always opens it, and an
+    /// ended trial never does.
+    func testFirstSyncPolicy() {
+        let trial = AccessState.trial(endsAt: start)
+        let expired = AccessState.expired(endedAt: start)
+        XCTAssertTrue(FirstSyncPolicy.linkAllowed(access: .notStarted, firstSyncUsed: false))
+        XCTAssertTrue(FirstSyncPolicy.firstSyncOnly(access: .notStarted, firstSyncUsed: false))
+        XCTAssertFalse(FirstSyncPolicy.linkAllowed(access: .notStarted, firstSyncUsed: true))
+        for used in [false, true] {
+            XCTAssertTrue(FirstSyncPolicy.linkAllowed(access: trial, firstSyncUsed: used))
+            XCTAssertTrue(FirstSyncPolicy.linkAllowed(access: .purchased, firstSyncUsed: used))
+            XCTAssertFalse(FirstSyncPolicy.firstSyncOnly(access: trial, firstSyncUsed: used))
+            XCTAssertFalse(FirstSyncPolicy.firstSyncOnly(access: .purchased, firstSyncUsed: used))
+            XCTAssertFalse(FirstSyncPolicy.linkAllowed(access: expired, firstSyncUsed: used))
+            XCTAssertFalse(FirstSyncPolicy.linkAllowed(access: .loading, firstSyncUsed: used))
+        }
+    }
+
     func testAccessGates() {
         XCTAssertTrue(AccessState.purchased.allowsLink)
         XCTAssertTrue(AccessState.trial(endsAt: start).allowsLink)

@@ -15,7 +15,7 @@ struct PairingFlowView: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var purchases: PurchaseManager
     @EnvironmentObject private var settings: AppSettings
-    @State private var step: Step = .install
+    @State private var step: Step = Self.initialStep
     @State private var error: String?
     @State private var camera: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
     @State private var pairTask: Task<Void, Never>?
@@ -23,6 +23,14 @@ struct PairingFlowView: View {
     #if DEBUG
     @State private var pasted = ""
     #endif
+
+    /// Debug builds launched with `-PairlinePairingScan` start at the scan step.
+    private static var initialStep: Step {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-PairlinePairingScan") { return .scan }
+        #endif
+        return .install
+    }
 
     var body: some View {
         NavigationStack {
@@ -49,7 +57,9 @@ struct PairingFlowView: View {
                         }
                     }
                 }
-                if isOnboarding, step == .install {
+                // "Later" also skips the free-week choice (D-069): the app opens, and the trial can start any time
+                // from its banner.
+                if isOnboarding, step == .install || (step == .scan && !app.linkAllowed) {
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Later") { finish() }
                     }
@@ -57,6 +67,9 @@ struct PairingFlowView: View {
             }
         }
         .interactiveDismissDisabled(step == .connecting)
+        // The free-week prompt after the first sync waits until this flow has closed (D-069).
+        .onAppear { app.pairingFlowOpen = true }
+        .onDisappear { app.pairingFlowOpen = false }
         .sheet(isPresented: $showPaywall) {
             PaywallView()
                 .environmentObject(purchases)
@@ -119,10 +132,12 @@ struct PairingFlowView: View {
             VStack(spacing: 20) {
                 StepHeader(number: 2, of: 2, title: Text("Scan the pairing code"),
                            subtitle: Text("Open Pairline Bridge on the Android phone, tap Pair and point this iPhone at the code."))
-                if !purchases.access.allowsLink {
+                if app.linkAllowed {
+                    // A trial, a purchase, or before either: pairing leads to the free first sync (D-069).
+                    scanner
+                } else if purchases.access.isExpired {
                     VStack(spacing: 12) {
                         Image(systemName: "lock.fill").font(.largeTitle).foregroundStyle(Color.brandAmber)
-                        Text("Start your free trial to pair").font(.headline)
                         Text("Pairing and the link need an active trial or a purchase.")
                             .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
                         Button("See options") { showPaywall = true }
@@ -130,7 +145,7 @@ struct PairingFlowView: View {
                     }
                     .card(padding: 20)
                 } else {
-                    scanner
+                    trialChoices
                 }
                 if let error {
                     Label {
@@ -190,6 +205,46 @@ struct PairingFlowView: View {
                     }
                 }
                 .buttonStyle(PrimaryButtonStyle())
+            }
+        }
+    }
+
+    /// Before the first scan: the free week or the purchase (D-069). Apple's rule for a paid-once app is that the
+    /// trial goes through the free "7-day Trial" item, and that its length, what stops when it ends and the price
+    /// show before it starts. Starting either one shows the scanner here.
+    @ViewBuilder private var trialChoices: some View {
+        if purchases.access == .loading {
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .card(padding: 24)
+        } else {
+            VStack(spacing: 14) {
+                Text("Start your free trial to pair")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                OptionCard(symbol: "gift.fill", tint: .brandFill, title: Text("Try free for 7 days"),
+                           text: Text("Everything works. Then \(purchases.priceText) once to keep it, or it stops connecting.")) {
+                    Task { _ = await purchases.startTrial() }
+                }
+                OptionCard(symbol: "bag.fill", tint: .brandGreen, title: Text("Buy once · \(purchases.priceText)"),
+                           text: Text("No subscription. Yours for good.")) {
+                    Task { _ = await purchases.buyFull() }
+                }
+                if purchases.busy {
+                    ProgressView()
+                }
+                Text("The 7-day trial is free. When it ends, sending messages, calls, syncing and USSD stop until you buy Pairline for \(purchases.priceText) once. Messages already synced stay readable. Nothing is charged automatically.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button("Restore Purchases") { Task { await purchases.restore() } }
+                    .font(.footnote.weight(.semibold))
+            }
+            .alert(Text("Pairline"), isPresented: Binding(get: { purchases.message != nil },
+                                                          set: { if !$0 { purchases.message = nil } })) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(purchases.message ?? "")
             }
         }
     }

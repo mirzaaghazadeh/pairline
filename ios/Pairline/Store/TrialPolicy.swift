@@ -22,6 +22,11 @@ enum AccessState: Equatable {
         if case .trial = self { return true }
         return false
     }
+
+    var isExpired: Bool {
+        if case .expired = self { return true }
+        return false
+    }
 }
 
 enum TrialPolicy {
@@ -52,6 +57,33 @@ enum TrialPolicy {
         let seconds = max(0, end.timeIntervalSince(now))
         let totalHours = Int((seconds / 3600).rounded(.up))
         return (totalHours / 24, totalHours % 24)
+    }
+}
+
+/// One free first sync before a trial (D-069): after pairing, the link stays up until the bridge's messages, contacts
+/// and call log have synced once, so people see their own messages before choosing the free week. Then the link waits
+/// for the trial or the purchase; sending, calls and the rest always need one of them. Not time-based, and what synced
+/// stays readable, like after a trial.
+enum FirstSyncPolicy {
+    static func linkAllowed(access: AccessState, firstSyncUsed: Bool) -> Bool {
+        access.allowsLink || firstSyncOnly(access: access, firstSyncUsed: firstSyncUsed)
+    }
+
+    /// The link is up only for the free first sync.
+    static func firstSyncOnly(access: AccessState, firstSyncUsed: Bool) -> Bool {
+        access == .notStarted && !firstSyncUsed
+    }
+}
+
+/// Whether the free first sync was used. In the Keychain, like the trial clock, so unpairing and pairing again or
+/// reinstalling doesn't give another one.
+enum FirstSyncStore {
+    private static let account = "trial.firstsync"
+
+    static var used: Bool { Keychain.get(account: account) != nil }
+
+    static func markUsed() {
+        try? Keychain.set(Data("1".utf8), account: account)
     }
 }
 

@@ -54,6 +54,7 @@ final class AppModel: ObservableObject {
         real = BridgeController(mode: .real, link: link, db: AppDatabase.openDefault())
         pairedPeer = peers.peer
         real.onPaywallRequest = { [weak self] in self?.showPaywall = true }
+        real.onFirstSyncDone = { [weak self] in self?.firstSyncDone() }
         link.onPeerChange = { [weak self] in self?.peerChanged() }
 
         purchases.$access
@@ -100,10 +101,54 @@ final class AppModel: ObservableObject {
     /// When the app hosts unit tests, its own link stays idle so it can't touch a real or emulated bridge.
     static let isTestHost = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
 
+    // MARK: - Free first sync (D-069)
+
+    /// The free first sync before a trial was used (kept in the Keychain).
+    @Published private(set) var firstSyncUsed = FirstSyncStore.used
+    /// The pairing flow is on screen; the free-week prompt waits until it closes.
+    var pairingFlowOpen = false {
+        didSet { if oldValue, !pairingFlowOpen { presentTrialPromptSoon() } }
+    }
+    private var trialPromptPending = false
+
+    /// Pairing is open before a trial: it leads to the free first sync.
+    var firstSyncAvailable: Bool {
+        FirstSyncPolicy.firstSyncOnly(access: purchases.access, firstSyncUsed: firstSyncUsed)
+    }
+
+    /// Whether pairing and the link may run now: a trial, a purchase, or the free first sync.
+    var linkAllowed: Bool {
+        FirstSyncPolicy.linkAllowed(access: purchases.access, firstSyncUsed: firstSyncUsed)
+    }
+
+    /// The first sync before a trial finished: the link waits for the trial or purchase, and the free week is offered.
+    private func firstSyncDone() {
+        guard !firstSyncUsed else { return }
+        FirstSyncStore.markUsed()
+        firstSyncUsed = true
+        log.info("store", "Free first sync done; the link waits for a trial or purchase")
+        accessChanged(purchases.access)
+        trialPromptPending = true
+        presentTrialPromptSoon()
+    }
+
+    private func presentTrialPromptSoon() {
+        guard trialPromptPending else { return }
+        Task { @MainActor in
+            // After the pairing flow or onboarding has finished animating away.
+            try? await Task.sleep(nanoseconds: 800_000_000)
+            guard self.trialPromptPending, !self.pairingFlowOpen, self.settings.onboardingDone, !self.isDemo,
+                  self.purchases.access == .notStarted, !self.showPaywall else { return }
+            self.trialPromptPending = false
+            self.showPaywall = true
+        }
+    }
+
     private func accessChanged(_ access: AccessState) {
         guard access != .loading else { return }
         real.canUseLink = access.allowsLink
-        link.setAllowed(access.allowsLink && !Self.isTestHost)
+        real.firstSyncOnly = FirstSyncPolicy.firstSyncOnly(access: access, firstSyncUsed: firstSyncUsed)
+        link.setAllowed(FirstSyncPolicy.linkAllowed(access: access, firstSyncUsed: firstSyncUsed) && !Self.isTestHost)
         switch access {
         case .trial(let end):
             Notifier.shared.scheduleTrialReminder(trialEnd: end, price: purchases.priceText)
@@ -155,7 +200,7 @@ final class AppModel: ObservableObject {
             log.info("pairing", "Pairing link opened (debug build)")
             Task {
                 do {
-                    if !purchases.access.allowsLink {
+                    if !linkAllowed {
                         toast = PairingError.locked.errorDescription
                         return
                     }
@@ -223,6 +268,8 @@ final class AppModel: ObservableObject {
             }
         }
         if args.contains("-PairlinePaywall") { showPaywall = true }
+        // Opens pairing at its scan step (screenshots of the free-week choice there, D-069).
+        if args.contains("-PairlinePairingScan") { showPairing = true }
         // Same path as opening the pairing link through the URL scheme, without the system's confirmation alert.
         if let index = args.firstIndex(of: "-PairlinePairLink"), index + 1 < args.count, let url = URL(string: args[index + 1]) {
             Task { @MainActor in

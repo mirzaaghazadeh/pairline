@@ -1107,3 +1107,26 @@ over it by itself, calls relayed both ways over it, Ring only on the iPhone work
 running after Wireless debugging went off with the Wi-Fi. One fix: Android 15 lists the hotspot itself as a Wi-Fi
 network (with LOCAL_NETWORK), so "This phone's hotspot" took the phone for being on Wi-Fi and the status row said
 "Ready on this phone's Wi-Fi network"; such networks no longer count as Wi-Fi.
+
+### D-069 — No payment before pairing: pair, one free sync, then the free week (2026-11-25)
+
+The maintainer: showing the trial and the price on the first screen loses people; they should pair and see their own
+messages first. The rules of D-036 stay (a free week through the free "7-day Trial" item, then $9.99 once); what
+changes is when they're offered:
+- **The start screen has no price:** "Pair your Android phone" and "Explore the demo", with Restore Purchases, Privacy
+  and Terms.
+- **Pairing works before a trial, for one free first sync.** After pairing, the link stays up until the bridge's
+  messages, contacts and call log have synced once; then the iPhone closes it and shows the paywall (Start 7-day free
+  trial, Buy now, the trial's terms, and a close button for later). What synced stays readable, as after a trial.
+  Nothing else runs in that window: sending, calls (an incoming call isn't brought to the iPhone), USSD, files and the
+  rest still ask for the trial, and nothing syncs again until the trial starts or Pairline is bought. The banner
+  "Start your free week to connect" stays until then.
+- **Only once:** a flag in the Keychain (next to the trial clock) marks the free sync as used, so unpairing and pairing
+  again, or reinstalling, doesn't give another one; the pairing screen then offers the free week or the purchase before
+  scanning, with "Later" to skip.
+- **Why Apple accepts it:** guideline 3.1.1 asks a paid-once app's time-limited trial to go through a free
+  non-consumable "XX-day Trial" item, with its length, what stops and the price shown before it starts. That's
+  unchanged. The free first sync isn't time-based and doesn't run out; it's a small free part of the app, which 3.1.1
+  allows. The user can always close the offer and keep looking around, and the demo stays free (D-020).
+- App Store screenshots: the start screen no longer shows prices, so the "Pay once" slide shows the paywall instead.
+  `-PairlinePairingScan` (debug builds) opens pairing at its scan step.
