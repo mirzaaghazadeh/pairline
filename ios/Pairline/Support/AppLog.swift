@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// Removes personal data from log text (AGENTS.md rule 9): phone numbers, emails, MAC addresses and UUIDs.
 /// Callers never pass message text or contact names to the log in the first place; this is the second fence.
@@ -57,6 +58,10 @@ final class AppLog {
 
     private let queue = DispatchQueue(label: "app.pairline.log")
     private let fileURL: URL?
+    #if DEBUG
+    private static let systemLog = Logger(subsystem: "app.pairline.ios", category: "app")
+    #endif
+
     private let formatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime]
@@ -76,6 +81,9 @@ final class AppLog {
         let line = "\(formatter.string(from: Date())) \(level.rawValue) [\(category)] \(Redactor.redact(message))\n"
         #if DEBUG
         print(line, terminator: "")
+        // Debug builds also write the (already redacted) line to the device's system log, so a tester's iPhone can be
+        // followed from a connected Mac (`idevicesyslog -p Pairline`). Release builds never do.
+        Self.systemLog.log("\(line, privacy: .public)")
         #endif
         queue.async { [fileURL] in
             guard let fileURL, let data = line.data(using: .utf8) else { return }
