@@ -14,7 +14,7 @@ struct SettingsTab: View {
     @State private var page: Page?
 
     enum Page: Hashable {
-        case blocked, netShare, help, diagnostics, privacy, about
+        case blocked, netShare, export, help, diagnostics, privacy, about
     }
 
     var body: some View {
@@ -44,6 +44,7 @@ struct SettingsTab: View {
         switch page {
         case .blocked: BlockedNumbersView()
         case .netShare: NetShareView()
+        case .export: ExportMessagesView()
         case .help: HelpCenterView()
         case .diagnostics: DiagnosticsView()
         case .privacy: PrivacySummaryView()
@@ -365,6 +366,9 @@ struct SettingsTab: View {
             }
             pageLink(.diagnostics) {
                 Label("Diagnostics", systemImage: "stethoscope")
+            }
+            pageLink(.export) {
+                Label { Text("Export messages", tableName: "PhoneTools") } icon: { Image(systemName: "square.and.arrow.up.on.square") }
             }
             pageLink(.privacy) {
                 Label("Privacy", systemImage: "hand.raised")

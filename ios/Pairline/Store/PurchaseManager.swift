@@ -1,5 +1,6 @@
 import Foundation
 import StoreKit
+import UIKit
 
 /// StoreKit 2 purchases (D-017, D-036). Two non-consumables: a free "7-day Trial" and "Pairline Full Access".
 /// Entitlements are verified on the device from Apple-signed transactions; there's no receipt server.
@@ -173,11 +174,23 @@ final class PurchaseManager: ObservableObject {
         return await purchase(product)
     }
 
+    /// The scene on screen, so Apple's purchase sheet attaches to it (iOS 17+). Without one, StoreKit picks a scene
+    /// itself, and on a tester's iPhone the sheet stayed up after "Get" (D-079).
+    private var activeScene: UIScene? {
+        UIApplication.shared.connectedScenes.first { $0.activationState == .foregroundActive }
+            ?? UIApplication.shared.connectedScenes.first
+    }
+
     private func purchase(_ product: Product) async -> Bool {
         busy = true
         defer { busy = false }
         do {
-            let result = try await product.purchase()
+            let result: Product.PurchaseResult
+            if #available(iOS 17.0, *), let scene = activeScene {
+                result = try await product.purchase(confirmIn: scene)
+            } else {
+                result = try await product.purchase()
+            }
             switch result {
             case .success(let verification):
                 guard case .verified(let transaction) = verification else {
@@ -196,9 +209,22 @@ final class PurchaseManager: ObservableObject {
                 return false
             }
         } catch {
-            message = error.localizedDescription
+            message = Self.describe(error)
             return false
         }
+    }
+
+    /// StoreKit's own errors in words a user can act on; the details go to the diagnostics log (D-079). A tester saw
+    /// "SKInternalErrorDomain error 14", which StoreKit gives when the App Store account can't complete it.
+    static func describe(_ error: Error) -> String {
+        let ns = error as NSError
+        let underlying = (ns.userInfo[NSUnderlyingErrorKey] as? NSError).map { " ← \($0.domain) \($0.code)" } ?? ""
+        log.warning("store", "Purchase failed: \(ns.domain) \(ns.code)\(underlying)")
+        if let storeKit = error as? StoreKitError, case .networkError = storeKit {
+            return String(localized: "The App Store isn't available right now. Check your connection and try again.")
+        }
+        let code = "\(ns.domain) \(ns.code)"
+        return String(localized: "The App Store couldn't complete this (\(code)). Check that you're signed in under Settings › your name › Media & Purchases and that in-app purchases are allowed in Screen Time, then try again. If it still fails, restart the iPhone.", table: "PhoneTools")
     }
 
     /// Restore Purchases: syncs with the App Store (may ask the user to sign in).
@@ -212,7 +238,7 @@ final class PurchaseManager: ObservableObject {
                 ? String(localized: "Your purchase was restored.")
                 : String(localized: "No purchase was found for this Apple Account.")
         } catch {
-            message = error.localizedDescription
+            message = Self.describe(error)
         }
     }
 }

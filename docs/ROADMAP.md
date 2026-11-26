@@ -201,5 +201,5 @@ Two Android phones pairing with each other isn't planned; the started work is ar
 - ~~Notification mirroring from chosen Android apps~~ — done (D-077), real-phone test pending
 - ~~Mac app~~ — the iPad app on Apple Silicon Macs (D-076)
 - MMS (picture messages)
-- Encrypted backup and export of SMS history
+- ~~Export of SMS history~~ — done on the iPhone (D-079); an encrypted backup format isn't planned (D-079)
 - More languages: Turkish, Urdu, Chinese, Indonesian (English, Persian and Arabic ship at launch, D-019)

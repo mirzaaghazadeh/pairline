@@ -1310,3 +1310,16 @@ The maintainer asked for a Mac app; the iPad app runs on Apple Silicon Macs as i
 - The "Did you hear it?" test after a relayed call is in place on the iPhone (`call.media.feedback`, the bridge picks
   the capture source and mic handling); the roadmap item is closed except for a shipped list of known devices, which
   needs real-device results first.
+
+### D-079 — Export messages; the trial purchase on testers' iPhones (2026-11-26)
+
+- **Export messages** (iPhone Settings › Help › Export messages): every conversation on the iPhone as a readable
+  text file and a CSV, made on the device (complete file protection), handed to the share sheet only when the user
+  taps one, and deleted when the screen closes. An encrypted backup format isn't added: the messages stay in
+  Android's own SMS store, which is the copy that matters, and a new format would need its own crypto spec (rule 8).
+- **Trial purchase on TestFlight:** on one tester's iPhone Apple's purchase sheet stayed up after "Get"; on another
+  StoreKit failed with "SKInternalErrorDomain error 14" (no public meaning; reported elsewhere as a StoreKit system
+  error when the account can't complete it). The purchase now names the scene on screen
+  (`Product.purchase(confirmIn:)`, iOS 17+) so the sheet attaches to Pairline's window; failures log their domain,
+  code and underlying error to diagnostics and tell the user what to check (signed in under Media & Purchases,
+  in-app purchases allowed in Screen Time, restart).

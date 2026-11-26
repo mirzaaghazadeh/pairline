@@ -49,6 +49,14 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar Telefon uygulamasının Son Aramalar listesinde görünür; tek dokunuşla Pairline üzerinden geri ararsınız. Son Aramalar iCloud ile eşzamanlanabilir: aramaları yalnızca Pairline’da tutmak için bunu kapatın." } }
       }
     },
+    "The App Store couldn't complete this (%@). Check that you're signed in under Settings › your name › Media & Purchases and that in-app purchases are allowed in Screen Time, then try again. If it still fails, restart the iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر على App Store إكمال ذلك (%@). تأكد من تسجيل الدخول في الإعدادات › اسمك › الوسائط والمشتريات، ومن السماح بعمليات الشراء داخل التطبيقات في «مدة استخدام الجهاز»، ثم حاول مرة أخرى. إن استمر الفشل، أعد تشغيل الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The App Store couldn't complete this (%@). Check that you're signed in under Settings › your name › Media & Purchases and that in-app purchases are allowed in Screen Time, then try again. If it still fails, restart the iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اپ‌استور نتوانست این کار را انجام دهد (%@). مطمئن شوید در تنظیمات › نام شما › رسانه و خریدها وارد شده‌اید و در «زمان استفاده» خرید درون‌برنامه‌ای مجاز است، سپس دوباره امتحان کنید. اگر باز هم نشد، آیفون را یک بار خاموش و روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "App Store bunu tamamlayamadı (%@). Ayarlar › adınız › Medya ve Satın Alımlar’da oturum açtığınızdan ve Ekran Süresi’nde uygulama içi satın alımlara izin verildiğinden emin olun, sonra yeniden deneyin. Yine olmazsa iPhone’u yeniden başlatın." } }
+      }
+    },
     "Edit" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعديل" } },
@@ -71,6 +79,38 @@
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit contacts from iPhone" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "ویرایش مخاطب‌ها از آیفون" } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kişileri iPhone’dan düzenle" } }
+      }
+    },
+    "Export messages" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصدير الرسائل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export messages" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خروجی گرفتن از پیام‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajları dışa aktar" } }
+      }
+    },
+    "Create export" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إنشاء ملف التصدير" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create export" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ساختن فایل خروجی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dışa aktarımı oluştur" } }
+      }
+    },
+    "Makes a copy of every conversation on this iPhone: one text file to read, and one CSV file for a spreadsheet. It isn't sent anywhere: you choose where to save or share it." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ينشئ نسخة من كل المحادثات على هذا الآيفون: ملف نصي للقراءة، وملف CSV لجدول بيانات. لا يُرسل إلى أي مكان: أنت تختار أين تحفظه أو تشاركه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Makes a copy of every conversation on this iPhone: one text file to read, and one CSV file for a spreadsheet. It isn't sent anywhere: you choose where to save or share it." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از همهٔ گفتگوهای این آیفون یک نسخه می‌سازد: یک فایل متنی برای خواندن و یک فایل CSV برای صفحه‌گسترده. به جایی فرستاده نمی‌شود: خودتان انتخاب می‌کنید کجا ذخیره یا ارسالش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone’daki tüm konuşmaların bir kopyasını oluşturur: okumak için bir metin dosyası ve bir tablo için bir CSV dosyası. Hiçbir yere gönderilmez: nereye kaydedeceğinizi ya da paylaşacağınızı siz seçersiniz." } }
+      }
+    },
+    "The files hold your messages as plain text. Keep them somewhere safe, and delete them when you no longer need them." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحتوي الملفات على رسائلك كنص عادي. احفظها في مكان آمن، واحذفها عندما لا تحتاج إليها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The files hold your messages as plain text. Keep them somewhere safe, and delete them when you no longer need them." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این فایل‌ها پیام‌های شما را به‌صورت متن ساده دارند. جای امنی نگهشان دارید و وقتی لازم نیستند پاکشان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosyalar mesajlarınızı düz metin olarak içerir. Güvenli bir yerde saklayın ve artık gerekmediğinde silin." } }
       }
     },
     "Favourite" : {
