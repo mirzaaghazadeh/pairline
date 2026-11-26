@@ -183,7 +183,10 @@ struct PairingFlowView: View {
                             .strokeBorder(Color.brandBlue.opacity(0.6), lineWidth: 3)
                     )
                     .overlay(alignment: .bottom) {
-                        Text("Looking for a Pairline code…")
+                        // On a Mac (the iPad app, D-076) the FaceTime camera faces the user.
+                        (ProcessInfo.processInfo.isiOSAppOnMac
+                            ? Text("Hold the Android phone's screen up to this Mac's camera.", tableName: "PhoneTools")
+                            : Text("Looking for a Pairline code…"))
                             .font(.caption.weight(.semibold))
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)

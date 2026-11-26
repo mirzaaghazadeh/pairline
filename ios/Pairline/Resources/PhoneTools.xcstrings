@@ -89,6 +89,14 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonu bul" } }
       }
     },
+    "Hold the Android phone's screen up to this Mac's camera." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ارفع شاشة هاتف أندرويد أمام كاميرا هذا الـMac." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hold the Android phone's screen up to this Mac's camera." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صفحهٔ گوشی اندرویدی را جلوی دوربین این مک بگیرید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun ekranını bu Mac’in kamerasına tutun." } }
+      }
+    },
     "Hold" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعليق" } },

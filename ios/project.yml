@@ -24,7 +24,8 @@ settings:
     # iPhone and iPad (D-034). XcodeGen's iOS app preset sets "1,2" on the target anyway; this says so explicitly.
     TARGETED_DEVICE_FAMILY: "1,2"
     SUPPORTS_MACCATALYST: NO
-    SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+    # The iPad app also runs on Apple Silicon Macs (D-076); the App Store side is a setting in App Store Connect.
+    SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: YES
     LOCALIZATION_PREFERS_STRING_CATALOGS: YES
     SWIFT_EMIT_LOC_STRINGS: YES
     ENABLE_USER_SCRIPT_SANDBOXING: YES

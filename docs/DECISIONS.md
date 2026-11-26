@@ -1271,3 +1271,15 @@ to show calls in Recents by default, and to drop the setup videos for guidance i
   Android refuses one of those permissions and this copy came from a file (`InstallSourceInfo.packageSource`, read
   locally), the bridge opens App info and leaves the steps in the setup guide's notification (⋮ › Allow restricted
   settings, then Permissions › SMS), instead of leaving the user at Android's dialog.
+
+### D-076 — The iPad app on Apple Silicon Macs (2026-11-26)
+
+The maintainer asked for a Mac app; the iPad app runs on Apple Silicon Macs as it is, so no separate app.
+- `SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD` is now YES (it was NO without a recorded reason); the app builds for "My Mac
+  (Designed for iPad)". Both TestFlight groups already offer iOS builds on Apple Silicon Macs
+  (`iosBuildsAvailableForAppleSiliconMac`). The App Store side is the "iPhone and iPad Apps on Apple Silicon Macs"
+  setting in App Store Connect's Pricing and Availability, which the API doesn't expose.
+- On a Mac: the Bluetooth link works as on iPad; CallKit's call screen isn't there, so calls use Pairline's own call
+  screen (the existing fallback); pairing scans the Android screen with the Mac's camera (the AVFoundation scanner,
+  since VisionKit's isn't on Mac), with a hint to hold the phone up to it.
+- Not tested on a Mac yet.
