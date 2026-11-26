@@ -4,8 +4,8 @@ Use your Android phone's SIM card on your iPhone — calls, SMS, contacts and mo
 end-to-end encrypted link between your own two phones.
 
 <p align="center">
-  <img src="docs/images/readme-screens.png" width="100%"
-       alt="Pairline Bridge on Android, connected to the iPhone; the iPhone app's Messages with a one-time code, an incoming call, and the bridge's SIM, signal and battery">
+  <img src="docs/images/readme-banner.png" width="100%"
+       alt="Pairline: your Android SIM, on your iPhone. Pairline Bridge on an Android phone, connected over an encrypted link to the iPhone app's Messages with a one-time code. Calls with hold and call waiting, SMS and one-time codes, contacts and call history, hotspot, tethering and mobile data, notifications from Android apps, Find my phone and ringer, iPhone, iPad and Mac, no accounts and no trackers">
 </p>
 
 ## Download
@@ -19,6 +19,27 @@ Both links always point to the newest release. Each release's notes list the APK
 certificate and its [VirusTotal](https://www.virustotal.com) report; see [Verifying releases](#verifying-releases).
 Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 
+## What it does
+
+Everything goes through the Android phone's SIM, so the people you call and text see that phone's number.
+
+- **Calls** on the iPhone's own call screen: answer, decline, hold, call waiting and swap, and move the sound to a
+  headset or the car. With **Talk on iPhone** you hear and talk on the iPhone itself, over Bluetooth or Wi-Fi.
+- **Call back from the iPhone's Recents**, with Siri ("Call with Pairline") or from a Shortcut.
+- **SMS:** your conversations, one tap to copy a one-time code, reply from the notification, mute a conversation,
+  messages you read marked read on Android too, and export to a text file or CSV.
+- **Contacts and call history** from the Android phone; add, edit and star contacts from the iPhone.
+- **USSD codes** (balance, top-ups), both SIMs on a dual-SIM phone, and the bridge's signal and battery, also as a
+  Live Activity on the Lock Screen.
+- **Internet:** share the Android phone's connection with the iPhone, and turn its hotspot, Bluetooth tethering, mobile
+  data and data SIM on or off from the iPhone.
+- **Notifications from the Android apps you choose**, on the iPhone; dismiss one and it goes away on both phones.
+- **Find my phone** makes the Android phone ring loudly; switch its ringer between ring, vibrate and silent.
+- **Files** both ways over Wi-Fi, from the share sheet.
+- **iPad and Mac:** the same app runs on iPad, and on Macs with Apple silicon.
+
+Hearing calls on the iPhone, the internet switches and read status on Android need Talk on iPhone (see below).
+
 ## Our promise
 
 - **Your data stays on your phones.** Messages, contacts, call history and call audio go only
@@ -26,7 +47,8 @@ Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 - **No accounts, no analytics, no ads, no trackers.**
 - **No settings changed behind your back.** Pairline changes no system setting you didn't ask for. The one
   exception is Talk on iPhone: once you've set it up, and only while it's on, it turns Developer options and
-  debugging back on when its helper needs them. Turn Talk on iPhone off and that stops.
+  debugging back on when its helper needs them. Turn Talk on iPhone off and that stops. The Android phone's hotspot,
+  mobile data and ringer change only when you flip that switch on the iPhone.
 - **No silent updates.** Android asks you before every update is installed.
 - **Check it yourself.** The full source is here. [docs/PRIVACY.md](docs/PRIVACY.md) lists every
   data flow and every permission, and why it's needed.
@@ -38,10 +60,12 @@ Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 3. Pair them once by scanning a QR code. The two phones exchange keys; nobody else ever sees them.
 4. Incoming calls ring on your iPhone's normal call screen, and SMS arrive in the Pairline app.
 5. Optional, on Android 11 or later: set up **Talk on iPhone** once to hear and talk on the iPhone itself.
-   Pairline starts a small helper through the Android phone's own Wireless debugging: no root and no other app.
+   Pairline starts a small helper through the Android phone's own Wireless debugging: no root and no other app
+   (a rooted phone can start it through its own `su` instead, under Settings › Advanced).
    While the iPhone is linked, the Android phone stops ringing too ("Ring only on the iPhone", on by default).
 
-The phones talk over Bluetooth LE, plus local Wi-Fi (or the Android phone's own hotspot) for call audio and files.
+The phones talk over Bluetooth LE, call audio included. Local Wi-Fi (or the Android phone's own hotspot) carries files,
+and call audio too if you choose it.
 Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md).
 A three-minute intro video, in English, Persian, Turkish and Arabic, is on [getpairline.com](https://getpairline.com).
 

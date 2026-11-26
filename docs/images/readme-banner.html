@@ -1,0 +1,106 @@
+<!doctype html>
+<!--
+  The README banner (docs/images/readme-banner.png). Laid out at 1280 x 640 CSS px and rendered at 2x
+  (2560 x 1280) by render.sh with headless Chrome. The screens are the real app screenshots in docs/screenshots
+  (retake those first when the UI changes). Icons: Material Icons paths (Apache-2.0). A maintainer tool only;
+  nothing here ships in the apps.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pairline README banner</title>
+<style>
+  :root { --green: #3ddc97; --text: #ffffff; --soft: #c9d8f6; --font: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif; }
+  html, body { margin: 0; overflow: hidden; }
+  body {
+    position: relative; width: 1280px; height: 640px; color: var(--text); font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(42% 60% at 78% 58%, rgba(111, 156, 240, 0.50), transparent 70%),
+      radial-gradient(36% 46% at 8% 0%, rgba(18, 184, 134, 0.24), transparent 70%),
+      linear-gradient(160deg, #081631 0%, #0f2d63 48%, #1d59b5 100%);
+  }
+
+  .copy { position: absolute; left: 72px; top: 0; bottom: 0; width: 590px; display: flex; flex-direction: column;
+          justify-content: center; }
+  .mark { display: flex; align-items: center; gap: 16px; font-size: 30px; font-weight: 700; color: #e6eeff; }
+  .mark img { width: 56px; height: 56px; border-radius: 13px; box-shadow: 0 8px 22px rgba(2, 8, 24, 0.45); }
+  h1 { margin: 26px 0 0; font-size: 60px; line-height: 1.04; font-weight: 800; letter-spacing: -0.03em; }
+  p { margin: 18px 0 0; font-size: 21px; line-height: 1.38; font-weight: 500; color: var(--soft); max-width: 590px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 15px 8px 11px; border-radius: 999px;
+          font-size: 17px; font-weight: 600; letter-spacing: -0.005em; color: #eef3ff; white-space: nowrap;
+          background: rgba(255, 255, 255, 0.09); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); }
+  .chip svg { width: 19px; height: 19px; fill: var(--green); flex: none; }
+
+  .device { position: absolute; box-sizing: border-box; background: #05070c;
+            box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.18), 0 30px 70px rgba(2, 8, 24, 0.6); }
+  .device .screen { position: relative; overflow: hidden; background: #000; height: 100%; }
+  .device img { display: block; width: 100%; }
+  /* iPhone: Dynamic Island. */
+  .iphone { padding: 9px; border-radius: 52px; }
+  .iphone .screen { border-radius: 43px; }
+  .iphone .island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 84px; height: 25px;
+                    border-radius: 13px; background: #000; }
+  /* Android: hole-punch camera. */
+  .android { padding: 8px; border-radius: 38px; }
+  .android .screen { border-radius: 30px; }
+  .android .camera { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 11px; height: 11px;
+                     border-radius: 50%; background: #000; box-shadow: 0 0 0 1.5px #1c1f27; }
+
+  .lock { position: absolute; left: 931px; top: 331px; width: 48px; height: 48px; border-radius: 50%; z-index: 4;
+          display: flex; align-items: center; justify-content: center; background: #12b886;
+          box-shadow: 0 0 0 6px rgba(18, 184, 134, 0.25), 0 10px 24px rgba(2, 8, 24, 0.45); }
+  .lock svg { width: 24px; height: 24px; fill: #fff; }
+</style>
+</head>
+<body>
+<div class="copy">
+  <div class="mark"><img src="../../ios/Pairline/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png" alt=""><span>Pairline</span></div>
+  <h1>Your Android SIM,<br>on your iPhone</h1>
+  <p>Calls, texts and codes from the phone that holds your SIM, end-to-end encrypted between your two phones.</p>
+  <div class="chips" id="chips"></div>
+</div>
+
+<!-- Android bridge, behind; the iPhone in front. Both run off the bottom edge. -->
+<div class="device android" style="left: 688px; top: 150px; width: 260px; height: 594px; z-index: 2">
+  <div class="screen"><img src="../screenshots/android/en/5-home-dark.png" alt=""><div class="camera"></div></div>
+</div>
+<div class="device iphone" style="left: 962px; top: 92px; width: 272px; height: 600px; z-index: 3">
+  <div class="screen"><img src="../screenshots/ios/en/04-messages.png" alt=""><div class="island"></div></div>
+</div>
+<div class="lock"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>
+
+<script>
+const ICON = {
+  call: "M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z",
+  sms: "M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z",
+  person: "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
+  hotspot: "M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 2c0-3.31-2.69-6-6-6s-6 2.69-6 6c0 2.22 1.21 4.15 3 5.19l1-1.74c-1.19-.7-2-1.97-2-3.45 0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.48-.81 2.75-2 3.45l1 1.74c1.79-1.04 3-2.97 3-5.19zM12 3C6.48 3 2 7.48 2 13c0 3.7 2.01 6.92 4.99 8.65l1-1.73C5.61 18.53 4 15.96 4 13c0-4.42 3.58-8 8-8s8 3.58 8 8c0 2.96-1.61 5.53-4 6.92l1 1.73c2.99-1.73 5-4.95 5-8.65 0-5.52-4.48-10-10-10z",
+  bell: "M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z",
+  ring: "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z",
+  laptop: "M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z",
+  shield: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z",
+};
+const CHIPS = [
+  ["call", "Calls, hold and call waiting"],
+  ["sms", "SMS and one-time codes"],
+  ["person", "Contacts and call history"],
+  ["hotspot", "Hotspot, tethering, mobile data"],
+  ["bell", "Notifications from Android apps"],
+  ["ring", "Find my phone and ringer"],
+  ["laptop", "iPhone, iPad and Mac"],
+  ["shield", "No accounts, no trackers"],
+];
+const chips = document.getElementById("chips");
+for (const [icon, label] of CHIPS) {
+  const c = document.createElement("span");
+  c.className = "chip";
+  c.innerHTML = `<svg viewBox="0 0 24 24"><path d="${ICON[icon]}"/></svg>`;
+  c.append(label);
+  chips.appendChild(c);
+}
+</script>
+</body>
+</html>
