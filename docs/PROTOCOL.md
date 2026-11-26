@@ -1,9 +1,10 @@
-# Link protocol — draft v0
+# Link protocol — draft v0, with remote mode as v1
 
 > **Status: draft.** The wire version is `0` until an outside cryptographer has reviewed this
 > design (required before 1.0, see ROADMAP M7). Nothing has shipped yet, so v0 is still being filled in;
 > after the first release, any change to the wire format bumps the version and updates the shared test
-> vectors in `protocol/test-vectors/`.
+> vectors in `protocol/test-vectors/`. Remote mode (D-072) is version 1: v0 plus the section "Remote mode (v1,
+> D-072)", with its own vectors in `protocol/test-vectors/v1-remote.json`; the local links stay v0 on the wire.
 
 ## Roles and keys
 
@@ -471,7 +472,138 @@ an unknown request with `error` / `unsupported`, so the wire version stays 0.
   `InCallService`, or `ANSWER_PHONE_CALLS`); incoming, missed, declined and blocked entries from it are left out of
   `calllog.sync`. A call R already shows when the number arrives late is left alone.
 
+## Remote mode (v1, D-072)
+
+Remote mode lets the phones work while apart: the iPhone gets calls, SMS and codes, and sends commands, through a
+mailbox in the user's own iCloud, plus a direct connection through the bridge's home router when one is possible.
+There is no Pairline server; Apple stores only the sealed records described here.
+
+**Version 1.** v1 is v0 plus everything in this section. The local links (BLE, Wi-Fi, debug TCP) are unchanged and
+keep version 0 on the wire (hello and associated data). New in v1: mailbox records (version byte 1), the remote
+invitation (`v=1`), the `remote.*` and `rpair.*` messages, and the direct connection. An app that supports v1 sends
+`proto: 1` in `device.info`; R offers remote mode only to a B that did. A v0 app ignores the new messages and never
+sees a mailbox record.
+
+### Mailbox records
+
+A mailbox record is one message from one phone to the other, sealed on its own, so records can be lost, repeated or
+reordered without harm. Its bytes (`sealed`) start with a header that is also the associated data:
+
+| Offset | Size | Field |
+|--------|------|-------|
+| 0 | 1 | version: `0x01` |
+| 1 | 1 | kind: `0x01` = sealed with the pinned identity keys, `0x02` = invitation record (remote pairing, below) |
+| 2 | 1 | direction: `'B'` (`0x42`) = B→R, `'R'` (`0x52`) = R→B |
+| 3 | 16 | record id: random; also the CloudKit record name (32 lowercase hex digits) |
+| 19 | 8 | time: milliseconds since the Unix epoch, big-endian |
+| 27 | 65 | kind `0x01` only: the sender's ephemeral public key |
+
+**Kind `0x01`** (a one-way Noise K pattern: `e, es, ss`). The sender S creates a fresh ephemeral key pair `e` for
+every record. With the recipient P's pinned identity key `sP`:
+
+- `ikm = ECDH(e, sP) ‖ ECDH(sS, sP)` (64 bytes; P computes `ECDH(sP, e) ‖ ECDH(sP, sS)`)
+- `key = HKDF-SHA256(ikm, salt = SHA-256(header), info = "pairline v1 mailbox", L = 32)`
+- AES-256-GCM with that key, a 12-byte zero nonce (each key seals exactly one record) and the 92-byte header as
+  associated data.
+- `sealed = header ‖ ciphertext ‖ tag`
+
+Only the pinned peer can produce the `ss` term, so a record that decrypts comes from it. The ephemeral key protects
+past records if the sender's identity key leaks later; a leak of the recipient's identity key would expose records
+still stored, which is why records are deleted as soon as they're handled.
+
+**Receiving.** The recipient drops a record (and deletes it from the mailbox) unless: the version is 1, the kind is
+known, the direction is the peer's, the time is no more than 14 days old and no more than 10 minutes ahead, the
+record id isn't one it has already handled (it keeps handled ids for 14 days), and it decrypts. Drops are silent.
+
+**Plaintext.** A UTF-8 JSON message from the catalog, exactly as in a session record, at most 48 KB. Requests from R
+carry an `id` from a counter R keeps across restarts; B answers through the mailbox, or on a session if one is up.
+
+### Mailboxes in iCloud
+
+Records are CloudKit records of type `Mail` in Pairline's container (`iCloud.app.pairline.ios`):
+
+| Field | Type | Use |
+|-------|------|-----|
+| `sealed` | string | the sealed bytes, base64url without padding, when at most 2,700 characters (it then rides in the push) |
+| `payload` | bytes | the sealed bytes when larger (the recipient fetches the record) |
+| `mailbox` | string, queryable | public backend only: the recipient mailbox id |
+
+There are three mailboxes: **B→R alert** (things the user should see: an SMS, a code, a call), **B→R quiet**
+(everything else: status, delivery reports, the bridge's address) and **R→B**. A mailbox id is 16 random bytes as
+32 lowercase hex digits, chosen by R.
+
+- **Private backend** (the design): the user's private database, zones `ToPhone` (alert), `ToPhoneQuiet` and
+  `ToBridge`.
+- **Public backend** (debug builds while D-072's question to Apple is open): the public database's default zone; a
+  record's `mailbox` names its mailbox, and only the iCloud user who wrote a record can read it.
+
+R subscribes to its two mailboxes: the alert one with an alert push that its notification service extension may
+modify (it unseals the record and shows the message or rings the call), the quiet one with a silent push. B can't
+receive Apple's pushes; it checks the R→B mailbox while no session is up (every 30 s while R was seen in the last
+10 minutes, otherwise every 2 minutes). B writes and reads through CloudKit Web Services with a web auth token from
+R; R uses CloudKit on the iPhone. The recipient deletes each record once handled; a sender deletes its own records
+older than one day.
+
+### Remote messages
+
+| Type | Direction | Body |
+|------|-----------|------|
+| `remote.config` | R→B | `id`, `on`, `backend` (`private` / `public`), `env` (`production` / `development`), `token` (web auth token), `mb` `{b, a, q}` (the R→B, alert and quiet mailbox ids) → `ok`. `on: false` stops remote mode on B: it stops checking, closes its router mapping and listener, and deletes its records |
+| `remote.token` | R→B | `token`: a fresh web auth token. R sends one in the R→B mailbox every 12 hours, and at once when its records there stay unread for 10 minutes |
+| `remote.addr` | B→R | `v4` (`"203.0.113.5:47830"`) and `v6` (`"[2001:db8::5]:47830"`), either null: where the direct connection listens. Sent (quiet) whenever it changes |
+| `remote.state` | B→R | `direct` (`open` / `none` / `blocked`), `reason` (English, for the log): why there's no direct connection |
+| `rpair.hello`, `rpair.nonce`, `rpair.reveal`, `rpair.confirm` | see below | remote pairing |
+
+B→R events go on a session when one is up, otherwise in the mailbox: `sms.new`, `call.incoming` and missed calls in
+the alert mailbox, everything else in the quiet one. `status` goes to the mailbox only when it changes, never on a
+timer.
+
+### Direct connection
+
+B opens one TCP port on its router (NAT-PMP, then PCP, then UPnP IGD) and listens on it; R connects to the address in
+`remote.addr` and runs exactly the Wi-Fi session (framing, handshake, messages; no media or bulk channel until M10's
+Opus step). On the public listener B:
+
+- accepts no pairing frames: anything but `HELLO` first closes the connection;
+- parses only the frame length and the hello before the handshake has authenticated the peer;
+- closes a connection that hasn't completed the handshake within 10 s, keeps at most 4 such connections, and accepts
+  at most 10 new connections per minute from one address;
+- closes the mapping and the listener when remote mode is turned off or the pairing is forgotten.
+
+### Remote pairing
+
+Pairing while the phones are apart (D-072). It replaces "seeing the QR code" with an invitation the user sends by any
+means plus a 6-digit code the two people compare on a phone call. Release builds start it only from "Pair a phone
+that's far away" on the iPhone and accept it only after the person at home allows it on the Android phone.
+
+1. R creates a 32-byte invitation secret `is` and the three mailbox ids, and shows or shares the invitation:
+   `pairline://invite?v=1&k=<pubR>&s=<is>&b=<backend>&e=<env>&t=<token>&m=<R→B id>&a=<alert id>&q=<quiet id>&x=<expiry>`
+   (`k`, `s` base64url; `t` percent-encoded; `x` Unix seconds, 10 minutes ahead).
+2. Invitation records (kind `0x02`) are sealed with
+   `kI = HKDF-SHA256(is, salt = empty, info = "pairline v1 invite", L = 64)` (B→R the first 32 bytes, R→B the last 32),
+   the first 12 bytes of the record id as the nonce and the 27-byte header as associated data.
+3. B, once its user allows it, creates a 32-byte `nonceB` and sends (kind 2)
+   `{"t":"rpair.hello","k":<pubB>,"id":<B device id>,"c":<commit>}` with
+   `commit = SHA-256("pairline v1 commit" ‖ pubR ‖ pubB ‖ nonceB)`.
+4. R accepts only the first `rpair.hello` for an invitation (a second one means someone else has it: R cancels and
+   tells the user), creates a 32-byte `nonceR` and sends `{"t":"rpair.nonce","n":<nonceR>}`.
+5. B sends `{"t":"rpair.reveal","n":<nonceB>}`. R checks it against `commit` and cancels on a mismatch.
+6. Both show `code`: the first 4 bytes of `HMAC-SHA256(is, "pairline v1 code" ‖ pubR ‖ pubB ‖ nonceR ‖ nonceB)` as a
+   big-endian number, modulo 1,000,000, as 6 digits. The two people read it to each other; each taps "The codes
+   match" or cancels.
+7. On a match each side pins the other's identity key and sends `{"t":"rpair.confirm"}` as a kind 1 record. The
+   pairing is complete on a side when its own user confirmed and the peer's confirm decrypted. B takes its
+   `remote.config` from the invitation.
+
+Because B commits to `nonceB` before it sees `nonceR`, someone who copied the invitation and put their own key in the
+middle gets matching codes with a chance of one in a million per try, and every try is visible to the users.
+The invitation expires after 10 minutes (steps 3–5), and both sides give up 10 minutes after the codes appear.
+
 ## Test vectors
+
+`protocol/test-vectors/v1-remote.json` covers remote mode: kind 1 and kind 2 mailbox records, the invitation link,
+the commitment and the comparison code. It is generated by `protocol/tools/gen_vectors_remote.py` with the same fixed
+keys as v0.
 
 `protocol/test-vectors/v0.json` holds fixed keys and inputs with the expected ECDH results, HKDF outputs, pairing
 MACs, hello bodies, session keys, confirm records, encrypted records (control, media and bulk), records that must
