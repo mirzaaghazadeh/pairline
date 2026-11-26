@@ -17,7 +17,10 @@ Commands:
   put [--zone ToPhone] [--size 200]       write one Mail record with random bytes; prints its name
   delete NAME [--zone ToPhone]            delete a record
   changes [--zone ToBridge]               list changed records in a zone
-  latency --device UDID [--tries 20]      write records and time the iPhone's push (needs idevicesyslog)
+  latency --device UDID [--tries 20]      write records and time the iPhone's push (needs idevicesyslog over USB)
+  latency --out FILE [--tries 20]         write records and note when; time them later with `match`
+  match WRITES DELIVERIES                 pair `latency --out` writes with the iPhone's `-PairlineRemoteSpike report`
+  tokens                                  is a token single-use, and is a second token from the iPhone independent?
   webcourier [--seconds 120]              register for web push and long-poll (does CloudKit push to a web client?)
 """
 
@@ -207,6 +210,8 @@ class DeviceLog:
 
 
 def cmd_latency(ck, args):
+    if not args.device:
+        return latency_writes_only(ck, args)
     log = DeviceLog(args.device, args.match)
     time.sleep(2)
     results = []
@@ -237,6 +242,98 @@ def cmd_latency(ck, args):
         print(f"delay: min {seen[0]:.2f} s, median {statistics.median(seen):.2f} s, max {seen[-1]:.2f} s, "
               f"p90 {seen[int(0.9 * (len(seen) - 1))]:.2f} s")
     return bool(seen)
+
+
+def latency_writes_only(ck, args):
+    """Writes records and notes this Mac's wall-clock time around each write, for `match`."""
+    writes = []
+    for i in range(args.tries):
+        start = time.time()
+        name, ok, status, payload, t_http = put_record(ck, args.zone, args.size)
+        end = time.time()
+        if not ok:
+            print(f"#{i + 1}: write failed HTTP {status}: {json.dumps(summarize(payload))[:400]}")
+            break
+        writes.append({"record": name, "start": start, "end": end})
+        deleted = ""
+        if not args.keep:
+            time.sleep(args.delete_after)
+            status, _, _ = delete_record(ck, args.zone, name)
+            deleted = f", deleted (HTTP {status})"
+            writes[-1]["deleted"] = time.time()
+        print(f"#{i + 1}: write {t_http * 1000:.0f} ms{deleted}", flush=True)
+        with open(args.out, "w") as f:
+            json.dump({"writes": writes}, f, indent=1)
+        if i + 1 < args.tries:
+            time.sleep(args.interval)
+    print(f"{len(writes)} records written; requests on the token chain: {ck.requests}; notes in {args.out}")
+    return len(writes) == args.tries
+
+
+def cmd_match(args):
+    with open(args.writes) as f:
+        writes = json.load(f)["writes"]
+    with open(args.deliveries) as f:
+        report = json.load(f)
+    deliveries = report["deliveries"]
+    used = set()
+    delays = []
+    for i, w in enumerate(writes):
+        next_start = writes[i + 1]["start"] if i + 1 < len(writes) else float("inf")
+        hit = None
+        for j, d in enumerate(deliveries):
+            if j in used:
+                continue
+            if d.get("record") == w["record"] or (not d.get("record") and w["start"] - 2 <= d["delivered"] < next_start):
+                hit = j
+                break
+        if hit is None:
+            print(f"#{i + 1}: no notification")
+            continue
+        used.add(hit)
+        d = deliveries[hit]
+        delay = d["delivered"] - w["end"]
+        delays.append(delay)
+        extra = f", payload in push: {d['payloadInPush']}" if "payloadInPush" in d else ""
+        print(f"#{i + 1}: {delay:+.2f} s after the write returned ({d['delivered'] - w['start']:+.2f} s after it "
+              f"started), subscription {d.get('subscription')}{extra}")
+    others = [d for j, d in enumerate(deliveries) if j not in used]
+    print(f"\n{len(delays)}/{len(writes)} writes produced a notification; {len(others)} other notifications "
+          f"(types {sorted({d.get('type') for d in others})}, reasons {sorted({d.get('reason') for d in others if 'reason' in d})})")
+    if delays:
+        s = sorted(delays)
+        print(f"delay after the write returned: min {s[0]:.2f} s, median {statistics.median(s):.2f} s, "
+              f"max {s[-1]:.2f} s, p90 {s[int(0.9 * (len(s) - 1))]:.2f} s")
+        print("(Mac and iPhone clocks both follow Apple's time servers; expect a few tenths of a second of error.)")
+    return bool(delays)
+
+
+def cmd_tokens(ck, args):
+    """Single use: replay a token that was already spent. Independence: a spare token minted after the main one."""
+    spent = ck.token
+    status, payload, _ = ck.call("zones/list")
+    print(f"main chain: HTTP {status}, rotated: {payload['_rotated']}")
+    current = ck.token
+    write_secret(ck.chain_path, spent)
+    status, payload, _ = ck.call("zones/list")
+    print(f"replaying the spent token: HTTP {status} {payload.get('serverErrorCode', '')} {payload.get('reason', '')}")
+    if status == 200:
+        print(f"  the replay was accepted (rotated: {payload['_rotated']}); the chain continues from the replay")
+    else:
+        write_secret(ck.chain_path, current)
+    status, payload, _ = ck.call("zones/list")
+    print(f"main chain after the replay: HTTP {status} {payload.get('serverErrorCode', '')}")
+    spare_path = os.path.join(CONFIG_DIR, "ck-webauth-spare.token")
+    if os.path.exists(spare_path):
+        spare = CloudKit("spare")
+        status, payload, _ = spare.call("zones/list")
+        print(f"spare chain (minted after main, unused until now): HTTP {status} "
+              f"{payload.get('serverErrorCode', '')} rotated: {payload['_rotated']}")
+        status, payload, _ = ck.call("zones/list")
+        print(f"main chain after the spare was used: HTTP {status} {payload.get('serverErrorCode', '')}")
+    else:
+        print("no spare chain imported (import-token --chain spare FILE)")
+    return True
 
 
 def cmd_webcourier(ck, args):
@@ -281,25 +378,32 @@ def main():
     p = sub.add_parser("delete"); p.add_argument("name"); p.add_argument("--zone", default="ToPhone")
     p = sub.add_parser("changes"); p.add_argument("--zone", default="ToBridge")
     p = sub.add_parser("latency")
-    p.add_argument("--device", required=True)
+    p.add_argument("--device", help="UDID of a USB-connected iPhone whose system log shows the push")
+    p.add_argument("--out", default=os.path.join(CONFIG_DIR, "latency-writes.json"),
+                   help="without --device: where to note the writes for `match`")
     p.add_argument("--tries", type=int, default=20)
     p.add_argument("--interval", type=float, default=15)
     p.add_argument("--timeout", type=float, default=60)
     p.add_argument("--zone", default="ToPhone")
     p.add_argument("--size", type=int, default=200)
     p.add_argument("--keep", action="store_true", help="don't delete records after each try")
+    p.add_argument("--delete-after", type=float, default=5, help="without --device: seconds before deleting")
     p.add_argument("--verbose", action="store_true")
     p.add_argument("--match", default=r"apsd.*(app\.pairline\.ios|icloud-container)",
                    help="regex for the iPhone log line that shows the push arrived")
+    p = sub.add_parser("match"); p.add_argument("writes"); p.add_argument("deliveries")
+    sub.add_parser("tokens")
     p = sub.add_parser("webcourier"); p.add_argument("--seconds", type=int, default=120)
     p.add_argument("--zone", default="ToBridge")
     args = ap.parse_args()
     if args.cmd == "import-token":
         cmd_import_token(args)
         return 0
+    if args.cmd == "match":
+        return 0 if cmd_match(args) else 1
     ck = CloudKit(args.chain)
     ok = {"zones": cmd_zones, "put": cmd_put, "delete": cmd_delete, "changes": cmd_changes,
-          "latency": cmd_latency, "webcourier": cmd_webcourier}[args.cmd](ck, args)
+          "latency": cmd_latency, "tokens": cmd_tokens, "webcourier": cmd_webcourier}[args.cmd](ck, args)
     return 0 if ok else 1
 
 

@@ -7,17 +7,23 @@ import UserNotifications
 /// a non-Apple client wakes a suspended iPhone. Launch with `-PairlineRemoteSpike <subscription>`, where
 /// `<subscription>` is `db` (`CKDatabaseSubscription`), `zone` (`CKRecordZoneSubscription` on ToPhone) or `query`
 /// (`CKQuerySubscription` on ToPhone, record creation only, the payload inside the push). It creates the zones and
-/// that one subscription (removing the other two), registers for remote notifications, and writes a web auth token to
-/// `Library/Caches/remote-spike-token.txt` for `protocol/tools/cloudkit_mailbox.py`, which a Mac copies off with
-/// `xcrun devicectl device copy from`. The token is never logged. `-PairlineRemoteSpike clear` removes the
-/// subscriptions, the zones and the token file.
+/// that one subscription (removing the other two), registers for remote notifications, and writes two web auth tokens,
+/// fetched one after the other, to `Library/Caches/remote-spike-token.txt` and `remote-spike-token-spare.txt` for
+/// `protocol/tools/cloudkit_mailbox.py`, which a Mac copies off with `xcrun devicectl device copy from`. The tokens are
+/// never logged. `-PairlineRemoteSpike report` writes when each delivered notification arrived (and the record it
+/// names, for the query subscription) to `remote-spike-deliveries.json`, then clears them, so a Mac without the
+/// iPhone's system log can time the pushes. `-PairlineRemoteSpike clear` removes the subscriptions, the zones and the
+/// files.
 enum RemoteSpike {
     static let subscriptionIDs = ["to-phone-db": "db", "to-phone-zone": "zone", "to-phone-query": "query"]
 
-    static var tokenFile: URL {
-        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("remote-spike-token.txt")
+    private static func cacheFile(_ name: String) -> URL {
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent(name)
     }
+
+    static var tokenFile: URL { cacheFile("remote-spike-token.txt") }
+    static var spareTokenFile: URL { cacheFile("remote-spike-token-spare.txt") }
+    static var deliveriesFile: URL { cacheFile("remote-spike-deliveries.json") }
 
     static func runIfRequested() {
         let args = ProcessInfo.processInfo.arguments
@@ -38,6 +44,10 @@ enum RemoteSpike {
                 try await clear()
                 return
             }
+            if step == "report" {
+                try await report()
+                return
+            }
             let granted = try await UNUserNotificationCenter.current()
                 .requestAuthorization(options: [.alert, .sound, .badge])
             note("notifications allowed: \(granted)")
@@ -46,13 +56,45 @@ enum RemoteSpike {
             note("zones ready")
             try await saveSubscription(step)
             note("subscription \(step) saved")
-            let started = Date()
-            let token = try await RemoteCloud.fetchWebAuthToken()
-            try Data(token.utf8).write(to: tokenFile, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
-            note("web auth token fetched in \(Int(Date().timeIntervalSince(started) * 1000)) ms (\(token.count) characters)")
+            for file in [tokenFile, spareTokenFile] {
+                let started = Date()
+                let token = try await RemoteCloud.fetchWebAuthToken()
+                try Data(token.utf8).write(to: file, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+                note("web auth token fetched in \(Int(Date().timeIntervalSince(started) * 1000)) ms (\(token.count) characters)")
+            }
         } catch {
             note("failed: \(error)")
         }
+    }
+
+    /// When each delivered notification arrived, what kind of CloudKit notification it was and which record it names
+    /// (query subscriptions only), and whether the payload field rode along. Never the payload itself.
+    private static func report() async throws {
+        let center = UNUserNotificationCenter.current()
+        let delivered = await center.deliveredNotifications()
+        var rows: [[String: Any]] = []
+        for item in delivered {
+            let userInfo = item.request.content.userInfo
+            var row: [String: Any] = ["delivered": item.date.timeIntervalSince1970]
+            if let ck = CKNotification(fromRemoteNotificationDictionary: userInfo) {
+                row["type"] = ck.notificationType.rawValue
+                row["subscription"] = ck.subscriptionID ?? ""
+                if let query = ck as? CKQueryNotification {
+                    row["record"] = query.recordID?.recordName ?? ""
+                    row["reason"] = query.queryNotificationReason.rawValue
+                    row["payloadInPush"] = query.recordFields?[RemoteCloud.payloadField] != nil
+                }
+            } else {
+                row["type"] = -1
+            }
+            rows.append(row)
+        }
+        rows.sort { ($0["delivered"] as? Double ?? 0) < ($1["delivered"] as? Double ?? 0) }
+        let json = try JSONSerialization.data(withJSONObject: ["reportedAt": Date().timeIntervalSince1970,
+                                                               "deliveries": rows], options: [.prettyPrinted])
+        try json.write(to: deliveriesFile, options: .atomic)
+        center.removeAllDeliveredNotifications()
+        note("reported \(rows.count) delivered notifications")
     }
 
     private static func notificationInfo(desiredKeys: [String]? = nil) -> CKSubscription.NotificationInfo {
@@ -100,7 +142,9 @@ enum RemoteSpike {
         _ = try? await RemoteCloud.database.modifySubscriptions(saving: [], deleting: Array(subscriptionIDs.keys))
         _ = try? await RemoteCloud.database.modifyRecordZones(
             saving: [], deleting: [RemoteCloud.toPhoneZone, RemoteCloud.toBridgeZone])
-        try? FileManager.default.removeItem(at: tokenFile)
+        for file in [tokenFile, spareTokenFile, deliveriesFile] {
+            try? FileManager.default.removeItem(at: file)
+        }
         note("cleared")
     }
 }
