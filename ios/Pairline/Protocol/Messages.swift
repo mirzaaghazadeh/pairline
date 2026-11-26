@@ -324,6 +324,10 @@ struct Inbound {
     let type: String
     let id: Int?
     let message: InboundMessage
+    /// Remote mode (D-072): it came through the iCloud mailbox, not a live session, so it may be old news.
+    var viaMailbox = false
+    /// …and the notification service extension already showed it.
+    var alreadyShown = false
 
     private struct Envelope: Decodable {
         let t: String
@@ -454,7 +458,14 @@ struct Outbound {
         self.isRequest = isRequest
     }
 
-    var timeout: TimeInterval { type == "ussd.run" ? 60 : 15 }
+    var timeout: TimeInterval {
+        switch type {
+        case "ussd.run": return 60
+        // The bridge checks iCloud before it answers.
+        case "remote.config": return 30
+        default: return 15
+        }
+    }
 
     func json(id: Int?) throws -> Data {
         var object = fields
@@ -469,10 +480,20 @@ struct Outbound {
     static let remoteCaps = ["files"]
 
     static func deviceInfo(name: String, os: String, app: String) -> Outbound {
-        Outbound("device.info", ["name": name, "platform": "ios", "os": os, "app": app, "proto": Int(WireProtocol.version),
-                                 "caps": remoteCaps],
+        Outbound("device.info", ["name": name, "platform": "ios", "os": os, "app": app,
+                                 "proto": RemoteFeature.protocolVersion, "caps": remoteCaps],
                  isRequest: false)
     }
+
+    /// Turns remote mode on (D-072): where the mailboxes are, and a web auth token for the bridge.
+    static func remoteConfig(_ settings: RemoteSettings, token: String) -> Outbound {
+        Outbound("remote.config", ["on": true, "backend": settings.backend.rawValue,
+                                   "env": settings.environment.rawValue, "token": token,
+                                   "mb": ["b": settings.mailboxes.toBridge, "a": settings.mailboxes.alert,
+                                          "q": settings.mailboxes.quiet]])
+    }
+
+    static var remoteConfigOff: Outbound { Outbound("remote.config", ["on": false]) }
 
     /// Requests whose replies can be large: sent on the Wi-Fi session when one is up (PROTOCOL.md, "Two sessions").
     static let bulkTypes: Set<String> = ["sms.threads", "sms.history", "contacts.sync", "calllog.sync"]

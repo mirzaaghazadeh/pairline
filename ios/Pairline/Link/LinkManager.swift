@@ -13,8 +13,14 @@ enum LinkPhase: Equatable {
     case connected
     case waiting(until: Date)
     case pairing
+    /// Remote mode (D-072): no session, but messages reach the bridge through the user's iCloud ("Via iCloud").
+    /// Texts, status and history work; calls don't, since there's no audio without a direct connection yet.
+    case remote
 
+    /// A live session with the bridge.
     var isConnected: Bool { self == .connected }
+    /// Requests reach the bridge: a live session, or the iCloud mailbox (slower, and no calls).
+    var canReachBridge: Bool { self == .connected || self == .remote }
 }
 
 enum LinkError: LocalizedError, Equatable {
@@ -107,7 +113,8 @@ final class LinkManager: BridgeLink {
         let continuation: CheckedContinuation<Inbound, Error>
         let timer: Timer
         let message: Outbound
-        let lane: LinkLane
+        /// nil: sent through remote mode's mailbox.
+        let lane: LinkLane?
     }
 
     private struct PairingAttempt {
@@ -143,11 +150,20 @@ final class LinkManager: BridgeLink {
     static let wifiPingAfter: TimeInterval = 15
     static let wifiIdleLimit: TimeInterval = 45
     static let handshakeLimit: TimeInterval = 30
+    /// A request through remote mode's mailbox waits this long for its reply: the bridge checks the mailbox every
+    /// 30 s while this iPhone was active in the last 10 minutes, otherwise every 2 minutes (PROTOCOL.md).
+    static let mailboxTimeout: TimeInterval = 180
+    /// While such a request waits and the app is open, look for the reply this often (silent pushes can lag).
+    static let mailboxPollInterval: TimeInterval = 10
     /// Posted (object: the link manager) when `mediaChannel` changes.
     static let mediaChannelDidChange = Notification.Name("PairlineMediaChannelDidChange")
 
     private(set) var phase: LinkPhase = .notPaired {
-        didSet { if phase != oldValue { onPhaseChange?(phase) } }
+        didSet {
+            guard phase != oldValue else { return }
+            onPhaseChange?(phase)
+            if phase == .remote { Task { await remoteCatchUp() } }
+        }
     }
     private(set) var latency: TimeInterval?
     private(set) var lastSessionError: LinkSessionError?
@@ -162,6 +178,8 @@ final class LinkManager: BridgeLink {
     var onPeerChange: (() -> Void)?
     /// The iPhone just joined the bridge's own hotspot, which has no internet (iOS says "No Internet Connection").
     var onJoinedBridgeHotspot: (() -> Void)?
+    /// Remote pairing (D-072): the bridge's `rpair.confirm` arrived through a catch-up.
+    var onRemotePairConfirm: (() -> Void)?
 
     /// The open media channel of the Wi-Fi session, or nil (no Wi-Fi session, or its UDP path isn't verified yet).
     private(set) var mediaChannel: MediaChannel?
@@ -172,6 +190,8 @@ final class LinkManager: BridgeLink {
     let hotspot = HotspotJoiner()
     let identityStore: IdentityStore
     let peerStore: PeerStore
+    /// Remote mode's mailbox in iCloud (D-072): the path while no session is up. nil where it isn't available.
+    let remote: RemoteLink?
     private let makeConnector: (TransportKind) -> LinkConnector
     private var connectors: [TransportKind: LinkConnector] = [:]
     private let primary = Lane(.primary)
@@ -186,6 +206,7 @@ final class LinkManager: BridgeLink {
     private var media: MediaSocket?
     private var bridgeCaps: Set<String> = []
     private var hotspotTimer: Timer?
+    private var mailboxPoll: Timer?
 
     /// The transport of the first lane: Bluetooth in release builds; debug builds may use TCP or nothing (Wi-Fi only).
     var primaryKind: TransportKind? {
@@ -205,11 +226,12 @@ final class LinkManager: BridgeLink {
         return peerStore.peer?.wifi != nil || bridgeCaps.contains(Capability.wifi.rawValue)
     }
 
-    init(identityStore: IdentityStore, peerStore: PeerStore, deviceInfo: Outbound,
+    init(identityStore: IdentityStore, peerStore: PeerStore, deviceInfo: Outbound, remote: RemoteLink? = nil,
          makeConnector: @escaping (TransportKind) -> LinkConnector) {
         self.identityStore = identityStore
         self.peerStore = peerStore
         self.deviceInfo = deviceInfo
+        self.remote = remote
         self.makeConnector = makeConnector
         // Create the Bluetooth central right away when paired, so iOS can restore it.
         if peerStore.peer != nil, primaryKind == .bluetooth {
@@ -217,6 +239,14 @@ final class LinkManager: BridgeLink {
         }
         files.sendControl = { [weak self] message in self?.sendOnWiFi(message) ?? false }
         files.sendBulk = { [weak self] data, done in self?.sendBulk(data, completion: done) ?? false }
+        remote?.onMessage = { [weak self] delivery in
+            self?.handle(plaintext: delivery.plaintext, lane: nil, alreadyShown: delivery.alreadyShown)
+        }
+        remote?.onChange = { [weak self] in self?.updatePhase() }
+        remote?.sendOverSession = { [weak self] message in
+            guard let self, let lane = self.route(message) else { return false }
+            return self.sendRaw(message, id: nil, on: lane)
+        }
         updatePhase()
     }
 
@@ -298,6 +328,10 @@ final class LinkManager: BridgeLink {
         }
         guard allowed else {
             phase = .locked
+            return
+        }
+        if remote?.isOn == true {
+            phase = .remote
             return
         }
         if lanes.contains(where: { $0.session != nil }) {
@@ -400,6 +434,8 @@ final class LinkManager: BridgeLink {
         watchdog = nil
         hotspotTimer?.invalidate()
         hotspotTimer = nil
+        mailboxPoll?.invalidate()
+        mailboxPoll = nil
         for lane in lanes {
             let old = lane.session
             lane.session = nil
@@ -539,8 +575,10 @@ final class LinkManager: BridgeLink {
 
     // MARK: - Unpair
 
-    /// Forgets the bridge. If connected, tells the bridge first so it forgets this iPhone too.
+    /// Forgets the bridge. If connected, tells the bridge first so it forgets this iPhone too; in remote mode without
+    /// a session, it tells it through the mailbox.
     func unpair() {
+        var farewell: RemoteLink.SealedRecord?
         if let lane = lanes.first(where: \.isEstablished), let session = lane.session,
            let data = try? Outbound.unpair.json(id: nil) {
             try? session.send(data)
@@ -551,8 +589,13 @@ final class LinkManager: BridgeLink {
                 try? await Task.sleep(nanoseconds: 600_000_000)
                 session.close()
             }
+        } else if let remote, remote.isOn, let data = try? Outbound.unpair.json(id: nil) {
+            // Sealed now, while the bridge's key is still pinned.
+            farewell = try? remote.seal(data)
+            log.info("link", "Telling the bridge to unpair through iCloud")
         }
         teardown()
+        remote?.reset(farewell: farewell)
         peerStore.clear()
         (connectors[.wifi] as? WiFiConnector)?.forgetBad()
         bridgeCaps = []
@@ -566,6 +609,7 @@ final class LinkManager: BridgeLink {
     private func remoteUnpaired() {
         log.info("link", "The bridge unpaired this iPhone")
         teardown()
+        remote?.reset()
         peerStore.clear()
         (connectors[.wifi] as? WiFiConnector)?.forgetBad()
         bridgeCaps = []
@@ -597,6 +641,8 @@ final class LinkManager: BridgeLink {
                 hints = WiFiHints(addresses: pairing.wifiAddresses, port: pairing.wifiPort, lastGood: nil,
                                   ssid: pairing.hotspotSSID, password: pairing.hotspotPassword)
             }
+            // Remote mode belonged to the previous pairing; it's turned on again in Settings.
+            self.remote?.reset()
             self.peerStore.save(PairedPeer(deviceID: pairing.deviceID, publicKey: bridgeKey, pairedAt: Date(), name: nil,
                                            peripheralID: peripheralID, transport: kind.rawValue, wifi: hints))
             // Addresses that failed with the previous bridge's key may be this bridge.
@@ -726,30 +772,38 @@ final class LinkManager: BridgeLink {
         }
     }
 
-    private func handle(plaintext: Data, lane: Lane) {
-        lane.lastReceived = Date()
-        let inbound: Inbound
+    /// One message from the bridge: from a session's `lane`, or (lane nil) from remote mode's mailbox.
+    private func handle(plaintext: Data, lane: Lane?, alreadyShown: Bool = false) {
+        lane?.lastReceived = Date()
+        var inbound: Inbound
         do {
             inbound = try Inbound.decode(plaintext)
         } catch {
             log.warning("link", "Ignored a message that isn't valid JSON")
             return
         }
+        inbound.viaMailbox = lane == nil
+        inbound.alreadyShown = alreadyShown
+        if inbound.type.hasPrefix("remote.") || inbound.type.hasPrefix("rpair.") {
+            return handleRemote(inbound, plaintext: plaintext)
+        }
         switch inbound.message {
         case .ping:
-            if let id = inbound.id { sendRaw(Outbound("pong", isRequest: false), id: id, on: lane) }
+            // Through the mailbox nobody waits for the pong.
+            if let id = inbound.id, let lane { sendRaw(Outbound("pong", isRequest: false), id: id, on: lane) }
             return
         case .unpair:
             remoteUnpaired()
             return
         case .wifiOffer(let offer):
-            wifiOffered(offer)
+            // From far away its addresses and hotspot are of no use.
+            if lane != nil { wifiOffered(offer) }
             return
         case .wifiMedia(let port):
-            if lane.id == .wifi { openMedia(port: port, lane: lane) }
+            if let lane, lane.id == .wifi { openMedia(port: port, lane: lane) }
             return
         case .fileOffer, .fileAnswer, .fileDone, .fileCancel:
-            if lane.id == .wifi { files.handle(inbound.message) }
+            if lane?.id == .wifi { files.handle(inbound.message) }
             return
         case .status(let status):
             let caps = Set(status.caps ?? [])
@@ -772,6 +826,20 @@ final class LinkManager: BridgeLink {
             return
         }
         onEvent?(inbound)
+    }
+
+    /// Remote mode's own messages (D-072); none is for the app above the link.
+    private func handleRemote(_ inbound: Inbound, plaintext: Data) {
+        switch inbound.type {
+        case "rpair.confirm":
+            onRemotePairConfirm?()
+        case "remote.state":
+            remote?.bridgeState(plaintext)
+        case "remote.addr":
+            log.info("remote", "The bridge sent its direct-connection addresses (not used by this iPhone yet)")
+        default:
+            break
+        }
     }
 
     // MARK: - Wi-Fi offers, media and files
@@ -902,10 +970,58 @@ final class LinkManager: BridgeLink {
     }
 
     func request(_ message: Outbound) async throws -> Inbound {
-        guard let lane = route(message) else { throw LinkError.notConnected }
         _ = try message.json(id: 0)
+        if let lane = route(message) {
+            return try await withCheckedThrowingContinuation { continuation in
+                dispatch(message, continuation: continuation, on: lane)
+            }
+        }
+        guard phase == .remote, let remote else { throw LinkError.notConnected }
+        return try await requestThroughMailbox(message, remote: remote)
+    }
+
+    /// Remote mode: the request goes into the iCloud mailbox with an id from the mailbox counter (kept across
+    /// restarts); the reply comes back through a catch-up, or on a session if one comes up meanwhile.
+    private func requestThroughMailbox(_ message: Outbound, remote: RemoteLink) async throws -> Inbound {
+        let id = remote.nextRequestID()
+        let record = try remote.seal(message.json(id: id))
         return try await withCheckedThrowingContinuation { continuation in
-            dispatch(message, continuation: continuation, on: lane)
+            let timer = Timer.scheduledTimer(withTimeInterval: max(message.timeout, Self.mailboxTimeout),
+                                             repeats: false) { [weak self] _ in
+                Task { @MainActor in
+                    guard let self, let pending = self.pending.removeValue(forKey: id) else { return }
+                    log.warning("link", "Request \(message.type) through iCloud timed out")
+                    pending.continuation.resume(throwing: LinkError.timeout)
+                }
+            }
+            pending[id] = Pending(continuation: continuation, timer: timer, message: message, lane: nil)
+            pollMailboxWhileWaiting()
+            Task {
+                do {
+                    try await remote.write(record)
+                } catch {
+                    guard let pending = self.pending.removeValue(forKey: id) else { return }
+                    pending.timer.invalidate()
+                    pending.continuation.resume(throwing: LinkError.notConnected)
+                }
+            }
+        }
+    }
+
+    /// While a request waits for its reply through iCloud and the app is open, look for it every 10 s rather than
+    /// rely on the silent push alone, which iOS may hold back.
+    private func pollMailboxWhileWaiting() {
+        guard mailboxPoll == nil else { return }
+        mailboxPoll = Timer.scheduledTimer(withTimeInterval: Self.mailboxPollInterval, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                guard self.pending.values.contains(where: { $0.lane == nil }) else {
+                    self.mailboxPoll?.invalidate()
+                    self.mailboxPoll = nil
+                    return
+                }
+                await self.remoteCatchUp()
+            }
         }
     }
 
@@ -948,8 +1064,12 @@ final class LinkManager: BridgeLink {
     }
 
     func send(_ message: Outbound) {
-        guard let lane = route(message) else { return }
-        sendRaw(message, id: nil, on: lane)
+        if let lane = route(message) {
+            sendRaw(message, id: nil, on: lane)
+            return
+        }
+        guard phase == .remote, let remote, let record = try? remote.seal(message.json(id: nil)) else { return }
+        Task { try? await remote.write(record) }
     }
 
     @discardableResult
@@ -967,10 +1087,55 @@ final class LinkManager: BridgeLink {
     }
 
     func measureLatency() async {
+        // A session's round trip only; never a ping through iCloud.
+        guard lanes.contains(where: \.isEstablished) else { return }
         let start = Date()
         if (try? await request(.ping)) != nil {
             latency = Date().timeIntervalSince(start)
         }
+    }
+
+    // MARK: - Remote mode (D-072)
+
+    /// Remote mode's catch-up (on launch, when the app becomes active, on a push, and while a reply is awaited):
+    /// what the bridge left in iCloud, handled like a session's messages. Returns whether anything arrived.
+    @discardableResult
+    func remoteCatchUp() async -> Bool {
+        guard let remote, remote.isOn, allowed, peerStore.peer != nil, pairingAttempt == nil else { return false }
+        return await remote.catchUp(sessionUp: lanes.contains(where: \.isEstablished))
+    }
+
+    /// Turns remote mode on (Settings). The bridge gets `remote.config` over the session, so one must be up.
+    func turnOnRemote() async throws {
+        guard let remote, !remote.isOn else { return }
+        guard lanes.contains(where: \.isEstablished) else { throw RemoteError.needsNearbyLink }
+        try await remote.turnOn { message in try await self.request(message) }
+    }
+
+    /// Turns remote mode off: `remote.config` off to the bridge (over a session, or through the mailbox one last
+    /// time), then everything of it on this iPhone and in iCloud goes.
+    func turnOffRemote() async {
+        guard let remote, remote.isOn else { return }
+        let off = Outbound.remoteConfigOff
+        if route(off) != nil {
+            _ = try? await request(off)
+            await remote.reset().value
+        } else {
+            let farewell = try? remote.seal(off.json(id: remote.nextRequestID()))
+            await remote.reset(farewell: farewell).value
+        }
+    }
+
+    /// Remote pairing finished on this side: the bridge is pinned and remote mode is on with the invitation's
+    /// mailboxes. The link reaches the bridge through iCloud until the phones meet.
+    func adoptRemotePairing(peer: PairedPeer, settings: RemoteSettings) {
+        peerStore.save(peer)
+        bridgeCaps = []
+        (connectors[.wifi] as? WiFiConnector)?.forgetBad()
+        remote?.adopt(settings)
+        lanes.forEach(connectIfNeeded)
+        updatePhase()
+        onPeerChange?()
     }
 
     private func failPending(_ error: Error) {

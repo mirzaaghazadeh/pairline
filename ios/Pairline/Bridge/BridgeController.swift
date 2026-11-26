@@ -121,14 +121,18 @@ final class BridgeController: ObservableObject {
 
     var protocolMismatch: Bool {
         guard let proto = deviceInfo?.proto else { return false }
-        return proto != Int(WireProtocol.version)
+        return !RemoteFeature.compatibleVersions.contains(proto)
     }
+
+    /// The bridge speaks remote mode (D-072): it sent `proto` 1 or later.
+    var bridgeSupportsRemote: Bool { (deviceInfo?.proto ?? 0) >= 1 }
 
     func requestPaywall() { onPaywallRequest?() }
 
     // MARK: - Link events
 
     private func phaseChanged(_ phase: LinkPhase) {
+        let wasRemote = self.phase == .remote
         self.phase = phase
         transports = link.activeTransports
         if phase != .connected {
@@ -136,6 +140,8 @@ final class BridgeController: ObservableObject {
             latencyTimer = nil
             calls.linkLost()
         }
+        // Remote mode (D-072): texts written while the bridge was away go through iCloud.
+        if phase == .remote, !wasRemote, canUseLink { Task { await flushOutbox() } }
         saveWidget()
     }
 
@@ -167,14 +173,15 @@ final class BridgeController: ObservableObject {
         switch inbound.message {
         case .deviceInfo(let info):
             deviceInfo = info
-            if info.proto != nil, info.proto != Int(WireProtocol.version) {
-                log.warning("link", "Bridge speaks protocol \(info.proto ?? -1)")
+            if let proto = info.proto, !RemoteFeature.compatibleVersions.contains(proto) {
+                log.warning("link", "Bridge speaks protocol \(proto)")
             }
         case .status(let s):
             applyStatus(s)
         case .smsNew(let message):
             let inserted = db.upsertMessages([message], countUnread: Notifier.shared.visibleThread != message.thread)
-            for stored in inserted where !stored.isOutgoing {
+            // Through iCloud the notification service extension may have shown it already.
+            for stored in inserted where !stored.isOutgoing && !inbound.alreadyShown {
                 notify(stored)
             }
             if !inserted.isEmpty { Haptics.soft() }
@@ -183,12 +190,14 @@ final class BridgeController: ObservableObject {
             let state = MessageState(rawValue: event.state) ?? .sent
             db.updateState(cid: event.cid, state: state, key: event.key, error: event.error)
             if state == .failed { Haptics.warning() }
-        case .callIncoming(let event):
+        // Calls through the iCloud mailbox may be minutes old, and can't be answered without a direct connection:
+        // they ring only from a session (the extension already showed a call that came through iCloud).
+        case .callIncoming(let event) where !inbound.viaMailbox:
             // During the free first sync (D-069) calls aren't brought here: they need the trial or the purchase.
             if canUseLink { calls.handleIncoming(event) }
-        case .callState(let event):
+        case .callState(let event) where !inbound.viaMailbox:
             calls.handleState(event)
-        case .callMediaState(let event):
+        case .callMediaState(let event) where !inbound.viaMailbox:
             calls.handleMediaState(event)
         case .netShare(let info) where inbound.id == nil:
             // The bridge stopped sharing by itself (its user turned it off).
@@ -277,26 +286,32 @@ final class BridgeController: ObservableObject {
 
     // MARK: - Sync
 
-    /// Pull-to-refresh and reconnects: new messages, contacts and call log.
+    /// Pull-to-refresh and reconnects: new messages, contacts and call log. Through iCloud (remote mode) only new
+    /// messages: contacts, the call log and a first full sync are too large for the mailbox.
     func sync() async {
-        guard canUseLink || firstSyncOnly, phase.isConnected, !syncing else { return }
+        guard canUseLink || firstSyncOnly, phase.canReachBridge, !syncing else { return }
         syncing = true
         defer { syncing = false }
         if has(.smsHistory) { await syncMessages() }
-        if has(.contacts) { await syncContacts() }
-        if has(.calllog) { await syncCallLog() }
+        if phase.isConnected {
+            if has(.contacts) { await syncContacts() }
+            if has(.calllog) { await syncCallLog() }
+        }
         updateBadge()
         // The free first sync counts only once it ran to the end on a live link (D-069).
         if firstSyncOnly, !canUseLink, phase.isConnected { onFirstSyncDone?() }
     }
 
     private func syncMessages() async {
+        // Smaller pages through iCloud, where a record holds at most 48 KB.
+        let pageSize = phase.isConnected ? 100 : 30
         do {
             if let newest = db.newestMessageTime {
                 var after = newest
                 var newInbound: [StoredMessage] = []
                 for _ in 0..<20 {
-                    guard let reply = try await historyPage(thread: nil, before: nil, after: after, limit: 100) else { break }
+                    guard let reply = try await historyPage(thread: nil, before: nil, after: after, limit: pageSize)
+                    else { break }
                     let inserted = db.upsertMessages(reply.msgs, countUnread: true)
                     newInbound += inserted.filter { !$0.isOutgoing }
                     guard reply.more, let maxTime = reply.msgs.map(\.time).max(), maxTime > after else { break }
@@ -309,7 +324,7 @@ final class BridgeController: ObservableObject {
                 } else {
                     recent.forEach(notify)
                 }
-            } else {
+            } else if phase.isConnected {
                 var before: Int64?
                 for _ in 0..<10 {
                     let reply = try await link.request(.smsThreads(limit: 50, before: before))
@@ -355,6 +370,7 @@ final class BridgeController: ObservableObject {
     }
 
     private func syncContacts() async {
+        guard phase.isConnected else { return }
         var cursor = db.value("contacts.cursor").flatMap(OpaqueValue.init(storageString:))
         var replaced = false
         do {
@@ -376,6 +392,7 @@ final class BridgeController: ObservableObject {
     }
 
     private func syncCallLog() async {
+        guard phase.isConnected else { return }
         var cursor = db.value("calllog.cursor").flatMap(OpaqueValue.init(storageString:))
         var replaced = false
         do {
@@ -421,7 +438,7 @@ final class BridgeController: ObservableObject {
     }
 
     private func deliver(_ message: StoredMessage) async {
-        guard let cid = message.cid, !inFlight.contains(cid), phase.isConnected else { return }
+        guard let cid = message.cid, !inFlight.contains(cid), phase.canReachBridge else { return }
         inFlight.insert(cid)
         defer { inFlight.remove(cid) }
         do {
@@ -575,12 +592,13 @@ final class BridgeController: ObservableObject {
         db.setBlockedNumbers(list)
     }
 
+    /// The bridge tab's pull-to-refresh; through iCloud too (remote mode), without the latency.
     func refreshStatus() async {
-        guard phase.isConnected else { return }
+        guard phase.canReachBridge else { return }
         if let reply = try? await link.request(.statusGet), case .status(let s) = reply.message {
             applyStatus(s)
         }
-        await measureLatency()
+        if phase.isConnected { await measureLatency() }
     }
 
     /// Clears synced data (unpair).

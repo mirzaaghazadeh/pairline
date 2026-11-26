@@ -78,6 +78,19 @@ enum RemoteInbox {
         }
     }
 
+    // MARK: Settings the extension needs
+
+    private static let showsTextKey = "notifications.previews"
+
+    /// Settings › "Show message text", mirrored for the extension (the app keeps the setting in its own defaults).
+    static func setShowsMessageText(_ on: Bool) {
+        UserDefaults(suiteName: SharedOutbox.appGroup)?.set(on, forKey: showsTextKey)
+    }
+
+    static var showsMessageText: Bool {
+        UserDefaults(suiteName: SharedOutbox.appGroup)?.object(forKey: showsTextKey) as? Bool ?? true
+    }
+
     /// Remote mode off or the pairing forgotten: nothing of it stays.
     static func clear() {
         if let directory { try? FileManager.default.removeItem(at: directory) }

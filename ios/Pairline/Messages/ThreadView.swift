@@ -273,7 +273,7 @@ struct MessageBubble: View {
                 switch message.state {
                 case .pending:
                     Image(systemName: "clock")
-                    Text(bridge.phase.isConnected ? "Sending…" : "Waiting for bridge")
+                    Text(bridge.phase.canReachBridge ? "Sending…" : "Waiting for bridge")
                 case .sent:
                     Image(systemName: "checkmark")
                     Text("Sent")
@@ -349,7 +349,7 @@ struct Composer: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             } else {
-                if !bridge.phase.isConnected && !draft.isEmpty {
+                if !bridge.phase.canReachBridge && !draft.isEmpty {
                     Text("Your message will be sent when the bridge phone reconnects.")
                         .font(.caption)
                         .foregroundStyle(.secondary)

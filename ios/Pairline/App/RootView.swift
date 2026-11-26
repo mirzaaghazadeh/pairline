@@ -286,15 +286,23 @@ struct OfflineBanner: View {
     @EnvironmentObject private var app: AppModel
 
     var body: some View {
-        InfoBanner(symbol: symbol, tint: tint, text: LinkStatusPill.title(for: phase)) {
+        InfoBanner(symbol: symbol, tint: tint, text: text) {
             Button("Help") { app.tab = .bridge }
                 .font(.subheadline.weight(.semibold))
         }
     }
 
+    /// Remote mode (D-072) says what works through iCloud: calls don't yet.
+    private var text: Text {
+        phase == .remote
+            ? Text("Via iCloud: texts and codes work. Calls stay on the Android phone for now.")
+            : LinkStatusPill.title(for: phase)
+    }
+
     private var symbol: String {
         switch phase {
         case .bluetoothOff, .bluetoothUnauthorized, .bluetoothUnsupported: return "antenna.radiowaves.left.and.right.slash"
+        case .remote: return "icloud"
         default: return "arrow.triangle.2.circlepath"
         }
     }
@@ -302,6 +310,7 @@ struct OfflineBanner: View {
     private var tint: Color {
         switch phase {
         case .bluetoothOff, .bluetoothUnauthorized, .bluetoothUnsupported: return .brandRed
+        case .remote: return .brandBlue
         default: return .brandAmber
         }
     }

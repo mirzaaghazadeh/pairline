@@ -44,7 +44,13 @@ final class AppModel: ObservableObject {
         purchases = PurchaseManager()
         let deviceInfo = Outbound.deviceInfo(name: UIDevice.current.model, os: UIDevice.current.systemVersion,
                                              app: AppInfo.version)
-        link = LinkManager(identityStore: identity, peerStore: peers, deviceInfo: deviceInfo) { kind in
+        var remote: RemoteLink?
+        if RemoteFeature.isAvailable {
+            remote = RemoteLink(store: RemoteStore(), identity: { [identity] in try identity.identity() },
+                                bridgeKey: { [peers] in peers.peer?.publicKey },
+                                registerForPush: { if !Self.isTestHost { UIApplication.shared.registerForRemoteNotifications() } })
+        }
+        link = LinkManager(identityStore: identity, peerStore: peers, deviceInfo: deviceInfo, remote: remote) { kind in
             #if DEBUG
             if kind == .tcp { return TCPConnector() }
             #endif
@@ -73,6 +79,9 @@ final class AppModel: ObservableObject {
             self?.active.updateBadge()
         }
         notifier.onOpenStatus = { [weak self] in self?.tab = .bridge }
+        // Remote mode (D-072): an alert push shown while Pairline is open; take what it announced.
+        notifier.onRemotePush = { [weak self] in Task { await self?.remoteCatchUp() } }
+        if link.remote?.isOn == true, !Self.isTestHost { UIApplication.shared.registerForRemoteNotifications() }
 
         // The bridge status on the Lock Screen and in the Dynamic Island follows the bridge on screen (D-053).
         $demo
@@ -189,6 +198,41 @@ final class AppModel: ObservableObject {
         pairedPeer = nil
     }
 
+    // MARK: - Remote mode (D-072)
+
+    /// What the bridge left in iCloud, once the purchase state is known (a push can launch the app before it is).
+    @discardableResult
+    func remoteCatchUp() async -> Bool {
+        for _ in 0..<20 where purchases.access == .loading {
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+        return await link.remoteCatchUp()
+    }
+
+    /// A remote pairing ("Pair a phone that's far away") wired to this app's keys, link and iCloud.
+    func makeRemotePairing() -> RemotePairing {
+        let pairing = RemotePairing(environment: .init(
+            identity: { [identity] in try identity.identity() },
+            makeMailbox: { RemoteMailbox(backend: RemoteFeature.backend, ids: $0) },
+            fetchToken: { try await RemoteCloud.fetchWebAuthToken() },
+            adopt: { [weak self] peer, settings in await self?.adoptRemotePairing(peer: peer, settings: settings) },
+            rollBack: { [weak self] in self?.unpair() },
+            restore: { [weak self] in await self?.link.remote?.resubscribe() }))
+        link.onRemotePairConfirm = { [weak pairing] in pairing?.bridgeConfirmed() }
+        return pairing
+    }
+
+    /// The codes matched: this bridge replaces any paired one (and its data), then the link goes through iCloud.
+    private func adoptRemotePairing(peer: PairedPeer, settings: RemoteSettings) async {
+        if pairedPeer != nil {
+            link.unpair()
+            real.wipe()
+            await link.remote?.waitForReset()
+        }
+        link.adoptRemotePairing(peer: peer, settings: settings)
+        pairedPeer = peers.peer
+    }
+
     /// Debug builds accept `pairline://pair?…` links (Simulator testing, D-018). Release builds pair only by scanning.
     func handleURL(_ url: URL) {
         if url.host == "status" {
@@ -248,6 +292,7 @@ final class AppModel: ObservableObject {
             await Notifier.shared.refreshAuthorization()
         }
         if real.phase.isConnected { Task { await real.sync() } }
+        Task { await remoteCatchUp() }
     }
 
     private func applyLaunchArguments() {
@@ -269,7 +314,8 @@ final class AppModel: ObservableObject {
         }
         if args.contains("-PairlinePaywall") { showPaywall = true }
         // Opens pairing at its scan step (screenshots of the free-week choice there, D-069), or at its first step.
-        if args.contains("-PairlinePairingScan") || args.contains("-PairlinePairingInstall") { showPairing = true }
+        if args.contains("-PairlinePairingScan") || args.contains("-PairlinePairingInstall")
+            || args.contains("-PairlinePairingRemote") { showPairing = true }
         // Same path as opening the pairing link through the URL scheme, without the system's confirmation alert.
         if let index = args.firstIndex(of: "-PairlinePairLink"), index + 1 < args.count, let url = URL(string: args[index + 1]) {
             Task { @MainActor in
@@ -294,7 +340,7 @@ final class AppModel: ObservableObject {
             let to = args[index + 1]
             let body = args[index + 2]
             Task { @MainActor in
-                for _ in 0..<30 where !self.active.phase.isConnected {
+                for _ in 0..<30 where !self.active.phase.canReachBridge {
                     try? await Task.sleep(nanoseconds: 500_000_000)
                 }
                 let message = try? self.active.sendSMS(to: to, body: body, sim: nil, thread: nil)

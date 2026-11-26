@@ -1,3 +1,4 @@
+import CloudKit
 import SwiftUI
 import UIKit
 
@@ -46,6 +47,19 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         log.info("remote", "Remote notifications unavailable: \((error as NSError).code)")
+    }
+
+    /// Remote mode (D-072): a silent push from the quiet mailbox (or any CloudKit push that wakes the app). Catches up
+    /// on the mailboxes; replies to waiting requests and events are handled as if they came over a session.
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        guard RemoteFeature.isAvailable, CKNotification(fromRemoteNotificationDictionary: userInfo) != nil else {
+            return completionHandler(.noData)
+        }
+        Task { @MainActor in
+            let got = await AppModel.shared.remoteCatchUp()
+            completionHandler(got ? .newData : .noData)
+        }
     }
 
     /// The user swiped Pairline away: iOS won't relaunch it for Bluetooth until it's opened again, so calls and

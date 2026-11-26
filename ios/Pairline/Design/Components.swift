@@ -214,6 +214,7 @@ struct LinkStatusPill: View {
     var color: Color {
         switch phase {
         case .connected: return .brandGreen
+        case .remote: return .brandBlue
         case .searching, .securing, .pairing, .waiting: return .brandAmber
         case .locked: return .brandAmber
         case .bluetoothOff, .bluetoothUnauthorized, .bluetoothUnsupported: return .brandRed
@@ -229,6 +230,7 @@ struct LinkStatusPill: View {
     static func title(for phase: LinkPhase) -> Text {
         switch phase {
         case .connected: return Text("Connected")
+        case .remote: return Text("Via iCloud")
         case .searching: return Text("Looking for your bridge…")
         case .securing: return Text("Securing the link…")
         case .pairing: return Text("Pairing…")

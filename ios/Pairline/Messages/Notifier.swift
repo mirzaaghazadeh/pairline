@@ -24,6 +24,8 @@ final class Notifier: NSObject, ObservableObject {
     var onOpenThread: ((Int64) -> Void)?
     var onMarkRead: ((Int64) -> Void)?
     var onOpenStatus: (() -> Void)?
+    /// Remote mode (D-072): a CloudKit alert push reached the open app.
+    var onRemotePush: (() -> Void)?
 
     private let center = UNUserNotificationCenter.current()
 
@@ -39,6 +41,8 @@ final class Notifier: NSObject, ObservableObject {
                                          hiddenPreviewsBodyPlaceholder: String(localized: "New message"),
                                          options: [])
         center.setNotificationCategories([sms, otp])
+        // Remote mode's notification extension follows "Show message text" too.
+        RemoteInbox.setShowsMessageText(AppSettings.shared.showMessagePreviews)
         Task { await refreshAuthorization() }
     }
 
@@ -172,7 +176,10 @@ extension Notifier: UNUserNotificationCenterDelegate {
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
                                             withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let thread = (notification.request.content.userInfo["thread"] as? NSNumber)?.int64Value
+        // CloudKit's pushes carry a "ck" dictionary.
+        let isRemotePush = notification.request.content.userInfo["ck"] != nil
         Task { @MainActor in
+            if isRemotePush { Notifier.shared.onRemotePush?() }
             if let thread, thread == Notifier.shared.visibleThread {
                 completionHandler([])
             } else {

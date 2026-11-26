@@ -60,9 +60,7 @@ enum RemoteNotification {
         return ms >= now - 14 * 24 * 3600 * 1000 && ms <= now + 10 * 60 * 1000
     }
 
-    private static var showPreviews: Bool {
-        UserDefaults(suiteName: SharedOutbox.appGroup)?.object(forKey: "notifications.previews") as? Bool ?? true
-    }
+    private static var showPreviews: Bool { RemoteInbox.showsMessageText }
 
     private static func base(from original: UNNotificationContent) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()

@@ -74,6 +74,9 @@ struct SettingsTab: View {
             List {
                 purchaseSection
                 bridgeSection
+                if RemoteFeature.isAvailable, app.isPaired, !app.isDemo, let remote = app.link.remote {
+                    RemoteModeSection(remote: remote, bridge: app.real)
+                }
                 liveActivitySection
                 notificationSection
                 // Shown once the bridge has reported its SIMs (D-062).
@@ -94,7 +97,8 @@ struct SettingsTab: View {
                     Haptics.success()
                 }
             } message: {
-                if app.real.phase.isConnected {
+                // Through iCloud (remote mode) the bridge is told as well.
+                if app.real.phase.canReachBridge {
                     Text("This iPhone forgets the bridge phone and removes the messages, contacts and call history synced from it. Nothing is deleted on the Android phone.")
                 } else {
                     Text("This iPhone forgets the bridge phone and removes what was synced from it. The bridge phone isn't connected, so also unpair in Pairline Bridge on the Android phone.")
@@ -265,6 +269,7 @@ struct SettingsTab: View {
             Toggle(isOn: $settings.showMessagePreviews) {
                 Label("Show message text", systemImage: "text.bubble")
             }
+            .onValueChange(settings.showMessagePreviews) { RemoteInbox.setShowsMessageText($0) }
             Toggle(isOn: $settings.lowBatteryAlert) {
                 Label("Bridge battery alerts", systemImage: "battery.25")
             }

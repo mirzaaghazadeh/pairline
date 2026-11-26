@@ -1,12 +1,14 @@
 import AVFoundation
 import SwiftUI
 
-/// Guided pairing: install the free bridge app on Android, scan its QR code, connect, allow notifications.
+/// Guided pairing: install the free bridge app on Android, scan its QR code, connect, allow notifications. Where
+/// remote mode is available (D-072), "Pair a phone that's far away" pairs through an invitation instead.
 struct PairingFlowView: View {
     enum Step {
         case install
         case scan
         case connecting
+        case remote
         case done
     }
 
@@ -24,10 +26,12 @@ struct PairingFlowView: View {
     @State private var pasted = ""
     #endif
 
-    /// Debug builds launched with `-PairlinePairingScan` start at the scan step.
+    /// Debug builds launched with `-PairlinePairingScan` start at the scan step, with `-PairlinePairingRemote` at
+    /// "Pair a phone that's far away".
     private static var initialStep: Step {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-PairlinePairingScan") { return .scan }
+        if ProcessInfo.processInfo.arguments.contains("-PairlinePairingRemote") { return .remote }
         #endif
         return .install
     }
@@ -40,16 +44,18 @@ struct PairingFlowView: View {
                 case .install: install.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
                 case .scan: scan.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
                 case .connecting: connecting.transition(.opacity)
+                case .remote: remote.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
                 case .done: done.transition(.opacity)
                 }
             }
             .animation(.spring(response: 0.45, dampingFraction: 0.9), value: step)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if !isOnboarding || step == .scan {
+                if !isOnboarding || step == .scan || step == .remote {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button(isOnboarding ? "Back" : "Cancel") {
-                            if isOnboarding, step == .scan {
+                        Button(isOnboarding || step == .remote ? "Back" : "Cancel") {
+                            if step == .remote || (isOnboarding && step == .scan) {
+                                // Leaving the remote step cancels its pairing (RemotePairingView).
                                 step = .install
                             } else {
                                 cancel()
@@ -66,7 +72,7 @@ struct PairingFlowView: View {
                 }
             }
         }
-        .interactiveDismissDisabled(step == .connecting)
+        .interactiveDismissDisabled(step == .connecting || step == .remote)
         // The free-week prompt after the first sync waits until this flow has closed (D-069).
         .onAppear { app.pairingFlowOpen = true }
         .onDisappear { app.pairingFlowOpen = false }
@@ -117,6 +123,9 @@ struct PairingFlowView: View {
                     HelpBullet(symbol: "qrcode", text: Text("Tap Pair in the bridge app to show a pairing code."))
                 }
                 .card(padding: 14)
+                if RemoteFeature.isAvailable {
+                    farAwayButton
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 8)
@@ -171,6 +180,9 @@ struct PairingFlowView: View {
                       systemImage: "lock.shield")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+                if RemoteFeature.isAvailable {
+                    farAwayButton
+                }
                 #if DEBUG
                 debugPaste
                 #endif
@@ -288,6 +300,31 @@ struct PairingFlowView: View {
     }
     #endif
 
+    // MARK: - Far away (remote mode, D-072)
+
+    private var farAwayButton: some View {
+        Button {
+            Haptics.tap()
+            error = nil
+            step = .remote
+        } label: {
+            Label("Pair a phone that's far away", systemImage: "icloud.and.arrow.up")
+                .font(.subheadline.weight(.semibold))
+        }
+    }
+
+    /// Needs a trial or the purchase: through iCloud there's no free first sync (D-069) to lead to.
+    @ViewBuilder private var remote: some View {
+        if purchases.access.allowsLink {
+            RemotePairingView { step = .done }
+        } else {
+            ScrollView {
+                trialChoices
+                    .padding(20)
+            }
+        }
+    }
+
     // MARK: - Connecting / done
 
     private var connecting: some View {
@@ -318,7 +355,9 @@ struct PairingFlowView: View {
                     .foregroundStyle(Color.brandGreen)
             }
             Text("You're paired!").font(.largeTitle.weight(.bold))
-            Text("Messages and calls from your Android phone's SIM now come to this iPhone.")
+            (app.real.phase == .remote
+                ? Text("Texts and codes from your Android phone's SIM now come to this iPhone through iCloud. Calls still need the phones together for now.")
+                : Text("Messages and calls from your Android phone's SIM now come to this iPhone."))
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

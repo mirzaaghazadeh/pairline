@@ -11954,6 +11954,334 @@
           }
         }
       }
+    },
+    "Via iCloud" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق iCloud" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden" } }
+      }
+    },
+    "Via iCloud: texts and codes work. Calls stay on the Android phone for now." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud: تصلك الرسائل والرموز، أما المكالمات فتبقى على هاتف أندرويد حاليًا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق iCloud: پیامک‌ها و کدها کار می‌کنند. تماس‌ها فعلاً روی گوشی اندرویدی می‌مانند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden: mesajlar ve kodlar çalışıyor. Aramalar şimdilik Android telefonda kalıyor." } }
+      }
+    },
+    "Calls don't work via iCloud yet. Make the call on the Android phone, or bring the phones together." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا تعمل المكالمات عبر iCloud بعد. أجرِ المكالمة من هاتف أندرويد نفسه، أو اجمع الهاتفين في مكان واحد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس هنوز از طریق iCloud کار نمی‌کند. با خود گوشی اندرویدی تماس بگیرید، یا دو گوشی را کنار هم بیاورید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar henüz iCloud üzerinden çalışmıyor. Aramayı Android telefondan yapın ya da iki telefonu bir araya getirin." } }
+      }
+    },
+    "Remote mode" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع عن بُعد" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod" } }
+      }
+    },
+    "Status" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الحالة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وضعیت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Durum" } }
+      }
+    },
+    "On · using the nearby link" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفعّل · يُستخدم الاتصال القريب الآن" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن · فعلاً از اتصال نزدیک استفاده می‌شود" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Açık · şu an yakın bağlantı kullanılıyor" } }
+      }
+    },
+    "Sign in to iCloud on this iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجّل الدخول إلى iCloud على هذا الآيفون" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در این آیفون وارد iCloud شوید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone'da iCloud'a giriş yapın" } }
+      }
+    },
+    "Can't reach iCloud right now" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر الوصول إلى iCloud حاليًا" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فعلاً دسترسی به iCloud ممکن نیست" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şu anda iCloud'a ulaşılamıyor" } }
+      }
+    },
+    "The bridge phone hasn't checked in for 10 minutes" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يستلم الهاتف الوسيط الرسائل منذ عشر دقائق" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل ۱۰ دقیقه است پیام‌ها را دریافت نکرده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefon 10 dakikadır mesajları almadı" } }
+      }
+    },
+    "iCloud isn't working right now" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يعمل iCloud حاليًا" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "iCloud فعلاً کار نمی‌کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud şu anda çalışmıyor" } }
+      }
+    },
+    "Turn remote mode on while your phones are linked nearby." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل الوضع عن بُعد بينما يكون هاتفاك قريبين ومتصلين ببعضهما." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور را وقتی روشن کنید که دو گوشی کنار هم و به هم متصل‌اند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak modu, telefonlarınız yakında ve birbirine bağlıyken açın." } }
+      }
+    },
+    "Remote mode needs a newer Pairline Bridge on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج الوضع عن بُعد إلى إصدار أحدث من Pairline Bridge على هاتف أندرويد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور به نسخه جدیدتری از Pairline Bridge روی گوشی اندرویدی نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod için Android telefonda daha yeni bir Pairline Bridge gerekiyor." } }
+      }
+    },
+    "The bridge phone couldn't reach iCloud. Check its internet connection and try again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر على الهاتف الوسيط الوصول إلى iCloud. تحقّق من اتصاله بالإنترنت ثم أعد المحاولة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل نتوانست به iCloud دسترسی پیدا کند. اتصال اینترنت آن را بررسی کنید و دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefon iCloud'a ulaşamadı. İnternet bağlantısını kontrol edip tekrar deneyin." } }
+      }
+    },
+    "Sign in to iCloud on this iPhone, then try again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجّل الدخول إلى iCloud على هذا الآيفون، ثم أعد المحاولة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در این آیفون وارد iCloud شوید و دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone'da iCloud'a giriş yapın, sonra tekrar deneyin." } }
+      }
+    },
+    "Couldn't reach iCloud. Check this iPhone's internet connection and try again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر الوصول إلى iCloud. تحقّق من اتصال هذا الآيفون بالإنترنت ثم أعد المحاولة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دسترسی به iCloud ممکن نشد. اتصال اینترنت این آیفون را بررسی کنید و دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud'a ulaşılamadı. Bu iPhone'un internet bağlantısını kontrol edip tekrar deneyin." } }
+      }
+    },
+    "That didn't work. Try again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم ينجح ذلك. أعد المحاولة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انجام نشد. دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Olmadı. Tekrar deneyin." } }
+      }
+    },
+    "Allow notifications for Pairline so texts and codes reach you through iCloud." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسمح بإشعارات Pairline لتصلك الرسائل والرموز عبر iCloud." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اعلان‌های Pairline را مجاز کنید تا پیامک‌ها و کدها از طریق iCloud به شما برسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajların ve kodların iCloud üzerinden size ulaşması için Pairline bildirimlerine izin verin." } }
+      }
+    },
+    "Keeps texts and codes coming when your phones are apart. There's no Pairline server: messages are locked with keys only your two phones hold, and Apple stores only locked records in your iCloud until they're read. Apple and internet providers can see that your phones talk, not what they say. Calls still need the phones together for now." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبقي الرسائل والرموز تصلك حين يكون هاتفاك بعيدين عن بعضهما. لا يوجد خادم لـ Pairline: تُقفَل الرسائل بمفاتيح لا يملكها إلا هاتفاك، ولا تخزّن Apple في iCloud الخاص بك سوى هذه السجلات المقفلة إلى أن تُقرأ. يمكن لـ Apple ومزوّدي الإنترنت أن يعرفوا أن هاتفيك يتواصلان، لا ما يقولانه. أما المكالمات فما زالت تحتاج حاليًا إلى أن يكون الهاتفان معًا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی دو گوشی از هم دورند، پیامک‌ها و کدها همچنان به شما می‌رسند. هیچ سرور Pairline در کار نیست: پیام‌ها با کلیدهایی قفل می‌شوند که فقط دو گوشی شما دارند، و Apple فقط همین رکوردهای قفل‌شده را تا وقتی خوانده شوند در iCloud شما نگه می‌دارد. Apple و ارائه‌دهندگان اینترنت می‌توانند ببینند که گوشی‌های شما با هم در ارتباط‌اند، اما نه اینکه چه می‌گویند. تماس‌ها فعلاً هنوز نیاز دارند که دو گوشی کنار هم باشند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirinden uzaktayken de mesajlar ve kodlar gelmeye devam eder. Pairline sunucusu yoktur: mesajlar yalnızca iki telefonunuzdaki anahtarlarla kilitlenir ve Apple, iCloud'unuzda yalnızca bu kilitli kayıtları okunana kadar saklar. Apple ve internet sağlayıcıları telefonlarınızın birbiriyle konuştuğunu görebilir, ne konuştuklarını göremez. Aramalar için şimdilik telefonların bir arada olması gerekiyor." } }
+      }
+    },
+    "Pair a phone that's far away" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إقران هاتف بعيد" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "جفت کردن با گوشی‌ای که دور است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktaki bir telefonla eşleştir" } }
+      }
+    },
+    "For when the Android phone with your SIM is somewhere else, like at home, and someone there can help." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حين يكون هاتف أندرويد الذي يحمل شريحتك في مكان آخر، كالمنزل، وهناك من يستطيع المساعدة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای وقتی که گوشی اندرویدیِ دارای سیم‌کارت شما جای دیگری است، مثلاً در خانه، و کسی آنجا می‌تواند کمک کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "SIM kartınızın takılı olduğu Android telefon başka bir yerdeyse (örneğin evde) ve orada yardım edebilecek biri varsa." } }
+      }
+    },
+    "Ask them to install Pairline Bridge on the Android phone from getpairline.com." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اطلب منه تثبيت Pairline Bridge على هاتف أندرويد من getpairline.com." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از او بخواهید Pairline Bridge را از getpairline.com روی گوشی اندرویدی نصب کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge'i getpairline.com adresinden Android telefona yüklemesini isteyin." } }
+      }
+    },
+    "Send them the invitation from the next screen. They open it on the Android phone and allow the pairing." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أرسل إليه الدعوة من الشاشة التالية، فيفتحها على هاتف أندرويد ويسمح بالإقران." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دعوت‌نامه را از صفحه بعد برایش بفرستید. او آن را روی گوشی اندرویدی باز می‌کند و اجازه جفت‌سازی را می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sonraki ekrandaki daveti ona gönderin. Daveti Android telefonda açıp eşleştirmeye izin verir." } }
+      }
+    },
+    "Call them: you'll both see a 6-digit code. Pair only if the codes match." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصل به: سيظهر لكما رمز من ستة أرقام. أكمل الإقران فقط إذا تطابق الرمزان." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "با او تماس بگیرید: هر دو یک کد ۶ رقمی می‌بینید. فقط اگر کدها یکی بودند جفت کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Onu arayın: ikiniz de 6 haneli bir kod göreceksiniz. Yalnızca kodlar aynıysa eşleştirin." } }
+      }
+    },
+    "The invitation works once, for 10 minutes. Send it only to the person helping you." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعمل الدعوة مرة واحدة ولمدة عشر دقائق. أرسلها فقط إلى الشخص الذي يساعدك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دعوت‌نامه فقط یک بار و تا ۱۰ دقیقه کار می‌کند. آن را فقط برای کسی بفرستید که به شما کمک می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Davet yalnızca bir kez ve 10 dakika boyunca geçerlidir. Yalnızca size yardım eden kişiye gönderin." } }
+      }
+    },
+    "Create invitation" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إنشاء دعوة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ساختن دعوت‌نامه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Davet oluştur" } }
+      }
+    },
+    "Creating the invitation…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ إنشاء الدعوة…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال ساختن دعوت‌نامه…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Davet oluşturuluyor…" } }
+      }
+    },
+    "Waiting for the Android phone to confirm…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بانتظار تأكيد هاتف أندرويد…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در انتظار تأیید گوشی اندرویدی…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun onaylaması bekleniyor…" } }
+      }
+    },
+    "Send this invitation" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أرسل هذه الدعوة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این دعوت‌نامه را بفرستید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu daveti gönderin" } }
+      }
+    },
+    "Share it with the person helping you. It opens in Pairline Bridge on the Android phone; the QR code holds the same invitation." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شاركها مع الشخص الذي يساعدك، فتُفتح في Pairline Bridge على هاتف أندرويد. ورمز QR يحمل الدعوة نفسها." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آن را برای کسی که به شما کمک می‌کند بفرستید. روی گوشی اندرویدی در Pairline Bridge باز می‌شود؛ کد QR هم همین دعوت‌نامه است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Size yardım eden kişiyle paylaşın. Android telefonda Pairline Bridge'de açılır; QR kod da aynı daveti içerir." } }
+      }
+    },
+    "Share invitation" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مشاركة الدعوة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اشتراک‌گذاری دعوت‌نامه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Daveti paylaş" } }
+      }
+    },
+    "Expires in %@" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تنتهي صلاحيتها خلال %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "%@ دیگر منقضی می‌شود" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ içinde sona erer" } }
+      }
+    },
+    "The Android phone answered. Getting the code…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ردّ هاتف أندرويد. جارٍ الحصول على الرمز…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی پاسخ داد. در حال گرفتن کد…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yanıt verdi. Kod alınıyor…" } }
+      }
+    },
+    "Waiting for the Android phone…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بانتظار هاتف أندرويد…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در انتظار گوشی اندرویدی…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon bekleniyor…" } }
+      }
+    },
+    "Compare the codes" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قارِن الرمزين" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کدها را مقایسه کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kodları karşılaştırın" } }
+      }
+    },
+    "Read this code to the person holding the Android phone on a call. Their phone shows a code too." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في مكالمة هاتفية، اقرأ هذا الرمز على من يحمل هاتف أندرويد، فهاتفه يعرض رمزًا أيضًا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این کد را در یک تماس تلفنی برای کسی که گوشی اندرویدی دستش است بخوانید. گوشی او هم یک کد نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu kodu bir aramada Android telefonu tutan kişiye okuyun. Onun telefonunda da bir kod görünür." } }
+      }
+    },
+    "If the codes are different, cancel: someone else may have the invitation." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا اختلف الرمزان فألغِ العملية، فقد تكون الدعوة لدى شخص آخر." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر کدها فرق دارند، لغو کنید: ممکن است دعوت‌نامه دست کس دیگری هم باشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kodlar farklıysa iptal edin: davet başka birinin elinde olabilir." } }
+      }
+    },
+    "The codes match" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرمزان متطابقان" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کدها یکی‌اند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kodlar aynı" } }
+      }
+    },
+    "New invitation" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "دعوة جديدة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دعوت‌نامه جدید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeni davet" } }
+      }
+    },
+    "Sign in to iCloud on this iPhone to pair a phone that's far away." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجّل الدخول إلى iCloud على هذا الآيفون لإقران هاتف بعيد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای جفت کردن با گوشی‌ای که دور است، در این آیفون وارد iCloud شوید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktaki bir telefonla eşleştirmek için bu iPhone'da iCloud'a giriş yapın." } }
+      }
+    },
+    "The invitation expired before the Android phone answered. Create a new one." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "انتهت صلاحية الدعوة قبل أن يردّ هاتف أندرويد. أنشئ دعوة جديدة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دعوت‌نامه پیش از پاسخ گوشی اندرویدی منقضی شد. یک دعوت‌نامه جدید بسازید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yanıt vermeden davetin süresi doldu. Yeni bir davet oluşturun." } }
+      }
+    },
+    "Someone else opened this invitation too, so pairing was stopped to keep you safe. Create a new one and send it only to the person helping you." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فتح شخص آخر هذه الدعوة أيضًا، لذا أُوقف الإقران حفاظًا على أمانك. أنشئ دعوة جديدة وأرسلها فقط إلى الشخص الذي يساعدك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کس دیگری هم این دعوت‌نامه را باز کرد، پس برای حفظ امنیت شما جفت‌سازی متوقف شد. یک دعوت‌نامه جدید بسازید و فقط برای کسی بفرستید که به شما کمک می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu daveti başka biri de açtı, bu yüzden güvenliğiniz için eşleştirme durduruldu. Yeni bir davet oluşturup yalnızca size yardım eden kişiye gönderin." } }
+      }
+    },
+    "The Android phone's answer didn't check out, so pairing was stopped to keep you safe. Try again with a new invitation." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يجتز ردّ هاتف أندرويد التحقق، لذا أُوقف الإقران حفاظًا على أمانك. أعد المحاولة بدعوة جديدة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاسخ گوشی اندرویدی تأیید نشد، پس برای حفظ امنیت شما جفت‌سازی متوقف شد. با یک دعوت‌نامه جدید دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun yanıtı doğrulanamadı, bu yüzden güvenliğiniz için eşleştirme durduruldu. Yeni bir davetle tekrar deneyin." } }
+      }
+    },
+    "The Android phone didn't confirm in time. Try again with a new invitation." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يؤكّد هاتف أندرويد في الوقت المحدد. أعد المحاولة بدعوة جديدة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی به‌موقع تأیید نکرد. با یک دعوت‌نامه جدید دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon zamanında onaylamadı. Yeni bir davetle tekrar deneyin." } }
+      }
+    },
+    "Texts and codes from your Android phone's SIM now come to this iPhone through iCloud. Calls still need the phones together for now." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصل الآن الرسائل والرموز من شريحة هاتف أندرويد إلى هذا الآيفون عبر iCloud. أما المكالمات فما زالت تحتاج حاليًا إلى أن يكون الهاتفان معًا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از این پس، پیامک‌ها و کدهای سیم‌کارت گوشی اندرویدی شما از طریق iCloud به این آیفون می‌آیند. تماس‌ها فعلاً هنوز نیاز دارند که دو گوشی کنار هم باشند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzun SIM'ine gelen mesajlar ve kodlar artık iCloud üzerinden bu iPhone'a geliyor. Aramalar için şimdilik telefonların bir arada olması gerekiyor." } }
+      }
+    },
+    "remote.push.title" : {
+      "comment" : "Title of a remote-mode push before the notification service extension replaces it (CloudKit titleLocalizationKey).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "Pairline" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairline" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline" } }
+      }
+    },
+    "remote.push.body" : {
+      "comment" : "Body of a remote-mode push before the notification service extension replaces it (CloudKit alertLocalizationKey). Generic: it never names a sender or shows content.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نشاط جديد من هاتفك الوسيط" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New activity from your bridge phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فعالیت تازه از گوشی پل شما" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonunuzdan yeni etkinlik" } }
+      }
     }
   },
   "version" : "1.0"
