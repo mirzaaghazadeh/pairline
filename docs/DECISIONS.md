@@ -1208,12 +1208,15 @@ service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch
   the App Store Connect API key (`-authenticationKeyPath`), because Xcode has no account signed in.
 - **Web auth tokens are not single-use.** A token from `CKFetchWebAuthTokenOperation` works for many requests; each
   response returns a refreshed token in `X-Apple-CloudKit-Web-Auth-Token` that works only once its trailing `__` is
-  removed; a refreshed chain holds. An unused token still worked after 22 minutes; longer lifetimes are being
-  measured.
-- **Blocker: the private database is refused** on the maintainer's account: HTTP 403 `ACCESS_DENIED`, "private db
-  access disabled for this account", for every device-minted token, while the same tokens read the user record
-  through the public database. Other projects tie this to Advanced Data Protection (web access to private data then
-  needs a per-app approval on an Apple device, which CloudKit Web Services doesn't offer) or to "Access iCloud Data
-  on the Web" being off. Waiting for the maintainer's settings and decision; the push delay isn't measured yet.
+  removed; a refreshed chain holds. An unused token still worked after 4 hours, and a chain refreshed every 20
+  minutes kept working (Apple's archived reference says 30 minutes; that no longer holds).
+- **Blocker: the private database is refused** on the maintainer's account, which has no Advanced Data Protection
+  and has "Access iCloud Data on the Web" on. Tokens from the iPhone get HTTP 403 `ACCESS_DENIED`, "private db
+  access disabled for this account"; a token from Apple's web sign-in for the same user (a second, Development-only
+  API token redirecting to localhost) gets HTTP 401 `AUTHENTICATION_FAILED` on the private and shared databases.
+  Both read the user record through the public database, both are Development tokens, and GET and POST requests
+  fail alike. Other projects tie the 403 to Advanced Data Protection, which doesn't apply here; nothing published
+  explains it for a plain account. Whether it affects every account or only some is untested (it needs a second
+  Apple ID). The push delay isn't measured yet.
 - **Filtering entitlement** requested on 2026-11-26 (Apple request ID Q7U98356ZR), for the extension
   `app.pairline.ios.notifications`, use case end-to-end encrypted messaging.
