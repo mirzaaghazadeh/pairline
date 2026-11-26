@@ -411,6 +411,15 @@ struct BridgeStatusTab: View {
                                 subtitle: Text("Photos and documents over Wi-Fi, both ways"))
                     }
                     Divider().padding(.leading, 52)
+                    // D-088: browse the Android phone's photos (opt-in there).
+                    NavigationLink {
+                        PhotosView(files: app.link.files)
+                    } label: {
+                        ToolRow(symbol: "photo.on.rectangle.angled", tint: .purple,
+                                title: Text("Photos on the Android phone", tableName: "Photos"),
+                                subtitle: Text("See them here and copy the ones you want, over Wi-Fi", tableName: "Photos"))
+                    }
+                    Divider().padding(.leading, 52)
                 }
                 NavigationLink {
                     HelpCenterView()

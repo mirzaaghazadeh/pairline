@@ -45,6 +45,20 @@ final class ScheduleAndDataTests: XCTestCase {
         XCTAssertTrue(defaultOn)
     }
 
+    /// D-088: a page of photos, and the requests that go on the Wi-Fi session only.
+    func testMediaPages() throws {
+        guard case .mediaList(let page) = try decode([
+            "t": "media.list", "id": 2, "more": true, "cursor": "1764000000:42",
+            "items": [["mid": 42, "time": 1, "w": 4000, "h": 3000, "size": 2_000_000, "thumb": "AAAA"], ["bad": 1]],
+        ]).message else { return XCTFail() }
+        XCTAssertEqual(page.items.map(\.mid), [42])
+        XCTAssertEqual(page.cursor, "1764000000:42")
+        XCTAssertTrue(page.more)
+        XCTAssertEqual(Outbound.mediaList(cursor: nil, limit: 30).lane, .wifi)
+        XCTAssertEqual(Outbound.mediaGet(mid: 42).lane, .wifi)
+        XCTAssertTrue(try json(.mediaList(cursor: nil, limit: 30))["before"] is NSNull)
+    }
+
     /// D-087: the captions panel keeps the last ~240 characters, cut at a word.
     func testCaptionsTail() {
         XCTAssertEqual(LiveCaptions.tail("hello there"), "hello there")

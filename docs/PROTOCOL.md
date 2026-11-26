@@ -330,6 +330,8 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `sms.scheduled` | R→B, B→R | — | request: `id` / reply: `id`, `items` [`{cid, sim, to, body, at}`] (waiting, soonest first), `done` [`{cid, state, key, error}`] (what became of the ones sent in the last 7 days, at most 50; `state` is `pending` until the radio answers, then as in `sms.state`), `exact` (B can send at the exact minute: Android's "Alarms & reminders") |
 | `data.usage` | R→B, B→R | — | request: `id`, `since` (ms, at most 62 days back) / reply: `id`, `since`, `until`, `bytes` (mobile data received and sent, every SIM together, from Android's statistics). `error` `permission` while Usage access isn't given (B then asks its user). Needs `data.usage` (D-084) |
 | `remote.ring` | B→R | — | `on` (default true): B's user is looking for R; R plays a sound for up to 30 seconds, or stops. Sent only to an R that listed `ring` in its `device.info` `caps` (D-084) |
+| `media.list` | R→B, B→R | — | Wi-Fi session only. request: `id`, `before` (the last page's `cursor`, or null), `limit` (default 30, at most 60) / reply: `id`, `items` [`{mid, time, w, h, size, thumb}`] (newest first; `thumb` a base64 JPEG of 128 px at most, about 4 KB), `more`, `cursor` (opaque). Pages stay under 30 KB, so they may hold fewer than `limit`. `unsupported` on another session. Needs `media.photos` (D-088) |
+| `media.get` | R→B | — | `id`, `mid` → `ok`, then B offers the photo with the normal file transfer (`file.offer` on the Wi-Fi session). Needs `media.photos` (D-088) |
 | `wifi.offer` | B→R | M5 | `ip` [address], `port`, `ssid` and `password` (only while B's hotspot is on, else null), `band` (`"2.4"` / `"5"` / `"6"` or null). Sent on B's event session after `status` and whenever any of it changes; `ip: []` means B has no Wi-Fi now |
 | `wifi.media` | B→R | M5 | `port` (UDP) or null. On each Wi-Fi session, right after the handshake |
 | `link.switch` | — | M5 | Not used: replies follow their request's session (D-044) |
@@ -356,7 +358,8 @@ tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's he
 (messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `call.voicemail`
 (`call.dial` takes `voicemail: true`, SIMs carry `vm`, D-082), `sms.schedule` (B keeps and sends scheduled messages,
 D-084), `data.usage` (Usage access given, D-084), `call.screen` (B is Android's call-screening app: blocked numbers
-are turned away before they ring and `block.set` `unknown` works, D-085), `contacts.edit`
+are turned away before they ring and `block.set` `unknown` works, D-085), `media.photos` (B's user turned on
+"Photos for the iPhone" and gave photo access, with the Wi-Fi link on, D-088), `contacts.edit`
 (with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `notif.mirror` (notification access given:
 chosen apps' notifications are sent as `notif.posted`, D-077), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),

@@ -26,6 +26,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getBoolean(CONTACTS_ADD, false)
         set(value) = edit { putBoolean(CONTACTS_ADD, value) }
 
+    /** The iPhone may browse this phone's photos and fetch them over Wi-Fi (D-088). Off by default (PRIVACY.md). */
+    var photosEnabled: Boolean
+        get() = prefs.getBoolean("photosEnabled", false)
+        set(value) = edit { putBoolean("photosEnabled", value) }
+
     /** The Wi-Fi link (M5): listen on the local network for the paired iPhone. On by default (PRIVACY.md). */
     var wifiLinkEnabled: Boolean
         get() = prefs.getBoolean(WIFI_LINK, true)

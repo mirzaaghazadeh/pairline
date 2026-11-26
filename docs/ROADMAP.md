@@ -206,7 +206,7 @@ parties). Each needs a real-phone test.
 - [x] Mobile data used this month on the bridge phone, with a limit alert (D-084)
 - [x] Call screening role on Android: blocked calls never ring, silence unknown callers, blocked prefixes (D-085)
 - [x] Reply to Android app notifications from the iPhone (D-086)
-- [ ] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi
+- [x] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi (D-088)
 - [x] Live captions of relayed calls on the iPhone (on-device speech recognition, nothing recorded or stored, D-087)
 - [ ] MMS and group messages
 - [ ] More than one iPhone, iPad or Mac paired with one bridge

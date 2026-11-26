@@ -52,6 +52,8 @@ class StatusMonitor(
     private val ringer: () -> String? = { null },
     /** Usage access is given for the data meter (D-084). */
     private val dataUsage: () -> Boolean = { false },
+    /** The iPhone may browse this phone's photos (D-088). */
+    private val photos: () -> Boolean = { false },
 ) {
     /** Called (on a background thread) whenever something in the status may have changed. */
     var onChange: (() -> Unit)? = null
@@ -182,6 +184,7 @@ class StatusMonitor(
                 notifMirror = app.pairline.android.mirror.NotificationMirror.accessGranted(context),
                 dataUsage = dataUsage(),
                 callScreen = CallScreening.held(context),
+                photos = photos(),
             ),
         )
     }

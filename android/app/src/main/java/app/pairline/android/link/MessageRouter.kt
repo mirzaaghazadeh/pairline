@@ -69,6 +69,7 @@ class MessageRouter(
     private val appContext: Context,
     private val scheduled: ScheduledSms,
     private val dataUsage: DataUsage,
+    private val photos: app.pairline.android.files.PhotoLibrary,
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -319,6 +320,20 @@ class MessageRouter(
             Msg.SMS_SCHEDULED -> request(message) { id -> scheduled.toMessage(id) }
             Msg.DATA_USAGE -> request(message) { id ->
                 dataUsage.toMessage(id, message.longOrNull("since") ?: invalid("since missing"))
+            }
+            // D-088: photos, over the Wi-Fi session only (thumbnails are too heavy for Bluetooth).
+            Msg.MEDIA_LIST -> request(message) { id ->
+                if (link.wifiToken != token) throw RequestException(ErrorCode.UNSUPPORTED, "photos need the Wi-Fi link")
+                photos.list(
+                    id,
+                    message.stringOrNull("before"),
+                    app.pairline.android.files.PhotoLibrary.limit(message.longOrNull("limit")),
+                )
+            }
+            Msg.MEDIA_GET -> request(message) { id ->
+                if (link.wifiToken == null) throw RequestException(ErrorCode.UNSUPPORTED, "photos need the Wi-Fi link")
+                photos.get(message.longOrNull("mid") ?: invalid("mid missing"))
+                Messages.ok(id)
             }
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }

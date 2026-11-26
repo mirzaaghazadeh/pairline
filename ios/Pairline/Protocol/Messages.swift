@@ -287,6 +287,24 @@ struct ScheduledList: Equatable {
     var exact: Bool
 }
 
+/// `media.list` (D-088): a page of the bridge phone's photos, newest first, each with a small JPEG thumbnail.
+struct MediaPage: Equatable {
+    struct Item: Codable, Equatable, Identifiable {
+        var mid: Int64
+        var time: Int64?
+        var w: Int?
+        var h: Int?
+        var size: Int64?
+        /// Base64 JPEG, about 128 px on the long side.
+        var thumb: String?
+        var id: Int64 { mid }
+    }
+
+    var items: [Item]
+    var more: Bool
+    var cursor: String?
+}
+
 /// `data.usage` (D-084): mobile bytes the bridge phone used between `since` and `until` (ms).
 struct DataUsageReply: Codable, Equatable {
     var since: Int64
@@ -398,6 +416,8 @@ enum InboundMessage {
     case smsScheduled(ScheduledList)
     case dataUsage(DataUsageReply)
     case remoteRing(Bool)
+    /// D-088: a page of the bridge phone's photos.
+    case mediaList(MediaPage)
     case unknown
 }
 
@@ -463,6 +483,7 @@ struct Inbound {
         var exact: Bool?
     }
     private struct OnBody: Decodable { var on: Bool? }
+    private struct MediaBody2: Decodable { var items: LossyList<MediaPage.Item>?; var more: Bool?; var cursor: String? }
 
     static func decode(_ data: Data) throws -> Inbound {
         let decoder = JSONDecoder()
@@ -531,6 +552,9 @@ struct Inbound {
                                                   exact: b.exact ?? true))
         case "data.usage": message = .dataUsage(try body(DataUsageReply.self))
         case "remote.ring": message = .remoteRing(try body(OnBody.self).on ?? true)
+        case "media.list":
+            let b = try body(MediaBody2.self)
+            message = .mediaList(MediaPage(items: b.items?.elements ?? [], more: b.more ?? false, cursor: b.cursor))
         default:
             message = .unknown
         }
@@ -748,6 +772,14 @@ struct Outbound {
     /// The bridge phone's mobile data since `since` (ms), every SIM together (needs `data.usage`, D-084).
     static func dataUsage(since: Int64) -> Outbound { Outbound("data.usage", ["since": since]) }
 
+    /// A page of the bridge phone's photos, after `cursor` (needs `media.photos`; Wi-Fi session only, D-088).
+    static func mediaList(cursor: String?, limit: Int) -> Outbound {
+        Outbound("media.list", ["before": optional(cursor), "limit": limit], lane: .wifi)
+    }
+
+    /// The bridge sends this photo with the file transfer (needs `media.photos`, D-088).
+    static func mediaGet(mid: Int64) -> Outbound { Outbound("media.get", ["mid": mid], lane: .wifi) }
+
     static func blockSet(add: [String], remove: [String]) -> Outbound {
         Outbound("block.set", ["add": add, "remove": remove])
     }
@@ -818,6 +850,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case block = "block"
     /// The bridge is Android's call-screening app: blocked calls don't ring, unknown callers can be silenced (D-085).
     case callScreen = "call.screen"
+    /// The bridge phone's photos can be browsed and fetched over Wi-Fi (opt-in there, D-088).
+    case mediaPhotos = "media.photos"
 
     var id: String { rawValue }
 }

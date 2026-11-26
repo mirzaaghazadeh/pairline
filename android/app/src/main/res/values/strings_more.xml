@@ -20,4 +20,6 @@
     <string name="screen_unknown">Silence unknown callers</string>
     <string name="screen_unknown_sub">Calls from numbers that aren’t in your contacts ring neither phone. They go to voicemail and show as missed.</string>
     <string name="block_prefix_note">End a number with * to block every number that starts with it, for example +234*.</string>
+    <string name="photos_title">Photos for the iPhone</string>
+    <string name="photos_sub">Browse this phone’s photos on the iPhone and copy the ones you tap, over Wi-Fi only</string>
 </resources>

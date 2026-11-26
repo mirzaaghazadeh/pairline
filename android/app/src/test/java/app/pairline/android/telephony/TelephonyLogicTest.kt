@@ -40,10 +40,11 @@ class TelephonyLogicTest {
         mirror: Boolean = false,
         usage: Boolean = false,
         screen: Boolean = false,
+        photos: Boolean = false,
     ) = CapsCalculator.compute(
         CapsInput(
             granted, messaging, calling, sims, inCall, add, listen, talk, share, wifi, link, switches, smsWrite, tools,
-            mirror, usage, screen,
+            mirror, usage, screen, photos,
         ),
     )
 
@@ -66,6 +67,7 @@ class TelephonyLogicTest {
             caps(
                 sims = 2, inCall = true, add = true, listen = true, talk = true, share = true, wifi = true, link = true,
                 switches = true, smsWrite = true, tools = true, mirror = true, usage = true, screen = true,
+                photos = true,
             ),
         )
     }

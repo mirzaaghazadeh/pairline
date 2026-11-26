@@ -18,4 +18,6 @@
     <string name="screen_unknown">Bilinmeyen arayanları sessize al</string>
     <string name="screen_unknown_sub">Kişilerinizde olmayan numaralardan gelen aramalar iki telefonda da çalmaz; sesli mesaja gider ve cevapsız olarak görünür.</string>
     <string name="block_prefix_note">Bir numarayı * ile bitirin; onunla başlayan tüm numaralar engellenir, örneğin +234*.</string>
+    <string name="photos_title">iPhone için fotoğraflar</string>
+    <string name="photos_sub">Bu telefonun fotoğraflarına iPhone’da göz atın ve dokunduklarınızı kopyalayın; yalnızca Wi-Fi üzerinden</string>
 </resources>

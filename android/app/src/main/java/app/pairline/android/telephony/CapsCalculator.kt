@@ -34,6 +34,8 @@ data class CapsInput(
     val dataUsage: Boolean = false,
     /** Pairline holds Android's call-screening role (D-085). */
     val callScreen: Boolean = false,
+    /** "Photos for the iPhone" is on and photo access is given (D-088). */
+    val photos: Boolean = false,
 )
 
 /**
@@ -94,6 +96,8 @@ object CapsCalculator {
         // The block list needs no permission: it filters what the bridge relays (D-043).
         caps += Caps.BLOCK
         if (input.callScreen && input.hasCalling) caps += Caps.CALL_SCREEN
+        // Photos travel with the file transfer, so only with the Wi-Fi link on.
+        if (input.photos && input.wifiLink) caps += Caps.MEDIA_PHOTOS
         return Caps.ALL.filter { it in caps }
     }
 }

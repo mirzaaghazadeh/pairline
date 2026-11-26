@@ -27,6 +27,8 @@ the section in the same commit that raises `versionName`.
   as +234*.
 - **Reply to app notifications from the iPhone.** Notifications from apps you chose (WhatsApp, Telegram…) get a Reply
   field on the iPhone; the reply goes through that app on this phone, as if you had typed it here.
+- **Photos for the iPhone** (Settings, off by default): browse this phone's photos on the iPhone and copy the ones you
+  tap, over Wi-Fi only.
 
 ## 1.7.0 (2026-11-26)
 

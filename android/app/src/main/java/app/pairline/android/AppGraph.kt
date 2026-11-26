@@ -5,6 +5,7 @@ import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.audio.MediaChannelTransport
 import app.pairline.android.files.FileNotifications
 import app.pairline.android.files.FileTransfers
+import app.pairline.android.files.PhotoLibrary
 import app.pairline.android.link.IdentityStore
 import app.pairline.android.netshare.NetShare
 import app.pairline.android.netshare.NetSwitches
@@ -91,8 +92,12 @@ object AppGraph {
             smsWrite = { privileged.canWriteSms() },
             ringer = { Ringer.mode(app) },
             dataUsage = { dataUsage.accessGranted() },
+            photos = { photos.available() },
         )
     }
+
+    /** This phone's photos for the iPhone, opt-in (D-088). */
+    val photos: PhotoLibrary by lazy { PhotoLibrary(app, prefs, files) }
 
     /** Messages the iPhone asked to send later (D-084). */
     val scheduledSms: ScheduledSms by lazy { ScheduledSms(app, smsSender, link::send) }
@@ -102,7 +107,7 @@ object AppGraph {
     val router: MessageRouter by lazy {
         MessageRouter(
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
-            netSwitches, app, scheduledSms, dataUsage,
+            netSwitches, app, scheduledSms, dataUsage, photos,
         )
     }
 

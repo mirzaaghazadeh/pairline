@@ -44,6 +44,7 @@ struct CapabilityInfo: Identifiable {
         case .calllogDelete: return "trash"
         case .block: return "hand.raised"
         case .callScreen: return "phone.badge.waveform.fill"
+        case .mediaPhotos: return "photo.on.rectangle"
         }
     }
 
@@ -81,6 +82,7 @@ struct CapabilityInfo: Identifiable {
         case .calllogDelete: return String(localized: "Delete calls on the bridge phone")
         case .block: return String(localized: "Block list")
         case .callScreen: return String(localized: "Call screening", table: "Screening")
+        case .mediaPhotos: return String(localized: "Photos on the Android phone", table: "Photos")
         }
     }
 
@@ -139,6 +141,8 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Update Pairline Bridge on your Android phone to block numbers.")
         case .callScreen:
             return String(localized: "In Pairline Bridge › Blocked numbers on your Android phone, make it the call-screening app (Android 10 or later).", table: "Screening")
+        case .mediaPhotos:
+            return String(localized: "Turn on Photos for the iPhone in Pairline Bridge › Settings on your Android phone, with the Wi-Fi link on.", table: "Photos")
         }
     }
 }

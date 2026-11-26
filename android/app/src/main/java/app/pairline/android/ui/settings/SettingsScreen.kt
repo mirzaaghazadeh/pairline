@@ -216,6 +216,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     onClick = { navigate(Route.Mirror) },
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                PhotosRow() // D-088
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(
                     title = stringResource(if (paired) R.string.home_pair_new else R.string.home_pair),
                     icon = PIcons.Qr,

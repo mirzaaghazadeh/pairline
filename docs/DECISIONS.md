@@ -1494,3 +1494,18 @@ and in a language the user reads better than they hear.
   picks the language.
 - New iOS permission: Speech Recognition (`NSSpeechRecognitionUsageDescription`), asked the first time CC is tapped.
   Strings in a `Captions` table. Needs a real relayed call to tune.
+
+### D-088 — Browse the Android phone's photos from the iPhone (2026-11-26)
+
+Files already go both ways (D-045), but only what the Android side chooses to send. This lets the iPhone pick.
+- **Opt-in on the Android phone:** Pairline Bridge › Settings › "Photos for the iPhone", off by default; turning it on
+  asks for `READ_MEDIA_IMAGES` (`READ_EXTERNAL_STORAGE` up to Android 12). Capability `media.photos`, listed only with
+  the Wi-Fi link on.
+- **`media.list`** pages the photos newest first (MediaStore, ordered by when added, then id; the cursor is
+  "seconds:id"), each with a thumbnail made on the phone (Android's own `loadThumbnail`, at most 128 px and ~4 KB as
+  JPEG), within the usual 30 KB page. Answered only on the Wi-Fi session: thumbnails would crowd the Bluetooth link.
+- **`media.get`** hands the photo to the existing file transfer, so it arrives like any file (Files › Pairline ›
+  Received) and the iPhone opens it in Quick Look, where Share › Save Image puts it in Photos. No iOS Photos
+  permission is needed for that.
+- Only photos for now; videos would need streaming rather than copying to be pleasant. Strings: Android
+  `strings_more.xml`, iOS `Photos` table. Unit tests on both sides; needs real phones.

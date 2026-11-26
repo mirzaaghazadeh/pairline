@@ -18,4 +18,6 @@
     <string name="screen_unknown">إسكات المتصلين المجهولين</string>
     <string name="screen_unknown_sub">لا ترنّ على أيٍّ من الهاتفين مكالماتُ الأرقام غير الموجودة في جهات اتصالك؛ تذهب إلى البريد الصوتي وتظهر فائتة.</string>
     <string name="block_prefix_note">أنهِ الرقم بـ * لحظر كل رقم يبدأ به، مثلًا ‎+234*‎.</string>
+    <string name="photos_title">الصور للآيفون</string>
+    <string name="photos_sub">تصفّح صور هذا الهاتف على الآيفون وانسخ ما تنقر عليه، عبر الواي فاي فقط</string>
 </resources>
