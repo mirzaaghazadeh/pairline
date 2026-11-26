@@ -348,6 +348,22 @@ private fun DirectLine(s: DirectStatus) {
         )
         Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
+    // What fixes it, when the home's router, modem or provider is the reason (D-082): texts and codes work anyway.
+    val hint = when {
+        s.direct == null || open || s.ipv6Unconfirmed -> null
+        s.reason == DirectReason.NO_MAPPING || s.reason == null -> R.string.direct_hint_router
+        s.reason == DirectReason.DOUBLE_NAT || s.reason == DirectReason.NO_PUBLIC_ADDRESS -> R.string.direct_hint_modem
+        s.reason == DirectReason.CARRIER_NAT -> R.string.direct_hint_provider
+        else -> null
+    }
+    if (hint != null) {
+        Text(
+            stringResource(hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 26.dp),
+        )
+    }
 }
 
 @StringRes

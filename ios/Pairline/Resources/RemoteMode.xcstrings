@@ -1,6 +1,135 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Allow calls from far away" : {
+      "comment" : "Help article title (Cloud mode's direct connection): how to let the home router make the direct connection that calls from far away need. Fits any router brand.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "السماح بالمكالمات من بعيد" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ممکن کردن تماس از راه دور" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktan aramalara izin verin" } }
+      }
+    },
+    "Let your home router make the direct connection" : {
+      "comment" : "Help list subtitle under \"Allow calls from far away\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "دع موجّه منزلك يُنشئ الاتصال المباشر" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بگذارید مودم خانه اتصال مستقیم را برقرار کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Doğrudan bağlantıyı ev yönlendiricinizin kurmasına izin verin" } }
+      }
+    },
+    "How to allow calls from far away" : {
+      "comment" : "Link under the result of Check my home connection when the router, a modem or the provider is the reason; opens the help article.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كيف تسمح بالمكالمات من بعيد" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "چطور تماس از راه دور را ممکن کنم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktan aramalara nasıl izin verilir" } }
+      }
+    },
+    "Texts and codes reach you through iCloud anywhere. Calls from far away also need a direct connection to the Android phone at home, which your home router makes by opening one port for Pairline. Many routers do this by themselves; on others you turn it on once." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصلك الرسائل والرموز عبر iCloud أينما كنت. أما المكالمات من بعيد فتحتاج أيضًا إلى اتصال مباشر بهاتف أندرويد في المنزل، ينشئه موجّه منزلك بفتح منفذ واحد لـ Pairline. كثير من الموجّهات تفعل ذلك تلقائيًا، وفي غيرها تفعّل الخيار مرة واحدة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها و کدها هر جا باشید از راه iCloud به شما می‌رسند. اما تماس از راه دور به اتصال مستقیم به گوشی اندرویدی در خانه هم نیاز دارد، که مودم (روتر) خانه با باز کردن یک پورت برای Pairline برقرارش می‌کند. خیلی از مودم‌ها این کار را خودشان می‌کنند؛ در بقیه یک بار روشنش می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar ve kodlar size her yerde iCloud üzerinden ulaşır. Uzaktan aramalar ise evdeki Android telefona doğrudan bir bağlantı da gerektirir; bunu ev yönlendiriciniz Pairline için bir port açarak kurar. Birçok yönlendirici bunu kendiliğinden yapar; diğerlerinde bir kez açmanız yeterlidir." } }
+      }
+    },
+    "Open your router's settings" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "افتح إعدادات الموجّه" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تنظیمات مودم را باز کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiricinizin ayarlarını açın" } }
+      }
+    },
+    "On a phone or computer on your home Wi-Fi, open your router's settings page in a web browser. Its address and admin password are usually on a sticker on the router, or in your internet provider's app." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "من هاتف أو حاسوب متصل بشبكة الواي فاي في منزلك، افتح صفحة إعدادات الموجّه في متصفح الويب. عادةً ما تجد عنوانها وكلمة مرور المدير على ملصق على الموجّه، أو في تطبيق مزوّد الإنترنت." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "با گوشی یا رایانه‌ای که به وای‌فای خانه وصل است، صفحهٔ تنظیمات مودم را در مرورگر باز کنید. نشانی آن و رمز مدیر معمولاً روی برچسب پشت مودم یا در برنامهٔ شرکت اینترنت شماست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ev Wi-Fi ağınıza bağlı bir telefon ya da bilgisayarda yönlendiricinin ayar sayfasını bir web tarayıcısında açın. Adresi ve yönetici parolası genellikle yönlendiricinin üzerindeki etikette ya da internet sağlayıcınızın uygulamasında bulunur." } }
+      }
+    },
+    "Turn on UPnP or NAT-PMP" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل UPnP أو NAT-PMP" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "UPnP یا NAT-PMP را روشن کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "UPnP veya NAT-PMP'yi açın" } }
+      }
+    },
+    "Look for UPnP, NAT-PMP or PCP, often under Advanced, NAT, Network or Firewall. Turn it on and save. Can't find it? Search the web for your router's model and \"UPnP\"." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ابحث عن UPnP أو NAT-PMP أو PCP، وغالبًا ما تجدها ضمن «متقدّم» أو NAT أو «الشبكة» أو «جدار الحماية». فعّلها واحفظ. لم تجدها؟ ابحث في الويب عن طراز موجّهك مع كلمة «UPnP»." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دنبال UPnP، NAT-PMP یا PCP بگردید؛ معمولاً در بخش Advanced، NAT، Network یا Firewall است. روشنش کنید و ذخیره کنید. پیدایش نمی‌کنید؟ مدل مودمتان را همراه «UPnP» در اینترنت جست‌وجو کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "UPnP, NAT-PMP veya PCP'yi arayın; genellikle Gelişmiş, NAT, Ağ veya Güvenlik Duvarı altındadır. Açın ve kaydedin. Bulamadınız mı? Yönlendiricinizin modelini \"UPnP\" ile birlikte internette arayın." } }
+      }
+    },
+    "Check again" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "افحص مرة أخرى" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دوباره بررسی کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeniden kontrol edin" } }
+      }
+    },
+    "In Pairline, open Settings › Cloud mode › Check my home connection. When it says a direct connection should work, calls from far away work too." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في Pairline، افتح الإعدادات › الوضع السحابي › فحص اتصال منزلي. حين يقول إن الاتصال المباشر يُفترض أن يعمل، ستعمل المكالمات من بعيد أيضًا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در Pairline، تنظیمات › حالت ابری › بررسی اتصال خانه را باز کنید. وقتی بگوید اتصال مستقیم باید کار کند، تماس از راه دور هم کار می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline'da Ayarlar › Bulut modu › Ev bağlantımı kontrol et'i açın. Doğrudan bağlantının çalışması gerektiğini söylediğinde uzaktan aramalar da çalışır." } }
+      }
+    },
+    "If your provider shares one address" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا كان مزوّدك يشارك عنوانًا واحدًا" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر شرکت اینترنت یک نشانی را بین چند خانه تقسیم می‌کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sağlayıcınız tek bir adresi paylaştırıyorsa" } }
+      }
+    },
+    "Some internet providers share one internet address among many homes (carrier-grade NAT). Then no router setting helps. Ask your provider for a public IPv4 address or for IPv6; some give one on request." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يشارك بعض مزوّدي الإنترنت عنوان إنترنت واحدًا بين منازل كثيرة (CGNAT). عندها لا يفيد أي إعداد في الموجّه. اطلب من مزوّدك عنوان IPv4 عامًا أو IPv6؛ بعضهم يمنحه عند الطلب." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعضی شرکت‌های اینترنت یک نشانی اینترنتی را بین خانه‌های زیادی تقسیم می‌کنند (CGNAT). در این حالت هیچ تنظیمی در مودم کمکی نمی‌کند. از شرکت اینترنت یک نشانی IPv4 عمومی یا IPv6 بخواهید؛ بعضی‌ها با درخواست می‌دهند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bazı internet sağlayıcıları tek bir internet adresini birçok ev arasında paylaştırır (CGNAT). Bu durumda hiçbir yönlendirici ayarı işe yaramaz. Sağlayıcınızdan genel bir IPv4 adresi veya IPv6 isteyin; bazıları istek üzerine verir." } }
+      }
+    },
+    "Two boxes at home" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جهازان في المنزل" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دو دستگاه در خانه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evde iki cihaz" } }
+      }
+    },
+    "If your provider's modem sits in front of your own router, turn on UPnP on the modem too, or put the modem in bridge mode so your router gets the internet address." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا كان مودم مزوّدك قبل موجّهك الخاص، ففعّل UPnP على المودم أيضًا، أو اضبط المودم على وضع الجسر (Bridge) ليحصل موجّهك على عنوان الإنترنت." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر مودم شرکت اینترنت پیش از روتر خودتان قرار دارد، UPnP را روی مودم هم روشن کنید، یا مودم را در حالت Bridge بگذارید تا روتر شما نشانی اینترنت را بگیرد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sağlayıcınızın modemi kendi yönlendiricinizin önündeyse modemde de UPnP'yi açın ya da yönlendiriciniz internet adresini alsın diye modemi köprü (bridge) moduna alın." } }
+      }
+    },
+    "What turning on UPnP means" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ماذا يعني تفعيل UPnP" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن کردن UPnP یعنی چه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "UPnP'yi açmak ne anlama gelir" } }
+      }
+    },
+    "Apps on your home network can ask the router to open ports. Pairline opens one, closes it when you turn Cloud mode off, and only your paired iPhone can use it." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يصبح بإمكان التطبيقات على شبكة منزلك أن تطلب من الموجّه فتح منافذ. يفتح Pairline منفذًا واحدًا، ويغلقه حين توقف الوضع السحابي، ولا يستطيع استخدامه إلا آيفونك المقترن." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برنامه‌های روی شبکهٔ خانه می‌توانند از مودم بخواهند پورت باز کند. Pairline یک پورت باز می‌کند، وقتی حالت ابری را خاموش کنید آن را می‌بندد، و فقط آیفون جفت‌شدهٔ شما می‌تواند از آن استفاده کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ev ağınızdaki uygulamalar yönlendiriciden port açmasını isteyebilir. Pairline bir port açar, Bulut modunu kapattığınızda kapatır ve onu yalnızca eşleştirilmiş iPhone'unuz kullanabilir." } }
+      }
+    },
+    "Talking on the iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التحدث على الآيفون" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صحبت کردن روی آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone'da konuşmak" } }
+      }
+    },
+    "To hear and talk on the iPhone, the Android phone also needs Talk on iPhone set up (Android 11 or later)." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لكي تسمع وتتحدث على الآيفون، يحتاج هاتف أندرويد أيضًا إلى إعداد «التحدث عبر الآيفون» (أندرويد 11 أو أحدث)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای شنیدن و صحبت کردن روی آیفون، گوشی اندرویدی باید «مکالمه با آیفون» را هم راه‌اندازی کرده باشد (اندروید ۱۱ یا جدیدتر)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone'da duyup konuşmak için Android telefonda \"iPhone’dan konuşma\" özelliğinin de kurulu olması gerekir (Android 11 veya üstü)." } }
+      }
+    },
     "Cloud mode" : {
       "comment" : "The feature's name (D-080, code name remote mode): the phones keep working over the internet, through the user's own iCloud and, where the home router allows, a direct connection. Settings section header and switch, and the title of its explanation screen.",
       "localizations" : {

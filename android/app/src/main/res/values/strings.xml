@@ -553,4 +553,8 @@
     <string name="direct_reason_no_address">the router has no internet address</string>
     <string name="direct_reason_no_mapping">the router doesn\'t open ports for apps</string>
     <string name="direct_reason_listen">couldn\'t open a port on this phone</string>
+    <!-- Under the direct-connection line: what fixes it. Help on the iPhone has the steps for any router. -->
+    <string name="direct_hint_router">Texts and codes still work. For calls from far away, turn on UPnP or NAT-PMP in your router\'s settings. Step by step: Help › Allow calls from far away, in Pairline on your iPhone.</string>
+    <string name="direct_hint_modem">Texts and codes still work. For calls from far away, turn on UPnP on your provider\'s modem too, or put the modem in bridge mode. Step by step: Help › Allow calls from far away, in Pairline on your iPhone.</string>
+    <string name="direct_hint_provider">Texts and codes still work. Calls from far away need your own internet address: ask your internet provider for a public IPv4 address or IPv6.</string>
 </resources>

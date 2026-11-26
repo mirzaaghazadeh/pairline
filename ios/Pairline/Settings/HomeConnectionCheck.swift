@@ -56,6 +56,15 @@ extension HomeCheckReply {
         }
     }
 
+    /// The router, a second modem or the provider is the reason: Help › "Allow calls from far away" explains the fix.
+    var hasRouterHelp: Bool {
+        if likely { return false }
+        switch reason {
+        case .router?, .noPublicAddress?, .carrierNAT?, nil: return true
+        case .notOnWiFi?: return false
+        }
+    }
+
     /// What it means for Cloud mode, or nil when there's nothing to add.
     var consequence: Text? {
         if likely || reason == .notOnWiFi { return nil }
@@ -124,6 +133,17 @@ struct HomeConnectionCheckRow: View {
             }
             .fixedSize(horizontal: false, vertical: true)
             .padding(.vertical, 2)
+            if result.hasRouterHelp {
+                NavigationLink {
+                    RouterHelpView()
+                } label: {
+                    Label {
+                        Text("How to allow calls from far away", tableName: "RemoteMode")
+                    } icon: {
+                        Image(systemName: "questionmark.circle")
+                    }
+                }
+            }
         } else if let failure {
             Text(failure)
                 .font(.footnote)

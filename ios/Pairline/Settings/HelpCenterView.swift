@@ -42,6 +42,12 @@ struct HelpCenterView: View {
                         ToolRow(symbol: "icloud.fill", tint: .brandBlue, title: Text("How Cloud mode works", tableName: "RemoteMode"),
                                 subtitle: Text("Leave the Android phone at home, on charge and on Wi-Fi.", tableName: "RemoteMode"))
                     }
+                    NavigationLink {
+                        RouterHelpView()
+                    } label: {
+                        ToolRow(symbol: "wifi.router", tint: .brandBlue, title: Text("Allow calls from far away", tableName: "RemoteMode"),
+                                subtitle: Text("Let your home router make the direct connection", tableName: "RemoteMode"))
+                    }
                 }
             } header: {
                 Text("Guides")

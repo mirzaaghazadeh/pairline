@@ -545,4 +545,7 @@
     <string name="direct_reason_no_address">ليس للراوتر عنوان على الإنترنت</string>
     <string name="direct_reason_no_mapping">الراوتر لا يفتح المنافذ للتطبيقات</string>
     <string name="direct_reason_listen">تعذّر فتح منفذ على هذا الهاتف</string>
+    <string name="direct_hint_router">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد، فعّل UPnP أو NAT-PMP في إعدادات الموجّه. الخطوات بالتفصيل: المساعدة › السماح بالمكالمات من بعيد، في Pairline على آيفونك.</string>
+    <string name="direct_hint_modem">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد، فعّل UPnP على مودم مزوّدك أيضًا، أو اضبط المودم على وضع الجسر. الخطوات بالتفصيل: المساعدة › السماح بالمكالمات من بعيد، في Pairline على آيفونك.</string>
+    <string name="direct_hint_provider">ما زالت الرسائل والرموز تعمل. تحتاج المكالمات من بعيد إلى عنوان إنترنت خاص بك: اطلب من مزوّد الإنترنت عنوان IPv4 عامًا أو IPv6.</string>
 </resources>

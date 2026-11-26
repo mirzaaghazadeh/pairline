@@ -544,4 +544,7 @@
     <string name="direct_reason_no_address">روتر آدرس اینترنتی ندارد</string>
     <string name="direct_reason_no_mapping">روتر برای برنامه‌ها پورت باز نمی‌کند</string>
     <string name="direct_reason_listen">باز کردن پورت روی این گوشی ممکن نشد</string>
+    <string name="direct_hint_router">پیامک‌ها و کدها همچنان کار می‌کنند. برای تماس از راه دور، UPnP یا NAT-PMP را در تنظیمات مودم روشن کنید. قدم‌به‌قدم: راهنما › ممکن کردن تماس از راه دور، در Pairline روی آیفونتان.</string>
+    <string name="direct_hint_modem">پیامک‌ها و کدها همچنان کار می‌کنند. برای تماس از راه دور، UPnP را روی مودم شرکت اینترنت هم روشن کنید، یا مودم را در حالت Bridge بگذارید. قدم‌به‌قدم: راهنما › ممکن کردن تماس از راه دور، در Pairline روی آیفونتان.</string>
+    <string name="direct_hint_provider">پیامک‌ها و کدها همچنان کار می‌کنند. تماس از راه دور به نشانی اینترنتی اختصاصی نیاز دارد: از شرکت اینترنت یک نشانی IPv4 عمومی یا IPv6 بخواهید.</string>
 </resources>
