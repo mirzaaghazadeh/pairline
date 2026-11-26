@@ -4,7 +4,7 @@ import UIKit
 /// The app's language (D-081). On a fresh install Pairline starts in Persian, Arabic or Turkish when the iPhone is in
 /// English (or a language Pairline doesn't have) and the person clearly uses one of those: they have its keyboard, and
 /// when they have several, the time zone or region picks among them. With no keyboard list to read, the time zone,
-/// then the region decides. The choice is the same per-app language as iPhone Settings › Pairline › Language, where
+/// then the region decides. Tehran's time zone always means Persian (D-090). The choice is the same per-app language as iPhone Settings › Pairline › Language, where
 /// it can be changed, and it has to be made before anything loads a string, so `PairlineMain` runs it first.
 /// Nothing is sent anywhere. Following D-033 the app never lists its languages; it only shows the current one.
 enum AppLanguage {
@@ -36,6 +36,8 @@ enum AppLanguage {
     /// ISO code.
     static func suggest(systemLanguage: String, keyboards: [String]?, zone: String?, region: String?) -> String? {
         if ours.contains(systemLanguage.lowercased()) { return nil }
+        // Tehran's time zone is used only in Iran: Persian whatever the keyboards (D-090).
+        if zone.flatMap({ countryByZone[$0] }) == "IR" { return "fa" }
         let fromCountry = [zone.flatMap { countryByZone[$0] }, region?.uppercased()]
             .compactMap { $0.flatMap { languageByCountry[$0] } }
         guard let keyboards else { return fromCountry.first }

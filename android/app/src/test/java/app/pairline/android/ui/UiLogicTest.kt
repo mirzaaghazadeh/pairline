@@ -63,13 +63,22 @@ class UiLogicTest {
         assertEquals("tr", FirstLanguage.suggest(listOf("", null, "TR", "US"), "en"))
         assertEquals("ar", FirstLanguage.suggest(listOf(null, "ae", "AE", ""), "en"))
         assertEquals("fa", FirstLanguage.suggest(listOf("", "", "001", "AF"), "de"))
-        // A US SIM keeps the phone's language even in Tehran's time zone.
-        assertEquals(null, FirstLanguage.suggest(listOf("us", "us", "IR", "IR"), "en"))
+        // A German SIM keeps the phone's language; the region setting isn't reached.
+        assertEquals(null, FirstLanguage.suggest(listOf("de", "de", "DE", "IR"), "en", "DE"))
         assertEquals(null, FirstLanguage.suggest(listOf(null, null, null, ""), "en"))
     }
 
     @Test
+    fun tehransTimeZoneMeansPersianWhateverTheSim() {
+        assertEquals("fa", FirstLanguage.suggest(listOf("us", "us", "IR", "US"), "en", "IR"))
+        assertEquals("fa", FirstLanguage.suggest(listOf("tr", "tr", "IR", "TR"), "de", "IR"))
+        // Only Tehran's: a US SIM in Istanbul's time zone keeps English.
+        assertEquals(null, FirstLanguage.suggest(listOf("us", "us", "TR", "US"), "en", "TR"))
+    }
+
+    @Test
     fun firstLanguageKeepsAPhoneAlreadyInOneOfOurLanguages() {
+        assertEquals(null, FirstLanguage.suggest(listOf("tr"), "tr", "IR"))
         assertEquals(null, FirstLanguage.suggest(listOf("ir"), "tr"))
         assertEquals(null, FirstLanguage.suggest(listOf("tr"), "fa"))
         assertEquals(null, FirstLanguage.suggest(listOf("sa"), "ar"))

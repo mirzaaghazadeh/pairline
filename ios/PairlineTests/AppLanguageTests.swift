@@ -24,6 +24,11 @@ final class AppLanguageTests: XCTestCase {
         XCTAssertNil(AppLanguage.suggest(systemLanguage: "en", keyboards: [en, "emoji@sw=Emoji"], zone: "Asia/Dubai", region: "AE"))
     }
 
+    func testTehransTimeZoneMeansPersianWhateverTheKeyboards() {
+        XCTAssertEqual(AppLanguage.suggest(systemLanguage: "en", keyboards: [en], zone: "Asia/Tehran", region: "US"), "fa")
+        XCTAssertEqual(AppLanguage.suggest(systemLanguage: "en", keyboards: [en, tr], zone: "Asia/Tehran", region: "TR"), "fa")
+    }
+
     func testWithoutAKeyboardListTheTimeZoneThenRegionDecide() {
         XCTAssertEqual(AppLanguage.suggest(systemLanguage: "en", keyboards: nil, zone: "Asia/Tehran", region: "US"), "fa")
         XCTAssertEqual(AppLanguage.suggest(systemLanguage: "en", keyboards: nil, zone: "America/New_York", region: "tr"), "tr")

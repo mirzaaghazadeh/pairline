@@ -11,8 +11,9 @@ import java.util.Locale
  * The app's language on first open (D-081). Before setup has started, Pairline picks Persian, Arabic or Turkish when
  * the phone's country points to one and the phone itself is in English (or a language Pairline doesn't have). The
  * country comes from the SIM card, else the mobile network, else the time zone, else the phone's region setting: the
- * first one known decides. Setup then opens on the language step, so the user sees the choice and can change it.
- * Nothing is sent anywhere; only the chosen language is kept (and logged).
+ * first one known decides, except that Tehran's time zone always means Persian (D-090). Setup then opens on the
+ * language step, so the user sees the choice and can change it. Nothing is sent anywhere; only the chosen language is
+ * kept (and logged).
  */
 object FirstLanguage {
     private const val TAG = "language"
@@ -31,10 +32,13 @@ object FirstLanguage {
 
     /**
      * The language to start in, or null to follow the phone. [countries] are ISO codes in order of trust (SIM,
-     * network, time zone, region; blank or null when unknown); [systemLanguage] is the phone's language.
+     * network, time zone, region; blank or null when unknown); [systemLanguage] is the phone's language; [zoneCountry]
+     * the time zone's country.
      */
-    fun suggest(countries: List<String?>, systemLanguage: String): String? {
+    fun suggest(countries: List<String?>, systemLanguage: String, zoneCountry: String? = null): String? {
         if (systemLanguage.lowercase(Locale.ROOT) in OWN) return null
+        // Tehran's time zone is used only in Iran: Persian whatever the SIM says (an Iranian with a foreign SIM).
+        if (zoneCountry.equals("IR", ignoreCase = true)) return "fa"
         val country = countries.firstOrNull { !it.isNullOrBlank() && it != "001" } ?: return null
         return LANGUAGE_BY_COUNTRY[country.uppercase(Locale.ROOT)]
     }
@@ -47,7 +51,8 @@ object FirstLanguage {
             prefs.languageGuess = ""
             return
         }
-        val tag = suggest(countries(context), systemLanguage()).orEmpty()
+        val zone = runCatching { android.icu.util.TimeZone.getRegion(java.util.TimeZone.getDefault().id) }.getOrNull()
+        val tag = suggest(countries(context, zone), systemLanguage(), zone).orEmpty()
         prefs.languageGuess = tag
         if (tag.isEmpty()) return
         LocaleHelper.set(context, tag)
@@ -56,11 +61,10 @@ object FirstLanguage {
 
     private fun systemLanguage(): String = Resources.getSystem().configuration.locales[0].language
 
-    private fun countries(context: Context): List<String?> {
+    private fun countries(context: Context, zone: String?): List<String?> {
         val phone = context.getSystemService(TelephonyManager::class.java)
         val sim = runCatching { phone?.simCountryIso }.getOrNull()
         val network = runCatching { phone?.networkCountryIso }.getOrNull()
-        val zone = runCatching { android.icu.util.TimeZone.getRegion(java.util.TimeZone.getDefault().id) }.getOrNull()
         val region = Resources.getSystem().configuration.locales[0].country
         return listOf(sim, network, zone, region)
     }

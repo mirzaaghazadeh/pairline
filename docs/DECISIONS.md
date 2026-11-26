@@ -1533,3 +1533,17 @@ MMS store and `SEND_SMS` lets an app that isn't the default messaging app send t
   sender above each incoming run of messages.
 - Strings in an `MMS` table. Unit tests: the PDU's encoding, keys, participants, the merged history's storage, the
   picture sizing. Needs real phones and carriers.
+
+### D-090 — Tehran's time zone always means Persian (2026-11-26)
+
+The maintainer asked that Tehran's time zone give Persian on first open, amending D-081. Asia/Tehran is used only in
+Iran, so unlike Istanbul's or Dubai's it says little about visitors and a lot about the person.
+- **Android:** a time zone whose country (ICU) is Iran gives Persian before the SIM is looked at, so an Iranian with a
+  foreign SIM, or with none, starts in Persian. Other time zones keep D-081's order (SIM, network, time zone, region).
+- **iPhone:** Tehran's time zone gives Persian whatever keyboards were added; other time zones still only choose among
+  the keyboards' languages.
+- Still only on a fresh install, and only when the phone itself isn't in Persian, Arabic or Turkish (a Turkish phone
+  in Tehran stays Turkish). Nothing new is read; PRIVACY.md already lists the time zone.
+- **Open:** iPhone Settings › Pairline shows a Language row only when the iPhone has two or more languages in General
+  › Language & Region. On an iPhone with one, a person put in Persian this way has no way back to English short of
+  adding a language there.
