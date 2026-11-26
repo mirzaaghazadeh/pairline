@@ -1,0 +1,60 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ is calling your Android number." : {
+      "comment" : "Remote mode: an incoming call on the bridge phone, shown as a notification. The argument is the caller's name or number.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "%@ يتصل برقمك على هاتف أندرويد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "%@ با شمارهٔ اندرویدی شما تماس می‌گیرد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ Android numaranızı arıyor." } }
+      }
+    },
+    "A phone answered your pairing invitation." : {
+      "comment" : "Remote pairing: the Android phone answered the invitation this iPhone sent.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ردّ هاتف على دعوة الاقتران التي أرسلتها." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک گوشی به دعوت جفت‌کردن شما پاسخ داد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bir telefon eşleştirme davetinize yanıt verdi." } }
+      }
+    },
+    "Incoming call" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مكالمة واردة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس ورودی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gelen arama" } }
+      }
+    },
+    "Missed call" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مكالمة فائتة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس بی‌پاسخ" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Cevapsız arama" } }
+      }
+    },
+    "New message" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رسالة جديدة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام جدید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeni mesaj" } }
+      }
+    },
+    "New one-time code" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رمز جديد لمرة واحدة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کد یک‌بارمصرف جدید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeni tek kullanımlık kod" } }
+      }
+    },
+    "Pairline" : {
+      "shouldTranslate" : false
+    },
+    "Unknown caller" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "متصل غير معروف" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌گیرنده ناشناس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bilinmeyen arayan" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

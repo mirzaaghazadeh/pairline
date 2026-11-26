@@ -15,10 +15,13 @@ final class IdentityStore {
     private var cached: KeyAgreementPrivateKey?
     private(set) var kind: Kind?
 
-    /// `prefix` keeps test keys apart from the app's own.
+    /// `prefix` keeps test keys apart from the app's own. The key lives in the shared Keychain group, so remote
+    /// mode's notification service extension can unseal records (D-072); a key from before that moves there once.
     init(prefix: String = "") {
         kindAccount = prefix + "identity.kind"
         keyAccount = prefix + "identity.key"
+        Keychain.share(account: kindAccount)
+        Keychain.share(account: keyAccount)
     }
 
     func identity() throws -> KeyAgreementPrivateKey {
@@ -58,16 +61,16 @@ final class IdentityStore {
                                                             .privateKeyUsage, &error),
                let key = try? SecureEnclave.P256.KeyAgreement.PrivateKey(compactRepresentable: false,
                                                                          accessControl: access) {
-                try Keychain.set(key.dataRepresentation, account: keyAccount)
-                try Keychain.set(Data(Kind.secureEnclave.rawValue.utf8), account: kindAccount)
+                try Keychain.set(key.dataRepresentation, account: keyAccount, shared: true)
+                try Keychain.set(Data(Kind.secureEnclave.rawValue.utf8), account: kindAccount, shared: true)
                 kind = .secureEnclave
                 log.info("identity", "Created a Secure Enclave identity key")
                 return key
             }
         }
         let key = P256.KeyAgreement.PrivateKey(compactRepresentable: false)
-        try Keychain.set(key.rawRepresentation, account: keyAccount)
-        try Keychain.set(Data(Kind.keychain.rawValue.utf8), account: kindAccount)
+        try Keychain.set(key.rawRepresentation, account: keyAccount, shared: true)
+        try Keychain.set(Data(Kind.keychain.rawValue.utf8), account: kindAccount, shared: true)
         kind = .keychain
         log.info("identity", "Created a Keychain identity key")
         return key
@@ -99,8 +102,10 @@ final class PeerStore {
     private let account: String
     private(set) var peer: PairedPeer?
 
+    /// In the shared Keychain group, like the identity key (the extension needs the bridge's pinned key).
     init(prefix: String = "") {
         account = prefix + "peer"
+        Keychain.share(account: account)
         if let data = Keychain.get(account: account) {
             peer = try? JSONDecoder().decode(PairedPeer.self, from: data)
         }
@@ -109,7 +114,7 @@ final class PeerStore {
     func save(_ peer: PairedPeer) {
         self.peer = peer
         if let data = try? JSONEncoder().encode(peer) {
-            try? Keychain.set(data, account: account)
+            try? Keychain.set(data, account: account, shared: true)
         }
     }
 

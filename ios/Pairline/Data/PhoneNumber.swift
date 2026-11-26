@@ -1,0 +1,83 @@
+import Foundation
+
+/// Phone-number helpers. Numbers are shown as the bridge sends them, always left-to-right.
+enum PhoneNumber {
+    /// Converts Persian and Arabic-Indic digits to ASCII.
+    static func asciiDigits(_ text: String) -> String {
+        String(text.unicodeScalars.map { scalar -> Character in
+            switch scalar.value {
+            case 0x06F0...0x06F9: return Character(UnicodeScalar(scalar.value - 0x06F0 + 0x30)!)
+            case 0x0660...0x0669: return Character(UnicodeScalar(scalar.value - 0x0660 + 0x30)!)
+            default: return Character(scalar)
+            }
+        })
+    }
+
+    /// The characters a dialer accepts: digits, +, *, #.
+    static func dialable(_ text: String) -> String {
+        String(asciiDigits(text).filter { $0.isASCII && ($0.isNumber || "+*#".contains($0)) })
+    }
+
+    /// "0098 912…" as "+98 912…" (D-067): "00" is the international prefix in Iran, Turkey and most of the world, and
+    /// "+" is how phones write it. The same number, dialed the same; contacts still match (they compare the last digits).
+    static func international(_ text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+        guard trimmed.hasPrefix("00"), trimmed.count > 6,
+              trimmed.dropFirst(2).first.map({ $0.isASCII && $0.isNumber && $0 != "0" }) == true else { return text }
+        return "+" + trimmed.dropFirst(2)
+    }
+
+    /// A key for matching numbers written in different formats: the last 9 digits.
+    static func matchKey(_ text: String) -> String? {
+        let digits = asciiDigits(text).filter { $0.isASCII && $0.isNumber }
+        guard digits.count >= 5 else {
+            let trimmed = text.trimmingCharacters(in: .whitespaces).lowercased()
+            return trimmed.isEmpty ? nil : "t:" + trimmed
+        }
+        return String(digits.suffix(9))
+    }
+
+    /// The ASCII digits of a number, in order (Persian and Arabic-Indic digits converted).
+    static func digits(_ text: String) -> String {
+        String(asciiDigits(text).filter { $0.isASCII && $0.isNumber })
+    }
+
+    /// Whether a block-list entry covers `number`, the same rule as the bridge (D-043): with seven or more digits on
+    /// both sides, the last digits agree (as many as the shorter has, up to 9), so "+354 555 1234" covers "5551234".
+    /// Shorter numbers and sender names such as "BANK" must match exactly.
+    static func blockMatches(_ blocked: String, _ number: String) -> Bool {
+        let a = digits(blocked)
+        let b = digits(number)
+        if a.count >= 7 && b.count >= 7 {
+            let n = min(9, a.count, b.count)
+            return a.suffix(n) == b.suffix(n)
+        }
+        guard let key = matchKey(blocked) else { return false }
+        return key == matchKey(number)
+    }
+
+    /// Whether an address looks like a phone number (and not an alphanumeric sender such as "BANK").
+    static func isPhoneNumber(_ text: String) -> Bool {
+        let digits = asciiDigits(text).filter { $0.isASCII && $0.isNumber }
+        return digits.count >= 3 && !text.contains(where: { $0.isLetter })
+    }
+
+    /// Wraps text in Unicode left-to-right isolates so numbers keep their order inside right-to-left text.
+    static func ltr(_ text: String) -> String { "\u{2066}\(text)\u{2069}" }
+
+    /// USSD-looking input such as `*140#` or `*#06#`.
+    static func isUSSD(_ text: String) -> Bool {
+        let t = dialable(text)
+        return (t.hasPrefix("*") || t.hasPrefix("#")) && t.hasSuffix("#") && t.count >= 3
+    }
+
+    /// A stable negative thread id for a conversation the bridge hasn't stored yet.
+    static func syntheticThreadID(for address: String) -> Int64 {
+        var hash: UInt64 = 0xcbf2_9ce4_8422_2325
+        for byte in (matchKey(address) ?? address).utf8 {
+            hash ^= UInt64(byte)
+            hash = hash &* 0x0000_0100_0000_01b3
+        }
+        return -Int64(hash % 1_000_000_000_000) - 1
+    }
+}

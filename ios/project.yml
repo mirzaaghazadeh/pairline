@@ -65,6 +65,9 @@ targets:
       - target: PairlineShare
         embed: true
         codeSign: true
+      - target: PairlineNotifications
+        embed: true
+        codeSign: true
       # Live Activities (D-053) need iOS 16.1+; weak so the app still launches on iOS 16.0.
       - sdk: ActivityKit.framework
         weak: true
@@ -114,6 +117,33 @@ targets:
     dependencies:
       - sdk: SwiftUI.framework
       - sdk: UniformTypeIdentifiers.framework
+
+  # Remote mode (D-072): unseals alert-mailbox records pushed by CloudKit and shows them. It uses only the protocol
+  # and Keychain code it needs, and no network.
+  PairlineNotifications:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PairlineNotifications
+      - path: Shared/RemoteInbox.swift
+      - path: Shared/SharedOutbox.swift
+      - path: Pairline/Protocol/Bytes.swift
+      - path: Pairline/Protocol/Frames.swift
+      - path: Pairline/Protocol/SessionCrypto.swift
+      - path: Pairline/Remote/MailboxCrypto.swift
+      - path: Pairline/Identity/Keychain.swift
+      - path: Pairline/Messages/OTPDetector.swift
+      - path: Pairline/Data/PhoneNumber.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios.notifications
+        PRODUCT_NAME: PairlineNotifications
+        INFOPLIST_FILE: PairlineNotifications/Info.plist
+        CODE_SIGN_ENTITLEMENTS: PairlineNotifications/PairlineNotifications.entitlements
+        SKIP_INSTALL: YES
+    dependencies:
+      - sdk: CloudKit.framework
+      - sdk: UserNotifications.framework
 
   PairlineTests:
     type: bundle.unit-test
