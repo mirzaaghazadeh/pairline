@@ -1549,6 +1549,24 @@ Iran, so unlike Istanbul's or Dubai's it says little about visitors and a lot ab
   › Language & Region. On an iPhone with one, a person put in Persian this way has no way back to English short of
   adding a language there.
 
+### D-091 — Accessibility labels only for what was checked; the iPhone app earns five (2026-11-26)
+
+The maintainer asked for the App Store's Accessibility Nutrition Labels and then for the fixes behind them. A label
+promises that the app's common tasks work with that setting on, so each claim follows a check, recorded in
+`docs/app-store/accessibility.md`, and nothing is claimed for a build that isn't on the App Store yet.
+- **Claimed (iPhone and iPad, drafts):** Dark Interface, Differentiate Without Color Alone, and, from commit fe82970,
+  Larger Text, Sufficient Contrast and Reduced Motion. Published only once a build with fe82970 is live.
+- **Sufficient Contrast through Increase Contrast,** which Apple's criteria accept when the default falls short: the
+  default look stays as it is (the system's secondary gray is 3.4:1 on white), and with Increase Contrast every brand
+  color has a high-contrast variant. Green and red serve both as text and behind white glyphs, which no single shade
+  does well in dark mode, so `BrandGreenFill` and `BrandRedFill` (same as the text colors by default) are used behind
+  white.
+- **Not claimed yet:** VoiceOver and Voice Control, until someone does the common tasks with them on a real iPhone; the
+  automated audit found no missing labels. Captions and Audio Descriptions don't apply (no video).
+- **How it's checked:** XCTest's `performAccessibilityAudit` on 9 demo screens in five modes from a temporary UI-test
+  target (not committed: it would add a UI-test bundle to CI for a check that's run before releases), with each flagged
+  element's contrast measured from the screenshot, since the audit also flags text behind the tab bar or off screen.
+
 ### D-092 — Remote mode: the user's own iCloud as doorbell and mailbox, a direct connection through the home router (2026-11-26)
 
 The maintainer's design, built on the `remote-mode` branch as milestone M10 (written there as D-072, then D-080, and

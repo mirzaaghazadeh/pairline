@@ -12,7 +12,7 @@ Everything the App Store product page needs, kept as source so it can be regener
 | `assets.html`, `upload-assets.sh` | The iOS 27 product-page header and search-results images per locale, uploaded and placed with the `asc` CLI |
 | `events/<event>/`, `events.html`, `upload-event.sh` | In-app events: each folder has `event.env` (type, purpose, priority, deep link, dates) and the name and descriptions per locale; `events.html` renders the text-free card and details-page images; `upload-event.sh` creates or updates the event with the `asc` CLI and never submits it |
 | `custom-pages/<page>/`, `upload-custom-page.sh` | Custom product pages: `page.env` (name, slide order) and each locale's promotional text and search keywords; `upload-custom-page.sh` fills in whatever is missing in App Store Connect (localizations, screenshots in that order, keywords) and never submits |
-| `accessibility.md` | The Accessibility Nutrition Labels: what's claimed per device family, the audit behind it, and what to fix to claim more |
+| `accessibility.md` | The Accessibility Nutrition Labels (D-091): what's claimed per device family, the audit behind each, when to publish, and the rules that keep them true |
 | `privacy.json` | The App Privacy declaration ("Data Not Collected"), applied and published with `asc web privacy` (needs an `asc web auth login` session) |
 | `../screenshots/ipad/<lang>/` | iPad Pro 13-inch (M5) Simulator captures (2064 x 2752, flattened), framed by `slides.html#device=ipad` |
 | `../screenshots/duo/<lang>/` | iPhone Duo Simulator captures of the inner display, open, in landscape (2853 x 2007), framed by `slides.html#device=duo` |
