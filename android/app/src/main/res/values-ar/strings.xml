@@ -483,4 +483,7 @@
     <string name="remote_pair_failed_icloud">لا تسمح Apple لتطبيق Pairline بالوصول إلى حساب iCloud هذا من هاتف آخر، لذا لا يمكن الإقران عن بُعد مع هذا الحساب حاليًا.</string>
     <string name="remote_pair_failed_bad_answer">لم يجتز ردّ الآيفون عمليات التحقق، لذا توقّف الإقران حفاظًا على أمان هذا الهاتف. اطلب دعوة جديدة.</string>
     <string name="remote_pair_failed_internal">حدث خطأ ما على هذا الهاتف. حاول مجددًا بدعوة جديدة.</string>
+    <string name="remote_pair_paste_intro">هل الآيفون بعيد؟ إذا وصلك منه رابط دعوة، فانسخ الرابط كاملًا والصقه هنا.</string>
+    <string name="remote_pair_paste">لصق دعوة</string>
+    <string name="remote_pair_paste_none">لا توجد دعوة من Pairline في الحافظة. انسخ الرابط كاملًا (يبدأ بـ pairline://invite) ثم حاول مرة أخرى.</string>
 </resources>

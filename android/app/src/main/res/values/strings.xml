@@ -484,4 +484,8 @@
     <string name="remote_pair_failed_icloud">Apple doesn\'t let Pairline reach this iCloud account from another phone, so pairing from far away can\'t work with it right now.</string>
     <string name="remote_pair_failed_bad_answer">The iPhone\'s answer didn\'t pass the checks, so pairing stopped to keep this phone safe. Ask for a new invitation.</string>
     <string name="remote_pair_failed_internal">Something went wrong on this phone. Try again with a new invitation.</string>
+    <!-- On the pairing screen: for an invitation that arrived in a messenger that doesn't open pairline:// links. -->
+    <string name="remote_pair_paste_intro">Is the iPhone far away? If you got an invitation link from it, copy the whole link and paste it here.</string>
+    <string name="remote_pair_paste">Paste an invitation</string>
+    <string name="remote_pair_paste_none">There\'s no Pairline invitation on the clipboard. Copy the whole link (it starts with pairline://invite) and try again.</string>
 </resources>

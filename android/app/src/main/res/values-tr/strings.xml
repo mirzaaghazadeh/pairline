@@ -482,4 +482,7 @@
     <string name="remote_pair_failed_icloud">Apple, Pairline\'ın bu iCloud hesabına başka bir telefondan erişmesine izin vermiyor; bu yüzden bu hesapla uzaktan eşleştirme şu anda mümkün değil.</string>
     <string name="remote_pair_failed_bad_answer">iPhone\'un yanıtı doğrulanamadı, bu yüzden bu telefonu korumak için eşleştirme durduruldu. Yeni bir davet isteyin.</string>
     <string name="remote_pair_failed_internal">Bu telefonda bir sorun oluştu. Yeni bir davetle tekrar deneyin.</string>
+    <string name="remote_pair_paste_intro">iPhone uzakta mı? Ondan bir davet bağlantısı aldıysanız bağlantının tamamını kopyalayıp buraya yapıştırın.</string>
+    <string name="remote_pair_paste">Daveti yapıştır</string>
+    <string name="remote_pair_paste_none">Panoda Pairline daveti yok. Bağlantının tamamını (pairline://invite ile başlar) kopyalayıp tekrar deneyin.</string>
 </resources>

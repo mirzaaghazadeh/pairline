@@ -1,6 +1,8 @@
 package app.pairline.android.ui.pairing
 
 import android.app.Activity
+import android.content.ClipboardManager
+import android.content.Context
 import android.view.WindowManager
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -56,6 +58,7 @@ import app.pairline.android.R
 import app.pairline.android.link.BluetoothStatus
 import app.pairline.android.link.LinkService
 import app.pairline.android.link.PairingOutcome
+import app.pairline.android.protocol.RemoteInvitation
 import app.pairline.android.ui.PIcons
 import app.pairline.android.ui.PermissionGroup
 import app.pairline.android.ui.SystemActions
@@ -219,9 +222,34 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                     NoteBox(stringResource(R.string.pair_replaces, name), Tone.WARN, PIcons.Warning)
                 }
                 NoteBox(stringResource(R.string.pair_keep_open), Tone.NEUTRAL, PIcons.Lock)
+                RemoteInvitationPaste()
             }
         }
     }
+}
+
+/**
+ * Remote pairing (D-072) for an invitation that arrived in a messenger that doesn't open `pairline://` links: the
+ * person copies the whole link and pastes it here. The clipboard is read only when they tap the button.
+ */
+@Composable
+private fun RemoteInvitationPaste() {
+    val context = LocalContext.current
+    var nothingToPaste by remember { mutableStateOf(false) }
+    Text(
+        stringResource(R.string.remote_pair_paste_intro),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+    )
+    SecondaryButton(stringResource(R.string.remote_pair_paste), {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val text = clipboard.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)
+            ?.coerceToText(context)?.toString()?.trim()
+        nothingToPaste = text == null || !text.startsWith(RemoteInvitation.PREFIX)
+        if (!nothingToPaste) AppGraph.remotePairing.open(text!!)
+    }, icon = PIcons.Copy)
+    if (nothingToPaste) NoteBox(stringResource(R.string.remote_pair_paste_none), Tone.WARN, PIcons.Warning)
 }
 
 @Composable

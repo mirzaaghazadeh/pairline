@@ -482,4 +482,7 @@
     <string name="remote_pair_failed_icloud">اپل اجازه نمی‌دهد Pairline از گوشی دیگری به این حساب iCloud دسترسی داشته باشد، پس فعلاً جفت کردن از راه دور با این حساب ممکن نیست.</string>
     <string name="remote_pair_failed_bad_answer">پاسخ آیفون در بررسی‌ها تأیید نشد، پس برای امنیت این گوشی جفت‌سازی متوقف شد. دعوت تازه‌ای بخواهید.</string>
     <string name="remote_pair_failed_internal">در این گوشی مشکلی پیش آمد. با یک دعوت تازه دوباره امتحان کنید.</string>
+    <string name="remote_pair_paste_intro">آیفون دور است؟ اگر از آن لینک دعوت گرفته‌اید، کل لینک را کپی کنید و اینجا بچسبانید.</string>
+    <string name="remote_pair_paste">چسباندن دعوت</string>
+    <string name="remote_pair_paste_none">هیچ دعوت Pairline در کلیپ‌بورد نیست. کل لینک را (که با pairline://invite شروع می‌شود) کپی کنید و دوباره امتحان کنید.</string>
 </resources>
