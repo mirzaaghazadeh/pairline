@@ -7,6 +7,7 @@ import app.pairline.android.files.FileNotifications
 import app.pairline.android.files.FileTransfers
 import app.pairline.android.link.IdentityStore
 import app.pairline.android.netshare.NetShare
+import app.pairline.android.netshare.NetSwitches
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.privileged.TalkReminder
 import app.pairline.android.link.LinkManager
@@ -82,10 +83,20 @@ object AppGraph {
             inCallServiceAvailable = { calls.inCallServiceAvailable },
             mediaCaps = { audioRelay.canListen to audioRelay.canTalk },
             mediaLink = { audioRelay.canLink },
+            net = { netSwitches.state().toJson() },
+            netSwitch = { netSwitches.canSwitch },
         )
     }
     val router: MessageRouter by lazy {
-        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList)
+        MessageRouter(
+            link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
+            netSwitches,
+        )
+    }
+
+    /** This phone's hotspot, Bluetooth tethering, mobile data and data SIM, switched from the iPhone (D-073). */
+    val netSwitches: NetSwitches by lazy {
+        NetSwitches(app, privileged, sims, hotspot).also { it.onChange = { router.statusChanged() } }
     }
 
     /** Internet sharing for the paired iPhone (M8, D-048). */

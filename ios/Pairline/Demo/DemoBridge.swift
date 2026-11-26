@@ -22,6 +22,9 @@ final class DemoBridge: BridgeLink {
     private var calls: [CallLogRecord] = []
     private var blocked: [BlockedNumber] = []
     private var netShareOn = false
+    /// The demo bridge's hotspot, Bluetooth tethering, mobile data and data SIM (D-073).
+    private var net: [String: Bool] = ["hotspot": false, "bluetooth": false, "data": true]
+    private var dataSlot = 0
     private var nextKey = 1000
     private var activeCall: (id: Int64, number: String, dir: String, state: String)?
     private var nextCallID: Int64 = 1
@@ -92,10 +95,11 @@ final class DemoBridge: BridgeLink {
             "battery": ["level": battery, "charging": false],
             "sims": [
                 ["slot": 0, "carrier": content.carriers.0, "label": "SIM 1", "number": content.ownNumber, "signal": 4,
-                 "net": "5G", "roaming": false, "defaultSms": true, "defaultVoice": true],
+                 "net": "5G", "roaming": false, "defaultSms": true, "defaultVoice": true, "defaultData": dataSlot == 0],
                 ["slot": 1, "carrier": content.carriers.1, "label": "SIM 2", "number": NSNull(), "signal": 2,
-                 "net": "LTE", "roaming": false, "defaultSms": false, "defaultVoice": false],
+                 "net": "LTE", "roaming": false, "defaultSms": false, "defaultVoice": false, "defaultData": dataSlot == 1],
             ],
+            "net": net,
             "app": "0.1.0",
             // Everything a fully set-up bridge can do, so the demo shows Talk on iPhone and internet sharing as
             // ready. Demo calls show their audio on this iPhone without playing any (CallCenter).
@@ -189,6 +193,18 @@ final class DemoBridge: BridgeLink {
             return ["t": "net.share", "id": id, "on": true, "host": "192.168.43.1", "port": 47830,
                     "user": "pairline", "pass": "demo-k7f2q9", "pac": "http://192.168.43.1:47830/proxy.pac",
                     "vpn": false]
+        case "net.switch":
+            // Nothing is switched anywhere: the demo only remembers it and shows it in the next status.
+            if let what = f["what"] as? String, what == "dataSim", let slot = f["sim"] as? Int, (0...1).contains(slot) {
+                dataSlot = slot
+            } else if let what = f["what"] as? String, net[what] != nil, let on = f["on"] as? Bool {
+                net[what] = on
+            } else {
+                return ["t": "error", "id": id, "code": "invalid", "msg": "bad switch"]
+            }
+            let status = statusBody(id: nil)
+            DispatchQueue.main.async { [weak self] in self?.emit(status) }
+            return ["t": "ok", "id": id]
         case "block.list":
             return blockListBody(id: id)
         case "block.set":

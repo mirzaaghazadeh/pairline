@@ -26,6 +26,15 @@ struct SettingsTab: View {
                 destination(page ?? .about)
                     .id(page ?? .about)
             }
+            #if DEBUG
+            // `-PairlineSettingsPage netShare` opens that page beside the list, for checking it on the Simulator.
+            .onAppear {
+                let args = ProcessInfo.processInfo.arguments
+                if let i = args.firstIndex(of: "-PairlineSettingsPage"), i + 1 < args.count, args[i + 1] == "netShare" {
+                    page = .netShare
+                }
+            }
+            #endif
         } else {
             NavigationStack { settingsList }
         }

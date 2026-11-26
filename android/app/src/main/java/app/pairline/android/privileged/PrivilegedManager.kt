@@ -378,6 +378,16 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
             .getOrDefault(false)
     }
 
+    /**
+     * The iPhone's internet switches (D-073), only when the user flips one there. Each needs the helper (null
+     * without it) and throws what the helper threw; off the main thread.
+     */
+    fun setTethering(type: Int, on: Boolean): Int? = service?.setTethering(type, on)
+
+    fun setMobileData(on: Boolean): Boolean? = service?.setMobileData(on)
+
+    fun setDataSubscription(subId: Int): Boolean? = service?.setDataSubscription(subId)
+
     fun allowOngoingCalls(): Boolean {
         val s = service ?: return false
         return runCatching { s.allowOngoingCalls(context.packageName) }

@@ -1,6 +1,110 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Android phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon" } }
+      }
+    },
+    "Bluetooth tethering" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مشاركة الإنترنت عبر البلوتوث" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bluetooth tethering" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اشتراک اینترنت با بلوتوث" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bluetooth ile paylaşım" } }
+      }
+    },
+    "Bluetooth tethering: on this iPhone, tap the Android phone in Settings › Bluetooth (pair once when asked). It's slower than the hotspot but needs no Wi-Fi." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مشاركة الإنترنت عبر البلوتوث: على هذا الآيفون، اضغط على هاتف أندرويد في الإعدادات › Bluetooth (وأقرن الجهازين مرة واحدة عند الطلب). وهي أبطأ من نقطة الاتصال لكنها لا تحتاج إلى واي فاي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bluetooth tethering: on this iPhone, tap the Android phone in Settings › Bluetooth (pair once when asked). It's slower than the hotspot but needs no Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اشتراک اینترنت با بلوتوث: در همین آیفون، در تنظیمات › Bluetooth روی گوشی اندرویدی بزنید (بار اول جفت‌شدن را تأیید کنید). از هات‌اسپات کندتر است، اما وای‌فای لازم ندارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bluetooth ile paylaşım: bu iPhone’da Ayarlar › Bluetooth’ta Android telefona dokunun (istendiğinde bir kez eşleştirin). Erişim noktasından yavaştır ama Wi-Fi gerektirmez." } }
+      }
+    },
+    "Can I turn on the Android phone's hotspot from here?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل يمكنني تشغيل نقطة اتصال هاتف أندرويد من هنا؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can I turn on the Android phone's hotspot from here?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "می‌توانم هات‌اسپات گوشی اندرویدی را از اینجا روشن کنم؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun erişim noktasını buradan açabilir miyim?" } }
+      }
+    },
+    "Data SIM" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شريحة البيانات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Data SIM" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سیم‌کارت اینترنت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Veri SIM’i" } }
+      }
+    },
+    "Hotspot" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نقطة الاتصال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hotspot" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هات‌اسپات" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Erişim noktası" } }
+      }
+    },
+    "Hotspot and data switches" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفاتيح نقطة الاتصال والبيانات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hotspot and data switches" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کلیدهای هات‌اسپات و اینترنت همراه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Erişim noktası ve veri anahtarları" } }
+      }
+    },
+    "Mobile data" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بيانات الجوال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mobile data" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اینترنت همراه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mobil veri" } }
+      }
+    },
+    "Needs Talk on iPhone on, and the latest Pairline Bridge, on your Android phone (Android 11 or later)." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يتطلب تشغيل «التحدث عبر الآيفون» وأحدث إصدار من Pairline Bridge على هاتف أندرويد (أندرويد 11 أو أحدث)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Needs Talk on iPhone on, and the latest Pairline Bridge, on your Android phone (Android 11 or later)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به روشن بودن «مکالمه با آیفون» و آخرین نسخهٔ Pairline Bridge روی گوشی اندرویدی نیاز دارد (اندروید ۱۱ یا جدیدتر)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda iPhone’dan konuşma’nın açık olması ve en son Pairline Bridge gerekir (Android 11 veya üstü)." } }
+      }
+    },
+    "The Android phone couldn't switch it. Try again, or switch it on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يتمكن هاتف أندرويد من تبديله. حاول مرة أخرى، أو بدّله على هاتف أندرويد نفسه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone couldn't switch it. Try again, or switch it on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی نتوانست آن را عوض کند. دوباره امتحان کنید یا روی خود گوشی اندرویدی عوضش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon bunu değiştiremedi. Yeniden deneyin ya da Android telefonun kendisinde değiştirin." } }
+      }
+    },
+    "The carrier or Android didn't allow this on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم تسمح شركة الاتصالات أو أندرويد بذلك على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The carrier or Android didn't allow this on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اپراتور یا اندروید روی گوشی اندرویدی اجازهٔ این کار را نداد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Operatör ya da Android, Android telefonda buna izin vermedi." } }
+      }
+    },
+    "These switch the Android phone itself. Join its hotspot here in Settings › Wi-Fi: the fastest way to use its internet, and Pairline connects over it too." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هذه المفاتيح تغيّر إعدادات هاتف أندرويد نفسه. اتصل بنقطة اتصاله هنا في الإعدادات › Wi-Fi: إنها أسرع طريقة لاستخدام إنترنته، ويتصل Pairline عبرها أيضًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "These switch the Android phone itself. Join its hotspot here in Settings › Wi-Fi: the fastest way to use its internet, and Pairline connects over it too." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این کلیدها خود گوشی اندرویدی را عوض می‌کنند. اینجا در تنظیمات › Wi-Fi به هات‌اسپات آن وصل شوید: سریع‌ترین راه برای استفاده از اینترنت آن است و Pairline هم از طریق آن وصل می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bunlar Android telefonun kendisini değiştirir. Erişim noktasına burada Ayarlar › Wi-Fi’dan bağlanın: internetini kullanmanın en hızlı yolu budur ve Pairline da onun üzerinden bağlanır." } }
+      }
+    },
+    "Yes, while Talk on iPhone is on in the bridge app: Settings › Internet sharing here switches the Android phone's hotspot, Bluetooth tethering, mobile data and data SIM. Then join the hotspot in Settings › Wi-Fi, or, for Bluetooth tethering, tap the Android phone in Settings › Bluetooth (pair once when asked). Bluetooth is slower but needs no Wi-Fi." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، ما دام «التحدث عبر الآيفون» مفعّلًا في تطبيق الهاتف الوسيط: الإعدادات › مشاركة الإنترنت هنا تشغّل وتوقف نقطة اتصال هاتف أندرويد ومشاركة الإنترنت عبر البلوتوث وبيانات الجوال، وتختار شريحة البيانات. ثم اتصل بنقطة الاتصال في الإعدادات › Wi-Fi، أو لمشاركة البلوتوث اضغط على هاتف أندرويد في الإعدادات › Bluetooth (وأقرن الجهازين مرة واحدة عند الطلب). البلوتوث أبطأ لكنه لا يحتاج إلى واي فاي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, while Talk on iPhone is on in the bridge app: Settings › Internet sharing here switches the Android phone's hotspot, Bluetooth tethering, mobile data and data SIM. Then join the hotspot in Settings › Wi-Fi, or, for Bluetooth tethering, tap the Android phone in Settings › Bluetooth (pair once when asked). Bluetooth is slower but needs no Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، تا وقتی «مکالمه با آیفون» در برنامهٔ پل روشن است: اینجا در تنظیمات › اشتراک اینترنت می‌توانید هات‌اسپات، اشتراک اینترنت با بلوتوث و اینترنت همراه گوشی اندرویدی را روشن و خاموش کنید و سیم‌کارت اینترنت را انتخاب کنید. بعد در تنظیمات › Wi-Fi به هات‌اسپات وصل شوید، یا برای اشتراک با بلوتوث در تنظیمات › Bluetooth روی گوشی اندرویدی بزنید (بار اول جفت‌شدن را تأیید کنید). بلوتوث کندتر است، اما وای‌فای لازم ندارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, köprü uygulamasında iPhone’dan konuşma açık olduğu sürece: buradaki Ayarlar › İnternet paylaşımı, Android telefonun erişim noktasını, Bluetooth ile paylaşımını ve mobil verisini açıp kapatır, veri SIM’ini seçer. Ardından erişim noktasına Ayarlar › Wi-Fi’dan bağlanın ya da Bluetooth ile paylaşım için Ayarlar › Bluetooth’ta Android telefona dokunun (istendiğinde bir kez eşleştirin). Bluetooth daha yavaştır ama Wi-Fi gerektirmez." } }
+      }
+    },
     "Apps with SOCKS5 proxy settings" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "التطبيقات التي تدعم إعدادات وكيل SOCKS5" } },

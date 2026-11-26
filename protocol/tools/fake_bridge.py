@@ -87,8 +87,8 @@ CALLLOG_PAGE = 20        # 30 sample entries: 2 pages
 
 ALL_CAPS = ["sms.receive", "sms.send", "sms.history", "call.observe", "call.control", "call.dial",
             "call.dtmf", "call.audio", "contacts", "calllog", "contacts.add", "ussd", "dualsim",
-            "calllog.delete", "block"]
-CAP_FOR = {"sms.threads": "sms.history", "sms.history": "sms.history", "sms.send": "sms.send",
+            "calllog.delete", "block", "net.switch"]
+CAP_FOR = {"net.switch": "net.switch","sms.threads": "sms.history", "sms.history": "sms.history", "sms.send": "sms.send",
            "call.dial": "call.dial", "call.answer": "call.control", "call.reject": "call.control",
            "call.end": "call.control", "call.dtmf": "call.dtmf", "call.audio": "call.audio",
            "contacts.sync": "contacts", "calllog.sync": "calllog", "contacts.add": "contacts.add",
@@ -398,9 +398,9 @@ def fit(items, limit, size=lambda it: len(dumps(it))):
 
 SIM_SLOTS = [
     {"slot": 0, "carrier": "Irancell", "label": "SIM 1", "number": "+989121234567", "signal": 3, "net": "LTE",
-     "roaming": False, "defaultSms": True, "defaultVoice": True},
+     "roaming": False, "defaultSms": True, "defaultVoice": True, "defaultData": True},
     {"slot": 1, "carrier": "Vodafone", "label": "SIM 2", "number": None, "signal": 2, "net": "5G",
-     "roaming": False, "defaultSms": False, "defaultVoice": False},
+     "roaming": False, "defaultSms": False, "defaultVoice": False, "defaultData": False},
 ]
 
 BANK = "72975"
@@ -1202,6 +1202,8 @@ class Bridge:
             self.all_caps += ["wifi", "files"]
         self.caps = list(self.all_caps)
         self.battery = {"level": 82, "charging": False}
+        # status.net (D-073): the bridge phone's own hotspot, Bluetooth tethering and mobile data, as net.switch sets.
+        self.net = {"hotspot": False, "bluetooth": False, "data": True}
         self.app_version = args.app_version
         self.pairing = None
         # Debug TCP stands in for Bluetooth; "wifi" is the M5 Wi-Fi link. One established session per transport.
@@ -1226,7 +1228,7 @@ class Bridge:
             "contacts.sync": self.req_contacts_sync, "calllog.sync": self.req_calllog_sync,
             "contacts.add": self.req_contacts_add, "ussd.run": self.req_ussd_run,
             "calllog.delete": self.req_calllog_delete, "block.list": self.req_block_list,
-            "block.set": self.req_block_set,
+            "block.set": self.req_block_set, "net.switch": self.req_net_switch,
         }
 
     # State file
@@ -1367,7 +1369,7 @@ class Bridge:
 
     def status(self) -> dict:
         return {"t": "status", "battery": dict(self.battery), "sims": [dict(s) for s in self.sims],
-                "app": self.app_version, "caps": list(self.caps), "time": now_ms()}
+                "app": self.app_version, "caps": list(self.caps), "net": dict(self.net), "time": now_ms()}
 
     def push_status(self):
         if self.link and self.link.ready:
@@ -1580,6 +1582,27 @@ class Bridge:
 
     def req_block_list(self, link, msg):
         return self.block_list()
+
+    def req_net_switch(self, link, msg):
+        """D-073: switches nothing real; remembers it and shows it in the status that follows."""
+        what = msg.get("what")
+        if what == "dataSim":
+            slot = msg.get("sim")
+            if not is_int(slot) or not any(s["slot"] == slot for s in self.sims):
+                raise Reject("invalid", "no SIM in that slot")
+            for s in self.sims:
+                s["defaultData"] = s["slot"] == slot
+            log(f"  data SIM is now SIM {slot + 1}")
+        elif what in self.net:
+            on = msg.get("on")
+            if not isinstance(on, bool):
+                raise Reject("invalid", "on missing")
+            self.net[what] = on
+            log(f"  {what} turned {'on' if on else 'off'}")
+        else:
+            raise Reject("invalid", "unknown switch")
+        self.emit(self.status())
+        return {"t": "ok"}
 
     def req_block_set(self, link, msg):
         lists = []

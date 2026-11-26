@@ -42,7 +42,10 @@ one, stop and ask the maintainer instead of working around it.
    decision): once the user has set up Talk on iPhone and while it's on, Pairline turns Developer options,
    USB debugging and Wireless debugging back on whenever its helper needs them (after a restart, or when
    Android switched them off), and keeps debugging authorizations from expiring. Turning Talk on iPhone off
-   or "Forget pairing" ends this and returns the permission. Nothing else is ever changed.
+   or "Forget pairing" ends this and returns the permission. The iPhone's internet switches (D-073, the maintainer's
+   decision) are the user asking: while Talk on iPhone's helper runs, the Android phone's hotspot, Bluetooth
+   tethering, mobile data and data SIM change when, and only when, the user flips that switch on the iPhone.
+   Nothing else is ever changed.
 6. **Never install updates silently.** Android updates go through the system package-installer
    confirmation. Privileged (shell/root) access must never be used for `pm install`.
 7. **Privileged access is optional and fenced.** Shell access comes only through Pairline's own helper,
@@ -51,7 +54,9 @@ one, stop and ask the maintainer instead of working around it.
    calls live in one small module (`privileged/`) with an explicit allowlist of operations, validate every
    argument, and accept calls only from our own UID. The helper runs only while Talk on iPhone needs it and
    stops at every restart. The helper may grant Pairline itself WRITE_SECURE_SETTINGS (Talk on iPhone only,
-   D-059); Pairline uses it only for the debugging settings in rule 5.
+   D-059); Pairline uses it only for the debugging settings in rule 5. The helper's tethering, mobile-data and
+   data-SIM operations (D-073) accept only the Wi-Fi hotspot and Bluetooth tethering kinds and an active SIM, and run
+   only for the iPhone's switches in rule 5.
 8. **Crypto only as specified in `docs/PROTOCOL.md`,** using platform primitives (Android JCA,
    iOS CryptoKit). No home-made algorithms. Any wire-format change bumps the protocol version and
    updates `PROTOCOL.md` and the shared test vectors.

@@ -178,6 +178,8 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
       doesn't tell other apps
 - [x] `netshare` package is allowed to open non-local connections (network-code-check.sh), only for the iPhone's
       own traffic; PRIVACY.md updated
+- [x] Switch the Android phone's hotspot, Bluetooth tethering, mobile data and data SIM from the iPhone, through Talk
+      on iPhone's helper (D-073) — real-phone test pending
 
 ## M9 — Android client mode: dropped (D-050)
 

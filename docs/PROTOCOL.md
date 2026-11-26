@@ -260,10 +260,13 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 {"key": "sms:1234", "thread": 17, "addr": "+15551234567", "body": "text", "time": 1764000000000,
  "box": "in" | "out", "sim": 0, "state": "received" | "pending" | "sent" | "delivered" | "failed"}
 
-// SIM, in status.sims
+// SIM, in status.sims (defaultData: Android's data SIM, D-073)
 {"slot": 0, "carrier": "Carrier", "label": "SIM 1", "number": "+15551234567" | null,
  "signal": 0-4, "net": "5G" | "LTE" | "3G" | "2G" | "none", "roaming": false,
- "defaultSms": true, "defaultVoice": true}
+ "defaultSms": true, "defaultVoice": true, "defaultData": true}
+
+// The bridge phone's own internet sharing, in status.net (D-073)
+{"hotspot": false, "bluetooth": false, "data": true | null}
 
 // Contact
 {"key": "c:42", "name": "Ada Lovelace", "starred": false,
@@ -280,7 +283,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | Type | Direction | Milestone | Body |
 |------|-----------|-----------|------|
 | `device.info` | either | M1 | `name`, `platform` (`android`/`ios`), `os`, `app` (version), `proto` (0), `caps` (R only, M5: what R can receive, see below) |
-| `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `time`. Sent after the handshake, on every change, and at least every 60 s |
+| `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `net` (D-073: the bridge phone's hotspot, Bluetooth tethering and mobile data; older bridges omit it), `time`. Sent after the handshake, on every change, and at least every 60 s |
 | `status.get` | R→B | M1 | `id` → `status` with the same `id` |
 | `ping` / `pong` | either | M1 | `id`. Keep-alive; also used to measure latency |
 | `unpair` | either | M1 | — The receiver deletes the pinned key and closes the link |
@@ -317,6 +320,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `file.done` | either | M5 | `fid` (the peer's), `ok`, `reason` (`cancelled` / `failed` / `no_space`, when not ok) |
 | `file.cancel` | either | M5 | `fid` (the sender's own), `reason` |
 | `net.share` | R→B, B→R | M8 | request: `id`, `on` / reply (same `id`) or event (no `id`, when the bridge's user stops it): `on`, and while on `host`, `port` (one port for SOCKS5 and HTTP), `user`, `pass` (new for every start), `pac` (`http://host:port/proxy.pac`), `vpn` (the bridge's traffic goes through a VPN), `direct` [domain suffix]. `error` `permission` while the bridge's user hasn't allowed sharing. Needs `net.share` |
+| `net.switch` | R→B | M8 | `id`, `what` (`"hotspot"`: the bridge phone's own Wi-Fi hotspot; `"bluetooth"`: Bluetooth tethering; `"data"`: mobile data on the data SIM) and `on`, or `what: "dataSim"` and `sim` (slot) → `ok` once Android applied it (turning a hotspot off is answered first, then done), then `status` shows it. `error`: `unsupported` (the helper isn't running), `permission` (the carrier's entitlement check or Android refused), `invalid`, `failed` (`msg` has Android's reason, in English). Sent only when the user flips the switch on R. Needs `net.switch` (D-073) |
 
 ### Capabilities (`status.caps`)
 
@@ -329,7 +333,8 @@ be relayed to the iPhone: "Talk on iPhone" is on and the bridge's helper is runn
 can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone),
 `call.media.link` (listed with `call.media`: the call audio can also travel inside the Bluetooth session as Opus,
 `via: "link"`; the bridge has an Opus encoder and decoder, D-072), `net.share`
-(the bridge's user allows internet sharing, M8), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
+(the bridge's user allows internet sharing, M8), `net.switch` (R may switch the bridge phone's hotspot, Bluetooth
+tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's helper running, D-073), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),
 `block` (the bridge keeps a block list, M4)
 

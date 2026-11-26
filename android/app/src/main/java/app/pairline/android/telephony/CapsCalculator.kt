@@ -22,6 +22,8 @@ data class CapsInput(
     val wifiLink: Boolean = false,
     /** Call audio can also travel inside the Bluetooth session as Opus (with [mediaListen], D-072). */
     val mediaLink: Boolean = false,
+    /** The iPhone may switch this phone's internet sharing (Talk on iPhone's helper running, D-073). */
+    val netSwitch: Boolean = false,
 )
 
 /**
@@ -58,6 +60,7 @@ object CapsCalculator {
         if (input.contactsAddEnabled && has(Manifest.permission.WRITE_CONTACTS)) caps += Caps.CONTACTS_ADD
         if (input.activeSims >= 2) caps += Caps.DUALSIM
         if (input.netShare) caps += Caps.NET_SHARE
+        if (input.netSwitch) caps += Caps.NET_SWITCH
         if (input.wifiLink) {
             caps += Caps.WIFI
             caps += Caps.FILES

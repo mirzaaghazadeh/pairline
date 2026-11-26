@@ -1188,3 +1188,35 @@ Bluetooth, with a setting, and Bluetooth as the default if it works well.
   Simulator against `fake_bridge.py` over the debug TCP link, which echoes `MEDIA` frames: with `-PairlineLinkMediaTest`
   (debug builds) the app sent 50 Opus frames of a tone (32 kbit/s, 71 bytes on average), got all 50 back and decoded
   them at the tone's level. Android's `MediaCodec` Opus and the Bluetooth path itself need real phones next.
+
+### D-073 — The Android phone's hotspot, Bluetooth tethering, mobile data and data SIM, switched from the iPhone (2026-11-26)
+
+Away from Wi-Fi, the iPhone gets internet through the Android phone's hotspot or Bluetooth tethering, but the user had
+to take the Android phone out to turn them on: Pairline only opened Android's hotspot settings (D-061, rule 5). The
+maintainer asked for switches on the iPhone, and for Bluetooth tethering to be shown and explained.
+- **Rule 5 and 7, amended by the maintainer:** a switch the user flips on the iPhone is the user asking. While Talk on
+  iPhone's helper runs, the Android phone's hotspot, Bluetooth tethering, mobile data and data SIM change when, and
+  only when, the user flips that switch. AGENTS.md and PRIVACY.md say so.
+- **How:** three helper operations (helper version 7), each on the allowlist with its arguments checked:
+  `setTethering(type, on)` with Android's own `TetheringManager` (a system API, reached by reflection as the shell
+  user, which holds `TETHER_PRIVILEGED`; Android's carrier entitlement check still runs), only the Wi-Fi hotspot and
+  Bluetooth kinds; `setMobileData(on)` with Android's own `svc data` (or `cmd phone data`); and
+  `setDataSubscription(subId)` (`SubscriptionManager.setDefaultDataSubId`, `MODIFY_PHONE_STATE`), only an active SIM.
+  Android 11 or later (the helper's own minimum), with no new permission in the app's manifest.
+- **Wire:** `status.net` (`hotspot`, `bluetooth`, `data`), `sims[].defaultData`, and the `net.switch` request
+  (`what`, `on` or `sim`), under the capability `net.switch` (listed while the helper runs). No version bump: older
+  apps ignore the new fields and never send the request. Turning a hotspot off is answered before it stops, since the
+  iPhone may be on it. Pairline's own local-only hotspot gives way when the phone's hotspot is turned on.
+- **Reading** needs no privilege: Android's tethering broadcast (`bt-pan` is Bluetooth tethering; Android 11 and 12
+  list it only once a device has joined, so there it shows as on from when Pairline turned it on), and the data SIM's
+  `isDataEnabled`. The bridge's own Settings › This phone's hotspot also says when Bluetooth tethering is on and how
+  the iPhone joins it (Settings › Bluetooth, pair once), and that the iPhone can switch these.
+- **iPhone:** Settings › Internet sharing starts with an "Android phone" section: Hotspot, Bluetooth tethering, Mobile
+  data and, with two SIMs, Data SIM. Without the capability the switches show the state, disabled, with what's
+  needed. A help answer explains the switches and joining over Wi-Fi or Bluetooth.
+- **Left out on purpose:** airplane mode, which would cut the Bluetooth link the switch travels on, so the iPhone
+  couldn't turn it back off; and the preferred network type, which Android exposes per carrier in ways that vary too
+  much to switch safely without a real phone to test on.
+- **Tested:** unit tests on both sides (requests, errors, caps, status decoding), `fake_bridge.py` answers
+  `net.switch`, and the iPhone screen in English and Persian on the Simulator in demo mode. The helper's tethering,
+  mobile-data and data-SIM calls need a real phone next.

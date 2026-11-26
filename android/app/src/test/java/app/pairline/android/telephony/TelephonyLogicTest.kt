@@ -34,7 +34,8 @@ class TelephonyLogicTest {
         share: Boolean = false,
         wifi: Boolean = false,
         link: Boolean = false,
-    ) = CapsCalculator.compute(CapsInput(granted, messaging, calling, sims, inCall, add, listen, talk, share, wifi, link))
+        switches: Boolean = false,
+    ) = CapsCalculator.compute(CapsInput(granted, messaging, calling, sims, inCall, add, listen, talk, share, wifi, link, switches))
 
     @Test
     fun allPermissionsSingleSim() {
@@ -51,8 +52,18 @@ class TelephonyLogicTest {
     fun everythingIncludingOptionalOnes() {
         assertEquals(
             Caps.ALL,
-            caps(sims = 2, inCall = true, add = true, listen = true, talk = true, share = true, wifi = true, link = true),
+            caps(
+                sims = 2, inCall = true, add = true, listen = true, talk = true, share = true, wifi = true, link = true,
+                switches = true,
+            ),
         )
+    }
+
+    @Test
+    fun netSwitchFollowsTheHelperOnly() {
+        // No permission or SIM needed: the helper does the switching (D-073).
+        assertEquals(listOf(Caps.NET_SWITCH, Caps.BLOCK), caps(granted = emptySet(), switches = true))
+        assertEquals(false, Caps.NET_SWITCH in caps())
     }
 
     @Test

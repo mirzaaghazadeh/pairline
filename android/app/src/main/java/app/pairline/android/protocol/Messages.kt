@@ -31,6 +31,7 @@ object Msg {
     const val CALL_MEDIA_STATE = "call.media.state"
     const val CALL_MEDIA_FEEDBACK = "call.media.feedback"
     const val NET_SHARE = "net.share"
+    const val NET_SWITCH = "net.switch"
     const val CONTACTS_SYNC = "contacts.sync"
     const val CALLLOG_SYNC = "calllog.sync"
     const val CONTACTS_ADD = "contacts.add"
@@ -77,6 +78,12 @@ object Caps {
     /** The user allows internet sharing for the iPhone (M8, D-048). */
     const val NET_SHARE = "net.share"
 
+    /**
+     * The iPhone may switch this phone's hotspot, Bluetooth tethering, mobile data and data SIM (`net.switch`, through
+     * Talk on iPhone's helper, D-073).
+     */
+    const val NET_SWITCH = "net.switch"
+
     /** Call-history entries can be deleted on the bridge too (D-043). */
     const val CALLLOG_DELETE = "calllog.delete"
 
@@ -86,8 +93,8 @@ object Caps {
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK, CALL_MEDIA_LINK, NET_SHARE, WIFI,
-        FILES, CALLLOG_DELETE, BLOCK,
+        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK, CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH,
+        WIFI, FILES, CALLLOG_DELETE, BLOCK,
     )
 }
 

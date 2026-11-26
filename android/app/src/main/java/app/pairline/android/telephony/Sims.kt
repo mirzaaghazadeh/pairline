@@ -28,6 +28,8 @@ data class SimSnapshot(
     val roaming: Boolean,
     val defaultSms: Boolean,
     val defaultVoice: Boolean,
+    /** Android's data SIM (D-073). */
+    val defaultData: Boolean = false,
 ) {
     fun toJson(): JSONObject = JSONObject()
         .put("slot", slot)
@@ -39,6 +41,7 @@ data class SimSnapshot(
         .put("roaming", roaming)
         .put("defaultSms", defaultSms)
         .put("defaultVoice", defaultVoice)
+        .put("defaultData", defaultData)
 }
 
 /** Maps SIM slots (what the protocol uses) to subscription ids (what Android uses) and describes each SIM. */
@@ -123,6 +126,7 @@ class SimDirectory(private val context: Context) {
     fun snapshots(): List<SimSnapshot> {
         val defaultSms = SubscriptionManager.getDefaultSmsSubscriptionId()
         val defaultVoice = SubscriptionManager.getDefaultVoiceSubscriptionId()
+        val defaultData = SubscriptionManager.getDefaultDataSubscriptionId()
         val list = activeSubscriptions()
         return list.map { info ->
             val tm = telephony?.createForSubscriptionId(info.subscriptionId)
@@ -139,6 +143,7 @@ class SimDirectory(private val context: Context) {
                 roaming = runCatching { tm?.isNetworkRoaming == true }.getOrDefault(false),
                 defaultSms = info.subscriptionId == defaultSms || (list.size == 1),
                 defaultVoice = info.subscriptionId == defaultVoice || (list.size == 1),
+                defaultData = info.subscriptionId == defaultData || (list.size == 1),
             )
         }
     }

@@ -89,6 +89,7 @@ class LinkService : Service() {
         graph.status.onChange = graph.router::statusChanged
         graph.status.onCallState = graph.calls::onTelephonyState
         graph.status.start()
+        graph.netSwitches.start()
 
         ContextCompat.registerReceiver(
             this,
@@ -171,6 +172,7 @@ class LinkService : Service() {
         runCatching { unregisterReceiver(bluetoothReceiver) }
         runCatching { unregisterReceiver(phoneStateReceiver) }
         graph.status.stop()
+        graph.netSwitches.stop()
         transports.forEach { it.stop() }
         transports = emptyList()
         wifi?.stop()

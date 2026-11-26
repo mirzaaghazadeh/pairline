@@ -536,7 +536,8 @@ private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
 /**
  * Android's own hotspot (D-061), the way to link the phones away from Wi-Fi: it shares this phone's internet and the
  * Wi-Fi link listens on it. The row opens Android's hotspot settings (only opens them; rule 5) and says whether the
- * iPhone gets internet over it, and why not.
+ * iPhone gets internet over it, and why not; also whether Bluetooth tethering is on, and, with the helper running,
+ * that the iPhone can switch these (D-073).
  */
 @Composable
 private fun PhoneHotspotRow(info: PhoneHotspot.Info) {
@@ -556,11 +557,19 @@ private fun PhoneHotspotRow(info: PhoneHotspot.Info) {
             else -> R.string.settings_phone_hotspot_on
         },
     )
+    val notes = listOfNotNull(
+        text,
+        stringResource(R.string.settings_phone_bluetooth_on).takeIf { info.bluetooth },
+        stringResource(R.string.settings_phone_hotspot_helper).takeIf { helperNote },
+        // The iPhone's switches (D-073) need the helper running, so Talk on iPhone on.
+        stringResource(R.string.settings_phone_hotspot_remote).takeIf { helper == PrivilegedManager.State.READY },
+    )
     ListRow(
         title = stringResource(R.string.settings_phone_hotspot),
-        subtitle = if (helperNote) text + "\n\n" + stringResource(R.string.settings_phone_hotspot_helper) else text,
+        subtitle = notes.joinToString("\n\n"),
         icon = PIcons.Hotspot,
         iconTone = when {
+            !info.on && info.bluetooth -> Tone.GOOD
             !info.on -> Tone.ACCENT
             !info.upstream || info.vpn || helperNote -> Tone.WARN
             else -> Tone.GOOD

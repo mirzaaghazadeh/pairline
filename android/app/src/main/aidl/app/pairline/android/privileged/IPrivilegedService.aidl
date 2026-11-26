@@ -46,4 +46,18 @@ interface IPrivilegedService {
 
     /** Silences the ringing call's ringtone and vibration on this phone; the call itself rings on (D-066). */
     boolean silenceRinger() = 9;
+
+    /**
+     * The user flipped a switch on the iPhone (D-073): starts ([on]) or stops Android's own tethering of [type]
+     * (PrivilegedService.TETHER_WIFI, the phone's hotspot, or TETHER_BLUETOOTH), as Android's Hotspot & tethering
+     * screen does. Returns 0 once Android started or stopped it, else Android's tethering error code
+     * (PrivilegedService.TETHER_NO_ANSWER if it didn't answer in time).
+     */
+    int setTethering(int type, boolean on) = 10;
+
+    /** The user's switch on the iPhone (D-073): mobile data on or off, on the data SIM. */
+    boolean setMobileData(boolean on) = 11;
+
+    /** The user's choice on the iPhone (D-073): the active SIM with subscription id [subId] becomes the data SIM. */
+    boolean setDataSubscription(int subId) = 12;
 }

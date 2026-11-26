@@ -43,6 +43,9 @@ class StatusMonitor(
     private val mediaCaps: () -> Pair<Boolean, Boolean> = { false to false },
     /** Call audio can also travel inside the Bluetooth session, as Opus (D-072). */
     private val mediaLink: () -> Boolean = { false },
+    /** This phone's internet sharing for `status.net`, and whether the iPhone may switch it (D-073). */
+    private val net: () -> JSONObject? = { null },
+    private val netSwitch: () -> Boolean = { false },
 ) {
     /** Called (on a background thread) whenever something in the status may have changed. */
     var onChange: (() -> Unit)? = null
@@ -167,6 +170,7 @@ class StatusMonitor(
                 mediaLink = mediaLink(),
                 netShare = prefs.netShareAllowed,
                 wifiLink = prefs.wifiLinkEnabled,
+                netSwitch = netSwitch(),
             ),
         )
     }
@@ -181,6 +185,7 @@ class StatusMonitor(
             .put("sims", sims.simsJson())
             .put("app", appVersion)
             .put("caps", JSONArray(caps()))
+            .apply { runCatching { net() }.getOrNull()?.let { put("net", it) } }
             .put("time", System.currentTimeMillis())
     }
 
@@ -230,9 +235,10 @@ class StatusMonitor(
             override fun onCallStateChanged(state: Int, phoneNumber: String?) {
                 onCallState?.invoke(subId, state, phoneNumber?.takeIf { it.isNotBlank() })
             }
+            override fun onUserMobileDataStateChanged(enabled: Boolean) = changed()
         }
         var events = PhoneStateListener.LISTEN_SIGNAL_STRENGTHS or PhoneStateListener.LISTEN_SERVICE_STATE or
-            PhoneStateListener.LISTEN_CALL_STATE
+            PhoneStateListener.LISTEN_CALL_STATE or PhoneStateListener.LISTEN_USER_MOBILE_DATA_STATE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) events = events or PhoneStateListener.LISTEN_DISPLAY_INFO_CHANGED
         tm.listen(listener, events)
         return listener
@@ -244,8 +250,13 @@ class StatusMonitor(
         TelephonyCallback.SignalStrengthsListener,
         TelephonyCallback.ServiceStateListener,
         TelephonyCallback.DisplayInfoListener,
-        TelephonyCallback.CallStateListener {
+        TelephonyCallback.CallStateListener,
+        TelephonyCallback.UserMobileDataStateListener,
+        TelephonyCallback.ActiveDataSubscriptionIdListener {
         override fun onSignalStrengthsChanged(signalStrength: SignalStrength) = changed()
+        // Mobile data and the data SIM are in `status.net` and `sims` (D-073).
+        override fun onUserMobileDataStateChanged(enabled: Boolean) = changed()
+        override fun onActiveDataSubscriptionIdChanged(subId: Int) = changed()
         override fun onServiceStateChanged(serviceState: ServiceState) {
             sims.serviceStates[subId] = serviceState.state
             changed()

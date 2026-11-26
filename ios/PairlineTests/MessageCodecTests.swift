@@ -28,6 +28,34 @@ final class MessageCodecTests: XCTestCase {
         XCTAssertEqual(status.caps, ["sms.send", "ussd"], "non-string caps are skipped")
     }
 
+    /// `status.net`, `sims[].defaultData` and `net.switch` (D-073).
+    func testNetSwitches() throws {
+        let inbound = try decode([
+            "t": "status", "caps": ["net.switch"],
+            "sims": [["slot": 0, "defaultData": false], ["slot": 1, "defaultData": true]],
+            "net": ["hotspot": true, "bluetooth": false, "data": NSNull(), "future": 1],
+        ])
+        guard case .status(let status) = inbound.message else { return XCTFail() }
+        XCTAssertEqual(status.net, BridgeNetState(hotspot: true, bluetooth: false, data: nil))
+        XCTAssertEqual(status.net?.value(.hotspot), true)
+        XCTAssertNil(status.net?.value(.data), "unknown mobile data stays unknown")
+        XCTAssertEqual(status.sims?.map(\.defaultData), [false, true])
+
+        guard case .status(let old) = try decode(["t": "status", "caps": []]).message else { return XCTFail() }
+        XCTAssertNil(old.net, "an older bridge sends no net: the switches stay hidden")
+
+        let flip = try json(.netSwitch(.bluetooth, on: true))
+        XCTAssertEqual(flip["t"] as? String, "net.switch")
+        XCTAssertEqual(flip["what"] as? String, "bluetooth")
+        XCTAssertEqual(flip["on"] as? Bool, true)
+        XCTAssertEqual(flip["id"] as? Int, 5)
+        let sim = try json(.netDataSIM(slot: 1))
+        XCTAssertEqual(sim["what"] as? String, "dataSim")
+        XCTAssertEqual(sim["sim"] as? Int, 1)
+        XCTAssertNil(sim["on"])
+        XCTAssertEqual(Set(NetSwitch.allCases.map(\.rawValue)), ["hotspot", "bluetooth", "data"])
+    }
+
     func testSMSMessagesAndHistoryPage() throws {
         let inbound = try decode([
             "t": "sms.history", "id": 9, "more": true,

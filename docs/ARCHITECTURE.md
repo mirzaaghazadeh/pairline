@@ -76,8 +76,9 @@ Start as one `:app` module with these packages; split into Gradle modules only w
   debugging back on. Talk on iPhone needs Android 11+ (D-056): Android 10's shell user may neither capture nor
   record call audio. A computer command remains for phones whose Wireless debugging can't be used.
 - Allowlisted operations only:
-  - call-audio capture and injection (M6)
-  - hotspot start/stop and band choice (M5)
+  - call-audio capture and injection (M6), the earpiece and ringer silenced during a relayed call (D-066)
+  - the phone's own hotspot and Bluetooth tethering on or off, mobile data on or off, and the data SIM, each only
+    when the user flips that switch on the iPhone (D-073)
   - Bluetooth restart to recover a stuck link (M1), only if the user turned that option on
 
 **Setup experience (M1)**

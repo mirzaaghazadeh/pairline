@@ -6,6 +6,8 @@ import app.pairline.android.BuildConfig
 import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.log.Log
 import app.pairline.android.netshare.NetShare
+import app.pairline.android.netshare.NetSwitchRequest
+import app.pairline.android.netshare.NetSwitches
 import app.pairline.android.protocol.Caps
 import app.pairline.android.protocol.ErrorCode
 import app.pairline.android.protocol.Messages
@@ -56,6 +58,7 @@ class MessageRouter(
     private val netShare: NetShare,
     private val files: FileMessageHandler,
     private val blockList: BlockList,
+    private val netSwitches: NetSwitches,
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -232,6 +235,12 @@ class MessageRouter(
                 // Sharing keeps running across link drops; it stops when the iPhone or the user turns it off.
                 if (message.boolOrNull("on") == false) netShare.stop("stopped by the iPhone") else netShare.start()
                 netShareReply(id)
+            }
+            Msg.NET_SWITCH -> request(message) { id ->
+                // The user flipped a switch on the iPhone (D-073); the status that follows shows the result.
+                netSwitches.set(NetSwitchRequest.parse(message.stringOrNull("what"), message.boolOrNull("on"), sim(message)))
+                statusChanged()
+                Messages.ok(id)
             }
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }

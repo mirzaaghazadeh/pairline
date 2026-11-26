@@ -114,8 +114,28 @@ struct SIMInfo: Codable, Equatable, Identifiable, Hashable {
     var roaming: Bool?
     var defaultSms: Bool?
     var defaultVoice: Bool?
+    /// Android's data SIM (D-073).
+    var defaultData: Bool?
 
     var id: Int { slot }
+}
+
+/// `status.net` (D-073): the bridge phone's own internet sharing. Switched with `net.switch` (needs `net.switch`).
+struct BridgeNetState: Codable, Equatable {
+    /// Android's own Wi-Fi hotspot is on.
+    var hotspot: Bool?
+    /// Bluetooth tethering is on.
+    var bluetooth: Bool?
+    /// Mobile data is on (on the data SIM); null if Android didn't say.
+    var data: Bool?
+
+    func value(_ what: NetSwitch) -> Bool? {
+        switch what {
+        case .hotspot: return hotspot
+        case .bluetooth: return bluetooth
+        case .data: return data
+        }
+    }
 }
 
 struct BridgeStatus: Codable, Equatable {
@@ -124,6 +144,7 @@ struct BridgeStatus: Codable, Equatable {
     var app: String?
     var caps: [String]?
     var time: Int64?
+    var net: BridgeNetState?
 }
 
 struct SMSMessage: Codable, Equatable {
@@ -344,6 +365,7 @@ struct Inbound {
         var app: String?
         var caps: LossyList<String>?
         var time: Int64?
+        var net: BridgeNetState?
     }
 
     private struct MsgBody: Decodable { var msg: SMSMessage }
@@ -387,7 +409,7 @@ struct Inbound {
         case "status":
             let s = try body(StatusBody.self)
             message = .status(BridgeStatus(battery: s.battery, sims: s.sims?.elements, app: s.app,
-                                           caps: s.caps?.elements, time: s.time))
+                                           caps: s.caps?.elements, time: s.time, net: s.net))
         case "ping": message = .ping
         case "pong": message = .pong
         case "unpair": message = .unpair
@@ -561,6 +583,17 @@ struct Outbound {
         Outbound("net.share", ["on": on])
     }
 
+    /// Switches the bridge phone's hotspot, Bluetooth tethering or mobile data (needs `net.switch`, D-073). The reply
+    /// is `ok`; the next `status` shows the result in `net`.
+    static func netSwitch(_ what: NetSwitch, on: Bool) -> Outbound {
+        Outbound("net.switch", ["what": what.rawValue, "on": on])
+    }
+
+    /// Makes the SIM in [slot] the bridge phone's data SIM (needs `net.switch` and `dualsim`, D-073).
+    static func netDataSIM(slot: Int) -> Outbound {
+        Outbound("net.switch", ["what": "dataSim", "sim": slot])
+    }
+
     /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
     static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {
         Outbound("call.media.feedback", ["heard": optional(heard), "heardMe": optional(heardMe)])
@@ -596,6 +629,13 @@ struct Outbound {
     }
 }
 
+/// What `net.switch` turns on or off on the bridge phone (D-073).
+enum NetSwitch: String, CaseIterable {
+    case hotspot
+    case bluetooth
+    case data
+}
+
 /// Capability names from `status.caps`.
 enum Capability: String, CaseIterable, Identifiable {
     case smsReceive = "sms.receive"
@@ -619,6 +659,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case callMediaLink = "call.media.link"
     /// The bridge's user allows internet sharing for this iPhone (M8).
     case netShare = "net.share"
+    /// This iPhone may switch the bridge phone's hotspot, Bluetooth tethering, mobile data and data SIM (D-073).
+    case netSwitch = "net.switch"
     /// The bridge's Wi-Fi link is on (M5).
     case wifi = "wifi"
     /// The bridge sends and receives files over a Wi-Fi session (M5).
