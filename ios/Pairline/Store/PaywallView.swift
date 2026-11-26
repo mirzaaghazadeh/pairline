@@ -134,7 +134,9 @@ struct PaywallView: View {
                 Image(systemName: "checkmark.seal.fill").font(.system(size: 44)).foregroundStyle(Color.brandGreen)
                 Text("You own Pairline").font(.title2.weight(.bold))
                 Text("Thank you for supporting independent, private software.")
-                    .foregroundStyle(.secondary)
+                    // The plain secondary label, not `.secondary`: on the material behind the offer that becomes a
+                    // vibrant gray that Increase Contrast barely darkens.
+                    .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
                 Button("Done") { finish() }
                     .buttonStyle(PrimaryButtonStyle())
@@ -163,7 +165,7 @@ struct PaywallView: View {
                 .disabled(purchases.busy)
                 Text("Free for 7 days, then \(purchases.priceText) once to keep using Pairline. If you don't buy, sending messages, calls, syncing and USSD stop after the trial; your synced messages stay readable. Nothing is charged automatically.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -186,7 +188,7 @@ struct PaywallView: View {
                 buyButton
                 Text("Your synced messages stay readable without buying. Demo mode and help always work.")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
             }
         }
