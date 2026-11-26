@@ -215,7 +215,9 @@ class MessageRouter(
             Msg.CALL_MEDIA_START -> request(message) { id ->
                 val call = callId(message)
                 if (!calls.isInProgress(call)) invalid("call isn't in progress")
-                audio.start(call, wantTalk = message.boolOrNull("talk") ?: true)
+                val via = CallAudioRelay.Via.of(message.stringOrNull("via")) ?: invalid("unknown via")
+                // With via "link", the audio rides inside the session this request came on (D-072).
+                audio.start(call, wantTalk = message.boolOrNull("talk") ?: true, via = via, token = token)
                 Messages.ok(id)
             }
             Msg.CALL_MEDIA_STOP -> request(message) { id ->

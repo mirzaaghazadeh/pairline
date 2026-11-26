@@ -71,6 +71,9 @@ object Caps {
     /** …and the iPhone's microphone can be fed into the call. */
     const val CALL_MEDIA_TALK = "call.media.talk"
 
+    /** …and the audio can travel inside the Bluetooth session, as Opus (`call.media.start` `via: "link"`, D-072). */
+    const val CALL_MEDIA_LINK = "call.media.link"
+
     /** The user allows internet sharing for the iPhone (M8, D-048). */
     const val NET_SHARE = "net.share"
 
@@ -83,8 +86,8 @@ object Caps {
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK, NET_SHARE, WIFI, FILES,
-        CALLLOG_DELETE, BLOCK,
+        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK, CALL_MEDIA_LINK, NET_SHARE, WIFI,
+        FILES, CALLLOG_DELETE, BLOCK,
     )
 }
 

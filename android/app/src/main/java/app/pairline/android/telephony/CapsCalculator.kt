@@ -20,6 +20,8 @@ data class CapsInput(
     val netShare: Boolean = false,
     /** The Wi-Fi link is switched on (M5): files can go both ways over a Wi-Fi session. */
     val wifiLink: Boolean = false,
+    /** Call audio can also travel inside the Bluetooth session as Opus (with [mediaListen], D-072). */
+    val mediaLink: Boolean = false,
 )
 
 /**
@@ -48,6 +50,7 @@ object CapsCalculator {
             if (input.mediaListen && phoneState) {
                 caps += Caps.CALL_MEDIA
                 if (input.mediaTalk) caps += Caps.CALL_MEDIA_TALK
+                if (input.mediaLink) caps += Caps.CALL_MEDIA_LINK
             }
         }
         if (has(Manifest.permission.READ_CONTACTS)) caps += Caps.CONTACTS

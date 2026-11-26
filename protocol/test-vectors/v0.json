@@ -70,7 +70,9 @@
     "media_k_br": "496979e17f245d3ac7832445c84d98401ef6b884ad343f82a0d054208295c418",
     "media_k_rb": "44ec03eb03a74c04fe24c9085f9f2909f015dd8044441970117a0f19171faba4",
     "bulk_k_br": "355a2f07f5e6e83b91e2c1facaf81af580295e7b170e3684feb7bf4d2df64490",
-    "bulk_k_rb": "69d8d5812455c6eca9627d8355da60e939f86452cb14defa4a1cedf01706cd4b"
+    "bulk_k_rb": "69d8d5812455c6eca9627d8355da60e939f86452cb14defa4a1cedf01706cd4b",
+    "link_media_k_br": "603d433b7c8678bccdb1d2c33ab2c176de39f7c136d5b5d05537710544102dde",
+    "link_media_k_rb": "d723f0c25a5d40d4e59ece5af949dda92670563d5e64fa68e61b825c20ff02ee"
   },
   "records": [
     {
@@ -235,6 +237,47 @@
     "plaintext": "0100000007000000000000c00066696c65206461746120e29c93",
     "frame": "210000000000000000ff63d8a0900e1faa4d76c24343ab603b4ec8ffb0fdb28bf7f9f8fba459bb05aca28838947e4b45419b65",
     "tcp": "00000033210000000000000000ff63d8a0900e1faa4d76c24343ab603b4ec8ffb0fdb28bf7f9f8fba459bb05aca28838947e4b45419b65"
+  },
+  "link_media": {
+    "key_br": "link_media_k_br",
+    "key_rb": "link_media_k_rb",
+    "channel": 3,
+    "packets_b_to_r": [
+      "02ffffed0bf07cb7d6f7370faa810459f9698aa85135a4d8fecb37",
+      "020000a19af805d203aa65761c62c29c493bcb1e367d4091829691a18fda3a5f5f"
+    ],
+    "sequences_b_to_r": [
+      65535,
+      0
+    ],
+    "plaintext_b_to_r": "001b02ffffed0bf07cb7d6f7370faa810459f9698aa85135a4d8fecb370021020000a19af805d203aa65761c62c29c493bcb1e367d4091829691a18fda3a5f5f",
+    "counter_b_to_r": 3,
+    "frame_b_to_r": "220000000000000003023aa3ae59bd8406e42ccd3de0d394429bf76f6e76c968577ad2c520f5867276a247eeeb91201ff6d530a7a50d1a4751b6690420226c8d1e85cc94d49c45ac1602f1fda678f73d6238e6cda046f3c7cc",
+    "ble_att_payload": 244,
+    "ble_fragments_b_to_r": [
+      "030059220000000000000003023aa3ae59bd8406e42ccd3de0d394429bf76f6e76c968577ad2c520f5867276a247eeeb91201ff6d530a7a50d1a4751b6690420226c8d1e85cc94d49c45ac1602f1fda678f73d6238e6cda046f3c7cc"
+    ],
+    "tcp_b_to_r": "00000059220000000000000003023aa3ae59bd8406e42ccd3de0d394429bf76f6e76c968577ad2c520f5867276a247eeeb91201ff6d530a7a50d1a4751b6690420226c8d1e85cc94d49c45ac1602f1fda678f73d6238e6cda046f3c7cc",
+    "packets_r_to_b": [
+      "020029b7efef88bb0ba50418bbfc28818495232831b1d9"
+    ],
+    "plaintext_r_to_b": "0017020029b7efef88bb0ba50418bbfc28818495232831b1d9",
+    "counter_r_to_b": 0,
+    "frame_r_to_b": "2200000000000000007d6448a3d3dabecda237a8af3c36cb45584116da2ec542a429f150704076ef28eb14c4fc94321e0572",
+    "must_fail": [
+      {
+        "why": "Wi-Fi media key",
+        "key": "media_k_br",
+        "channel": 3,
+        "wire": "0000000000000003023aa3ae59bd8406e42ccd3de0d394429bf76f6e76c968577ad2c520f5867276a247eeeb91201ff6d530a7a50d1a4751b6690420226c8d1e85cc94d49c45ac1602f1fda678f73d6238e6cda046f3c7cc"
+      },
+      {
+        "why": "Wi-Fi media channel in associated data",
+        "key": "link_media_k_br",
+        "channel": 1,
+        "wire": "0000000000000003023aa3ae59bd8406e42ccd3de0d394429bf76f6e76c968577ad2c520f5867276a247eeeb91201ff6d530a7a50d1a4751b6690420226c8d1e85cc94d49c45ac1602f1fda678f73d6238e6cda046f3c7cc"
+      }
+    ]
   },
   "pair_uri_wifi": {
     "uri": "pairline://pair?v=0&id=obLD1OX2Bxg&k=BMFsdl_Cv9ICFPZCaC7GYdjB09xa6od52g2idP9YxYsGiCAMGGL1RyeNUEZz7Tqo-lwHosQs_a2xeNKY9yfRrTQ&s=RckDaSOwfAzcD1hyQhuXOt7zUoCYIJD-JzmMNjaFz9s&ip=192.168.1.23,fd12:3456:789a::1&port=47820&ssid=QW5kcm9pZFNoYXJlXzQ4MjE&pw=azN5IHdpdGggc3BhY2VzICYg4pyT",

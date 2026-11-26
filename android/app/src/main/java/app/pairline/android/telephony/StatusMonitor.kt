@@ -41,6 +41,8 @@ class StatusMonitor(
     private val inCallServiceAvailable: () -> Boolean,
     /** Call audio relay readiness: (listen, talk). D-047. */
     private val mediaCaps: () -> Pair<Boolean, Boolean> = { false to false },
+    /** Call audio can also travel inside the Bluetooth session, as Opus (D-072). */
+    private val mediaLink: () -> Boolean = { false },
 ) {
     /** Called (on a background thread) whenever something in the status may have changed. */
     var onChange: (() -> Unit)? = null
@@ -162,6 +164,7 @@ class StatusMonitor(
                 contactsAddEnabled = prefs.contactsAddEnabled,
                 mediaListen = mediaListen,
                 mediaTalk = mediaTalk,
+                mediaLink = mediaLink(),
                 netShare = prefs.netShareAllowed,
                 wifiLink = prefs.wifiLinkEnabled,
             ),

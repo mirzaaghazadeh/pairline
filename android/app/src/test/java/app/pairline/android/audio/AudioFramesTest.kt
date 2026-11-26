@@ -31,6 +31,28 @@ class AudioFramesTest {
     }
 
     @Test
+    fun opusPacketsCarryTheirKindAndSequence() {
+        val opus = ByteArray(80) { it.toByte() }
+        val packet = AudioPackets.encodeOpus(0xFFFF, opus)
+        assertEquals(AudioPackets.KIND_OPUS, packet[0].toInt())
+        val (seq, back) = AudioPackets.decodeOpus(packet)!!
+        assertEquals(0xFFFF, seq)
+        assertArrayEquals(opus, back)
+        assertNull("not PCM", AudioPackets.decode(packet))
+        assertNull("not Opus", AudioPackets.decodeOpus(AudioPackets.encode(1, frame(0))))
+        assertNull("empty", AudioPackets.decodeOpus(byteArrayOf(2, 0, 1)))
+        assertNull("too long", AudioPackets.decodeOpus(byteArrayOf(2, 0, 1) + ByteArray(AudioPackets.MAX_OPUS_BYTES + 1)))
+    }
+
+    @Test
+    fun viaDefaultsToWifi() {
+        assertEquals(CallAudioRelay.Via.WIFI, CallAudioRelay.Via.of(null))
+        assertEquals(CallAudioRelay.Via.WIFI, CallAudioRelay.Via.of("wifi"))
+        assertEquals(CallAudioRelay.Via.LINK, CallAudioRelay.Via.of("link"))
+        assertNull(CallAudioRelay.Via.of("carrier pigeon"))
+    }
+
+    @Test
     fun jitterBufferWaitsThenPlaysInOrder() {
         val jb = JitterBuffer(target = 3)
         jb.put(11, frame(11))

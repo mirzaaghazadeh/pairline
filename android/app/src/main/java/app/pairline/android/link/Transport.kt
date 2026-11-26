@@ -41,6 +41,22 @@ interface LinkConnection {
      * it to stop reading while too many frames wait (file data arrives faster than BLE ever could).
      */
     fun frameProcessed() {}
+
+    /**
+     * True if this connection pulls call audio from a [MediaFrameSource] itself, ahead of frames that haven't started
+     * (Bluetooth: a slow link mustn't queue audio behind a sync page). Otherwise the source sends its frames through
+     * [send] as they come.
+     */
+    val pullsMedia: Boolean get() = false
+
+    /** Call audio is waiting in [source] (D-072). Only called when [pullsMedia]. Any thread. */
+    fun mediaReady(source: MediaFrameSource) {}
+}
+
+/** Call audio waiting to go out as `MEDIA` frames (PROTOCOL.md, "Call audio", D-072). */
+interface MediaFrameSource {
+    /** The next `MEDIA` frame, with every packet that's waiting in it, or null when nothing is. Thread-safe. */
+    fun nextFrame(): ByteArray?
 }
 
 /** A Wi-Fi connection can open the UDP media channel for its session. */

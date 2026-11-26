@@ -32,13 +32,17 @@ interface SessionCallbacks {
 
     /** An authentic `BULK` record's plaintext (Wi-Fi sessions only). */
     fun onBulk(plaintext: ByteArray) {}
+
+    /** An authentic `MEDIA` record's plaintext (Bluetooth and debug TCP sessions only, D-072). */
+    fun onLinkMedia(plaintext: ByteArray) {}
 }
 
 /**
  * The bridge (B) side of one connection: pairing, the session handshake and records
  * (docs/PROTOCOL.md). Transport-independent and single-threaded; BLE and TCP feed it whole frames.
  *
- * A Wi-Fi session ([wifiChannels]) also derives the media and bulk keys and accepts `BULK` frames (M5).
+ * A Wi-Fi session ([wifiChannels]) also derives the media and bulk keys and accepts `BULK` frames (M5). Any other
+ * session (Bluetooth, debug TCP) derives the link media keys and accepts `MEDIA` frames: call audio (D-072).
  */
 class BridgeSession(
     private val identity: StaticKey,
@@ -62,6 +66,9 @@ class BridgeSession(
     private var bulkSealer: RecordSealer? = null
     private var bulkOpener: RecordOpener? = null
     private var mediaKeys: Pair<ByteArray, ByteArray>? = null
+    private var linkMediaSealer: LinkMediaSealer? = null
+    private var linkMediaOpener: RecordOpener? = null
+    private var linkMediaHandedOut = false
 
     fun onFrame(bytes: ByteArray) {
         if (state == State.CLOSED) return
@@ -72,6 +79,7 @@ class BridgeSession(
                 FrameType.HELLO -> onHello(frame.body)
                 FrameType.RECORD -> onRecord(frame.body)
                 FrameType.BULK -> onBulk(frame.body)
+                FrameType.MEDIA -> onLinkMedia(frame.body)
                 FrameType.PAIR_OK, FrameType.PAIR_FAIL -> fail("unexpected ${frame.type} from the remote")
             }
         } catch (e: ProtocolException) {
@@ -119,6 +127,16 @@ class BridgeSession(
         return mediaKeys.also { mediaKeys = null }
     }
 
+    /**
+     * The sealer for this Bluetooth or debug TCP session's `MEDIA` frames (B→R), handed out once after the handshake.
+     * It stays tied to the session: closing the session wipes it.
+     */
+    fun takeLinkMediaSealer(): LinkMediaSealer? {
+        if (state != State.ESTABLISHED || linkMediaHandedOut) return null
+        linkMediaHandedOut = true
+        return linkMediaSealer
+    }
+
     fun close(reason: String) {
         if (state == State.CLOSED) return
         state = State.CLOSED
@@ -128,6 +146,8 @@ class BridgeSession(
         bulkOpener?.wipe()
         mediaKeys?.let { (a, b) -> a.wipe(); b.wipe() }
         mediaKeys = null
+        linkMediaSealer?.wipe()
+        linkMediaOpener?.wipe()
         callbacks.close(reason)
     }
 
@@ -184,6 +204,10 @@ class BridgeSession(
             bulkSealer = RecordSealer(wifi.bulkBridgeToRemote, Proto.DIR_BRIDGE_TO_REMOTE, Proto.CHANNEL_BULK)
             bulkOpener = RecordOpener(wifi.bulkRemoteToBridge, Proto.DIR_REMOTE_TO_BRIDGE, Proto.CHANNEL_BULK)
             mediaKeys = wifi.mediaBridgeToRemote to wifi.mediaRemoteToBridge
+        } else {
+            val (br, rb) = keys.linkMedia()
+            linkMediaSealer = LinkMediaSealer(br, Proto.DIR_BRIDGE_TO_REMOTE)
+            linkMediaOpener = RecordOpener(rb, Proto.DIR_REMOTE_TO_BRIDGE, Proto.CHANNEL_LINK_MEDIA)
         }
         keys.wipe()
         callbacks.sendFrame(Frame(FrameType.HELLO, helloB.encode()).encode())
@@ -220,6 +244,15 @@ class BridgeSession(
         val o = bulkOpener ?: throw ProtocolException("no bulk keys")
         val (_, plaintext) = o.open(body)
         callbacks.onBulk(plaintext)
+    }
+
+    /** Ordered like the control channel: a replayed or forged `MEDIA` record closes the connection (D-072). */
+    private fun onLinkMedia(body: ByteArray) {
+        if (wifiChannels) throw ProtocolException("media frame on a Wi-Fi session")
+        if (state != State.ESTABLISHED) throw ProtocolException("media frame before the handshake")
+        val o = linkMediaOpener ?: throw ProtocolException("no link media keys")
+        val (_, plaintext) = o.open(body)
+        callbacks.onLinkMedia(plaintext)
     }
 
     private fun fail(reason: String) = close(reason)

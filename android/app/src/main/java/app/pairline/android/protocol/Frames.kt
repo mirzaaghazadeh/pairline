@@ -15,6 +15,9 @@ object Proto {
     const val CHANNEL_MEDIA: Int = 1
     const val CHANNEL_BULK: Int = 2
 
+    /** Call audio inside a Bluetooth or debug TCP session (`MEDIA` frames, D-072). */
+    const val CHANNEL_LINK_MEDIA: Int = 3
+
     const val MAX_FRAME: Int = 65_535
     const val HELLO_LENGTH: Int = 99
     const val PUBLIC_KEY_LENGTH: Int = 65
@@ -39,6 +42,7 @@ object Proto {
     val SESSION_INFO: ByteArray = "pairline v0 session".toByteArray(Charsets.US_ASCII)
     val MEDIA_INFO: ByteArray = "pairline v0 media".toByteArray(Charsets.US_ASCII)
     val BULK_INFO: ByteArray = "pairline v0 bulk".toByteArray(Charsets.US_ASCII)
+    val LINK_MEDIA_INFO: ByteArray = "pairline v0 link media".toByteArray(Charsets.US_ASCII)
 
     /** Media datagrams carry at most this much plaintext, so one fits any Wi-Fi path unfragmented. */
     const val MEDIA_MAX_PLAINTEXT: Int = 1200
@@ -67,7 +71,10 @@ enum class FrameType(val code: Int) {
     RECORD(0x20),
 
     /** A record on the bulk channel (M5): Wi-Fi TCP only, after the handshake. */
-    BULK(0x21);
+    BULK(0x21),
+
+    /** A record on the link media channel (call audio, D-072): Bluetooth and debug TCP only, after the handshake. */
+    MEDIA(0x22);
 
     companion object {
         fun of(code: Int): FrameType? = entries.firstOrNull { it.code == code }

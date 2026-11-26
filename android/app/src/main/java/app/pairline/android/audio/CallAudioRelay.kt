@@ -10,8 +10,10 @@ import app.pairline.android.privileged.PrivilegedService
 import app.pairline.android.protocol.ErrorCode
 import app.pairline.android.protocol.Msg
 import app.pairline.android.protocol.RequestException
+import app.pairline.android.link.MediaChannel
 import java.io.IOException
 import java.io.InputStream
+import java.util.concurrent.Executors
 import org.json.JSONObject
 
 /**
@@ -19,9 +21,9 @@ import org.json.JSONObject
  * - the caller's voice is captured through the privileged service and sent to the iPhone as 20 ms packets;
  * - packets from the iPhone's microphone go through a [JitterBuffer] and are fed into the call's uplink.
  *
- * Audio travels only over the encrypted media channel of the Wi-Fi link and is never stored or logged; the log gets
- * only counts and levels. Nothing starts unless the iPhone asks during an active call and the user turned on
- * "Talk on iPhone".
+ * Audio travels only between the two phones, encrypted: as PCM on the Wi-Fi link's media channel, or as Opus inside
+ * the Bluetooth session (D-072), whichever the iPhone asks for. It's never stored or logged; the log gets only counts
+ * and levels. Nothing starts unless the iPhone asks during an active call and the user turned on "Talk on iPhone".
  */
 class CallAudioRelay(
     private val privileged: PrivilegedManager,
@@ -29,12 +31,30 @@ class CallAudioRelay(
     private val emit: (JSONObject) -> Unit,
     /** Android's current audio mode (`AudioManager.getMode`). */
     private val audioMode: () -> Int = { AudioManager.MODE_IN_CALL },
+    /** The link media channel of the Bluetooth (or debug TCP) session with this token, if it's still up (D-072). */
+    private val linkMedia: (Long) -> PacketTransport? = { null },
+    /** This phone can encode and decode Opus (Android 10+, checked once). */
+    private val opusAvailable: () -> Boolean = { Opus.available },
 ) {
-    /** The Wi-Fi link's encrypted media channel (M5). Lossy and unordered; [send] never blocks. */
+    /** A media channel: Wi-Fi's (lossy, unordered) or the Bluetooth session's. [send] never blocks. */
     interface PacketTransport {
         val isOpen: Boolean
         fun send(packet: ByteArray)
         fun setReceiver(receiver: ((ByteArray) -> Unit)?)
+    }
+
+    /** Where a call's audio travels (`call.media.start` `via`). */
+    enum class Via(val wire: String) {
+        WIFI("wifi"),
+        LINK("link");
+
+        companion object {
+            fun of(wire: String?): Via? = when (wire) {
+                null, WIFI.wire -> WIFI
+                LINK.wire -> LINK
+                else -> null
+            }
+        }
     }
 
     private val lock = Any()
@@ -45,6 +65,9 @@ class CallAudioRelay(
 
     /** Called when capabilities may have changed (e.g. talking turned out not to work here). */
     var onCapsChanged: (() -> Unit)? = null
+
+    /** A relay inside the Bluetooth session started (true) or ended (false): the link asks for its fastest setting. */
+    var onLinkAudio: ((Boolean) -> Unit)? = null
 
     init {
         // Before the helper made its recorders as itself (D-065), interception failed on some phones and the relay
@@ -65,24 +88,44 @@ class CallAudioRelay(
     val canTalk: Boolean
         get() = canListen && privileged.probe.value?.canTalk == true && prefs.audioTalkFailures < MAX_TALK_FAILURES
 
-    /** The link layer sets the media channel while a Wi-Fi link is up, and null when it goes away. */
+    /** …and the audio can also travel inside the Bluetooth session, as Opus (`call.media.link`, D-072). */
+    val canLink: Boolean
+        get() = canListen && opusAvailable()
+
+    /** The link layer sets the Wi-Fi media channel while a Wi-Fi link is up, and null when it goes away. */
     fun setTransport(t: PacketTransport?) {
         transport = t
-        if (t == null) stop(null, "media channel closed")
+        if (t == null) stopIf("media channel closed") { it.via == Via.WIFI }
     }
 
-    /** `call.media.start`: [callId] must be an active call (checked by the caller). Blocking; not on the main thread. */
-    fun start(callId: String, wantTalk: Boolean) {
+    /** The Bluetooth (or debug TCP) session [token] ended: a relay inside it stops. */
+    fun linkClosed(token: Long) = stopIf("Bluetooth session closed") { it.via == Via.LINK && it.token == token }
+
+    /**
+     * `call.media.start`: [callId] must be an active call (checked by the caller). [token] is the session the request
+     * came on, which carries the audio when [via] is [Via.LINK]. Blocking; not on the main thread.
+     */
+    fun start(callId: String, wantTalk: Boolean, via: Via = Via.WIFI, token: Long = 0) {
         if (!prefs.talkOnIphone) throw RequestException(ErrorCode.UNSUPPORTED, "Talk on iPhone is off on the bridge")
         val service = privileged.service
             ?: throw RequestException(ErrorCode.UNSUPPORTED, "Pairline's helper isn't running on the bridge")
         if (!canListen) throw RequestException(ErrorCode.UNSUPPORTED, "this phone doesn't allow capturing call audio")
-        val t = transport?.takeIf { it.isOpen }
-            ?: throw RequestException(ErrorCode.UNSUPPORTED, "call audio needs the Wi-Fi link")
+        val t = when (via) {
+            Via.WIFI -> transport?.takeIf { it.isOpen }
+                ?: throw RequestException(ErrorCode.UNSUPPORTED, "call audio needs the Wi-Fi link")
+            Via.LINK -> {
+                if (!opusAvailable()) throw RequestException(ErrorCode.UNSUPPORTED, "this phone has no Opus codec")
+                linkMedia(token)?.takeIf { it.isOpen }
+                    ?: throw RequestException(ErrorCode.UNSUPPORTED, "call audio over Bluetooth needs a Bluetooth session")
+            }
+        }
         synchronized(lock) {
-            if (session?.callId == callId) return
-            session?.close("replaced")
-            val s = Session(callId, wantTalk && canTalk, service, t)
+            session?.let { current ->
+                if (current.callId == callId && current.via == via && current.token == token) return
+                session = null
+                current.close("replaced")
+            }
+            val s = Session(callId, wantTalk && canTalk, service, t, via, token)
             session = s
             try {
                 s.open()
@@ -92,15 +135,17 @@ class CallAudioRelay(
                 state(callId, "failed", listen = false, talk = false, reason = e.message)
                 throw e as? RequestException ?: RequestException(ErrorCode.FAILED, "call audio failed: ${e.message}")
             }
-            state(callId, "active", listen = true, talk = s.talking, reason = s.talkProblem)
+            state(callId, "active", listen = true, talk = s.talking, reason = s.talkProblem, via = via)
         }
     }
 
     /** `call.media.stop`, the call ending, or the media channel closing. [callId] null stops whatever runs. */
-    fun stop(callId: String?, reason: String) {
+    fun stop(callId: String?, reason: String) = stopIf(reason) { callId == null || it.callId == callId }
+
+    private fun stopIf(reason: String, matches: (Session) -> Boolean) {
         synchronized(lock) {
             val s = session ?: return
-            if (callId != null && s.callId != callId) return
+            if (!matches(s)) return
             session = null
             s.close(reason)
             state(s.callId, "stopped", listen = false, talk = false, reason = reason)
@@ -176,7 +221,7 @@ class CallAudioRelay(
         }
     }
 
-    private fun state(callId: String, state: String, listen: Boolean, talk: Boolean, reason: String?) {
+    private fun state(callId: String, state: String, listen: Boolean, talk: Boolean, reason: String?, via: Via? = null) {
         emit(
             JSONObject()
                 .put("t", Msg.CALL_MEDIA_STATE)
@@ -184,6 +229,7 @@ class CallAudioRelay(
                 .put("state", state)
                 .put("listen", listen)
                 .put("talk", talk)
+                .apply { if (via != null) put("via", via.wire) }
                 .apply { if (reason != null) put("reason", reason) },
         )
     }
@@ -193,13 +239,26 @@ class CallAudioRelay(
         private val wantTalk: Boolean,
         private val service: IPrivilegedService,
         private val transport: PacketTransport,
+        val via: Via,
+        val token: Long,
     ) {
         @Volatile
         private var running = true
         private var captureFd: ParcelFileDescriptor? = null
         private var injectFd: ParcelFileDescriptor? = null
         private var captureRate = AudioPackets.SAMPLE_RATE
-        private val jitter = JitterBuffer()
+
+        /** Bluetooth delivers in bursts: hold 80 ms there, 60 ms on Wi-Fi (PROTOCOL.md, "Call audio"). */
+        private val jitter = JitterBuffer(target = if (via == Via.LINK) LINK_JITTER_FRAMES else WIFI_JITTER_FRAMES)
+
+        /** Opus for the Bluetooth session (D-072); the capture thread owns it. */
+        private var encoder: VoiceEncoder? = null
+
+        /** Opus packets from the iPhone are decoded here, in arrival order, off the link thread. */
+        private val decodeThread = Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-audio-decode") }
+        private var decoder: VoiceDecoder? = null
+        private var decoderBroken = false
+        private var decodeFailures = 0
         private var sent = 0
         private var received = 0
         private var levelSum = 0L
@@ -209,6 +268,13 @@ class CallAudioRelay(
             private set
 
         fun open() {
+            if (via == Via.LINK) {
+                encoder = try {
+                    Opus.encoder()
+                } catch (e: Exception) {
+                    throw RequestException(ErrorCode.FAILED, "the Opus encoder didn't start: ${e.message}")
+                }
+            }
             // One deadline for waiting on the call's audio mode and for asking the interception API again.
             val deadline = System.nanoTime() + CALL_MODE_WAIT_MS * 1_000_000
             if (!awaitCallAudioMode(deadline)) {
@@ -278,15 +344,47 @@ class CallAudioRelay(
                     Log.w(TAG, "feeding audio into the call failed: ${e.message}")
                 }
             }
-            transport.setReceiver { packet ->
-                AudioPackets.decode(packet)?.let { (sequence, frame) ->
-                    received++
-                    jitter.put(sequence, frame)
-                }
-            }
-            Log.i(TAG, "relaying call audio: capture $captureRate Hz from source $opened, talk $talking")
+            transport.setReceiver(::received)
+            Log.i(
+                TAG,
+                "relaying call audio over ${if (via == Via.LINK) "Bluetooth (Opus)" else "Wi-Fi (PCM)"}: capture " +
+                    "$captureRate Hz from source $opened, talk $talking",
+            )
+            if (via == Via.LINK) onLinkAudio?.invoke(true)
+            captureStarted = true
             Thread(::captureLoop, "pairline-audio-up").apply { isDaemon = true }.start()
             if (talking) Thread(::playoutLoop, "pairline-audio-down").apply { isDaemon = true }.start()
+        }
+
+        /** Once the capture thread runs, it owns [encoder] and closes it. */
+        @Volatile
+        private var captureStarted = false
+
+        /** A packet from the iPhone: PCM goes straight to the jitter buffer, Opus is decoded first (on its thread). */
+        private fun received(packet: ByteArray) {
+            AudioPackets.decode(packet)?.let { (sequence, frame) ->
+                received++
+                jitter.put(sequence, frame)
+                return
+            }
+            val (sequence, opus) = AudioPackets.decodeOpus(packet) ?: return
+            if (!running || !opusAvailable()) return
+            received++
+            runCatching {
+                decodeThread.execute {
+                    if (!running || decoderBroken) return@execute
+                    try {
+                        val codec = decoder ?: Opus.decoder().also { decoder = it }
+                        codec.decode(opus)?.let { jitter.put(sequence, it) } ?: decodeFailures++
+                    } catch (e: Exception) {
+                        // A codec that broke stays off for this call; the iPhone's voice doesn't reach the call then.
+                        decoderBroken = true
+                        runCatching { decoder?.close() }
+                        decoder = null
+                        Log.w(TAG, "decoding the iPhone's audio failed: ${e.message}")
+                    }
+                }
+            }
         }
 
         /** Caller's voice → iPhone. */
@@ -306,14 +404,28 @@ class CallAudioRelay(
                             .copyOf(AudioPackets.FRAME_BYTES)
                     }
                     levelSum += Pcm.rms(frame)
-                    transport.send(AudioPackets.encode(sequence, frame))
-                    sequence = (sequence + 1) and 0xFFFF
-                    sent++
+                    val opus = encoder
+                    if (opus == null) {
+                        transport.send(AudioPackets.encode(sequence, frame))
+                        sequence = (sequence + 1) and 0xFFFF
+                        sent++
+                    } else {
+                        for (packet in opus.encode(frame)) {
+                            if (packet.size > AudioPackets.MAX_OPUS_BYTES) continue
+                            transport.send(AudioPackets.encodeOpus(sequence, packet))
+                            sequence = (sequence + 1) and 0xFFFF
+                            sent++
+                        }
+                    }
                 }
             } catch (_: IOException) {
                 // The service or close() ended the pipe.
+            } catch (e: IllegalStateException) {
+                // The Opus encoder failed (MediaCodec.CodecException is one): the caller's voice stops here.
+                if (running) Log.w(TAG, "encoding the caller's voice failed: ${e.message}")
             } finally {
                 runCatching { input.close() }
+                runCatching { encoder?.close() }
             }
         }
 
@@ -349,11 +461,22 @@ class CallAudioRelay(
             runCatching { service.stopAudio() }
             runCatching { captureFd?.close() }
             runCatching { injectFd?.close() }
+            if (!captureStarted) runCatching { encoder?.close() }
+            // The decoder belongs to its thread: close it there, after anything still queued.
+            runCatching {
+                decodeThread.execute {
+                    runCatching { decoder?.close() }
+                    decoder = null
+                }
+            }
+            decodeThread.shutdown()
+            if (via == Via.LINK) onLinkAudio?.invoke(false)
             val level = if (sent > 0) levelSum / sent else 0
+            val opus = if (via == Via.LINK) ", Opus packets the codec dropped $decodeFailures" else ""
             Log.i(
                 TAG,
                 "call audio stopped ($reason): sent $sent frames (average level $level), received $received, " +
-                    "quiet frames skipped ${jitter.skipped}",
+                    "quiet frames skipped ${jitter.skipped}$opus",
             )
         }
 
@@ -389,6 +512,17 @@ class CallAudioRelay(
             6, // MODE_COMMUNICATION_REDIRECT (Android 13)
         )
         private const val FRAME_NANOS = 20_000_000L
+        private const val WIFI_JITTER_FRAMES = 3
+        private const val LINK_JITTER_FRAMES = 4
         private const val RESYNC_NANOS = 200_000_000L
+    }
+}
+
+/** A media channel (the Wi-Fi link's, or the Bluetooth session's) as the relay wants it (D-047, D-072). */
+class MediaChannelTransport(private val channel: MediaChannel) : CallAudioRelay.PacketTransport {
+    override val isOpen: Boolean get() = channel.isOpen
+    override fun send(packet: ByteArray) = channel.send(packet)
+    override fun setReceiver(receiver: ((ByteArray) -> Unit)?) {
+        channel.onPacket = receiver
     }
 }

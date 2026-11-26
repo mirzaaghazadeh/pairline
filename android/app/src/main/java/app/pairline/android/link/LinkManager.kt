@@ -115,6 +115,9 @@ class LinkManager(
         var lastPingSent: Long = 0
         var token: Long = 0
         var media: MediaEndpoint? = null
+
+        /** Call audio inside this Bluetooth or debug TCP session (D-072); null on Wi-Fi. */
+        var linkMedia: LinkMediaChannel? = null
         val wifi: Boolean get() = connection.kind.isWifi
     }
 
@@ -150,6 +153,19 @@ class LinkManager(
      */
     val media: StateFlow<MediaChannel?> = _media
 
+    /** The Bluetooth (or debug TCP) session's token and its link media channel (D-072). Read on any thread. */
+    @Volatile
+    private var radioMedia: Pair<Long, LinkMediaChannel>? = null
+
+    /**
+     * The link media channel of the established Bluetooth or debug TCP session [token], or null (the session ended,
+     * or [token] is a Wi-Fi session). Call audio with `via: "link"` uses it (D-072).
+     */
+    fun linkMedia(token: Long): LinkMediaChannel? = radioMedia?.takeIf { it.first == token }?.second
+
+    /** A session's link media channel closed with it. Called on the link thread with the session's token. */
+    var onLinkMediaClosed: ((Long) -> Unit)? = null
+
     fun updateState(transform: (LinkSnapshot) -> LinkSnapshot) {
         synchronized(_state) { _state.value = transform(_state.value) }
     }
@@ -171,6 +187,13 @@ class LinkManager(
         post {
             entries.keys.toList().forEach { it.close() }
             entries.values.forEach { it.media?.close() }
+            entries.values.forEach { e ->
+                e.linkMedia?.let { channel ->
+                    channel.close()
+                    onLinkMediaClosed?.invoke(e.token)
+                }
+            }
+            radioMedia = null
             entries.clear()
             radio = null
             wifi = null
@@ -305,6 +328,12 @@ class LinkManager(
             if (_media.value === endpoint) setMedia(null)
         }
         entry.media = null
+        entry.linkMedia?.let { channel ->
+            channel.close()
+            if (radioMedia?.second === channel) radioMedia = null
+            onLinkMediaClosed?.invoke(entry.token)
+        }
+        entry.linkMedia = null
         val previous = primary
         if (refreshPrimary()) {
             primary?.let { now ->
@@ -425,6 +454,12 @@ class LinkManager(
             if (e.wifi) {
                 openMedia(e)
                 wifiListener?.onWifiSession(e.token)
+            } else {
+                e.session.takeLinkMediaSealer()?.let { sealer ->
+                    val channel = LinkMediaChannel(connection, sealer)
+                    e.linkMedia = channel
+                    radioMedia = e.token to channel
+                }
             }
             handler?.onEstablished(e.token, connection.kind, carriesEvents)
         }
@@ -443,6 +478,15 @@ class LinkManager(
                 wifiListener?.onBulk(entry.token, plaintext)
             } catch (e: Exception) {
                 Log.e(TAG, "handling bulk data failed", e)
+            }
+        }
+
+        override fun onLinkMedia(plaintext: ByteArray) {
+            entry.lastReceived = clock()
+            try {
+                entry.linkMedia?.receive(plaintext)
+            } catch (e: Exception) {
+                Log.e(TAG, "handling call audio failed", e)
             }
         }
     }

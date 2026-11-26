@@ -113,6 +113,9 @@ class SessionKeys(val okm: ByteArray) {
     /** Wi-Fi bulk channel keys (M5). */
     fun bulk(): Pair<ByteArray, ByteArray> = split(Hkdf.derive(okm, ByteArray(0), Proto.BULK_INFO, 64))
 
+    /** Link media keys (D-072): call audio inside a Bluetooth or debug TCP session. First B→R, then R→B. */
+    fun linkMedia(): Pair<ByteArray, ByteArray> = split(Hkdf.derive(okm, ByteArray(0), Proto.LINK_MEDIA_INFO, 64))
+
     fun wipe() = okm.wipe()
 
     private fun split(k: ByteArray) = k.copyOfRange(0, 32) to k.copyOfRange(32, 64)

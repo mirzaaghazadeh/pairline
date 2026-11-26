@@ -85,11 +85,14 @@ Only the pinned peer can derive the keys, because both static keys are mixed in.
 - **Nonce (12 bytes):** a 4-byte big-endian direction label (`B→R` = `00000001`, `R→B` = `00000002`) followed by an
   8-byte big-endian counter.
 - **Associated data (2 bytes):** protocol version ‖ channel (0 = control, on every transport including the Wi-Fi
-  TCP link; 1 = Wi-Fi media; 2 = Wi-Fi bulk).
+  TCP link; 1 = Wi-Fi media; 2 = Wi-Fi bulk; 3 = link media: call audio inside a Bluetooth or debug TCP session).
 - **Record on the wire:** counter (8 bytes, big-endian) ‖ ciphertext ‖ tag.
 - **Replay:**
   - The control channel is ordered, so the receiver rejects any counter ≤ the last one it accepted and drops the connection.
   - The bulk channel is ordered too (it shares the Wi-Fi TCP connection) and follows the same rule.
+  - The link media channel is ordered too (it shares the Bluetooth or debug TCP connection) and follows the same rule.
+    Counters may skip; a counter at or below the last accepted one, or a record that doesn't authenticate, closes the
+    connection.
   - The UDP media channel uses a 64-record sliding replay window instead (below).
 - **Rekeying:** new keys on every reconnect, and the connection is closed and re-established before any counter
   reaches 2³².
@@ -97,6 +100,9 @@ Only the pinned peer can derive the keys, because both static keys are mixed in.
   `"pairline v0 bulk"`; the first 32 bytes are B→R, the last 32 R→B. `okm` is the one of the **Wi-Fi TCP session**
   the channel belongs to (M5, D-044): each Wi-Fi connection runs its own handshake, and its media and bulk keys die
   with it.
+- **Link media keys (D-072):** `HKDF-SHA256(okm, salt = empty, info = "pairline v0 link media", L = 64)`; the first
+  32 bytes are B→R, the last 32 R→B. `okm` is the one of the Bluetooth (or debug TCP) session that carries the
+  `MEDIA` frames. They differ from the Wi-Fi media keys, so the two media paths never share a key and nonce.
 - **Counters per channel:** each direction of each channel has its own counter, starting at 0. On the control
   channel counter 0 is the confirm; on the bulk and media channels counter 0 is an ordinary record.
 - **Media replay window (64 records):** the receiver keeps the highest counter it has accepted (`top`) and a 64-bit
@@ -118,11 +124,14 @@ A frame is one complete unit after transport reassembly. Its first byte is the f
 | `0x10` | `HELLO` | 99-byte hello body |
 | `0x20` | `RECORD` | encrypted record (control channel) |
 | `0x21` | `BULK` | encrypted record on the bulk channel (M5): Wi-Fi TCP only, after the handshake |
+| `0x22` | `MEDIA` | encrypted record on the link media channel (call audio, D-072): BLE and debug TCP only, after the handshake |
 
 Frames are at most 65,535 bytes. Unknown frame types close the connection. `BULK` is new in M5 but needs no version
 bump: a side sends it only for a file transfer the peer accepted with `file.answer`, which an older app never sends.
 A `BULK` frame on BLE or the debug TCP link, before the handshake, or one that doesn't authenticate closes the
-connection.
+connection. `MEDIA` needs no version bump for the same reason: a side sends it only for call audio the bridge
+accepted with `call.media.start` `via: "link"`, which an older app never asks for or accepts. A `MEDIA` frame on a
+Wi-Fi session, before the handshake, or one that doesn't authenticate closes the connection.
 
 ## Transports
 
@@ -196,6 +205,8 @@ bulk channels.
   it's established, and everything else on BLE when it's established (iOS wakes the app for Bluetooth, not for
   sockets), otherwise on whichever is up. A bulk request whose Wi-Fi session closes before the reply arrives is sent
   again on BLE.
+- `call.media.start` with `via: "link"` goes on the Bluetooth (or debug TCP) session, whose `MEDIA` frames then carry
+  the call audio (D-072).
 - `link.switch` isn't used: replies follow their request (D-044).
 - After each handshake each side sends `device.info`, and B sends `status`, on that session. B re-sends calls in
   progress (`call.incoming` / `call.state`) only when its event session changes.
@@ -286,7 +297,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events |
 | `call.dtmf` | R→B | M3 | `id`, `call`, `digit` (needs capability `call.dtmf`) |
 | `call.audio` | R→B | M3 | `id`, `call`, `mute`, `speaker` (either optional; needs `call.audio`) |
-| `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true) → `ok` once audio flows, or `error` (`unsupported`: not set up, the bridge's helper isn't running or no Wi-Fi link; `failed`: capture didn't start). Needs `call.media` |
+| `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true), `via` (`"wifi"`, the default: the Wi-Fi session's UDP media channel; `"link"`: `MEDIA` frames on the session this request arrives on, which must be Bluetooth or debug TCP, D-072) → `ok` once audio flows, or `error` (`unsupported`: not set up, the bridge's helper isn't running, no Wi-Fi link for `wifi`, a Wi-Fi session or no `call.media.link` for `link`; `failed`: capture didn't start). Needs `call.media` |
 | `call.media.stop` | R→B | M6 | `id`, `call` → `ok`. The relay also stops by itself when the call ends or the Wi-Fi link drops |
 | `call.media.state` | B→R | M6 | `call`, `state` (`active` / `stopped` / `failed`), `listen`, `talk`, `reason` (English, for diagnostics) |
 | `call.media.feedback` | R→B | M6 | `id`, `heard` (the iPhone heard the caller), `heardMe` (the caller heard the iPhone); either may be null → `ok`. The bridge uses it to pick the capture source and mic handling that work on this phone |
@@ -315,7 +326,9 @@ version supports it. The iPhone hides or explains anything missing instead of gu
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
 `call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `call.media` (call audio can
 be relayed to the iPhone: "Talk on iPhone" is on and the bridge's helper is running, D-054), `call.media.talk` (the iPhone's microphone
-can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone), `net.share`
+can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone),
+`call.media.link` (listed with `call.media`: the call audio can also travel inside the Bluetooth session as Opus,
+`via: "link"`; the bridge has an Opus encoder and decoder, D-072), `net.share`
 (the bridge's user allows internet sharing, M8), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),
 `block` (the bridge keeps a block list, M4)
@@ -349,23 +362,41 @@ in `BULK` frames on the same connection. Without a Wi-Fi session, no transfer st
 
 ### Call audio (M6)
 
-Call audio travels only on the Wi-Fi link's **media channel** (UDP, channel 1, media keys, 64-record replay window;
-see "Records"). Each media record's plaintext is one packet:
+Call audio takes one of two paths, chosen by R in `call.media.start` (`via`):
+
+- **`wifi`:** the Wi-Fi link's **media channel** (UDP, channel 1, media keys, 64-record replay window; see
+  "Records"). Each media record's plaintext is one packet.
+- **`link` (D-072):** `MEDIA` frames inside the Bluetooth (or debug TCP) session the request arrived on (channel 3,
+  link media keys, ordered). Needs `call.media.link`. Each `MEDIA` record's plaintext holds **one or more packets**,
+  each preceded by its length (2 bytes, big-endian, at least 3): `length ‖ packet ‖ length ‖ packet …`, at most 1200
+  bytes in all. A record that doesn't split exactly into such packets is ignored (the connection stays up).
+
+A packet is the same on both paths:
 
 | Bytes | Field |
 |-------|-------|
-| 1 | kind: `0x01` = 16-bit little-endian mono PCM at 16 kHz, one 20 ms frame |
+| 1 | kind: `0x01` = 16-bit little-endian mono PCM at 16 kHz, one 20 ms frame; `0x02` = one Opus packet of 20 ms (D-072) |
 | 2 | sequence number, big-endian, +1 per frame, wraps at 65 536 |
-| 640 | 320 samples (kind `0x01`) |
+| 640 or 1–400 | 320 samples (kind `0x01`), or the Opus packet (kind `0x02`) |
 
-- Both directions use the same format; packets are sent every 20 ms while the relay is active. Receivers drop
-  unknown kinds and wrong sizes, play frames in sequence order behind a 60 ms jitter buffer, and cover a lost frame by
-  repeating the previous one at half volume (twice at most), then silence.
-- Uncompressed PCM (32 KB/s each way) is fine on a local network and needs no codec on either side; a compressed kind
-  can be added later without breaking older receivers.
-- R starts the relay with `call.media.start` once the call is in progress and its media channel is open, and plays
-  silence (not nothing) while muted, so B's jitter buffer stays steady. Audio is never stored on either phone.
-- A call-audio packet is 643 bytes, well under the media channel's 1200-byte limit (M5).
+- **Kinds per path:** `wifi` sends kind `0x01` (32 KB/s each way is nothing on a local network and adds no codec
+  delay). `link` sends kind `0x02`: Bluetooth LE can't carry raw PCM reliably. Opus is encoded from 16 kHz mono with
+  20 ms frames, the VoIP application and about 32 kbit/s (packets of about 80 bytes); a receiver accepts any valid
+  Opus packet of 20 ms and resamples what its decoder outputs to 16 kHz. Receivers drop unknown kinds and wrong sizes.
+- Packets are produced every 20 ms while the relay is active. Receivers play frames in sequence order behind a jitter
+  buffer (60 ms on `wifi`; 80 ms on `link`, whose deliveries come in bursts) and cover a lost frame by repeating the
+  previous one at half volume (twice at most), then silence.
+- **Sending on `link`:** audio goes ahead of control frames that haven't started yet (a frame already being sent is
+  finished first: BLE fragments of two frames never interleave). When the link can't keep up, the sender puts every
+  packet that is waiting into the next `MEDIA` record instead of one record per packet, and drops the oldest
+  packets beyond 200 ms waiting, so a stall never builds lasting delay. While a `link` relay runs, B asks Android for
+  its fastest Bluetooth connection (high connection priority, 2M PHY where available) and returns to balanced after.
+- R starts the relay with `call.media.start` once the call is in progress (on `wifi`: once its media channel is open),
+  and sends silence (not nothing) while muted, so B's jitter buffer stays steady. Audio is never stored on either phone.
+- The relay ends when the call ends, with `call.media.stop`, or when the session or channel it runs on closes; B then
+  sends `call.media.state` `stopped`, and R may start it again on the other path.
+- A PCM packet is 643 bytes, under the media channel's 1200-byte limit (M5). An Opus packet with its length prefix is
+  about 85 bytes, so one `MEDIA` frame of a single packet fits one BLE fragment.
 
 ### Clarifications (v0)
 
@@ -475,7 +506,8 @@ an unknown request with `error` / `unsupported`, so the wire version stays 0.
 
 `protocol/test-vectors/v0.json` holds fixed keys and inputs with the expected ECDH results, HKDF outputs, pairing
 MACs, hello bodies, session keys, confirm records, encrypted records (control, media and bulk), records that must
-fail, the media replay window, a pair link with the Wi-Fi parameters, BLE fragments and TCP framing. It is generated by an independent Python implementation (`protocol/tools/gen_vectors.py`). Unit tests
+fail, the media replay window, a pair link with the Wi-Fi parameters, BLE fragments and TCP framing, and the link
+media keys with a `MEDIA` frame of two batched packets (D-072). It is generated by an independent Python implementation (`protocol/tools/gen_vectors.py`). Unit tests
 in both apps must reproduce every value.
 
 ## Open questions for review
