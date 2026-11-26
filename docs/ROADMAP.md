@@ -191,11 +191,14 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
       non-Apple client wakes a suspended iPhone; delay measured (public database, median 1.6 s; the private
       database is refused on the maintainer's account, asked Apple, D-072)
 - [x] Phase 0: notification-filtering entitlement requested (2026-11-26, Apple request ID Q7U98356ZR)
-- [ ] Protocol: mailbox records, remote session, Opus kind; version bump and shared vectors
-- [ ] Bridge mailbox: CloudKit Web Services client in `link/remote/`
-- [ ] iPhone: subscription and Notification Service Extension (SMS, codes, calls through CallKit)
-- [ ] Remote pairing: one-time invitation from the iPhone, allowed on the Android phone, 6-digit code compared on a
-      call (D-072)
+- [x] Protocol: mailbox records, remote messages, remote pairing; v1 with shared vectors (`v1-remote.json`); the Opus
+      kind comes with the Opus step
+- [x] Bridge mailbox: CloudKit Web Services client and RemoteLink in `link/remote/`
+- [x] iPhone: subscriptions and Notification Service Extension (SMS and codes; calls as a time-sensitive notification
+      until the filtering entitlement lets them ring through CallKit)
+- [x] Remote pairing: one-time invitation from the iPhone, allowed on the Android phone (tap or paste the link), 6-digit
+      code compared on a call (D-072); tested iPhone ↔ stand-in bridge through iCloud on 2026-11-26
+- [ ] Street test with a real Android bridge in another home (a tester's phone)
 - [ ] Router mapping, public listener and direct session
 - [ ] Opus call audio on the direct connection
 - [ ] Settings, status line, the before-you-turn-it-on screen and "Check my home connection"
