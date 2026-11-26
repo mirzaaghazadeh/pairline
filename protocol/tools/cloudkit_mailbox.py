@@ -8,8 +8,9 @@ Configuration lives outside the repo:
   ~/.config/pairline/cloudkit-development.env   CK_CONTAINER, CK_ENVIRONMENT, CK_API_TOKEN (mode 600)
   ~/.config/pairline/ck-webauth-<name>.token     the current web auth token of a chain (mode 600)
 
-CloudKit web auth tokens are single-use: every response carries the next one (`X-Apple-CloudKit-Web-Auth-Token`),
-which replaces the stored one before anything else happens, and requests on one chain never overlap.
+Every response carries a refreshed web auth token (`X-Apple-CloudKit-Web-Auth-Token`), which replaces the stored one
+before anything else happens; requests on one chain never overlap. Measured in Phase 0 (D-072): a token from the
+iPhone works for more than one request, and the returned one works only without the trailing `__` it comes with.
 
 Commands:
   import-token FILE [--chain NAME]        start a chain from a token the iPhone wrote (then delete FILE yourself)
@@ -21,7 +22,7 @@ Commands:
   latency --device UDID [--tries 20]      write records and time the iPhone's push (needs idevicesyslog over USB)
   latency --out FILE [--tries 20]         write records and note when; time them later with `match`
   match WRITES DELIVERIES                 pair `latency --out` writes with the iPhone's `-PairlineRemoteSpike report`
-  tokens                                  is a token single-use, and is a second token from the iPhone independent?
+  tokens [--steps 5]                      is a used token still good, and does a refreshed chain go on?
   webcourier [--seconds 120]              register for web push and long-poll (does CloudKit push to a web client?)
 """
 
@@ -56,6 +57,12 @@ def load_env():
     return env
 
 
+def normalize_token(token):
+    """CloudKit returns refreshed web auth tokens with a trailing `__` that it then refuses (HTTP 421)."""
+    token = token.strip()
+    return token[:-2] if token.endswith("__") else token
+
+
 def write_secret(path, text):
     tmp = path + ".tmp"
     fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
@@ -65,16 +72,19 @@ def write_secret(path, text):
 
 
 class CloudKit:
-    def __init__(self, chain="main"):
+    def __init__(self, chain="main", keep_token=False, show_headers=False):
         self.env = load_env()
         self.chain_path = os.path.join(CONFIG_DIR, f"ck-webauth-{chain}.token")
+        self.next_path = os.path.join(CONFIG_DIR, f"ck-webauth-{chain}-next.token")
+        self.keep_token = keep_token  # diagnosis: save the returned token beside the chain instead of replacing it
+        self.show_headers = show_headers  # diagnosis: print response header names and value lengths, never values
         self.lock = threading.Lock()
         self.requests = 0
 
     @property
     def token(self):
         with open(self.chain_path) as f:
-            return f.read().strip()
+            return normalize_token(f.read())
 
     def url(self, scope, path, api="database"):
         e = self.env
@@ -98,9 +108,14 @@ class CloudKit:
                 status, headers, raw = err.code, err.headers, err.read()
             elapsed = time.monotonic() - started
             self.requests += 1
+            if self.show_headers:
+                sent = self.token
+                for k, v in headers.items():
+                    same = " (same as the token sent)" if v == sent else ""
+                    print(f"  header {k}: {len(v)} characters{same}")
             rotated = next((headers.get(h) for h in TOKEN_HEADERS if headers.get(h)), None)
             if rotated:
-                write_secret(self.chain_path, rotated)
+                write_secret(self.next_path if self.keep_token else self.chain_path, normalize_token(rotated))
             try:
                 payload = json.loads(raw) if raw else {}
             except ValueError:
@@ -318,31 +333,23 @@ def cmd_match(args):
 
 
 def cmd_tokens(ck, args):
-    """Single use: replay a token that was already spent. Independence: a spare token minted after the main one."""
-    spent = ck.token
-    status, payload, _ = ck.call("zones/list")
-    print(f"main chain: HTTP {status}, rotated: {payload['_rotated']}")
+    """Is a used token still good, and does the chain go on? Uses the public database's users/current, which works
+    even where the private database is refused."""
+    def probe(client, label):
+        status, payload, _ = client.call("users/current", scope="public")
+        print(f"{label}: HTTP {status} {payload.get('serverErrorCode', '')} rotated: {payload['_rotated']}")
+        return status == 200
+    used = ck.token
+    ok = probe(ck, "main chain")
     current = ck.token
-    write_secret(ck.chain_path, spent)
-    status, payload, _ = ck.call("zones/list")
-    print(f"replaying the spent token: HTTP {status} {payload.get('serverErrorCode', '')} {payload.get('reason', '')}")
-    if status == 200:
-        print(f"  the replay was accepted (rotated: {payload['_rotated']}); the chain continues from the replay")
-    else:
-        write_secret(ck.chain_path, current)
-    status, payload, _ = ck.call("zones/list")
-    print(f"main chain after the replay: HTTP {status} {payload.get('serverErrorCode', '')}")
-    spare_path = os.path.join(CONFIG_DIR, "ck-webauth-spare.token")
-    if os.path.exists(spare_path):
-        spare = CloudKit("spare")
-        status, payload, _ = spare.call("zones/list")
-        print(f"spare chain (minted after main, unused until now): HTTP {status} "
-              f"{payload.get('serverErrorCode', '')} rotated: {payload['_rotated']}")
-        status, payload, _ = ck.call("zones/list")
-        print(f"main chain after the spare was used: HTTP {status} {payload.get('serverErrorCode', '')}")
-    else:
-        print("no spare chain imported (import-token --chain spare FILE)")
-    return True
+    write_secret(ck.chain_path, used)
+    reused = probe(ck, "the token just used, again")
+    write_secret(ck.chain_path, current)
+    for i in range(args.steps):
+        ok = probe(ck, f"refreshed token #{i + 1}") and ok
+    print(f"a used token is {'still' if reused else 'no longer'} accepted; the refreshed chain "
+          f"{'held' if ok else 'broke'} over {args.steps} steps")
+    return ok
 
 
 def cmd_webcourier(ck, args):
@@ -380,6 +387,10 @@ def cmd_webcourier(ck, args):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--chain", default="main", help="which stored token chain to use")
+    ap.add_argument("--keep-token", action="store_true",
+                    help="diagnosis: don't replace the chain's token; save the returned one as <chain>-next")
+    ap.add_argument("--show-headers", action="store_true",
+                    help="diagnosis: print response header names and value lengths (never values)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("import-token"); p.add_argument("file")
     sub.add_parser("whoami")
@@ -402,7 +413,7 @@ def main():
     p.add_argument("--match", default=r"apsd.*(app\.pairline\.ios|icloud-container)",
                    help="regex for the iPhone log line that shows the push arrived")
     p = sub.add_parser("match"); p.add_argument("writes"); p.add_argument("deliveries")
-    sub.add_parser("tokens")
+    p = sub.add_parser("tokens"); p.add_argument("--steps", type=int, default=5)
     p = sub.add_parser("webcourier"); p.add_argument("--seconds", type=int, default=120)
     p.add_argument("--zone", default="ToBridge")
     args = ap.parse_args()
@@ -411,7 +422,7 @@ def main():
         return 0
     if args.cmd == "match":
         return 0 if cmd_match(args) else 1
-    ck = CloudKit(args.chain)
+    ck = CloudKit(args.chain, keep_token=args.keep_token, show_headers=args.show_headers)
     ok = {"whoami": cmd_whoami, "zones": cmd_zones, "put": cmd_put, "delete": cmd_delete, "changes": cmd_changes,
           "latency": cmd_latency, "tokens": cmd_tokens, "webcourier": cmd_webcourier}[args.cmd](ck, args)
     return 0 if ok else 1
