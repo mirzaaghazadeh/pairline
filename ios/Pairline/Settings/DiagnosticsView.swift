@@ -67,7 +67,10 @@ struct DiagnosticsView: View {
         lines.append("Link: \(describe(bridge.phase))")
         lines.append("Bluetooth lane: \(app.link.primarySummary)")
         lines.append("Wi-Fi lane: \(app.link.wifiSummary)")
-        if let remote = app.link.remote { lines.append("Remote mode: \(remote.summary)") }
+        if let remote = app.link.remote {
+            lines.append("Remote mode: \(remote.summary)")
+            lines.append("Direct lane: \(app.link.directSummary)")
+        }
         let transfers = app.link.files.transfers
         if !transfers.isEmpty {
             lines.append("File transfers: \(transfers.filter { $0.state == .done }.count) done, \(transfers.filter { !$0.isFinished }.count) active")
@@ -100,7 +103,7 @@ struct DiagnosticsView: View {
 
     private func describe(_ phase: LinkPhase) -> String {
         switch phase {
-        case .connected: return "connected"
+        case .connected: return app.link.isDirect ? "connected (direct connection)" : "connected"
         case .remote: return "via iCloud (remote mode)"
         case .notPaired: return "not paired"
         case .locked: return "locked"

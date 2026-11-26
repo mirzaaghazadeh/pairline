@@ -10,6 +10,8 @@ final class FakeConnector: LinkConnector {
     var makeTransport: () -> LoopbackTransport
     /// When false, `connect` waits (like a bridge that isn't reachable) until cancelled or enabled.
     var enabled: Bool
+    /// When true, `connect` fails at once (like an address where nothing answers).
+    var failing = false
     private(set) var targets: [ConnectTarget] = []
     private var waiting: ((Result<(FrameTransport, UUID?), Error>) -> Void)?
 
@@ -22,6 +24,10 @@ final class FakeConnector: LinkConnector {
     func connect(_ target: ConnectTarget, completion: @escaping (Result<(FrameTransport, UUID?), Error>) -> Void) {
         cancel()
         targets.append(target)
+        if failing {
+            DispatchQueue.main.async { completion(.failure(ConnectError.failed)) }
+            return
+        }
         guard enabled else {
             waiting = completion
             return

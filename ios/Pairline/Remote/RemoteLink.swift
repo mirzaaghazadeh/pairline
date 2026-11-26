@@ -130,8 +130,8 @@ final class RemoteLink: ObservableObject {
 
     @Published private(set) var settings: RemoteSettings?
     @Published private(set) var problem: RemoteProblem?
-    /// The bridge's last `remote.state` `direct` value (`open`, `none` or `blocked`), for diagnostics.
-    @Published private(set) var directState: String?
+    /// What the bridge last said about its direct connection (`remote.addr`, `remote.state`).
+    @Published private(set) var direct: RemoteDirect
 
     /// A message from the bridge, handled like a session's plaintext.
     var onMessage: ((Delivery) -> Void)?
@@ -151,6 +151,10 @@ final class RemoteLink: ObservableObject {
     private var catchUpTask: Task<Bool, Never>?
     private var catchUpAgain = false
     private var resetTask: Task<Void, Never>?
+    /// Direct-connection addresses whose handshake failed since the last `remote.addr` (in memory only).
+    private var droppedEndpoints = Set<WiFiEndpoint>()
+    /// `remote.config` is on its way to the bridge (turning remote mode on).
+    private var configuring = false
 
     init(store: RemoteStore, inbox: RemoteInboxing = SharedRemoteInbox(),
          identity: @escaping () throws -> KeyAgreementPrivateKey, bridgeKey: @escaping () -> Data?,
@@ -165,9 +169,17 @@ final class RemoteLink: ObservableObject {
         self.fetchToken = fetchToken
         self.registerForPush = registerForPush
         settings = store.settings
+        direct = store.direct
     }
 
     var isOn: Bool { settings?.on == true }
+
+    /// The addresses the direct connection may dial: from the bridge's last `remote.addr`, IPv6 first, minus any
+    /// whose handshake failed since. Empty while remote mode is off.
+    var directCandidates: [WiFiEndpoint] {
+        guard isOn else { return [] }
+        return direct.endpoints.candidates.filter { !droppedEndpoints.contains($0) }
+    }
 
     func nextRequestID() -> Int { store.nextRequestID() }
 
@@ -344,12 +356,17 @@ final class RemoteLink: ObservableObject {
         do {
             try await mailbox.prepare()
             let token = try await fetchToken(new)
+            // The bridge may send `remote.addr` right after its `ok`, before this task goes on.
+            configuring = true
+            defer { configuring = false }
             let reply = try await request(.remoteConfig(new, token: token))
             guard case .ok = reply.message else { throw RemoteError.failed }
         } catch {
             let reason = RemoteError(error)
             log.warning("remote", "Couldn't turn remote mode on: \(reason)")
             Task { try? await mailbox.tearDown() }
+            store.saveDirect(RemoteDirect())
+            direct = store.direct
             throw reason
         }
         var on = new
@@ -387,7 +404,8 @@ final class RemoteLink: ObservableObject {
         store.clear()
         settings = nil
         problem = nil
-        directState = nil
+        direct = store.direct
+        droppedEndpoints = []
         let mailbox = mailbox(for: old)
         let task = Task {
             for box in RemoteMailbox.Box.allCases {
@@ -421,12 +439,39 @@ final class RemoteLink: ObservableObject {
 
     // MARK: - From the bridge
 
-    /// `remote.state`: only `direct` is kept; `reason` stays out of the app.
+    /// `remote.addr` from the paired bridge (a session record, or a mailbox record sealed with its pinned key):
+    /// replaces the direct-connection addresses, keeping only valid public ones. Returns whether it was taken.
+    @discardableResult
+    func bridgeAddresses(_ plaintext: Data) -> Bool {
+        guard isOn || configuring,
+              let object = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any] else { return false }
+        var direct = self.direct
+        direct.endpoints = DirectEndpoints(message: object)
+        store.saveDirect(direct)
+        self.direct = direct
+        droppedEndpoints = []
+        log.info("remote", "The bridge's direct-connection addresses: \(direct.endpoints.summary)")
+        return true
+    }
+
+    /// The direct connection's handshake failed at this address: skip it until the next `remote.addr`.
+    func dropDirect(_ endpoint: WiFiEndpoint) {
+        guard direct.endpoints.candidates.contains(endpoint), droppedEndpoints.insert(endpoint).inserted else { return }
+        log.warning("remote", "Skipping the bridge's \(DirectAddress.family(endpoint)) address until it sends new ones")
+    }
+
+    /// `remote.state`, shown in Settings: `direct`, and of `reason` only a cause the app recognizes in it.
     func bridgeState(_ plaintext: Data) {
-        guard let object = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any],
-              let direct = object["direct"] as? String, ["open", "none", "blocked"].contains(direct) else { return }
-        if directState != direct { log.info("remote", "The bridge's direct connection: \(direct)") }
-        directState = direct
+        guard isOn || configuring, let object = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any],
+              let status = DirectStatus(message: object) else { return }
+        if direct.status != status {
+            log.info("remote", "The bridge's direct connection: \(status.availability.rawValue)"
+                     + (status.reason.map { " (\($0.rawValue))" } ?? ""))
+        }
+        var direct = self.direct
+        direct.status = status
+        store.saveDirect(direct)
+        self.direct = direct
     }
 
     private func note(_ error: Error) {
@@ -439,6 +484,6 @@ final class RemoteLink: ObservableObject {
     var summary: String {
         guard let settings, settings.on else { return "off" }
         return "on (\(settings.backend.rawValue), \(settings.environment.rawValue)); problem: "
-            + "\(problem.map { "\($0)" } ?? "none"); direct: \(directState ?? "?")"
+            + "\(problem.map { "\($0)" } ?? "none"); direct: \(direct.status?.availability.rawValue ?? "?")"
     }
 }

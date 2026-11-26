@@ -39,7 +39,7 @@ final class BridgeLiveActivity: ObservableObject {
         self.bridge = bridge
         lastState = nil
         // @Published fires before the property changes; read the bridge on the next turn of the main queue.
-        observation = Publishers.CombineLatest3(bridge.$phase, bridge.$status, bridge.$deviceInfo)
+        observation = Publishers.CombineLatest4(bridge.$phase, bridge.$transports, bridge.$status, bridge.$deviceInfo)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.refresh(inForeground: Self.inForeground) }
         refresh(inForeground: Self.inForeground)

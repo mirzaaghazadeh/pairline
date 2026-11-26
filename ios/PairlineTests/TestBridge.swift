@@ -5,6 +5,8 @@ import Foundation
 /// Two connected in-memory transports. Frames are delivered asynchronously on the main queue, like the real ones.
 final class LoopbackTransport: FrameTransport {
     var kind: TransportKind = .tcp
+    /// The address a real Wi-Fi or direct transport would have dialed.
+    var dialed: WiFiEndpoint?
     weak var peer: LoopbackTransport?
     var onFrame: ((Data) -> Void)?
     var onClose: ((Error?) -> Void)?

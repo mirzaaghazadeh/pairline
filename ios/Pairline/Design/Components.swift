@@ -209,6 +209,8 @@ struct InfoBanner<Trailing: View>: View {
 struct LinkStatusPill: View {
     let phase: LinkPhase
     var isDemo = false
+    /// The live session is remote mode's direct connection (D-072).
+    var isDirect = false
     @State private var pulse = false
 
     var color: Color {
@@ -224,12 +226,12 @@ struct LinkStatusPill: View {
 
     var label: Text {
         if isDemo, phase == .connected, !DebugSettings.marketingScreenshots { return Text("Demo bridge") }
-        return LinkStatusPill.title(for: phase)
+        return LinkStatusPill.title(for: phase, isDirect: isDirect)
     }
 
-    static func title(for phase: LinkPhase) -> Text {
+    static func title(for phase: LinkPhase, isDirect: Bool = false) -> Text {
         switch phase {
-        case .connected: return Text("Connected")
+        case .connected: return isDirect ? Text("Direct connection") : Text("Connected")
         case .remote: return Text("Via iCloud")
         case .searching: return Text("Looking for your bridge…")
         case .securing: return Text("Securing the link…")

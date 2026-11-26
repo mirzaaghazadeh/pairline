@@ -7,6 +7,8 @@ protocol FrameTransport: AnyObject {
     var onFrame: ((Data) -> Void)? { get set }
     var onClose: ((Error?) -> Void)? { get set }
     var kind: TransportKind { get }
+    /// The address this transport dialed (Wi-Fi and the direct connection); nil for Bluetooth.
+    var dialed: WiFiEndpoint? { get }
     func send(_ frame: Data)
     /// Sends and calls `completion` (on the main queue) once the transport took the frame, for flow control.
     func send(_ frame: Data, completion: (() -> Void)?)
@@ -14,6 +16,8 @@ protocol FrameTransport: AnyObject {
 }
 
 extension FrameTransport {
+    var dialed: WiFiEndpoint? { nil }
+
     func send(_ frame: Data, completion: (() -> Void)?) {
         send(frame)
         if let completion { DispatchQueue.main.async(execute: completion) }
@@ -25,6 +29,9 @@ enum TransportKind: String, Codable {
     case tcp
     /// The production Wi-Fi link (M5): a full session over TCP on the local network, plus media and bulk channels.
     case wifi
+    /// Remote mode's direct connection (D-072): the Wi-Fi session over TCP to the bridge's public address, without
+    /// the media and bulk channels for now.
+    case direct
     case demo
 }
 
@@ -77,7 +84,7 @@ final class LinkSession {
     var transportKind: TransportKind { transport.kind }
     /// The transport under this session (the Wi-Fi link reads the peer's address from it for the media channel).
     var frameTransport: FrameTransport { transport }
-    /// `BULK` frames exist only on the Wi-Fi link (PROTOCOL.md, "Frames").
+    /// `BULK` frames exist only on the Wi-Fi link (PROTOCOL.md, "Frames"); not on the direct connection yet.
     var carriesBulk: Bool { transport.kind == .wifi }
 
     init(transport: FrameTransport, identity: KeyAgreementPrivateKey, pinnedBridgeKey: Data?, pairing: PairingLink?,

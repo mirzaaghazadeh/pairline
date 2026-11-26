@@ -97,16 +97,20 @@ protocol BridgeLink: AnyObject {
     func reconnectNow()
 }
 
-/// Which of the two sessions a message travels on (PROTOCOL.md, "Two sessions at once").
+/// Which session a message travels on (PROTOCOL.md, "Two sessions at once").
 enum LinkLane: String, CaseIterable {
     /// Bluetooth (or the debug TCP link in debug builds).
     case primary
     case wifi
+    /// Remote mode's direct connection (D-072): only while no nearby session is up.
+    case direct
 }
 
 /// The real link: up to two sessions with the paired bridge — Bluetooth and Wi-Fi — each with its own transport,
 /// handshake, reconnection and keep-alive; requests routed between them; the Wi-Fi session's media channel and file
-/// transfers (PROTOCOL.md, "Wi-Fi").
+/// transfers (PROTOCOL.md, "Wi-Fi"). In remote mode, while neither is up, a third session runs over the direct
+/// connection to the bridge's public address when the bridge has sent one, and otherwise messages go through the
+/// iCloud mailbox (PROTOCOL.md, "Remote mode").
 @MainActor
 final class LinkManager: BridgeLink {
     private struct Pending {
@@ -157,6 +161,12 @@ final class LinkManager: BridgeLink {
     /// While such a request waits and the app is open, look for the reply this often (silent pushes can lag; the
     /// bridge checks every 5 s right after hearing from this iPhone, so a reply is usually there within seconds).
     static let mailboxPollInterval: TimeInterval = 3
+    /// The direct connection retries after 5 s, 15 s and 30 s, then every 2 minutes; at once when the network
+    /// changes, a nearby session ends or new addresses arrive.
+    nonisolated static func directRetryDelay(attempt: Int) -> TimeInterval {
+        let delays: [TimeInterval] = [5, 15, 30]
+        return attempt < delays.count ? delays[max(0, attempt)] : 120
+    }
     /// Posted (object: the link manager) when `mediaChannel` changes.
     static let mediaChannelDidChange = Notification.Name("PairlineMediaChannelDidChange")
 
@@ -172,6 +182,8 @@ final class LinkManager: BridgeLink {
     var connectedSince: Date? { lanes.compactMap(\.connectedSince).min() }
     var transportKind: TransportKind { activeTransports.first ?? primaryKind ?? .wifi }
     var activeTransports: [TransportKind] { lanes.filter(\.isEstablished).compactMap { $0.session?.transportKind } }
+    /// The live session is remote mode's direct connection (the UI says "Direct connection").
+    var isDirect: Bool { activeTransports == [.direct] }
 
     var onPhaseChange: ((LinkPhase) -> Void)?
     var onTransportsChange: (() -> Void)?
@@ -198,7 +210,8 @@ final class LinkManager: BridgeLink {
     private var connectors: [TransportKind: LinkConnector] = [:]
     private let primary = Lane(.primary)
     private let wifi = Lane(.wifi)
-    private var lanes: [Lane] { [primary, wifi] }
+    private let direct = Lane(.direct)
+    private var lanes: [Lane] { [primary, wifi, direct] }
     private var pending: [Int: Pending] = [:]
     private var nextID = 1
     private var watchdog: Timer?
@@ -228,6 +241,12 @@ final class LinkManager: BridgeLink {
         return peerStore.peer?.wifi != nil || bridgeCaps.contains(Capability.wifi.rawValue)
     }
 
+    /// The direct lane runs in remote mode, once the bridge has sent addresses, while no nearby session is up.
+    private var directWanted: Bool {
+        guard let remote, remote.isOn, !remote.directCandidates.isEmpty else { return false }
+        return !primary.isEstablished && !wifi.isEstablished
+    }
+
     init(identityStore: IdentityStore, peerStore: PeerStore, deviceInfo: Outbound, remote: RemoteLink? = nil,
          makeConnector: @escaping (TransportKind) -> LinkConnector) {
         self.identityStore = identityStore
@@ -244,7 +263,7 @@ final class LinkManager: BridgeLink {
         remote?.onMessage = { [weak self] delivery in
             self?.handle(plaintext: delivery.plaintext, lane: nil, alreadyShown: delivery.alreadyShown)
         }
-        remote?.onChange = { [weak self] in self?.updatePhase() }
+        remote?.onChange = { [weak self] in self?.remoteChanged() }
         remote?.sendOverSession = { [weak self] message in
             guard let self, let lane = self.route(message) else { return false }
             return self.sendRaw(message, id: nil, on: lane)
@@ -278,7 +297,13 @@ final class LinkManager: BridgeLink {
         updatePhase()
     }
 
-    private func lane(_ id: LinkLane) -> Lane { id == .primary ? primary : wifi }
+    private func lane(_ id: LinkLane) -> Lane {
+        switch id {
+        case .primary: return primary
+        case .wifi: return wifi
+        case .direct: return direct
+        }
+    }
 
     private func connector(for kind: TransportKind) -> LinkConnector {
         if let existing = connectors[kind] { return existing }
@@ -288,12 +313,19 @@ final class LinkManager: BridgeLink {
             wifiConnector.hints = { [weak self] in self?.peerStore.peer?.wifi }
             wifiConnector.onNetworkChange = { [weak self] in self?.kickWiFi(reason: "network changed") }
         }
+        if let directConnector = new as? DirectConnector {
+            directConnector.onNetworkChange = { [weak self] in self?.kickDirect(reason: "network changed") }
+        }
         connectors[kind] = new
         return new
     }
 
     private func laneKind(_ lane: Lane) -> TransportKind? {
-        lane.id == .wifi ? .wifi : primaryKind
+        switch lane.id {
+        case .primary: return primaryKind
+        case .wifi: return .wifi
+        case .direct: return .direct
+        }
     }
 
     private func availabilityChanged() {
@@ -360,6 +392,7 @@ final class LinkManager: BridgeLink {
         guard allowed, let peer = peerStore.peer, lane.session == nil, pairingAttempt == nil, !lane.connecting,
               let kind = laneKind(lane) else { return }
         if lane.id == .wifi, !wifiLaneEnabled { return }
+        if lane.id == .direct, !directWanted { return }
         lane.retryTimer?.invalidate()
         lane.retryTimer = nil
         lane.retryAt = nil
@@ -367,8 +400,11 @@ final class LinkManager: BridgeLink {
         lane.connecting = true
         lane.token += 1
         let token = lane.token
+        var target = ConnectTarget(deviceID: peer.deviceID, knownPeripheral: peer.peripheralID)
+        // The only non-local addresses the iPhone dials: from the paired bridge's authenticated `remote.addr`.
+        if lane.id == .direct { target.direct = remote?.directCandidates ?? [] }
         updatePhase()
-        connector.connect(ConnectTarget(deviceID: peer.deviceID, knownPeripheral: peer.peripheralID)) { [weak self, weak lane] result in
+        connector.connect(target) { [weak self, weak lane] result in
             guard let self, let lane, token == lane.token else {
                 if case .success(let (transport, _)) = result { transport.close() }
                 return
@@ -376,7 +412,8 @@ final class LinkManager: BridgeLink {
             lane.connecting = false
             switch result {
             case .success(let (transport, peripheralID)):
-                guard self.allowed, self.peerStore.peer != nil, self.pairingAttempt == nil, lane.session == nil else {
+                guard self.allowed, self.peerStore.peer != nil, self.pairingAttempt == nil, lane.session == nil,
+                      lane.id != .direct || self.directWanted else {
                     transport.close()
                     return self.updatePhase()
                 }
@@ -392,7 +429,9 @@ final class LinkManager: BridgeLink {
     private func scheduleRetry(_ lane: Lane) {
         guard allowed, peerStore.peer != nil, pairingAttempt == nil else { return updatePhase() }
         if lane.id == .wifi, !wifiLaneEnabled { return updatePhase() }
-        let delay = min(30, pow(2, Double(lane.retryAttempt)))
+        if lane.id == .direct, !directWanted { return updatePhase() }
+        let delay = lane.id == .direct ? Self.directRetryDelay(attempt: lane.retryAttempt)
+            : min(30, pow(2, Double(lane.retryAttempt)))
         lane.retryAttempt += 1
         lane.retryAt = Date().addingTimeInterval(delay)
         lane.retryTimer?.invalidate()
@@ -421,6 +460,70 @@ final class LinkManager: BridgeLink {
             connectors[.wifi]?.cancel()
         }
         connectIfNeeded(wifi)
+    }
+
+    // MARK: - Direct connection (D-072)
+
+    /// Something suggests the direct connection may work now (new addresses, the network changed, the nearby link
+    /// ended): restart its attempt without waiting for its backoff. A direct session already up is kept.
+    private func kickDirect(reason: String) {
+        guard allowed, peerStore.peer != nil, pairingAttempt == nil, direct.session == nil else { return }
+        cancelDirectAttempt()
+        direct.retryAttempt = 0
+        guard directWanted else { return updatePhase() }
+        log.info("direct", "Trying the direct connection (\(reason))")
+        connectIfNeeded(direct)
+    }
+
+    private func cancelDirectAttempt() {
+        direct.retryTimer?.invalidate()
+        direct.retryTimer = nil
+        direct.retryAt = nil
+        if direct.connecting {
+            direct.token += 1
+            direct.connecting = false
+            connectors[.direct]?.cancel()
+        }
+    }
+
+    /// Remote mode went on or off: the direct lane follows it.
+    private func remoteChanged() {
+        if remote?.isOn == true {
+            connectIfNeeded(direct)
+        } else {
+            cancelDirectAttempt()
+            direct.retryAttempt = 0
+            closeDirectSession()
+        }
+        updatePhase()
+    }
+
+    /// A nearby session is up, so the direct one isn't needed: stop trying, and close it once its requests are
+    /// answered (the bridge answers on the session a request came on).
+    private func retireDirect() {
+        guard primary.isEstablished || wifi.isEstablished else { return }
+        cancelDirectAttempt()
+        guard let session = direct.session else { return }
+        if session.phase == .established, pending.values.contains(where: { $0.lane == .direct }) { return }
+        log.info("direct", "A nearby link is up; closing the direct connection")
+        closeDirectSession()
+    }
+
+    /// Closes the direct session on purpose (it worked, so its address stays).
+    private func closeDirectSession() {
+        guard let session = direct.session else { return }
+        direct.session = nil
+        direct.connectedSince = nil
+        session.close()
+        reroutePending(from: direct)
+        if !lanes.contains(where: \.isEstablished) { latency = nil }
+        onTransportsChange?()
+        updatePhase()
+    }
+
+    /// The direct handshake failed or timed out at this session's address: skip it until the next `remote.addr`.
+    private func dropDirectAddress(of session: LinkSession) {
+        if let endpoint = session.frameTransport.dialed { remote?.dropDirect(endpoint) }
     }
 
     private func teardown() {
@@ -690,6 +793,8 @@ final class LinkManager: BridgeLink {
         }
         sendRaw(deviceInfo, id: nil, on: lane)
         finishPairing(.success(()))
+        // A nearby link beats the direct connection.
+        if lane.id != .direct { retireDirect() }
         updatePhase()
         updateFiles()
         onTransportsChange?()
@@ -699,6 +804,7 @@ final class LinkManager: BridgeLink {
 
     private func sessionClosed(_ lane: Lane, session: LinkSession, error: LinkSessionError?) {
         let transport = session.frameTransport as? WiFiTransport
+        let wasEstablished = lane.connectedSince != nil
         lane.session = nil
         lane.connectedSince = nil
         if let error { lastSessionError = error }
@@ -707,6 +813,13 @@ final class LinkManager: BridgeLink {
             closeMedia()
             if error == .keyMismatch, let endpoint = transport?.resolvedEndpoint ?? transport?.dialed {
                 (connectors[.wifi] as? WiFiConnector)?.markBad(endpoint)
+            }
+        }
+        if lane.id == .direct, !wasEstablished {
+            // Someone else answered there, or not the protocol: a failed handshake, not a lost connection.
+            switch error {
+            case .keyMismatch?, .protocolViolation?: dropDirectAddress(of: session)
+            default: break
             }
         }
         reroutePending(from: lane)
@@ -730,6 +843,9 @@ final class LinkManager: BridgeLink {
             lane.retryAttempt = max(lane.retryAttempt, 4)
         }
         scheduleRetry(lane)
+        if lane.id != .direct, !lanes.contains(where: \.isEstablished) {
+            kickDirect(reason: "the nearby link ended")
+        }
     }
 
     private func ensureWatchdog() {
@@ -746,6 +862,7 @@ final class LinkManager: BridgeLink {
             guard session.phase == .established else {
                 if pairingAttempt == nil, now.timeIntervalSince(lane.startedAt) > Self.handshakeLimit {
                     log.warning("link", "\(lane.id.rawValue) handshake timed out")
+                    if lane.id == .direct { dropDirectAddress(of: session) }
                     session.close()
                 }
                 continue
@@ -757,9 +874,11 @@ final class LinkManager: BridgeLink {
                     log.warning("link", "Nothing received for \(Int(Self.idleLimit)) s; reconnecting")
                     session.close()
                 }
-            case .wifi:
+            case .wifi, .direct:
+                // The direct connection keeps alive like the Wi-Fi session it is.
                 if idle > Self.wifiIdleLimit {
-                    log.warning("wifi", "Nothing received over Wi-Fi for \(Int(Self.wifiIdleLimit)) s; closing it")
+                    let what = lane.id == .wifi ? "Wi-Fi" : "the direct connection"
+                    log.warning(lane.id.rawValue, "Nothing received over \(what) for \(Int(Self.wifiIdleLimit)) s; closing it")
                     session.close()
                 } else if idle > Self.wifiPingAfter, now.timeIntervalSince(lane.lastPing) > Self.wifiPingAfter {
                     lane.lastPing = now
@@ -768,6 +887,7 @@ final class LinkManager: BridgeLink {
                 }
             }
         }
+        retireDirect()
         if lanes.allSatisfy({ $0.session == nil }) {
             watchdog?.invalidate()
             watchdog = nil
@@ -798,8 +918,8 @@ final class LinkManager: BridgeLink {
             remoteUnpaired()
             return
         case .wifiOffer(let offer):
-            // From far away its addresses and hotspot are of no use.
-            if lane != nil { wifiOffered(offer) }
+            // From far away (the mailbox or the direct connection) its addresses and hotspot are of no use.
+            if let lane, lane.id != .direct { wifiOffered(offer) }
             return
         case .wifiMedia(let port):
             if let lane, lane.id == .wifi { openMedia(port: port, lane: lane) }
@@ -838,7 +958,8 @@ final class LinkManager: BridgeLink {
         case "remote.state":
             remote?.bridgeState(plaintext)
         case "remote.addr":
-            log.info("remote", "The bridge sent its direct-connection addresses (not used by this iPhone yet)")
+            // Authenticated: it came on a session or in a mailbox record sealed with the pinned bridge's key.
+            if remote?.bridgeAddresses(plaintext) == true { kickDirect(reason: "new addresses") }
         default:
             break
         }
@@ -963,11 +1084,21 @@ final class LinkManager: BridgeLink {
         return "\(kind.rawValue) \(state)"
     }
 
+    /// Debug and diagnostics: the direct connection, with address families only.
+    var directSummary: String {
+        guard let remote, remote.isOn else { return "off" }
+        let state = direct.isEstablished ? "connected" : direct.session != nil ? "handshake"
+            : direct.connecting ? "connecting" : direct.retryAt != nil ? "waiting" : "idle"
+        let families = remote.directCandidates.map(DirectAddress.family)
+        return "\(state); addresses: \(families.isEmpty ? "none" : families.joined(separator: " + "))"
+    }
+
     // MARK: - Messages
 
-    /// The session a message goes on: bulk requests prefer Wi-Fi, everything else Bluetooth.
+    /// The session a message goes on: bulk requests prefer Wi-Fi, everything else Bluetooth; the direct connection
+    /// carries everything while it's the only one (a nearby session closes it).
     private func route(_ message: Outbound) -> Lane? {
-        let order = message.isBulk ? [wifi, primary] : [primary, wifi]
+        let order = message.isBulk ? [wifi, primary, direct] : [primary, wifi, direct]
         return order.first(where: \.isEstablished)
     }
 

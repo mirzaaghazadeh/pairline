@@ -46,7 +46,7 @@ private let activityRed = Color(red: 0xE0 / 255, green: 0x31 / 255, blue: 0x31 /
 
 private func linkColor(_ link: WidgetSnapshot.Link) -> Color {
     switch link {
-    case .connected, .remote: return activityGreen
+    case .connected, .direct, .remote: return activityGreen
     case .connecting, .locked: return activityAmber
     case .offline, .notPaired: return .secondary
     }
@@ -55,6 +55,7 @@ private func linkColor(_ link: WidgetSnapshot.Link) -> Color {
 private func linkText(_ link: WidgetSnapshot.Link) -> Text {
     switch link {
     case .connected: return Text("Connected")
+    case .direct: return Text("Direct connection")
     case .remote: return Text("Via iCloud")
     case .connecting: return Text("Connecting…")
     case .offline: return Text("Not connected")

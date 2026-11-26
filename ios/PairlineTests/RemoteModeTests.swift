@@ -389,7 +389,7 @@ final class RemoteLinkManagerTests: XCTestCase {
         peers = PeerStore(prefix: "test.remote.")
         peers.save(PairedPeer(deviceID: Data(repeating: 9, count: 8), publicKey: bridge.publicKey.x963Representation,
                               pairedAt: Date(), name: nil, peripheralID: nil, transport: "remote", wifi: nil))
-        let store = RemoteStore(defaults: defaults)
+        let store = RemoteStore(defaults: defaults, prefix: "test.remote.")
         store.save(RemoteSettings(on: true, backend: .public, environment: .development, mailboxes: .random(),
                                   tokenSentAt: Date()))
         mailbox = FakeMailbox()
@@ -410,6 +410,7 @@ final class RemoteLinkManagerTests: XCTestCase {
     override func tearDown() async throws {
         manager.setAllowed(false)
         await remote.waitForReset()
+        RemoteStore(defaults: defaults, prefix: "test.remote.").clear()
         identity.reset()
         peers.clear()
         defaults.removePersistentDomain(forName: suite)
@@ -466,7 +467,7 @@ final class RemoteLinkManagerTests: XCTestCase {
         await manager.remoteCatchUp()
         XCTAssertTrue(events.isEmpty)
         XCTAssertEqual(confirmed, 1)
-        XCTAssertEqual(remote.directState, "none")
+        XCTAssertEqual(remote.direct.status, DirectStatus(availability: .unavailable, reason: .router))
     }
 
     func testUnpairFromTheBridgeThroughTheMailbox() async {

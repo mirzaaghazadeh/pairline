@@ -170,7 +170,7 @@ struct SettingsTab: View {
                         Image(systemName: "iphone.gen2.radiowaves.left.and.right")
                     }
                     Spacer()
-                    LinkStatusPill(phase: app.real.phase)
+                    LinkStatusPill(phase: app.real.phase, isDirect: app.real.isDirect)
                 }
                 Button {
                     app.showPairing = true

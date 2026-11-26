@@ -27,6 +27,15 @@ struct RemoteModeSection: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
+            if remote.isOn, !busy, let direct = directText {
+                HStack(spacing: 12) {
+                    Text("Direct connection")
+                    Spacer(minLength: 12)
+                    direct
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.trailing)
+                }
+            }
         } header: {
             Text("Remote mode")
         } footer: {
@@ -48,7 +57,22 @@ struct RemoteModeSection: View {
     private var status: Text {
         guard remote.isOn else { return Text("Off") }
         if let problem = remote.problem { return Text(problem.text) }
+        if bridge.isDirect { return Text("On · direct connection") }
         return bridge.phase.isConnected ? Text("On · using the nearby link") : Text("Via iCloud")
+    }
+
+    /// What the bridge said about its direct connection (`remote.state`), or that it's in use; nil before it said.
+    private var directText: Text? {
+        if bridge.isDirect { return Text("Connected") }
+        guard let status = remote.direct.status else { return nil }
+        switch status.availability {
+        case .open:
+            return Text("Open")
+        case .unavailable:
+            return status.reason.map { Text("Not possible: \($0.text)") } ?? Text("Not possible")
+        case .blocked:
+            return status.reason.map { Text("Blocked: \($0.text)") } ?? Text("Blocked by the network")
+        }
     }
 
     /// Why it can't be turned on right now: the bridge gets its settings over a nearby session, and must speak v1.

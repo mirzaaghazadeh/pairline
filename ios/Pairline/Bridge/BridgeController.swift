@@ -74,6 +74,7 @@ final class BridgeController: ObservableObject {
         link.onTransportsChange = { [weak self] in
             guard let self else { return }
             self.transports = self.link.activeTransports
+            self.saveWidget()
         }
         link.onEvent = { [weak self] inbound in self?.handle(inbound) }
         link.onEstablished = { [weak self] in self?.established() }
@@ -126,6 +127,9 @@ final class BridgeController: ObservableObject {
 
     /// The bridge speaks remote mode (D-072): it sent `proto` 1 or later.
     var bridgeSupportsRemote: Bool { (deviceInfo?.proto ?? 0) >= 1 }
+
+    /// The live session is remote mode's direct connection (D-072): the UI says "Direct connection".
+    var isDirect: Bool { phase.isConnected && transports == [.direct] }
 
     func requestPaywall() { onPaywallRequest?() }
 
@@ -261,7 +265,7 @@ final class BridgeController: ObservableObject {
     func statusSnapshot() -> WidgetSnapshot {
         let link: WidgetSnapshot.Link
         switch phase {
-        case .connected: link = .connected
+        case .connected: link = self.link.activeTransports == [.direct] ? .direct : .connected
         case .remote: link = .remote
         case .searching, .securing, .pairing, .waiting: link = .connecting
         case .notPaired: link = .notPaired

@@ -32,7 +32,9 @@ struct RemoteSettings: Equatable {
 }
 
 /// Remote mode's state in the app's own defaults (not the app group): the settings, and the counter that numbers
-/// requests sent through the mailbox. Mailbox ids aren't secret; tokens and keys are never stored here.
+/// requests sent through the mailbox. Mailbox ids aren't secret; tokens and keys are never stored here. What the
+/// bridge said about its direct connection goes in the Keychain instead (this device only, never in a backup), since
+/// its public addresses tell roughly where it is.
 final class RemoteStore {
     /// Mailbox request ids start here, apart from a session's ids (which restart at 1 on every launch).
     static let firstRequestID = 1_000_000
@@ -50,14 +52,30 @@ final class RemoteStore {
     private let defaults: UserDefaults
     private let settingsKey: String
     private let counterKey: String
+    private let directAccount: String
     private(set) var settings: RemoteSettings?
+    private(set) var direct: RemoteDirect
 
     /// `prefix` keeps test state apart from the app's own.
     init(defaults: UserDefaults = .standard, prefix: String = "") {
         self.defaults = defaults
         settingsKey = prefix + "remote.settings"
         counterKey = prefix + "remote.nextRequestID"
+        directAccount = prefix + "remote.direct"
         settings = Self.load(defaults.data(forKey: settingsKey))
+        let stored = Keychain.get(account: directAccount)
+        var direct = stored.flatMap { try? JSONDecoder().decode(RemoteDirect.self, from: $0) } ?? RemoteDirect()
+        direct.endpoints = direct.endpoints.checked
+        self.direct = direct
+    }
+
+    func saveDirect(_ direct: RemoteDirect) {
+        self.direct = direct
+        if direct == RemoteDirect() {
+            Keychain.delete(account: directAccount)
+        } else if let data = try? JSONEncoder().encode(direct) {
+            try? Keychain.set(data, account: directAccount)
+        }
     }
 
     private static func load(_ data: Data?) -> RemoteSettings? {
@@ -92,10 +110,11 @@ final class RemoteStore {
         return id
     }
 
-    /// Forgets the settings. The request counter stays, so no id is ever used twice.
+    /// Forgets the settings and the bridge's direct connection. The request counter stays, so no id is ever used twice.
     func clear() {
         settings = nil
         defaults.removeObject(forKey: settingsKey)
+        saveDirect(RemoteDirect())
     }
 }
 

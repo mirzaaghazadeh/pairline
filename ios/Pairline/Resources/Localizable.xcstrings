@@ -12282,6 +12282,102 @@
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "فعالیت تازه از گوشی پل شما" } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonunuzdan yeni etkinlik" } }
       }
+    },
+    "Direct connection" : {
+      "comment" : "Remote mode (D-072): the live session goes straight to the bridge phone at home over the internet, not through iCloud. Link state and a Settings row title.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مباشر" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مستقیم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Doğrudan bağlantı" } }
+      }
+    },
+    "Internet" : {
+      "comment" : "Bridge tab: the transport of remote mode's direct connection (like \"Bluetooth\" or \"Wi-Fi\").",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإنترنت" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اینترنت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İnternet" } }
+      }
+    },
+    "On · direct connection" : {
+      "comment" : "Settings › Remote mode status: on, and linked straight to the bridge phone over the internet.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفعّل · اتصال مباشر" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن · اتصال مستقیم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Açık · doğrudan bağlantı" } }
+      }
+    },
+    "Open" : {
+      "comment" : "Settings › Remote mode › Direct connection: the bridge's home router lets this iPhone connect (an adjective, not a button).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفتوح" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "باز" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Açık" } }
+      }
+    },
+    "Not possible" : {
+      "comment" : "Settings › Remote mode › Direct connection: the bridge's home network doesn't allow it.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "غير ممكن" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ممکن نیست" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mümkün değil" } }
+      }
+    },
+    "Not possible: %@" : {
+      "comment" : "Settings › Remote mode › Direct connection; %@ is the cause, e.g. \"carrier-grade NAT\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "غير ممكن: %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ممکن نیست: %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mümkün değil: %@" } }
+      }
+    },
+    "Blocked: %@" : {
+      "comment" : "Settings › Remote mode › Direct connection is blocked; %@ is the cause, e.g. \"carrier-grade NAT\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "محظور: %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مسدود است: %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Engelli: %@" } }
+      }
+    },
+    "Blocked by the network" : {
+      "comment" : "Settings › Remote mode › Direct connection is blocked, cause unknown.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحظره الشبكة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شبکه آن را مسدود کرده است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ağ tarafından engelleniyor" } }
+      }
+    },
+    "carrier-grade NAT" : {
+      "comment" : "Why there's no direct connection: the bridge's internet provider shares one public address among many homes. Follows \"Not possible: \".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "NAT لدى مزوّد الخدمة (CGNAT)" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "NAT اپراتور (CGNAT)" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "operatör düzeyinde NAT (CGNAT)" } }
+      }
+    },
+    "no public address" : {
+      "comment" : "Why there's no direct connection: the bridge's home network has no public internet address. Follows \"Not possible: \".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يوجد عنوان عام" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نشانی عمومی ندارد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "genel IP adresi yok" } }
+      }
+    },
+    "the router doesn't open a port" : {
+      "comment" : "Why there's no direct connection: the home router doesn't support NAT-PMP, PCP or UPnP. Follows \"Not possible: \".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جهاز التوجيه لا يفتح منفذًا" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم درگاهی باز نمی‌کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "modem bir port açmıyor" } }
+      }
+    },
+    "the bridge phone isn't on Wi-Fi" : {
+      "comment" : "Why there's no direct connection: the bridge phone uses mobile data. Follows \"Not possible: \".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الهاتف الوسيط غير متصل بشبكة Wi-Fi" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل به وای‌فای وصل نیست" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "köprü telefon Wi-Fi'a bağlı değil" } }
+      }
     }
   },
   "version" : "1.0"

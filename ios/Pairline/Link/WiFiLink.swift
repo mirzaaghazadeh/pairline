@@ -35,9 +35,10 @@ struct WiFiHints: Codable, Equatable {
 }
 
 /// The production Wi-Fi link (PROTOCOL.md, "Wi-Fi"): frames over TCP, each preceded by its 4-byte big-endian length,
-/// carrying the same pairing, handshake and records as Bluetooth, plus `BULK` frames. Callbacks run on the main queue.
+/// carrying the same pairing, handshake and records as Bluetooth, plus `BULK` frames. Remote mode's direct connection
+/// (`kind` `.direct`) is the same link to the bridge's public address. Callbacks run on the main queue.
 final class WiFiTransport: FrameTransport {
-    let kind: TransportKind = .wifi
+    let kind: TransportKind
     /// What was dialed (an address from a hint, or a DNS-SD service resolved to `remoteHost`).
     let label: String
     let dialed: WiFiEndpoint?
@@ -48,10 +49,11 @@ final class WiFiTransport: FrameTransport {
     var onFrame: ((Data) -> Void)?
     var onClose: ((Error?) -> Void)?
 
-    fileprivate init(connection: NWConnection, dialed: WiFiEndpoint?, label: String) {
+    init(connection: NWConnection, dialed: WiFiEndpoint?, label: String, kind: TransportKind = .wifi) {
         self.connection = connection
         self.dialed = dialed
         self.label = label
+        self.kind = kind
     }
 
     /// The bridge's address as connected; the media channel sends its datagrams there.
@@ -78,7 +80,7 @@ final class WiFiTransport: FrameTransport {
         }
     }
 
-    fileprivate func startReceiving() {
+    func startReceiving() {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65_536) { [weak self] data, _, isComplete, error in
             guard let self, !self.closed else { return }
             if let data, !data.isEmpty {

@@ -31,6 +31,9 @@ struct ConnectTarget {
     var wifi: [WiFiEndpoint] = []
     /// Wi-Fi: try only `wifi` (pairing never sends `PAIR_HELLO` to an address the link didn't give).
     var wifiExplicitOnly = false
+    /// The direct connection: the bridge's public addresses from its authenticated `remote.addr`, IPv6 first.
+    /// Nothing else ever fills it.
+    var direct: [WiFiEndpoint] = []
 }
 
 /// Finds the bridge and opens a frame transport to it.

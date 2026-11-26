@@ -83,7 +83,7 @@ struct BridgeStatusTab: View {
         VStack(spacing: 14) {
             TwoPhonesIllustration(state: illustrationState, height: 112)
                 .padding(.horizontal, 28)
-            LinkStatusPill(phase: bridge.phase, isDemo: bridge.isDemo)
+            LinkStatusPill(phase: bridge.phase, isDemo: bridge.isDemo, isDirect: bridge.isDirect)
             VStack(spacing: 4) {
                 Text(verbatim: bridge.deviceInfo?.name ?? String(localized: "Bridge phone"))
                     .font(.title2.weight(.bold))
@@ -124,6 +124,7 @@ struct BridgeStatusTab: View {
         case .bluetooth: return "dot.radiowaves.left.and.right"
         case .tcp: return "cable.connector"
         case .wifi: return "wifi"
+        case .direct: return "globe"
         case .demo: return "sparkles"
         }
     }
@@ -138,6 +139,8 @@ struct BridgeStatusTab: View {
         case .bluetooth: return Text("Bluetooth")
         case .tcp: return Text("Debug TCP")
         case .wifi: return Text("Wi-Fi")
+        // Remote mode's direct connection: the pill above says "Direct connection".
+        case .direct: return Text("Internet")
         case .demo: return Text("Demo")
         }
     }
