@@ -207,7 +207,7 @@ parties). Each needs a real-phone test.
 - [x] Call screening role on Android: blocked calls never ring, silence unknown callers, blocked prefixes (D-085)
 - [x] Reply to Android app notifications from the iPhone (D-086)
 - [ ] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi
-- [ ] Live captions of relayed calls on the iPhone (on-device speech recognition, nothing recorded or stored)
+- [x] Live captions of relayed calls on the iPhone (on-device speech recognition, nothing recorded or stored, D-087)
 - [ ] MMS and group messages
 - [ ] More than one iPhone, iPad or Mac paired with one bridge
 

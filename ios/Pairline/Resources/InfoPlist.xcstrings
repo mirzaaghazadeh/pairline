@@ -180,6 +180,36 @@
           }
         }
       }
+    },
+    "NSSpeechRecognitionUsageDescription" : {
+      "comment" : "Privacy - Speech Recognition Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عند تشغيل الترجمة النصية المباشرة، تتحوّل كلمات المتصل إلى نص على هذا الآيفون فقط طوال المكالمة. لا يغادر الصوت الآيفون ولا يُحفظ شيء."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "With live captions on, the caller's words are turned into text on this iPhone only, while the call lasts. The audio never leaves it and nothing is saved."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "با روشن بودن زیرنویس زنده، حرف‌های تماس‌گیرنده فقط روی همین آیفون و فقط در طول تماس به متن تبدیل می‌شود. صدا از آیفون بیرون نمی‌رود و چیزی ذخیره نمی‌شود."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canlı altyazı açıkken arayanın sözleri yalnızca bu iPhone'da, arama süresince yazıya dönüştürülür. Ses iPhone'dan çıkmaz ve hiçbir şey kaydedilmez."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

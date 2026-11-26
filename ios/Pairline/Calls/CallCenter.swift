@@ -543,8 +543,11 @@ final class CallCenter: ObservableObject {
     /// Echo cancellation first; if the engine won't start with it (some routes and devices refuse), a fresh engine
     /// without it, so the call's audio still comes here. Remembered for the rest of the call.
     private func startedEngine(_ transport: AudioPacketTransport, path: CallAudioPath) throws -> CallAudioEngine {
+        // The caller's voice also feeds live captions while they're on (D-087); nothing else reads it.
+        let captions = LiveCaptions.shared
         if !echoCancellationFailed {
             let engine = try CallAudioEngine(transport: transport, voiceProcessing: true, path: path)
+            engine.onCallerFrame = { captions.append($0) }
             do {
                 try engine.start()
                 return engine
@@ -554,6 +557,7 @@ final class CallCenter: ObservableObject {
             }
         }
         let engine = try CallAudioEngine(transport: transport, voiceProcessing: false, path: path)
+        engine.onCallerFrame = { captions.append($0) }
         try engine.start()
         return engine
     }
@@ -601,6 +605,7 @@ final class CallCenter: ObservableObject {
         let wasRelaying = audioOnIPhone
         let relayedFor = relayStartedAt.map { Date().timeIntervalSince($0) } ?? 0
         stopEngine()
+        LiveCaptions.shared.stop()
         if relayAccepted, !callEnded, tellBridge, let bridgeID = current?.bridgeID, let bridge {
             Task { _ = try? await bridge.link.request(.callMediaStop(bridgeID)) }
         }

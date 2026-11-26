@@ -1477,3 +1477,20 @@ a second WhatsApp or Telegram on the Android phone's number is usable from the i
   the text). Nothing is stored, logged or queued.
 - No other actions (mark as read, like) for now: their meaning differs between apps, and a wrong tap can't be undone.
 - No new permission: notification access already covers reading and firing a notification's actions.
+
+### D-087 — Live captions of relayed calls, on the iPhone only (2026-11-26)
+
+Asked for "using the call-audio relay, without call recording". Captions help in noise, for the hard of hearing,
+and in a language the user reads better than they hear.
+- A **CC** button on Pairline's call screen while the call's audio is on the iPhone (Talk on iPhone). The call
+  engine hands each decoded 20 ms frame of the **caller's** voice to `LiveCaptions` (nothing of the iPhone's own
+  microphone); Apple's `SFSpeechRecognizer` turns it into text with `requiresOnDeviceRecognition`, and a request is
+  renewed every 55 seconds so long calls keep going. The panel shows the last ~240 characters.
+- **On the device or not at all:** only languages the iPhone reports `supportsOnDeviceRecognition` for are offered
+  (Pairline's four first, then the user's own); otherwise the panel explains how to add a dictation language. Server
+  recognition would send call audio to Apple, which rule 1 rules out.
+- **No recording, no transcript:** the text lives in memory during the call and goes when it ends or CC is turned off.
+  CallKit's own call screen can't show captions, so they're on Pairline's call screen only. Touching and holding CC
+  picks the language.
+- New iOS permission: Speech Recognition (`NSSpeechRecognitionUsageDescription`), asked the first time CC is tapped.
+  Strings in a `Captions` table. Needs a real relayed call to tune.

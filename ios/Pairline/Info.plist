@@ -63,6 +63,8 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>During a call you take on this iPhone, Pairline sends your voice to your Android bridge phone so the other person can hear you. Nothing is recorded.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>With live captions on, the caller's words are turned into text on this iPhone only, while the call lasts. The audio never leaves it and nothing is saved.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

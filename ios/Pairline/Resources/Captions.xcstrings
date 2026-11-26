@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Allow Speech Recognition for Pairline in iPhone Settings to see captions." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسمح بـ«التعرّف على الكلام» لـ Pairline في إعدادات الآيفون لرؤية الترجمة النصية." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Allow Speech Recognition for Pairline in iPhone Settings to see captions." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای دیدن زیرنویس، «تشخیص گفتار» را در تنظیمات آیفون برای Pairline مجاز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Altyazıları görmek için iPhone Ayarları’nda Pairline’a Konuşma Tanıma izni verin." } }
+      }
+    },
+    "Live captions" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ترجمة نصية مباشرة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Live captions" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "زیرنویس زنده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Canlı altyazı" } }
+      }
+    },
+    "This iPhone can't recognize speech on the device for your languages, and Pairline never sends call audio anywhere else. Add a dictation language in iPhone Settings › General › Keyboard." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يستطيع هذا الآيفون التعرّف على الكلام بلغاتك على الجهاز نفسه، ولا يرسل Pairline صوت المكالمة إلى أي مكان آخر أبدًا. أضف لغة إملاء في إعدادات الآيفون › عام › لوحة المفاتيح." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This iPhone can't recognize speech on the device for your languages, and Pairline never sends call audio anywhere else. Add a dictation language in iPhone Settings › General › Keyboard." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این آیفون نمی‌تواند گفتار زبان‌های شما را روی خود دستگاه تشخیص دهد، و Pairline هرگز صدای تماس را به جای دیگری نمی‌فرستد. در تنظیمات آیفون › عمومی › صفحه‌کلید یک زبان دیکته اضافه کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone dillerinizdeki konuşmayı cihazın kendisinde tanıyamıyor ve Pairline arama sesini asla başka bir yere göndermez. iPhone Ayarları › Genel › Klavye’de bir dikte dili ekleyin." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

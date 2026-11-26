@@ -45,6 +45,15 @@ final class ScheduleAndDataTests: XCTestCase {
         XCTAssertTrue(defaultOn)
     }
 
+    /// D-087: the captions panel keeps the last ~240 characters, cut at a word.
+    func testCaptionsTail() {
+        XCTAssertEqual(LiveCaptions.tail("hello there"), "hello there")
+        let long = String(repeating: "word ", count: 100)
+        let tail = LiveCaptions.tail(long)
+        XCTAssertLessThanOrEqual(tail.count, 240)
+        XCTAssertTrue(tail.hasPrefix("word"), "starts at a whole word")
+    }
+
     func testDataMonthStart() {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "UTC")!

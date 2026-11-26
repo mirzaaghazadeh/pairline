@@ -196,6 +196,10 @@ final class CallAudioEngine {
     /// interruption). Called on the main queue; the call center builds a fresh engine.
     var onConfigurationChange: (() -> Void)?
 
+    /// Each decoded 20 ms frame of the caller's voice, on the channel's queue: live captions (D-087). Set before
+    /// [start]. Nothing else reads the call audio.
+    var onCallerFrame: (([Int16]) -> Void)?
+
     private struct SendState {
         var pending: [Int16] = []
         var sequence: UInt16 = 0
@@ -290,9 +294,11 @@ final class CallAudioEngine {
     private func received(_ packet: Data) {
         if let (sequence, frame) = AudioPackets.decode(packet) {
             jitter.put(sequence, frame)
+            onCallerFrame?(frame)
         } else if let decoder, let (sequence, opus) = AudioPackets.decodeOpus(packet) {
             if let frame = decoder.decode(opus) {
                 jitter.put(sequence, frame)
+                onCallerFrame?(frame)
             } else {
                 state.withLock { $0.decodeFailures += 1 }
             }
