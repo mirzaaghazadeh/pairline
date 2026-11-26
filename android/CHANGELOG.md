@@ -5,8 +5,19 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
-## 1.8.0 (not released yet)
+## 1.8.0 (2026-11-26)
 
+- **Cloud mode (testing, with Pairline for iPhone from TestFlight).** Leave this phone at home: when the phones aren't
+  near each other, texts, one-time codes and calls keep reaching your iPhone over the internet, through your own
+  iCloud, locked so that only your two phones can read them. There's no Pairline server. Where your home router allows
+  it (UPnP or NAT-PMP), Pairline also opens one port that only your paired iPhone can use, for a direct connection
+  that calls need; the home screen says whether it's open, and what to change in the router or forward by hand if
+  not. It's off until you turn it on in Pairline on your iPhone.
+- **Pair over the internet.** Open an invitation from your own iPhone here, then check that both phones show the same
+  6-digit code.
+- **This phone can't be found over Bluetooth?** Some older phones can't advertise over Bluetooth; the home screen now
+  says so and what still works (Wi-Fi while Pairline is open on the iPhone, and Cloud mode).
+- Pairline Bridge now stays upright (portrait only).
 - **Starts in your language.** On a new install, Pairline picks Persian, Arabic or Turkish from your SIM card's
   country (or the network's, or the time zone; Tehran's time zone always gives Persian) when the phone itself is in
   English. Setup now opens with a Language step, so you can see the choice and change it.
