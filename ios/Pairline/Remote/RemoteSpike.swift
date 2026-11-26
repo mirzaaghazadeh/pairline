@@ -13,7 +13,8 @@ import UserNotifications
 /// never logged. `-PairlineRemoteSpike report` writes when each delivered notification arrived (and the record it
 /// names, for the query subscription) to `remote-spike-deliveries.json`, then clears them, so a Mac without the
 /// iPhone's system log can time the pushes. `-PairlineRemoteSpike clear` removes the subscriptions, the zones and the
-/// files.
+/// files. `-PairlineRemoteSpikeAPIToken <token>` mints the tokens with another API token (a build signed for iCloud
+/// Production needs the Production one). Each step is also written to `remote-spike-status.txt`, without secrets.
 enum RemoteSpike {
     static let subscriptionIDs = ["to-phone-db": "db", "to-phone-zone": "zone", "to-phone-query": "query"]
 
@@ -24,19 +25,35 @@ enum RemoteSpike {
     static var tokenFile: URL { cacheFile("remote-spike-token.txt") }
     static var spareTokenFile: URL { cacheFile("remote-spike-token-spare.txt") }
     static var deliveriesFile: URL { cacheFile("remote-spike-deliveries.json") }
+    static var statusFile: URL { cacheFile("remote-spike-status.txt") }
+
+    private static var apiToken = RemoteCloud.developmentAPIToken
 
     static func runIfRequested() {
         let args = ProcessInfo.processInfo.arguments
         guard let index = args.firstIndex(of: "-PairlineRemoteSpike"), index + 1 < args.count else { return }
         let step = args[index + 1]
+        if let i = args.firstIndex(of: "-PairlineRemoteSpikeAPIToken"), i + 1 < args.count {
+            apiToken = args[i + 1]
+        }
+        try? FileManager.default.removeItem(at: statusFile)
         Task.detached { await run(step) }
     }
 
     private static func note(_ text: String) {
         log.info("remote", "Spike: \(text)")
+        let line = Data("\(Date().timeIntervalSince1970) \(text)\n".utf8)
+        if let handle = try? FileHandle(forWritingTo: statusFile) {
+            handle.seekToEndOfFile()
+            handle.write(line)
+            try? handle.close()
+        } else {
+            try? line.write(to: statusFile)
+        }
     }
 
     private static func run(_ step: String) async {
+        note("step \(step), \(apiToken == RemoteCloud.developmentAPIToken ? "Development" : "other") API token")
         do {
             let status = try await RemoteCloud.container.accountStatus()
             guard status == .available else { throw RemoteCloudError.accountUnavailable(status) }
@@ -58,7 +75,7 @@ enum RemoteSpike {
             note("subscription \(step) saved")
             for file in [tokenFile, spareTokenFile] {
                 let started = Date()
-                let token = try await RemoteCloud.fetchWebAuthToken()
+                let token = try await RemoteCloud.fetchWebAuthToken(apiToken: apiToken)
                 try Data(token.utf8).write(to: file, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
                 note("web auth token fetched in \(Int(Date().timeIntervalSince(started) * 1000)) ms (\(token.count) characters)")
             }
@@ -142,7 +159,7 @@ enum RemoteSpike {
         _ = try? await RemoteCloud.database.modifySubscriptions(saving: [], deleting: Array(subscriptionIDs.keys))
         _ = try? await RemoteCloud.database.modifyRecordZones(
             saving: [], deleting: [RemoteCloud.toPhoneZone, RemoteCloud.toBridgeZone])
-        for file in [tokenFile, spareTokenFile, deliveriesFile] {
+        for file in [tokenFile, spareTokenFile, deliveriesFile, statusFile] {
             try? FileManager.default.removeItem(at: file)
         }
         note("cleared")
