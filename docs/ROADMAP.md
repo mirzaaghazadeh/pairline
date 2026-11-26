@@ -209,7 +209,15 @@ parties). Each needs a real-phone test.
 - [x] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi (D-088)
 - [x] Live captions of relayed calls on the iPhone (on-device speech recognition, nothing recorded or stored, D-087)
 - [x] MMS and group messages: shown with thumbnails, attachments over Wi-Fi, pictures and group texts sent (D-089)
-- [ ] More than one iPhone, iPad or Mac paired with one bridge
+- [ ] More than one iPhone, iPad or Mac paired with one bridge — **needs a protocol change, waiting for the
+      maintainer:** the bridge derives session keys from the one pinned iPhone key, and an iPhone's `HELLO` says
+      nothing about which device it is, so with two pinned devices the bridge can't pick the key. Proposed: a new frame
+      `HELLO_ID` (0x11) sent before `HELLO` only to a bridge listing a `multi` capability (like `BULK`/`MEDIA`, so old
+      apps are unaffected): a 16-byte nonce and `HMAC-SHA256(SHA-256(sR), "pairline remote id" ‖ nonce)[0..16]`, which
+      the bridge checks against each pinned key and which an observer can't link across connections. Then
+      `LinkManager` keeps lanes per device and sends events to each, pairing a second device stops replacing the first,
+      Wi-Fi features (files, photos, call audio over Wi-Fi) follow the device that asked, and the iPhone gets
+      "Add a device" (a fresh pairing link from the bridge as a QR code, or copied for a Mac).
 
 ## M9 — Android client mode: dropped (D-050)
 
