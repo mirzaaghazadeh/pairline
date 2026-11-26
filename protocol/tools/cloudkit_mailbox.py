@@ -13,7 +13,8 @@ which replaces the stored one before anything else happens, and requests on one 
 
 Commands:
   import-token FILE [--chain NAME]        start a chain from a token the iPhone wrote (then delete FILE yourself)
-  zones                                   list the private database's zones (proves private-database access)
+  whoami                                  the token's user, through the public database (proves the token works)
+  zones [--scope private]                 list a database's zones (proves private-database access)
   put [--zone ToPhone] [--size 200]       write one Mail record with random bytes; prints its name
   delete NAME [--zone ToPhone]            delete a record
   changes [--zone ToBridge]               list changed records in a zone
@@ -123,8 +124,16 @@ def cmd_import_token(args):
     print(f"chain {args.chain}: token stored ({len(token)} characters)")
 
 
+def cmd_whoami(ck, args):
+    status, payload, t = ck.call("users/current", scope="public")
+    print(f"HTTP {status} in {t * 1000:.0f} ms, token rotated: {payload['_rotated']}, "
+          f"user record {'present' if payload.get('userRecordName') else 'absent'} "
+          f"{payload.get('serverErrorCode', '')} {payload.get('reason', '')}")
+    return status == 200
+
+
 def cmd_zones(ck, args):
-    status, payload, t = ck.call("zones/list")
+    status, payload, t = ck.call("zones/list", scope=args.scope)
     print(f"HTTP {status} in {t * 1000:.0f} ms, token rotated: {payload['_rotated']}")
     print(json.dumps(summarize(payload), indent=2)[:2000])
     return status == 200
@@ -373,7 +382,8 @@ def main():
     ap.add_argument("--chain", default="main", help="which stored token chain to use")
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("import-token"); p.add_argument("file")
-    sub.add_parser("zones")
+    sub.add_parser("whoami")
+    p = sub.add_parser("zones"); p.add_argument("--scope", default="private", choices=["private", "public", "shared"])
     p = sub.add_parser("put"); p.add_argument("--zone", default="ToPhone"); p.add_argument("--size", type=int, default=200)
     p = sub.add_parser("delete"); p.add_argument("name"); p.add_argument("--zone", default="ToPhone")
     p = sub.add_parser("changes"); p.add_argument("--zone", default="ToBridge")
@@ -402,7 +412,7 @@ def main():
     if args.cmd == "match":
         return 0 if cmd_match(args) else 1
     ck = CloudKit(args.chain)
-    ok = {"zones": cmd_zones, "put": cmd_put, "delete": cmd_delete, "changes": cmd_changes,
+    ok = {"whoami": cmd_whoami, "zones": cmd_zones, "put": cmd_put, "delete": cmd_delete, "changes": cmd_changes,
           "latency": cmd_latency, "tokens": cmd_tokens, "webcourier": cmd_webcourier}[args.cmd](ck, args)
     return 0 if ok else 1
 
