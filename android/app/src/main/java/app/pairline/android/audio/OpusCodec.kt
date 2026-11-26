@@ -33,10 +33,13 @@ object Opus {
     /** Wait this long for the codec's output after giving it a frame (it works on its own thread). */
     private const val OUTPUT_WAIT_US = 10_000L
     private const val INPUT_WAIT_US = 5_000L
+    private const val MAX_INPUT_BYTES = 4_096
 
     private fun encoderFormat(): MediaFormat =
         MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_OPUS, SAMPLE_RATE, 1).apply {
             setInteger(MediaFormat.KEY_BIT_RATE, BITRATE)
+            // A whole 20 ms frame must fit one input buffer, whatever the codec's default size.
+            setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, MAX_INPUT_BYTES)
         }
 
     /** RFC 7845's identification header for a mono stream: no pre-skip, 16 kHz input, no gain, mapping family 0. */
@@ -55,6 +58,7 @@ object Opus {
 
     private fun decoderFormat(): MediaFormat =
         MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_OPUS, 48_000, 1).apply {
+            setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, MAX_INPUT_BYTES)
             setByteBuffer("csd-0", ByteBuffer.wrap(opusHead()))
             setByteBuffer("csd-1", nanos(0)) // codec delay
             setByteBuffer("csd-2", nanos(80_000_000)) // seek pre-roll

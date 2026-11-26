@@ -119,9 +119,9 @@ final class CallCenter: ObservableObject {
     var audioOnIPhone: Bool { if case .iphone = audioRoute { return true } else { return false } }
     /// The path a call's audio takes now (D-072): the one chosen in Settings › Call audio when it's up, else the
     /// other. Bluetooth needs a bridge that lists `call.media.link`; Wi-Fi needs an open media channel.
-    private func availablePath() -> (path: CallAudioPath, transport: AudioPacketTransport)? {
+    private func availablePath(excluding excluded: CallAudioPath? = nil) -> (path: CallAudioPath, transport: AudioPacketTransport)? {
         let order: [CallAudioPath] = AppSettings.shared.callAudioPath == .wifi ? [.wifi, .link] : [.link, .wifi]
-        for path in order {
+        for path in order where path != excluded {
             switch path {
             case .link:
                 if bridge?.has(.callMediaLink) == true, let channel = linkTransport?(), channel.isOpen { return (path, channel) }
@@ -358,14 +358,15 @@ final class CallCenter: ObservableObject {
         }
     }
 
-    private func startRelayIfPossible() {
+    /// `excluding`: a path the bridge just refused for this call; the other one is tried instead (D-072).
+    private func startRelayIfPossible(excluding excluded: CallAudioPath? = nil) {
         // Demo mode has no audio to relay; the call screen still shows how a call looks with Talk on iPhone set up.
         if let bridge, bridge.isDemo, audioRoute == .bridge, bridge.has(.callMedia) {
             audioRoute = .iphone(talk: bridge.has(.callMediaTalk))
             return
         }
         guard audioRoute == .bridge, !relayAccepted, let bridge, bridge.has(.callMedia),
-              let choice = availablePath(), let bridgeID = current?.bridgeID else { return }
+              let choice = availablePath(excluding: excluded), let bridgeID = current?.bridgeID else { return }
         audioRoute = .connecting
         let talk = bridge.has(.callMediaTalk)
         if !useCallKit || current?.inCallKit == false { activateOwnAudioSession() }
@@ -380,9 +381,16 @@ final class CallCenter: ObservableObject {
                 self.relayTransport = choice.transport
                 self.startEngineIfReady()
             } catch {
-                log.warning("audio", "Bridge didn't start call audio: \(error.localizedDescription)")
+                log.warning("audio", "Bridge didn't start call audio over \(choice.path == .link ? "Bluetooth" : "Wi-Fi"): \(error.localizedDescription)")
                 guard self.current?.bridgeID == bridgeID, self.audioRoute == .connecting else { return }
                 self.audioRoute = .bridge
+                // Refused on one path (e.g. the bridge's codec didn't start): try the other one once, if it's up.
+                if let id = self.current?.id, excluded == nil, !self.relayRetried.contains(id),
+                   self.availablePath(excluding: choice.path) != nil {
+                    self.relayRetried.insert(id)
+                    self.startRelayIfPossible(excluding: choice.path)
+                    return
+                }
                 if case LinkError.bridge(let reply) = error {
                     self.explainRelayFailure(reply.msg ?? reply.code)
                 } else {
