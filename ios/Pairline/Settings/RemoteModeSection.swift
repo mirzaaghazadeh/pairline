@@ -4,11 +4,22 @@ import SwiftUI
 /// Shown only where remote mode is available (`RemoteFeature`) and a bridge is paired.
 struct RemoteModeSection: View {
     @EnvironmentObject private var app: AppModel
+    @EnvironmentObject private var purchases: PurchaseManager
     @ObservedObject var remote: RemoteLink
     @ObservedObject var bridge: BridgeController
     @ObservedObject private var notifier = Notifier.shared
     @State private var busy = false
     @State private var error: String?
+    /// The before-you-turn-it-on screen was read and accepted once ("Turn on"); after that the switch acts at once.
+    @AppStorage("remote.introSeen") private var introSeen = false
+    @State private var intro: IntroSheet?
+    @State private var showLog = false
+
+    private enum IntroSheet: Identifiable {
+        case beforeTurningOn
+        case info
+        var id: Self { self }
+    }
 
     var body: some View {
         Section {
@@ -16,6 +27,7 @@ struct RemoteModeSection: View {
                 Label("Remote mode", systemImage: "icloud")
             }
             .disabled(busy || (!remote.isOn && blocker != nil))
+            RemoteAddOnButton()
             HStack(spacing: 12) {
                 Text("Status")
                 Spacer(minLength: 12)
@@ -36,6 +48,42 @@ struct RemoteModeSection: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
+            // Free, with remote mode on or off: the bridge asks its router, read-only (`remote.check`).
+            HomeConnectionCheckRow(bridge: bridge)
+            Button {
+                intro = .info
+            } label: {
+                Label {
+                    Text("How remote mode works", tableName: "RemoteMode")
+                } icon: {
+                    Image(systemName: "questionmark.circle")
+                }
+            }
+            // On a row that's never disabled, so the sheets' buttons never inherit a disabled state.
+            .sheet(item: $intro) { sheet in
+                RemoteModeIntroView(onTurnOn: introAction(for: sheet))
+            }
+            .sheet(isPresented: $showLog) {
+                NavigationStack {
+                    DiagnosticsView()
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button { showLog = false } label: { Text("Done", tableName: "RemoteMode") }
+                            }
+                        }
+                }
+                .environmentObject(app)
+                .environmentObject(purchases)
+            }
+            Button {
+                showLog = true
+            } label: {
+                Label {
+                    Text("Connection log", tableName: "RemoteMode")
+                } icon: {
+                    Image(systemName: "doc.text.magnifyingglass")
+                }
+            }
         } header: {
             Text("Remote mode")
         } footer: {
@@ -46,10 +94,13 @@ struct RemoteModeSection: View {
                 if !remote.isOn, let blocker {
                     blocker
                 }
+                if let note = RemoteAddOnText.trialNote(purchases.remoteAccess, price: purchases.remotePriceText) {
+                    note
+                }
                 if remote.isOn, notifier.authorization == .denied || notifier.authorization == .notDetermined {
                     Text("Allow notifications for Pairline so texts and codes reach you through iCloud.")
                 }
-                Text("Keeps texts and codes coming when your phones are apart. There's no Pairline server: messages are locked with keys only your two phones hold, and Apple stores only locked records in your iCloud until they're read. Apple and internet providers can see that your phones talk, not what they say. Calls still need the phones together for now.")
+                Text("Keeps texts and codes coming through your own iCloud when your phones are apart, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold.", tableName: "RemoteMode")
             }
         }
     }
@@ -77,12 +128,33 @@ struct RemoteModeSection: View {
 
     /// Why it can't be turned on right now: the bridge gets its settings over a nearby session, and must speak v1.
     private var blocker: Text? {
+        // The purchase state first (D-081): remote mode is part of the trial, then an add-on to Full Access.
+        if let addOn = RemoteAddOnText.blocker(purchases.remoteAccess) { return addOn }
         if !bridge.phase.isConnected { return Text("Turn remote mode on while your phones are linked nearby.") }
         if !bridge.bridgeSupportsRemote { return Text("Remote mode needs a newer Pairline Bridge on the Android phone.") }
         return nil
     }
 
     private func change(to on: Bool) {
+        guard !busy, on != remote.isOn else { return }
+        // The first time, the plain-words screen comes first; its "Turn on" turns it on (D-080).
+        if on, !introSeen {
+            intro = .beforeTurningOn
+            return
+        }
+        turn(on: on)
+    }
+
+    /// "Turn on" in the before-you-turn-it-on screen; the information-only screen has just "Done".
+    private func introAction(for sheet: IntroSheet) -> (() -> Void)? {
+        guard sheet == .beforeTurningOn else { return nil }
+        return {
+            introSeen = true
+            turn(on: true)
+        }
+    }
+
+    private func turn(on: Bool) {
         guard !busy, on != remote.isOn else { return }
         busy = true
         error = nil

@@ -129,7 +129,17 @@ final class RemoteLink: ObservableObject {
     static let pageSize = 50
 
     @Published private(set) var settings: RemoteSettings?
-    @Published private(set) var problem: RemoteProblem?
+    @Published private(set) var problem: RemoteProblem? {
+        didSet {
+            // The log notes when the mailbox recovers, and when the bridge stops reading it (errors log themselves).
+            guard problem != oldValue else { return }
+            if problem == nil, let oldValue {
+                log.info("remote", "Mailbox working again (was: \(oldValue))")
+            } else if problem == .bridgeNotReading {
+                log.warning("remote", "The bridge hasn't read the mailbox for 10 minutes")
+            }
+        }
+    }
     /// What the bridge last said about its direct connection (`remote.addr`, `remote.state`).
     @Published private(set) var direct: RemoteDirect
 

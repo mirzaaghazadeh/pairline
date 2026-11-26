@@ -159,6 +159,8 @@ internal class FakeRouter : RouterIo {
     }
 
     private fun answerPcp(local: InetAddress, d: ByteArray): ByteArray {
+        // ANNOUNCE: just the header back, success, lifetime 0. It changes nothing.
+        if (d[1].toInt() == Pcp.OP_ANNOUNCE) return byteArrayOf(2, 0x80.toByte(), 0, 0) + BigEndian.u32(0) + BigEndian.u32(EPOCH) + ByteArray(12)
         val lifetime = BigEndian.readU32(d, 4)
         val nonce = d.copyOfRange(24, 36)
         val internal = BigEndian.readU16(d, 40)

@@ -11,10 +11,13 @@ import app.pairline.android.link.remote.router.UpnpService
 import app.pairline.android.link.remote.router.V4Kind
 import app.pairline.android.link.remote.router.V4Result
 import app.pairline.android.log.Log
+import app.pairline.android.protocol.ErrorCode
 import app.pairline.android.protocol.Messages
+import app.pairline.android.protocol.RequestException
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.security.SecureRandom
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -153,6 +156,21 @@ class DirectLink(
         wake.trySend(Unit)
     }
 
+    /**
+     * "Check my home connection" (`remote.check`): asks this phone's current Wi-Fi router, read-only, whether a direct
+     * connection could work ([HomeCheck]). Works with remote mode on or off; one check at a time. Blocks for seconds.
+     */
+    fun check(): HomeCheck.Result {
+        if (!checking.compareAndSet(false, true)) throw RequestException(ErrorCode.BUSY, "a check is already running")
+        try {
+            return HomeCheck.run(if (networkKnown) wantNetwork else null)
+        } finally {
+            checking.set(false)
+        }
+    }
+
+    private val checking = AtomicBoolean(false)
+
     /** Remote mode was just (re)configured: send `remote.addr` and `remote.state` again even if unchanged. */
     fun announce() {
         reannounce = true
@@ -216,6 +234,13 @@ class DirectLink(
         if (now >= v4DueAt) {
             val previous = v4
             v4 = previous?.let { attempt { mapper.renew(it) } }
+            // The log says when a mapping is renewed or lost; the quarter-hourly checks in between stay quiet.
+            val renewed = v4
+            when {
+                previous == null -> Unit
+                renewed == null -> Log.i(TAG, "the router no longer keeps the IPv4 mapping (${previous.protocol.label}); mapping again")
+                now >= previous.renewAt -> Log.i(TAG, "IPv4 mapping renewed (${renewed.protocol.label}, ${renewed.lifetime} s)")
+            }
             if (v4 == null) {
                 if (previous == null) deleteLeftover(net)
                 mapV4(mapper, info, p)
@@ -229,7 +254,13 @@ class DirectLink(
             v4DueAt = v4?.let { minOf(it.renewAt, clock() + CHECK_MS) } ?: (clock() + retry)
         }
         if (now >= v6DueAt) {
+            val previousV6 = v6
             v6 = if (info.globalV6 == null) null else attempt { v6?.let(mapper::renew) ?: mapper.pinholeV6(p) }
+            when {
+                previousV6 == null -> Unit
+                v6 == null -> Log.i(TAG, "the router no longer keeps the IPv6 pinhole (PCP)")
+                now >= previousV6.renewAt -> Log.i(TAG, "IPv6 pinhole renewed (PCP)")
+            }
             v6DueAt = when {
                 info.globalV6 == null -> Long.MAX_VALUE
                 v6 != null -> minOf(v6!!.renewAt, clock() + CHECK_MS)

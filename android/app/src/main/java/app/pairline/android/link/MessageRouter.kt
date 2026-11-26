@@ -5,6 +5,7 @@ import android.os.Build
 import app.pairline.android.AppPrefs
 import app.pairline.android.BuildConfig
 import app.pairline.android.audio.CallAudioRelay
+import app.pairline.android.link.remote.HomeCheck
 import app.pairline.android.link.remote.RemoteConfig
 import app.pairline.android.link.remote.RemoteConfigRequest
 import app.pairline.android.link.remote.RemoteLink
@@ -68,6 +69,8 @@ class MessageRouter(
     private val netSwitches: NetSwitches,
     private val appContext: Context,
     private val remote: RemoteLink,
+    /** "Check my home connection" (`remote.check`): asks the router read-only; blocks for seconds. */
+    private val checkHome: () -> HomeCheck.Result,
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -307,6 +310,8 @@ class MessageRouter(
                 null // the reply is the ussd.result with the same id, sent when the network answers
             }
             Msg.REMOTE_CONFIG -> request(message) { id -> remoteConfig(id, message, token) }
+            // Free, with remote mode on or off: asks the router read-only, never opens a port (D-080).
+            Msg.REMOTE_CHECK -> request(message) { id -> HomeCheck.reply(id, checkHome()) }
             // An event in PROTOCOL.md; answered with `ok` only if R gave it an id anyway.
             Msg.REMOTE_TOKEN -> if (message.requestId != null) {
                 request(message) { id -> remoteToken(message); Messages.ok(id) }

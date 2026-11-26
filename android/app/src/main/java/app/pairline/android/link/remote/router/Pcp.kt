@@ -12,7 +12,9 @@ import java.net.InetAddress
  */
 object Pcp {
     const val VERSION = 2
+    const val OP_ANNOUNCE = 0
     const val OP_MAP = 1
+    const val HEADER_LENGTH = 24
     const val PROTOCOL_TCP = 6
     const val RESULT_SUCCESS = 0
     const val NONCE_LENGTH = 12
@@ -71,6 +73,24 @@ object Pcp {
         )
     }
 
+    /**
+     * ANNOUNCE (RFC 6887 §14.1): only the common header, lifetime 0, from [client]. It asks whether a PCP server is
+     * there and changes nothing on the router ("Check my home connection").
+     */
+    fun announceRequest(client: InetAddress): ByteArray {
+        val out = ByteArray(HEADER_LENGTH)
+        out[0] = VERSION.toByte()
+        out[1] = OP_ANNOUNCE.toByte()
+        as16(client).copyInto(out, 8)
+        return out
+    }
+
+    /** The result code of an ANNOUNCE answer, or null for anything else. */
+    fun parseAnnounceReply(bytes: ByteArray): Int? {
+        if (bytes.size < HEADER_LENGTH || bytes[0].toInt() != VERSION || (bytes[1].toInt() and 0xff) != 0x80 + OP_ANNOUNCE) return null
+        return bytes[3].toInt() and 0xff
+    }
+
     /** True if [bytes] is a NAT-PMP "unsupported version" answer: the router speaks NAT-PMP only. */
     fun isNatPmpOnlyAnswer(bytes: ByteArray): Boolean = bytes.size >= 4 && bytes[0].toInt() == 0 && BigEndian.readU16(bytes, 2) == 1
 
@@ -97,6 +117,15 @@ class PcpClient(private val udp: RouterUdp, private val client: InetAddress, pri
     fun map(nonce: ByteArray, internalPort: Int, suggestedExternalPort: Int, lifetime: Long): Pcp.MapReply? {
         val reply = exchange(Pcp.mapRequest(client, nonce, internalPort, suggestedExternalPort, lifetime), nonce, internalPort)
         return reply?.takeIf { it.result == Pcp.RESULT_SUCCESS && it.lifetime > 0 && it.externalPort > 0 }
+    }
+
+    /** ANNOUNCE: true if a PCP server answered with success. Read-only on the router. */
+    fun announce(): Boolean {
+        val result = udp.ask(Pcp.announceRequest(client), TRIES, now) { bytes ->
+            if (Pcp.isNatPmpOnlyAnswer(bytes)) -1 else Pcp.parseAnnounceReply(bytes)
+        }
+        lastResult = result?.takeIf { it >= 0 }
+        return result == Pcp.RESULT_SUCCESS
     }
 
     /** Deletes the mapping made with [nonce]. True if the router agreed. */

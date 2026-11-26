@@ -1234,6 +1234,7 @@ class Bridge:
             "block.set": self.req_block_set, "net.switch": self.req_net_switch,
             "sms.read": self.req_sms_read, "call.hold": self.req_call_hold, "contacts.update": self.req_contacts_update,
             "phone.find": self.req_phone_find, "phone.ringer": self.req_phone_ringer,
+            "remote.check": self.req_remote_check,
         }
 
     # State file
@@ -1588,6 +1589,10 @@ class Bridge:
 
     def req_block_list(self, link, msg):
         return self.block_list()
+
+    def req_remote_check(self, link, msg):
+        """"Check my home connection" (D-080): a canned answer; this fake never asks a router anything."""
+        return {"t": "remote.check", "direct": "likely", "reason": None, "router": "nat-pmp", "ipv6": False}
 
     def req_net_switch(self, link, msg):
         """D-073: switches nothing real; remembers it and shows it in the status that follows."""

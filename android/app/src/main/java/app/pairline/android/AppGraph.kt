@@ -134,7 +134,7 @@ object AppGraph {
     val router: MessageRouter by lazy {
         MessageRouter(
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
-            netSwitches, app, remote,
+            netSwitches, app, remote, checkHome = { direct.check() },
         ).also { router ->
             remote.onConfigured = {
                 router.remoteStarted()

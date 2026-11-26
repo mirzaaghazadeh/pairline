@@ -133,6 +133,8 @@ class RemoteLink(
             }
             outbox.addLast(Outgoing(slot, plaintext, clock(), Mailbox.newRecordId(random)))
         }
+        // Which way a message went (the sessions log theirs): only its type and mailbox, never ids or content.
+        Log.i(TAG, "${message.type} goes through iCloud (${slot.name.lowercase()} mailbox)")
         wake.trySend(Unit)
     }
 
@@ -249,6 +251,7 @@ class RemoteLink(
                 sweep(ready)
                 nextSweepAt = now + SWEEP_EVERY_MS
             }
+            if (failures > 0) Log.i(TAG, "mailbox reachable again after $failures failed attempt(s)")
             failures = 0
         } catch (_: CloudKitWebClient.TokenRejected) {
             stopFor(RemoteStore.Problem.TOKEN_REJECTED)

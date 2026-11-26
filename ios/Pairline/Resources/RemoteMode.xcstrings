@@ -1,0 +1,220 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Remote mode" : {
+      "comment" : "Title of the before-you-turn-it-on screen for remote mode (D-080).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع عن بُعد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Remote mode" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod" } }
+      }
+    },
+    "Texts, codes and calls keep reaching this iPhone when your phones are apart." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تستمر الرسائل والرموز والمكالمات في الوصول إلى هذا الآيفون عندما يكون هاتفاك بعيدين عن بعضهما." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts, codes and calls keep reaching this iPhone when your phones are apart." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها، کدها و تماس‌ها وقتی گوشی‌هایتان از هم دورند هم به این آیفون می‌رسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirinden uzaktayken de mesajlar, kodlar ve aramalar bu iPhone’a ulaşmaya devam eder." } }
+      }
+    },
+    "There's no Pairline server and no account. Your phones talk through your own iCloud and your home's internet connection." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يوجد خادم لـ Pairline ولا حساب. يتواصل هاتفاك عبر iCloud الخاص بك واتصال الإنترنت في منزلك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "There's no Pairline server and no account. Your phones talk through your own iCloud and your home's internet connection." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هیچ سرور و حساب کاربری Pairline در کار نیست. گوشی‌هایتان از طریق iCloud خودتان و اینترنت خانه‌تان با هم حرف می‌زنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline sunucusu ve hesabı yoktur. Telefonlarınız kendi iCloud’unuz ve evinizin internet bağlantısı üzerinden konuşur." } }
+      }
+    },
+    "Texts, calls and codes are locked with keys only your two phones hold. Apple stores only locked records in your iCloud, and they're deleted once read." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُقفل الرسائل والمكالمات والرموز بمفاتيح لا يملكها إلا هاتفاك. لا تخزّن Apple في iCloud الخاص بك إلا سجلات مقفلة، وتُحذف بعد قراءتها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts, calls and codes are locked with keys only your two phones hold. Apple stores only locked records in your iCloud, and they're deleted once read." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها، تماس‌ها و کدها با کلیدهایی قفل می‌شوند که فقط دو گوشی شما دارند. اپل فقط رکوردهای قفل‌شده را در iCloud شما نگه می‌دارد و پس از خوانده شدن پاک می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar, aramalar ve kodlar yalnızca iki telefonunuzda bulunan anahtarlarla kilitlenir. Apple, iCloud’unuzda yalnızca kilitli kayıtlar saklar ve bunlar okununca silinir." } }
+      }
+    },
+    "Call audio goes straight between your phones, not through iCloud." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ينتقل صوت المكالمة مباشرةً بين هاتفيك، لا عبر iCloud." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call audio goes straight between your phones, not through iCloud." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس مستقیم بین گوشی‌هایتان می‌رود، نه از طریق iCloud." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi iCloud üzerinden değil, doğrudan telefonlarınız arasında gider." } }
+      }
+    },
+    "Your home router opens one port for the Android phone. Only your paired iPhone can use it; anything else is turned away." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يفتح جهاز التوجيه في منزلك منفذًا واحدًا لهاتف أندرويد. لا يستطيع استخدامه إلا الآيفون المقترن بك، ويُرفض أي شيء آخر." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your home router opens one port for the Android phone. Only your paired iPhone can use it; anything else is turned away." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم خانه‌تان یک درگاه برای گوشی اندرویدی باز می‌کند. فقط آیفون جفت‌شدهٔ شما می‌تواند از آن استفاده کند و هر چیز دیگری رد می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evinizdeki modem Android telefon için tek bir port açar. Onu yalnızca eşlenmiş iPhone’unuz kullanabilir; diğer her şey geri çevrilir." } }
+      }
+    },
+    "Apple and internet providers can see that your phones talk, not what they say." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يمكن لـ Apple ومزوّدي الإنترنت رؤية أن هاتفيك يتواصلان، لا ما يقولانه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Apple and internet providers can see that your phones talk, not what they say." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اپل و شرکت‌های اینترنتی می‌توانند ببینند که گوشی‌هایتان با هم در ارتباط‌اند، نه اینکه چه می‌گویند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Apple ve internet sağlayıcıları telefonlarınızın konuştuğunu görebilir, ne konuştuklarını göremez." } }
+      }
+    },
+    "Leave the Android phone at home, on charge and on Wi-Fi." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اترك هاتف أندرويد في المنزل، موصولًا بالشاحن ومتصلًا بشبكة Wi-Fi." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Leave the Android phone at home, on charge and on Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی را در خانه، به شارژ و وصل به وای‌فای بگذارید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonu evde, şarjda ve Wi-Fi’a bağlı bırakın." } }
+      }
+    },
+    "It's off unless you turn it on, and you can turn it off any time. That closes the router's port and deletes the records in iCloud." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يبقى متوقفًا ما لم تفعّله، ويمكنك إيقافه في أي وقت. يؤدي ذلك إلى إغلاق منفذ جهاز التوجيه وحذف السجلات في iCloud." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "It's off unless you turn it on, and you can turn it off any time. That closes the router's port and deletes the records in iCloud." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تا خودتان روشنش نکنید خاموش است و هر وقت بخواهید می‌توانید خاموشش کنید. با این کار درگاه مودم بسته و رکوردهای iCloud پاک می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Siz açmadıkça kapalıdır ve istediğiniz zaman kapatabilirsiniz. Bu, modemdeki portu kapatır ve iCloud’daki kayıtları siler." } }
+      }
+    },
+    "Turn on" : {
+      "comment" : "Button: turns remote mode on after its explanation.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تفعيل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن کردن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aç" } }
+      }
+    },
+    "Not now" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ليس الآن" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not now" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "الان نه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şimdi değil" } }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تمام" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bitti" } }
+      }
+    },
+    "Check my home connection" : {
+      "comment" : "Settings › Remote mode: asks the bridge whether its home router could allow a direct connection. Free.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فحص اتصال منزلي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check my home connection" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بررسی اتصال خانه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ev bağlantımı kontrol et" } }
+      }
+    },
+    "A direct connection should work: your home router can open a port for Pairline." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُفترض أن يعمل الاتصال المباشر: يستطيع جهاز التوجيه في منزلك فتح منفذ لـ Pairline." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A direct connection should work: your home router can open a port for Pairline." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مستقیم باید کار کند: مودم خانه‌تان می‌تواند برای Pairline درگاهی باز کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Doğrudan bağlantı çalışmalı: evinizdeki modem Pairline için bir port açabiliyor." } }
+      }
+    },
+    "Your internet provider shares one internet address among many homes (carrier-grade NAT), so nothing at home can open a port." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يتشارك مزوّد الإنترنت عنوان إنترنت واحدًا بين منازل كثيرة (CGNAT)، لذلك لا يستطيع أي جهاز في المنزل فتح منفذ." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your internet provider shares one internet address among many homes (carrier-grade NAT), so nothing at home can open a port." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شرکت اینترنت شما یک نشانی اینترنتی را بین خانه‌های زیادی تقسیم می‌کند (CGNAT)، پس هیچ وسیله‌ای در خانه نمی‌تواند درگاهی باز کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İnternet sağlayıcınız tek bir internet adresini birçok ev arasında paylaştırıyor (CGNAT), bu yüzden evdeki hiçbir cihaz port açamaz." } }
+      }
+    },
+    "Your router doesn't have its own internet address: another router or modem sits in front of it. Putting that modem in bridge mode may help." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ليس لجهاز التوجيه عنوان إنترنت خاص به: يوجد جهاز توجيه أو مودم آخر قبله. قد يساعد ضبط ذلك المودم على وضع الجسر (Bridge)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your router doesn't have its own internet address: another router or modem sits in front of it. Putting that modem in bridge mode may help." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم شما نشانی اینترنتی خودش را ندارد: یک مودم یا روتر دیگر جلوی آن است. شاید گذاشتن آن مودم در حالت Bridge کمک کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Modeminizin kendi internet adresi yok: önünde başka bir modem veya yönlendirici var. O cihazı köprü (bridge) moduna almak işe yarayabilir." } }
+      }
+    },
+    "Your router doesn't open ports on request. Turning on UPnP or NAT-PMP in the router's settings usually fixes this." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يفتح جهاز التوجيه المنافذ عند الطلب. عادةً ما يحلّ تفعيل UPnP أو NAT-PMP في إعدادات جهاز التوجيه هذه المشكلة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your router doesn't open ports on request. Turning on UPnP or NAT-PMP in the router's settings usually fixes this." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم شما با درخواست، درگاه باز نمی‌کند. روشن کردن UPnP یا NAT-PMP در تنظیمات مودم معمولاً این مشکل را حل می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Modeminiz istek üzerine port açmıyor. Modem ayarlarında UPnP veya NAT-PMP’yi açmak genellikle bunu çözer." } }
+      }
+    },
+    "The Android phone isn't on Wi-Fi. Connect it to your home Wi-Fi and check again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتف أندرويد غير متصل بشبكة Wi-Fi. اربطه بشبكة Wi-Fi في منزلك وتحقّق مرة أخرى." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone isn't on Wi-Fi. Connect it to your home Wi-Fi and check again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی به وای‌فای وصل نیست. آن را به وای‌فای خانه وصل کنید و دوباره بررسی کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon Wi-Fi’a bağlı değil. Evinizin Wi-Fi ağına bağlayıp yeniden kontrol edin." } }
+      }
+    },
+    "A direct connection doesn't look possible on this network." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يبدو أن الاتصال المباشر ممكن على هذه الشبكة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A direct connection doesn't look possible on this network." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به نظر نمی‌رسد اتصال مستقیم در این شبکه ممکن باشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu ağda doğrudan bağlantı mümkün görünmüyor." } }
+      }
+    },
+    "The Android phone also has an IPv6 address, which may work if your router lets incoming connections through. Otherwise texts and codes still come through iCloud, but calls need a direct connection." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لدى هاتف أندرويد أيضًا عنوان IPv6، وقد يعمل إذا سمح جهاز التوجيه بالاتصالات الواردة. وإلا فستظل الرسائل والرموز تصل عبر iCloud، لكن المكالمات تحتاج إلى اتصال مباشر." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone also has an IPv6 address, which may work if your router lets incoming connections through. Otherwise texts and codes still come through iCloud, but calls need a direct connection." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی نشانی IPv6 هم دارد که اگر مودم اتصال‌های ورودی را راه بدهد ممکن است کار کند. در غیر این صورت پیامک‌ها و کدها همچنان از طریق iCloud می‌رسند، اما تماس‌ها به اتصال مستقیم نیاز دارند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun bir IPv6 adresi de var; modeminiz gelen bağlantılara izin verirse bu işe yarayabilir. Aksi halde mesajlar ve kodlar yine iCloud üzerinden gelir, ancak aramalar için doğrudan bağlantı gerekir." } }
+      }
+    },
+    "Texts and codes still come through iCloud, but calls need a direct connection." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ستظل الرسائل والرموز تصل عبر iCloud، لكن المكالمات تحتاج إلى اتصال مباشر." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts and codes still come through iCloud, but calls need a direct connection." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها و کدها همچنان از طریق iCloud می‌رسند، اما تماس‌ها به اتصال مستقیم نیاز دارند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar ve kodlar yine iCloud üzerinden gelir, ancak aramalar için doğrudan bağlantı gerekir." } }
+      }
+    },
+    "Router answers: %@" : {
+      "comment" : "Which port-mapping protocol the home router answered: NAT-PMP, PCP or UPnP (never translated).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بروتوكول جهاز التوجيه: %@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Router answers: %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پروتکل مودم: %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Modem protokolü: %@" } }
+      }
+    },
+    "The bridge phone sent an answer this app doesn't understand. Update both apps." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أرسل الهاتف الوسيط ردًا لا يفهمه هذا التطبيق. حدّث التطبيقين." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The bridge phone sent an answer this app doesn't understand. Update both apps." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل پاسخی فرستاد که این برنامه آن را نمی‌فهمد. هر دو برنامه را به‌روز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefon bu uygulamanın anlamadığı bir yanıt gönderdi. İki uygulamayı da güncelleyin." } }
+      }
+    },
+    "How remote mode works" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كيف يعمل الوضع عن بُعد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "How remote mode works" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور چطور کار می‌کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod nasıl çalışır" } }
+      }
+    },
+    "Connection log" : {
+      "comment" : "Settings › Remote mode: opens the app's local, redacted log (Diagnostics).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجل الاتصال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connection log" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گزارش اتصال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bağlantı günlüğü" } }
+      }
+    },
+    "Keeps texts and codes coming through your own iCloud when your phones are apart, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold." : {
+      "comment" : "Footer of Settings › Remote mode.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبقي الرسائل والرموز تصلك عبر iCloud الخاص بك عندما يكون هاتفاك بعيدين، والمكالمات أيضًا إذا سمح جهاز التوجيه في منزلك باتصال مباشر. لا يوجد خادم لـ Pairline: كل شيء مقفل بمفاتيح لا يملكها إلا هاتفاك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keeps texts and codes coming through your own iCloud when your phones are apart, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی گوشی‌هایتان از هم دورند، پیامک‌ها و کدها را از طریق iCloud خودتان می‌رساند، و اگر مودم خانه اجازهٔ اتصال مستقیم بدهد، تماس‌ها را هم. هیچ سرور Pairline در کار نیست: همه‌چیز با کلیدهایی قفل می‌شود که فقط دو گوشی شما دارند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirinden uzaktayken mesajların ve kodların kendi iCloud’unuz üzerinden gelmesini sağlar; evinizdeki modem doğrudan bağlantıya izin verirse aramaların da. Pairline sunucusu yoktur: her şey yalnızca iki telefonunuzda bulunan anahtarlarla kilitlenir." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

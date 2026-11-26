@@ -1,14 +1,20 @@
 import Foundation
 import os
 
-/// Removes personal data from log text (AGENTS.md rule 9): phone numbers, emails, MAC addresses and UUIDs.
-/// Callers never pass message text or contact names to the log in the first place; this is the second fence.
+/// Removes personal data from log text (AGENTS.md rule 9): phone numbers, emails, MAC addresses, UUIDs and IP
+/// addresses (remote mode, D-080: a home's internet address tells roughly where it is). Callers never pass message
+/// text or contact names to the log in the first place; this is the second fence.
 enum Redactor {
     private static let rules: [(NSRegularExpression, String)] = {
         let patterns: [(String, String)] = [
             (#"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}"#, "[email]"),
             (#"\b[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\b"#, "[id]"),
             (#"\b(?:[0-9A-Fa-f]{2}[:\-]){5}[0-9A-Fa-f]{2}\b"#, "[mac]"),
+            // IPv6 in brackets (with a port), written out in full, or compressed ("::"); then IPv4 with a port.
+            (#"\[[0-9A-Fa-f:.]*:[0-9A-Fa-f:.]*(?:%\w+)?\](?::\d{1,5})?"#, "[ip]"),
+            (#"(?<![\w:])(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}(?:%\w+)?(?![\w:])"#, "[ip]"),
+            (#"(?<![\w:])(?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4}){0,6})?::(?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4}){0,6})?(?:%\w+)?(?![\w:])"#, "[ip]"),
+            (#"(?<![\d.])\d{1,3}(?:\.\d{1,3}){3}(?::\d{1,5})?(?![\d.])"#, "[ip]"),
             // Five or more digits, optionally with a leading + and separators: phone numbers and codes. Spaces and
             // tabs only, never a line break, so one line's number can't swallow the next line's time stamp.
             (#"\+?\d(?:[\d \t\-().]*\d){4,}"#, "[number]"),

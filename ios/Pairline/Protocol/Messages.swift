@@ -353,6 +353,8 @@ enum InboundMessage {
     case fileCancel(FileCancelMessage)
     /// The reply to `block.list` / `block.set`, or (without an `id`) the list after it changed on the bridge.
     case blockList([BlockedNumber])
+    /// The reply to `remote.check`: "Check my home connection" (D-080).
+    case remoteCheck(HomeCheckReply)
     case unknown
 }
 
@@ -477,6 +479,7 @@ struct Inbound {
         case "file.cancel": message = .fileCancel(try body(FileCancelMessage.self))
         case "block.list":
             message = .blockList(try body(BlockListBody.self).numbers?.elements ?? [])
+        case "remote.check": message = .remoteCheck(try body(HomeCheckReply.self))
         default:
             message = .unknown
         }
@@ -507,6 +510,8 @@ struct Outbound {
         case "ussd.run": return 60
         // The bridge checks iCloud before it answers.
         case "remote.config": return 30
+        // The bridge asks its router over NAT-PMP, PCP and UPnP in turn, a few seconds each when one is silent.
+        case "remote.check": return 40
         default: return 15
         }
     }
@@ -538,6 +543,10 @@ struct Outbound {
     }
 
     static var remoteConfigOff: Outbound { Outbound("remote.config", ["on": false]) }
+
+    /// "Check my home connection" (D-080): the bridge asks its router, read-only, whether a direct connection could
+    /// work. Free, and answered with remote mode on or off.
+    static var remoteCheck: Outbound { Outbound("remote.check") }
 
     /// Requests whose replies can be large: sent on the Wi-Fi session when one is up (PROTOCOL.md, "Two sessions").
     static let bulkTypes: Set<String> = ["sms.threads", "sms.history", "contacts.sync", "calllog.sync"]

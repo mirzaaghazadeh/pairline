@@ -47,6 +47,20 @@ class RedactorTest {
     }
 
     @Test
+    fun ipAddresses() {
+        assertEquals("mapped [ip] for the iPhone", r("mapped 81.2.69.160:47830 for the iPhone"))
+        assertEquals("router [ip]", r("router 10.0.0.1"))
+        assertEquals("listening on [ip]", r("listening on [2a02:1234:5678:9abc::23]:47830"))
+        assertEquals("from [ip] now", r("from 2a02:1234:5678:9abc::23 now"))
+        assertEquals("gateway [ip]", r("gateway fe80::1%wlan0"))
+        assertEquals("full [ip]", r("full 2001:0db8:0000:0000:0000:ff00:0042:8329"))
+        // What the direct connection logs on purpose stays: a LAN hint, a port, a protocol, a time.
+        assertEquals("NAT-PMP: router ….1 mapped TCP 47830 to port 47830", r("NAT-PMP: router ….1 mapped TCP 47830 to port 47830"))
+        assertEquals("2026-11-24 01:52:22.443 I/direct: renewed", r("2026-11-24 01:52:22.443 I/direct: renewed"))
+        assertEquals("Android 16.0.1", r("Android 16.0.1"))
+    }
+
+    @Test
     fun ourTimestampsStay() {
         assertEquals("2026-11-24 01:52:22.443 I/link: connected", r("2026-11-24 01:52:22.443 I/link: connected"))
         assertEquals("Paired: yes, since 2026-11-24 10:22", r("Paired: yes, since 2026-11-24 10:22"))

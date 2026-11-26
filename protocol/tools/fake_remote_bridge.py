@@ -190,6 +190,11 @@ def fake_status(request_id=None) -> dict:
     return status
 
 
+def fake_home_check(request_id):
+    """`remote.check`'s reply (PROTOCOL.md, "Remote messages"): a router that answers UPnP with a public address."""
+    return {"t": "remote.check", "id": request_id, "direct": "likely", "reason": None, "router": "upnp", "ipv6": False}
+
+
 def cmd_serve(args):
     """Answers the iPhone's requests from the R→B mailbox: `ok` for most, a status for status.get, a fake sms.state
     for sms.send. Starts by introducing itself (device.info and status), as the real bridge does when remote mode
@@ -217,6 +222,9 @@ def cmd_serve(args):
                 ckm.write_secret(ck.chain_path, ckm.normalize_token(msg["token"]))
             if kind == "status.get":
                 put(ck, state["mb"]["q"], seal_to_iphone(state, fake_status(msg.get("id"))))
+            elif kind == "remote.check" and msg.get("id") is not None:
+                # A canned "Check my home connection" answer; this stand-in never touches a router.
+                put(ck, state["mb"]["q"], seal_to_iphone(state, fake_home_check(msg["id"])))
             elif msg.get("id") is not None:
                 put(ck, state["mb"]["q"], seal_to_iphone(state, {"t": "ok", "id": msg["id"]}))
             if kind == "sms.send":

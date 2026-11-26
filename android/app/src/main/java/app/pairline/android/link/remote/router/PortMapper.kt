@@ -6,7 +6,8 @@ import java.net.Inet6Address
 import java.net.InetAddress
 import java.security.SecureRandom
 
-enum class MapProtocol(val label: String) { NAT_PMP("NAT-PMP"), PCP("PCP"), UPNP("UPnP") }
+/** [label] for the log; [wire] for `remote.check`'s `router` (PROTOCOL.md, "Remote messages"). */
+enum class MapProtocol(val label: String, val wire: String) { NAT_PMP("NAT-PMP", "nat-pmp"), PCP("PCP", "pcp"), UPNP("UPnP", "upnp") }
 
 /**
  * One TCP port opened on the router: [external]:[externalPort] reaches this phone's [internal]:[internalPort]. For an

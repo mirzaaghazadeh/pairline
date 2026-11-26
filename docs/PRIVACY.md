@@ -66,7 +66,7 @@ Any change that adds or changes a data flow or permission must update this file 
 | Free first sync used | No | One flag in the Keychain (D-069), so pairing again doesn't give a second free sync. No content | Like the trial clock |
 | Preferences (including the SIM for new calls and messages, D-062) and saved USSD codes | No | iOS user defaults (no message content) | Until app removal |
 | Demo mode data | No | Made-up sample data in memory only, never mixed with real data | Until you leave demo mode |
-| App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids or message text) | Last 7 days |
+| App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids, IP addresses or message text; remote mode logs only which way messages went and why a connection failed, never addresses, tokens or mailbox ids) | Last 7 days |
 | Pairing link (QR code) | No | Read from the camera and used once; the secret is never stored or logged | Until pairing ends |
 
 ### Remote mode (opt-in, D-080)
@@ -101,6 +101,7 @@ readable only by the iCloud account that wrote it; the design, and release build
 | Android bridge, only with remote mode on | `api.apple-cloudkit.com` (Apple's CloudKit Web Services) | Writes and reads the sealed remote-mode records in your iCloud, with your iCloud web access token; Apple sees the bridge's IP address. Checks every 5 seconds for 2 minutes after hearing from the iPhone, every 30 seconds within 10 minutes, otherwise every 2 minutes, and not at all while a local link is up |
 | iPhone app, only with remote mode on | iCloud (CloudKit) and Apple's push service | Writes and reads the same sealed records, and gets a push when one arrives |
 | Android bridge, only with remote mode on and on Wi-Fi | Your home router, on your local network (NAT-PMP and PCP on UDP 5351, UPnP: an SSDP search and HTTP to the router's own LAN address) | Asks it to forward one TCP port (47830) to the bridge, and to tell the bridge your home's internet address. Never anything outside your local network |
+| Android bridge, only when you tap "Check my home connection" on the iPhone (remote mode on or off) | Your home router, on your local network (NAT-PMP's address request and PCP's ANNOUNCE on UDP 5351, UPnP: an SSDP search, the router's description and `GetExternalIPAddress`) | Asks, read-only, whether the router could open a port and what kind of internet address it has; opens nothing. The iPhone gets only the verdict (likely or not, why, which protocol answered, whether there's IPv6), never an address |
 | Android bridge, only with remote mode on | Listens on that one TCP port, reachable from the internet through your router | Your iPhone connects to it from anywhere (the direct connection: the same encrypted session as Wi-Fi, used for messages and, later, call audio). Anyone else is disconnected at the handshake |
 | iPhone app, only with remote mode on and no nearby link | Your bridge phone's home internet address (from a sealed `remote.addr`), on that port | The direct connection. It never connects to any other address on the internet |
 
@@ -177,7 +178,7 @@ log line, already redacted, to the iPhone's system log, which a connected Mac ca
 | Background mode `audio` | Keeps a relayed call's audio running while the iPhone is locked or another app is open | No prompt |
 | CallKit (no prompt) | Shows calls on the iPhone call screen. Calls are added to iPhone Recents unless you turn that off in Settings › Calls (D-074), and a tap there calls back through Pairline | — |
 | Siri and Shortcuts (no prompt) | "Call with Pairline" calls the number you give it; runs only when you run it (D-074) | — |
-| In-App Purchase (no prompt) | The free 7-day trial and the one-time purchase (D-017, D-036) | — |
+| In-App Purchase (no prompt) | The free 7-day trial, the one-time purchase (D-017, D-036) and the one-time remote-mode add-on (D-081) | — |
 | App Group `group.app.pairline.ios` (no prompt) | Shares the bridge status with Pairline's widget | — |
 | Live Activities (`NSSupportsLiveActivities`, no prompt) | The bridge status on the Lock Screen and in the Dynamic Island (D-053). You can turn it off in Pairline's Settings or for Pairline in iOS Settings | — |
 | Local Network (`NSLocalNetworkUsageDescription`, Bonjour service `_pairline._tcp`) (M5) | The Wi-Fi link: find the bridge phone on your Wi-Fi network and connect to it. Only local addresses, only your paired bridge | The first time Pairline looks for the bridge on Wi-Fi |

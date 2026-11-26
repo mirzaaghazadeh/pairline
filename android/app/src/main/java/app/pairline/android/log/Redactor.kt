@@ -2,13 +2,21 @@ package app.pairline.android.log
 
 /**
  * Removes personal data from log text (AGENTS.md rule 9): phone numbers, email addresses, Bluetooth/Wi-Fi
- * MAC addresses, pairing links and long key-like tokens. Message text must never be passed to the log at
- * all; this is the safety net, not the plan.
+ * MAC addresses, IP addresses (remote mode, D-080: a home's internet address tells roughly where it is), pairing
+ * links and long key-like tokens. Message text must never be passed to the log at all; this is the safety net, not
+ * the plan.
  */
 object Redactor {
     private val pairingLink = Regex("""pairline://\S+""", RegexOption.IGNORE_CASE)
     private val email = Regex("""[\p{L}\p{N}._%+\-]+@[\p{L}\p{N}.\-]+\.\p{L}{2,}""")
     private val mac = Regex("""\b[0-9A-Fa-f]{2}(?:[:\-][0-9A-Fa-f]{2}){5}\b""")
+
+    // IPv4 with an optional port; IPv6 in brackets (with a port), compressed ("::") or written out in full.
+    private val ipv4 = Regex("""(?<![\d.])\d{1,3}(?:\.\d{1,3}){3}(?::\d{1,5})?(?![\d.])""")
+    private val ipv6Bracketed = Regex("""\[[0-9A-Fa-f:.]*:[0-9A-Fa-f:.]*(?:%\w+)?](?::\d{1,5})?""")
+    private val ipv6 = Regex(
+        """(?<![\w:])(?:(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){0,7}:(?::?[0-9A-Fa-f]{1,4}){0,7})(?:%\w+)?(?![\w:])""",
+    )
 
     // Base64url/hex blobs of 24+ characters with both letters and digits: keys, secrets, device ids.
     private val token = Regex("""(?<![\p{L}\p{N}_\-])(?=[A-Za-z0-9_\-]*\d)(?=[A-Za-z0-9_\-]*[A-Za-z])[A-Za-z0-9_\-]{24,}""")
@@ -26,6 +34,9 @@ object Redactor {
         var out = pairingLink.replace(text, "[pairing-link]")
         out = email.replace(out, "[email]")
         out = mac.replace(out, "[mac]")
+        out = ipv6Bracketed.replace(out, "[ip]")
+        out = ipv6.replace(out) { m -> if (m.value.contains("::") || m.value.count { it == ':' } == 7) "[ip]" else m.value }
+        out = ipv4.replace(out, "[ip]")
         out = token.replace(out, "[key]")
         out = digits.replace(out) { m ->
             val value = m.value.trimEnd()

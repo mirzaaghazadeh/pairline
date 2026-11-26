@@ -60,6 +60,7 @@ object Msg {
     const val REMOTE_TOKEN = "remote.token"
     const val REMOTE_ADDR = "remote.addr"
     const val REMOTE_STATE = "remote.state"
+    const val REMOTE_CHECK = "remote.check"
     const val RPAIR_HELLO = "rpair.hello"
     const val RPAIR_NONCE = "rpair.nonce"
     const val RPAIR_REVEAL = "rpair.reveal"
@@ -221,6 +222,19 @@ object Messages {
         .put("t", Msg.REMOTE_STATE)
         .put("direct", direct)
         .putNullable("reason", reason)
+
+    /**
+     * The reply to `remote.check` ("Check my home connection"): [direct] `likely` / `unlikely`; [reason] one of
+     * `remote.state`'s codes or null; [router] `nat-pmp` / `pcp` / `upnp` or null; [ipv6] this phone has a global
+     * IPv6 address.
+     */
+    fun remoteCheck(id: Long, direct: String, reason: String?, router: String?, ipv6: Boolean): JSONObject = JSONObject()
+        .put("t", Msg.REMOTE_CHECK)
+        .put("id", id)
+        .put("direct", direct)
+        .putNullable("reason", reason)
+        .putNullable("router", router)
+        .put("ipv6", ipv6)
 }
 
 /** The message type, or null if it's missing. */
