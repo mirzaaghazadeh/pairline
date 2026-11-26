@@ -189,7 +189,7 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
       (`protocol/tools/router_check.py`)
 - [ ] Phase 0: CloudKit container, API and management tokens; a record written through CloudKit Web Services from a
       non-Apple client wakes a suspended iPhone; delay measured
-- [ ] Phase 0: notification-filtering entitlement requested
+- [x] Phase 0: notification-filtering entitlement requested (2026-11-26, Apple request ID Q7U98356ZR)
 - [ ] Protocol: mailbox records, remote session, Opus kind; version bump and shared vectors
 - [ ] Bridge mailbox: CloudKit Web Services client in `link/remote/`
 - [ ] iPhone: subscription and Notification Service Extension (SMS, codes, calls through CallKit)

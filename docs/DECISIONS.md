@@ -1196,3 +1196,24 @@ service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch
   iCloud"; the local log records connections, redacted (rule 9).
 - **First, three risky parts are proven** (Phase 0): the home router's port mapping, the CloudKit path from a
   non-Apple client to a suspended iPhone, and the filtering entitlement request. Results are added below.
+
+**Phase 0 results (2026-11-26, in progress):**
+
+- **Router** (`protocol/tools/router_check.py`, read-only): the maintainer's OpenWrt router answers none of NAT-PMP,
+  PCP or UPnP IGD (no miniupnpd installed), and the home network has no global IPv6. A direct connection isn't
+  possible there as configured; whether the router's WAN address is public or carrier-grade NAT is still open.
+- **CloudKit setup:** container `iCloud.app.pairline.ios`, iCloud and push on `app.pairline.ios`, App ID
+  `app.pairline.ios.notifications` with the App Group, the `Mail` record type in Development only, an API token
+  (outside the repo, mode 600) and a management token (Keychain, `cktool`). Command-line device builds sign with
+  the App Store Connect API key (`-authenticationKeyPath`), because Xcode has no account signed in.
+- **Web auth tokens are not single-use.** A token from `CKFetchWebAuthTokenOperation` works for many requests; each
+  response returns a refreshed token in `X-Apple-CloudKit-Web-Auth-Token` that works only once its trailing `__` is
+  removed; a refreshed chain holds. An unused token still worked after 22 minutes; longer lifetimes are being
+  measured.
+- **Blocker: the private database is refused** on the maintainer's account: HTTP 403 `ACCESS_DENIED`, "private db
+  access disabled for this account", for every device-minted token, while the same tokens read the user record
+  through the public database. Other projects tie this to Advanced Data Protection (web access to private data then
+  needs a per-app approval on an Apple device, which CloudKit Web Services doesn't offer) or to "Access iCloud Data
+  on the Web" being off. Waiting for the maintainer's settings and decision; the push delay isn't measured yet.
+- **Filtering entitlement** requested on 2026-11-26 (Apple request ID Q7U98356ZR), for the extension
+  `app.pairline.ios.notifications`, use case end-to-end encrypted messaging.
