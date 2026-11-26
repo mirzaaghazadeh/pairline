@@ -129,4 +129,13 @@
     <string name="cap_missing_dtmf_talk">Comes with Talk on iPhone.</string>
     <string name="cap_dtmf_next_call">Turns on during your next call.</string>
     <string name="action_set_up">Set up</string>
+    <string name="settings_advanced">Advanced</string>
+    <string name="settings_root">Root mode</string>
+    <string name="settings_root_sub">For rooted phones only. Talk on iPhone’s helper starts through your root app (Magisk, KernelSU…) instead of Wireless debugging: no Developer options, and it keeps working after a restart, even without Wi-Fi. It runs with the same limited rights as before, not as root. Your root app asks once.</string>
+    <string name="settings_root_none">No root found on this phone. Talk on iPhone uses Wireless debugging, which needs no root.</string>
+    <string name="talk_root_title">Start the helper with root</string>
+    <string name="talk_root_idle">Starts by itself while Talk on iPhone is on.</string>
+    <string name="talk_root_starting">Starting… If your root app asks, allow Pairline Bridge.</string>
+    <string name="talk_root_running">Running. It starts by itself after every restart.</string>
+    <string name="talk_root_failed">Root didn’t start the helper. Allow Pairline Bridge in your root app, then try again, or turn Root mode off in Settings › Advanced to use Wireless debugging.</string>
 </resources>

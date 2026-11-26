@@ -226,6 +226,8 @@
     <string name="settings_phone_hotspot_vpn">On, but a VPN is on here, and Android sends hotspot traffic around VPNs, not through them. The iPhone gets this phone’s connection without the VPN, and no internet at all if only the VPN gets through. To use the VPN on the iPhone, turn on Internet sharing below.</string>
     <string name="settings_phone_hotspot_no_internet">On, but this phone has no internet right now (is mobile data on?), so the iPhone shows “No Internet Connection”. Calls and messages still work over it.</string>
     <string name="settings_phone_hotspot_helper">Talk on iPhone: its helper starts only while this phone is on Wi-Fi. After a restart, connect to Wi-Fi once before you turn on the hotspot; the helper then keeps running.</string>
+    <string name="restricted_guide_title">Allow SMS for Pairline Bridge</string>
+    <string name="restricted_guide_steps">Android blocks SMS and call history for apps installed from a file until you allow it:\n1. Here in App info, tap ⋮ at the top right and choose “Allow restricted settings”, then confirm.\n2. Tap Permissions and allow SMS (and Call logs if it’s there).\n3. Come back to Pairline Bridge.</string>
     <string name="guide_channel">Setup guide</string>
     <string name="guide_back">When you’re done, tap here to go back to Pairline Bridge.</string>
     <string name="find_channel">Find phone</string>

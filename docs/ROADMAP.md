@@ -137,8 +137,8 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [ ] Test call with "Did you hear it?" feedback; automatic choice of the audio method (`call.media.feedback`
       flips capture source and bridge-mic muting — bridge side done, iPhone prompt pending); known-device list
       shipped inside the app (never fetched)
-- [ ] Root mode (option C) for devices where shell rights aren't enough — the same helper started with `su`
-      (not built; with Shizuku gone, D-054, rooted phones use Wireless debugging like everyone else)
+- [x] Root mode in Settings › Advanced (D-075): the same helper started as the shell user with `su`, so a rooted
+      phone needs no Wireless debugging and keeps Talk on iPhone after a restart without Wi-Fi — real-phone test pending
 - [x] Clean fallback to "audio on the Android phone" when a device isn't supported: caps `call.media` /
       `call.media.talk` say exactly what works; "listen only" when injection isn't possible
 - [x] Android setup: optional "Talk on iPhone" step after pairing and a Settings page — a checklist that ticks

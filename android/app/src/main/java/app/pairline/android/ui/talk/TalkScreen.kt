@@ -136,7 +136,7 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
         NoteBox(stringResource(R.string.talk_android_too_old, Build.VERSION.RELEASE ?: "9"), Tone.WARN, PIcons.Warning)
         return
     }
-    WirelessSteps(state, pairing, tick)
+    if (manager.rootMode) RootSteps(state) else WirelessSteps(state, pairing, tick)
 
     if (state == State.READY) {
         val p = probe
@@ -184,6 +184,29 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && (manager.paired || state == State.READY)) ManageCard()
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && state != State.READY) ComputerAlternative()
     NoteBox(stringResource(R.string.talk_wifi_note), Tone.NEUTRAL, PIcons.Lock)
+}
+
+/** Root mode (Settings › Advanced, D-075): one step, the helper started through the phone's own root. */
+@Composable
+private fun RootSteps(state: State) {
+    val manager = AppGraph.privileged
+    SectionCard(title = stringResource(R.string.talk_steps)) {
+        StepRow(
+            done = state == State.READY,
+            title = stringResource(R.string.talk_root_title),
+            subtitle = stringResource(
+                when {
+                    state == State.READY -> R.string.talk_root_running
+                    state == State.STARTING -> R.string.talk_root_starting
+                    state == State.FAILED && manager.failure == PrivilegedManager.Failure.NO_ROOT -> R.string.talk_root_failed
+                    state == State.FAILED -> R.string.talk_start_failed
+                    else -> R.string.talk_root_idle
+                },
+            ),
+            action = if (state == State.FAILED) stringResource(R.string.talk_try_again) else null,
+            onAction = { manager.retry() },
+        )
+    }
 }
 
 /** Android 11+: Developer options, Wireless debugging, pairing, then the helper starts by itself. */

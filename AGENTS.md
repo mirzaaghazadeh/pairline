@@ -51,7 +51,9 @@ one, stop and ask the maintainer instead of working around it.
    confirmation. Privileged (shell/root) access must never be used for `pm install`.
 7. **Privileged access is optional and fenced.** Shell access comes only through Pairline's own helper,
    started through Wireless debugging that the user turned on and paired (or from the user's computer),
-   never through a third-party app (D-054, replacing Shizuku); root is never required. All privileged
+   never through a third-party app (D-054, replacing Shizuku); root is never required. On a rooted phone the user
+   may instead turn on Settings › Advanced › Root mode (D-075): the same helper, started as the shell user through
+   the phone's own `su`, never as root. All privileged
    calls live in one small module (`privileged/`) with an explicit allowlist of operations, validate every
    argument, and accept calls only from our own UID. The helper runs only while Talk on iPhone needs it and
    stops at every restart. The helper may grant Pairline itself WRITE_SECURE_SETTINGS (Talk on iPhone only,

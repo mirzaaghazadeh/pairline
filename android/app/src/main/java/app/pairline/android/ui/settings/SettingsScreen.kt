@@ -58,6 +58,7 @@ import app.pairline.android.link.WifiLinkStatus
 import app.pairline.android.link.wifi.HotspotFailure
 import app.pairline.android.link.wifi.HotspotState
 import app.pairline.android.link.wifi.PhoneHotspot
+import app.pairline.android.log.Log
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.telephony.Perms
 import app.pairline.android.ui.GrantState
@@ -268,6 +269,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
             }
 
             UpdatesSection()
+
+            AdvancedSection()
 
             SectionCard(title = stringResource(R.string.settings_support)) {
                 ListRow(
@@ -531,6 +534,35 @@ private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
             )
         }
     }
+}
+
+/**
+ * Settings › Advanced (D-075): root mode, for rooted phones only. Talk on iPhone's helper then starts through the
+ * phone's own `su` as the shell user, instead of Wireless debugging: no Developer options, and it keeps working after
+ * a restart without Wi-Fi.
+ */
+@Composable
+private fun AdvancedSection() {
+    val prefs = AppGraph.prefs
+    val prefsTick by prefs.changes.collectAsState()
+    val on = remember(prefsTick) { prefs.rootMode }
+    val available = remember { AppGraph.privileged.rootAvailable() }
+    SectionCard(title = stringResource(R.string.settings_advanced)) {
+        ListRow(
+            title = stringResource(R.string.settings_root),
+            subtitle = stringResource(if (available || on) R.string.settings_root_sub else R.string.settings_root_none),
+            icon = PIcons.Shield,
+            iconTone = if (on) Tone.GOOD else Tone.NEUTRAL,
+            onClick = if (available || on) ({ setRootMode(!on) }) else null,
+            trailing = { Switch(checked = on, enabled = available || on, onCheckedChange = { setRootMode(it) }) },
+        )
+    }
+}
+
+private fun setRootMode(on: Boolean) {
+    AppGraph.prefs.rootMode = on
+    Log.i("settings", "root mode ${if (on) "on" else "off"}")
+    AppGraph.privileged.retry()
 }
 
 /**

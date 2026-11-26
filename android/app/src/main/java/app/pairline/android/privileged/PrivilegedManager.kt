@@ -60,7 +60,8 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         FAILED,
     }
 
-    enum class Failure { NO_SERVICE, NO_HELPER, OTHER }
+    /** NO_ROOT: root mode, but `su` is missing or the root app said no (D-075). */
+    enum class Failure { NO_SERVICE, NO_HELPER, NO_ROOT, OTHER }
 
     enum class Pairing { IDLE, WAITING, FOUND, PAIRING, WRONG_CODE, FAILED, DONE }
 
@@ -161,12 +162,18 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
             autoEnableFailures = 0
             return set(State.READY)
         }
-        if (wanted && paired) turnDebuggingBackOn()
+        if (wanted && paired && !rootMode) turnDebuggingBackOn()
         set(nextWithoutHelper())
         if (_state.value == State.IDLE && wanted) startHelper()
     }
 
+    /** Root mode (D-075): the helper starts through the phone's own `su`, without Developer options or Wi-Fi. */
+    val rootMode: Boolean get() = prefs.rootMode
+
     private fun nextWithoutHelper(): State = when {
+        rootMode && starting -> State.STARTING
+        rootMode && _state.value == State.FAILED && failure != null -> State.FAILED
+        rootMode -> State.IDLE
         !developerOptionsOn() -> State.NEEDS_DEVELOPER_OPTIONS
         wirelessDebuggingOn() == false -> State.NEEDS_WIRELESS_DEBUGGING
         !paired -> State.NEEDS_PAIRING
@@ -178,7 +185,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
     val paired: Boolean get() = prefs.adbPaired && AdbKey.exists(context)
 
     private fun canRestart(): Boolean =
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && paired && wirelessDebuggingOn() != false
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && (rootMode || (paired && wirelessDebuggingOn() != false))
 
     /** "Try again" after a failure. */
     fun retry() {
@@ -220,6 +227,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
     /** Worker thread: finds Wireless debugging, runs the start command and waits for the helper to attach. */
     private fun launch() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+        if (rootMode) return launchWithRoot()
         val key = AdbKey.loadOrCreate(context)
         val finder = AdbServiceFinder(context, AdbServiceFinder.CONNECT)
         val port = try {
@@ -251,6 +259,36 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
             if (!latch.await(ATTACH_TIMEOUT_MS, TimeUnit.MILLISECONDS)) throw StartException(Failure.NO_HELPER)
         }
     }
+
+    /**
+     * Root mode (D-075): the same start command, run as the shell user (uid 2000) through the phone's own `su`
+     * (Magisk, KernelSU…), whose app asks the user once. The helper is then exactly what Wireless debugging starts:
+     * shell rights, not root. Worker thread.
+     */
+    private fun launchWithRoot() {
+        val latch = CountDownLatch(1)
+        attached = latch
+        val printed = try {
+            val process = ProcessBuilder("su", SHELL_UID, "-c", HelperCommand.forShell(context) + " echo $STARTED_MARKER")
+                .redirectErrorStream(true)
+                .start()
+            val out = process.inputStream.bufferedReader().use { it.readText() }
+            process.waitFor()
+            out
+        } catch (e: java.io.IOException) {
+            Log.w(TAG, "no su on this phone")
+            throw StartException(Failure.NO_ROOT)
+        }
+        if (!printed.contains(STARTED_MARKER)) {
+            Log.w(TAG, "su didn't run the start command: ${printed.trim().take(200)}")
+            throw StartException(Failure.NO_ROOT)
+        }
+        if (!latch.await(ATTACH_TIMEOUT_MS, TimeUnit.MILLISECONDS)) throw StartException(Failure.NO_HELPER)
+        Log.i(TAG, "helper started with root")
+    }
+
+    /** A `su` binary is on this phone (root mode can work). Doesn't run it, so no root prompt. */
+    fun rootAvailable(): Boolean = SU_PATHS.any { java.io.File(it).exists() }
 
     /** The helper handed over its binder ([HelperProvider]); any thread. */
     private fun attach(binder: IBinder) {
@@ -526,6 +564,13 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         private const val ADB_WIFI_ENABLED = "adb_wifi_enabled"
         private const val WRITE_SECURE_SETTINGS = "android.permission.WRITE_SECURE_SETTINGS"
         private const val OPSTR_WRITE_SMS = "android:write_sms"
+
+        /** The shell user: root mode starts the helper as it, never as root itself (D-075). */
+        private const val SHELL_UID = "2000"
+        private val SU_PATHS = listOf(
+            "/system/bin/su", "/system/xbin/su", "/sbin/su", "/su/bin/su", "/debug_ramdisk/su",
+            "/data/adb/ksu/bin/su", "/data/adb/ap/bin/su",
+        )
         private const val ADB_ALLOWED_CONNECTION_TIME = "adb_allowed_connection_time"
         /** 15 s, doubled after each try that didn't bring the helper back (at most ~32 min). */
         private const val AUTO_ENABLE_BASE_MS = 15_000L

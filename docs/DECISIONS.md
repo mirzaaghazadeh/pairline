@@ -1256,3 +1256,18 @@ to show calls in Recents by default, and to drop the setup videos for guidance i
 - **Tested:** unit tests on both sides (caps, requests, status, number detection), `fake_bridge.py` answers the new
   requests, both apps build and lint clean. CallKit, Recents, Siri, hold and call waiting, read sync and the ringer
   need real phones.
+
+### D-075 — Root mode under Settings › Advanced; restricted settings guided (2026-11-26)
+
+- **Root mode,** the maintainer's choice, kept out of the way under a new Settings › Advanced: on a rooted phone
+  (Magisk, KernelSU, APatch), Talk on iPhone's helper starts with `su 2000 -c <the same start command>` instead of
+  through Wireless debugging. It runs as the shell user, exactly as before, never as root: the allowlist, the caller
+  check and everything the helper may do stay the same (rule 7). No Developer options, no pairing, and it starts
+  again by itself after a restart without Wi-Fi. The switch is offered only when a `su` binary is found (checked by
+  looking for the file, so no root prompt until the user turns it on); the root app asks once. If `su` is missing or
+  refused, Talk on iPhone says so and offers Wireless debugging again.
+- **"App was denied access" (restricted settings):** Android 13 and later block SMS and call-history permissions for
+  apps installed from a downloaded or local file until the user allows restricted settings. A tester hit it. When
+  Android refuses one of those permissions and this copy came from a file (`InstallSourceInfo.packageSource`, read
+  locally), the bridge opens App info and leaves the steps in the setup guide's notification (⋮ › Allow restricted
+  settings, then Permissions › SMS), instead of leaving the user at Android's dialog.
