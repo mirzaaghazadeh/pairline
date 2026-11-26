@@ -11,4 +11,11 @@
     <string name="ring_iphone_offline">آیفون الان وصل نیست.</string>
     <string name="ring_iphone_update">برای زنگ زدن آیفون از اینجا، Pairline را روی آیفون به‌روز کنید.</string>
     <string name="ring_iphone_sent">آیفون شما در حال زنگ خوردن است…</string>
+    <string name="screen_title">بررسی تماس‌ها</string>
+    <string name="screen_role">مسدود کردن تماس‌ها پیش از زنگ خوردن</string>
+    <string name="screen_role_on">روشن: Pairline Bridge تماس‌های ورودی را بررسی می‌کند</string>
+    <string name="screen_role_off">بزنید تا Pairline Bridge برنامهٔ بررسی تماس اندروید شود. بدون آن، تماس مسدودشده قبل از رد شدن یک لحظه اینجا زنگ می‌خورد.</string>
+    <string name="screen_unknown">بی‌صدا کردن تماس‌گیرندگان ناشناس</string>
+    <string name="screen_unknown_sub">تماس شماره‌هایی که در مخاطبان شما نیستند روی هیچ‌کدام از دو گوشی زنگ نمی‌خورد؛ به پست صوتی می‌رود و بی‌پاسخ نشان داده می‌شود.</string>
+    <string name="block_prefix_note">شماره را با * تمام کنید تا همهٔ شماره‌هایی که با آن شروع می‌شوند مسدود شوند، مثلاً ‎+234*‎.</string>
 </resources>

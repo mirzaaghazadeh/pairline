@@ -389,8 +389,9 @@ enum InboundMessage {
     case fileAnswer(FileAnswerMessage)
     case fileDone(FileDoneMessage)
     case fileCancel(FileCancelMessage)
-    /// The reply to `block.list` / `block.set`, or (without an `id`) the list after it changed on the bridge.
-    case blockList([BlockedNumber])
+    /// The reply to `block.list` / `block.set`, or (without an `id`) the list after it changed on the bridge, and
+    /// whether "Silence unknown callers" is on there (D-085; nil from an older bridge).
+    case blockList([BlockedNumber], unknown: Bool?)
     /// D-084: the scheduled messages, the data meter, and the bridge's user ringing this iPhone.
     case smsScheduled(ScheduledList)
     case dataUsage(DataUsageReply)
@@ -453,7 +454,7 @@ struct Inbound {
         var password: String?
         var band: String?
     }
-    private struct BlockListBody: Decodable { var numbers: LossyList<BlockedNumber>? }
+    private struct BlockListBody: Decodable { var numbers: LossyList<BlockedNumber>?; var unknown: Bool? }
     private struct ScheduledBody: Decodable {
         var items: LossyList<ScheduledList.Item>?
         var done: LossyList<ScheduledList.Done>?
@@ -520,7 +521,8 @@ struct Inbound {
         case "file.done": message = .fileDone(try body(FileDoneMessage.self))
         case "file.cancel": message = .fileCancel(try body(FileCancelMessage.self))
         case "block.list":
-            message = .blockList(try body(BlockListBody.self).numbers?.elements ?? [])
+            let b = try body(BlockListBody.self)
+            message = .blockList(b.numbers?.elements ?? [], unknown: b.unknown)
         case "sms.scheduled":
             let b = try body(ScheduledBody.self)
             message = .smsScheduled(ScheduledList(items: b.items?.elements ?? [], done: b.done?.elements ?? [],
@@ -744,6 +746,11 @@ struct Outbound {
     static func blockSet(add: [String], remove: [String]) -> Outbound {
         Outbound("block.set", ["add": add, "remove": remove])
     }
+
+    /// "Silence unknown callers" on the bridge phone (needs `call.screen`, D-085).
+    static func blockSilenceUnknown(_ on: Bool) -> Outbound {
+        Outbound("block.set", ["add": [String](), "remove": [String](), "unknown": on])
+    }
 }
 
 /// What `net.switch` turns on or off on the bridge phone (D-073).
@@ -804,6 +811,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case calllogDelete = "calllog.delete"
     /// The bridge keeps a block list (D-043).
     case block = "block"
+    /// The bridge is Android's call-screening app: blocked calls don't ring, unknown callers can be silenced (D-085).
+    case callScreen = "call.screen"
 
     var id: String { rawValue }
 }

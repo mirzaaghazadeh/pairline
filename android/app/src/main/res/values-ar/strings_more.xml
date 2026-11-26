@@ -11,4 +11,11 @@
     <string name="ring_iphone_offline">الآيفون غير متصل الآن.</string>
     <string name="ring_iphone_update">حدّث Pairline على الآيفون لتجعله يرنّ من هنا.</string>
     <string name="ring_iphone_sent">جارٍ رنين الآيفون…</string>
+    <string name="screen_title">فحص المكالمات</string>
+    <string name="screen_role">حظر المكالمات قبل أن ترنّ</string>
+    <string name="screen_role_on">مفعّل: يفحص Pairline Bridge المكالمات الواردة</string>
+    <string name="screen_role_off">انقر لجعل Pairline Bridge تطبيق فحص المكالمات في أندرويد. من دونه ترنّ المكالمة المحظورة هنا لحظة قبل رفضها.</string>
+    <string name="screen_unknown">إسكات المتصلين المجهولين</string>
+    <string name="screen_unknown_sub">لا ترنّ على أيٍّ من الهاتفين مكالماتُ الأرقام غير الموجودة في جهات اتصالك؛ تذهب إلى البريد الصوتي وتظهر فائتة.</string>
+    <string name="block_prefix_note">أنهِ الرقم بـ * لحظر كل رقم يبدأ به، مثلًا ‎+234*‎.</string>
 </resources>

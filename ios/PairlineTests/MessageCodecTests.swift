@@ -215,12 +215,20 @@ final class MessageCodecTests: XCTestCase {
         let reply = try decode(["t": "block.list", "id": 4,
                                 "numbers": [["n": "+15551234", "time": 1_764_000_000_000], ["time": 1], "bad"]])
         XCTAssertEqual(reply.id, 4)
-        guard case .blockList(let list) = reply.message else { return XCTFail() }
+        guard case .blockList(let list, let oldBridge) = reply.message else { return XCTFail() }
         XCTAssertEqual(list, [BlockedNumber(n: "+15551234", time: 1_764_000_000_000)], "bad entries are skipped")
-        let event = try decode(["t": "block.list", "numbers": []])
+        XCTAssertNil(oldBridge, "an older bridge doesn't send unknown")
+        let event = try decode(["t": "block.list", "numbers": [], "unknown": true])
         XCTAssertNil(event.id, "the bridge's own changes arrive as an event")
-        guard case .blockList(let empty) = event.message else { return XCTFail() }
+        guard case .blockList(let empty, let unknown) = event.message else { return XCTFail() }
         XCTAssertTrue(empty.isEmpty)
+        XCTAssertEqual(unknown, true, "D-085: silence unknown callers")
+        XCTAssertEqual(try json(.blockSilenceUnknown(false))["unknown"] as? Bool, false)
+        XCTAssertTrue(PhoneNumber.blockMatches("+234*", "+2348012345678"), "D-085: a prefix")
+        XCTAssertTrue(PhoneNumber.blockMatches("+234*", "002348012345678"))
+        XCTAssertFalse(PhoneNumber.blockMatches("+234*", "08012345678"))
+        XCTAssertTrue(PhoneNumber.blockMatches("0900*", "0900 123 4567"))
+        XCTAssertFalse(PhoneNumber.blockMatches("+2*", "+2348012345678"), "one digit is no prefix")
 
         let set = try json(.blockSet(add: ["+15551234"], remove: []))
         XCTAssertEqual(set["t"] as? String, "block.set")

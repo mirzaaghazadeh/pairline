@@ -125,6 +125,7 @@ enum PhoneNumber {
     /// both sides, the last digits agree (as many as the shorter has, up to 9), so "+354 555 1234" covers "5551234".
     /// Shorter numbers and sender names such as "BANK" must match exactly.
     static func blockMatches(_ blocked: String, _ number: String) -> Bool {
+        if let prefix = blockPrefix(blocked) { return prefixMatches(prefix, number) }
         let a = digits(blocked)
         let b = digits(number)
         if a.count >= 7 && b.count >= 7 {
@@ -133,6 +134,35 @@ enum PhoneNumber {
         }
         guard let key = matchKey(blocked) else { return false }
         return key == matchKey(number)
+    }
+
+    /// A block-list entry ending with "*" blocks every number starting with it (D-085), the same rule as the bridge:
+    /// at least two digits; "+" or "00" first means an international prefix.
+    struct BlockPrefix: Equatable {
+        var international: Bool
+        var digits: String
+    }
+
+    static func blockPrefix(_ entry: String) -> BlockPrefix? {
+        let t = entry.trimmingCharacters(in: .whitespaces)
+        guard t.hasSuffix("*"), t.filter({ $0 == "*" }).count == 1 else { return nil }
+        let body = String(t.dropLast())
+        let ascii = asciiDigits(body)
+        guard ascii.allSatisfy({ ($0.isASCII && $0.isNumber) || $0 == "+" || $0 == " " || $0 == "-" }) else { return nil }
+        let d = digits(body)
+        guard d.count >= 2 else { return nil }
+        let plus = body.trimmingCharacters(in: .whitespaces).hasPrefix("+")
+        return BlockPrefix(international: plus || d.hasPrefix("00"),
+                           digits: !plus && d.hasPrefix("00") ? String(d.dropFirst(2)) : d)
+    }
+
+    static func prefixMatches(_ prefix: BlockPrefix, _ number: String) -> Bool {
+        let trimmed = number.trimmingCharacters(in: .whitespaces)
+        let d = digits(trimmed)
+        guard prefix.international else { return d.hasPrefix(prefix.digits) }
+        if trimmed.hasPrefix("+") { return d.hasPrefix(prefix.digits) }
+        if d.hasPrefix("00") { return d.dropFirst(2).hasPrefix(prefix.digits) }
+        return false
     }
 
     /// Whether an address looks like a phone number (and not an alphanumeric sender such as "BANK").

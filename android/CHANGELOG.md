@@ -21,6 +21,10 @@ the section in the same commit that raises `versionName`.
 - **Ring my iPhone.** From the home screen or a new Quick Settings tile, make the iPhone play a sound for 30 seconds.
 - **Mobile data meter.** The iPhone can show how much mobile data this phone used this month, once you give Pairline
   Bridge Usage access. Only the total goes to the iPhone.
+- **Blocked calls don't ring at all.** In Blocked numbers, make Pairline Bridge Android's call-screening app (Android
+  10 and later): blocked numbers are turned away before they ring, and **Silence unknown callers** sends calls from
+  numbers that aren't in your contacts to voicemail on both phones. Block whole ranges by ending a number with *, such
+  as +234*.
 
 ## 1.7.0 (2026-11-26)
 

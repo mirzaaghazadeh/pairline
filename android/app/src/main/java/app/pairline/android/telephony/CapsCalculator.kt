@@ -32,6 +32,8 @@ data class CapsInput(
     val notifMirror: Boolean = false,
     /** Usage access is given, so the iPhone can show the mobile data used (D-084). */
     val dataUsage: Boolean = false,
+    /** Pairline holds Android's call-screening role (D-085). */
+    val callScreen: Boolean = false,
 )
 
 /**
@@ -91,6 +93,7 @@ object CapsCalculator {
         if (has(Manifest.permission.READ_CALL_LOG) && has(Manifest.permission.WRITE_CALL_LOG)) caps += Caps.CALLLOG_DELETE
         // The block list needs no permission: it filters what the bridge relays (D-043).
         caps += Caps.BLOCK
+        if (input.callScreen && input.hasCalling) caps += Caps.CALL_SCREEN
         return Caps.ALL.filter { it in caps }
     }
 }

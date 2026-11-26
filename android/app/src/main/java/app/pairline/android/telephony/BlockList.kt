@@ -43,17 +43,22 @@ object BlockRules {
     class Matcher(list: List<BlockedNumber>) {
         private val long: List<String>
         private val short: Set<String>
+        /** Entries ending with '*' (D-085). */
+        private val prefixes: List<PhoneNumbers.BlockPrefix>
 
         init {
-            val (l, s) = list.partition { PhoneNumbers.digits(it.number).length >= PhoneNumbers.MIN_MATCH }
+            val (p, rest) = list.partition { PhoneNumbers.blockPrefix(it.number) != null }
+            prefixes = p.mapNotNull { PhoneNumbers.blockPrefix(it.number) }
+            val (l, s) = rest.partition { PhoneNumbers.digits(it.number).length >= PhoneNumbers.MIN_MATCH }
             long = l.map { PhoneNumbers.digits(it.number) }
             short = s.mapNotNullTo(HashSet()) { PhoneNumbers.matchKey(it.number) }
         }
 
-        val isEmpty: Boolean get() = long.isEmpty() && short.isEmpty()
+        val isEmpty: Boolean get() = long.isEmpty() && short.isEmpty() && prefixes.isEmpty()
 
         fun matches(number: String?): Boolean {
             if (number.isNullOrBlank() || isEmpty) return false
+            if (prefixes.any { PhoneNumbers.prefixMatches(it, number) }) return true
             val d = PhoneNumbers.digits(number)
             if (d.length >= PhoneNumbers.MIN_MATCH) return long.any { PhoneNumbers.sameEnding(it, d) }
             return PhoneNumbers.matchKey(number) in short
@@ -97,6 +102,20 @@ class BlockList(context: Context) {
     /** Whether [number] (any formatting) is on the list. Unknown or empty numbers are never blocked. */
     fun isBlocked(number: String?): Boolean = matcher.matches(number)
 
+    /**
+     * "Silence unknown callers" (D-085): with Pairline as Android's call-screening app, calls from numbers that aren't
+     * in the contacts ring neither phone; they go to voicemail and show as missed. Kept here with the list.
+     */
+    val silenceUnknown: Boolean get() = prefs.getBoolean(KEY_UNKNOWN, false)
+
+    /** Returns whether it changed. */
+    fun setSilenceUnknown(on: Boolean): Boolean = synchronized(lock) {
+        if (silenceUnknown == on) return false
+        prefs.edit { putBoolean(KEY_UNKNOWN, on) }
+        _changes.value++
+        true
+    }
+
     /** Applies additions and removals; returns whether anything changed. */
     fun update(add: List<String>, remove: List<String>): Boolean = synchronized(lock) {
         val next = BlockRules.apply(entries, add, remove, System.currentTimeMillis())
@@ -113,8 +132,10 @@ class BlockList(context: Context) {
         .put("t", Msg.BLOCK_LIST)
         .apply { if (id != null) put("id", id) }
         .put("numbers", JSONArray().apply { entries.forEach { put(it.toJson()) } })
+        .put("unknown", silenceUnknown)
 
     private companion object {
         const val KEY = "numbers"
+        const val KEY_UNKNOWN = "silenceUnknown"
     }
 }

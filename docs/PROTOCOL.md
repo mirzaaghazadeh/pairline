@@ -322,8 +322,8 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `ussd.run` | R→B | M4 | `id`, `sim`, `code`: a USSD or GSM service code (`*`/`#` first, `#` last). A `+` may follow a `*` (call forwarding to an international number, `**21*+905551234567#`, D-082) |
 | `ussd.result` | B→R | M4 | `id`, `ok`, `text`, `error` |
 | `calllog.delete` | R→B | M4 | `id`, `keys` [call-log key] or `all: true` → `ok` / `error` (needs capability `calllog.delete`) |
-| `block.list` | R→B, B→R | M4 | request: `id` / reply: `id`, `numbers` [`{n, time}`]. Also sent by B without `id` when the list changes on the bridge (needs `block`) |
-| `block.set` | R→B | M4 | `id`, `add` [number], `remove` [number] → `block.list` with the same `id` (needs `block`) |
+| `block.list` | R→B, B→R | M4 | request: `id` / reply: `id`, `numbers` [`{n, time}`], `unknown` ("Silence unknown callers" is on, D-085; older bridges leave it out). Also sent by B without `id` when the list changes on the bridge (needs `block`). An entry ending with `*` and at least two digits before it (`+234*`, `0900*`) blocks every number starting with it; with `+` or `00` first it's an international prefix (D-085) |
+| `block.set` | R→B | M4 | `id`, `add` [number], `remove` [number], `unknown` (optional, turns "Silence unknown callers" on or off; needs `call.screen`, D-085) → `block.list` with the same `id` (needs `block`) |
 | `sms.schedule` | R→B | — | `id`, `cid` (R's id for the message, as in `sms.send`), `sim`, `to`, `body`, `at` (ms; from 5 minutes ago up to a year ahead) → `ok`. B keeps it and sends it at `at` with that `cid`, so `sms.state` events follow when R is linked. At most 100 waiting; `busy` beyond that or for a `cid` in use. Needs `sms.schedule` (D-084) |
 | `sms.unschedule` | R→B | — | `id`, `cid` → `ok`; `invalid` when B no longer has it (already sent) |
 | `sms.scheduled` | R→B, B→R | — | request: `id` / reply: `id`, `items` [`{cid, sim, to, body, at}`] (waiting, soonest first), `done` [`{cid, state, key, error}`] (what became of the ones sent in the last 7 days, at most 50; `state` is `pending` until the radio answers, then as in `sms.state`), `exact` (B can send at the exact minute: Android's "Alarms & reminders") |
@@ -354,7 +354,8 @@ can also be fed into the call; without it the iPhone listens and the user talks 
 tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's helper running, D-073), `sms.read`
 (messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `call.voicemail`
 (`call.dial` takes `voicemail: true`, SIMs carry `vm`, D-082), `sms.schedule` (B keeps and sends scheduled messages,
-D-084), `data.usage` (Usage access given, D-084), `contacts.edit`
+D-084), `data.usage` (Usage access given, D-084), `call.screen` (B is Android's call-screening app: blocked numbers
+are turned away before they ring and `block.set` `unknown` works, D-085), `contacts.edit`
 (with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `notif.mirror` (notification access given:
 chosen apps' notifications are sent as `notif.posted`, D-077), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),

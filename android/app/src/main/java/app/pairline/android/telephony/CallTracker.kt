@@ -296,6 +296,12 @@ class CallTracker(
             Log.i(TAG, "incoming call from a blocked number (${t.id}); not shown on the iPhone")
             declineBlocked(t, 0)
         }
+        // Silenced by the call-screening service ("Silence unknown callers", D-085): it rings neither phone and goes
+        // to voicemail, so it isn't declined here either.
+        if (!t.blocked && t.incoming && !t.incomingSent && CallScreening.wasSilenced(t.number)) {
+            t.blocked = true
+            Log.i(TAG, "incoming call from an unknown number (${t.id}); silenced, not shown on the iPhone")
+        }
         return t.blocked
     }
 

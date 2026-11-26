@@ -13,4 +13,11 @@
     <string name="ring_iphone_offline">The iPhone isn’t connected right now.</string>
     <string name="ring_iphone_update">Update Pairline on the iPhone to ring it from here.</string>
     <string name="ring_iphone_sent">Ringing your iPhone…</string>
+    <string name="screen_title">Call screening</string>
+    <string name="screen_role">Block calls before they ring</string>
+    <string name="screen_role_on">On: Pairline Bridge screens incoming calls</string>
+    <string name="screen_role_off">Tap to make Pairline Bridge Android’s call-screening app. Without it, a blocked call rings here for a moment before it’s declined.</string>
+    <string name="screen_unknown">Silence unknown callers</string>
+    <string name="screen_unknown_sub">Calls from numbers that aren’t in your contacts ring neither phone. They go to voicemail and show as missed.</string>
+    <string name="block_prefix_note">End a number with * to block every number that starts with it, for example +234*.</string>
 </resources>

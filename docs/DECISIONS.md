@@ -1445,3 +1445,21 @@ The third part of "More from the same two phones": three things only the two pho
   opening Pairline stops it.
 - Android strings in a new `strings_more.xml` per language, iOS strings in a new `Extras` table. Unit tests on both
   sides; needs real phones (exact alarms on Android 13+, Usage access, background audio on the iPhone).
+
+### D-085 — Call screening: blocked calls never ring, silence unknown callers, blocked prefixes (2026-11-26)
+
+Until now a blocked call was kept off the iPhone and declined on the bridge (D-043), but it rang there for a moment
+first, and nothing could quiet callers who aren't in the contacts.
+- **Android's call-screening role** (Android 10+), which any app may hold once the user agrees in Android's own
+  dialog: Pairline Bridge › Blocked numbers › "Block calls before they ring". `PairlineScreeningService` sees each
+  incoming call's number before it rings: a blocked number is turned away (rejected, no notification, still in the
+  call log), and with **Silence unknown callers** a number that isn't in the bridge's contacts (or a hidden one) is
+  silenced, which sends it to voicemail. The call tracker keeps a silenced call off the iPhone too (the service
+  notes it for 30 seconds), so it rings neither phone, like the iPhone's own setting. Capability `call.screen`.
+- **The setting lives on the bridge** with the block list, so it works while the iPhone is away; `block.list` carries
+  `unknown` and `block.set` takes it, so the iPhone's Blocked numbers screen has the same switch. Android 9 and phones
+  without the role keep the D-043 behaviour.
+- **Prefixes:** an entry ending with `*` and two or more digits blocks every number starting with it: `+234*` (with
+  `+` or `00` it's an international prefix, matching numbers written with either), `0900*` (as the digits come).
+  The same rule on both phones (`PhoneNumbers.blockPrefix`, `PhoneNumber.blockPrefix`), for calls and texts alike.
+- Strings: Android `strings_more.xml`, iOS `Screening` table. Unit tests on both sides; needs a real phone.

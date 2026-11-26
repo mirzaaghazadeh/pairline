@@ -419,9 +419,15 @@ class MessageRouter(
     private fun blockSet(id: Long, m: JSONObject): JSONObject {
         val add = strings(m.optJSONArray("add"), BlockRules.MAX_PER_REQUEST)
         val remove = strings(m.optJSONArray("remove"), BlockRules.MAX_PER_REQUEST)
-        if (add.isEmpty() && remove.isEmpty()) invalid("add or remove missing")
+        val unknown = m.boolOrNull("unknown") // D-085
+        if (add.isEmpty() && remove.isEmpty() && unknown == null) invalid("add, remove or unknown missing")
         if (add.any { PhoneNumbers.normalizeBlockable(it) == null }) invalid("bad number")
-        if (blockList.update(add, remove)) Log.i(TAG, "block list changed from the iPhone (${blockList.all().size} entries)")
+        if (add.isNotEmpty() || remove.isNotEmpty()) {
+            if (blockList.update(add, remove)) Log.i(TAG, "block list changed from the iPhone (${blockList.all().size} entries)")
+        }
+        if (unknown != null && blockList.setSilenceUnknown(unknown)) {
+            Log.i(TAG, "silence unknown callers ${if (unknown) "on" else "off"} from the iPhone")
+        }
         return blockList.toMessage(id)
     }
 

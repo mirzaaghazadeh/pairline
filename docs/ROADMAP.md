@@ -204,7 +204,7 @@ parties). Each needs a real-phone test.
 - [x] "Bridge phone left behind" alert when the link stays down for 5 minutes (D-083)
 - [x] Ring the iPhone from the Android phone: home screen and a Quick Settings tile (D-084)
 - [x] Mobile data used this month on the bridge phone, with a limit alert (D-084)
-- [ ] Call screening role on Android: blocked calls never ring, silence unknown callers, blocked prefixes
+- [x] Call screening role on Android: blocked calls never ring, silence unknown callers, blocked prefixes (D-085)
 - [ ] Reply to Android app notifications from the iPhone
 - [ ] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi
 - [ ] Live captions of relayed calls on the iPhone (on-device speech recognition, nothing recorded or stored)

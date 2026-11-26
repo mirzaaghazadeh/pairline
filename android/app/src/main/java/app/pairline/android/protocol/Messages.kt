@@ -135,13 +135,19 @@ object Caps {
     /** The bridge keeps a block list (D-043). */
     const val BLOCK = "block"
 
+    /**
+     * Pairline is Android's call-screening app (D-085): blocked numbers don't ring at all, and "Silence unknown
+     * callers" (`block.set` `unknown`) works.
+     */
+    const val CALL_SCREEN = "call.screen"
+
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, SMS_SCHEDULE, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF,
         CALL_AUDIO, CALL_HOLD, CALL_VOICEMAIL, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA,
         CALL_MEDIA_TALK,
         CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, NOTIF_MIRROR, DATA_USAGE, WIFI, FILES,
-        CALLLOG_DELETE, BLOCK,
+        CALLLOG_DELETE, BLOCK, CALL_SCREEN,
     )
 
     /** What the iPhone can receive, in its `device.info` `caps`: `remote.ring` needs this (D-084). */

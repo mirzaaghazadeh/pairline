@@ -190,6 +190,17 @@
             android:name=".telephony.SmsResultReceiver"
             android:exported="false" />
 
+        <!-- Call screening (D-085, Android 10+): Android binds it for incoming calls only once the user made Pairline
+             Bridge the call-screening app in the system's own dialog (BIND_SCREENING_SERVICE). -->
+        <service
+            android:name=".telephony.PairlineScreeningService"
+            android:exported="true"
+            android:permission="android.permission.BIND_SCREENING_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecom.CallScreeningService" />
+            </intent-filter>
+        </service>
+
         <!-- The alarm for messages scheduled on the iPhone (D-084); reached only through our own PendingIntent. -->
         <receiver
             android:name=".telephony.ScheduledSmsReceiver"

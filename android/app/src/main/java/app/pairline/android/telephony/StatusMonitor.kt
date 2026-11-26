@@ -181,6 +181,7 @@ class StatusMonitor(
                 phoneTools = true,
                 notifMirror = app.pairline.android.mirror.NotificationMirror.accessGranted(context),
                 dataUsage = dataUsage(),
+                callScreen = CallScreening.held(context),
             ),
         )
     }

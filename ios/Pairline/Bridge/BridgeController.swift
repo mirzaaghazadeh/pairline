@@ -208,9 +208,9 @@ final class BridgeController: ObservableObject {
         case .netShare(let info) where inbound.id == nil:
             // The bridge stopped sharing by itself (its user turned it off).
             netShare = info
-        case .blockList(let list):
+        case .blockList(let list, let unknown):
             // Changed in the bridge app itself.
-            applyBlockList(list)
+            applyBlockList(list, unknown: unknown)
         case .remoteRing(let on):
             // The bridge's user is looking for this iPhone (D-084).
             if mode == .real { on ? IPhoneRinger.shared.start() : IPhoneRinger.shared.stop() }
@@ -788,9 +788,23 @@ final class BridgeController: ObservableObject {
     /// Fetches the bridge's list (after every connect).
     func refreshBlockList() async {
         guard canUseLink, phase.isConnected, has(.block) else { return }
-        if let reply = try? await link.request(.blockList), case .blockList(let list) = reply.message {
-            applyBlockList(list)
+        if let reply = try? await link.request(.blockList), case .blockList(let list, let unknown) = reply.message {
+            applyBlockList(list, unknown: unknown)
         }
+    }
+
+    /// "Silence unknown callers", as the bridge phone has it (D-085).
+    @Published private(set) var silenceUnknown = false
+
+    func setSilenceUnknown(_ on: Bool) async throws {
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        guard has(.callScreen) else { throw ActionError.missingCapability(.callScreen) }
+        let reply = try await link.request(.blockSilenceUnknown(on))
+        if case .blockList(let list, let unknown) = reply.message { applyBlockList(list, unknown: unknown) }
+        log.info("block", "Silence unknown callers \(on ? "on" : "off")")
     }
 
     /// Blocks or unblocks numbers (or sender names) on the bridge phone, which keeps the list that counts.
@@ -803,12 +817,13 @@ final class BridgeController: ObservableObject {
         guard status == nil || has(.block) else { throw ActionError.missingCapability(.block) }
         let message: Outbound = blocked ? .blockSet(add: numbers, remove: []) : .blockSet(add: [], remove: numbers)
         let reply = try await link.request(message)
-        if case .blockList(let list) = reply.message { applyBlockList(list) }
+        if case .blockList(let list, let unknown) = reply.message { applyBlockList(list, unknown: unknown) }
         log.info("block", blocked ? "Blocked \(numbers.count) number(s)" : "Unblocked \(numbers.count) number(s)")
         Haptics.success()
     }
 
-    private func applyBlockList(_ list: [BlockedNumber]) {
+    private func applyBlockList(_ list: [BlockedNumber], unknown: Bool? = nil) {
+        if let unknown { silenceUnknown = unknown }
         guard list != blockedNumbers else { return }
         blockedNumbers = list
         db.setBlockedNumbers(list)
