@@ -227,6 +227,29 @@
         }
       }
     },
+    "Via iCloud" : {
+      "comment" : "Link state in the widget and Live Activity: no nearby link, but remote mode reaches the bridge through iCloud (D-072).",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عبر iCloud"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "از طریق iCloud"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud üzerinden"
+          }
+        }
+      }
+    },
     "Not paired" : {
       "localizations" : {
         "ar" : {

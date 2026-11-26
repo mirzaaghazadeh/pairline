@@ -6,10 +6,15 @@ import Foundation
 struct WidgetSnapshot: Codable, Equatable {
     enum Link: String, Codable {
         case connected
+        /// No nearby link, but remote mode reaches the bridge through iCloud (D-072).
+        case remote
         case connecting
         case offline
         case notPaired
         case locked
+
+        /// The bridge's status is current: a live session, or remote mode.
+        var reachesBridge: Bool { self == .connected || self == .remote }
     }
 
     struct SIM: Codable, Hashable, Identifiable {

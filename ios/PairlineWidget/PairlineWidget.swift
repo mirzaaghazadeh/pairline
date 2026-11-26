@@ -76,7 +76,7 @@ struct BridgeStatusWidgetView: View {
 
     private var linkColor: Color {
         switch snapshot?.link {
-        case .connected?: return .brandGreen
+        case .connected?, .remote?: return .brandGreen
         case .connecting?: return .brandAmber
         case .locked?: return .brandAmber
         default: return .secondary
@@ -86,6 +86,7 @@ struct BridgeStatusWidgetView: View {
     private var linkText: Text {
         switch snapshot?.link {
         case .connected?: return Text("Connected")
+        case .remote?: return Text("Via iCloud")
         case .connecting?: return Text("Connecting…")
         case .offline?: return Text("Not connected")
         case .locked?: return Text("Locked")

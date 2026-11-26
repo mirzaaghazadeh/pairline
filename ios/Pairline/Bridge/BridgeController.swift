@@ -262,6 +262,7 @@ final class BridgeController: ObservableObject {
         let link: WidgetSnapshot.Link
         switch phase {
         case .connected: link = .connected
+        case .remote: link = .remote
         case .searching, .securing, .pairing, .waiting: link = .connecting
         case .notPaired: link = .notPaired
         case .locked: link = .locked

@@ -15,7 +15,7 @@ struct BridgeLiveActivityWidget: Widget {
             let state = context.state
             return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    ActivitySIMView(sim: state.primarySIM, connected: state.link == .connected, large: true)
+                    ActivitySIMView(sim: state.primarySIM, connected: state.link.reachesBridge, large: true)
                         .padding(.leading, 6)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
@@ -46,7 +46,7 @@ private let activityRed = Color(red: 0xE0 / 255, green: 0x31 / 255, blue: 0x31 /
 
 private func linkColor(_ link: WidgetSnapshot.Link) -> Color {
     switch link {
-    case .connected: return activityGreen
+    case .connected, .remote: return activityGreen
     case .connecting, .locked: return activityAmber
     case .offline, .notPaired: return .secondary
     }
@@ -55,6 +55,7 @@ private func linkColor(_ link: WidgetSnapshot.Link) -> Color {
 private func linkText(_ link: WidgetSnapshot.Link) -> Text {
     switch link {
     case .connected: return Text("Connected")
+    case .remote: return Text("Via iCloud")
     case .connecting: return Text("Connecting…")
     case .offline: return Text("Not connected")
     case .locked: return Text("Locked")
@@ -74,7 +75,7 @@ private struct CompactSignalView: View {
     let state: BridgeActivityAttributes.ContentState
 
     var body: some View {
-        if state.link == .connected, let sim = state.primarySIM {
+        if state.link.reachesBridge, let sim = state.primarySIM {
             SignalBarsView(level: sim.signal ?? 0)
                 .frame(width: 17, height: 11)
         } else {
@@ -91,7 +92,7 @@ private struct CompactTrailingView: View {
     let state: BridgeActivityAttributes.ContentState
 
     var body: some View {
-        if state.link != .connected {
+        if !state.link.reachesBridge {
             Circle().fill(linkColor(state.link)).frame(width: 8, height: 8)
         } else if let net = state.primarySIM?.net, !net.isEmpty {
             Text(verbatim: net).font(.caption.weight(.semibold)).lineLimit(1)
@@ -116,7 +117,7 @@ private struct ActivityBottomRow: View {
             if isDemo { DemoBadge() }
             Spacer(minLength: 4)
             if state.sims.count > 1 {
-                ActivitySIMView(sim: state.sims[1], connected: state.link == .connected, large: false)
+                ActivitySIMView(sim: state.sims[1], connected: state.link.reachesBridge, large: false)
             }
         }
     }
@@ -156,7 +157,7 @@ private struct ActivityLockScreenView: View {
             if !state.sims.isEmpty {
                 HStack(spacing: 16) {
                     ForEach(state.sims) { sim in
-                        ActivitySIMView(sim: sim, connected: state.link == .connected, large: true)
+                        ActivitySIMView(sim: sim, connected: state.link.reachesBridge, large: true)
                     }
                     Spacer(minLength: 0)
                 }
