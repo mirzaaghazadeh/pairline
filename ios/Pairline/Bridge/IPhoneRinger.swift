@@ -91,6 +91,7 @@ final class IPhoneRinger: ObservableObject {
 /// Over everything while the iPhone rings for the Android phone: one big button to stop it.
 struct RingingOverlay: View {
     @ObservedObject private var ringer = IPhoneRinger.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         if ringer.ringing {
@@ -113,7 +114,7 @@ struct RingingOverlay: View {
             .padding(24)
             .background(RoundedRectangle(cornerRadius: 24, style: .continuous).fill(.regularMaterial))
             .padding(20)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .transition(.slide(from: .bottom, reduceMotion: reduceMotion))
         }
     }
 }

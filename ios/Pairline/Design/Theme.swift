@@ -5,8 +5,12 @@ extension Color {
     /// Blue for filled surfaces behind white text and glyphs (stays deep in dark mode).
     static let brandFill = Color("BrandFill")
     static let brandGreen = Color("BrandGreen")
+    /// Green and red for filled surfaces behind white text and glyphs: the same as the text colors by default, deeper
+    /// with Increase Contrast, where the text colors go lighter in dark mode instead.
+    static let brandGreenFill = Color("BrandGreenFill")
     static let brandAmber = Color("BrandAmber")
     static let brandRed = Color("BrandRed")
+    static let brandRedFill = Color("BrandRedFill")
     static let bubbleIncoming = Color("BubbleIncoming")
     static let cardBackground = Color("CardBackground")
 }
@@ -21,6 +25,7 @@ enum Metrics {
 struct PrimaryButtonStyle: ButtonStyle {
     var tint: Color = .brandFill
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -32,15 +37,17 @@ struct PrimaryButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(tint.opacity(isEnabled ? 1 : 0.4))
             )
-            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
             .opacity(configuration.isPressed ? 0.9 : 1)
-            .animation(.spring(response: 0.25, dampingFraction: 0.8), value: configuration.isPressed)
+            .animation(.motion(.spring(response: 0.25, dampingFraction: 0.8), reduceMotion: reduceMotion),
+                       value: configuration.isPressed)
     }
 }
 
 /// The tinted, secondary button.
 struct SecondaryButtonStyle: ButtonStyle {
     var tint: Color = .brandBlue
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -52,8 +59,10 @@ struct SecondaryButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(tint.opacity(0.12))
             )
-            .scaleEffect(configuration.isPressed ? 0.98 : 1)
-            .animation(.spring(response: 0.25, dampingFraction: 0.8), value: configuration.isPressed)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
+            .opacity(configuration.isPressed && reduceMotion ? 0.8 : 1)
+            .animation(.motion(.spring(response: 0.25, dampingFraction: 0.8), reduceMotion: reduceMotion),
+                       value: configuration.isPressed)
     }
 }
 

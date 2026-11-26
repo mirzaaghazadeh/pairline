@@ -15,6 +15,7 @@ struct PairingFlowView: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var purchases: PurchaseManager
     @EnvironmentObject private var settings: AppSettings
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var step: Step = Self.initialStep
     @State private var error: String?
     @State private var camera: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
@@ -23,6 +24,11 @@ struct PairingFlowView: View {
     #if DEBUG
     @State private var pasted = ""
     #endif
+
+    /// The next step slides in from the trailing edge; with Reduce Motion it fades in.
+    private var stepTransition: AnyTransition {
+        .asymmetric(insertion: reduceMotion ? .opacity : .move(edge: .trailing), removal: .opacity)
+    }
 
     /// Debug builds launched with `-PairlinePairingScan` start at the scan step.
     private static var initialStep: Step {
@@ -37,13 +43,13 @@ struct PairingFlowView: View {
             ZStack {
                 Color(.systemGroupedBackground).ignoresSafeArea()
                 switch step {
-                case .install: install.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
-                case .scan: scan.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
+                case .install: install.transition(stepTransition)
+                case .scan: scan.transition(stepTransition)
                 case .connecting: connecting.transition(.opacity)
                 case .done: done.transition(.opacity)
                 }
             }
-            .animation(.spring(response: 0.45, dampingFraction: 0.9), value: step)
+            .animation(.motion(.spring(response: 0.45, dampingFraction: 0.9), reduceMotion: reduceMotion), value: step)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if !isOnboarding || step == .scan {

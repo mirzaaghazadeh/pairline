@@ -227,12 +227,15 @@ struct CallLogRow: View {
     let call: () -> Void
     @EnvironmentObject private var db: AppDatabase
     @EnvironmentObject private var bridge: BridgeController
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var name: String? { item.name ?? db.knownName(for: item.number) }
     private var isMissed: Bool { item.type == .missed || item.type == .rejected }
 
     var body: some View {
-        HStack(spacing: 12) {
+        // At the accessibility text sizes the details and the time go under the name, and nothing is cut short.
+        let large = typeSize.isAccessibilitySize
+        HStack(alignment: large ? .top : .center, spacing: 12) {
             Image(systemName: symbol)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(isMissed ? Color.brandRed : .secondary)
@@ -247,22 +250,29 @@ struct CallLogRow: View {
                 }
                 .font(.body.weight(.semibold))
                 .foregroundStyle(isMissed ? Color.brandRed : .primary)
-                .lineLimit(1)
-                HStack(spacing: 6) {
-                    if bridge.isDualSIM, let sim = item.sim { SIMBadge(slot: sim) }
-                    typeText
-                    if item.duration > 0 {
-                        Text(verbatim: "·")
-                        Text(Formatters.duration(item.duration))
+                .lineLimit(large ? nil : 1)
+                AdaptiveStack(spacing: large ? 2 : 6) {
+                    HStack(spacing: 6) {
+                        if bridge.isDualSIM, let sim = item.sim { SIMBadge(slot: sim) }
+                        typeText
                     }
+                    if item.duration > 0 {
+                        HStack(spacing: 6) {
+                            if !large { Text(verbatim: "·") }
+                            Text(Formatters.duration(item.duration))
+                        }
+                    }
+                    if large { Text(Formatters.listTime(item.time)) }
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
-            Spacer()
-            Text(Formatters.listTime(item.time))
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Spacer(minLength: 0)
+            if !large {
+                Text(Formatters.listTime(item.time))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             if let showContact, let contact = db.contact(forNumber: item.number) {
                 Button {
                     showContact(contact)
@@ -457,7 +467,7 @@ struct DialerView: View {
             .frame(width: key + 6, height: key + 6)
             Button(action: primaryAction) {
                 ZStack {
-                    Circle().fill(Color.brandGreen)
+                    Circle().fill(Color.brandGreenFill)
                     if runningUSSD {
                         ProgressView().tint(.white)
                     } else {

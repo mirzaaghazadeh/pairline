@@ -17,6 +17,7 @@ struct LTRText: View {
 struct Avatar: View {
     let name: String
     var size: CGFloat = 44
+    @Environment(\.colorSchemeContrast) private var contrast
 
     private static let palettes: [(Color, Color)] = [
         (Color(red: 0.36, green: 0.55, blue: 0.97), Color(red: 0.18, green: 0.37, blue: 0.80)),
@@ -59,6 +60,11 @@ struct Avatar: View {
         ZStack {
             Circle().fill(LinearGradient(colors: [palette.0, palette.1], startPoint: .topLeading,
                                          endPoint: .bottomTrailing))
+            if contrast == .increased {
+                // Deep enough for the white initials with Increase Contrast (4.5:1 on every palette).
+                Circle().fill(palette.1)
+                Circle().fill(Color.black.opacity(0.25))
+            }
             switch content {
             case .initials(let text):
                 Text(verbatim: text)
@@ -136,7 +142,7 @@ struct SIMBadge: View {
             .font(.system(size: 10, weight: .bold, design: .rounded))
             .foregroundStyle(.white)
             .frame(width: 15, height: 15)
-            .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(slot == 0 ? Color.brandFill : Color.brandGreen))
+            .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(slot == 0 ? Color.brandFill : Color.brandGreenFill))
             .accessibilityLabel(Text("SIM \(slot + 1)"))
     }
 }
@@ -186,18 +192,22 @@ struct InfoBanner<Trailing: View>: View {
     let tint: Color
     let text: Text
     @ViewBuilder var trailing: Trailing
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: symbol)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(tint)
-            text
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.primary)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            trailing
+        // At the accessibility text sizes the buttons go under the text, which then wraps freely.
+        AdaptiveStack(spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: symbol)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(tint)
+                text
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .lineLimit(typeSize.isAccessibilitySize ? nil : 2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            HStack(spacing: 10) { trailing }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
@@ -210,6 +220,7 @@ struct LinkStatusPill: View {
     let phase: LinkPhase
     var isDemo = false
     @State private var pulse = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var color: Color {
         switch phase {
@@ -253,8 +264,9 @@ struct LinkStatusPill: View {
             Circle()
                 .fill(color)
                 .frame(width: 8, height: 8)
-                .scaleEffect(pulse && isTransient ? 1.35 : 1)
-                .opacity(pulse && isTransient ? 0.6 : 1)
+                // No pulsing with Reduce Motion: the label already says the link is on its way.
+                .scaleEffect(pulse && isTransient && !reduceMotion ? 1.35 : 1)
+                .opacity(pulse && isTransient && !reduceMotion ? 0.6 : 1)
             label
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)

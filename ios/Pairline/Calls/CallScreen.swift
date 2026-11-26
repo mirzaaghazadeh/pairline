@@ -237,10 +237,10 @@ struct CallScreen: View {
             Spacer(minLength: 8)
             if other.state == .ringing {
                 Button { calls.endOther() } label: { Image(systemName: "phone.down.fill") }
-                    .buttonStyle(.borderedProminent).tint(.brandRed)
+                    .buttonStyle(.borderedProminent).tint(.brandRedFill)
                     .accessibilityLabel(Text("Decline"))
                 Button { calls.answerOther() } label: { Image(systemName: "phone.fill") }
-                    .buttonStyle(.borderedProminent).tint(.brandGreen)
+                    .buttonStyle(.borderedProminent).tint(.brandGreenFill)
                     .accessibilityLabel(Text("Accept"))
             } else {
                 if other.state == .held && calls.canHold {
@@ -248,7 +248,7 @@ struct CallScreen: View {
                         .buttonStyle(.bordered).tint(.white)
                 }
                 Button { calls.endOther() } label: { Image(systemName: "phone.down.fill") }
-                    .buttonStyle(.borderedProminent).tint(.brandRed)
+                    .buttonStyle(.borderedProminent).tint(.brandRedFill)
                     .accessibilityLabel(Text("End"))
             }
         }
@@ -363,11 +363,11 @@ struct CallScreen: View {
     @ViewBuilder private func actions(_ call: ActiveCall) -> some View {
         if call.state == .ringing && !call.isOutgoing {
             HStack(spacing: 80) {
-                RoundCallButton(symbol: "phone.down.fill", color: .brandRed, title: Text("Decline")) {
+                RoundCallButton(symbol: "phone.down.fill", color: .brandRedFill, title: Text("Decline")) {
                     Haptics.tap()
                     calls.hangUp()
                 }
-                RoundCallButton(symbol: "phone.fill", color: .brandGreen, title: Text("Accept")) {
+                RoundCallButton(symbol: "phone.fill", color: .brandGreenFill, title: Text("Accept")) {
                     Haptics.success()
                     calls.answer()
                 }
@@ -378,7 +378,7 @@ struct CallScreen: View {
             RoundCallButton(symbol: "phone.down.fill", color: .gray, title: Text("Ended")) {}
                 .disabled(true)
         } else {
-            RoundCallButton(symbol: "phone.down.fill", color: .brandRed, title: Text("End")) {
+            RoundCallButton(symbol: "phone.down.fill", color: .brandRedFill, title: Text("End")) {
                 Haptics.tap()
                 calls.hangUp()
             }

@@ -6,6 +6,7 @@ struct OnboardingFlow: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var purchases: PurchaseManager
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var page = OnboardingFlow.initialPage
     @State private var showPairing = false
     @State private var pairingAsSheet = false
@@ -72,7 +73,8 @@ struct OnboardingFlow: View {
             }).tag(3)
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
-        .animation(.easeInOut, value: page)
+        // With Reduce Motion, Continue shows the next page without sliding to it.
+        .animation(reduceMotion ? nil : .easeInOut, value: page)
     }
 
     @ViewBuilder private var bottomBar: some View {
@@ -81,7 +83,7 @@ struct OnboardingFlow: View {
                 PageDots(count: pageCount, current: page)
                 Button {
                     Haptics.tap()
-                    withAnimation { page += 1 }
+                    withAnimation(reduceMotion ? nil : .default) { page += 1 }
                 } label: {
                     Text(page == 0 ? "Get started" : "Continue")
                 }
@@ -168,18 +170,30 @@ private struct PrivacyShield: View {
 private struct WelcomePage: View {
     var showsHero = true
     @State private var appeared = false
+    @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 44
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        // At the accessibility text sizes the page scrolls like the others, so the words are never cut short.
+        if typeSize.isAccessibilitySize {
+            CenteredPageScroll { page(spaced: false) }
+        } else {
+            page(spaced: true)
+        }
+    }
+
+    private func page(spaced: Bool) -> some View {
         VStack(spacing: 22) {
-            Spacer()
+            if spaced { Spacer() }
             if showsHero {
                 BrandMarkImage(size: 120)
-                    .scaleEffect(appeared ? 1 : 0.85)
+                    .scaleEffect(appeared || reduceMotion ? 1 : 0.85)
                     .opacity(appeared ? 1 : 0)
             }
             VStack(spacing: 10) {
                 Text(verbatim: "Pairline")
-                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                    .font(.system(size: titleSize, weight: .bold, design: .rounded))
                 Text("Your Android SIM, on your iPhone.")
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
@@ -190,8 +204,8 @@ private struct WelcomePage: View {
                     .padding(.horizontal, 12)
             }
             .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 12)
-            Spacer()
+            .offset(y: appeared || reduceMotion ? 0 : 12)
+            if spaced { Spacer() }
             // The language the app runs in, picked from the iPhone on first open (D-081); iPhone Settings changes it.
             // Only the current language is named here (D-033).
             Button {
@@ -209,11 +223,13 @@ private struct WelcomePage: View {
             .accessibilityValue(Text(verbatim: AppLanguage.shownName))
             .accessibilityHint(Text("Change the language in iPhone Settings › Pairline › Language."))
             .opacity(appeared ? 1 : 0)
-            Spacer()
+            if spaced { Spacer() }
         }
         .padding(.horizontal, 24)
         .onAppear {
-            withAnimation(.spring(response: 0.7, dampingFraction: 0.8).delay(0.1)) { appeared = true }
+            withAnimation(.motion(.spring(response: 0.7, dampingFraction: 0.8), reduceMotion: reduceMotion).delay(0.1)) {
+                appeared = true
+            }
         }
     }
 }

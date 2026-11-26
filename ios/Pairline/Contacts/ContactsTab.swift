@@ -8,6 +8,7 @@ struct ContactsTab: View {
     @State private var search = ""
     @State private var showAdd = false
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
     /// The contact open beside the list on a large display (D-063).
     @State private var selected: Contact.ID?
 
@@ -116,8 +117,9 @@ struct ContactsTab: View {
                                                 Avatar(name: contact.name, size: 58)
                                                 Text(verbatim: contact.name.split(separator: " ").first.map(String.init) ?? contact.name)
                                                     .font(.caption)
-                                                    .lineLimit(1)
-                                                    .frame(width: 70)
+                                                    .lineLimit(typeSize.isAccessibilitySize ? 2 : 1)
+                                                    .multilineTextAlignment(.center)
+                                                    .frame(width: typeSize.isAccessibilitySize ? 120 : 70)
                                             }
                                         }
                                         .buttonStyle(.plain)

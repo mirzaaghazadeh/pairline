@@ -314,6 +314,7 @@ struct ConversationRow: View {
     let conversation: Conversation
     let match: StoredMessage?
     @EnvironmentObject private var db: AppDatabase
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     /// A group conversation lists its people (D-089).
     private var name: String {
@@ -343,17 +344,20 @@ struct ConversationRow: View {
                 }
             }
             VStack(alignment: .leading, spacing: 3) {
-                HStack(alignment: .firstTextBaseline) {
-                    nameText
-                        .font(.headline.weight(conversation.unread > 0 ? .bold : .semibold))
-                        .lineLimit(1)
-                    if Notifier.shared.isMuted(conversation.thread) {
-                        Image(systemName: "bell.slash.fill")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel(Text("Muted", tableName: "PhoneTools"))
+                // At the accessibility text sizes the time goes under the name, and both wrap instead of being cut.
+                AdaptiveStack(verticalAlignment: .firstTextBaseline, spacing: typeSize.isAccessibilitySize ? 2 : nil) {
+                    HStack(alignment: .firstTextBaseline) {
+                        nameText
+                            .font(.headline.weight(conversation.unread > 0 ? .bold : .semibold))
+                            .lineLimit(typeSize.isAccessibilitySize ? 3 : 1)
+                        if Notifier.shared.isMuted(conversation.thread) {
+                            Image(systemName: "bell.slash.fill")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .accessibilityLabel(Text("Muted", tableName: "PhoneTools"))
+                        }
                     }
-                    Spacer(minLength: 8)
+                    if !typeSize.isAccessibilitySize { Spacer(minLength: 8) }
                     Text(Formatters.listTime(conversation.time))
                         .font(.caption)
                         .foregroundStyle(conversation.unread > 0 ? Color.brandBlue : .secondary)
@@ -365,7 +369,7 @@ struct ConversationRow: View {
                     Text(snippet)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(typeSize.isAccessibilitySize ? 5 : 2)
                 }
                 if let code {
                     CopyChip(label: Text("Copy code \(PhoneNumber.ltr(code))"), value: code, isCode: true)
