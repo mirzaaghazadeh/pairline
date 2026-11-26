@@ -1,6 +1,6 @@
 import Foundation
 
-/// Remote mode's hand-off between the notification service extension and the app (D-072): the extension unseals an
+/// Remote mode's hand-off between the notification service extension and the app (D-080): the extension unseals an
 /// alert-mailbox record, shows it, and leaves its plaintext here; the app takes each message once (as if it had come
 /// over a session), deletes the file and the CloudKit record. Both sides note handled record names so a record that
 /// arrives twice (push and catch-up) is handled once (PROTOCOL.md, "Receiving": 14 days).

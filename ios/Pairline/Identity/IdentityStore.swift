@@ -16,7 +16,7 @@ final class IdentityStore {
     private(set) var kind: Kind?
 
     /// `prefix` keeps test keys apart from the app's own. The key lives in the shared Keychain group, so remote
-    /// mode's notification service extension can unseal records (D-072); a key from before that moves there once.
+    /// mode's notification service extension can unseal records (D-080); a key from before that moves there once.
     init(prefix: String = "") {
         kindAccount = prefix + "identity.kind"
         keyAccount = prefix + "identity.key"

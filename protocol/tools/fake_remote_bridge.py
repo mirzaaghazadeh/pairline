@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A stand-in for the Android bridge in remote mode (D-072, docs/PROTOCOL.md "Remote mode (v1, D-072)"), for testing
+"""A stand-in for the Android bridge in remote mode (D-080, docs/PROTOCOL.md "Remote mode (v1, D-080)"), for testing
 the iPhone without an Android phone: remote pairing from an invitation, sealed events into the iPhone's mailboxes,
 and the iPhone's requests answered from the R→B mailbox. Debug/test tool only; it talks to CloudKit Web Services
 (api.apple-cloudkit.com) and nothing else.

@@ -2,7 +2,7 @@ import AVFoundation
 import SwiftUI
 
 /// Guided pairing: install the free bridge app on Android, scan its QR code, connect, allow notifications. Where
-/// remote mode is available (D-072), "Pair a phone that's far away" pairs through an invitation instead.
+/// remote mode is available (D-080), "Pair a phone that's far away" pairs through an invitation instead.
 struct PairingFlowView: View {
     enum Step {
         case install
@@ -303,7 +303,7 @@ struct PairingFlowView: View {
     }
     #endif
 
-    // MARK: - Far away (remote mode, D-072)
+    // MARK: - Far away (remote mode, D-080)
 
     private var farAwayButton: some View {
         Button {

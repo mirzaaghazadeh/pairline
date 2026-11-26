@@ -229,7 +229,7 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 /**
- * Remote pairing (D-072) for an invitation that arrived in a messenger that doesn't open `pairline://` links: the
+ * Remote pairing (D-080) for an invitation that arrived in a messenger that doesn't open `pairline://` links: the
  * person copies the whole link and pastes it here. The clipboard is read only when they tap the button.
  */
 @Composable

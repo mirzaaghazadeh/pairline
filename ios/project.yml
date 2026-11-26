@@ -119,7 +119,7 @@ targets:
       - sdk: SwiftUI.framework
       - sdk: UniformTypeIdentifiers.framework
 
-  # Remote mode (D-072): unseals alert-mailbox records pushed by CloudKit and shows them. It uses only the protocol
+  # Remote mode (D-080): unseals alert-mailbox records pushed by CloudKit and shows them. It uses only the protocol
   # and Keychain code it needs, and no network.
   PairlineNotifications:
     type: app-extension

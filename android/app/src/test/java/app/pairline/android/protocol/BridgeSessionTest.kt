@@ -145,7 +145,7 @@ class BridgeSessionTest {
 
     @Test
     fun directConnectionRefusesPairingSilently() {
-        // Remote mode's direct connection (D-072): a valid PAIR_HELLO with the code on screen still gets nothing.
+        // Remote mode's direct connection (D-080): a valid PAIR_HELLO with the code on screen still gets nothing.
         val gate = Gate(hex("pairing.pairing_secret"))
         val rec = Recorder(pinned = null)
         BridgeSession(TestVectors.key("sB"), gate, rec, allowPairing = false).onFrame(frame(FrameType.PAIR_HELLO, pairHello))

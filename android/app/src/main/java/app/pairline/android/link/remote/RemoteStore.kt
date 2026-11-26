@@ -35,7 +35,7 @@ class PrefsKeyValueStore(context: Context, name: String) : KeyValueStore {
 }
 
 /**
- * Remote mode's state on this phone (D-072): whether it's on, where the mailboxes are, the web auth token (encrypted
+ * Remote mode's state on this phone (D-080): whether it's on, where the mailboxes are, the web auth token (encrypted
  * with an AES-GCM key that stays in Android Keystore, like the wrapped identity key), the records this phone has
  * handled (kept 14 days, PROTOCOL.md "Receiving") and the ones it sent (deleted from iCloud after a day). Excluded
  * from backups like all app data. [clear] deletes all of it.

@@ -477,7 +477,7 @@
     <string name="help_q_unpair">What happens when I unpair?</string>
     <string name="help_a_unpair">Both phones delete each other\'s key, so they can\'t talk to each other anymore. Your messages and contacts stay where they are on this phone.</string>
 
-    <!-- Remote pairing (D-072): an invitation link from an iPhone that is far away. The code is always shown left to right. -->
+    <!-- Remote pairing (D-080): an invitation link from an iPhone that is far away. The code is always shown left to right. -->
     <string name="remote_pair_title">Pair from far away</string>
     <string name="remote_pair_ask_title">An iPhone wants to pair with this phone from far away</string>
     <string name="remote_pair_ask_body">If you allow it, the person holding that iPhone gets this phone\'s text messages, one-time codes and calls wherever they are, and can send texts and make calls with this phone\'s SIM.</string>
@@ -513,7 +513,7 @@
     <string name="remote_pair_paste">Paste an invitation</string>
     <string name="remote_pair_paste_none">There\'s no Pairline invitation on the clipboard. Copy the whole link (it starts with pairline://invite) and try again.</string>
 
-    <!-- Remote mode's direct connection through the home router (D-072): the link card's line while remote mode is on. -->
+    <!-- Remote mode's direct connection through the home router (D-080): the link card's line while remote mode is on. -->
     <string name="home_connected_body_direct">Over the internet, straight through your home router. Calls and messages are being relayed to your iPhone.</string>
     <string name="notif_connected_text_direct">Connected over the internet. Calls and messages are being relayed to your iPhone.</string>
     <string name="direct_checking">Direct connection: checking…</string>

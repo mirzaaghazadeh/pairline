@@ -110,7 +110,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- Remote pairing (D-072): an invitation from the iPhone, pairline://invite?…. Opening it only shows what
+            <!-- Remote pairing (D-080): an invitation from the iPhone, pairline://invite?…. Opening it only shows what
                  it asks for; nothing is sent until the user taps Allow. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

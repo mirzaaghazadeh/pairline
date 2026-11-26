@@ -292,7 +292,7 @@ struct OfflineBanner: View {
         }
     }
 
-    /// Remote mode (D-072) says what works through iCloud: calls don't yet.
+    /// Remote mode (D-080) says what works through iCloud: calls don't yet.
     private var text: Text {
         phase == .remote
             ? Text("Via iCloud: texts and codes work. Calls stay on the Android phone for now.")

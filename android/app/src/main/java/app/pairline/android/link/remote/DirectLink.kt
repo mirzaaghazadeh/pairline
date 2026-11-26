@@ -69,7 +69,7 @@ data class DirectStatus(
 )
 
 /**
- * Remote mode's direct connection on the bridge (D-072, PROTOCOL.md "Direct connection"). While remote mode is on and
+ * Remote mode's direct connection on the bridge (D-080, PROTOCOL.md "Direct connection"). While remote mode is on and
  * the phone is on Wi-Fi it listens ([DirectServer]) on this phone's Wi-Fi IPv4 address and its global IPv6 address,
  * asks the home router to open the port ([PortMapper]: NAT-PMP, then PCP, then UPnP; a PCP pinhole for IPv6), renews
  * the mapping before it expires and checks the router's internet address every [CHECK_MS], and maps again when the

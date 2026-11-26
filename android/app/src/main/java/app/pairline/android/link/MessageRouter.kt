@@ -156,7 +156,7 @@ class MessageRouter(
     }
 
     /**
-     * Remote mode just started (D-072). A phone paired from far away may never have had a session, so the iPhone
+     * Remote mode just started (D-080). A phone paired from far away may never have had a session, so the iPhone
      * learns this phone's name, model and status through the mailbox (or the session, if one is up).
      */
     fun remoteStarted() {
@@ -425,7 +425,7 @@ class MessageRouter(
     }
 
     /**
-     * `remote.config` (D-072): `on: true` stores the mailboxes and token and starts checking; `on: false` stops remote
+     * `remote.config` (D-080): `on: true` stores the mailboxes and token and starts checking; `on: false` stops remote
      * mode and deletes its state and records. An `on: false` read from the mailbox gets no `ok`: the iPhone has
      * already taken its mailboxes down, so nobody would read or delete it. Release builds refuse the public backend,
      * which is for testing only.

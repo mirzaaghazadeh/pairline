@@ -2,7 +2,7 @@ import CryptoKit
 import XCTest
 @testable import Pairline
 
-// Remote mode (D-072) on the iPhone: the state store, the mailbox catch-up (dedupe, time window, dispatch through
+// Remote mode (D-080) on the iPhone: the state store, the mailbox catch-up (dedupe, time window, dispatch through
 // LinkManager) and the remote pairing state machine, against an in-memory mailbox instead of CloudKit.
 
 /// An in-memory iCloud mailbox: what the iPhone sends lands in `.toBridge` (and in `sent`).

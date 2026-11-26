@@ -11,7 +11,7 @@ Any change that adds or changes a data flow or permission must update this file 
   directly between them, encrypted.
 - **Only two outside companies are involved, and neither gets your data:** Apple, when you buy something in the
   iPhone app, and GitHub, which the Android app asks once a day whether a new version exists (you can turn that off).
-- **Remote mode (off unless you turn it on, D-072)** lets the phones work while apart through your own iCloud: Apple
+- **Remote mode (off unless you turn it on, D-080)** lets the phones work while apart through your own iCloud: Apple
   stores records locked with keys only your two phones hold, and can see that your phones exchange them, not what
   they say. Details below.
 
@@ -69,9 +69,9 @@ Any change that adds or changes a data flow or permission must update this file 
 | App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids or message text) | Last 7 days |
 | Pairing link (QR code) | No | Read from the camera and used once; the secret is never stored or logged | Until pairing ends |
 
-### Remote mode (opt-in, D-072)
+### Remote mode (opt-in, D-080)
 
-Off until you turn it on (on the iPhone, or by pairing from far away). Until Apple answers D-072's question about the
+Off until you turn it on (on the iPhone, or by pairing from far away). Until Apple answers D-080's question about the
 private database, it exists in debug builds only and uses the app's public CloudKit database, where each record is
 readable only by the iCloud account that wrote it; the design, and release builds, use your private iCloud database.
 

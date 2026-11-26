@@ -195,7 +195,7 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
 Two Android phones pairing with each other isn't planned; the started work is archived on
 `archive/m9-android-client-start`.
 
-## M10 — Remote mode (opt-in, paid add-on on the iPhone; D-072)
+## M10 — Remote mode (opt-in, paid add-on on the iPhone; D-080)
 
 The bridge stays at home; the iPhone gets calls, SMS and codes, and makes calls and sends SMS, from anywhere. Only
 Apple (the user's own iCloud) and the two phones take part. Built on the `remote-mode` branch.
@@ -204,7 +204,7 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
       (`protocol/tools/router_check.py`)
 - [x] Phase 0: CloudKit container, API and management tokens; a record written through CloudKit Web Services from a
       non-Apple client wakes a suspended iPhone; delay measured (public database, median 1.6 s; the private
-      database is refused on the maintainer's account, asked Apple, D-072)
+      database is refused on the maintainer's account, asked Apple, D-080)
 - [x] Phase 0: notification-filtering entitlement requested (2026-11-26, Apple request ID Q7U98356ZR)
 - [x] Protocol: mailbox records, remote messages, remote pairing; v1 with shared vectors (`v1-remote.json`); the Opus
       kind comes with the Opus step
@@ -212,7 +212,7 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 - [x] iPhone: subscriptions and Notification Service Extension (SMS and codes; calls as a time-sensitive notification
       until the filtering entitlement lets them ring through CallKit)
 - [x] Remote pairing: one-time invitation from the iPhone, allowed on the Android phone (tap or paste the link), 6-digit
-      code compared on a call (D-072); tested iPhone ↔ stand-in bridge through iCloud on 2026-11-26
+      code compared on a call (D-080); tested iPhone ↔ stand-in bridge through iCloud on 2026-11-26
 - [ ] Street test with a real Android bridge in another home (a tester's phone)
 - [ ] Router mapping, public listener and direct session
 - [ ] Opus call audio on the direct connection

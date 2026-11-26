@@ -475,7 +475,7 @@
     <string name="help_q_unpair">Eşleştirmeyi kaldırdığımda ne olur?</string>
     <string name="help_a_unpair">İki telefon da birbirinin anahtarını siler, böylece artık birbirleriyle iletişim kuramazlar. Mesajlarınız ve kişileriniz bu telefonda oldukları yerde kalır.</string>
 
-    <!-- Remote pairing (D-072). -->
+    <!-- Remote pairing (D-080). -->
     <string name="remote_pair_title">Uzaktan eşleştir</string>
     <string name="remote_pair_ask_title">Bir iPhone bu telefonla uzaktan eşleşmek istiyor</string>
     <string name="remote_pair_ask_body">İzin verirseniz o iPhone\'u elinde tutan kişi, nerede olursa olsun bu telefonun SMS mesajlarını, tek kullanımlık kodlarını ve aramalarını alır; bu telefonun SIM kartıyla SMS gönderebilir ve arama yapabilir.</string>

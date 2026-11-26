@@ -1,7 +1,7 @@
 import Foundation
 import Network
 
-/// Remote mode's direct connection (D-072; PROTOCOL.md, "Direct connection"): the bridge's addresses checked strictly.
+/// Remote mode's direct connection (D-080; PROTOCOL.md, "Direct connection"): the bridge's addresses checked strictly.
 /// The only non-local addresses this iPhone ever dials pass through here, and they come only from an authenticated
 /// `remote.addr` of the paired bridge.
 enum DirectAddress {

@@ -476,7 +476,7 @@
     <string name="help_q_unpair">ماذا يحدث عند إلغاء الإقران؟</string>
     <string name="help_a_unpair">يحذف كل هاتف مفتاح الآخر، فلا يعود بإمكانهما التواصل. وتبقى رسائلك وجهات اتصالك في مكانها على هذا الهاتف.</string>
 
-    <!-- Remote pairing (D-072). -->
+    <!-- Remote pairing (D-080). -->
     <string name="remote_pair_title">الإقران عن بُعد</string>
     <string name="remote_pair_ask_title">آيفون يريد الإقران بهذا الهاتف عن بُعد</string>
     <string name="remote_pair_ask_body">إذا سمحت بذلك، فسيستلم من يحمل ذلك الآيفون رسائل هذا الهاتف النصية ورموز التحقق ومكالماته أينما كان، وسيتمكن من إرسال الرسائل وإجراء المكالمات بشريحة هذا الهاتف.</string>

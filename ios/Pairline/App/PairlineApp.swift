@@ -52,7 +52,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         log.info("remote", "Remote notifications unavailable: \((error as NSError).code)")
     }
 
-    /// Remote mode (D-072): a silent push from the quiet mailbox (or any CloudKit push that wakes the app). Catches up
+    /// Remote mode (D-080): a silent push from the quiet mailbox (or any CloudKit push that wakes the app). Catches up
     /// on the mailboxes; replies to waiting requests and events are handled as if they came over a session.
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {

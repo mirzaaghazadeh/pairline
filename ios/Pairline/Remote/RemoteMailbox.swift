@@ -1,13 +1,13 @@
 import CloudKit
 import Foundation
 
-/// The three mailboxes of remote mode in the user's iCloud (PROTOCOL.md, "Mailboxes in iCloud"; D-072): this iPhone
+/// The three mailboxes of remote mode in the user's iCloud (PROTOCOL.md, "Mailboxes in iCloud"; D-080): this iPhone
 /// writes sealed records for the bridge, and subscribes to the alert mailbox (a push its notification service
 /// extension may change: it unseals the record and shows it) and the quiet one (a silent push).
 ///
 /// Two backends with the same records: the user's private database (zones), which is the design, and the public
 /// database (a `mailbox` field on each record, readable only by the iCloud user who wrote it), which debug builds use
-/// while D-072's question to Apple is open.
+/// while D-080's question to Apple is open.
 struct RemoteMailbox {
     typealias Backend = RemoteInvitation.Backend
 

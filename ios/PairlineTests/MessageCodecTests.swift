@@ -242,7 +242,7 @@ final class MessageCodecTests: XCTestCase {
         let info = try json(.deviceInfo(name: "iPhone", os: "17.2", app: "0.1.0"), id: nil)
         XCTAssertNil(info["id"], "events carry no id")
         XCTAssertEqual(info["platform"] as? String, "ios")
-        // 1 where remote mode is available (D-072), 0 otherwise.
+        // 1 where remote mode is available (D-080), 0 otherwise.
         XCTAssertEqual(info["proto"] as? Int, RemoteFeature.isAvailable ? 1 : 0)
 
         XCTAssertEqual(Outbound.ussdRun(sim: 0, code: "*140#").timeout, 60)

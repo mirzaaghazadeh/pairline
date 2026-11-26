@@ -938,7 +938,7 @@ def start_session(link: Link, out: Transcript, state: State, timeout: float) -> 
     else:
         out.note(f"bridge: {info.get('name')} ({info.get('platform')} {info.get('os')}), app {info.get('app')}, "
                  f"proto {info.get('proto')}")
-        # The local link is v0 on the wire; proto 1 only adds remote mode (PROTOCOL.md, "Remote mode (v1, D-072)").
+        # The local link is v0 on the wire; proto 1 only adds remote mode (PROTOCOL.md, "Remote mode (v1, D-080)").
         if info.get("proto") not in (VERSION, 1):
             out.warn(f"bridge reports proto {info.get('proto')!r}, expected {VERSION} or 1")
     status = session.poll_for(lambda m: m["t"] == "status" and "id" not in m, max(0.0, deadline - time.monotonic()))

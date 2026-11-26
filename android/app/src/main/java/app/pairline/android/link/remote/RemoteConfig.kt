@@ -64,7 +64,7 @@ sealed interface RemoteConfigRequest {
     companion object {
         /**
          * Reads `on`, `backend`, `env`, `token` and `mb {b, a, q}`. Throws [RequestException] (`invalid`) for anything
-         * missing or malformed, and for the public backend unless [allowPublic] (debug builds, D-072).
+         * missing or malformed, and for the public backend unless [allowPublic] (debug builds, D-080).
          */
         fun parse(message: JSONObject, allowPublic: Boolean): RemoteConfigRequest {
             val on = message.boolOrNull("on") ?: invalid("on missing")

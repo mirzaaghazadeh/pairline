@@ -55,7 +55,7 @@ object Msg {
     const val BLOCK_LIST = "block.list"
     const val BLOCK_SET = "block.set"
 
-    // Remote mode (v1, D-072).
+    // Remote mode (v1, D-080).
     const val REMOTE_CONFIG = "remote.config"
     const val REMOTE_TOKEN = "remote.token"
     const val REMOTE_ADDR = "remote.addr"
@@ -205,7 +205,7 @@ object Messages {
         .putNullable("reason", reason)
 
     /**
-     * Where remote mode's direct connection listens (D-072): `v4` `"203.0.113.5:47830"`, `v6` `"[2001:db8::5]:47830"`,
+     * Where remote mode's direct connection listens (D-080): `v4` `"203.0.113.5:47830"`, `v6` `"[2001:db8::5]:47830"`,
      * either null.
      */
     fun remoteAddr(v4: String?, v6: String?): JSONObject = JSONObject()

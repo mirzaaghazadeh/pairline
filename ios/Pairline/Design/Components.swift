@@ -209,7 +209,7 @@ struct InfoBanner<Trailing: View>: View {
 struct LinkStatusPill: View {
     let phase: LinkPhase
     var isDemo = false
-    /// The live session is remote mode's direct connection (D-072).
+    /// The live session is remote mode's direct connection (D-080).
     var isDirect = false
     @State private var pulse = false
 

@@ -93,7 +93,7 @@ final class AppModel: ObservableObject {
             }
         }
         notifier.onOpenStatus = { [weak self] in self?.tab = .bridge }
-        // Remote mode (D-072): an alert push shown while Pairline is open; take what it announced.
+        // Remote mode (D-080): an alert push shown while Pairline is open; take what it announced.
         notifier.onRemotePush = { [weak self] in Task { await self?.remoteCatchUp() } }
         if link.remote?.isOn == true, !Self.isTestHost { UIApplication.shared.registerForRemoteNotifications() }
 
@@ -212,7 +212,7 @@ final class AppModel: ObservableObject {
         pairedPeer = nil
     }
 
-    // MARK: - Remote mode (D-072)
+    // MARK: - Remote mode (D-080)
 
     /// What the bridge left in iCloud, once the purchase state is known (a push can launch the app before it is).
     @discardableResult

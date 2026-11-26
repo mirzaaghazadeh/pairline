@@ -53,7 +53,7 @@ import app.pairline.android.ui.components.ltr
 import kotlinx.coroutines.delay
 
 /**
- * Remote pairing (D-072, PROTOCOL.md "Remote pairing"): an iPhone far away invited this phone. The screen says who
+ * Remote pairing (D-080, PROTOCOL.md "Remote pairing"): an iPhone far away invited this phone. The screen says who
  * asks and what allowing it means, sends nothing before Allow, then shows the 6-digit code to compare on a phone
  * call. It covers every other screen while open, and keeps the display on.
  */

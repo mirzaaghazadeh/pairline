@@ -4,7 +4,7 @@ import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
 
-/** What kind of IPv4 address the router reports as its internet address (D-072). */
+/** What kind of IPv4 address the router reports as its internet address (D-080). */
 enum class V4Kind {
     /** Reachable from the internet: a mapping on this router helps. */
     PUBLIC,

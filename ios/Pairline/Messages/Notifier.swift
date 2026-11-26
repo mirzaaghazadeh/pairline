@@ -30,7 +30,7 @@ final class Notifier: NSObject, ObservableObject {
     /// A mirrored notification was dismissed here (D-077): its key on the bridge phone.
     var onMirrorDismissed: ((String) -> Void)?
     var onOpenStatus: (() -> Void)?
-    /// Remote mode (D-072): a CloudKit alert push reached the open app.
+    /// Remote mode (D-080): a CloudKit alert push reached the open app.
     var onRemotePush: (() -> Void)?
 
     // MARK: Muted conversations (D-074): no banner or sound, still counted as unread.

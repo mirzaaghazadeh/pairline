@@ -2,7 +2,7 @@ import CryptoKit
 import XCTest
 @testable import Pairline
 
-// Remote mode's direct connection (D-072) on the iPhone: which addresses it takes, when the direct lane runs (a nearby
+// Remote mode's direct connection (D-080) on the iPhone: which addresses it takes, when the direct lane runs (a nearby
 // session beats it, it beats the iCloud mailbox), its retries, and that nothing but an authenticated `remote.addr` of
 // the paired bridge makes the app dial anywhere.
 

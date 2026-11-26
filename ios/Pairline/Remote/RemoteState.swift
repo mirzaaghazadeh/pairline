@@ -1,6 +1,6 @@
 import Foundation
 
-/// Remote mode (D-072) is in debug builds only for now: it uses the public CloudKit backend in the Development
+/// Remote mode (D-080) is in debug builds only for now: it uses the public CloudKit backend in the Development
 /// environment while Apple looks into the private database. Release builds show and do nothing of it.
 enum RemoteFeature {
     static var isAvailable: Bool {

@@ -36,7 +36,7 @@ enum TransportKind: String, Codable {
     case tcp
     /// The production Wi-Fi link (M5): a full session over TCP on the local network, plus media and bulk channels.
     case wifi
-    /// Remote mode's direct connection (D-072): the Wi-Fi session over TCP to the bridge's public address, without
+    /// Remote mode's direct connection (D-080): the Wi-Fi session over TCP to the bridge's public address, without
     /// the media and bulk channels for now.
     case direct
     case demo

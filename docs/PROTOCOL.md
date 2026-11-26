@@ -3,8 +3,8 @@
 > **Status: draft.** The wire version is `0` until an outside cryptographer has reviewed this
 > design (required before 1.0, see ROADMAP M7). Nothing has shipped yet, so v0 is still being filled in;
 > after the first release, any change to the wire format bumps the version and updates the shared test
-> vectors in `protocol/test-vectors/`. Remote mode (D-072) is version 1: v0 plus the section "Remote mode (v1,
-> D-072)", with its own vectors in `protocol/test-vectors/v1-remote.json`; the local links stay v0 on the wire.
+> vectors in `protocol/test-vectors/`. Remote mode (D-080) is version 1: v0 plus the section "Remote mode (v1,
+> D-080)", with its own vectors in `protocol/test-vectors/v1-remote.json`; the local links stay v0 on the wire.
 
 ## Roles and keys
 
@@ -519,7 +519,7 @@ an unknown request with `error` / `unsupported`, so the wire version stays 0.
   `InCallService`, or `ANSWER_PHONE_CALLS`); incoming, missed, declined and blocked entries from it are left out of
   `calllog.sync`. A call R already shows when the number arrives late is left alone.
 
-## Remote mode (v1, D-072)
+## Remote mode (v1, D-080)
 
 Remote mode lets the phones work while apart: the iPhone gets calls, SMS and codes, and sends commands, through a
 mailbox in the user's own iCloud, plus a direct connection through the bridge's home router when one is possible.
@@ -582,7 +582,7 @@ There are three mailboxes: **B→R alert** (things the user should see: an SMS, 
 
 - **Private backend** (the design): the user's private database, zones `ToPhone` (alert), `ToPhoneQuiet` and
   `ToBridge`.
-- **Public backend** (debug builds while D-072's question to Apple is open): the public database's default zone; a
+- **Public backend** (debug builds while D-080's question to Apple is open): the public database's default zone; a
   record's `mailbox` names its mailbox, and only the iCloud user who wrote a record can read it.
 
 R subscribes to its two mailboxes: the alert one with an alert push that its notification service extension may
@@ -624,7 +624,7 @@ network changes or a new `remote.addr` arrives. An address whose handshake fails
 
 ### Remote pairing
 
-Pairing while the phones are apart (D-072). It replaces "seeing the QR code" with an invitation the user sends by any
+Pairing while the phones are apart (D-080). It replaces "seeing the QR code" with an invitation the user sends by any
 means plus a 6-digit code the two people compare on a phone call. Release builds start it only from "Pair a phone
 that's far away" on the iPhone and accept it only after the person at home allows it on the Android phone.
 

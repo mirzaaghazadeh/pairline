@@ -751,7 +751,7 @@ final class CallCenter: ObservableObject {
             return
         }
         guard bridge.phase.isConnected else {
-            // Remote mode (D-072) carries no call audio yet.
+            // Remote mode (D-080) carries no call audio yet.
             notice = bridge.phase == .remote
                 ? String(localized: "Calls don't work via iCloud yet. Make the call on the Android phone, or bring the phones together.")
                 : String(localized: "Your bridge phone isn't connected right now.")

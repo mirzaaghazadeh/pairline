@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// "Pair a phone that's far away" (D-072; PROTOCOL.md, "Remote pairing"): a short explanation, then the invitation to
+/// "Pair a phone that's far away" (D-080; PROTOCOL.md, "Remote pairing"): a short explanation, then the invitation to
 /// send, the code the two people compare on a call, and the confirmation. Only where `RemoteFeature.isAvailable`.
 struct RemotePairingView: View {
     let onPaired: () -> Void

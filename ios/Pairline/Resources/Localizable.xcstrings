@@ -12284,7 +12284,7 @@
       }
     },
     "Direct connection" : {
-      "comment" : "Remote mode (D-072): the live session goes straight to the bridge phone at home over the internet, not through iCloud. Link state and a Settings row title.",
+      "comment" : "Remote mode (D-080): the live session goes straight to the bridge phone at home over the internet, not through iCloud. Link state and a Settings row title.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مباشر" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مستقیم" } },

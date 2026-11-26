@@ -3,7 +3,7 @@ import CloudKit
 import UIKit
 import UserNotifications
 
-/// Phase 0 of remote mode (D-072), debug builds only: proves that a record written through CloudKit Web Services by
+/// Phase 0 of remote mode (D-080), debug builds only: proves that a record written through CloudKit Web Services by
 /// a non-Apple client wakes a suspended iPhone. Launch with `-PairlineRemoteSpike <subscription>`, where
 /// `<subscription>` is `db` (`CKDatabaseSubscription`), `zone` (`CKRecordZoneSubscription` on ToPhone) or `query`
 /// (`CKQuerySubscription` on ToPhone, record creation only, the payload inside the push). It creates the zones and
@@ -15,7 +15,7 @@ import UserNotifications
 /// iPhone's system log can time the pushes. `-PairlineRemoteSpike clear` removes the subscriptions, the zones and the
 /// files. `-PairlineRemoteSpikeAPIToken <token>` mints the tokens with another API token (a build signed for iCloud
 /// Production needs the Production one). Each step is also written to `remote-spike-status.txt`, without secrets.
-/// `-PairlineRemoteSpike public` tries the public database instead (D-072, while Apple looks into the private one):
+/// `-PairlineRemoteSpike public` tries the public database instead (D-080, while Apple looks into the private one):
 /// a random mailbox ID in `remote-spike-mailbox.txt` and a query subscription on it.
 enum RemoteSpike {
     static let subscriptionIDs = ["to-phone-db": "db", "to-phone-zone": "zone", "to-phone-query": "query"]

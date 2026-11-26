@@ -100,7 +100,7 @@ enum RemoteReceiving {
     }
 }
 
-/// Remote mode's mailbox path (D-072; PROTOCOL.md, "Remote mode"): the third way to the bridge after Bluetooth and
+/// Remote mode's mailbox path (D-080; PROTOCOL.md, "Remote mode"): the third way to the bridge after Bluetooth and
 /// Wi-Fi, used while no session is up. It seals messages for the bridge into the user's iCloud, catches up on what
 /// the bridge left there, and keeps the bridge supplied with web auth tokens. `LinkManager` routes through it.
 ///

@@ -127,10 +127,10 @@ final class BridgeController: ObservableObject {
         return !RemoteFeature.compatibleVersions.contains(proto)
     }
 
-    /// The bridge speaks remote mode (D-072): it sent `proto` 1 or later.
+    /// The bridge speaks remote mode (D-080): it sent `proto` 1 or later.
     var bridgeSupportsRemote: Bool { (deviceInfo?.proto ?? 0) >= 1 }
 
-    /// The live session is remote mode's direct connection (D-072): the UI says "Direct connection".
+    /// The live session is remote mode's direct connection (D-080): the UI says "Direct connection".
     var isDirect: Bool { phase.isConnected && transports == [.direct] }
 
     func requestPaywall() { onPaywallRequest?() }
@@ -146,7 +146,7 @@ final class BridgeController: ObservableObject {
             latencyTimer = nil
             calls.linkLost()
         }
-        // Remote mode (D-072): texts written while the bridge was away go through iCloud.
+        // Remote mode (D-080): texts written while the bridge was away go through iCloud.
         if phase == .remote, !wasRemote, canUseLink { Task { await flushOutbox() } }
         saveWidget()
     }

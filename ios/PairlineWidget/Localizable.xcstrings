@@ -228,7 +228,7 @@
       }
     },
     "Direct connection" : {
-      "comment" : "Link state in the widget and Live Activity: remote mode's live session goes straight to the bridge phone at home over the internet (D-072).",
+      "comment" : "Link state in the widget and Live Activity: remote mode's live session goes straight to the bridge phone at home over the internet (D-080).",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -251,7 +251,7 @@
       }
     },
     "Via iCloud" : {
-      "comment" : "Link state in the widget and Live Activity: no nearby link, but remote mode reaches the bridge through iCloud (D-072).",
+      "comment" : "Link state in the widget and Live Activity: no nearby link, but remote mode reaches the bridge through iCloud (D-080).",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

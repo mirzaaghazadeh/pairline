@@ -280,7 +280,7 @@ private fun LinkCard(
     }
 }
 
-/** Remote mode's direct connection through the home router (D-072): open, or why not. */
+/** Remote mode's direct connection through the home router (D-080): open, or why not. */
 @Composable
 private fun DirectLine(s: DirectStatus) {
     val open = s.direct == Direct.OPEN

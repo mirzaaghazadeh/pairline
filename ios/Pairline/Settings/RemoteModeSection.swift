@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Remote mode (D-072) in Settings: what it is in plain words, whether it's working, and the switch (off by default).
+/// Remote mode (D-080) in Settings: what it is in plain words, whether it's working, and the switch (off by default).
 /// Shown only where remote mode is available (`RemoteFeature`) and a bridge is paired.
 struct RemoteModeSection: View {
     @EnvironmentObject private var app: AppModel

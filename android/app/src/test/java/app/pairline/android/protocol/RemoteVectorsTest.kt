@@ -14,7 +14,7 @@ import org.junit.Test
 import java.security.SecureRandom
 import java.util.Base64
 
-/** Every value in protocol/test-vectors/v1-remote.json (remote mode, D-072), reproduced with JCA (AGENTS.md rule 8). */
+/** Every value in protocol/test-vectors/v1-remote.json (remote mode, D-080), reproduced with JCA (AGENTS.md rule 8). */
 class RemoteVectorsTest {
     private val v = TestVectors.remote
     private val invite = v.getJSONObject("invite")

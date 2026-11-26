@@ -63,7 +63,7 @@ object AppGraph {
         LinkManager({ identity.identity() }, pairing, peers, prefs).also { it.remote = remote }
     }
 
-    /** Remote mode (D-072): the mailbox in the user's own iCloud, the path next to the sessions. */
+    /** Remote mode (D-080): the mailbox in the user's own iCloud, the path next to the sessions. */
     val remote: RemoteLink by lazy {
         RemoteLink(
             RemoteStore.create(app),
@@ -75,14 +75,14 @@ object AppGraph {
     }
 
     /**
-     * Remote mode's direct connection through the home router (D-072): a public listener whose sessions join
+     * Remote mode's direct connection through the home router (D-080): a public listener whose sessions join
      * [link] on their own lane, and the router's port mapping. Its `remote.addr` / `remote.state` go out like events.
      */
     val direct: DirectLink by lazy {
         DirectLink(DirectListener(link), link::send, PrefsKeyValueStore(app, "pairline.direct"))
     }
 
-    /** Pairing from far away through an invitation (D-072). */
+    /** Pairing from far away through an invitation (D-080). */
     val remotePairing: RemotePairingFlow by lazy {
         RemotePairingFlow(
             object : RemotePairingFlow.Host {

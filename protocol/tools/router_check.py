@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only check of the home router for Pairline's remote mode (D-072).
+"""Read-only check of the home router for Pairline's remote mode (D-080).
 
 Asks the router, from a computer on the home network, whether it supports port mapping and what its external
 address is. It never creates, changes or deletes a mapping:

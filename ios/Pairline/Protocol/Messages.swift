@@ -360,7 +360,7 @@ struct Inbound {
     let type: String
     let id: Int?
     let message: InboundMessage
-    /// Remote mode (D-072): it came through the iCloud mailbox, not a live session, so it may be old news.
+    /// Remote mode (D-080): it came through the iCloud mailbox, not a live session, so it may be old news.
     var viaMailbox = false
     /// …and the notification service extension already showed it.
     var alreadyShown = false
@@ -529,7 +529,7 @@ struct Outbound {
                  isRequest: false)
     }
 
-    /// Turns remote mode on (D-072): where the mailboxes are, and a web auth token for the bridge.
+    /// Turns remote mode on (D-080): where the mailboxes are, and a web auth token for the bridge.
     static func remoteConfig(_ settings: RemoteSettings, token: String) -> Outbound {
         Outbound("remote.config", ["on": true, "backend": settings.backend.rawValue,
                                    "env": settings.environment.rawValue, "token": token,
