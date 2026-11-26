@@ -370,9 +370,11 @@ private fun DirectLine(s: DirectStatus) {
     }
     if (hint != null) {
         HintText(hint)
-        // Android 10+ gives each Wi-Fi network a random hardware address, which can break the router's reservation.
-        if ((routerReason || modemReason) && forwardable && Build.VERSION.SDK_INT >= 29) {
-            HintText(stringResource(R.string.direct_hint_device_mac))
+        if ((routerReason || modemReason) && forwardable) {
+            // A hand-made rule points at one address: why this phone must keep it, and how (D-083).
+            HintText(stringResource(R.string.direct_hint_fixed_address, address!!))
+            // Android 10+ gives each Wi-Fi network a random hardware address, which can break the router's reservation.
+            if (Build.VERSION.SDK_INT >= 29) HintText(stringResource(R.string.direct_hint_device_mac))
         }
     } else if (forwardable && !s.mappedV4) {
         // Not opened by the router itself: the user may have forwarded the port by hand; here is what to forward.
