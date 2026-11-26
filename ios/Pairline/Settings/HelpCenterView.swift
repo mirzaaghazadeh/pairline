@@ -29,6 +29,20 @@ struct HelpCenterView: View {
                     ToolRow(symbol: "phone.fill", tint: .brandFill, title: Text("How calls work"),
                             subtitle: Text("Answer here; talk here too with Talk on iPhone", tableName: "CallAudio"))
                 }
+                // Cloud mode (D-080): the same plain-words explanation as before turning it on.
+                if RemoteFeature.isAvailable {
+                    NavigationLink {
+                        ScrollView {
+                            RemoteModeIntroContent()
+                                .padding(20)
+                        }
+                        .background(Color(.systemGroupedBackground))
+                        .navigationBarTitleDisplayMode(.inline)
+                    } label: {
+                        ToolRow(symbol: "icloud.fill", tint: .brandBlue, title: Text("How Cloud mode works", tableName: "RemoteMode"),
+                                subtitle: Text("Leave the Android phone at home, on charge and on Wi-Fi.", tableName: "RemoteMode"))
+                    }
+                }
             } header: {
                 Text("Guides")
             }

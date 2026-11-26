@@ -2,7 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "%@ is calling your Android number." : {
-      "comment" : "Remote mode: an incoming call on the bridge phone, shown as a notification. The argument is the caller's name or number.",
+      "comment" : "Cloud mode: an incoming call on the bridge phone, shown as a notification. The argument is the caller's name or number.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "%@ يتصل برقمك على هاتف أندرويد." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "%@ با شمارهٔ اندرویدی شما تماس می‌گیرد." } },

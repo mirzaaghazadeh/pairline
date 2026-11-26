@@ -33,6 +33,8 @@ final class AppModel: ObservableObject {
     @Published var composeTo: (name: String?, number: String)?
     @Published var showPaywall = false
     @Published var showPairing = false
+    /// The pairing sheet opens at "Pair over the internet" (Cloud mode, D-080) instead of the QR code.
+    @Published var pairingOverInternet = false
     @Published var toast: String?
 
     private var cancellables = Set<AnyCancellable>()
@@ -394,7 +396,7 @@ final class AppModel: ObservableObject {
         if args.contains("-PairlinePaywall") { showPaywall = true }
         // Opens pairing at its scan step (screenshots of the free-week choice there, D-069), or at its first step.
         if args.contains("-PairlinePairingScan") || args.contains("-PairlinePairingInstall")
-            || args.contains("-PairlinePairingRemote") { showPairing = true }
+            || args.contains("-PairlinePairingRemote") || args.contains("-PairlinePairingCloudStep") { showPairing = true }
         // Same path as opening the pairing link through the URL scheme, without the system's confirmation alert.
         if let index = args.firstIndex(of: "-PairlinePairLink"), index + 1 < args.count, let url = URL(string: args[index + 1]) {
             Task { @MainActor in

@@ -30,8 +30,8 @@ struct RootView: View {
         .fullScreenCover(isPresented: paywall(fullScreen: true)) {
             PaywallView()
         }
-        .sheet(isPresented: $app.showPairing) {
-            PairingFlowView(isOnboarding: false)
+        .sheet(isPresented: $app.showPairing, onDismiss: { app.pairingOverInternet = false }) {
+            PairingFlowView(isOnboarding: false, overInternet: app.pairingOverInternet)
         }
         .overlay(alignment: .top) {
             ToastOverlay(text: $app.toast)

@@ -153,6 +153,11 @@ struct BridgeStatusTab: View {
         bridge.phase.isConnected && !bridge.isDemo && !DebugSettings.marketingScreenshots && shownTransports == [.wifi]
     }
 
+    /// Cloud mode exists here and is off on a real bridge: worth pointing at where the user is stuck (D-080).
+    private var offersCloudMode: Bool {
+        RemoteFeature.isAvailable && !bridge.isDemo && app.link.remote != nil && app.link.remote?.isOn != true
+    }
+
     /// The current Wi-Fi's proxy points at the bridge's internet sharing, but sharing is off (no internet at all on that
     /// network) or the address changed. Checked when the tab appears and when Pairline comes back to the front.
     @State private var proxy: WiFiProxyStatus = .none
@@ -195,6 +200,23 @@ struct BridgeStatusTab: View {
                 Text("iOS pauses Wi-Fi links while Pairline is in the background, so calls and messages reach this iPhone only while Pairline is open. Over Bluetooth they keep coming while the iPhone is locked: keep Bluetooth on on both phones and the phones within about 10 meters.", tableName: "Hotspot")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                // Cloud mode (D-080) covers exactly this gap: a bridge phone that can't do Bluetooth still reaches a
+                // closed Pairline through iCloud.
+                if app.link.remote?.isOn == true {
+                    Text("With Cloud mode on, texts and codes still come through iCloud while Pairline is closed.", tableName: "RemoteMode")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else if offersCloudMode {
+                    Text("Or turn on Cloud mode in Settings: texts and codes then come through your own iCloud while Pairline is closed.", tableName: "RemoteMode")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Button {
+                        app.tab = .settings
+                    } label: {
+                        Text("Cloud mode settings", tableName: "RemoteMode")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                }
             }
         }
         .card()
@@ -423,6 +445,17 @@ struct BridgeStatusTab: View {
                     if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
                 }
                 .buttonStyle(PrimaryButtonStyle())
+            case .remote:
+                // Cloud mode (D-080): not lost, just apart; say what works and where to look.
+                Text("Linked through iCloud", tableName: "RemoteMode").font(.headline)
+                Text("Your phones aren't near each other, so Cloud mode carries texts and codes through your own iCloud. Calls need the direct connection to your home.", tableName: "RemoteMode")
+                    .font(.subheadline).foregroundStyle(.secondary)
+                Button {
+                    app.tab = .settings
+                } label: {
+                    Text("Cloud mode settings", tableName: "RemoteMode")
+                }
+                .buttonStyle(SecondaryButtonStyle())
             default:
                 Text("Looking for your bridge phone").font(.headline)
                 VStack(alignment: .leading, spacing: 10) {
@@ -430,6 +463,9 @@ struct BridgeStatusTab: View {
                     HelpBullet(symbol: "wifi", text: Text("Or connect both phones to the same Wi-Fi network."))
                     HelpBullet(symbol: "iphone.gen2", text: Text("Make sure Pairline Bridge is running on the Android phone and Bluetooth is on there."))
                     HelpBullet(symbol: "battery.100", text: Text("Exclude Pairline Bridge from battery optimization on the Android phone."))
+                    if offersCloudMode {
+                        HelpBullet(symbol: "icloud", text: Text("Phones apart? Turn on Cloud mode in Settings while they're linked, and texts and codes keep coming over the internet.", tableName: "RemoteMode"))
+                    }
                 }
                 Button("Try now") {
                     bridge.link.reconnectNow()

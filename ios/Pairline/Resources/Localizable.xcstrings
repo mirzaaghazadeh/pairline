@@ -11963,26 +11963,19 @@
       }
     },
     "Via iCloud: texts and codes work. Calls need the direct connection to your home." : {
-      "comment" : "Remote mode (D-080): the banner while the bridge is reached only through iCloud. Call audio needs the direct connection through the home router.",
+      "comment" : "Cloud mode (D-080): the banner while the bridge is reached only through iCloud. Call audio needs the direct connection through the home router.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud: تصلك الرسائل والرموز. أما المكالمات فتحتاج إلى الاتصال المباشر بمنزلك." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق iCloud: پیامک‌ها و کدها کار می‌کنند. تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند." } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden: mesajlar ve kodlar çalışıyor. Aramalar için evinize doğrudan bağlantı gerekiyor." } }
       }
     },
-    "Calls need the direct connection to your home, and it isn't up right now. Make the call on the Android phone, or bring the phones together." : {
-      "comment" : "Remote mode (D-080): the user tried to call while the bridge is reached only through iCloud.",
+    "Calls need the direct connection to your home, which isn't up right now. Settings › Cloud mode › Check my home connection shows why." : {
+      "comment" : "Cloud mode (D-080): the user tried to call while the bridge is reached only through iCloud. Use the same names as the Settings section and its button.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحتاج المكالمات إلى الاتصال المباشر بمنزلك، وهو غير متاح الآن. أجرِ المكالمة من هاتف أندرويد نفسه، أو اجمع الهاتفين في مكان واحد." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند و این اتصال الان برقرار نیست. با خود گوشی اندرویدی تماس بگیرید، یا دو گوشی را کنار هم بیاورید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar için evinize doğrudan bağlantı gerekiyor ve bu bağlantı şu anda kurulu değil. Aramayı Android telefondan yapın ya da iki telefonu bir araya getirin." } }
-      }
-    },
-    "Remote mode" : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع عن بُعد" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحتاج المكالمات إلى الاتصال المباشر بمنزلك، وهو غير متاح الآن. يعرض الإعدادات › الوضع السحابي › فحص اتصال منزلي السبب." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند که الان برقرار نیست. تنظیمات › حالت ابری › بررسی اتصال خانه دلیلش را نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar için evinize doğrudan bağlantı gerekiyor ve bu bağlantı şu anda kurulu değil. Nedenini Ayarlar › Bulut modu › Ev bağlantımı kontrol et gösterir." } }
       }
     },
     "Status" : {
@@ -12027,20 +12020,6 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud şu anda çalışmıyor" } }
       }
     },
-    "Turn remote mode on while your phones are linked nearby." : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل الوضع عن بُعد بينما يكون هاتفاك قريبين ومتصلين ببعضهما." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور را وقتی روشن کنید که دو گوشی کنار هم و به هم متصل‌اند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak modu, telefonlarınız yakında ve birbirine bağlıyken açın." } }
-      }
-    },
-    "Remote mode needs a newer Pairline Bridge on the Android phone." : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج الوضع عن بُعد إلى إصدار أحدث من Pairline Bridge على هاتف أندرويد." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور به نسخه جدیدتری از Pairline Bridge روی گوشی اندرویدی نیاز دارد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod için Android telefonda daha yeni bir Pairline Bridge gerekiyor." } }
-      }
-    },
     "The bridge phone couldn't reach iCloud. Check its internet connection and try again." : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر على الهاتف الوسيط الوصول إلى iCloud. تحقّق من اتصاله بالإنترنت ثم أعد المحاولة." } },
@@ -12074,13 +12053,6 @@
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسمح بإشعارات Pairline لتصلك الرسائل والرموز عبر iCloud." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "اعلان‌های Pairline را مجاز کنید تا پیامک‌ها و کدها از طریق iCloud به شما برسند." } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajların ve kodların iCloud üzerinden size ulaşması için Pairline bildirimlerine izin verin." } }
-      }
-    },
-    "Pair a phone that's far away" : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إقران هاتف بعيد" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "جفت کردن با گوشی‌ای که دور است" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktaki bir telefonla eşleştir" } }
       }
     },
     "For when your Android phone with the SIM isn't next to you, like at home. Send yourself the invitation, open it on the Android phone, and allow it there." : {
@@ -12217,13 +12189,6 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeni davet" } }
       }
     },
-    "Sign in to iCloud on this iPhone to pair a phone that's far away." : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجّل الدخول إلى iCloud على هذا الآيفون لإقران هاتف بعيد." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای جفت کردن با گوشی‌ای که دور است، در این آیفون وارد iCloud شوید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktaki bir telefonla eşleştirmek için bu iPhone'da iCloud'a giriş yapın." } }
-      }
-    },
     "The invitation expired before the Android phone answered. Create a new one." : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "انتهت صلاحية الدعوة قبل أن يردّ هاتف أندرويد. أنشئ دعوة جديدة." } },
@@ -12281,7 +12246,7 @@
       }
     },
     "Direct connection" : {
-      "comment" : "Remote mode (D-080): the live session goes straight to the bridge phone at home over the internet, not through iCloud. Link state and a Settings row title.",
+      "comment" : "Cloud mode (D-080): the live session goes straight to the bridge phone at home over the internet, not through iCloud. Link state and a Settings row title.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مباشر" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مستقیم" } },
@@ -12289,7 +12254,7 @@
       }
     },
     "Internet" : {
-      "comment" : "Bridge tab: the transport of remote mode's direct connection (like \"Bluetooth\" or \"Wi-Fi\").",
+      "comment" : "Bridge tab: the transport of Cloud mode's direct connection (like \"Bluetooth\" or \"Wi-Fi\").",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإنترنت" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "اینترنت" } },
@@ -12297,7 +12262,7 @@
       }
     },
     "On · direct connection" : {
-      "comment" : "Settings › Remote mode status: on, and linked straight to the bridge phone over the internet.",
+      "comment" : "Settings › Cloud mode status: on, and linked straight to the bridge phone over the internet.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفعّل · اتصال مباشر" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن · اتصال مستقیم" } },
@@ -12305,7 +12270,7 @@
       }
     },
     "Open" : {
-      "comment" : "Settings › Remote mode › Direct connection: the bridge's home router lets this iPhone connect (an adjective, not a button).",
+      "comment" : "Settings › Cloud mode › Direct connection: the bridge's home router lets this iPhone connect (an adjective, not a button).",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفتوح" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "باز" } },
@@ -12313,7 +12278,7 @@
       }
     },
     "Not possible" : {
-      "comment" : "Settings › Remote mode › Direct connection: the bridge's home network doesn't allow it.",
+      "comment" : "Settings › Cloud mode › Direct connection: the bridge's home network doesn't allow it.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "غير ممكن" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "ممکن نیست" } },
@@ -12321,7 +12286,7 @@
       }
     },
     "Not possible: %@" : {
-      "comment" : "Settings › Remote mode › Direct connection; %@ is the cause, e.g. \"carrier-grade NAT\".",
+      "comment" : "Settings › Cloud mode › Direct connection; %@ is the cause, e.g. \"carrier-grade NAT\".",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "غير ممكن: %@" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "ممکن نیست: %@" } },
@@ -12329,7 +12294,7 @@
       }
     },
     "Blocked: %@" : {
-      "comment" : "Settings › Remote mode › Direct connection is blocked; %@ is the cause, e.g. \"carrier-grade NAT\".",
+      "comment" : "Settings › Cloud mode › Direct connection is blocked; %@ is the cause, e.g. \"carrier-grade NAT\".",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "محظور: %@" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "مسدود است: %@" } },
@@ -12337,7 +12302,7 @@
       }
     },
     "Blocked by the network" : {
-      "comment" : "Settings › Remote mode › Direct connection is blocked, cause unknown.",
+      "comment" : "Settings › Cloud mode › Direct connection is blocked, cause unknown.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحظره الشبكة" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "شبکه آن را مسدود کرده است" } },

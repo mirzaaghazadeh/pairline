@@ -1,8 +1,9 @@
 import AVFoundation
 import SwiftUI
 
-/// Guided pairing: install the free bridge app on Android, scan its QR code, connect, allow notifications. Where
-/// remote mode is available (D-080), "Pair a phone that's far away" pairs through an invitation instead.
+/// Guided pairing: install the free bridge app on Android, scan its QR code, connect, allow notifications, and offer
+/// Cloud mode. Where Cloud mode (remote mode, D-080) is available, "Pair over the internet" pairs through an invitation
+/// instead.
 struct PairingFlowView: View {
     enum Step {
         case install
@@ -10,6 +11,8 @@ struct PairingFlowView: View {
         case connecting
         case remote
         case done
+        /// After pairing nearby: Cloud mode, explained, with "Turn on Cloud mode" / "Not now".
+        case cloud
     }
 
     let isOnboarding: Bool
@@ -17,21 +20,32 @@ struct PairingFlowView: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var purchases: PurchaseManager
     @EnvironmentObject private var settings: AppSettings
-    @State private var step: Step = Self.initialStep
+    @State private var step: Step
     @State private var error: String?
     @State private var camera: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
     @State private var pairTask: Task<Void, Never>?
     @State private var showPaywall = false
+    @State private var cloudBusy = false
+    @State private var cloudError: String?
+    /// Shared with Settings › Cloud mode: once Cloud mode was turned on after its explanation, the switch acts at once.
+    @AppStorage("remote.introSeen") private var cloudIntroSeen = false
     #if DEBUG
     @State private var pasted = ""
     #endif
 
+    /// `overInternet`: start at "Pair over the internet" (Settings' row for it).
+    init(isOnboarding: Bool, overInternet: Bool = false) {
+        self.isOnboarding = isOnboarding
+        _step = State(initialValue: overInternet && RemoteFeature.isAvailable ? .remote : Self.initialStep)
+    }
+
     /// Debug builds launched with `-PairlinePairingScan` start at the scan step, with `-PairlinePairingRemote` at
-    /// "Pair a phone that's far away".
+    /// "Pair over the internet", with `-PairlinePairingCloudStep` at the Cloud mode step.
     private static var initialStep: Step {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-PairlinePairingScan") { return .scan }
         if ProcessInfo.processInfo.arguments.contains("-PairlinePairingRemote") { return .remote }
+        if ProcessInfo.processInfo.arguments.contains("-PairlinePairingCloudStep") { return .cloud }
         #endif
         return .install
     }
@@ -46,6 +60,7 @@ struct PairingFlowView: View {
                 case .connecting: connecting.transition(.opacity)
                 case .remote: remote.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
                 case .done: done.transition(.opacity)
+                case .cloud: cloud.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
                 }
             }
             .animation(.spring(response: 0.45, dampingFraction: 0.9), value: step)
@@ -303,7 +318,7 @@ struct PairingFlowView: View {
     }
     #endif
 
-    // MARK: - Far away (remote mode, D-080)
+    // MARK: - Over the internet (remote mode, "Cloud mode", D-080)
 
     private var farAwayButton: some View {
         Button {
@@ -311,8 +326,12 @@ struct PairingFlowView: View {
             error = nil
             step = .remote
         } label: {
-            Label("Pair a phone that's far away", systemImage: "icloud.and.arrow.up")
-                .font(.subheadline.weight(.semibold))
+            Label {
+                Text("Pair over the internet", tableName: "RemoteMode")
+            } icon: {
+                Image(systemName: "icloud.and.arrow.up")
+            }
+            .font(.subheadline.weight(.semibold))
         }
     }
 
@@ -334,11 +353,11 @@ struct PairingFlowView: View {
         }
     }
 
-    /// Full Access is bought but not the remote-mode add-on, which pairing from far away is part of (D-081).
+    /// Full Access is bought but not the Cloud mode add-on, which pairing over the internet is part of (D-081).
     private var remoteAddOnOffer: some View {
         VStack(spacing: 12) {
             Image(systemName: "icloud.and.arrow.up").font(.largeTitle).foregroundStyle(Color.brandBlue)
-            Text("Pairing a phone that's far away is part of remote mode, a one-time \(purchases.remotePriceText) add-on to Pairline Full Access.",
+            Text("Pairing over the internet is part of Cloud mode, a one-time \(purchases.remotePriceText) add-on to Pairline Full Access.",
                  tableName: "RemoteAddOn")
                 .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
             Button {
@@ -347,7 +366,7 @@ struct PairingFlowView: View {
                     if await purchases.buyRemote() { Haptics.success() }
                 }
             } label: {
-                Text("Buy remote mode · \(purchases.remotePriceText)", tableName: "RemoteAddOn")
+                Text("Buy Cloud mode · \(purchases.remotePriceText)", tableName: "RemoteAddOn")
             }
             .buttonStyle(PrimaryButtonStyle())
             .disabled(purchases.busy)
@@ -400,22 +419,137 @@ struct PairingFlowView: View {
                     Button("Allow notifications") {
                         Task {
                             await Notifier.shared.requestAuthorization()
-                            finish()
+                            afterPaired()
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     Text("So you hear about new messages, codes and calls.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
-                    Button("Not now") { finish() }
+                    Button("Not now") { afterPaired() }
                         .font(.subheadline.weight(.semibold))
                 }
             } else {
-                Button("Done") { finish() }
-                    .buttonStyle(PrimaryButtonStyle())
+                Button {
+                    afterPaired()
+                } label: {
+                    offersCloudStep ? Text("Continue") : Text("Done")
+                }
+                .buttonStyle(PrimaryButtonStyle())
             }
         }
         .padding(24)
+    }
+
+    // MARK: - Cloud mode after pairing nearby (D-080, D-081)
+
+    /// After pairing nearby, Cloud mode is offered once: where it exists, while the new bridge is linked and speaks it,
+    /// it isn't on yet, and the purchase state covers it (the trial, or Full Access with the add-on) or offers the
+    /// add-on. Before the trial or the purchase there's nothing to offer yet, so the flow just ends.
+    private var offersCloudStep: Bool {
+        guard RemoteFeature.isAvailable, let remote = app.link.remote, !remote.isOn else { return false }
+        guard app.real.phase.isConnected, app.real.bridgeSupportsRemote else { return false }
+        return purchases.remoteAccess.allowsRemote || purchases.remoteAccess.offersPurchase
+    }
+
+    private func afterPaired() {
+        if offersCloudStep {
+            step = .cloud
+        } else {
+            finish()
+        }
+    }
+
+    private var cloud: some View {
+        ScrollView {
+            VStack(spacing: 14) {
+                RemoteModeIntroContent()
+                Group {
+                    if purchases.remoteAccess.offersPurchase {
+                        RemoteAddOnText.blocker(.needsAddOn)
+                    } else if let note = RemoteAddOnText.trialNote(purchases.remoteAccess, price: purchases.remotePriceText) {
+                        note
+                    }
+                }
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                if let cloudError {
+                    Label {
+                        Text(cloudError)
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Color.brandAmber)
+                    }
+                    .font(.subheadline)
+                    .card()
+                }
+                if let message = purchases.message {
+                    Text(message).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                }
+            }
+            .padding(20)
+        }
+        .scrollsOnlyWhenNeeded()
+        .safeAreaInset(edge: .bottom) {
+            VStack(spacing: 10) {
+                if purchases.remoteAccess.offersPurchase {
+                    Button {
+                        Haptics.tap()
+                        Task {
+                            if await purchases.buyRemote() { Haptics.success() }
+                        }
+                    } label: {
+                        Text("Buy Cloud mode · \(purchases.remotePriceText)", tableName: "RemoteAddOn")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(purchases.busy)
+                } else {
+                    Button {
+                        turnOnCloud()
+                    } label: {
+                        if cloudBusy {
+                            ProgressView()
+                        } else {
+                            Text("Turn on Cloud mode", tableName: "RemoteMode")
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(cloudBusy)
+                }
+                Button {
+                    finish()
+                } label: {
+                    Text("Not now", tableName: "RemoteMode")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(cloudBusy)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 6)
+            .background(.regularMaterial)
+        }
+    }
+
+    /// The same path as Settings › Cloud mode's switch; it stays there for later either way.
+    private func turnOnCloud() {
+        guard !cloudBusy else { return }
+        Haptics.tap()
+        cloudBusy = true
+        cloudError = nil
+        Task {
+            do {
+                try await app.link.turnOnRemote()
+                cloudIntroSeen = true
+                Haptics.success()
+                cloudBusy = false
+                finish()
+            } catch {
+                cloudError = error.localizedDescription
+                Haptics.error()
+                cloudBusy = false
+            }
+        }
     }
 
     // MARK: - Actions

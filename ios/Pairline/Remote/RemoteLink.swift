@@ -2,7 +2,7 @@ import CloudKit
 import CryptoKit
 import Foundation
 
-/// Why remote mode isn't working right now (the status in Settings).
+/// Why remote mode ("Cloud mode" on screen) isn't working right now (the status in Settings).
 enum RemoteProblem: Equatable {
     case iCloudUnavailable
     case offline
@@ -29,9 +29,23 @@ enum RemoteProblem: Equatable {
         case .failed: return String(localized: "iCloud isn't working right now")
         }
     }
+
+    /// What to do about it, for the Settings footer: every problem gets a next step.
+    var nextStep: String {
+        switch self {
+        case .iCloudUnavailable:
+            return String(localized: "Sign in to iCloud in this iPhone's Settings. Cloud mode uses your own iCloud.", table: "RemoteMode")
+        case .offline:
+            return String(localized: "Check this iPhone's internet connection. Pairline keeps trying.", table: "RemoteMode")
+        case .bridgeNotReading:
+            return String(localized: "Make sure the Android phone is on, online and running Pairline Bridge. What you send waits until it checks in.", table: "RemoteMode")
+        case .failed:
+            return String(localized: "Pairline keeps trying. If this doesn't clear up, turn Cloud mode off and on again while the phones are linked nearby.", table: "RemoteMode")
+        }
+    }
 }
 
-/// Why remote mode couldn't be turned on, or a remote pairing couldn't start.
+/// Why remote mode ("Cloud mode") couldn't be turned on, or a remote pairing couldn't start.
 enum RemoteError: LocalizedError, Equatable {
     case needsNearbyLink
     case bridgeUpdate
@@ -61,9 +75,9 @@ enum RemoteError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .needsNearbyLink:
-            return String(localized: "Turn remote mode on while your phones are linked nearby.")
+            return String(localized: "Turn Cloud mode on while your phones are linked nearby, over Bluetooth or the same Wi-Fi.", table: "RemoteMode")
         case .bridgeUpdate:
-            return String(localized: "Remote mode needs a newer Pairline Bridge on the Android phone.")
+            return String(localized: "Cloud mode needs a newer Pairline Bridge on the Android phone.", table: "RemoteMode")
         case .bridgeCantReachICloud:
             return String(localized: "The bridge phone couldn't reach iCloud. Check its internet connection and try again.")
         case .iCloudUnavailable:

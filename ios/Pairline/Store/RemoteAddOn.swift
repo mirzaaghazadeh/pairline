@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Whether remote mode may run, under D-081: it's part of the free trial, and after the trial it's a one-time add-on
-/// (`app.pairline.ios.remote`) to Full Access. Remote pairing ("Pair a phone that's far away") follows the same rule.
+/// Whether remote mode ("Cloud mode" on screen) may run, under D-081: it's part of the free trial, and after the trial
+/// it's a one-time add-on (`app.pairline.ios.remote`) to Full Access. Remote pairing ("Pair over the internet") follows
+/// the same rule.
 enum RemoteAccess: Equatable {
     /// The purchase state isn't known yet: nothing is decided (remote mode isn't turned off on launch).
     case loading
@@ -16,7 +17,7 @@ enum RemoteAccess: Equatable {
 
     var allowsRemote: Bool { self == .trial || self == .purchased }
 
-    /// The "Buy remote mode" button shows only here, and only where remote mode exists (`RemoteFeature`).
+    /// The "Buy Cloud mode" button shows only here, and only where remote mode exists (`RemoteFeature`).
     var offersPurchase: Bool { self == .needsAddOn }
 
     /// Remote mode, if on, turns off: the access is known and doesn't cover it.
@@ -41,10 +42,10 @@ enum RemoteAddOnText {
     static func blocker(_ access: RemoteAccess) -> Text? {
         switch access {
         case .needsAddOn:
-            return Text("Remote mode is a one-time add-on to Pairline Full Access. Everything nearby keeps working without it.",
+            return Text("Cloud mode is a one-time add-on to Pairline Full Access. Everything nearby keeps working without it.",
                         tableName: "RemoteAddOn")
         case .needsFullAccess:
-            return Text("Remote mode needs the free trial or Pairline Full Access.", tableName: "RemoteAddOn")
+            return Text("Cloud mode needs the free trial or Pairline Full Access.", tableName: "RemoteAddOn")
         case .loading, .trial, .purchased:
             return nil
         }
@@ -53,7 +54,7 @@ enum RemoteAddOnText {
     /// During the trial: it's included now, and what it costs later.
     static func trialNote(_ access: RemoteAccess, price: String) -> Text? {
         guard access == .trial else { return nil }
-        return Text("Remote mode is part of your free trial. After you buy Pairline, it's a one-time \(price) add-on.",
+        return Text("Cloud mode is part of your free trial. After you buy Pairline, it's a one-time \(price) add-on.",
                     tableName: "RemoteAddOn")
     }
 }
@@ -73,7 +74,7 @@ struct RemoteAddOnButton: View {
             } label: {
                 HStack(spacing: 12) {
                     Label {
-                        Text("Buy remote mode · \(purchases.remotePriceText)", tableName: "RemoteAddOn")
+                        Text("Buy Cloud mode · \(purchases.remotePriceText)", tableName: "RemoteAddOn")
                     } icon: {
                         Image(systemName: "cart")
                     }

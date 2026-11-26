@@ -1,21 +1,30 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Remote mode" : {
-      "comment" : "Title of the before-you-turn-it-on screen for remote mode (D-080).",
+    "Cloud mode" : {
+      "comment" : "The feature's name (D-080, code name remote mode): the phones keep working over the internet, through the user's own iCloud and, where the home router allows, a direct connection. Settings section header and switch, and the title of its explanation screen.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع عن بُعد" } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Remote mode" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع السحابي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu" } }
       }
     },
-    "Texts, codes and calls keep reaching this iPhone when your phones are apart." : {
+    "When your phones aren't near each other, they keep working over the internet: texts, codes and calls reach this iPhone wherever you are." : {
+      "comment" : "Cloud mode's explanation screen: the subtitle.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تستمر الرسائل والرموز والمكالمات في الوصول إلى هذا الآيفون عندما يكون هاتفاك بعيدين عن بعضهما." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts, codes and calls keep reaching this iPhone when your phones are apart." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها، کدها و تماس‌ها وقتی گوشی‌هایتان از هم دورند هم به این آیفون می‌رسند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirinden uzaktayken de mesajlar, kodlar ve aramalar bu iPhone’a ulaşmaya devam eder." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حين لا يكون هاتفاك قريبين من بعضهما، يظلان يعملان عبر الإنترنت: تصل الرسائل والرموز والمكالمات إلى هذا الآيفون أينما كنت." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "When your phones aren't near each other, they keep working over the internet: texts, codes and calls reach this iPhone wherever you are." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی گوشی‌هایتان نزدیک هم نیستند، از راه اینترنت کار می‌کنند: پیامک‌ها، کدها و تماس‌ها هر جا که باشید به این آیفون می‌رسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirine yakın değilken internet üzerinden çalışmaya devam eder: mesajlar, kodlar ve aramalar nerede olursanız olun bu iPhone’a ulaşır." } }
+      }
+    },
+    "Nearby, your phones keep using Bluetooth and Wi-Fi. Cloud mode takes over only when they can't reach each other." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حين يكونان قريبين، يواصل هاتفاك استخدام البلوتوث والواي فاي. لا يتولى الوضع السحابي الأمر إلا حين يتعذّر عليهما الوصول إلى بعضهما." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nearby, your phones keep using Bluetooth and Wi-Fi. Cloud mode takes over only when they can't reach each other." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی نزدیک هم‌اند، گوشی‌ها همچنان از بلوتوث و وای‌فای استفاده می‌کنند. حالت ابری فقط وقتی به کار می‌آید که به هم دسترسی ندارند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yakındayken telefonlarınız Bluetooth ve Wi-Fi kullanmaya devam eder. Bulut modu yalnızca birbirlerine ulaşamadıklarında devreye girer." } }
       }
     },
     "There's no Pairline server and no account. Your phones talk through your own iCloud and your home's internet connection." : {
@@ -42,12 +51,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi iCloud üzerinden değil, doğrudan telefonlarınız arasında gider." } }
       }
     },
-    "Your home router opens one port for the Android phone. Only your paired iPhone can use it; anything else is turned away." : {
+    "For calls, your home router opens one port for the Android phone, where it allows that. Only your paired iPhone can use it; anything else is turned away." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يفتح جهاز التوجيه في منزلك منفذًا واحدًا لهاتف أندرويد. لا يستطيع استخدامه إلا الآيفون المقترن بك، ويُرفض أي شيء آخر." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your home router opens one port for the Android phone. Only your paired iPhone can use it; anything else is turned away." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم خانه‌تان یک درگاه برای گوشی اندرویدی باز می‌کند. فقط آیفون جفت‌شدهٔ شما می‌تواند از آن استفاده کند و هر چیز دیگری رد می‌شود." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evinizdeki modem Android telefon için tek bir port açar. Onu yalnızca eşlenmiş iPhone’unuz kullanabilir; diğer her şey geri çevrilir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "للمكالمات، يفتح جهاز التوجيه في منزلك منفذًا واحدًا لهاتف أندرويد إن كان يسمح بذلك. لا يستطيع استخدامه إلا الآيفون المقترن بك، ويُرفض أي شيء آخر." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "For calls, your home router opens one port for the Android phone, where it allows that. Only your paired iPhone can use it; anything else is turned away." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای تماس‌ها، اگر مودم خانه‌تان اجازه بدهد، یک درگاه برای گوشی اندرویدی باز می‌کند. فقط آیفون جفت‌شدهٔ شما می‌تواند از آن استفاده کند و هر چیز دیگری رد می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar için ev modeminiz, izin veriyorsa Android telefon için tek bir port açar. Onu yalnızca eşlenmiş iPhone’unuz kullanabilir; diğer her şey geri çevrilir." } }
       }
     },
     "Apple and internet providers can see that your phones talk, not what they say." : {
@@ -74,13 +83,13 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Siz açmadıkça kapalıdır ve istediğiniz zaman kapatabilirsiniz. Bu, modemdeki portu kapatır ve iCloud’daki kayıtları siler." } }
       }
     },
-    "Turn on" : {
-      "comment" : "Button: turns remote mode on after its explanation.",
+    "Turn on Cloud mode" : {
+      "comment" : "Button: turns Cloud mode on after its explanation (in Settings, or right after pairing).",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تفعيل" } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن کردن" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aç" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تفعيل الوضع السحابي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Cloud mode" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن کردن حالت ابری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modunu aç" } }
       }
     },
     "Not now" : {
@@ -99,13 +108,98 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bitti" } }
       }
     },
+    "How Cloud mode works" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كيف يعمل الوضع السحابي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "How Cloud mode works" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری چطور کار می‌کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu nasıl çalışır" } }
+      }
+    },
+    "Connection log" : {
+      "comment" : "Settings › Cloud mode: opens the app's local, redacted log (Diagnostics).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجل الاتصال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connection log" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گزارش اتصال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bağlantı günlüğü" } }
+      }
+    },
+    "Keeps your phones working over the internet when they aren't near each other: texts and codes through your own iCloud, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold." : {
+      "comment" : "Footer of Settings › Cloud mode.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبقي هاتفيك يعملان عبر الإنترنت حين لا يكونان قريبين: تصل الرسائل والرموز عبر iCloud الخاص بك، والمكالمات أيضًا إذا سمح جهاز التوجيه في منزلك باتصال مباشر. لا يوجد خادم لـ Pairline: كل شيء مقفل بمفاتيح لا يملكها إلا هاتفاك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keeps your phones working over the internet when they aren't near each other: texts and codes through your own iCloud, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی گوشی‌هایتان نزدیک هم نیستند، از راه اینترنت کار می‌کنند: پیامک‌ها و کدها از طریق iCloud خودتان می‌رسند، و اگر مودم خانه اجازهٔ اتصال مستقیم بدهد، تماس‌ها هم. هیچ سرور Pairline در کار نیست: همه‌چیز با کلیدهایی قفل می‌شود که فقط دو گوشی شما دارند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirine yakın değilken internet üzerinden çalışmasını sağlar: mesajlar ve kodlar kendi iCloud’unuz üzerinden, ev modeminiz doğrudan bağlantıya izin verirse aramalar da. Pairline sunucusu yoktur: her şey yalnızca iki telefonunuzda bulunan anahtarlarla kilitlenir." } }
+      }
+    },
+    "Turn Cloud mode on while your phones are linked nearby, over Bluetooth or the same Wi-Fi." : {
+      "comment" : "Why the Cloud mode switch can't be turned on yet: the Android phone gets its settings over a nearby link.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل الوضع السحابي وهاتفاك مرتبطان عن قرب، عبر البلوتوث أو شبكة الواي فاي نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn Cloud mode on while your phones are linked nearby, over Bluetooth or the same Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری را وقتی روشن کنید که گوشی‌هایتان از نزدیک به هم وصل‌اند، با بلوتوث یا یک وای‌فای مشترک." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modunu telefonlarınız yakından bağlıyken açın: Bluetooth ya da aynı Wi-Fi üzerinden." } }
+      }
+    },
+    "Cloud mode needs a newer Pairline Bridge on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج الوضع السحابي إلى إصدار أحدث من Pairline Bridge على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode needs a newer Pairline Bridge on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری به نسخهٔ جدیدتر Pairline Bridge روی گوشی اندرویدی نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu için Android telefonda Pairline Bridge’in daha yeni bir sürümü gerekir." } }
+      }
+    },
+    "Sign in to iCloud in this iPhone's Settings. Cloud mode uses your own iCloud." : {
+      "comment" : "Settings › Cloud mode footer: what to do when the status says iCloud isn't signed in.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجّل الدخول إلى iCloud في إعدادات هذا الآيفون. يستخدم الوضع السحابي حساب iCloud الخاص بك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign in to iCloud in this iPhone's Settings. Cloud mode uses your own iCloud." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در تنظیمات این آیفون وارد iCloud شوید. حالت ابری از iCloud خودتان استفاده می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone’un Ayarlar’ında iCloud’a giriş yapın. Bulut modu kendi iCloud’unuzu kullanır." } }
+      }
+    },
+    "Check this iPhone's internet connection. Pairline keeps trying." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحقّق من اتصال هذا الآيفون بالإنترنت. سيواصل Pairline المحاولة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check this iPhone's internet connection. Pairline keeps trying." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال اینترنت این آیفون را بررسی کنید. Pairline دوباره تلاش می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone’un internet bağlantısını kontrol edin. Pairline denemeye devam ediyor." } }
+      }
+    },
+    "Make sure the Android phone is on, online and running Pairline Bridge. What you send waits until it checks in." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تأكّد من أن هاتف أندرويد يعمل ومتصل بالإنترنت وأن Pairline Bridge يعمل عليه. ما ترسله ينتظر إلى أن يتّصل." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Make sure the Android phone is on, online and running Pairline Bridge. What you send waits until it checks in." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مطمئن شوید گوشی اندرویدی روشن و به اینترنت وصل است و Pairline Bridge روی آن اجرا می‌شود. آنچه می‌فرستید تا وقتی آن گوشی سر بزند منتظر می‌ماند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun açık ve internete bağlı olduğundan, Pairline Bridge’in çalıştığından emin olun. Gönderdikleriniz o telefon bağlanana kadar bekler." } }
+      }
+    },
+    "Pairline keeps trying. If this doesn't clear up, turn Cloud mode off and on again while the phones are linked nearby." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سيواصل Pairline المحاولة. إن لم تُحلّ المشكلة، أوقف الوضع السحابي ثم فعّله مجددًا وهاتفاك مرتبطان عن قرب." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairline keeps trying. If this doesn't clear up, turn Cloud mode off and on again while the phones are linked nearby." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline دوباره تلاش می‌کند. اگر درست نشد، وقتی گوشی‌ها از نزدیک به هم وصل‌اند حالت ابری را خاموش و دوباره روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline denemeye devam ediyor. Düzelmezse, telefonlar yakından bağlıyken Bulut modunu kapatıp yeniden açın." } }
+      }
+    },
     "Check my home connection" : {
-      "comment" : "Settings › Remote mode: asks the bridge whether its home router could allow a direct connection. Free.",
+      "comment" : "Settings › Cloud mode: asks the bridge whether its home router could allow a direct connection. Free.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "فحص اتصال منزلي" } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Check my home connection" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "بررسی اتصال خانه" } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ev bağlantımı kontrol et" } }
+      }
+    },
+    "Link your phones first, nearby or with Cloud mode on, to check." : {
+      "comment" : "Settings › Cloud mode, under Check my home connection when the bridge can't be reached at all.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اربط هاتفيك أولًا، عن قرب أو مع تفعيل الوضع السحابي، ثم افحص." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Link your phones first, nearby or with Cloud mode on, to check." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای بررسی، اول گوشی‌هایتان را به هم وصل کنید؛ از نزدیک یا با حالت ابری روشن." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kontrol etmek için önce telefonlarınızı bağlayın: yakından ya da Bulut modu açıkken." } }
       }
     },
     "A direct connection should work: your home router can open a port for Pairline." : {
@@ -189,30 +283,79 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefon bu uygulamanın anlamadığı bir yanıt gönderdi. İki uygulamayı da güncelleyin." } }
       }
     },
-    "How remote mode works" : {
+    "Pair over the internet" : {
+      "comment" : "Pairing your own two phones while they aren't next to each other, through an invitation (D-080). Pairing screens and Settings.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كيف يعمل الوضع عن بُعد" } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "How remote mode works" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور چطور کار می‌کند" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod nasıl çalışır" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإقران عبر الإنترنت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pair over the internet" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "جفت کردن از راه اینترنت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İnternet üzerinden eşleştir" } }
       }
     },
-    "Connection log" : {
-      "comment" : "Settings › Remote mode: opens the app's local, redacted log (Diagnostics).",
+    "Sign in to iCloud on this iPhone to pair over the internet." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجل الاتصال" } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connection log" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گزارش اتصال" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bağlantı günlüğü" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجّل الدخول إلى iCloud على هذا الآيفون للإقران عبر الإنترنت." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign in to iCloud on this iPhone to pair over the internet." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای جفت کردن از راه اینترنت، در این آیفون وارد iCloud شوید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İnternet üzerinden eşleştirmek için bu iPhone’da iCloud’a giriş yapın." } }
       }
     },
-    "Keeps texts and codes coming through your own iCloud when your phones are apart, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold." : {
-      "comment" : "Footer of Settings › Remote mode.",
+    "This also turns on Cloud mode, so your phones keep working over the internet." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبقي الرسائل والرموز تصلك عبر iCloud الخاص بك عندما يكون هاتفاك بعيدين، والمكالمات أيضًا إذا سمح جهاز التوجيه في منزلك باتصال مباشر. لا يوجد خادم لـ Pairline: كل شيء مقفل بمفاتيح لا يملكها إلا هاتفاك." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keeps texts and codes coming through your own iCloud when your phones are apart, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی گوشی‌هایتان از هم دورند، پیامک‌ها و کدها را از طریق iCloud خودتان می‌رساند، و اگر مودم خانه اجازهٔ اتصال مستقیم بدهد، تماس‌ها را هم. هیچ سرور Pairline در کار نیست: همه‌چیز با کلیدهایی قفل می‌شود که فقط دو گوشی شما دارند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirinden uzaktayken mesajların ve kodların kendi iCloud’unuz üzerinden gelmesini sağlar; evinizdeki modem doğrudan bağlantıya izin verirse aramaların da. Pairline sunucusu yoktur: her şey yalnızca iki telefonunuzda bulunan anahtarlarla kilitlenir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يفعّل هذا أيضًا الوضع السحابي، فيظل هاتفاك يعملان عبر الإنترنت." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This also turns on Cloud mode, so your phones keep working over the internet." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این کار حالت ابری را هم روشن می‌کند تا گوشی‌هایتان از راه اینترنت کار کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu, Bulut modunu da açar; böylece telefonlarınız internet üzerinden çalışmaya devam eder." } }
+      }
+    },
+    "Linked through iCloud" : {
+      "comment" : "Bridge tab: Cloud mode reaches the bridge through iCloud (no nearby or direct link).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مرتبط عبر iCloud" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Linked through iCloud" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وصل از طریق iCloud" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden bağlı" } }
+      }
+    },
+    "Your phones aren't near each other, so Cloud mode carries texts and codes through your own iCloud. Calls need the direct connection to your home." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتفاك ليسا قريبين من بعضهما، لذا ينقل الوضع السحابي الرسائل والرموز عبر iCloud الخاص بك. وتحتاج المكالمات إلى الاتصال المباشر بمنزلك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your phones aren't near each other, so Cloud mode carries texts and codes through your own iCloud. Calls need the direct connection to your home." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی‌هایتان نزدیک هم نیستند، پس حالت ابری پیامک‌ها و کدها را از طریق iCloud خودتان می‌رساند. تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirine yakın değil; bu yüzden Bulut modu mesajları ve kodları kendi iCloud’unuz üzerinden taşıyor. Aramalar için evinize doğrudan bağlantı gerekir." } }
+      }
+    },
+    "Cloud mode settings" : {
+      "comment" : "Button: opens Settings, where the Cloud mode section is.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعدادات الوضع السحابي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode settings" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تنظیمات حالت ابری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu ayarları" } }
+      }
+    },
+    "Phones apart? Turn on Cloud mode in Settings while they're linked, and texts and codes keep coming over the internet." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتفاك بعيدان؟ فعّل الوضع السحابي في الإعدادات وهما مرتبطان، فتواصل الرسائل والرموز الوصول عبر الإنترنت." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Phones apart? Turn on Cloud mode in Settings while they're linked, and texts and codes keep coming over the internet." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی‌ها از هم دورند؟ وقتی به هم وصل‌اند، حالت ابری را در تنظیمات روشن کنید تا پیامک‌ها و کدها از راه اینترنت هم برسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlar uzakta mı? Bağlıyken Ayarlar’da Bulut modunu açın; mesajlar ve kodlar internet üzerinden gelmeye devam eder." } }
+      }
+    },
+    "With Cloud mode on, texts and codes still come through iCloud while Pairline is closed." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مع تفعيل الوضع السحابي، تظل الرسائل والرموز تصل عبر iCloud حتى وPairline مغلق." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "With Cloud mode on, texts and codes still come through iCloud while Pairline is closed." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "با روشن بودن حالت ابری، وقتی Pairline بسته است هم پیامک‌ها و کدها از طریق iCloud می‌رسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu açıkken, Pairline kapalıyken de mesajlar ve kodlar iCloud üzerinden gelir." } }
+      }
+    },
+    "Or turn on Cloud mode in Settings: texts and codes then come through your own iCloud while Pairline is closed." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أو فعّل الوضع السحابي في الإعدادات: عندها تصل الرسائل والرموز عبر iCloud الخاص بك حتى وPairline مغلق." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Or turn on Cloud mode in Settings: texts and codes then come through your own iCloud while Pairline is closed." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یا حالت ابری را در تنظیمات روشن کنید: آن‌وقت وقتی Pairline بسته است هم پیامک‌ها و کدها از طریق iCloud خودتان می‌رسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ya da Ayarlar’da Bulut modunu açın: o zaman Pairline kapalıyken de mesajlar ve kodlar kendi iCloud’unuz üzerinden gelir." } }
       }
     }
   },

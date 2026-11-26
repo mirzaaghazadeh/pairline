@@ -68,7 +68,7 @@ struct DiagnosticsView: View {
         lines.append("Bluetooth lane: \(app.link.primarySummary)")
         lines.append("Wi-Fi lane: \(app.link.wifiSummary)")
         if let remote = app.link.remote {
-            lines.append("Remote mode: \(remote.summary)")
+            lines.append("Cloud mode: \(remote.summary)")
             lines.append("Direct lane: \(app.link.directSummary)")
         }
         let transfers = app.link.files.transfers
@@ -104,7 +104,7 @@ struct DiagnosticsView: View {
     private func describe(_ phase: LinkPhase) -> String {
         switch phase {
         case .connected: return app.link.isDirect ? "connected (direct connection)" : "connected"
-        case .remote: return "via iCloud (remote mode)"
+        case .remote: return "via iCloud (Cloud mode)"
         case .notPaired: return "not paired"
         case .locked: return "locked"
         case .bluetoothOff: return "bluetooth off"

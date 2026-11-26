@@ -784,7 +784,7 @@ final class CallCenter: ObservableObject {
             // Remote mode (D-080): iCloud carries no call audio; the direct connection does, and then the phase is
             // connected and this guard passes.
             notice = bridge.phase == .remote
-                ? String(localized: "Calls need the direct connection to your home, and it isn't up right now. Make the call on the Android phone, or bring the phones together.")
+                ? String(localized: "Calls need the direct connection to your home, which isn't up right now. Settings › Cloud mode › Check my home connection shows why.")
                 : String(localized: "Your bridge phone isn't connected right now.")
             return
         }

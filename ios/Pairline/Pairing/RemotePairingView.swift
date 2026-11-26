@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// "Pair a phone that's far away" (D-080; PROTOCOL.md, "Remote pairing"): the owner pairs their own two phones while
-/// they're apart. A short explanation, then the invitation they send to their Android phone, the code to check on both
-/// phones, and the confirmation. Only where `RemoteFeature.isAvailable`.
+/// "Pair over the internet" (D-080; PROTOCOL.md, "Remote pairing"): the owner pairs their own two phones while they
+/// aren't next to each other, which also turns Cloud mode on. A short explanation, then the invitation they send to
+/// their Android phone, the code to check on both phones, and the confirmation. Only where `RemoteFeature.isAvailable`.
 struct RemotePairingView: View {
     let onPaired: () -> Void
     @EnvironmentObject private var app: AppModel
@@ -34,12 +34,13 @@ struct RemotePairingView: View {
                 Image(systemName: "icloud.and.arrow.up")
                     .font(.largeTitle)
                     .foregroundStyle(Color.brandBlue)
-                RemotePairingHeader(title: Text("Pair a phone that's far away"),
+                RemotePairingHeader(title: Text("Pair over the internet", tableName: "RemoteMode"),
                                     subtitle: Text("For when your Android phone with the SIM isn't next to you, like at home. Send yourself the invitation, open it on the Android phone, and allow it there."))
                 VStack(alignment: .leading, spacing: 12) {
                     HelpBullet(symbol: "arrow.down.app", text: Text("Pairline Bridge needs to be installed on the Android phone (getpairline.com)."))
                     HelpBullet(symbol: "square.and.arrow.up", text: Text("Send the invitation from the next screen to your Android phone, by email or a message to yourself. Open it there and allow the pairing."))
                     HelpBullet(symbol: "checkmark.shield", text: Text("Both phones then show a 6-digit code. Pair only if the codes match."))
+                    HelpBullet(symbol: "icloud", text: Text("This also turns on Cloud mode, so your phones keep working over the internet.", tableName: "RemoteMode"))
                 }
                 .card(padding: 14)
                 Label("The invitation works once, for 10 minutes. Send it only to yourself, for example to your own email or a chat with yourself.",
@@ -221,7 +222,7 @@ private struct RemotePairingSteps: View {
     private func failureText(_ failure: RemotePairing.Failure) -> String {
         switch failure {
         case .iCloudUnavailable:
-            return String(localized: "Sign in to iCloud on this iPhone to pair a phone that's far away.")
+            return String(localized: "Sign in to iCloud on this iPhone to pair over the internet.", table: "RemoteMode")
         case .offline:
             return RemoteError.offline.errorDescription ?? ""
         case .failed:

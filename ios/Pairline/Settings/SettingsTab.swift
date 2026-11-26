@@ -166,6 +166,22 @@ struct SettingsTab: View {
         }
     }
 
+    /// Pairing your own two phones while they aren't next to each other (Cloud mode, D-080).
+    @ViewBuilder private var pairOverInternetRow: some View {
+        if RemoteFeature.isAvailable, !app.isDemo {
+            Button {
+                app.pairingOverInternet = true
+                app.showPairing = true
+            } label: {
+                Label {
+                    Text("Pair over the internet", tableName: "RemoteMode")
+                } icon: {
+                    Image(systemName: "icloud.and.arrow.up")
+                }
+            }
+        }
+    }
+
     private var bridgeSection: some View {
         Section {
             if let peer = app.pairedPeer {
@@ -188,6 +204,7 @@ struct SettingsTab: View {
                 } label: {
                     Label("Pair a different bridge phone", systemImage: "qrcode.viewfinder")
                 }
+                pairOverInternetRow
                 Button(role: .destructive) {
                     confirmUnpair = true
                 } label: {
@@ -200,6 +217,7 @@ struct SettingsTab: View {
                 } label: {
                     Label("Pair a bridge phone", systemImage: "qrcode.viewfinder")
                 }
+                pairOverInternetRow
             }
             if app.pairedPeer != nil || bridge.isDemo {
                 pageLink(.blocked) {

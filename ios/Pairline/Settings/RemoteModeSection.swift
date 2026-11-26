@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Remote mode (D-080) in Settings: what it is in plain words, whether it's working, and the switch (off by default).
-/// Shown only where remote mode is available (`RemoteFeature`) and a bridge is paired.
+/// Cloud mode (remote mode, D-080) in Settings: what it is in plain words, whether it's working, and the switch (off by
+/// default). Shown only where remote mode is available (`RemoteFeature`) and a bridge is paired. Its strings live in the
+/// "RemoteMode" table, apart from the link states shared with the rest of the app.
 struct RemoteModeSection: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var purchases: PurchaseManager
@@ -24,7 +25,11 @@ struct RemoteModeSection: View {
     var body: some View {
         Section {
             Toggle(isOn: Binding(get: { remote.isOn }, set: { change(to: $0) })) {
-                Label("Remote mode", systemImage: "icloud")
+                Label {
+                    Text("Cloud mode", tableName: "RemoteMode")
+                } icon: {
+                    Image(systemName: "icloud")
+                }
             }
             .disabled(busy || (!remote.isOn && blocker != nil))
             RemoteAddOnButton()
@@ -48,13 +53,27 @@ struct RemoteModeSection: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
+            // Texts and codes reach a locked iPhone through iCloud only as notifications: a way to allow them here.
+            if remote.isOn, notifier.authorization == .notDetermined {
+                Button {
+                    Task { await notifier.requestAuthorization() }
+                } label: {
+                    Label("Allow notifications", systemImage: "bell.badge")
+                }
+            } else if remote.isOn, notifier.authorization == .denied {
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                } label: {
+                    Label("Open Settings", systemImage: "bell.slash")
+                }
+            }
             // Free, with remote mode on or off: the bridge asks its router, read-only (`remote.check`).
             HomeConnectionCheckRow(bridge: bridge)
             Button {
                 intro = .info
             } label: {
                 Label {
-                    Text("How remote mode works", tableName: "RemoteMode")
+                    Text("How Cloud mode works", tableName: "RemoteMode")
                 } icon: {
                     Image(systemName: "questionmark.circle")
                 }
@@ -85,11 +104,14 @@ struct RemoteModeSection: View {
                 }
             }
         } header: {
-            Text("Remote mode")
+            Text("Cloud mode", tableName: "RemoteMode")
         } footer: {
             VStack(alignment: .leading, spacing: 6) {
                 if let error {
                     Text(error).foregroundStyle(Color.brandRed)
+                }
+                if remote.isOn, !busy, let problem = remote.problem {
+                    Text(problem.nextStep).foregroundStyle(Color.brandAmber)
                 }
                 if !remote.isOn, let blocker {
                     blocker
@@ -100,7 +122,7 @@ struct RemoteModeSection: View {
                 if remote.isOn, notifier.authorization == .denied || notifier.authorization == .notDetermined {
                     Text("Allow notifications for Pairline so texts and codes reach you through iCloud.")
                 }
-                Text("Keeps texts and codes coming through your own iCloud when your phones are apart, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold.", tableName: "RemoteMode")
+                Text("Keeps your phones working over the internet when they aren't near each other: texts and codes through your own iCloud, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold.", tableName: "RemoteMode")
             }
         }
     }
@@ -128,10 +150,14 @@ struct RemoteModeSection: View {
 
     /// Why it can't be turned on right now: the bridge gets its settings over a nearby session, and must speak v1.
     private var blocker: Text? {
-        // The purchase state first (D-081): remote mode is part of the trial, then an add-on to Full Access.
+        // The purchase state first (D-081): Cloud mode is part of the trial, then an add-on to Full Access.
         if let addOn = RemoteAddOnText.blocker(purchases.remoteAccess) { return addOn }
-        if !bridge.phase.isConnected { return Text("Turn remote mode on while your phones are linked nearby.") }
-        if !bridge.bridgeSupportsRemote { return Text("Remote mode needs a newer Pairline Bridge on the Android phone.") }
+        if !bridge.phase.isConnected {
+            return Text("Turn Cloud mode on while your phones are linked nearby, over Bluetooth or the same Wi-Fi.", tableName: "RemoteMode")
+        }
+        if !bridge.bridgeSupportsRemote {
+            return Text("Cloud mode needs a newer Pairline Bridge on the Android phone.", tableName: "RemoteMode")
+        }
         return nil
     }
 

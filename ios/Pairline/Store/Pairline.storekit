@@ -50,13 +50,13 @@
       "internalID" : "6739000003",
       "localizations" : [
         {
-          "description" : "Texts, codes and calls while phones are apart",
-          "displayName" : "Remote Mode",
+          "description" : "Texts, codes and calls over the internet",
+          "displayName" : "Cloud Mode",
           "locale" : "en_US"
         }
       ],
       "productID" : "app.pairline.ios.remote",
-      "referenceName" : "Remote Mode",
+      "referenceName" : "Cloud Mode",
       "type" : "NonConsumable"
     }
   ],

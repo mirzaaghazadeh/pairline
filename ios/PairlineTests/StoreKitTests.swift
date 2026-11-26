@@ -51,7 +51,7 @@ final class StoreKitTests: XCTestCase {
         XCTAssertEqual(remote?.id, PurchaseManager.remoteID)
         XCTAssertEqual(remote?.type, .nonConsumable)
         XCTAssertEqual(remote?.price, Decimal(string: "9.99"))
-        XCTAssertEqual(remote?.displayName, "Remote Mode")
+        XCTAssertEqual(remote?.displayName, "Cloud Mode")
     }
 
     /// Remote mode is part of the trial; after Full Access it's an add-on, sold only then; a refund takes it away.

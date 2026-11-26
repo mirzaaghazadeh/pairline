@@ -224,7 +224,7 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 - [x] PRIVACY.md, ARCHITECTURE.md, PROTOCOL.md, README and decision entries (D-080, D-081)
 - [x] Pair over the internet: scan the invitation's QR code live on Android (or a picture, or paste the link); wording
       for pairing your own two phones
-- [ ] "Cloud mode" in the apps, offered right after a normal pairing, and a full UX pass of its screens (D-082)
+- [x] "Cloud mode" in the apps, offered right after a normal pairing, and a full UX pass of its screens (D-082)
 - [ ] Street tests on real phones, with the bridge at home on charge and Wi-Fi and the iPhone on mobile data:
   - [ ] Turn Cloud mode on; the status line says "Via iCloud", then "Direct connection" where the router allows it
   - [ ] "Check my home connection" matches what the router really does (open, carrier-grade NAT, no UPnP/NAT-PMP/PCP)
