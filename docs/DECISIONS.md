@@ -1840,6 +1840,14 @@ each a row in the draft's notes:
   identical). The library is now built without `.comment` (`llvm-objcopy --remove-section=.comment` after linking),
   so releases after 1.8.0 reproduce on Linux and macOS alike; 1.8.0 and earlier reproduce on Linux.
   `android-release-checks.yml` runs the same rebuild and comparison for a release that already exists.
+- **Signing keeps zipalign's layout (`apksigner sign --alignment-preserved`).** A test release (1.8.0-test.1, a
+  draft deleted afterwards) showed the byte-for-byte check could never pass: build-tools 37's apksigner pads every
+  stored file again with its own alignment field, which apksigcopier doesn't recreate, so even an identical build
+  plus our signature differed by those padding bytes. With the flag, the signed APK is zipalign's output plus the
+  signature, and the copy matches byte for byte (checked locally with a throwaway key); the release run checks the
+  alignment (`zipalign -c -P 16 4`: 4 bytes, 16 KB for native libraries). For releases signed before, the check
+  falls back to comparing every file's stored bytes, names, order and attributes, and says that only apksigner's
+  padding differs.
 - **Trackers.** `.github/scripts/trackers-scan.py` checks the APK against every tracker code signature in εxodus
   Privacy's public list, the same way εxodus's own scanner does (dexdump class paths matched against the
   signatures). It's our own standard-library script rather than εxodus's Python package, whose dependencies

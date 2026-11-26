@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: Commit or tag to build, e.g. android-v1.8.0
+        description: Tag, branch or full commit SHA to build, e.g. android-v1.8.0
         required: true
         type: string
 
