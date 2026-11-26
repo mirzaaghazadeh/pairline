@@ -1,9 +1,14 @@
 Pairline is the iPhone half of a two-phone setup. It relays SMS, calls, contacts, call history and USSD codes from the user's own Android phone, which runs our free "Pairline Bridge" Android app (getpairline.com), over an encrypted link between the two phones: Bluetooth, and optionally the local Wi-Fi network. There are no Pairline servers and no accounts.
 
+VIDEO ON TWO REAL PHONES
+VIDEO_LINK_HERE
+It shows pairing with an Android phone, a one-time code and a message arriving, an incoming call on the CallKit screen of a locked iPhone, answering it, the call's audio playing on the iPhone (Talk on iPhone) while Pairline is in the background, and "Ring my iPhone" from the Android phone making the locked iPhone beep.
+
 HOW TO REVIEW WITHOUT AN ANDROID PHONE
 1. Launch the app and tap Continue until "How would you like to start?".
 2. Choose "Explore the demo". Demo mode is free and shows every screen with sample data.
 3. Tap "Try it" in the demo banner to receive a sample one-time code, a message or an incoming call.
+In the demo, a sample call opens Pairline's own call screen and plays no audio. The system call screen (CallKit) and call audio are used only for real calls from the paired Android phone; the video above shows both.
 
 IN-APP PURCHASES (both non-consumable)
 - "7-day Trial" (free): starts a 7-day trial of all features. It needs no payment method.
@@ -13,12 +18,25 @@ To see the paywall without an Android phone: in the demo, Settings > "Unlock Pai
 Restore Purchases is on the start screen, on the paywall and in Settings. Nothing renews or is charged automatically.
 
 CALLKIT AND CALL AUDIO
-CallKit shows calls that ring on the user's own Android phone (the SIM is in that phone). Optionally ("Talk on iPhone", set up in the Android app), the call's audio is carried between the two phones over the local Wi-Fi network: the iPhone plays the caller's voice and sends the user's microphone. Nothing is recorded or stored. The microphone is used only during such a call. The app is not offered in China mainland.
+CallKit shows calls that ring on the user's own Android phone (the SIM is in that phone). Optionally ("Talk on iPhone", set up in the Android app), the call's audio is carried between the two phones over Bluetooth or the local Wi-Fi network: the iPhone plays the caller's voice and sends the user's microphone. Nothing is recorded or stored. The microphone is used only during such a call. The app is not offered in China mainland.
 
 BACKGROUND MODES
 - "bluetooth-central" keeps the link to the user's own Android phone, so messages and calls reach the iPhone while Pairline is in the background.
-- "audio" keeps a relayed call's audio running while the iPhone is locked, during an active CallKit call only.
+- "audio" is used for two things only: a relayed call's audio (Talk on iPhone), playing and recording while the iPhone is locked or Pairline is in the background, during an active CallKit call; and "Ring my iPhone", started from the Android app when the user can't find this iPhone, which plays a beep for at most 30 seconds (never during a call), even if Pairline is in the background.
 - "voip": CallKit requires it to report incoming calls (without it iOS refuses them with CXErrorCodeMissingVoIPBackgroundMode). Pairline uses no PushKit and no server: calls arrive over the Bluetooth or local Wi-Fi link to the user's own Android phone, and are shown with CallKit only.
+
+WHEN EACH PERMISSION IS ASKED
+- Bluetooth: when the app first connects to the user's Android phone (pairing).
+- Camera: on the pairing screen, to scan the code the Android phone shows.
+- Local Network: when the Wi-Fi link to the Android phone starts.
+- Notifications: after pairing (a Continue button leads to the system prompt) or in Settings.
+- Microphone: when the paired Android phone first offers Talk on iPhone, with the app open, so the prompt doesn't interrupt a call. It's used only during such calls.
+- Speech Recognition: only if the user turns on live captions for calls; recognition runs on the device only.
+- Photo Library (add only): only if the user chooses Save Image or Save Video in the share sheet for a file the Android phone sent.
+
+OTHER SCREENS
+- Lock Screen and Dynamic Island: a Live Activity shows the Android phone's signal, battery and link state (Settings > "Bridge status on Lock Screen" turns it off).
+- Internet sharing (Settings): shows the proxy address of the Android phone's shared connection, for the user to enter in iPhone Wi-Fi settings. The iPhone app itself forwards no traffic and has no VPN.
 
 LOCAL NETWORK
 The app finds and connects to the user's own Android phone on the local Wi-Fi (Bonjour service _pairline._tcp) for faster syncing, files and call audio. It never contacts the internet itself; links the user taps open in Safari.

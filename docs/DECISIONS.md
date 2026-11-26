@@ -1752,3 +1752,30 @@ The maintainer's decision: "if [UPnP or NAT-PMP] can be enabled, enable it; if n
   already listens while Cloud mode is on, the handshake pins the bridge's key, and nothing changes on the wire.
 - The entry lives in the iPhone's Keychain (this device only), is never logged (rule 9), and goes when Cloud mode is
   turned off or the pairing is forgotten. Carrier-grade NAT still can't be helped by any router setting.
+
+### D-097 — Ready for App Review: no "Allow" before a permission prompt, privacy manifests, Add to Photos, a review video (2026-11-27)
+
+A pass over the iPhone app as App Review would see it, while 1.0.1 (build 16) waits for review. What it found and
+what changed for the next build:
+- **Guideline 5.1.1(iv):** a button shown before the system's permission prompt mustn't say "Allow" or offer a way
+  around the prompt. The pairing scanner's "Allow camera" is now "Continue" (the step's title says what it's for). The
+  "You're paired!" screen's "Allow notifications" / "Not now" is one "Continue" that always leads to iOS's prompt,
+  where "Don't Allow" is the choice. The Settings and Cloud mode rows say "Turn on notifications". All four languages.
+- **Privacy manifests:** each bundle now has a `PrivacyInfo.xcprivacy` (no tracking, no collected data, matching
+  "Data Not Collected"). Required-reason APIs, checked against each Release binary's imported symbols with `nm -u`:
+  the app uses UserDefaults (CA92.1; 1C8F.1 for the app group), file creation dates of the app group's inbox
+  (C617.1), free disk space before a file transfer (E174.1), and the keyboards' languages for the first language
+  (54BD.1, D-081). The widget and the notification extension use only the app group's defaults (1C8F.1); the share
+  extension uses none. Uploads without them get ITMS-91053 warnings. A new required-reason API needs its entry in
+  the same change.
+- **Add to Photos (`NSPhotoLibraryAddUsageDescription`):** the share sheet of a received file offers Save Image or
+  Save Video, and iOS ends an app that does that without this purpose string. Add-only; PRIVACY.md lists it.
+- **Store text and review notes:** the description said call audio plays on the Android phone while the app declares
+  the `audio` background mode; it now says Talk on iPhone (Android 11 or later) is optional and doesn't work on every
+  phone yet. Demo calls use Pairline's own call screen and play no audio, so App Review can't see CallKit or the
+  background modes without two phones: the notes now ask for a video on two real phones (pairing, a code, a CallKit
+  call on a locked iPhone answered with Talk on iPhone, Ring my iPhone), explain both uses of `audio`, and say when
+  each permission is asked. `upload.sh` refuses to send the notes while they still say `VIDEO_LINK_HERE`.
+- **Left as they are, the maintainer's call:** the always-on bridge Live Activity, on by default (D-053), which some
+  reviewers question because Apple describes Live Activities as having a start and an end; "Android" in the subtitle
+  (allowed, since the app works with an Android phone).

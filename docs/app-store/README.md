@@ -78,5 +78,7 @@ account). "Pairline" alone is taken on the App Store, so the store name is "Pair
 - **App Privacy:** "Data Not Collected" (`docs/PRIVACY.md`: nothing leaves the user's two phones).
 - **Availability:** remove China mainland (CallKit, D-027).
 - **Age rating:** none of the content questions apply.
-- **Review notes:** `metadata/review_information/notes.txt` (demo mode, the "Try it" menu, the purchases, CallKit).
+- **Review notes:** `metadata/review_information/notes.txt` (demo mode, the "Try it" menu, the purchases, CallKit,
+  background modes, when each permission is asked). They link to a video on two real phones: `review-video.md` says
+  what to film; `upload.sh` refuses to run while the notes still say `VIDEO_LINK_HERE` (D-097).
   Add the contact name, phone and email in App Store Connect; they're kept out of this public repo.

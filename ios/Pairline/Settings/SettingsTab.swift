@@ -293,7 +293,7 @@ struct SettingsTab: View {
                 Button {
                     Task { await notifier.requestAuthorization() }
                 } label: {
-                    Label("Allow notifications", systemImage: "bell.badge")
+                    Label("Turn on notifications", systemImage: "bell.badge")
                 }
             }
             Toggle(isOn: $settings.showMessagePreviews) {

@@ -76,7 +76,7 @@ struct RemoteModeSection: View {
                 Button {
                     Task { await notifier.requestAuthorization() }
                 } label: {
-                    Label("Allow notifications", systemImage: "bell.badge")
+                    Label("Turn on notifications", systemImage: "bell.badge")
                 }
             } else if remote.isOn, notifier.authorization == .denied {
                 Button {

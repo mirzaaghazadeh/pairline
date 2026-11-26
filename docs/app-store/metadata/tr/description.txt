@@ -8,7 +8,7 @@ MESAJLAR VE KODLAR
 ARAMALAR
 • Android numarasına gelen aramalar, alışık olduğunuz iPhone arama ekranıyla iPhone'unuzda çalar
 • Aramaları iPhone'dan yanıtlayın, reddedin ya da sonlandırın; tuş takımından arama yapın
-• Şimdilik arama sesi Android telefondan gelir
+• Arama sesi Android telefondan gelir. İsteğe bağlı iPhone’dan konuşma kurulumuyla (Android 11 veya üstü) arayanı iPhone'da duyar ve iPhone'dan konuşursunuz; henüz her Android telefonda çalışmaz
 
 KİŞİLER, ARAMA GEÇMİŞİ VE DAHASI
 • Kişiler ve arama geçmişi Android telefondan eşitlenir ve yalnızca bu iPhone'da saklanır

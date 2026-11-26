@@ -202,6 +202,7 @@ log line, already redacted, to the iPhone's system log, which a connected Mac ca
 | Speech Recognition (`NSSpeechRecognitionUsageDescription`, D-087) | Only when you tap CC on Pairline's call screen: live captions of the caller during a call whose audio is on this iPhone. Recognition runs **on the iPhone only** (`requiresOnDeviceRecognition`); languages the iPhone can't recognize on the device aren't offered, so call audio is never sent to Apple. The text shows during the call and is never stored | The first time you tap CC |
 | CallKit (no prompt) | Shows calls on the iPhone call screen. Calls are added to iPhone Recents unless you turn that off in Settings › Calls (D-074), and a tap there calls back through Pairline | — |
 | Photo picker (no prompt, D-089) | The composer's picture button uses iOS's own picker, which runs outside Pairline: Pairline gets only the one photo you choose, never the library | — |
+| Add to Photos (`NSPhotoLibraryAddUsageDescription`, D-097) | Only when you choose Save Image or Save Video in the share sheet for a file the bridge phone sent: iOS adds that file to your library. Add-only: Pairline can't read or list your photos | The first time you choose Save Image or Save Video |
 | Siri and Shortcuts (no prompt) | "Call with Pairline" calls the number you give it; runs only when you run it (D-074) | — |
 | In-App Purchase (no prompt) | The free 7-day trial, the one-time purchase (D-017, D-036), and Cloud mode: bought with it as one purchase, or as a one-time add-on later (D-093) | — |
 | App Group `group.app.pairline.ios` (no prompt) | Shares the bridge status with Pairline's widget | — |
@@ -211,6 +212,11 @@ log line, already redacted, to the iPhone's system log, which a connected Mac ca
 | Files app folder (`UIFileSharingEnabled`) (M5) | Files you receive from the bridge phone appear under Pairline in the Files app | No prompt |
 | Share extension "Send to bridge phone" (M5) | Copies only what you share into the app group's outbox, which the app sends over the Wi-Fi link and then deletes | No prompt |
 | Contacts (optional, off by default; not yet used) | Save a contact from the bridge into iPhone Contacts | Not yet requested |
+
+Each iPhone bundle (the app, the widget, the share and notification extensions) carries Apple's privacy manifest,
+`PrivacyInfo.xcprivacy` (D-097): no tracking, no tracking domains, no collected data, and the reason for each
+"required reason" API it uses (settings in user defaults, file dates and free space in its own containers, the
+keyboards' languages for the first language). None of them sends anything anywhere.
 
 ## Things Pairline will never do
 

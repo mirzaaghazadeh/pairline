@@ -8,7 +8,7 @@ MESSAGES AND CODES
 CALLS
 • Calls to the Android number ring on your iPhone, with the familiar iPhone call screen
 • Answer, decline or hang up from the iPhone, and dial out from its keypad
-• For now, the call audio plays on the Android phone
+• The call audio plays on the Android phone. With the optional Talk on iPhone setup (Android 11 or later), you hear the caller and talk on the iPhone instead; it doesn't work on every Android phone yet
 
 CONTACTS, CALL HISTORY AND MORE
 • Contacts and call history synced from the Android phone, kept on this iPhone only

@@ -246,7 +246,9 @@ struct PairingFlowView: View {
                     .buttonStyle(SecondaryButtonStyle())
                 }
             default:
-                Button("Allow camera") {
+                // "Continue", never "Allow": a button before the system's permission prompt mustn't tell people what
+                // to answer (App Review guideline 5.1.1(iv), D-097). The step's title already says what it's for.
+                Button("Continue") {
                     AVCaptureDevice.requestAccess(for: .video) { _ in
                         DispatchQueue.main.async { checkCamera() }
                     }
@@ -421,19 +423,22 @@ struct PairingFlowView: View {
                 .multilineTextAlignment(.center)
             Spacer()
             if Notifier.shared.authorization == .notDetermined {
+                // One "Continue" that always leads to the system's prompt, where "Don't Allow" is the choice: no
+                // "Allow" wording and no way around the prompt on this screen (App Review guideline 5.1.1(iv), D-097).
                 VStack(spacing: 10) {
-                    Button("Allow notifications") {
+                    Text("So you hear about new messages, codes and calls.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                    Button {
                         Task {
                             await Notifier.shared.requestAuthorization()
                             afterPaired()
                         }
+                    } label: {
+                        Text("Continue")
                     }
                     .buttonStyle(PrimaryButtonStyle())
-                    Text("So you hear about new messages, codes and calls.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                    Button("Not now") { afterPaired() }
-                        .font(.subheadline.weight(.semibold))
                 }
             } else {
                 Button {

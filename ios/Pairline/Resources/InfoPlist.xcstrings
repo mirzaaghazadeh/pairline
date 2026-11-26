@@ -181,6 +181,36 @@
         }
       }
     },
+    "NSPhotoLibraryAddUsageDescription" : {
+      "comment" : "Privacy - Photo Library Additions Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عندما تختار «حفظ الصورة» أو «حفظ الفيديو» لملف أرسله هاتفك الوسيط الذي يعمل بنظام أندرويد، يضيفه Pairline إلى مكتبة الصور. ولا يقرأ صورك أبدًا."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When you choose Save Image or Save Video for a file your Android bridge phone sent, Pairline adds it to your photo library. It never reads your photos."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "وقتی برای فایلی که گوشی پل اندرویدی‌تان فرستاده «ذخیره تصویر» یا «ذخیره ویدیو» را انتخاب می‌کنید، Pairline آن را به کتابخانه عکس‌ها اضافه می‌کند. هیچ‌وقت عکس‌های شما را نمی‌خواند."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android köprü telefonunuzun gönderdiği bir dosya için Görüntüyü Kaydet'i veya Videoyu Kaydet'i seçtiğinizde Pairline onu fotoğraf arşivinize ekler. Fotoğraflarınızı asla okumaz."
+          }
+        }
+      }
+    },
     "NSSpeechRecognitionUsageDescription" : {
       "comment" : "Privacy - Speech Recognition Usage Description",
       "extractionState" : "extracted_with_value",

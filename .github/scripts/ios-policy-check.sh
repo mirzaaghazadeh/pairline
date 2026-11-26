@@ -52,5 +52,19 @@ if /usr/libexec/PlistBuddy -c 'Print :NSAppTransportSecurity' "$app/Info.plist" 
   echo "::error::Info.plist has App Transport Security exceptions."
   fail=1
 fi
+
+# Apple's privacy manifest in every bundle (D-097): no tracking and no collected data, as "Data Not Collected" says.
+for bundle in "$app" "$app"/PlugIns/*.appex; do
+  [[ -d "$bundle" ]] || continue
+  manifest="$bundle/PrivacyInfo.xcprivacy"
+  if [[ ! -f "$manifest" ]]; then
+    echo "::error::$(basename "$bundle") has no PrivacyInfo.xcprivacy (D-097)."
+    fail=1
+  elif [[ "$(/usr/libexec/PlistBuddy -c 'Print :NSPrivacyTracking' "$manifest" 2>/dev/null)" != "false" ]] ||
+       [[ "$(/usr/libexec/PlistBuddy -c 'Print :NSPrivacyCollectedDataTypes' "$manifest" 2>/dev/null | grep -c Dict)" != "0" ]]; then
+    echo "::error::$(basename "$bundle")'s privacy manifest must say no tracking and no collected data (D-097)."
+    fail=1
+  fi
+done
 [[ "$fail" -eq 0 ]] && echo "Release binary passes the policy checks."
 exit "$fail"

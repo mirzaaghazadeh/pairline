@@ -983,28 +983,6 @@
         }
       }
     },
-    "Allow camera" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "السماح بالكاميرا"
-          }
-        },
-        "fa" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اجازه دسترسی به دوربین"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kameraya izin ver"
-          }
-        }
-      }
-    },
     "Allow it to run without battery restrictions when Android asks. Some phones have extra autostart settings; the bridge app shows where they are." : {
       "localizations" : {
         "ar" : {
@@ -1023,28 +1001,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Android sorduğunda pil kısıtlaması olmadan çalışmasına izin verin. Bazı telefonlarda ek otomatik başlatma ayarları bulunur; köprü uygulaması bunların nerede olduğunu gösterir."
-          }
-        }
-      }
-    },
-    "Allow notifications" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "السماح بالإشعارات"
-          }
-        },
-        "fa" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اجازه نمایش اعلان‌ها"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bildirimlere izin ver"
           }
         }
       }
@@ -10640,6 +10596,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Android telefonunuzdaki Pairline Bridge'te kişi eşzamanlamasını açın."
+          }
+        }
+      }
+    },
+    "Turn on notifications" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تشغيل الإشعارات"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "روشن کردن اعلان‌ها"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildirimleri aç"
           }
         }
       }

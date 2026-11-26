@@ -15,6 +15,11 @@
 set -eu
 here=${0:A:h}
 : ${ASC_API_KEY_JSON:?Set ASC_API_KEY_JSON to the API key JSON file (see the comment at the top)}
+# The review notes carry a link to the two-phone video (D-097); never send App Review the placeholder.
+if grep -q VIDEO_LINK_HERE "$here/metadata/review_information/notes.txt"; then
+  print -u2 "metadata/review_information/notes.txt still says VIDEO_LINK_HERE: put the review video's link there first."
+  exit 1
+fi
 [[ -d $here/out/en-US/large ]] || $here/render.sh
 
 # deliver reads one folder per locale and tells the display size from each image's pixel size.
