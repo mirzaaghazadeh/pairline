@@ -195,7 +195,7 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
 Two Android phones pairing with each other isn't planned; the started work is archived on
 `archive/m9-android-client-start`.
 
-## M10 — Remote mode (opt-in, paid add-on on the iPhone; D-080)
+## M10 — Remote mode, "Cloud mode" in the apps (opt-in, paid add-on on the iPhone; D-080, D-082)
 
 The bridge stays at home; the iPhone gets calls, SMS and codes, and makes calls and sends SMS, from anywhere. Only
 Apple (the user's own iCloud) and the two phones take part. Built on the `remote-mode` branch.
@@ -222,8 +222,11 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 - [x] The remote-mode add-on purchase (D-081): code and the local StoreKit file; the App Store Connect product waits
       for the maintainer
 - [x] PRIVACY.md, ARCHITECTURE.md, PROTOCOL.md, README and decision entries (D-080, D-081)
+- [x] Pair over the internet: scan the invitation's QR code live on Android (or a picture, or paste the link); wording
+      for pairing your own two phones
+- [ ] "Cloud mode" in the apps, offered right after a normal pairing, and a full UX pass of its screens (D-082)
 - [ ] Street tests on real phones, with the bridge at home on charge and Wi-Fi and the iPhone on mobile data:
-  - [ ] Turn remote mode on; the status line says "Via iCloud", then "Direct connection" where the router allows it
+  - [ ] Turn Cloud mode on; the status line says "Via iCloud", then "Direct connection" where the router allows it
   - [ ] "Check my home connection" matches what the router really does (open, carrier-grade NAT, no UPnP/NAT-PMP/PCP)
   - [ ] SMS and a one-time code arrive with the iPhone locked, through the notification extension, within seconds
   - [ ] A text sent from the iPhone goes out from the Android phone (direct, and via iCloud with the direct
@@ -232,9 +235,9 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
         direct connection, mute, speaker, hang up from both sides
   - [ ] An outgoing call from the iPhone over the direct connection, then the same with the app in the background
   - [ ] Battery, signal and the bridge's name in the Bridge tab, widget and Live Activity while via iCloud
-  - [ ] Walk home: Bluetooth takes over (a call in progress keeps going); leave again: back to remote mode
-  - [ ] Turn remote mode off: the router mapping is gone (router page), the bridge stops checking iCloud
-  - [ ] Remote pairing with a tester's phone in another home, codes compared on a call
+  - [ ] Walk home: Bluetooth takes over (a call in progress keeps going); leave again: back over the internet
+  - [ ] Turn Cloud mode off: the router mapping is gone (router page), the bridge stops checking iCloud
+  - [ ] Pair over the internet with a phone in another home, codes checked on both phones
   - [ ] Both phones' logs show the paths taken and no addresses, numbers or tokens
 
 ## Later

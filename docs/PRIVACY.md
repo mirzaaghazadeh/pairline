@@ -11,7 +11,8 @@ Any change that adds or changes a data flow or permission must update this file 
   directly between them, encrypted.
 - **Only two outside companies are involved, and neither gets your data:** Apple, when you buy something in the
   iPhone app, and GitHub, which the Android app asks once a day whether a new version exists (you can turn that off).
-- **Remote mode (off unless you turn it on, D-080)** lets the phones work while apart through your own iCloud: Apple
+- **Cloud mode (off unless you turn it on; "remote mode" in the code, D-080, D-082)** lets the phones work over the
+  internet while apart, through your own iCloud: Apple
   stores records locked with keys only your two phones hold, and can see that your phones exchange them, not what
   they say. Details below.
 
@@ -69,9 +70,10 @@ Any change that adds or changes a data flow or permission must update this file 
 | App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids, IP addresses or message text; remote mode logs only which way messages went and why a connection failed, never addresses, tokens or mailbox ids) | Last 7 days |
 | Pairing link (QR code) | No | Read from the camera and used once; the secret is never stored or logged | Until pairing ends |
 
-### Remote mode (opt-in, D-080)
+### Cloud mode (opt-in; remote mode in the code, D-080, D-082)
 
-Off until you turn it on (on the iPhone, or by pairing from far away). Until Apple answers D-080's question about the
+Off until you turn it on (on the iPhone: in Settings, when it's offered right after pairing, or by pairing over the
+internet). There is no Pairline server: "cloud" here means your own iCloud. Until Apple answers D-080's question about the
 private database, it exists in debug builds only and uses the app's public CloudKit database, where each record is
 readable only by the iCloud account that wrote it; the design, and release builds, use your private iCloud database.
 

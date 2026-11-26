@@ -44,8 +44,8 @@ Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 The phones talk over Bluetooth LE, plus local Wi-Fi (or the Android phone's own hotspot) for call audio and files.
 Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md).
 
-**Remote mode (in development, off unless you turn it on).** Leave the Android phone at home and keep your texts,
-codes and calls on the iPhone anywhere. There is still no Pairline server: messages travel as locked records through
+**Cloud mode (in development, off unless you turn it on).** Leave the Android phone at home and keep your texts,
+codes and calls on the iPhone anywhere: when the phones aren't near each other, they stay connected over the internet. There is still no Pairline server: messages travel as locked records through
 your own iCloud, which only your two phones can open, and calls go straight to your home through one port your router
 opens for your paired iPhone alone. [docs/PRIVACY.md](docs/PRIVACY.md) lists exactly what Apple and your router see.
 A three-minute intro video, in English, Persian, Turkish and Arabic, is on [getpairline.com](https://getpairline.com).
@@ -56,7 +56,7 @@ A three-minute intro video, in English, Persian, Turkish and Arabic, is on [getp
 - **iPhone app:** free download. Pair your Android phone first: the first sync of your messages, contacts and call
   history is free, then a free week, then a one-time $9.99 In-App Purchase with free updates. No subscription.
   Demo mode is always free.
-- **Remote mode (when it ships):** included in the free week, then a one-time $9.99 add-on after the main purchase.
+- **Cloud mode (when it ships):** included in the free week, then a one-time $9.99 add-on after the main purchase.
 
 ## License
 

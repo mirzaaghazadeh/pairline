@@ -1444,3 +1444,26 @@ The maintainer's pricing for remote mode (D-080). Extends D-017 and D-036; the A
 - **Not done yet:** the product doesn't exist in App Store Connect. Creating it there (price tier, localized name and
   description in English, Arabic and Turkish, review screenshot) waits for the maintainer's OK; until then it exists
   only in `ios/Pairline/Store/Pairline.storekit` for Xcode and the unit tests.
+
+### D-082 — Remote mode is called "Cloud mode"; normal pairing offers it; pairing from far away is "Pair over the internet" (2026-11-26)
+
+The maintainer's decision, after testing remote mode on real phones: "away" and "remote" read as a special situation,
+while the feature is simply how the phones stay connected over the internet whenever they aren't linked nearby.
+
+- **Names in the apps:** the feature is **Cloud mode** (fa «حالت ابری», ar «الوضع السحابي», tr «Bulut modu»); remote
+  pairing is **Pair over the internet** (fa «جفت کردن از راه اینترنت», ar «الإقران عبر الإنترنت», tr «İnternet üzerinden
+  eşleştir»). The link states keep saying how the phones are linked right now: "Via iCloud" (texts and codes; calls
+  need the direct connection) and "Direct connection". The add-on (D-081) is the Cloud mode add-on; its product id
+  `app.pairline.ios.remote` stays.
+- **The code, the protocol and the docs' internals keep "remote mode"** (`remote.*` messages, `link/remote/`,
+  `Remote/`, PROTOCOL.md's "Remote mode (v1, D-080)"), so nothing on the wire or in storage changes. User-facing docs
+  say "Cloud mode (remote mode in the code)".
+- **"Cloud" never means a Pairline server.** Every screen that explains it says the records go through the user's own
+  iCloud, locked with keys only their two phones hold, and that calls go straight between the phones where the home
+  router allows.
+- **Normal pairing offers it.** After pairing with the QR code, the iPhone offers to turn Cloud mode on (with the same
+  explanation as the before-you-turn-it-on screen), where it's available and the purchase state allows it (D-081);
+  "Not now" leaves it off and it stays in Settings. The Android phone can't turn it on (the iPhone supplies the iCloud
+  access); its home screen says whether it's on and where to turn it on.
+- **Automatic, no mode switching:** with Cloud mode on, the phones use Bluetooth or Wi-Fi when they're near each other
+  and the internet (iCloud, and the direct connection) whenever they aren't, without the user doing anything.

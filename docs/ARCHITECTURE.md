@@ -184,7 +184,7 @@ The Android app declares `INTERNET` since D-041. CI (`network-code-check.sh`) co
 debugging, 127.0.0.1 only) and the opt-in `link/remote/` (remote mode: CloudKit Web Services and the home router
 only).
 
-**Remote mode (M10, D-080).** The bridge stays at home; the iPhone keeps texts, codes and calls from anywhere, with only
+**Remote mode (M10, D-080; "Cloud mode" in the apps, D-082).** The bridge stays at home; the iPhone keeps texts, codes and calls from anywhere, with only
 Apple and the two phones involved. While no nearby session is up, `LinkManager` on both sides adds two paths:
 
 - **The mailbox in iCloud.** Events from the bridge go to the iPhone's *alert* mailbox (pushed as a notification the
@@ -199,8 +199,10 @@ Apple and the two phones involved. While no nearby session is up, `LinkManager` 
   A nearby link always wins; in the background the iPhone closes the direct session unless a call is on, so events
   fall back to the mailbox, whose pushes wake the app.
 
-Pairing from far away (remote pairing) replaces the QR code with a one-time invitation and a 6-digit code compared
-on a phone call. Remote mode is off by default, part of the trial, then a one-time add-on (D-081).
+"Pair over the internet" (remote pairing) replaces the QR code with a one-time invitation the user sends to their own
+Android phone (a link, or its QR code scanned there) and a 6-digit code checked on both phones. Cloud mode is off by
+default; the iPhone offers it right after a normal pairing (D-082); it's part of the trial, then a one-time add-on
+(D-081).
 
 **The Wi-Fi link and iOS background.** iOS keeps Bluetooth sessions alive in the background (the app is woken for
 Bluetooth events) but suspends apps with only a socket open. So with both links up, events stay on Bluetooth; over
