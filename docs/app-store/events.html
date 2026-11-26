@@ -43,6 +43,7 @@
 // One entry per event folder in events/: the app screen to show and whether sound waves come off the phone.
 const EVENTS = {
   "talk-on-iphone": { screen: "06-incoming-call", waves: true },
+  "carrier-tools": { screen: "08-bridge-status", waves: true },
 };
 const params = new URLSearchParams(location.hash.slice(1));
 const lang = params.get("lang") || "en";

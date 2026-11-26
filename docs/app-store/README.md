@@ -11,6 +11,7 @@ Everything the App Store product page needs, kept as source so it can be regener
 | `upload.sh` | Uploads `metadata/` and the screenshots to App Store Connect with `fastlane deliver` |
 | `assets.html`, `upload-assets.sh` | The iOS 27 product-page header and search-results images per locale, uploaded and placed with the `asc` CLI |
 | `events/<event>/`, `events.html`, `upload-event.sh` | In-app events: each folder has `event.env` (type, purpose, priority, deep link, dates) and the name and descriptions per locale; `events.html` renders the text-free card and details-page images; `upload-event.sh` creates or updates the event with the `asc` CLI and never submits it |
+| `custom-pages/<page>/`, `upload-custom-page.sh` | Custom product pages: `page.env` (name, slide order) and each locale's promotional text and search keywords; `upload-custom-page.sh` fills in whatever is missing in App Store Connect (localizations, screenshots in that order, keywords) and never submits |
 | `privacy.json` | The App Privacy declaration ("Data Not Collected"), applied and published with `asc web privacy` (needs an `asc web auth login` session) |
 | `../screenshots/ipad/<lang>/` | iPad Pro 13-inch (M5) Simulator captures (2064 x 2752, flattened), framed by `slides.html#device=ipad` |
 | `../screenshots/duo/<lang>/` | iPhone Duo Simulator captures of the inner display, open, in landscape (2853 x 2007), framed by `slides.html#device=duo` |
@@ -64,8 +65,15 @@ account). "Pairline" alone is taken on the App Store, so the store name is "Pair
   `ASC_PROFILE=<profile> ./upload-event.sh <event>`. Text limits: name 30, short description 50, long description 120
   characters (the script checks them). An event runs at most 31 days and can show up to 14 days before it starts; set
   the purchase requirement in App Store Connect (the CLI only offers "no cost associated"), then submit with
-  `asc app-events submit --event-id <id> --app 6838659501 --confirm`. **`talk-on-iphone`** (event 6839726175, a draft):
-  call audio on the iPhone. Set its dates and submit it only after M6 passes the real-phone tests and ships.
+  `asc app-events submit --event-id <id> --app 6838659501 --confirm`. Only features that arrive *after* launch qualify:
+  1.0.1 (build 16) already has call audio, internet sharing and file transfer, so those belong on custom product pages,
+  not in events. Drafts: **`carrier-tools`** (event 6839730908; D-082, not in build 16) and **`talk-on-iphone`** (event
+  6839726175; use it only if a later update is what makes call audio work on real phones). Set dates and submit each
+  only after its feature passes the real-phone tests and ships in an App Store version.
+- **Custom product pages:** "One-time codes", "Travel with two phones" and "Two numbers", each in EN/AR/TR with
+  screenshots for all four sizes, waiting to be submitted. Link to one with the page's `?ppid=` URL (App Store Connect
+  shows it). Search keywords can only be added once the app is released in that locale; then run
+  `ASC_PROFILE=<profile> ./upload-custom-page.sh <page>` for each page to add them. A keyword leads to one page only.
 - **App Privacy:** "Data Not Collected" (`docs/PRIVACY.md`: nothing leaves the user's two phones).
 - **Availability:** remove China mainland (CallKit, D-027).
 - **Age rating:** none of the content questions apply.
