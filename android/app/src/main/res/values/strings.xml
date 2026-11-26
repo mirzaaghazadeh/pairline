@@ -479,38 +479,43 @@
 
     <!-- Remote pairing (D-080): an invitation link from an iPhone that is far away. The code is always shown left to right. -->
     <string name="remote_pair_title">Pair from far away</string>
-    <string name="remote_pair_ask_title">An iPhone wants to pair with this phone from far away</string>
-    <string name="remote_pair_ask_body">If you allow it, the person holding that iPhone gets this phone\'s text messages, one-time codes and calls wherever they are, and can send texts and make calls with this phone\'s SIM.</string>
-    <string name="remote_pair_ask_only_if">Allow it only if you know who sent you this invitation and you were expecting it. Nothing is sent before you tap Allow.</string>
+    <string name="remote_pair_ask_title">Your iPhone wants to pair with this phone from far away</string>
+    <string name="remote_pair_ask_body">If you allow it, your iPhone gets this phone\'s text messages, one-time codes and calls wherever it is, and can send texts and make calls with this phone\'s SIM.</string>
+    <string name="remote_pair_ask_only_if">Allow it only if you made this invitation on your own iPhone just now. Nothing is sent before you tap Allow.</string>
     <string name="remote_pair_replaces">This phone is paired with %1$s now. Allowing this replaces that pairing.</string>
-    <string name="remote_pair_ask_next">Next, both phones show a 6-digit code. Call the person holding the iPhone and check that the codes match.</string>
+    <string name="remote_pair_ask_next">Next, both phones show a 6-digit code. Check that your iPhone shows the same code.</string>
     <string name="remote_pair_expires">Invitation expires in %1$s</string>
     <string name="remote_pair_waiting">Waiting for the iPhone…</string>
-    <string name="remote_pair_waiting_body">This phone\'s answer reaches the iPhone through its owner\'s iCloud. Keep this screen open.</string>
+    <string name="remote_pair_waiting_body">This phone\'s answer reaches your iPhone through its iCloud. Keep this screen open.</string>
     <string name="remote_pair_network">Can\'t reach iCloud right now. Check this phone\'s internet connection; Pairline keeps trying.</string>
     <string name="remote_pair_code_title">Compare the codes</string>
-    <string name="remote_pair_code_body">Call the person holding the iPhone and read your codes to each other. Tap \"The codes match\" only if both phones show the same six digits.</string>
+    <string name="remote_pair_code_body">Look at the code on your iPhone. Tap \"The codes match\" only if both phones show the same six digits.</string>
     <string name="remote_pair_code_expires">Codes expire in %1$s</string>
-    <string name="remote_pair_code_mismatch">If the codes are different, someone else may have the invitation. Tap Cancel and ask for a new one.</string>
+    <string name="remote_pair_code_mismatch">If the codes are different, someone else may have the invitation. Tap Cancel and make a new one on your iPhone.</string>
     <string name="remote_pair_match">The codes match</string>
     <string name="remote_pair_confirming">Waiting for the iPhone to confirm…</string>
-    <string name="remote_pair_confirming_body">The person holding the iPhone needs to confirm that the codes match too.</string>
+    <string name="remote_pair_confirming_body">Confirm on your iPhone that the codes match too.</string>
     <string name="remote_pair_done_title">Paired</string>
-    <string name="remote_pair_done_body">This phone and the iPhone now trust each other. While they\'re apart, they reach each other through the iPhone owner\'s iCloud, and everything stays locked with keys only these two phones hold.</string>
+    <string name="remote_pair_done_body">This phone and your iPhone now trust each other. While they\'re apart, they reach each other through your iCloud, and everything stays locked with keys only these two phones hold.</string>
     <string name="remote_pair_refused_title">This invitation can\'t be used</string>
-    <string name="remote_pair_refused_malformed">The link is incomplete or damaged. Ask the person with the iPhone to send a new invitation.</string>
-    <string name="remote_pair_refused_expired">This invitation has expired. Invitations work for 10 minutes; ask the person with the iPhone for a new one.</string>
+    <string name="remote_pair_refused_malformed">The link is incomplete or damaged. Make a new invitation on your iPhone.</string>
+    <string name="remote_pair_refused_expired">This invitation has expired. Invitations work for 10 minutes; make a new one on your iPhone.</string>
     <string name="remote_pair_refused_unsupported">This invitation is for a test version of Pairline and doesn\'t work with this one.</string>
     <string name="remote_pair_failed_title">Pairing stopped</string>
-    <string name="remote_pair_failed_expired">The iPhone didn\'t answer before the invitation expired. Ask for a new invitation and try again.</string>
+    <string name="remote_pair_failed_expired">The iPhone didn\'t answer before the invitation expired. Make a new invitation on your iPhone and try again.</string>
     <string name="remote_pair_failed_timeout">The codes weren\'t confirmed on both phones within 10 minutes. Start again with a new invitation.</string>
-    <string name="remote_pair_failed_token">iCloud no longer accepts this invitation. Ask for a new one.</string>
+    <string name="remote_pair_failed_token">iCloud no longer accepts this invitation. Make a new one on your iPhone.</string>
     <string name="remote_pair_failed_icloud">Apple doesn\'t let Pairline reach this iCloud account from another phone, so pairing from far away can\'t work with it right now.</string>
-    <string name="remote_pair_failed_bad_answer">The iPhone\'s answer didn\'t pass the checks, so pairing stopped to keep this phone safe. Ask for a new invitation.</string>
+    <string name="remote_pair_failed_bad_answer">The iPhone\'s answer didn\'t pass the checks, so pairing stopped to keep this phone safe. Make a new invitation on your iPhone.</string>
     <string name="remote_pair_failed_internal">Something went wrong on this phone. Try again with a new invitation.</string>
-    <!-- On the pairing screen: for an invitation that arrived in a messenger that doesn't open pairline:// links. -->
-    <string name="remote_pair_paste_intro">Is the iPhone far away? If you got an invitation link from it, copy the whole link and paste it here.</string>
+    <!-- On the pairing screen: an invitation from the user's own iPhone that didn't arrive as a link that opens Pairline. -->
+    <string name="remote_pair_paste_intro">Is your iPhone somewhere else? Make an invitation on it, then open it here: scan its QR code, choose a picture of it, or copy the whole link and paste it.</string>
+    <string name="remote_pair_scan">Scan the invitation\'s QR code</string>
+    <string name="remote_pair_pick">Choose a picture of it</string>
     <string name="remote_pair_paste">Paste an invitation</string>
+    <string name="remote_pair_scan_reading">Reading the QR code…</string>
+    <string name="remote_pair_scan_none">There\'s no Pairline invitation in that picture. Take it again with the whole QR code in view, or paste the link instead.</string>
+    <string name="remote_pair_scan_no_camera">This phone has no camera app for that. Choose a picture of the QR code, or paste the link instead.</string>
     <string name="remote_pair_paste_none">There\'s no Pairline invitation on the clipboard. Copy the whole link (it starts with pairline://invite) and try again.</string>
 
     <!-- Remote mode's direct connection through the home router (D-080): the link card's line while remote mode is on. -->

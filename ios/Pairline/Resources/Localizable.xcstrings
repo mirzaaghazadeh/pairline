@@ -12083,39 +12083,40 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktaki bir telefonla eşleştir" } }
       }
     },
-    "For when the Android phone with your SIM is somewhere else, like at home, and someone there can help." : {
+    "For when your Android phone with the SIM isn't next to you, like at home. Send yourself the invitation, open it on the Android phone, and allow it there." : {
+      "comment" : "Remote pairing (D-080): the owner pairs their own two phones while they're apart. No helper.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حين يكون هاتف أندرويد الذي يحمل شريحتك في مكان آخر، كالمنزل، وهناك من يستطيع المساعدة." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای وقتی که گوشی اندرویدیِ دارای سیم‌کارت شما جای دیگری است، مثلاً در خانه، و کسی آنجا می‌تواند کمک کند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "SIM kartınızın takılı olduğu Android telefon başka bir yerdeyse (örneğin evde) ve orada yardım edebilecek biri varsa." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حين لا يكون هاتف أندرويد الذي يحمل شريحتك بجانبك، كأن يكون في المنزل. أرسل الدعوة إلى نفسك، وافتحها على هاتف أندرويد، واسمح بالإقران هناك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای وقتی که گوشی اندرویدیِ دارای سیم‌کارت کنارتان نیست، مثلاً در خانه است. دعوت‌نامه را برای خودتان بفرستید، روی گوشی اندرویدی بازش کنید و همان‌جا اجازه بدهید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "SIM kartın takılı olduğu Android telefonunuz yanınızda değilken, örneğin evdeyken. Daveti kendinize gönderin, Android telefonda açın ve orada izin verin." } }
       }
     },
-    "Ask them to install Pairline Bridge on the Android phone from getpairline.com." : {
+    "Pairline Bridge needs to be installed on the Android phone (getpairline.com)." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اطلب منه تثبيت Pairline Bridge على هاتف أندرويد من getpairline.com." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از او بخواهید Pairline Bridge را از getpairline.com روی گوشی اندرویدی نصب کند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge'i getpairline.com adresinden Android telefona yüklemesini isteyin." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يجب أن يكون Pairline Bridge مثبتًا على هاتف أندرويد (getpairline.com)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge باید روی گوشی اندرویدی نصب باشد (getpairline.com)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonda Pairline Bridge yüklü olmalıdır (getpairline.com)." } }
       }
     },
-    "Send them the invitation from the next screen. They open it on the Android phone and allow the pairing." : {
+    "Send the invitation from the next screen to your Android phone, by email or a message to yourself. Open it there and allow the pairing." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أرسل إليه الدعوة من الشاشة التالية، فيفتحها على هاتف أندرويد ويسمح بالإقران." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دعوت‌نامه را از صفحه بعد برایش بفرستید. او آن را روی گوشی اندرویدی باز می‌کند و اجازه جفت‌سازی را می‌دهد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sonraki ekrandaki daveti ona gönderin. Daveti Android telefonda açıp eşleştirmeye izin verir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أرسل الدعوة من الشاشة التالية إلى هاتف أندرويد الخاص بك، عبر البريد الإلكتروني أو رسالة إلى نفسك. افتحها هناك واسمح بالإقران." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دعوت‌نامه را از صفحه بعد به گوشی اندرویدی‌تان بفرستید، با ایمیل یا پیامی به خودتان. آنجا بازش کنید و اجازه جفت‌سازی را بدهید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sonraki ekrandaki daveti e-postayla ya da kendinize bir mesajla Android telefonunuza gönderin. Orada açıp eşleştirmeye izin verin." } }
       }
     },
-    "Call them: you'll both see a 6-digit code. Pair only if the codes match." : {
+    "Both phones then show a 6-digit code. Pair only if the codes match." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصل به: سيظهر لكما رمز من ستة أرقام. أكمل الإقران فقط إذا تطابق الرمزان." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "با او تماس بگیرید: هر دو یک کد ۶ رقمی می‌بینید. فقط اگر کدها یکی بودند جفت کنید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Onu arayın: ikiniz de 6 haneli bir kod göreceksiniz. Yalnızca kodlar aynıysa eşleştirin." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بعدها يعرض الهاتفان رمزًا من ستة أرقام. أكمل الإقران فقط إذا تطابق الرمزان." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعد هر دو گوشی یک کد ۶ رقمی نشان می‌دهند. فقط اگر کدها یکی بودند جفت کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ardından iki telefon da 6 haneli bir kod gösterir. Yalnızca kodlar aynıysa eşleştirin." } }
       }
     },
-    "The invitation works once, for 10 minutes. Send it only to the person helping you." : {
+    "The invitation works once, for 10 minutes. Send it only to yourself, for example to your own email or a chat with yourself." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعمل الدعوة مرة واحدة ولمدة عشر دقائق. أرسلها فقط إلى الشخص الذي يساعدك." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دعوت‌نامه فقط یک بار و تا ۱۰ دقیقه کار می‌کند. آن را فقط برای کسی بفرستید که به شما کمک می‌کند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Davet yalnızca bir kez ve 10 dakika boyunca geçerlidir. Yalnızca size yardım eden kişiye gönderin." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعمل الدعوة مرة واحدة ولمدة عشر دقائق. أرسلها إلى نفسك فقط، مثلًا إلى بريدك الإلكتروني أو إلى محادثة مع نفسك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دعوت‌نامه فقط یک بار و تا ۱۰ دقیقه کار می‌کند. آن را فقط برای خودتان بفرستید، مثلاً به ایمیل خودتان یا گفت‌وگویی با خودتان." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Davet yalnızca bir kez ve 10 dakika boyunca geçerlidir. Yalnızca kendinize gönderin, örneğin kendi e-postanıza ya da kendinizle bir sohbete." } }
       }
     },
     "Create invitation" : {
@@ -12146,11 +12147,11 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu daveti gönderin" } }
       }
     },
-    "Share it with the person helping you. It opens in Pairline Bridge on the Android phone; the QR code holds the same invitation." : {
+    "Send it to your Android phone, for example by email or a message to yourself. It opens in Pairline Bridge there. Or scan this QR code with the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شاركها مع الشخص الذي يساعدك، فتُفتح في Pairline Bridge على هاتف أندرويد. ورمز QR يحمل الدعوة نفسها." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آن را برای کسی که به شما کمک می‌کند بفرستید. روی گوشی اندرویدی در Pairline Bridge باز می‌شود؛ کد QR هم همین دعوت‌نامه است." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Size yardım eden kişiyle paylaşın. Android telefonda Pairline Bridge'de açılır; QR kod da aynı daveti içerir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أرسلها إلى هاتف أندرويد الخاص بك، مثلًا عبر البريد الإلكتروني أو رسالة إلى نفسك، فتُفتح هناك في Pairline Bridge. أو امسح رمز QR هذا بهاتف أندرويد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آن را به گوشی اندرویدی‌تان بفرستید، مثلاً با ایمیل یا پیامی به خودتان. آنجا در Pairline Bridge باز می‌شود. یا این کد QR را با گوشی اندرویدی اسکن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuza gönderin, örneğin e-postayla ya da kendinize bir mesajla. Orada Pairline Bridge'de açılır. Ya da bu QR kodu Android telefonla tarayın." } }
       }
     },
     "Share invitation" : {
@@ -12188,11 +12189,11 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kodları karşılaştırın" } }
       }
     },
-    "Read this code to the person holding the Android phone on a call. Their phone shows a code too." : {
+    "Check that your Android phone shows the same code." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في مكالمة هاتفية، اقرأ هذا الرمز على من يحمل هاتف أندرويد، فهاتفه يعرض رمزًا أيضًا." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این کد را در یک تماس تلفنی برای کسی که گوشی اندرویدی دستش است بخوانید. گوشی او هم یک کد نشان می‌دهد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu kodu bir aramada Android telefonu tutan kişiye okuyun. Onun telefonunda da bir kod görünür." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تأكّد من أن هاتف أندرويد الخاص بك يعرض الرمز نفسه." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مطمئن شوید گوشی اندرویدی‌تان همین کد را نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzun aynı kodu gösterdiğini kontrol edin." } }
       }
     },
     "If the codes are different, cancel: someone else may have the invitation." : {
@@ -12230,11 +12231,11 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yanıt vermeden davetin süresi doldu. Yeni bir davet oluşturun." } }
       }
     },
-    "Someone else opened this invitation too, so pairing was stopped to keep you safe. Create a new one and send it only to the person helping you." : {
+    "Someone else opened this invitation too, so pairing was stopped to keep you safe. Create a new one and send it only to yourself." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فتح شخص آخر هذه الدعوة أيضًا، لذا أُوقف الإقران حفاظًا على أمانك. أنشئ دعوة جديدة وأرسلها فقط إلى الشخص الذي يساعدك." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کس دیگری هم این دعوت‌نامه را باز کرد، پس برای حفظ امنیت شما جفت‌سازی متوقف شد. یک دعوت‌نامه جدید بسازید و فقط برای کسی بفرستید که به شما کمک می‌کند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu daveti başka biri de açtı, bu yüzden güvenliğiniz için eşleştirme durduruldu. Yeni bir davet oluşturup yalnızca size yardım eden kişiye gönderin." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فتح شخص آخر هذه الدعوة أيضًا، لذا أُوقف الإقران حفاظًا على أمانك. أنشئ دعوة جديدة وأرسلها إلى نفسك فقط." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کس دیگری هم این دعوت‌نامه را باز کرد، پس برای حفظ امنیت شما جفت‌سازی متوقف شد. یک دعوت‌نامه جدید بسازید و فقط برای خودتان بفرستید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu daveti başka biri de açtı, bu yüzden güvenliğiniz için eşleştirme durduruldu. Yeni bir davet oluşturup yalnızca kendinize gönderin." } }
       }
     },
     "The Android phone's answer didn't check out, so pairing was stopped to keep you safe. Try again with a new invitation." : {

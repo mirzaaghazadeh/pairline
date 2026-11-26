@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Files received from the iPhone on Android 9 (FileStore.LegacySink). Nothing else is shared. -->
+<!-- Files received from the iPhone on Android 9 (FileStore.LegacySink), and the one photo the camera app takes when
+     the user scans a remote-pairing invitation (InvitationPhoto, deleted once read). Nothing else is shared. -->
 <paths>
     <external-files-path name="received" path="Download/Pairline/" />
+    <cache-path name="scan" path="scan/" />
 </paths>

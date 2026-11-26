@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// "Pair a phone that's far away" (D-080; PROTOCOL.md, "Remote pairing"): a short explanation, then the invitation to
-/// send, the code the two people compare on a call, and the confirmation. Only where `RemoteFeature.isAvailable`.
+/// "Pair a phone that's far away" (D-080; PROTOCOL.md, "Remote pairing"): the owner pairs their own two phones while
+/// they're apart. A short explanation, then the invitation they send to their Android phone, the code to check on both
+/// phones, and the confirmation. Only where `RemoteFeature.isAvailable`.
 struct RemotePairingView: View {
     let onPaired: () -> Void
     @EnvironmentObject private var app: AppModel
@@ -34,14 +35,14 @@ struct RemotePairingView: View {
                     .font(.largeTitle)
                     .foregroundStyle(Color.brandBlue)
                 RemotePairingHeader(title: Text("Pair a phone that's far away"),
-                                    subtitle: Text("For when the Android phone with your SIM is somewhere else, like at home, and someone there can help."))
+                                    subtitle: Text("For when your Android phone with the SIM isn't next to you, like at home. Send yourself the invitation, open it on the Android phone, and allow it there."))
                 VStack(alignment: .leading, spacing: 12) {
-                    HelpBullet(symbol: "arrow.down.app", text: Text("Ask them to install Pairline Bridge on the Android phone from getpairline.com."))
-                    HelpBullet(symbol: "square.and.arrow.up", text: Text("Send them the invitation from the next screen. They open it on the Android phone and allow the pairing."))
-                    HelpBullet(symbol: "phone", text: Text("Call them: you'll both see a 6-digit code. Pair only if the codes match."))
+                    HelpBullet(symbol: "arrow.down.app", text: Text("Pairline Bridge needs to be installed on the Android phone (getpairline.com)."))
+                    HelpBullet(symbol: "square.and.arrow.up", text: Text("Send the invitation from the next screen to your Android phone, by email or a message to yourself. Open it there and allow the pairing."))
+                    HelpBullet(symbol: "checkmark.shield", text: Text("Both phones then show a 6-digit code. Pair only if the codes match."))
                 }
                 .card(padding: 14)
-                Label("The invitation works once, for 10 minutes. Send it only to the person helping you.",
+                Label("The invitation works once, for 10 minutes. Send it only to yourself, for example to your own email or a chat with yourself.",
                       systemImage: "lock.shield")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -138,7 +139,7 @@ private struct RemotePairingSteps: View {
         let start = Date()
         return VStack(spacing: 18) {
             RemotePairingHeader(title: Text("Send this invitation"),
-                                subtitle: Text("Share it with the person helping you. It opens in Pairline Bridge on the Android phone; the QR code holds the same invitation."))
+                                subtitle: Text("Send it to your Android phone, for example by email or a message to yourself. It opens in Pairline Bridge there. Or scan this QR code with the Android phone."))
             VStack(spacing: 14) {
                 // The invitation holds a secret and an iCloud token: not read out by VoiceOver.
                 QRCodeImage(text: uri)
@@ -170,7 +171,7 @@ private struct RemotePairingSteps: View {
     private func compare(_ code: String) -> some View {
         VStack(spacing: 18) {
             RemotePairingHeader(title: Text("Compare the codes"),
-                                subtitle: Text("Read this code to the person holding the Android phone on a call. Their phone shows a code too."))
+                                subtitle: Text("Check that your Android phone shows the same code."))
             // Digits only, always left to right, as "123 456".
             Text(verbatim: "\(code.prefix(3)) \(code.suffix(3))")
                 .font(.system(size: 56, weight: .bold, design: .rounded).monospacedDigit())
@@ -228,7 +229,7 @@ private struct RemotePairingSteps: View {
         case .expired:
             return String(localized: "The invitation expired before the Android phone answered. Create a new one.")
         case .someoneElse:
-            return String(localized: "Someone else opened this invitation too, so pairing was stopped to keep you safe. Create a new one and send it only to the person helping you.")
+            return String(localized: "Someone else opened this invitation too, so pairing was stopped to keep you safe. Create a new one and send it only to yourself.")
         case .notVerified:
             return String(localized: "The Android phone's answer didn't check out, so pairing was stopped to keep you safe. Try again with a new invitation.")
         case .timedOut:

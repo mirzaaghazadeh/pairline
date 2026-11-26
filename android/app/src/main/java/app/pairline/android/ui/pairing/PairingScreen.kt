@@ -1,9 +1,14 @@
 package app.pairline.android.ui.pairing
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.ClipboardManager
 import android.content.Context
+import android.net.Uri
 import android.view.WindowManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -35,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -73,7 +79,11 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
+import app.pairline.android.log.Log
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Shows the pairing QR code (PROTOCOL.md, "Pairing"): a single-use secret valid for 5 minutes, refreshed
@@ -229,27 +239,95 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 /**
- * Remote pairing (D-080) for an invitation that arrived in a messenger that doesn't open `pairline://` links: the
- * person copies the whole link and pastes it here. The clipboard is read only when they tap the button.
+ * Remote pairing (D-080) for an invitation that didn't arrive as a link that opens Pairline: scan its QR code (the
+ * phone's own camera app takes one photo, read here and deleted at once; no camera permission), choose a picture of
+ * the QR code (a screenshot sent in a messenger), or paste the whole link. The clipboard is read only on a tap.
  */
 @Composable
 private fun RemoteInvitationPaste() {
     val context = LocalContext.current
-    var nothingToPaste by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    var problem by remember { mutableStateOf<Int?>(null) }
+    var reading by remember { mutableStateOf(false) }
+    var photo by rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    fun open(text: String?, notFound: Int) {
+        val invitation = text?.trim()
+        if (invitation == null || !invitation.startsWith(RemoteInvitation.PREFIX)) {
+            problem = notFound
+            return
+        }
+        problem = null
+        AppGraph.remotePairing.open(invitation)
+    }
+
+    fun read(uri: Uri, temporary: Boolean) {
+        reading = true
+        scope.launch {
+            val text = withContext(Dispatchers.Default) {
+                try {
+                    InvitationQr.decode(context, uri)
+                } catch (e: Exception) {
+                    Log.w("pairing", "couldn't read the picture: ${e.javaClass.simpleName}")
+                    null
+                } finally {
+                    if (temporary) InvitationPhoto.delete(context)
+                }
+            }
+            reading = false
+            open(text, R.string.remote_pair_scan_none)
+        }
+    }
+
+    val takePicture = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
+        val uri = photo
+        photo = null
+        if (taken && uri != null) read(uri, temporary = true) else InvitationPhoto.delete(context)
+    }
+    val pickPicture = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) read(uri, temporary = false)
+    }
+
     Text(
         stringResource(R.string.remote_pair_paste_intro),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
     )
+    SecondaryButton(stringResource(R.string.remote_pair_scan), {
+        problem = null
+        val uri = InvitationPhoto.create(context)
+        photo = uri
+        try {
+            takePicture.launch(uri)
+        } catch (e: ActivityNotFoundException) {
+            photo = null
+            InvitationPhoto.delete(context)
+            problem = R.string.remote_pair_scan_no_camera
+        }
+    }, icon = PIcons.Qr)
+    SecondaryButton(stringResource(R.string.remote_pair_pick), {
+        problem = null
+        try {
+            pickPicture.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } catch (e: ActivityNotFoundException) {
+            problem = R.string.remote_pair_scan_none
+        }
+    }, icon = PIcons.Image)
     SecondaryButton(stringResource(R.string.remote_pair_paste), {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val text = clipboard.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)
-            ?.coerceToText(context)?.toString()?.trim()
-        nothingToPaste = text == null || !text.startsWith(RemoteInvitation.PREFIX)
-        if (!nothingToPaste) AppGraph.remotePairing.open(text!!)
+            ?.coerceToText(context)?.toString()
+        open(text, R.string.remote_pair_paste_none)
     }, icon = PIcons.Copy)
-    if (nothingToPaste) NoteBox(stringResource(R.string.remote_pair_paste_none), Tone.WARN, PIcons.Warning)
+    if (reading) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+            Spacer(Modifier.width(10.dp))
+            Text(stringResource(R.string.remote_pair_scan_reading), style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+    problem?.let { NoteBox(stringResource(it), Tone.WARN, PIcons.Warning) }
 }
 
 @Composable
