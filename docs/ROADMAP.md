@@ -44,13 +44,13 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [x] `status` message (battery, signal, carrier) shown on the iPhone — iOS: bridge dashboard, widget
 - [x] Unpair from either side
 - [x] Android setup wizard: permissions, battery-optimization request, OEM autostart tips
-- [ ] Setup guide videos (EN/FA), bundled in the app, shown in picture-in-picture over Android Settings — Android
-      has animated illustrations in each wizard step for now; no videos have been recorded yet
+- [x] Setup guidance over Android Settings — instead of videos (dropped, D-074): each step's instructions wait in a
+      notification while the user is in Android Settings, on top of the wizard's animated illustrations
 - [x] Readable diagnostics screen with a "Share report" action that shows the exact text first
 - [x] Bridge app version in `status`; the iPhone tells the user when the Android app needs an update (no network)
-- [ ] Auto-reconnect after the Bluetooth link drops; optional, opt-in Bluetooth restart (Pairline's helper) when
+- [x] Auto-reconnect after the Bluetooth link drops; optional, opt-in Bluetooth restart (Pairline's helper) when
       it's stuck — iOS done (pending connect + scanning, backoff, idle watchdog); Android re-advertises after a drop
-      and runs keep-alive / handshake timeouts. The Bluetooth restart through the helper isn't built
+      and runs keep-alive / handshake timeouts; the opt-in restart is in Settings › Advanced (D-078)
 
 ## M2 — SMS
 
@@ -130,11 +130,15 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
       local network; PROTOCOL.md "Call audio", D-047) — wired to the M5 media channel on both sides (bridge relay
       `setTransport`, iPhone `CallCenter.mediaTransport`); a real relayed call is still to be tested
 - [x] Packet-loss concealment (jitter buffer, repeat-and-fade) — echo self-test still open
-- [ ] Test call with "Did you hear it?" feedback; automatic choice of the audio method (`call.media.feedback`
-      flips capture source and bridge-mic muting — bridge side done, iPhone prompt pending); known-device list
-      shipped inside the app (never fetched)
-- [ ] Root mode (option C) for devices where shell rights aren't enough — the same helper started with `su`
-      (not built; with Shizuku gone, D-054, rooted phones use Wireless debugging like everyone else)
+- [x] Call audio over Bluetooth, so Talk on iPhone works without Wi-Fi between the phones (D-072): Opus inside the
+      Bluetooth session with each platform's own codec, audio ahead of other traffic, a fast connection during the
+      call; iPhone Settings › Call audio chooses Bluetooth (default) or Wi-Fi first — unit-tested on both sides and
+      on the Simulator against the fake bridge; **real phones pending**
+- [x] Test call with "Did you hear it?" feedback; automatic choice of the audio method (`call.media.feedback`
+      flips capture source and bridge-mic muting; the iPhone asks after a relayed call, D-078) — a known-device list
+      shipped inside the app waits for real-device results
+- [x] Root mode in Settings › Advanced (D-075): the same helper started as the shell user with `su`, so a rooted
+      phone needs no Wireless debugging and keeps Talk on iPhone after a restart without Wi-Fi — real-phone test pending
 - [x] Clean fallback to "audio on the Android phone" when a device isn't supported: caps `call.media` /
       `call.media.talk` say exactly what works; "listen only" when injection isn't possible
 - [x] Android setup: optional "Talk on iPhone" step after pairing and a Settings page — a checklist that ticks
@@ -174,6 +178,17 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
       doesn't tell other apps
 - [x] `netshare` package is allowed to open non-local connections (network-code-check.sh), only for the iPhone's
       own traffic; PRIVACY.md updated
+- [x] Switch the Android phone's hotspot, Bluetooth tethering, mobile data and data SIM from the iPhone, through Talk
+      on iPhone's helper (D-073) — real-phone test pending
+
+## Phone-app basics (D-074)
+
+- [x] Recents callback (`INStartCallIntent`), calls in Recents on by default, "Call with Pairline" for Siri and
+      Shortcuts, `pairline://call` fills the keypad
+- [x] Reply from the notification, mute a conversation, read state synced to the Android phone
+- [x] Hold, call waiting (answer, swap, end either), Audio route button
+- [x] Find phone and the ringer switch; edit contacts and favourites from the iPhone
+- [ ] Real-phone test of all of the above
 
 ## M9 — Android client mode: dropped (D-050)
 
@@ -208,8 +223,8 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 
 ## Later
 
-- Mac app
-- Notification mirroring from chosen Android apps
+- ~~Notification mirroring from chosen Android apps~~ — done (D-077), real-phone test pending
+- ~~Mac app~~ — the iPad app on Apple Silicon Macs (D-076)
 - MMS (picture messages)
-- Encrypted backup and export of SMS history
+- ~~Export of SMS history~~ — done on the iPhone (D-079); an encrypted backup format isn't planned (D-079)
 - More languages: Turkish, Urdu, Chinese, Indonesian (English, Persian and Arabic ship at launch, D-019)

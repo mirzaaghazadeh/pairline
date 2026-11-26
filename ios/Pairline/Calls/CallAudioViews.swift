@@ -23,7 +23,7 @@ struct CallAudioInfoSheet: View {
                     Section {
                         step(1, "On the Android phone, open Pairline Bridge › Settings › Talk on iPhone.")
                         step(2, "Turn on Wireless debugging in Developer options and pair it with the code on screen. The bridge app shows each step; no extra app is needed.")
-                        step(3, "Keep both phones on the same Wi-Fi. Calls you take on this iPhone then use its microphone and speaker.")
+                        step(3, "Keep the phones near each other. Calls you take on this iPhone then use its microphone and speaker, over Bluetooth or Wi-Fi.")
                     } header: {
                         t("Talk on your iPhone")
                     } footer: {
@@ -34,7 +34,7 @@ struct CallAudioInfoSheet: View {
                     t("After the Android phone restarts, the bridge app turns Wireless debugging back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Until then calls ring here and the audio stays on the Android phone.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
-                    t("Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored.")
+                    t("Call audio goes directly between your two phones over Bluetooth or Wi-Fi, encrypted end to end. It's never recorded or stored.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -57,7 +57,8 @@ struct CallAudioInfoSheet: View {
             return t("You hear this call here. Talk on your Android phone: it can't take audio from the iPhone.")
         case .connecting: return t("Moving the audio to this iPhone…")
         case .bridge:
-            if bridge.has(.callMedia) {
+            // Only an older bridge, which carries call audio over Wi-Fi alone, can be set up and still have no way.
+            if calls.audioNeedsWiFi {
                 return t("Your bridge is set up for Talk on iPhone, but the phones aren't on the same Wi-Fi right now.")
             }
             return t("This call's audio plays on your Android phone.")

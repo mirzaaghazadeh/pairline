@@ -6,6 +6,7 @@ struct CallsTab: View {
         case keypad
     }
 
+    @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var bridge: BridgeController
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var section: Section = .recents
@@ -71,6 +72,7 @@ struct CallsTab: View {
                 .frame(width: 220)
             }
         }
+        .onReceive(app.$dialerPrefill) { if $0 != nil { section = .keypad } }
     }
 }
 
@@ -363,6 +365,12 @@ struct DialerView: View {
             if sim == nil {
                 sim = bridge.effectiveSim(forSMS: false)
             }
+        }
+        // A `pairline://call` link fills in the number; the user still taps Call (D-074).
+        .onReceive(app.$dialerPrefill) { prefill in
+            guard let prefill else { return }
+            number = prefill
+            app.dialerPrefill = nil
         }
         .sheet(item: $ussdResult) { item in
             USSDResultSheet(item: item)

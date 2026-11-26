@@ -72,6 +72,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getBoolean(TALK_ON_IPHONE, false)
         set(value) = edit { putBoolean(TALK_ON_IPHONE, value) }
 
+    /** Settings › Advanced › Root mode (D-075): start the helper through `su` instead of Wireless debugging. */
+    var rootMode: Boolean
+        get() = prefs.getBoolean(ROOT_MODE, false)
+        set(value) = edit { putBoolean(ROOT_MODE, value) }
+
     /** Pairline is paired with this phone's Wireless debugging (D-054); cleared when adbd stops accepting its key. */
     var adbPaired: Boolean
         get() = prefs.getBoolean(ADB_PAIRED, false)
@@ -145,6 +150,16 @@ class AppPrefs(context: Context) {
         get() = prefs.getBoolean(NET_SHARE_DIRECT_IR, false)
         set(value) = edit { putBoolean(NET_SHARE_DIRECT_IR, value) }
 
+    /** Settings › Advanced › Restart Bluetooth when stuck (D-078, opt-in, needs the helper). */
+    var bluetoothRestart: Boolean
+        get() = prefs.getBoolean(BLUETOOTH_RESTART, false)
+        set(value) = edit { putBoolean(BLUETOOTH_RESTART, value) }
+
+    /** Apps whose notifications are mirrored to the iPhone (package names, D-077). Empty: none. */
+    var mirrorApps: Set<String>
+        get() = prefs.getStringSet(MIRROR_APPS, null).orEmpty().toSet()
+        set(value) = edit { putStringSet(MIRROR_APPS, value.toSet()) }
+
     /** Permissions we've asked for at least once, to tell "never asked" from "don't ask again". */
     fun wasRequested(permission: String): Boolean = prefs.getBoolean("asked:$permission", false)
 
@@ -178,6 +193,9 @@ class AppPrefs(context: Context) {
         const val LAST_SEEN = "last_seen"
         const val COMPANION_BOUND = "companion_bound_at"
         const val TALK_ON_IPHONE = "talk_on_iphone"
+        const val ROOT_MODE = "root_mode"
+        const val MIRROR_APPS = "mirror_apps"
+        const val BLUETOOTH_RESTART = "bluetooth_restart"
         const val ADB_PAIRED = "adb_paired"
         const val BRIDGE_STOPPED = "bridge_stopped"
         const val AUDIO_SOURCE = "audio_capture_source"

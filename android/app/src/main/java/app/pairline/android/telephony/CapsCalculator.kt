@@ -20,6 +20,16 @@ data class CapsInput(
     val netShare: Boolean = false,
     /** The Wi-Fi link is switched on (M5): files can go both ways over a Wi-Fi session. */
     val wifiLink: Boolean = false,
+    /** Call audio can also travel inside the Bluetooth session as Opus (with [mediaListen], D-072). */
+    val mediaLink: Boolean = false,
+    /** The iPhone may switch this phone's internet sharing (Talk on iPhone's helper running, D-073). */
+    val netSwitch: Boolean = false,
+    /** Pairline may mark SMS read (its WRITE_SMS app-op, D-074). */
+    val smsWrite: Boolean = false,
+    /** Find phone and the ringer switch are available (D-074). */
+    val phoneTools: Boolean = false,
+    /** Notification access is given, so chosen apps' notifications are mirrored (D-077). */
+    val notifMirror: Boolean = false,
 )
 
 /**
@@ -35,6 +45,7 @@ object CapsCalculator {
             if (has(Manifest.permission.RECEIVE_SMS)) caps += Caps.SMS_RECEIVE
             if (has(Manifest.permission.SEND_SMS)) caps += Caps.SMS_SEND
             if (has(Manifest.permission.READ_SMS)) caps += Caps.SMS_HISTORY
+            if (has(Manifest.permission.READ_SMS) && input.smsWrite) caps += Caps.SMS_READ
         }
         if (input.hasCalling) {
             if (phoneState) caps += Caps.CALL_OBSERVE
@@ -43,18 +54,29 @@ object CapsCalculator {
             if (input.inCallService) {
                 caps += Caps.CALL_DTMF
                 caps += Caps.CALL_AUDIO
+                caps += Caps.CALL_HOLD
             }
             if (has(Manifest.permission.CALL_PHONE) && phoneState) caps += Caps.USSD
             if (input.mediaListen && phoneState) {
                 caps += Caps.CALL_MEDIA
                 if (input.mediaTalk) caps += Caps.CALL_MEDIA_TALK
+                if (input.mediaLink) caps += Caps.CALL_MEDIA_LINK
             }
         }
         if (has(Manifest.permission.READ_CONTACTS)) caps += Caps.CONTACTS
         if (has(Manifest.permission.READ_CALL_LOG)) caps += Caps.CALLLOG
-        if (input.contactsAddEnabled && has(Manifest.permission.WRITE_CONTACTS)) caps += Caps.CONTACTS_ADD
+        if (input.contactsAddEnabled && has(Manifest.permission.WRITE_CONTACTS)) {
+            caps += Caps.CONTACTS_ADD
+            if (has(Manifest.permission.READ_CONTACTS)) caps += Caps.CONTACTS_EDIT
+        }
+        if (input.phoneTools) {
+            caps += Caps.PHONE_FIND
+            caps += Caps.PHONE_RINGER
+        }
+        if (input.notifMirror) caps += Caps.NOTIF_MIRROR
         if (input.activeSims >= 2) caps += Caps.DUALSIM
         if (input.netShare) caps += Caps.NET_SHARE
+        if (input.netSwitch) caps += Caps.NET_SWITCH
         if (input.wifiLink) {
             caps += Caps.WIFI
             caps += Caps.FILES

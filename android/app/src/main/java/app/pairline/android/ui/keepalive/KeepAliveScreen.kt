@@ -26,8 +26,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.pairline.android.R
+import app.pairline.android.ui.ClearSetupGuideOnResume
 import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
+import app.pairline.android.ui.SetupGuide
 import app.pairline.android.ui.SystemActions
 import app.pairline.android.ui.components.ListRow
 import app.pairline.android.ui.components.NoteBox
@@ -77,10 +79,21 @@ fun KeepAliveScreen(back: () -> Unit) {
                     }
                 }
             }
-            SectionCard(title = stringResource(R.string.keepalive_step_maker, stringResource(maker.label))) {
+            val makerTitle = stringResource(R.string.keepalive_step_maker, stringResource(maker.label))
+            val makerSteps = stringResource(maker.steps)
+            ClearSetupGuideOnResume()
+            SectionCard(title = makerTitle) {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(maker.steps), style = MaterialTheme.typography.bodyLarge)
-                    PrimaryButton(stringResource(R.string.action_open_settings), { maker.open(context) }, icon = PIcons.OpenExternal)
+                    Text(makerSteps, style = MaterialTheme.typography.bodyLarge)
+                    PrimaryButton(
+                        stringResource(R.string.action_open_settings),
+                        {
+                            // The steps wait in a notification while the user is in Android Settings (D-074).
+                            SetupGuide.show(context, makerTitle, makerSteps)
+                            maker.open(context)
+                        },
+                        icon = PIcons.OpenExternal,
+                    )
                 }
             }
             SectionCard(title = stringResource(R.string.keepalive_other_makers)) {

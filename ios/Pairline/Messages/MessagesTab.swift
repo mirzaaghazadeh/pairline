@@ -129,6 +129,7 @@ struct ConversationList: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var bridge: BridgeController
     @EnvironmentObject private var db: AppDatabase
+    @ObservedObject private var notifier = Notifier.shared
     @Environment(\.editMode) private var editMode
     @State private var rows: [(Conversation, StoredMessage?)] = []
 
@@ -161,13 +162,23 @@ struct ConversationList: View {
                         .swipeActions(edge: .leading) {
                             if conversation.unread > 0 {
                                 Button {
-                                    db.markRead(thread: conversation.thread)
-                                    bridge.updateBadge()
+                                    bridge.markRead(thread: conversation.thread)
                                 } label: {
                                     Label("Read", systemImage: "envelope.open")
                                 }
                                 .tint(.brandBlue)
                             }
+                            // Muted: no banner or sound for this conversation (D-074).
+                            Button {
+                                notifier.setMuted(conversation.thread, !notifier.isMuted(conversation.thread))
+                            } label: {
+                                if notifier.isMuted(conversation.thread) {
+                                    Label { Text("Unmute", tableName: "PhoneTools") } icon: { Image(systemName: "bell") }
+                                } else {
+                                    Label { Text("Mute", tableName: "PhoneTools") } icon: { Image(systemName: "bell.slash") }
+                                }
+                            }
+                            .tint(.indigo)
                         }
                 }
             }
@@ -265,6 +276,12 @@ struct ConversationRow: View {
                     nameText
                         .font(.headline.weight(conversation.unread > 0 ? .bold : .semibold))
                         .lineLimit(1)
+                    if Notifier.shared.isMuted(conversation.thread) {
+                        Image(systemName: "bell.slash.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel(Text("Muted", tableName: "PhoneTools"))
+                    }
                     Spacer(minLength: 8)
                     Text(Formatters.listTime(conversation.time))
                         .font(.caption)

@@ -53,7 +53,7 @@ account, so almost every user will buy the official app.
 
 No accounts, analytics, crash reporting or license server. The only network party is Apple, via StoreKit.
 A future remote-mode relay must be opt-in and end-to-end encrypted, and must be documented in PRIVACY.md before it ships.
-(Superseded for remote mode by D-072: no relay; the user's own iCloud and a direct connection.)
+(Superseded for remote mode by D-080: no relay; the user's own iCloud and a direct connection.)
 
 ### D-007 — Package IDs (2026-11-24)
 
@@ -1159,57 +1159,222 @@ captured open, in English and Arabic, and checked:
 - **No trademark filing,** the maintainer's decision. This replaces D-001's "do a proper trademark search before
   launch". The name and logo stay outside the license (its Trademarks clause, README), so a copy may not use them.
 
-### D-072 — Remote mode: the user's own iCloud as doorbell and mailbox, a direct connection through the home router (2026-11-26)
+### D-072 — Call audio over Bluetooth, as Opus inside the Bluetooth session (2026-11-26)
 
-The maintainer's design. **Supersedes D-006's "future remote-mode relay" sentence:** there is still no Pairline
-server. The bridge stays at home (on charge, on home Wi-Fi) and the iPhone keeps getting calls, SMS and one-time codes,
-and makes calls and sends SMS, from anywhere. Only Apple and the user's own two phones take part: no third-party
-service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch as milestone M10.
+Talk on iPhone needed the Wi-Fi link for its audio (D-047), so away from a shared Wi-Fi (in the street, in a car) the
+call's audio stayed on the Android phone unless the user turned its hotspot on. The maintainer asked for audio over
+Bluetooth, with a setting, and Bluetooth as the default if it works well.
+- **Setting:** iPhone Settings › Call audio: **Bluetooth** (default) or **Wi-Fi**. The choice is what a call tries
+  first; when it isn't up (no Bluetooth session, a bridge without `call.media.link`, no Wi-Fi link) the other is
+  used. Wi-Fi keeps uncompressed PCM (D-047).
+- **Codec:** Opus, 16 kHz mono, 20 ms frames, the VoIP application, 32 kbit/s: wideband speech like an HD-voice
+  call, about 80 bytes a frame, so a frame fits one BLE fragment (raw PCM is 640 bytes and 32 KB/s each way, more than
+  BLE carries reliably). Each platform's own codec: Android's `MediaCodec` (its Opus encoder came with Android 10;
+  Talk on iPhone needs 11+) and iOS's AudioToolbox (`kAudioFormatOpus`). **No new dependency**, nothing that could
+  reach a network. The bridge lists `call.media.link` only when it finds both an encoder and a decoder.
+- **Wire (PROTOCOL.md "Call audio"):** a new `MEDIA` frame (`0x22`) on the Bluetooth (or debug TCP) session, channel
+  3, with keys of its own (`"pairline v0 link media"`), so the two media paths never share a key and nonce. Ordered
+  like the control channel: a replayed or forged record closes the connection. One record holds one or more packets,
+  each with a 2-byte length, so a sender that fell behind catches up in one frame. A new packet kind `0x02` (Opus).
+  `call.media.start` takes `via: "link"`. No version bump: like `BULK`, nothing is sent until the bridge accepted a
+  request an older app never makes. New vectors (`link_media`) on both sides.
+- **Bluetooth behaviour:** at each frame boundary the audio goes before frames still waiting (a 30 KB sync page can't
+  hold up the voice; fragments of two frames still never interleave); audio that waited over 200 ms is dropped
+  rather than played late; during the call the bridge asks Android for high connection priority and the 2M PHY
+  through the LE link it already holds (`BleTransport.holdLeLink`), and returns to balanced after. Jitter buffers hold
+  80 ms on Bluetooth (deliveries come in bursts), 60 ms on Wi-Fi as before.
+- **Expected:** a short gap now and then when Bluetooth stalls, filled by the jitter buffer's concealment. Bluetooth
+  tethering between the same two phones shares the radio and can cause longer stalls; Wi-Fi stays available for that.
+- **Tested:** unit tests and vectors on both sides, the iPhone's Opus encoder and decoder round trip, and the
+  Simulator against `fake_bridge.py` over the debug TCP link, which echoes `MEDIA` frames: with `-PairlineLinkMediaTest`
+  (debug builds) the app sent 50 Opus frames of a tone (32 kbit/s, 71 bytes on average), got all 50 back and decoded
+  them at the tone's level. Android's `MediaCodec` Opus and the Bluetooth path itself need real phones next.
 
-- **Doorbell and mailbox: CloudKit, the user's own private database** (container `iCloud.app.pairline.ios`). At
-  pairing, and whenever it expires, the iPhone fetches a CloudKit web auth token (`CKFetchWebAuthTokenOperation` with
-  the app's CloudKit API token) and sends it to the bridge over the encrypted link. The bridge reads and writes records
-  through CloudKit Web Services. Every record's payload is sealed with keys from the pairing's sessions as PROTOCOL.md
-  specifies (no new algorithms), so Apple stores only ciphertext. Records are deleted once handled.
-- **Waking the iPhone:** a CloudKit database subscription with mutable content; a Notification Service Extension
-  decrypts and shows the SMS or the caller. A call rings through CallKit with
-  `CXProvider.reportNewIncomingVoIPPushPayload` from the extension, which needs Apple's notification-filtering
-  entitlement (`com.apple.developer.usernotifications.filtering`); until Apple grants it, a time-sensitive
-  notification opens the call. The extension reads the keys from a shared Keychain access group, nowhere less
-  protected.
-- **Commands from the iPhone** go over the direct connection when it's up, otherwise as mailbox records, which the
-  bridge watches while remote mode is on.
-- **Direct connection** (call audio, and everything else while the app is awake): the bridge asks the home router to
-  open one port (NAT-PMP, then PCP, then UPnP IGD; small clients of our own, no new dependency), learns the public
-  IPv4, lists its global IPv6 addresses, and puts them in the mailbox. The iPhone connects out to them and runs the
-  same session as the Wi-Fi link. The public listener drops anything that doesn't complete the pairing-key handshake,
-  parses as little as possible before that, and rate-limits. Turning remote mode off, or forgetting the pairing,
-  closes the router mapping, stops the listener and deletes the CloudKit records.
-- **Audio:** a compressed audio kind, Opus (iOS `AVAudioConverter`, Android `MediaCodec`, whose encoder exists from
-  Android 10), next to the PCM kind; local links keep PCM.
+### D-073 — The Android phone's hotspot, Bluetooth tethering, mobile data and data SIM, switched from the iPhone (2026-11-26)
+
+Away from Wi-Fi, the iPhone gets internet through the Android phone's hotspot or Bluetooth tethering, but the user had
+to take the Android phone out to turn them on: Pairline only opened Android's hotspot settings (D-061, rule 5). The
+maintainer asked for switches on the iPhone, and for Bluetooth tethering to be shown and explained.
+- **Rule 5 and 7, amended by the maintainer:** a switch the user flips on the iPhone is the user asking. While Talk on
+  iPhone's helper runs, the Android phone's hotspot, Bluetooth tethering, mobile data and data SIM change when, and
+  only when, the user flips that switch. AGENTS.md and PRIVACY.md say so.
+- **How:** three helper operations (helper version 7), each on the allowlist with its arguments checked:
+  `setTethering(type, on)` with Android's own `TetheringManager` (a system API, reached by reflection as the shell
+  user, which holds `TETHER_PRIVILEGED`; Android's carrier entitlement check still runs), only the Wi-Fi hotspot and
+  Bluetooth kinds; `setMobileData(on)` with Android's own `svc data` (or `cmd phone data`); and
+  `setDataSubscription(subId)` (`SubscriptionManager.setDefaultDataSubId`, `MODIFY_PHONE_STATE`), only an active SIM.
+  Android 11 or later (the helper's own minimum), with no new permission in the app's manifest.
+- **Wire:** `status.net` (`hotspot`, `bluetooth`, `data`), `sims[].defaultData`, and the `net.switch` request
+  (`what`, `on` or `sim`), under the capability `net.switch` (listed while the helper runs). No version bump: older
+  apps ignore the new fields and never send the request. Turning a hotspot off is answered before it stops, since the
+  iPhone may be on it. Pairline's own local-only hotspot gives way when the phone's hotspot is turned on.
+- **Reading** needs no privilege: Android's tethering broadcast (`bt-pan` is Bluetooth tethering; Android 11 and 12
+  list it only once a device has joined, so there it shows as on from when Pairline turned it on), and the data SIM's
+  `isDataEnabled`. The bridge's own Settings › This phone's hotspot also says when Bluetooth tethering is on and how
+  the iPhone joins it (Settings › Bluetooth, pair once), and that the iPhone can switch these.
+- **iPhone:** Settings › Internet sharing starts with an "Android phone" section: Hotspot, Bluetooth tethering, Mobile
+  data and, with two SIMs, Data SIM. Without the capability the switches show the state, disabled, with what's
+  needed. A help answer explains the switches and joining over Wi-Fi or Bluetooth.
+- **Left out on purpose:** airplane mode, which would cut the Bluetooth link the switch travels on, so the iPhone
+  couldn't turn it back off; and the preferred network type, which Android exposes per carrier in ways that vary too
+  much to switch safely without a real phone to test on.
+- **Tested:** unit tests on both sides (requests, errors, caps, status decoding), `fake_bridge.py` answers
+  `net.switch`, and the iPhone screen in English and Persian on the Simulator in demo mode. The helper's tethering,
+  mobile-data and data-SIM calls need a real phone next.
+
+### D-074 — Calls from Recents, Siri and links; reply, read sync and mute; hold and call waiting; Find phone; contact edits; a setup guide instead of videos (2026-11-26)
+
+The maintainer asked to finish what users expect of a phone app, to make a Pairline call in the iPhone's Recents work,
+to show calls in Recents by default, and to drop the setup videos for guidance inside the app.
+- **Recents:** tapping a Pairline call in the Phone app's Recents did nothing: iOS hands the app an
+  `INStartCallIntent`, which Pairline didn't take (`NSUserActivityTypes` and `onContinueUserActivity` now do; the call
+  is placed once the bridge is linked, after a cold start). "Show calls in iPhone Recents" is now **on by default**
+  (the maintainer's decision; ARCHITECTURE.md had it off because Recents can sync to iCloud, which the setting says).
+  A user who turned it off keeps it off.
+- **Siri and Shortcuts:** "Call with Pairline", an App Intent (text shared into a Shortcut works: its first phone
+  number is called). `pairline://call?number=…` links only fill in the keypad: any page could open one. Pairline as
+  iOS's default calling app (iOS 18.2+) needs an entitlement from Apple; not requested.
+- **Messages:** reply from the notification (sent through the bridge like a typed message, queued if the bridge is
+  away); mute a conversation on the iPhone (no banner or sound; one-time codes still notify); read sync: `sms.read`
+  marks a conversation's received messages read on Android. Only the default messaging app may write Android's SMS
+  store, so Talk on iPhone's helper gives Pairline its own WRITE_SMS app-op (helper version 8, Pairline's package only,
+  returned with "Forget pairing"); capability `sms.read`. Whether the default messaging app shows the change depends on
+  that app.
+- **Calls:** `call.hold` (the companion call service's `Call.hold`/`unhold`), CallKit's Hold button and an in-app one;
+  call waiting: a second call rings in CallKit (two call groups) and on the call screen; answering it puts the first on
+  hold (Android does), Swap brings the held one back, and either can be ended. An Audio button (iOS's route picker)
+  moves the call's audio on the iPhone to a headset or the car.
+- **Find phone** (`phone.find`): the Android phone rings on the alarm stream at full volume for up to a minute, even
+  on silent, with a Stop button in its notification; the alarm volume is put back. **Ringer** (`phone.ringer`, status
+  `ringer`): sound, vibrate or silent from the iPhone. Silent is Do Not Disturb to Android: it needs Do Not Disturb
+  access, which only the user grants (`ACCESS_NOTIFICATION_POLICY` declared so Pairline is listed; the bridge shows a
+  notification that opens the setting when it's missing).
+- **Contacts:** `contacts.update` (name, numbers, favourite), under the same opt-in as adding (`contacts.edit`).
+- **Setup guide instead of videos:** when a step opens Android Settings (Developer options, Wireless debugging, the
+  maker's battery settings), its exact instructions wait in a notification to pull down there, with a tap back; it
+  clears when Pairline is on screen again. The videos item in the roadmap is closed by this.
+- **Not done:** the preferred network type (D-073); Pairline as iOS's default calling app.
+- **Tested:** unit tests on both sides (caps, requests, status, number detection), `fake_bridge.py` answers the new
+  requests, both apps build and lint clean. CallKit, Recents, Siri, hold and call waiting, read sync and the ringer
+  need real phones.
+
+### D-075 — Root mode under Settings › Advanced; restricted settings guided (2026-11-26)
+
+- **Root mode,** the maintainer's choice, kept out of the way under a new Settings › Advanced: on a rooted phone
+  (Magisk, KernelSU, APatch), Talk on iPhone's helper starts with `su 2000 -c <the same start command>` instead of
+  through Wireless debugging. It runs as the shell user, exactly as before, never as root: the allowlist, the caller
+  check and everything the helper may do stay the same (rule 7). No Developer options, no pairing, and it starts
+  again by itself after a restart without Wi-Fi. The switch is offered only when a `su` binary is found (checked by
+  looking for the file, so no root prompt until the user turns it on); the root app asks once. If `su` is missing or
+  refused, Talk on iPhone says so and offers Wireless debugging again.
+- **"App was denied access" (restricted settings):** Android 13 and later block SMS and call-history permissions for
+  apps installed from a downloaded or local file until the user allows restricted settings. A tester hit it. When
+  Android refuses one of those permissions and this copy came from a file (`InstallSourceInfo.packageSource`, read
+  locally), the bridge opens App info and leaves the steps in the setup guide's notification (⋮ › Allow restricted
+  settings, then Permissions › SMS), instead of leaving the user at Android's dialog.
+
+### D-076 — The iPad app on Apple Silicon Macs (2026-11-26)
+
+The maintainer asked for a Mac app; the iPad app runs on Apple Silicon Macs as it is, so no separate app.
+- `SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD` is now YES (it was NO without a recorded reason); the app builds for "My Mac
+  (Designed for iPad)". Both TestFlight groups already offer iOS builds on Apple Silicon Macs
+  (`iosBuildsAvailableForAppleSiliconMac`). The App Store side is the "iPhone and iPad Apps on Apple Silicon Macs"
+  setting in App Store Connect's Pricing and Availability, which the API doesn't expose.
+- On a Mac: the Bluetooth link works as on iPad; CallKit's call screen isn't there, so calls use Pairline's own call
+  screen (the existing fallback); pairing scans the Android screen with the Mac's camera (the AVFoundation scanner,
+  since VisionKit's isn't on Mac), with a hint to hold the phone up to it.
+- Not tested on a Mac yet.
+
+### D-077 — Notifications from chosen Android apps, on the iPhone (2026-11-26)
+
+- **Opt-in twice:** the user gives Pairline Bridge notification access (Android's own screen; for an app installed
+  from a file that's a restricted setting first, and the setup guide says how), then chooses apps in Bridge › Settings
+  › Notifications from apps. None are chosen at first. On the iPhone, Settings › Notifications › "Notifications from
+  Android apps" (on) can hide them all.
+- **What's sent:** `notif.posted` with the app's name, the title and up to 1,000 characters of text, over the
+  encrypted link only (rule 1), never logged; a later post with the same key replaces it. `notif.removed` when it
+  goes away on Android, `notif.dismiss` when the user swipes it away on the iPhone (iOS's custom dismiss action), so
+  both phones agree. Ongoing notifications (music, navigation, downloads, foreground services), group summaries, calls
+  and Pairline's own are left out. Nothing is sent while the iPhone isn't linked; nothing is queued.
+- **Listing apps:** `<queries>` for home-screen apps (MAIN/LAUNCHER) instead of `QUERY_ALL_PACKAGES`.
+- **iPhone:** a local notification per mirrored one, grouped by app, title and app name, text unless "Show message
+  text" is off.
+- **Tested:** unit tests (caps, decoding), both apps build and lint clean; needs a real phone.
+
+### D-078 — Restart Bluetooth when stuck (opt-in, Settings › Advanced) (2026-11-26)
+
+- Android's Bluetooth stack sometimes stops advertising until Bluetooth is turned off and on. With "Restart Bluetooth
+  when stuck" on (off by default) and Talk on iPhone's helper running, three advertising failures within ten minutes
+  while the iPhone isn't linked make the helper run `cmd bluetooth_manager disable`/`enable` (`svc bluetooth` before
+  Android 12), at most once an hour. Failures during a connection don't count: some chips can't advertise while
+  connected. Helper version 9; rule 5 lists it as a setting changed only with the user's opt-in.
+- The "Did you hear it?" test after a relayed call is in place on the iPhone (`call.media.feedback`, the bridge picks
+  the capture source and mic handling); the roadmap item is closed except for a shipped list of known devices, which
+  needs real-device results first.
+
+### D-079 — Export messages; the trial purchase on testers' iPhones (2026-11-26)
+
+- **Export messages** (iPhone Settings › Help › Export messages): every conversation on the iPhone as a readable
+  text file and a CSV, made on the device (complete file protection), handed to the share sheet only when the user
+  taps one, and deleted when the screen closes. An encrypted backup format isn't added: the messages stay in
+  Android's own SMS store, which is the copy that matters, and a new format would need its own crypto spec (rule 8).
+- **Trial purchase on TestFlight:** on one tester's iPhone Apple's purchase sheet stayed up after "Get"; on another
+  StoreKit failed with "SKInternalErrorDomain error 14" (no public meaning; reported elsewhere as a StoreKit system
+  error when the account can't complete it). The purchase now names the scene on screen
+  (`Product.purchase(confirmIn:)`, iOS 17+) so the sheet attaches to Pairline's window; failures log their domain,
+  code and underlying error to diagnostics and tell the user what to check (signed in under Media & Purchases,
+  in-app purchases allowed in Screen Time, restart).
+
+### D-080 — Remote mode: the user's own iCloud as doorbell and mailbox, a direct connection through the home router (2026-11-26)
+
+The maintainer's design, built on the `remote-mode` branch as milestone M10 (written there as D-072 and renumbered
+when `main`'s D-072–D-079 were merged in). **Supersedes D-006's "future remote-mode relay" sentence:** there is still
+no Pairline server. The bridge stays at home (on charge, on home Wi-Fi) and the iPhone keeps getting calls, SMS and
+one-time codes, and makes calls and sends SMS, from anywhere. Only Apple and the user's own two phones take part: no
+third-party service (no STUN/TURN, Firebase or Tailscale).
+
+- **Doorbell and mailbox: CloudKit in the user's own iCloud** (container `iCloud.app.pairline.ios`). The iPhone
+  fetches a CloudKit web auth token (`CKFetchWebAuthTokenOperation` with the app's CloudKit API token) and sends it
+  to the bridge over the encrypted link or in a remote-pairing invitation. The bridge reads and writes records through
+  CloudKit Web Services. Every record is sealed on its own (PROTOCOL.md "Mailbox records": a one-way Noise K pattern
+  with the pinned identity keys, platform primitives only), so Apple stores only ciphertext. Records are deleted once
+  handled.
+- **Waking the iPhone:** CloudKit subscriptions on an alert mailbox (mutable push; a Notification Service Extension
+  unseals the record and shows the SMS, code or caller) and a quiet one (silent push: status, delivery reports). A
+  call is to ring through CallKit with `CXProvider.reportNewIncomingVoIPPushPayload` from the extension once Apple
+  grants the notification-filtering entitlement (`com.apple.developer.usernotifications.filtering`); until then a
+  time-sensitive notification opens the call. The extension reads the keys from the app group's Keychain group.
+- **Commands from the iPhone** go over a live session (Bluetooth, Wi-Fi or the direct connection) when one is up,
+  otherwise as mailbox records, which the bridge checks on a timer (Apple has no push for web clients).
+- **Direct connection:** the bridge asks the home router to forward one TCP port (NAT-PMP, then PCP, then UPnP IGD;
+  small clients of our own, no new dependency), learns the public IPv4 and its global IPv6 address, and sends them
+  sealed (`remote.addr`). The iPhone connects out to them and runs the same session as the Wi-Fi link. The public
+  listener reads only the hello and the confirm before the handshake authenticates the pinned iPhone, drops anything
+  else within 10 s, and rate-limits. Turning remote mode off, or forgetting the pairing, closes the router mapping,
+  stops the listener and deletes the CloudKit records.
+- **Audio:** D-072's Opus, as `MEDIA` frames inside the session, carried over the direct connection (no UDP port, no
+  second mapping); local links keep their own paths.
 - **Android code** lives in `link/remote/`; `network-code-check.sh` lets it reach only CloudKit's web services host
-  and the local router. Any wire change bumps the protocol version, PROTOCOL.md and the shared vectors.
+  and, by address, the local router and the paired iPhone.
 - **What users are told** (a screen before turning it on, PRIVACY.md, README): no Pairline server; content locked
   with keys only the two phones hold; Apple stores only locked records in the user's own iCloud; audio goes straight
   between the phones; the home router opens one port only the paired iPhone can use; Apple and internet providers can
   see that the phones talk, not what they say. Off by default. A status line shows "Direct connection" or "Via
   iCloud"; the local log records connections, redacted (rule 9).
-- **First, three risky parts are proven** (Phase 0): the home router's port mapping, the CloudKit path from a
-  non-Apple client to a suspended iPhone, and the filtering entitlement request. Results are added below.
-- **Remote pairing** (added 2026-11-26 at the maintainer's request, also for testing with a tester's phone in
-  another home): pairing while the phones are apart. The user picks "Pair a phone that's far away" on the iPhone,
-  which makes a one-time invitation (10 minutes, single use) carrying what the Android phone needs to reach the
-  mailbox and to start the pairing. It is sent by any means; the person at home opens it in Pairline on the Android
-  phone and allows it there. The phones meet through the iCloud mailbox (or the direct connection), and both show a
-  6-digit code derived from the pairing handshake, which the two people compare on a phone call and confirm on both
-  phones; a copied invitation produces different codes and the pairing stops. This replaces "seeing the QR code"
-  as the trust anchor for this one flow only, chosen explicitly on both phones; outside it, release builds still
-  pair only from the camera. The Android phone's own setup (installing Pairline, its permissions, Talk on iPhone)
-  still happens on that phone. Known limit: an intercepted invitation's iCloud token reaches only Pairline's records
-  in that user's iCloud, which stay sealed, until Apple expires it. Part of the remote-mode add-on; it comes after
-  the mailbox works, with its own protocol version, PROTOCOL.md text and vectors.
+- **Remote pairing** (the maintainer's request, also for testing with a tester's phone in another home): pairing
+  while the phones are apart. "Pair a phone that's far away" on the iPhone makes a one-time invitation (10 minutes,
+  single use); the person at home opens or pastes it in Pairline on the Android phone and allows it there; the phones
+  meet through the mailbox and both show a 6-digit code from the handshake, which the two people compare on a call and
+  confirm on both phones. A copied invitation produces different codes, and the pairing stops. This replaces "seeing
+  the QR code" as the trust anchor for this one flow only, chosen explicitly on both phones; outside it, release
+  builds still pair only from the camera. Known limit: an intercepted invitation's iCloud token reaches only
+  Pairline's records in that user's iCloud, which stay sealed, until Apple expires it.
+- **Protocol:** v1 is v0 plus remote mode (PROTOCOL.md "Remote mode (v1, D-080)", vectors `v1-remote.json`); local
+  links stay v0 on the wire. Status goes to the mailbox at once only when something that matters changes (network,
+  SIMs, charging, each 10 % of battery), signal bars and battery percent at most every 10 minutes; `remote.state`
+  reasons are fixed codes.
 
-**Phase 0 results (2026-11-26, in progress):**
+**Phase 0 results (2026-11-26):**
 
 - **Router** (`protocol/tools/router_check.py`, read-only): the maintainer's OpenWrt router answers none of NAT-PMP,
   PCP or UPnP IGD (no miniupnpd installed), and the home network has no global IPv6. A direct connection isn't
@@ -1238,7 +1403,8 @@ service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch
   Apple ID). Turning "Access iCloud Data on the Web" off and on only invalidated the existing tokens. iCloud.com
   shows the account's Notes, and the CloudKit Console ("Act As iCloud Account", which uses Apple's own developer
   API) lists the container's private zones for the same user, so only third-party web access is refused. A focused
-  sample app reproduces it from the iPhone alone; it went to Apple Developer Technical Support on 2026-11-26.
+  sample app reproduces it from the iPhone alone; it went to Apple Developer Technical Support on 2026-11-26
+  (Case-ID 23765312).
 - **Until Apple answers, tests use the public database** (the maintainer's decision; debug builds only; the
   shipping design stays the private database). `Mail` gets a queryable `mailbox` ID and a `sealed` text field
   (a push can't carry a BYTES field: "unsupported field type in notification"), and is readable only by the
@@ -1248,3 +1414,7 @@ service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch
   modification, so the notification service extension can unlock them before they're shown.
 - **Filtering entitlement** requested on 2026-11-26 (Apple request ID Q7U98356ZR), for the extension
   `app.pairline.ios.notifications`, use case end-to-end encrypted messaging.
+- **Tested on the maintainer's iPhone 16e** with a stand-in bridge (`protocol/tools/fake_remote_bridge.py`): remote
+  pairing through iCloud (both showed the same code), SMS with a one-time code shown on the locked iPhone by the
+  extension (the Secure Enclave key opened in the extension), texts sent from the iPhone through the mailbox, and the
+  bridge's name, battery and signal shown "Via iCloud" in the app, the Live Activity and the widget.

@@ -246,6 +246,37 @@ class BleTransport(
         startAdvertising()
     }
 
+    /**
+     * While call audio runs inside the Bluetooth session (D-072): asks for Android's fastest connection to the iPhone
+     * (high connection priority, about 11–15 ms between connection events instead of 30–50) and the 2M PHY, then back
+     * to balanced. The connection priority can only be asked for through a GATT client, which [holdLeLink] keeps
+     * anyway; the iPhone decides what it accepts.
+     */
+    fun setLowLatency(on: Boolean) {
+        handler.post {
+            val priority = if (on) BluetoothGatt.CONNECTION_PRIORITY_HIGH else BluetoothGatt.CONNECTION_PRIORITY_BALANCED
+            for ((address, gatt) in held) {
+                val asked = runCatching { gatt.requestConnectionPriority(priority) }.getOrDefault(false)
+                if (on) {
+                    // Phones without LE 2M keep 1M; Android just ignores the wish.
+                    runCatching {
+                        gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK,
+                            BluetoothDevice.PHY_OPTION_NO_PREFERRED)
+                    }
+                    connections[address]?.device?.let { device ->
+                        runCatching {
+                            server?.setPreferredPhy(device, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK,
+                                BluetoothDevice.PHY_OPTION_NO_PREFERRED)
+                        }
+                    }
+                }
+                Log.i(TAG, "call audio ${if (on) "started" else "ended"}: asked for ${if (on) "high" else "balanced"} " +
+                    "connection priority (${if (asked) "accepted by Android" else "refused"})")
+            }
+            if (held.isEmpty() && on) Log.i(TAG, "call audio started without an LE link hold; connection priority unchanged")
+        }
+    }
+
     private fun stopInternal() {
         runCatching { advertiser?.stopAdvertising(advertiseCallback) }
         advertising = false
@@ -420,8 +451,37 @@ class BleTransport(
         private var alive = true
         private var closing = false
         private var inFlight = false
-        private val queue = ArrayDeque<ByteArray>()
+
+        /** Frames waiting to start, each as its fragments. */
+        private val queue = ArrayDeque<List<ByteArray>>()
+
+        /** What's left of the frame being sent: fragments of two frames never interleave (PROTOCOL.md, "BLE"). */
+        private val sending = ArrayDeque<ByteArray>()
+
+        /** Call audio (D-072): pulled at each frame boundary, ahead of [queue]. */
+        private var media: MediaFrameSource? = null
         private val reassembler = BleReassembler()
+
+        override val pullsMedia: Boolean get() = true
+
+        override fun mediaReady(source: MediaFrameSource) {
+            handler.post {
+                if (closing || !current) return@post
+                media = source
+                pump()
+            }
+        }
+
+        private fun fragmentsOf(frame: ByteArray): List<ByteArray>? {
+            val payload = BleFragmenter.payloadFor(mtus[device.address] ?: 23)
+            return try {
+                BleFragmenter.fragment(frame, payload)
+            } catch (e: IllegalArgumentException) {
+                Log.w(TAG, "$label: can't send a frame of ${frame.size} bytes", e)
+                disconnect("frame too large")
+                null
+            }
+        }
 
         private val current: Boolean get() = alive && connections[device.address] === this
 
@@ -435,25 +495,20 @@ class BleTransport(
         override fun send(frame: ByteArray) {
             handler.post {
                 if (closing || !current) return@post
-                val payload = BleFragmenter.payloadFor(mtus[device.address] ?: 23)
-                val fragments = try {
-                    BleFragmenter.fragment(frame, payload)
-                } catch (e: IllegalArgumentException) {
-                    Log.w(TAG, "$label: can't send a frame of ${frame.size} bytes", e)
-                    disconnect("frame too large")
-                    return@post
-                }
-                queue.addAll(fragments)
+                queue.addLast(fragmentsOf(frame) ?: return@post)
                 pump()
             }
         }
+
+        private val idle: Boolean get() = queue.isEmpty() && sending.isEmpty() && !inFlight
 
         /** Disconnects once frames already queued (such as a final `unpair`) are sent, or after 2 s at most. */
         override fun close() {
             handler.post {
                 if (closing || !current) return@post
                 closing = true
-                if (queue.isEmpty() && !inFlight) {
+                media = null
+                if (idle) {
                     disconnect("closed by the bridge")
                 } else {
                     handler.postDelayed({ disconnect("closed by the bridge") }, 2_000)
@@ -469,6 +524,8 @@ class BleTransport(
             if (!alive) return
             alive = false
             queue.clear()
+            sending.clear()
+            media = null
             if (connections[device.address] === this) connections.remove(device.address)
             if (!linkGone) {
                 runCatching {
@@ -496,7 +553,13 @@ class BleTransport(
         fun pump() {
             ensureOpened()
             if (!current || inFlight || device.address !in subscribed) return
-            val next = queue.firstOrNull() ?: return
+            if (sending.isEmpty()) {
+                // A frame boundary: call audio first, then the frames waiting in order.
+                val audio = if (closing) null else media?.nextFrame()
+                val frame = audio?.let { fragmentsOf(it) ?: return } ?: queue.removeFirstOrNull() ?: return
+                sending.addAll(frame)
+            }
+            val next = sending.first()
             val s = server ?: return
             val tx = txCharacteristic ?: return
             val ok = try {
@@ -515,7 +578,7 @@ class BleTransport(
                 return
             }
             if (ok) {
-                queue.removeFirst()
+                sending.removeFirst()
                 inFlight = true
             } else {
                 // The stack is busy; try again shortly.
@@ -532,7 +595,7 @@ class BleTransport(
                 return
             }
             pump()
-            if (closing && queue.isEmpty() && !inFlight) disconnect("closed by the bridge")
+            if (closing && idle) disconnect("closed by the bridge")
         }
     }
 

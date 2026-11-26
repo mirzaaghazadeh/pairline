@@ -15,13 +15,20 @@ import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.os.Binder
 import android.os.Build
+import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.Process
 import android.telecom.TelecomManager
+import android.telephony.SubscriptionManager
 import androidx.annotation.RequiresApi
 import app.pairline.android.BuildConfig
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Proxy
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
+import java.util.function.Supplier
 import kotlin.system.exitProcess
 import org.json.JSONObject
 
@@ -30,9 +37,12 @@ import org.json.JSONObject
  * ([HelperMain]) as the shell user; the app talks to it through [IPrivilegedService].
  *
  * - Only Pairline's own uid may call it ([checkCaller]); every argument is checked against a fixed list.
- * - It can do six things: report what the phone allows, turn on Pairline's MANAGE_ONGOING_CALLS app-op, let
- *   Pairline write secure settings (D-059), capture the call's audio, feed audio into the call, and silence this
- *   phone's earpiece during a relayed call. Nothing else is reachable.
+ * - It can do these things and nothing else: report what the phone allows, turn on Pairline's MANAGE_ONGOING_CALLS
+ *   app-op, let Pairline write secure settings (D-059), capture the call's audio, feed audio into the call, silence
+ *   this phone's earpiece and ringer during a relayed call, and, when the user flips the switch on the iPhone,
+ *   start or stop the phone's hotspot or Bluetooth tethering, turn mobile data on or off, or pick the data SIM
+ *   (D-073), give Pairline its WRITE_SMS app-op so reading on the iPhone marks messages read here (D-074), and,
+ *   with the user's opt-in, restart Bluetooth when Android's Bluetooth is stuck (D-078).
  * - The microphone mute and earpiece silence it sets during a relayed call are restored by [stopAudio], or when
  *   Pairline's process ends; the app-op and the permission are set only once the user turned on "Talk on iPhone".
  * - It writes no logs: errors go back to the app as exceptions, and the app logs them (redacted) in its own log.
@@ -253,6 +263,131 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         return process.waitFor() == 0
     }
 
+    /**
+     * Android's TetheringManager (a system API, so reached by reflection), made for [shell] like [audio]: the
+     * tethering service checks that the calling package belongs to the calling uid, and the shell user holds
+     * TETHER_PRIVILEGED, which starting tethering requires. Android 11 and later.
+     */
+    private val tethering: Any? by lazy {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return@lazy null
+        runCatching {
+            val supplier = Supplier { serviceBinder(TETHERING_SERVICE) }
+            Class.forName(TETHERING_MANAGER)
+                .getConstructor(Context::class.java, Supplier::class.java)
+                .newInstance(shell, supplier)
+        }.getOrNull()
+    }
+
+    /**
+     * Starts or stops the phone's own hotspot or Bluetooth tethering, as Android's Hotspot & tethering screen does
+     * (with its carrier check). Only when the user flips the switch on the iPhone (D-073).
+     */
+    override fun setTethering(type: Int, on: Boolean): Int {
+        checkCaller()
+        if (type !in TETHERING_TYPES) throw IllegalArgumentException("tethering type $type isn't allowed")
+        val manager = tethering ?: throw IllegalStateException("tethering isn't reachable on this phone")
+        val cls = manager.javaClass
+        try {
+            if (!on) {
+                cls.getMethod("stopTethering", Int::class.javaPrimitiveType).invoke(manager, type)
+                return 0
+            }
+            val result = ArrayBlockingQueue<Int>(1)
+            val callbackClass = Class.forName("$TETHERING_MANAGER\$StartTetheringCallback")
+            val callback = Proxy.newProxyInstance(callbackClass.classLoader, arrayOf(callbackClass)) { proxy, method, args ->
+                when (method.name) {
+                    "onTetheringStarted" -> { result.offer(0); null }
+                    "onTetheringFailed" -> { result.offer(args?.firstOrNull() as? Int ?: TETHER_NO_ANSWER); null }
+                    "hashCode" -> System.identityHashCode(proxy)
+                    "equals" -> proxy === args?.firstOrNull()
+                    "toString" -> "pairline-tethering"
+                    else -> null
+                }
+            }
+            val builder = Class.forName("$TETHERING_MANAGER\$TetheringRequest\$Builder")
+                .getConstructor(Int::class.javaPrimitiveType)
+                .newInstance(type)
+            val request = builder.javaClass.getMethod("build").invoke(builder)!!
+            cls.getMethod("startTethering", request.javaClass, Executor::class.java, callbackClass)
+                .invoke(manager, request, Executor { it.run() }, callback)
+            return result.poll(TETHER_WAIT_MS, TimeUnit.MILLISECONDS) ?: TETHER_NO_ANSWER
+        } catch (e: InvocationTargetException) {
+            val cause = e.targetException
+            throw IllegalStateException(cause.message ?: cause.javaClass.simpleName)
+        } catch (e: ReflectiveOperationException) {
+            throw IllegalStateException("tethering isn't reachable on this phone (${e.javaClass.simpleName})")
+        }
+    }
+
+    /** Mobile data on or off for the data SIM, with Android's own shell command. Only from the iPhone's switch (D-073). */
+    override fun setMobileData(on: Boolean): Boolean {
+        checkCaller()
+        val verb = if (on) "enable" else "disable"
+        // `svc data` exists on every version the helper runs on; newer ones also have `cmd phone data`.
+        return run(SVC, "data", verb) || run(CMD, "phone", "data", verb)
+    }
+
+    /** Makes an active SIM the data SIM, as Android's SIM settings do. Only from the iPhone's choice (D-073). */
+    @SuppressLint("MissingPermission") // the shell user holds READ_PHONE_STATE and MODIFY_PHONE_STATE
+    override fun setDataSubscription(subId: Int): Boolean {
+        checkCaller()
+        val subs = subscriptions ?: throw IllegalStateException("no subscription service")
+        val active = subs.activeSubscriptionInfoList.orEmpty().map { it.subscriptionId }
+        if (subId !in active) throw IllegalArgumentException("subscription $subId isn't an active SIM")
+        try {
+            SubscriptionManager::class.java.getMethod("setDefaultDataSubId", Int::class.javaPrimitiveType).invoke(subs, subId)
+        } catch (e: InvocationTargetException) {
+            val cause = e.targetException
+            throw IllegalStateException(cause.message ?: cause.javaClass.simpleName)
+        } catch (e: ReflectiveOperationException) {
+            throw IllegalStateException("can't choose the data SIM on this phone (${e.javaClass.simpleName})")
+        }
+        return true
+    }
+
+    /** A SubscriptionManager made for [shell], like [audio]: reading the SIM list checks the package against the uid. */
+    private val subscriptions: SubscriptionManager? by lazy {
+        runCatching {
+            SubscriptionManager::class.java.getDeclaredConstructor(Context::class.java)
+                .apply { isAccessible = true }
+                .newInstance(shell)
+        }.getOrElse { shell.getSystemService(SubscriptionManager::class.java) }
+    }
+
+    /** Runs one of Android's own shell commands; true if it exited with 0. */
+    private fun run(vararg command: String): Boolean = runCatching {
+        val process = ProcessBuilder(*command).redirectErrorStream(true).start()
+        process.inputStream.use { it.readBytes() }
+        process.waitFor() == 0
+    }.getOrDefault(false)
+
+    @SuppressLint("PrivateApi", "DiscouragedPrivateApi")
+    private fun serviceBinder(name: String): IBinder? = runCatching {
+        Class.forName("android.os.ServiceManager").getMethod("getService", String::class.java).invoke(null, name) as IBinder?
+    }.getOrNull()
+
+    /**
+     * Pairline's own WRITE_SMS app-op (D-074): with it, Android's SMS store accepts Pairline marking messages read.
+     * Only Pairline's own package, only this app-op; [allow] false puts it back to Android's default.
+     */
+    override fun allowWriteSms(packageName: String?, allow: Boolean): Boolean {
+        checkCaller()
+        if (packageName != BuildConfig.APPLICATION_ID) throw SecurityException("only Pairline's own package")
+        return run(CMD, "appops", "set", packageName, "WRITE_SMS", if (allow) "allow" else "default")
+    }
+
+    /**
+     * Bluetooth off and on with Android's own commands, when its stack is stuck (D-078; the app asks only with the
+     * user's opt-in). `cmd bluetooth_manager` on Android 12+, `svc bluetooth` before.
+     */
+    override fun restartBluetooth(): Boolean {
+        checkCaller()
+        val off = run(CMD, "bluetooth_manager", "disable") || run(SVC, "bluetooth", "disable")
+        if (!off) return false
+        Thread.sleep(BLUETOOTH_PAUSE_MS)
+        return run(CMD, "bluetooth_manager", "enable") || run(SVC, "bluetooth", "enable")
+    }
+
     /** Pairline's process ended: give the call back its microphone and earpiece. Helper-internal, not on the binder. */
     fun releaseAudio() = synchronized(lock) { stopLocked() }
 
@@ -469,15 +604,30 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         /**
          * Bump when [IPrivilegedService] or what the helper does changes, so the app replaces a running older helper
          * (one keeps running across app updates). 4: recorders and players made as the helper (D-065).
-         * 5: silenceRinger (D-066). 6: silenceRinger as the shell package.
+         * 5: silenceRinger (D-066). 6: silenceRinger as the shell package. 7: the iPhone's internet switches (D-073).
+         * 8: allowWriteSms (D-074). 9: restartBluetooth (D-078).
          */
-        const val VERSION = 6
+        const val VERSION = 9
+        private const val BLUETOOTH_PAUSE_MS = 3_000L
 
         /** Not a MediaRecorder source: Android 13's call-audio interception API ([openInterceptRecord]). */
         const val SOURCE_INTERCEPT = 100
 
+        /** TetheringManager.TETHERING_WIFI and TETHERING_BLUETOOTH: the only kinds the iPhone may switch (D-073). */
+        const val TETHER_WIFI = 0
+        const val TETHER_BLUETOOTH = 2
+
+        /** setTethering's answer when Android didn't say within [TETHER_WAIT_MS]. */
+        const val TETHER_NO_ANSWER = -1
+
+        private val TETHERING_TYPES = setOf(TETHER_WIFI, TETHER_BLUETOOTH)
+        private const val TETHER_WAIT_MS = 15_000L
+        private const val TETHERING_MANAGER = "android.net.TetheringManager"
+        private const val TETHERING_SERVICE = "tethering"
+
         private const val SHELL_PACKAGE = "com.android.shell"
         private const val CMD = "/system/bin/cmd"
+        private const val SVC = "/system/bin/svc"
         private const val CALL_AUDIO_INTERCEPTION = "android.permission.CALL_AUDIO_INTERCEPTION"
         private const val WRITE_SECURE_SETTINGS = "android.permission.WRITE_SECURE_SETTINGS"
         private val CAPTURE_SOURCES =

@@ -50,10 +50,109 @@ struct NetShareView: View {
     @State private var error: String?
     @State private var copied: String?
     @State private var proxy: WiFiProxyStatus = .none
+    /// What the user just switched, shown until the bridge's status says so (or a few seconds pass).
+    @State private var pending: [NetSwitch: Bool] = [:]
+    @State private var pendingSIM: Int?
+    @State private var switchError: String?
     @Environment(\.scenePhase) private var scenePhase
 
     private func readProxy() {
         proxy = WiFiProxyStatus.current(sharingPAC: info?.on == true ? info?.pac : nil)
+    }
+
+    // MARK: The bridge phone's own switches (D-073)
+
+    private var net: BridgeNetState? { bridge.status?.net }
+    private var canSwitch: Bool { bridge.has(.netSwitch) && bridge.phase.isConnected }
+
+    private func value(_ what: NetSwitch) -> Bool { pending[what] ?? net?.value(what) == true }
+
+    private func switchRow(_ what: NetSwitch) -> some View {
+        Toggle(isOn: Binding(get: { value(what) }, set: { flip(what, on: $0) })) {
+            switch what {
+            case .hotspot: Label { t("Hotspot") } icon: { Image(systemName: "personalhotspot") }
+            case .bluetooth: Label { t("Bluetooth tethering") } icon: { Image(systemName: "dot.radiowaves.left.and.right") }
+            case .data: Label { t("Mobile data") } icon: { Image(systemName: "antenna.radiowaves.left.and.right") }
+            }
+        }
+        .disabled(!canSwitch || pending[what] != nil)
+    }
+
+    /// The SIMs to pick the data SIM from: only with two active SIMs.
+    private var dataSIMs: [SIMInfo] { (bridge.status?.sims ?? []).count > 1 ? bridge.status?.sims ?? [] : [] }
+
+    @ViewBuilder private var switchesSection: some View {
+        if net != nil {
+            Section {
+                switchRow(.hotspot)
+                switchRow(.bluetooth)
+                switchRow(.data)
+                if !dataSIMs.isEmpty {
+                    Picker(selection: Binding(
+                        get: { pendingSIM ?? dataSIMs.first { $0.defaultData == true }?.slot ?? -1 },
+                        set: { pickDataSIM($0) }
+                    )) {
+                        ForEach(dataSIMs) { sim in Text(verbatim: sim.label ?? "SIM \(sim.slot + 1)").tag(sim.slot) }
+                    } label: {
+                        Label { t("Data SIM") } icon: { Image(systemName: "simcard.2") }
+                    }
+                    .disabled(!canSwitch || pendingSIM != nil)
+                }
+                if let switchError {
+                    Text(verbatim: switchError).font(.footnote).foregroundStyle(.red)
+                }
+            } header: {
+                t("Android phone")
+            } footer: {
+                if !bridge.has(.netSwitch) {
+                    Text(CapabilityInfo(.netSwitch).missingText)
+                } else if value(.bluetooth) {
+                    t("Bluetooth tethering: on this iPhone, tap the Android phone in Settings › Bluetooth (pair once when asked). It's slower than the hotspot but needs no Wi-Fi.")
+                } else {
+                    t("These switch the Android phone itself. Join its hotspot here in Settings › Wi-Fi: the fastest way to use its internet, and Pairline connects over it too.")
+                }
+            }
+        }
+    }
+
+    private func flip(_ what: NetSwitch, on: Bool) {
+        pending[what] = on
+        switchError = nil
+        Task {
+            do {
+                _ = try await bridge.link.request(.netSwitch(what, on: on))
+                // The bridge's next status shows it; until then (at most a few seconds) the switch shows the choice.
+                try? await Task.sleep(nanoseconds: 6_000_000_000)
+            } catch {
+                switchError = Self.describe(error)
+            }
+            pending[what] = nil
+        }
+    }
+
+    private func pickDataSIM(_ slot: Int) {
+        guard slot >= 0 else { return }
+        pendingSIM = slot
+        switchError = nil
+        Task {
+            do {
+                _ = try await bridge.link.request(.netDataSIM(slot: slot))
+                try? await Task.sleep(nanoseconds: 6_000_000_000)
+            } catch {
+                switchError = Self.describe(error)
+            }
+            pendingSIM = nil
+        }
+    }
+
+    /// Android's refusals in words (the bridge's own message is English, for diagnostics).
+    static func describe(_ error: Error) -> String {
+        guard case LinkError.bridge(let reply) = error else { return error.localizedDescription }
+        switch reply.code {
+        case "permission": return String(localized: "The carrier or Android didn't allow this on the Android phone.", table: "NetShare")
+        case "unsupported": return CapabilityInfo(.netSwitch).missingText
+        default: return String(localized: "The Android phone couldn't switch it. Try again, or switch it on the Android phone.", table: "NetShare")
+        }
     }
 
     @ViewBuilder private var proxyRow: some View {
@@ -86,6 +185,7 @@ struct NetShareView: View {
             if proxy != .none {
                 Section { proxyRow }
             }
+            switchesSection
             Section {
                 Toggle(isOn: Binding(get: { info?.on == true }, set: { turn($0) })) {
                     Label { t("Use the bridge phone's internet") } icon: { Image(systemName: "network") }
@@ -150,6 +250,12 @@ struct NetShareView: View {
         .navigationTitle(t("Internet sharing"))
         .navigationBarTitleDisplayMode(.inline)
         .onReceive(bridge.$netShare) { info = $0; readProxy() }
+        // The bridge's status confirmed a switch: show it instead of the pending choice.
+        .onReceive(bridge.$status) { status in
+            guard let net = status?.net else { return }
+            for (what, wanted) in pending where net.value(what) == wanted { pending[what] = nil }
+            if let slot = pendingSIM, status?.sims?.first(where: { $0.slot == slot })?.defaultData == true { pendingSIM = nil }
+        }
         .onAppear { info = bridge.netShare; readProxy() }
         // Back from Settings › Wi-Fi: check the proxy again.
         .onValueChange(scenePhase) { if $0 == .active { readProxy() } }

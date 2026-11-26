@@ -165,7 +165,7 @@ struct HelpArticleView: View {
             HelpCard(symbol: "phone.arrow.down.left", title: Text("Incoming calls"),
                      text: Text("Calls to your Android number ring on this iPhone with the normal iPhone call screen, even when it's locked. Answer or decline here."))
             HelpCard(symbol: "speaker.wave.2", title: Text("Where the audio is", tableName: "CallAudio"),
-                     text: Text("Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker.", tableName: "CallAudio"))
+                     text: Text("Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging), calls you take here use this iPhone's microphone and speaker, over Bluetooth or Wi-Fi.", tableName: "CallAudio"))
             HelpCard(symbol: "arrow.clockwise", title: Text("After the Android phone restarts", tableName: "CallAudio"),
                      text: Text("Android turns Wireless debugging off at every restart, so call audio goes back to the Android phone. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Calls keep ringing here meanwhile.", tableName: "CallAudio"))
             HelpCard(symbol: "phone.arrow.up.right", title: Text("Making calls"),
@@ -232,7 +232,7 @@ struct FAQ: Identifiable {
         FAQ(id: 3, question: "Do I need both phones nearby?",
             answer: "Yes. The link uses Bluetooth, so keep the phones within about 10 meters. Leaving the Android phone at home while you're out isn't supported yet."),
         FAQ(id: 4, question: "Can I talk on the iPhone during calls?",
-            answer: "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone.",
+            answer: "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later and Wireless debugging (no extra app, no root). The audio goes over Bluetooth, or over Wi-Fi if you choose it in Settings › Call audio. Without it you answer here and talk on the Android phone.",
             table: "CallAudio"),
         FAQ(id: 9, question: "Why does call audio go back to the Android phone sometimes?",
             answer: "Android turns Wireless debugging off every time the Android phone restarts or leaves Wi-Fi. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Some phones also only allow listening: then you hear calls here and talk on the Android phone.",
@@ -243,6 +243,9 @@ struct FAQ: Identifiable {
         FAQ(id: 11, question: "iOS says “No Internet Connection” on the Android phone’s hotspot",
             answer: "Use the Android phone’s normal hotspot (on Android: Settings › Hotspot & tethering, or Pairline Bridge › Settings › This phone’s hotspot) and join it here in Settings › Wi-Fi: it shares the Android phone’s internet, and Pairline connects over it too. Pairline’s own hotspot (named AndroidShare_…) only links the two phones, so iOS shows “No Internet Connection” on it. If the normal hotspot has no internet either, Pairline Bridge › Settings › This phone’s hotspot says why: mobile data is off there, or a VPN is on, which Android doesn’t share over a hotspot. For the VPN, use Settings › Internet sharing here.",
             table: "Hotspot"),
+        FAQ(id: 12, question: "Can I turn on the Android phone's hotspot from here?",
+            answer: "Yes, while Talk on iPhone is on in the bridge app: Settings › Internet sharing here switches the Android phone's hotspot, Bluetooth tethering, mobile data and data SIM. Then join the hotspot in Settings › Wi-Fi, or, for Bluetooth tethering, tap the Android phone in Settings › Bluetooth (pair once when asked). Bluetooth is slower but needs no Wi-Fi.",
+            table: "NetShare"),
         FAQ(id: 5, question: "What happens after the free trial?",
             answer: "After 7 days, sending messages, calls, syncing and USSD stop until you buy Pairline once. Messages already on this iPhone stay readable, and demo mode, help and settings keep working."),
         FAQ(id: 6, question: "Is it a subscription?",

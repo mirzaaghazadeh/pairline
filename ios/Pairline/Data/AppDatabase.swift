@@ -480,6 +480,10 @@ final class AppDatabase: ObservableObject {
         return result
     }
 
+    func unread(thread: Int64) -> Int {
+        (try? db.query("SELECT unread FROM threads WHERE thread = ?", [.int(thread)]))?.first?.int("unread") ?? 0
+    }
+
     func markRead(thread: Int64) {
         try? db.execute("UPDATE threads SET unread = 0 WHERE thread = ? AND unread > 0", [.int(thread)])
         if db.changes > 0 { changed() }

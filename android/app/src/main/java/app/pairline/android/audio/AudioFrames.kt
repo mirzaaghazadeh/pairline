@@ -1,36 +1,58 @@
 package app.pairline.android.audio
 
 /**
- * Call-audio packets on the Wi-Fi media channel (PROTOCOL.md, "Call audio"). One packet is one 20 ms frame:
+ * Call-audio packets (PROTOCOL.md, "Call audio"). One packet is one 20 ms frame:
  *
- *     kind (1 byte) ‖ sequence (2 bytes, big-endian, wraps) ‖ samples
+ *     kind (1 byte) ‖ sequence (2 bytes, big-endian, wraps) ‖ audio
  *
- * Kind [KIND_PCM16]: 16-bit little-endian mono PCM at 16 kHz, 320 samples (640 bytes). Receivers drop unknown kinds.
- * The media channel encrypts every packet (AES-256-GCM, channel 1); this layer only frames audio.
+ * Kind [KIND_PCM16]: 16-bit little-endian mono PCM at 16 kHz, 320 samples (640 bytes), on the Wi-Fi media channel.
+ * Kind [KIND_OPUS]: one Opus packet of 20 ms, inside the Bluetooth session (D-072). Receivers drop unknown kinds.
+ * The channel under it encrypts every packet (AES-256-GCM); this layer only frames audio.
  */
 object AudioPackets {
     const val KIND_PCM16: Int = 0x01
+    const val KIND_OPUS: Int = 0x02
     const val SAMPLE_RATE: Int = 16_000
     const val FRAME_SAMPLES: Int = SAMPLE_RATE / 50
     const val FRAME_BYTES: Int = FRAME_SAMPLES * 2
     const val HEADER_BYTES: Int = 3
 
+    /** The largest Opus packet accepted (a 20 ms packet at our bitrate is about 80 bytes). */
+    const val MAX_OPUS_BYTES: Int = 400
+
     fun encode(sequence: Int, frame: ByteArray): ByteArray {
         require(frame.size == FRAME_BYTES) { "a frame is $FRAME_BYTES bytes" }
-        val out = ByteArray(HEADER_BYTES + FRAME_BYTES)
-        out[0] = KIND_PCM16.toByte()
+        return packet(KIND_PCM16, sequence, frame)
+    }
+
+    fun encodeOpus(sequence: Int, opus: ByteArray): ByteArray {
+        require(opus.size in 1..MAX_OPUS_BYTES) { "an Opus packet is 1 to $MAX_OPUS_BYTES bytes" }
+        return packet(KIND_OPUS, sequence, opus)
+    }
+
+    private fun packet(kind: Int, sequence: Int, payload: ByteArray): ByteArray {
+        val out = ByteArray(HEADER_BYTES + payload.size)
+        out[0] = kind.toByte()
         out[1] = (sequence ushr 8 and 0xFF).toByte()
         out[2] = (sequence and 0xFF).toByte()
-        frame.copyInto(out, HEADER_BYTES)
+        payload.copyInto(out, HEADER_BYTES)
         return out
     }
 
-    /** The sequence number and frame, or null for anything that isn't a well-formed audio packet. */
+    /** The sequence number and PCM frame, or null for anything that isn't a well-formed PCM packet. */
     fun decode(packet: ByteArray): Pair<Int, ByteArray>? {
         if (packet.size != HEADER_BYTES + FRAME_BYTES || (packet[0].toInt() and 0xFF) != KIND_PCM16) return null
-        val sequence = (packet[1].toInt() and 0xFF shl 8) or (packet[2].toInt() and 0xFF)
-        return sequence to packet.copyOfRange(HEADER_BYTES, packet.size)
+        return sequenceNumber(packet) to packet.copyOfRange(HEADER_BYTES, packet.size)
     }
+
+    /** The sequence number and Opus packet, or null for anything that isn't a well-formed Opus packet. */
+    fun decodeOpus(packet: ByteArray): Pair<Int, ByteArray>? {
+        val size = packet.size - HEADER_BYTES
+        if (size !in 1..MAX_OPUS_BYTES || (packet[0].toInt() and 0xFF) != KIND_OPUS) return null
+        return sequenceNumber(packet) to packet.copyOfRange(HEADER_BYTES, packet.size)
+    }
+
+    private fun sequenceNumber(packet: ByteArray): Int = (packet[1].toInt() and 0xFF shl 8) or (packet[2].toInt() and 0xFF)
 }
 
 /**

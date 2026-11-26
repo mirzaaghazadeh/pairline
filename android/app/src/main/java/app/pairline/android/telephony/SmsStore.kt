@@ -136,6 +136,25 @@ class SmsStore(
             .put("more", page.more)
     }
 
+    /**
+     * `sms.read` (D-074): the iPhone read this conversation, so its received messages are marked read here too. Android
+     * applies it only with the WRITE_SMS app-op, which Talk on iPhone's helper gives Pairline (otherwise the default
+     * messaging app alone may write). Returns how many messages changed.
+     */
+    fun markRead(thread: Long): Int {
+        requireRead()
+        val values = android.content.ContentValues().apply {
+            put(Telephony.Sms.READ, 1)
+            put(Telephony.Sms.SEEN, 1)
+        }
+        return context.contentResolver.update(
+            Telephony.Sms.CONTENT_URI,
+            values,
+            "${Telephony.Sms.THREAD_ID} = ? AND ${Telephony.Sms.READ} = 0 AND ${Telephony.Sms.TYPE} = ?",
+            arrayOf(thread.toString(), Telephony.Sms.MESSAGE_TYPE_INBOX.toString()),
+        )
+    }
+
     /** `sms.threads` reply: newest first; threads whose newest message is older than [before]. */
     fun threads(id: Long, before: Long?, limit: Int): JSONObject {
         requireRead()

@@ -46,4 +46,30 @@ interface IPrivilegedService {
 
     /** Silences the ringing call's ringtone and vibration on this phone; the call itself rings on (D-066). */
     boolean silenceRinger() = 9;
+
+    /**
+     * The user flipped a switch on the iPhone (D-073): starts ([on]) or stops Android's own tethering of [type]
+     * (PrivilegedService.TETHER_WIFI, the phone's hotspot, or TETHER_BLUETOOTH), as Android's Hotspot & tethering
+     * screen does. Returns 0 once Android started or stopped it, else Android's tethering error code
+     * (PrivilegedService.TETHER_NO_ANSWER if it didn't answer in time).
+     */
+    int setTethering(int type, boolean on) = 10;
+
+    /** The user's switch on the iPhone (D-073): mobile data on or off, on the data SIM. */
+    boolean setMobileData(boolean on) = 11;
+
+    /** The user's choice on the iPhone (D-073): the active SIM with subscription id [subId] becomes the data SIM. */
+    boolean setDataSubscription(int subId) = 12;
+
+    /**
+     * Gives ([allow]) or returns Pairline's WRITE_SMS app-op, so a message read on the iPhone is marked read on this
+     * phone too (D-074); otherwise only the default messaging app may write. Refuses any other package.
+     */
+    boolean allowWriteSms(String packageName, boolean allow) = 13;
+
+    /**
+     * Turns Bluetooth off and on again, only when the user turned on "Restart Bluetooth when stuck" and Android's
+     * Bluetooth keeps failing to advertise (D-078). Returns whether Bluetooth is back on.
+     */
+    boolean restartBluetooth() = 14;
 }

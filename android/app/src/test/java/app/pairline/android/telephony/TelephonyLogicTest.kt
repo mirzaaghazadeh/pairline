@@ -33,7 +33,17 @@ class TelephonyLogicTest {
         talk: Boolean = false,
         share: Boolean = false,
         wifi: Boolean = false,
-    ) = CapsCalculator.compute(CapsInput(granted, messaging, calling, sims, inCall, add, listen, talk, share, wifi))
+        link: Boolean = false,
+        switches: Boolean = false,
+        smsWrite: Boolean = false,
+        tools: Boolean = false,
+        mirror: Boolean = false,
+    ) = CapsCalculator.compute(
+        CapsInput(
+            granted, messaging, calling, sims, inCall, add, listen, talk, share, wifi, link, switches, smsWrite, tools,
+            mirror,
+        ),
+    )
 
     @Test
     fun allPermissionsSingleSim() {
@@ -50,13 +60,36 @@ class TelephonyLogicTest {
     fun everythingIncludingOptionalOnes() {
         assertEquals(
             Caps.ALL,
-            caps(sims = 2, inCall = true, add = true, listen = true, talk = true, share = true, wifi = true),
+            caps(
+                sims = 2, inCall = true, add = true, listen = true, talk = true, share = true, wifi = true, link = true,
+                switches = true, smsWrite = true, tools = true, mirror = true,
+            ),
         )
+    }
+
+    @Test
+    fun readSyncHoldEditAndPhoneTools() {
+        // D-074: read sync needs READ_SMS and the write app-op; hold the companion call service; editing the opt-in.
+        assertEquals(false, Caps.SMS_READ in caps())
+        assertEquals(true, Caps.SMS_READ in caps(smsWrite = true))
+        assertEquals(false, Caps.SMS_READ in caps(granted = everything - Manifest.permission.READ_SMS, smsWrite = true))
+        assertEquals(listOf(false, true), listOf(Caps.CALL_HOLD in caps(), Caps.CALL_HOLD in caps(inCall = true)))
+        assertEquals(listOf(false, true), listOf(Caps.CONTACTS_EDIT in caps(), Caps.CONTACTS_EDIT in caps(add = true)))
+        assertEquals(listOf(Caps.PHONE_FIND, Caps.PHONE_RINGER, Caps.BLOCK), caps(granted = emptySet(), tools = true))
+    }
+
+    @Test
+    fun netSwitchFollowsTheHelperOnly() {
+        // No permission or SIM needed: the helper does the switching (D-073).
+        assertEquals(listOf(Caps.NET_SWITCH, Caps.BLOCK), caps(granted = emptySet(), switches = true))
+        assertEquals(false, Caps.NET_SWITCH in caps())
     }
 
     @Test
     fun callAudioCapsNeedListenFirstAndCalling() {
         assertEquals(false, Caps.CALL_MEDIA_TALK in caps(talk = true))
+        assertEquals(false, Caps.CALL_MEDIA_LINK in caps(link = true))
+        assertEquals(true, Caps.CALL_MEDIA_LINK in caps(listen = true, link = true))
         assertEquals(listOf(true, false), caps(listen = true).let { listOf(Caps.CALL_MEDIA in it, Caps.CALL_MEDIA_TALK in it) })
         assertEquals(false, Caps.CALL_MEDIA in caps(calling = false, listen = true, talk = true))
     }

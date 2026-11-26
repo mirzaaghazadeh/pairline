@@ -114,8 +114,38 @@ struct SIMInfo: Codable, Equatable, Identifiable, Hashable {
     var roaming: Bool?
     var defaultSms: Bool?
     var defaultVoice: Bool?
+    /// Android's data SIM (D-073).
+    var defaultData: Bool?
 
     var id: Int { slot }
+}
+
+/// `notif.posted` (D-077): a notification from an app the user chose on the bridge phone.
+struct MirroredNotification: Codable, Equatable {
+    var key: String
+    var app: String
+    var appName: String?
+    var title: String?
+    var text: String?
+    var time: Int64?
+}
+
+/// `status.net` (D-073): the bridge phone's own internet sharing. Switched with `net.switch` (needs `net.switch`).
+struct BridgeNetState: Codable, Equatable {
+    /// Android's own Wi-Fi hotspot is on.
+    var hotspot: Bool?
+    /// Bluetooth tethering is on.
+    var bluetooth: Bool?
+    /// Mobile data is on (on the data SIM); null if Android didn't say.
+    var data: Bool?
+
+    func value(_ what: NetSwitch) -> Bool? {
+        switch what {
+        case .hotspot: return hotspot
+        case .bluetooth: return bluetooth
+        case .data: return data
+        }
+    }
 }
 
 struct BridgeStatus: Codable, Equatable {
@@ -124,6 +154,9 @@ struct BridgeStatus: Codable, Equatable {
     var app: String?
     var caps: [String]?
     var time: Int64?
+    var net: BridgeNetState?
+    /// The bridge phone's ringer (D-074): `normal`, `vibrate` or `silent`.
+    var ringer: String?
 }
 
 struct SMSMessage: Codable, Equatable {
@@ -298,6 +331,9 @@ enum InboundMessage {
     case ok
     case error(BridgeErrorReply)
     case smsNew(SMSMessage)
+    /// A notification from an app the user chose on the bridge phone (D-077), and its removal there.
+    case notifPosted(MirroredNotification)
+    case notifRemoved(String)
     case smsState(SMSStateEvent)
     case smsThreads(SMSThreadsReply)
     case smsHistory(SMSHistoryReply)
@@ -348,9 +384,12 @@ struct Inbound {
         var app: String?
         var caps: LossyList<String>?
         var time: Int64?
+        var net: BridgeNetState?
+        var ringer: String?
     }
 
     private struct MsgBody: Decodable { var msg: SMSMessage }
+    private struct KeyBody: Decodable { var key: String }
     private struct ErrorBody: Decodable { var code: String?; var msg: String? }
     private struct ThreadsBody: Decodable { var threads: LossyList<SMSThreadSummary>?; var more: Bool? }
     private struct HistoryBody: Decodable { var msgs: LossyList<SMSMessage>?; var more: Bool? }
@@ -391,7 +430,7 @@ struct Inbound {
         case "status":
             let s = try body(StatusBody.self)
             message = .status(BridgeStatus(battery: s.battery, sims: s.sims?.elements, app: s.app,
-                                           caps: s.caps?.elements, time: s.time))
+                                           caps: s.caps?.elements, time: s.time, net: s.net, ringer: s.ringer))
         case "ping": message = .ping
         case "pong": message = .pong
         case "unpair": message = .unpair
@@ -400,6 +439,8 @@ struct Inbound {
             let e = try body(ErrorBody.self)
             message = .error(BridgeErrorReply(code: e.code ?? "failed", msg: e.msg))
         case "sms.new": message = .smsNew(try body(MsgBody.self).msg)
+        case "notif.posted": message = .notifPosted(try body(MirroredNotification.self))
+        case "notif.removed": message = .notifRemoved(try body(KeyBody.self).key)
         case "sms.state": message = .smsState(try body(SMSStateEvent.self))
         case "sms.threads":
             let b = try body(ThreadsBody.self)
@@ -451,11 +492,14 @@ struct Outbound {
     var fields: [String: Any]
     /// Whether B answers with the same `id`.
     let isRequest: Bool
+    /// The only session this message may go on, when it matters (call audio inside the Bluetooth session, D-072).
+    var lane: LinkLane?
 
-    init(_ type: String, _ fields: [String: Any] = [:], isRequest: Bool = true) {
+    init(_ type: String, _ fields: [String: Any] = [:], isRequest: Bool = true, lane: LinkLane? = nil) {
         self.type = type
         self.fields = fields
         self.isRequest = isRequest
+        self.lane = lane
     }
 
     var timeout: TimeInterval {
@@ -563,9 +607,11 @@ struct Outbound {
         return Outbound("call.audio", fields)
     }
 
-    /// Asks the bridge to relay this call's audio over the Wi-Fi media channel (PROTOCOL.md "Call audio").
-    static func callMediaStart(_ call: OpaqueValue, talk: Bool) -> Outbound {
-        Outbound("call.media.start", ["call": call.jsonObject, "talk": talk])
+    /// Asks the bridge to relay this call's audio (PROTOCOL.md "Call audio"): over the Wi-Fi media channel, or inside
+    /// the Bluetooth session it's sent on (`.link`, D-072), which is why that one goes only on the Bluetooth lane.
+    static func callMediaStart(_ call: OpaqueValue, talk: Bool, via: CallAudioPath = .wifi) -> Outbound {
+        Outbound("call.media.start", ["call": call.jsonObject, "talk": talk, "via": via.wire],
+                 lane: via == .link ? .primary : nil)
     }
 
     static func callMediaStop(_ call: OpaqueValue) -> Outbound {
@@ -576,6 +622,43 @@ struct Outbound {
     static func netShare(on: Bool) -> Outbound {
         Outbound("net.share", ["on": on])
     }
+
+    /// Switches the bridge phone's hotspot, Bluetooth tethering or mobile data (needs `net.switch`, D-073). The reply
+    /// is `ok`; the next `status` shows the result in `net`.
+    static func netSwitch(_ what: NetSwitch, on: Bool) -> Outbound {
+        Outbound("net.switch", ["what": what.rawValue, "on": on])
+    }
+
+    /// Makes the SIM in [slot] the bridge phone's data SIM (needs `net.switch` and `dualsim`, D-073).
+    static func netDataSIM(slot: Int) -> Outbound {
+        Outbound("net.switch", ["what": "dataSim", "sim": slot])
+    }
+
+    /// The conversation was read on this iPhone: mark it read on the bridge phone too (needs `sms.read`, D-074).
+    static func smsRead(thread: Int64) -> Outbound { Outbound("sms.read", ["thread": thread]) }
+
+    /// Puts the call on hold or takes it off (needs `call.hold`, D-074).
+    static func callHold(_ call: OpaqueValue, hold: Bool) -> Outbound {
+        Outbound("call.hold", ["call": call.jsonObject, "hold": hold])
+    }
+
+    /// Edits a contact on the bridge phone: any of name, numbers and favourite (needs `contacts.edit`, D-074).
+    static func contactsUpdate(key: String, name: String?, numbers: [ContactNumber]?, starred: Bool?) -> Outbound {
+        var fields: [String: Any] = ["key": key]
+        if let name { fields["name"] = name }
+        if let numbers { fields["numbers"] = numbers.map { ["n": $0.n, "label": optional($0.label)] as [String: Any] } }
+        if let starred { fields["starred"] = starred }
+        return Outbound("contacts.update", fields)
+    }
+
+    /// Makes the bridge phone ring loudly, or stops it (needs `phone.find`, D-074).
+    static func phoneFind(on: Bool) -> Outbound { Outbound("phone.find", ["on": on]) }
+
+    /// The bridge phone's ringer: `normal`, `vibrate` or `silent` (needs `phone.ringer`, D-074).
+    static func phoneRinger(_ mode: String) -> Outbound { Outbound("phone.ringer", ["mode": mode]) }
+
+    /// The user dismissed a mirrored notification here: clear it on the bridge phone too (D-077).
+    static func notifDismiss(key: String) -> Outbound { Outbound("notif.dismiss", ["key": key]) }
 
     /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
     static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {
@@ -612,6 +695,13 @@ struct Outbound {
     }
 }
 
+/// What `net.switch` turns on or off on the bridge phone (D-073).
+enum NetSwitch: String, CaseIterable {
+    case hotspot
+    case bluetooth
+    case data
+}
+
 /// Capability names from `status.caps`.
 enum Capability: String, CaseIterable, Identifiable {
     case smsReceive = "sms.receive"
@@ -631,8 +721,24 @@ enum Capability: String, CaseIterable, Identifiable {
     case callMedia = "call.media"
     /// …and can feed this iPhone's microphone into the call.
     case callMediaTalk = "call.media.talk"
+    /// …and the audio can travel inside the Bluetooth session, as Opus (D-072).
+    case callMediaLink = "call.media.link"
     /// The bridge's user allows internet sharing for this iPhone (M8).
     case netShare = "net.share"
+    /// This iPhone may switch the bridge phone's hotspot, Bluetooth tethering, mobile data and data SIM (D-073).
+    case netSwitch = "net.switch"
+    /// A conversation read here is marked read on the bridge phone too (D-074).
+    case smsRead = "sms.read"
+    /// A call can be put on hold (D-074).
+    case callHold = "call.hold"
+    /// Contacts can be edited from here (D-074).
+    case contactsEdit = "contacts.edit"
+    /// The bridge phone can be made to ring loudly (D-074).
+    case phoneFind = "phone.find"
+    /// The bridge phone's ringer can be switched (D-074).
+    case phoneRinger = "phone.ringer"
+    /// Notifications from apps chosen on the bridge phone reach this iPhone (D-077).
+    case notifMirror = "notif.mirror"
     /// The bridge's Wi-Fi link is on (M5).
     case wifi = "wifi"
     /// The bridge sends and receives files over a Wi-Fi session (M5).

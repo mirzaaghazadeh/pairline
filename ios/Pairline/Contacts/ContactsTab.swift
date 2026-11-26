@@ -213,6 +213,10 @@ struct ContactDetailView: View {
     @EnvironmentObject private var db: AppDatabase
     @EnvironmentObject private var calls: CallCenter
     @State private var blockRequest: BlockRequest?
+    @State private var showEdit = false
+    /// The favourite as just set here, until the next sync shows it.
+    @State private var starred: Bool?
+    @State private var editError: String?
 
     private var numbers: [String] { contact.numbers.map(\.n).filter { !$0.isEmpty } }
     private var anyBlocked: Bool { numbers.contains { bridge.isBlocked($0) } }
@@ -327,6 +331,39 @@ struct ContactDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .blockPrompt($blockRequest)
+        // D-074: edit on the bridge phone, and its favourites.
+        .toolbar {
+            if bridge.has(.contactsEdit) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button {
+                        setStarred(!(starred ?? contact.starred))
+                    } label: {
+                        Label {
+                            Text("Favourite", tableName: "PhoneTools")
+                        } icon: {
+                            Image(systemName: (starred ?? contact.starred) ? "star.fill" : "star")
+                        }
+                    }
+                    Button { showEdit = true } label: { Text("Edit", tableName: "PhoneTools") }
+                }
+            }
+        }
+        .sheet(isPresented: $showEdit) { AddContactView(editing: contact) }
+        .alert(Text(verbatim: editError ?? ""), isPresented: Binding(get: { editError != nil }, set: { if !$0 { editError = nil } })) {
+            Button("OK", role: .cancel) {}
+        }
+    }
+
+    private func setStarred(_ on: Bool) {
+        starred = on
+        Task {
+            do {
+                try await bridge.updateContact(contact, name: nil, numbers: nil, starred: on)
+            } catch {
+                starred = nil
+                editError = error.localizedDescription
+            }
+        }
     }
 
     private func message(_ number: String) {
@@ -360,12 +397,22 @@ struct QuickAction: View {
 }
 
 struct AddContactView: View {
+    /// The contact to edit on the bridge phone (D-074); nil adds a new one.
+    var editing: Contact?
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var bridge: BridgeController
     @State private var name = ""
     @State private var numbers: [ContactNumber] = [ContactNumber(n: "", label: "mobile")]
     @State private var saving = false
     @State private var error: String?
+
+    init(editing: Contact? = nil) {
+        self.editing = editing
+        if let editing {
+            _name = State(initialValue: editing.name)
+            _numbers = State(initialValue: editing.numbers.isEmpty ? [ContactNumber(n: "", label: "mobile")] : editing.numbers)
+        }
+    }
 
     private var valid: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty
@@ -412,7 +459,7 @@ struct AddContactView: View {
                     }
                 }
             }
-            .navigationTitle(Text("New Contact"))
+            .navigationTitle(editing == nil ? Text("New Contact") : Text("Edit Contact", tableName: "PhoneTools"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -435,7 +482,13 @@ struct AddContactView: View {
         Task {
             defer { saving = false }
             do {
-                try await bridge.addContact(name: name.trimmingCharacters(in: .whitespaces), numbers: cleaned)
+                let trimmed = name.trimmingCharacters(in: .whitespaces)
+                if let editing {
+                    try await bridge.updateContact(editing, name: trimmed == editing.name ? nil : trimmed,
+                                                   numbers: cleaned == editing.numbers ? nil : cleaned, starred: nil)
+                } else {
+                    try await bridge.addContact(name: trimmed, numbers: cleaned)
+                }
                 Haptics.success()
                 dismiss()
             } catch {

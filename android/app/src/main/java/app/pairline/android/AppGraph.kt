@@ -2,10 +2,13 @@ package app.pairline.android
 
 import android.app.Application
 import app.pairline.android.audio.CallAudioRelay
+import app.pairline.android.audio.MediaChannelTransport
 import app.pairline.android.files.FileNotifications
 import app.pairline.android.files.FileTransfers
 import app.pairline.android.link.IdentityStore
 import app.pairline.android.netshare.NetShare
+import app.pairline.android.netshare.NetSwitches
+import app.pairline.android.tools.Ringer
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.privileged.TalkReminder
 import app.pairline.android.link.LinkManager
@@ -121,17 +124,28 @@ object AppGraph {
             BuildConfig.VERSION_NAME,
             inCallServiceAvailable = { calls.inCallServiceAvailable },
             mediaCaps = { audioRelay.canListen to audioRelay.canTalk },
+            mediaLink = { audioRelay.canLink },
+            net = { netSwitches.state().toJson() },
+            netSwitch = { netSwitches.canSwitch },
+            smsWrite = { privileged.canWriteSms() },
+            ringer = { Ringer.mode(app) },
         )
     }
     val router: MessageRouter by lazy {
         MessageRouter(
-            link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList, remote,
+            link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
+            netSwitches, app, remote,
         ).also { router ->
             remote.onConfigured = {
                 router.remoteStarted()
                 direct.announce()
             }
         }
+    }
+
+    /** This phone's hotspot, Bluetooth tethering, mobile data and data SIM, switched from the iPhone (D-073). */
+    val netSwitches: NetSwitches by lazy {
+        NetSwitches(app, privileged, sims, hotspot).also { it.onChange = { router.statusChanged() } }
     }
 
     /** Internet sharing for the paired iPhone (M8, D-048). */
@@ -157,6 +171,8 @@ object AppGraph {
                             io.execute {
                                 manager.allowOngoingCalls()
                                 manager.allowSecureSettings()
+                                // Messages read on the iPhone get marked read here too (D-074).
+                                if (manager.allowWriteSms()) router.statusChanged()
                             }
                         }
                     }
@@ -173,8 +189,13 @@ object AppGraph {
     /** Call audio between this phone and the iPhone (D-047). */
     val audioRelay: CallAudioRelay by lazy {
         val audio = app.getSystemService(android.media.AudioManager::class.java)
-        CallAudioRelay(privileged, prefs, link::send, audioMode = { audio.mode })
-            .also { relay -> relay.onCapsChanged = { router.statusChanged() } }
+        CallAudioRelay(
+            privileged,
+            prefs,
+            link::send,
+            audioMode = { audio.mode },
+            linkMedia = { token -> link.linkMedia(token)?.let(::MediaChannelTransport) },
+        ).also { relay -> relay.onCapsChanged = { router.statusChanged() } }
     }
 
     /** The daily GitHub update check and the verified update (D-042). */

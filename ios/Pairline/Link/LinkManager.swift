@@ -199,6 +199,8 @@ final class LinkManager: BridgeLink {
     private(set) var mediaChannel: MediaChannel?
     /// Called on the main queue whenever `mediaChannel` changes (opened, or closed with nil).
     var onMediaChannelChange: ((MediaChannel?) -> Void)?
+    /// Call audio inside the Bluetooth (or debug TCP) session while it's established, or nil (D-072).
+    private(set) var linkMediaChannel: LinkMediaChannel?
 
     let files = FileTransferManager()
     let hotspot = HotspotJoiner()
@@ -549,6 +551,7 @@ final class LinkManager: BridgeLink {
         }
         failPending(LinkError.notConnected)
         closeMedia()
+        closeLinkMedia()
         updateFiles()
         latency = nil
         onTransportsChange?()
@@ -767,6 +770,11 @@ final class LinkManager: BridgeLink {
             lane.lastReceived = Date()
             self.files.handleBulk(data)
         }
+        session.onLinkMedia = { [weak self, weak session, weak lane] data in
+            guard let self, let session, let lane, session === lane.session, lane.id == .primary else { return }
+            lane.lastReceived = Date()
+            self.linkMediaChannel?.receive(data)
+        }
         session.onClose = { [weak self, weak session, weak lane] error in
             guard let self, let session, let lane, session === lane.session else { return }
             self.sessionClosed(lane, session: session, error: error)
@@ -792,6 +800,15 @@ final class LinkManager: BridgeLink {
             }
         }
         sendRaw(deviceInfo, id: nil, on: lane)
+        if lane.id == .primary, let session = lane.session, session.carriesLinkMedia {
+            closeLinkMedia()
+            let channel = LinkMediaChannel(session: session)
+            linkMediaChannel = channel
+            mediaChanged()
+            #if DEBUG
+            if DebugSettings.linkMediaSelfTest { LinkMediaSelfTest.run(channel) }
+            #endif
+        }
         finishPairing(.success(()))
         // A nearby link beats the direct connection.
         if lane.id != .direct { retireDirect() }
@@ -809,6 +826,7 @@ final class LinkManager: BridgeLink {
         lane.connectedSince = nil
         if let error { lastSessionError = error }
         log.info("link", "\(lane.id.rawValue) session closed: \(error.map { "\($0)" } ?? "by us")")
+        if lane.id == .primary { closeLinkMedia() }
         if lane.id == .wifi {
             closeMedia()
             if error == .keyMismatch, let endpoint = transport?.resolvedEndpoint ?? transport?.dialed {
@@ -1032,6 +1050,14 @@ final class LinkManager: BridgeLink {
         }
     }
 
+    private func closeLinkMedia() {
+        guard let channel = linkMediaChannel else { return }
+        linkMediaChannel = nil
+        channel.close()
+        log.info("media", "Bluetooth call-audio channel closed: \(channel.framesSent) frames, \(channel.packetsSent) packets sent, \(channel.packetsDropped) dropped as late")
+        mediaChanged()
+    }
+
     private func mediaChanged() {
         onMediaChannelChange?(mediaChannel)
         NotificationCenter.default.post(name: Self.mediaChannelDidChange, object: self)
@@ -1098,6 +1124,10 @@ final class LinkManager: BridgeLink {
     /// The session a message goes on: bulk requests prefer Wi-Fi, everything else Bluetooth; the direct connection
     /// carries everything while it's the only one (a nearby session closes it).
     private func route(_ message: Outbound) -> Lane? {
+        if let required = message.lane {
+            let only = lane(required)
+            return only.isEstablished ? only : nil
+        }
         let order = message.isBulk ? [wifi, primary, direct] : [primary, wifi, direct]
         return order.first(where: \.isEstablished)
     }
@@ -1328,6 +1358,9 @@ enum DebugSettings {
 
     /// `-PairlineMediaTest`: when the media channel opens, send test packets and log how many came back.
     static var mediaSelfTest: Bool { ProcessInfo.processInfo.arguments.contains("-PairlineMediaTest") }
+    /// `-PairlineLinkMediaTest`: when the Bluetooth (or debug TCP) session's call-audio channel appears, send a second
+    /// of an Opus-encoded tone and log what came back (protocol/tools/fake_bridge.py echoes `MEDIA` frames; D-072).
+    static var linkMediaSelfTest: Bool { ProcessInfo.processInfo.arguments.contains("-PairlineLinkMediaTest") }
     #endif
 }
 
@@ -1376,6 +1409,74 @@ enum MediaSelfTest {
 
     private struct UncheckedChannel: @unchecked Sendable {
         let channel: MediaChannel
+    }
+}
+
+/// Debug builds only: call audio inside the session end to end (D-072). Encodes 50 frames of a 440 Hz tone with iOS's
+/// Opus encoder, sends them 20 ms apart over the link media channel, decodes what fake_bridge.py echoes, and logs the
+/// counts, the packet size and the decoded level (a 440 Hz tone at 8000 peak is about 5600 RMS).
+enum LinkMediaSelfTest {
+    private final class Results: @unchecked Sendable {
+        private let lock = NSLock()
+        private var echoes = 0
+        private var decoded = 0
+        private var levels: [Double] = []
+        private var firstEcho: Date?
+        let decoder = try? OpusDecoder()
+
+        /// On the channel's delivery queue (the decoder's only thread).
+        func add(_ packet: Data) {
+            guard let (_, opus) = AudioPackets.decodeOpus(packet) else { return }
+            let frame = decoder?.decode(opus)
+            lock.lock()
+            echoes += 1
+            if firstEcho == nil { firstEcho = Date() }
+            if let frame {
+                decoded += 1
+                levels.append(JitterBuffer.rms(frame))
+            }
+            lock.unlock()
+        }
+
+        var summary: (echoes: Int, decoded: Int, level: Int, first: Date?) {
+            lock.lock()
+            defer { lock.unlock() }
+            let tail = levels.suffix(20)
+            let level = tail.isEmpty ? 0 : Int(tail.reduce(0, +) / Double(tail.count))
+            return (echoes, decoded, level, firstEcho)
+        }
+    }
+
+    static func run(_ channel: LinkMediaChannel) {
+        let results = Results()
+        channel.onPacket = { results.add($0) }
+        let box = UncheckedChannel(channel: channel)
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 1) {
+            guard let encoder = try? OpusEncoder() else {
+                return log.warning("media", "Link media self-test: no Opus encoder")
+            }
+            let started = Date()
+            var sizes: [Int] = []
+            for n in 0..<50 {
+                let tone = (0..<Opus.frameSamples).map { i -> Int16 in
+                    Int16(8_000 * sin(2 * .pi * 440 * Double(n * Opus.frameSamples + i) / Opus.sampleRate))
+                }
+                if let opus = encoder.encode(tone) {
+                    sizes.append(opus.count)
+                    box.channel.send(AudioPackets.encodeOpus(sequence: UInt16(n), opus: opus))
+                }
+                Thread.sleep(forTimeInterval: 0.02)
+            }
+            Thread.sleep(forTimeInterval: 1)
+            let s = results.summary
+            let average = sizes.isEmpty ? 0 : sizes.reduce(0, +) / sizes.count
+            let firstMs = s.first.map { Int($0.timeIntervalSince(started) * 1000) } ?? -1
+            log.info("media", "Link media self-test: sent \(sizes.count) Opus packets (\(average) B average, \(encoder.bitRate / 1000) kbit/s), got \(s.echoes) back, decoded \(s.decoded), level \(s.level), first echo after \(firstMs) ms; channel sent \(box.channel.framesSent) frames, dropped \(box.channel.packetsDropped)")
+        }
+    }
+
+    private struct UncheckedChannel: @unchecked Sendable {
+        let channel: LinkMediaChannel
     }
 }
 #endif

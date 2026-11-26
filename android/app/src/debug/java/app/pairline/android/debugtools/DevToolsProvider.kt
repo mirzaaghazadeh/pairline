@@ -8,9 +8,14 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Process
 import app.pairline.android.AppGraph
+import app.pairline.android.audio.AudioPackets
+import app.pairline.android.audio.Opus
+import app.pairline.android.audio.Pcm
 import app.pairline.android.link.wifi.HotspotState
 import app.pairline.android.log.Log
 import app.pairline.android.ui.ScreenshotMode
+import kotlin.math.PI
+import kotlin.math.sin
 
 /**
  * DEBUG BUILDS ONLY (D-018). Lets tests pair and drive the app without a camera:
@@ -21,6 +26,7 @@ import app.pairline.android.ui.ScreenshotMode
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/screenshot-mode-on   # or -off
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/wifi              # Wi-Fi link state
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/media-echo-on     # or -off
+ *     adb shell content query --uri content://app.pairline.android.debug.devtools/opus-selftest     # this phone's Opus
  *     adb shell content query --uri 'content://app.pairline.android.debug.devtools/send-test-file?size=5000000'
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/update-pretend/1.0.0  # or /off
  *     adb shell content query --uri content://app.pairline.android.debug.devtools/update-check
@@ -32,6 +38,37 @@ import app.pairline.android.ui.ScreenshotMode
  */
 class DevToolsProvider : ContentProvider() {
     override fun onCreate(): Boolean = true
+
+    /**
+     * Encodes 50 frames (1 s) of a 440 Hz tone at 8000 peak with Android's Opus encoder and decodes every packet with
+     * its decoder. A healthy codec gives about 50 packets of about 80 bytes (32 kbit/s) and a level near 5600 (RMS).
+     */
+    private fun opusSelfTest(): Array<Any> {
+        if (!Opus.available) return arrayOf(false, 0, 0, 0, 0, "no Opus encoder or decoder on this phone")
+        return try {
+            Opus.encoder().use { encoder ->
+                Opus.decoder().use { decoder ->
+                    val sizes = ArrayList<Int>()
+                    val levels = ArrayList<Int>()
+                    for (n in 0 until 50) {
+                        val tone = ShortArray(AudioPackets.FRAME_SAMPLES) { i ->
+                            val t = (n * AudioPackets.FRAME_SAMPLES + i).toDouble() / AudioPackets.SAMPLE_RATE
+                            (8000 * sin(2 * PI * 440 * t)).toInt().toShort()
+                        }
+                        for (packet in encoder.encode(Pcm.toBytes(tone))) {
+                            sizes += packet.size
+                            decoder.decode(packet)?.let { levels += Pcm.rms(it) }
+                        }
+                    }
+                    val level = levels.takeLast(20).let { if (it.isEmpty()) 0 else it.sum() / it.size }
+                    Log.i("devtools", "Opus self-test: ${sizes.size} packets, ${levels.size} decoded, level $level")
+                    arrayOf(true, sizes.size, if (sizes.isEmpty()) 0 else sizes.sum() / sizes.size, levels.size, level, "")
+                }
+            }
+        } catch (e: Exception) {
+            arrayOf(true, 0, 0, 0, 0, "${e.javaClass.simpleName}: ${e.message}")
+        }
+    }
 
     override fun query(
         uri: Uri,
@@ -116,6 +153,10 @@ class DevToolsProvider : ContentProvider() {
                         },
                     ),
                 )
+            }
+            "opus-selftest" -> MatrixCursor(arrayOf("available", "packets", "avg_bytes", "decoded", "level", "error")).apply {
+                // Call audio over Bluetooth (D-072): this phone's own Opus codec, a 440 Hz tone there and back.
+                addRow(opusSelfTest())
             }
             "media-echo-on", "media-echo-off" -> MatrixCursor(arrayOf("media_echo")).apply {
                 WifiDevTools.setEcho(uri.lastPathSegment == "media-echo-on")

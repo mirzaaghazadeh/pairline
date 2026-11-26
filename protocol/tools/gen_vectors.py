@@ -23,6 +23,9 @@ ROLE_R, ROLE_B = 0x52, 0x42  # 'R', 'B'
 DIR_B_TO_R, DIR_R_TO_B = 1, 2
 FRAME_PAIR_HELLO, FRAME_PAIR_OK, FRAME_PAIR_FAIL, FRAME_HELLO, FRAME_RECORD = 0x01, 0x02, 0x03, 0x10, 0x20
 FRAME_BULK = 0x21
+FRAME_MEDIA = 0x22
+CHANNEL_LINK_MEDIA = 3
+KIND_OPUS = 0x02
 
 
 def hx(b: bytes) -> str:
@@ -153,6 +156,20 @@ def main():
     k_br, k_rb = okm[:32], okm[32:]
     media = hkdf(okm, b"", b"pairline v0 media", 64)
     bulk = hkdf(okm, b"", b"pairline v0 bulk", 64)
+    link_media = hkdf(okm, b"", b"pairline v0 link media", 64)
+
+    # Call audio inside the Bluetooth session (D-072): two Opus packets batched in one MEDIA record B→R, and one
+    # packet R→B. The Opus bytes are placeholders; only the framing and the crypto are tested here.
+    opus_1, opus_2, opus_r = label("opus packet 1")[:24], label("opus packet 2")[:30], label("opus packet r")[:20]
+    packet_1 = bytes([KIND_OPUS]) + struct.pack(">H", 65535) + opus_1
+    packet_2 = bytes([KIND_OPUS]) + struct.pack(">H", 0) + opus_2  # the sequence number wraps
+    packet_r = bytes([KIND_OPUS]) + struct.pack(">H", 41) + opus_r
+    link_plain = struct.pack(">H", len(packet_1)) + packet_1 + struct.pack(">H", len(packet_2)) + packet_2
+    link_plain_r = struct.pack(">H", len(packet_r)) + packet_r
+    link_rec = seal(link_media[:32], DIR_B_TO_R, 3, CHANNEL_LINK_MEDIA, link_plain)
+    link_rec_r = seal(link_media[32:], DIR_R_TO_B, 0, CHANNEL_LINK_MEDIA, link_plain_r)
+    link_frame = bytes([FRAME_MEDIA]) + link_rec
+    link_frame_r = bytes([FRAME_MEDIA]) + link_rec_r
 
     status = b'{"t":"status","battery":{"level":82,"charging":false},"app":"0.1.0"}'
     send = '{"t":"sms.send","id":7,"sim":0,"to":"+989121234567","body":"سلام 👋","cid":"c-1"}'.encode()
@@ -202,6 +219,7 @@ def main():
             "confirm_b_to_r": hx(seal(k_br, DIR_B_TO_R, 0, 0, b"")),
             "media_k_br": hx(media[:32]), "media_k_rb": hx(media[32:]),
             "bulk_k_br": hx(bulk[:32]), "bulk_k_rb": hx(bulk[32:]),
+            "link_media_k_br": hx(link_media[:32]), "link_media_k_rb": hx(link_media[32:]),
         },
         "records": [
             {"key": "k_br", "direction": DIR_B_TO_R, "counter": 1, "channel": 0,
@@ -226,6 +244,26 @@ def main():
                                 "steps": replay_window_steps(media[:32])},
         "bulk_file_data": {"fid": 7, "offset": 49152, "data_utf8": "file data ✓", "plaintext": hx(bulk_plain),
                            "frame": hx(bulk_frame), "tcp": hx(struct.pack(">I", len(bulk_frame)) + bulk_frame)},
+        # Call audio inside a Bluetooth or debug TCP session (D-072): MEDIA frames on channel 3. The B→R record
+        # batches two packets, each preceded by its 2-byte length; the R→B record holds one.
+        "link_media": {
+            "key_br": "link_media_k_br", "key_rb": "link_media_k_rb", "channel": CHANNEL_LINK_MEDIA,
+            "packets_b_to_r": [hx(packet_1), hx(packet_2)], "sequences_b_to_r": [65535, 0],
+            "plaintext_b_to_r": hx(link_plain), "counter_b_to_r": 3,
+            "frame_b_to_r": hx(link_frame),
+            "ble_att_payload": 244, "ble_fragments_b_to_r": [hx(f) for f in fragments(link_frame, 244)],
+            "tcp_b_to_r": hx(struct.pack(">I", len(link_frame)) + link_frame),
+            "packets_r_to_b": [hx(packet_r)], "plaintext_r_to_b": hx(link_plain_r), "counter_r_to_b": 0,
+            "frame_r_to_b": hx(link_frame_r),
+            # The same B→R record under the Wi-Fi media key, or with the media channel's associated data, must
+            # not open.
+            "must_fail": [
+                {"why": "Wi-Fi media key", "key": "media_k_br", "channel": CHANNEL_LINK_MEDIA,
+                 "wire": hx(link_rec)},
+                {"why": "Wi-Fi media channel in associated data", "key": "link_media_k_br", "channel": 1,
+                 "wire": hx(link_rec)},
+            ],
+        },
         "pair_uri_wifi": {"uri": qr_wifi, "ip": ["192.168.1.23", "fd12:3456:789a::1"], "port": 47820,
                           "ssid": "AndroidShare_4821", "pw": "k3y with spaces & ✓"},
         "must_fail": [

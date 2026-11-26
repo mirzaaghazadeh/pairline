@@ -1,6 +1,10 @@
 package app.pairline.android.ui
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageInstaller
+import android.os.Build
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -72,6 +76,34 @@ fun grantState(activity: Activity, group: PermissionGroup): GrantState {
 }
 
 /**
+ * Android 13+ "restricted settings" (D-075): an app installed from a file (not an app store) gets "App was denied
+ * access" for SMS and call history until the user allows restricted settings in its App info.
+ */
+object RestrictedSettings {
+    private val RESTRICTED = setOf(
+        Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS,
+        Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG,
+    )
+
+    fun applies(group: PermissionGroup): Boolean = group.permissions.any { it in RESTRICTED }
+
+    /** This copy came from a downloaded or local file, which Android 13+ restricts. Read locally. */
+    fun likely(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false
+        val source = runCatching { context.packageManager.getInstallSourceInfo(context.packageName).packageSource }
+            .getOrNull()
+        return source == PackageInstaller.PACKAGE_SOURCE_DOWNLOADED_FILE || source == PackageInstaller.PACKAGE_SOURCE_LOCAL_FILE
+    }
+
+    /** Opens App info with the steps waiting in a notification ([SetupGuide]). */
+    fun guide(context: Context) {
+        val r = LocaleHelper.wrap(context).resources
+        SetupGuide.show(context, r.getString(R.string.restricted_guide_title), r.getString(R.string.restricted_guide_steps))
+        SystemActions.openAppSettings(context)
+    }
+}
+
+/**
  * Returns a function that asks for a group's permissions through Android's dialog, or opens App info when
  * Android won't show the dialog anymore. The link service re-checks afterwards.
  */
@@ -80,16 +112,28 @@ fun rememberPermissionRequester(onResult: (PermissionGroup) -> Unit = {}): (Perm
     val context = LocalContext.current
     val activity = LocalActivity.current ?: return {}
     val holder = remember { arrayOfNulls<PermissionGroup>(1) }
+    ClearSetupGuideOnResume()
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         UiEvents.bump()
         LinkService.refresh(context)
-        holder[0]?.let(onResult)
+        val group = holder[0]
+        // Android said "App was denied access" (restricted settings): go straight to App info, steps in hand.
+        if (group != null && RestrictedSettings.applies(group) && RestrictedSettings.likely(context) &&
+            group.permissions.any { !Perms.granted(context, it) && !activity.shouldShowRequestPermissionRationale(it) }
+        ) {
+            RestrictedSettings.guide(context)
+        }
+        group?.let(onResult)
     }
     return remember(launcher) {
         { group ->
             holder[0] = group
             if (grantState(activity, group) == GrantState.BLOCKED) {
-                SystemActions.openAppSettings(context)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && RestrictedSettings.applies(group)) {
+                    RestrictedSettings.guide(context)
+                } else {
+                    SystemActions.openAppSettings(context)
+                }
             } else {
                 val missing = group.permissions.filterNot { Perms.granted(context, it) }
                 AppGraph.prefs.markRequested(missing)

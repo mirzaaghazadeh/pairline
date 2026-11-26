@@ -437,6 +437,19 @@ class CallTracker(
         executor.schedule({ runCatching { call.stopDtmfTone() } }, 250, TimeUnit.MILLISECONDS)
     }
 
+    /** Puts the call on hold or takes it off (`call.hold`, D-074); `call.state` then says `held` or `active`. */
+    fun hold(id: String, hold: Boolean) = onCall(id) { t ->
+        val call = t.telecom ?: throw RequestException(ErrorCode.UNSUPPORTED, "hold needs the companion call service")
+        if (hold) {
+            if (call.details.can(Call.Details.CAPABILITY_HOLD).not()) {
+                throw RequestException(ErrorCode.UNSUPPORTED, "this call can't be held")
+            }
+            call.hold()
+        } else {
+            call.unhold()
+        }
+    }
+
     @Suppress("DEPRECATION")
     fun audio(id: String, mute: Boolean?, speaker: Boolean?) = onCall(id) { _ ->
         val s = service ?: throw RequestException(ErrorCode.UNSUPPORTED, "audio controls need the companion call service")

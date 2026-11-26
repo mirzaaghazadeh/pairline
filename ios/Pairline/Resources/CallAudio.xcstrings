@@ -169,12 +169,60 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi" } }
       }
     },
-    "Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored." : {
+    "Call audio goes directly between your two phones over Bluetooth or Wi-Fi, encrypted end to end. It's never recorded or stored." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ينتقل صوت المكالمة بين هاتفيك عبر شبكة الواي فاي لديك بتشفير تام بين الطرفين، ولا يُسجَّل أو يُحفظ أبدًا." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call audio goes between your two phones over your Wi-Fi, encrypted end to end. It's never recorded or stored." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس از طریق وای‌فای شما و با رمزگذاری سرتاسری بین دو گوشی‌تان جابه‌جا می‌شود. هرگز ضبط یا ذخیره نمی‌شود." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi iki telefonunuz arasında Wi-Fi ağınız üzerinden uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ينتقل صوت المكالمة مباشرةً بين هاتفيك عبر البلوتوث أو الواي فاي بتشفير تام بين الطرفين، ولا يُسجَّل أو يُحفظ أبدًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call audio goes directly between your two phones over Bluetooth or Wi-Fi, encrypted end to end. It's never recorded or stored." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس مستقیم از راه بلوتوث یا وای‌فای و با رمزگذاری سرتاسری بین دو گوشی‌تان جابه‌جا می‌شود. هرگز ضبط یا ذخیره نمی‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi iki telefonunuz arasında doğrudan Bluetooth veya Wi-Fi üzerinden, uçtan uca şifreli gider. Asla kaydedilmez veya saklanmaz." } }
+      }
+    },
+    "Call audio over Bluetooth" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "صوت المكالمة عبر البلوتوث" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call audio over Bluetooth" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس از راه بلوتوث" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bluetooth üzerinden arama sesi" } }
+      }
+    },
+    "Needs Talk on iPhone and the latest Pairline Bridge on your Android phone. Until then call audio goes over Wi-Fi." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج إلى «التحدث عبر الآيفون» وأحدث إصدار من Pairline Bridge على هاتف أندرويد. وحتى ذلك الحين ينتقل صوت المكالمة عبر الواي فاي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Needs Talk on iPhone and the latest Pairline Bridge on your Android phone. Until then call audio goes over Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به «مکالمه با آیفون» و آخرین نسخهٔ Pairline Bridge روی گوشی اندرویدی نیاز دارد. تا آن موقع صدای تماس از راه وای‌فای می‌رود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda iPhone’dan konuşma ve Pairline Bridge’in son sürümü gerekir. O zamana kadar arama sesi Wi-Fi üzerinden gider." } }
+      }
+    },
+    "Bluetooth" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "البلوتوث" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bluetooth" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بلوتوث" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bluetooth" } }
+      }
+    },
+    "Wi-Fi" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الواي فاي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wi-Fi" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وای‌فای" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Wi-Fi" } }
+      }
+    },
+    "With Talk on iPhone, a call's audio goes between your phones the way you choose here; if that one isn't connected, Pairline uses the other. Bluetooth works wherever the phones are near each other; Wi-Fi needs both on the same network or the Android phone's hotspot." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مع «التحدث عبر الآيفون» ينتقل صوت المكالمة بين هاتفيك بالطريقة التي تختارها هنا، وإن لم تكن متصلة يستخدم Pairline الأخرى. يعمل البلوتوث أينما كان الهاتفان قريبين من بعضهما، أما الواي فاي فيحتاج أن يكون الهاتفان على الشبكة نفسها أو على نقطة اتصال هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "With Talk on iPhone, a call's audio goes between your phones the way you choose here; if that one isn't connected, Pairline uses the other. Bluetooth works wherever the phones are near each other; Wi-Fi needs both on the same network or the Android phone's hotspot." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "با «مکالمه با آیفون»، صدای تماس از راهی که اینجا انتخاب می‌کنید بین دو گوشی می‌رود؛ اگر آن راه وصل نباشد، Pairline از راه دیگر استفاده می‌کند. بلوتوث هر جا که گوشی‌ها نزدیک هم باشند کار می‌کند؛ وای‌فای لازم دارد هر دو گوشی روی یک شبکه یا هات‌اسپات گوشی اندرویدی باشند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan konuşma ile arama sesi telefonlarınız arasında burada seçtiğiniz yoldan gider; o bağlı değilse Pairline diğerini kullanır. Bluetooth, telefonlar birbirine yakın olduğu her yerde çalışır; Wi-Fi için iki telefonun aynı ağda ya da Android telefonun erişim noktasında olması gerekir." } }
+      }
+    },
+    "The iPhone couldn't start the audio codec for calls over Bluetooth." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر على الآيفون تشغيل برنامج ترميز الصوت للمكالمات عبر البلوتوث." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The iPhone couldn't start the audio codec for calls over Bluetooth." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آیفون نتوانست کدک صوتی تماس‌ها از راه بلوتوث را راه بیندازد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone, Bluetooth üzerinden aramalar için ses kodlayıcısını başlatamadı." } }
       }
     },
     "Can I talk on the iPhone during calls?" : {
@@ -217,12 +265,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Geliştirici seçenekleri’nde Kablosuz hata ayıklamayı açın ve ekrandaki kodla eşleyin. Köprü uygulaması her adımı gösterir; ek uygulama gerekmez." } }
       }
     },
-    "Keep both phones on the same Wi-Fi. Calls you take on this iPhone then use its microphone and speaker." : {
+    "Keep the phones near each other. Calls you take on this iPhone then use its microphone and speaker, over Bluetooth or Wi-Fi." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أبقِ الهاتفين على شبكة الواي فاي نفسها. عندها تستخدم المكالمات التي تردّ عليها على هذا الآيفون ميكروفونه ومكبّر صوته." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep both phones on the same Wi-Fi. Calls you take on this iPhone then use its microphone and speaker." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هر دو گوشی را به یک وای‌فای وصل نگه دارید. آن‌وقت تماس‌هایی که روی این آیفون جواب می‌دهید از میکروفون و بلندگوی آن استفاده می‌کنند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İki telefonu da aynı Wi-Fi ağında tutun. Böylece bu iPhone’da yanıtladığınız aramalar onun mikrofonunu ve hoparlörünü kullanır." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أبقِ الهاتفين قريبين من بعضهما. عندها تستخدم المكالمات التي تردّ عليها على هذا الآيفون ميكروفونه ومكبّر صوته، عبر البلوتوث أو الواي فاي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep the phones near each other. Calls you take on this iPhone then use its microphone and speaker, over Bluetooth or Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی‌ها را نزدیک هم نگه دارید. آن‌وقت تماس‌هایی که روی این آیفون جواب می‌دهید، از راه بلوتوث یا وای‌فای، از میکروفون و بلندگوی آن استفاده می‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonları birbirine yakın tutun. Böylece bu iPhone’da yanıtladığınız aramalar, Bluetooth veya Wi-Fi üzerinden, onun mikrofonunu ve hoparlörünü kullanır." } }
       }
     },
     "Listening here · talk on your Android phone" : {
@@ -265,12 +313,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şimdi değil" } }
       }
     },
-    "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It uses Wireless debugging on the Android phone (no extra app) and the same Wi-Fi." : {
+    "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It uses Wireless debugging on the Android phone (no extra app)." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختياري: فعّل «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط لتسمع المكالمات وتردّ عليها بهذا الآيفون. يستخدم «تصحيح الأخطاء اللاسلكي» على هاتف أندرويد (بلا تطبيق إضافي) وشبكة الواي فاي نفسها." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It uses Wireless debugging on the Android phone (no extra app) and the same Wi-Fi." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اختیاری: «مکالمه با آیفون» را در برنامهٔ پل راه بیندازید تا تماس‌ها را با همین آیفون بشنوید و جواب بدهید. از «اشکال‌زدایی بی‌سیم» روی گوشی اندرویدی (بدون برنامهٔ اضافه) و یک وای‌فای مشترک استفاده می‌کند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İsteğe bağlı: aramaları bu iPhone ile duyup yanıtlamak için köprü uygulamasında “iPhone’dan konuşma”yı kurun. Android telefonda Kablosuz hata ayıklamayı (ek uygulama gerekmez) ve aynı Wi-Fi ağını kullanır." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختياري: فعّل «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط لتسمع المكالمات وتردّ عليها بهذا الآيفون. يستخدم «تصحيح الأخطاء اللاسلكي» على هاتف أندرويد (بلا تطبيق إضافي)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Optional: set up “Talk on iPhone” in the bridge app to hear and answer calls with this iPhone. It uses Wireless debugging on the Android phone (no extra app)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اختیاری: «مکالمه با آیفون» را در برنامهٔ پل راه بیندازید تا تماس‌ها را با همین آیفون بشنوید و جواب بدهید. از «اشکال‌زدایی بی‌سیم» روی گوشی اندرویدی (بدون برنامهٔ اضافه) استفاده می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İsteğe bağlı: aramaları bu iPhone ile duyup yanıtlamak için köprü uygulamasında “iPhone’dan konuşma”yı kurun. Android telefonda Kablosuz hata ayıklamayı kullanır (ek uygulama gerekmez)." } }
       }
     },
     "On the Android phone, open Pairline Bridge › Settings › Talk on iPhone." : {
@@ -353,12 +401,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın (Android 12 veya üstü ve Kablosuz hata ayıklama gerekir)." } }
       }
     },
-    "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi." : {
+    "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later and Wireless debugging (no extra app)." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد. يحتاج إلى أندرويد 11 أو أحدث و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي)، وأن يكون الهاتفان على شبكة الواي فاي نفسها." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید. به اندروید ۱۱ یا جدیدتر، «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın. Android 11 veya üstü, Kablosuz hata ayıklama (ek uygulama gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «التحدث عبر الآيفون» في Pairline Bridge على هاتف أندرويد. يحتاج إلى أندرويد 11 أو أحدث و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later and Wireless debugging (no extra app)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» را در Pairline Bridge روی گوشی اندرویدی روشن کنید. به اندروید ۱۱ یا جدیدتر و «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه) نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge’de iPhone’dan konuşma’yı açın. Android 11 veya üstü ve Kablosuz hata ayıklama (ek uygulama gerekmez) gerekir." } }
       }
     },
     "You hear this call here. Talk on your Android phone: it can't take audio from the iPhone." : {
@@ -377,12 +425,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses nerede" } }
       }
     },
-    "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." : {
+    "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging), calls you take here use this iPhone's microphone and speaker, over Bluetooth or Wi-Fi." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عادةً تتحكم في المكالمات من الآيفون وتتحدث من هاتف أندرويد. ومع إعداد «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط (أندرويد 11 أو أحدث، و«تصحيح الأخطاء اللاسلكي»، والواي فاي نفسه)، تستخدم المكالمات التي تردّ عليها هنا ميكروفون هذا الآيفون ومكبّر صوته." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging, the same Wi-Fi), calls you take here use this iPhone's microphone and speaker." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "معمولاً تماس‌ها را از آیفون کنترل می‌کنید و با گوشی اندرویدی صحبت می‌کنید. با راه‌اندازی «مکالمه با آیفون» در برنامهٔ پل (اندروید ۱۱ یا جدیدتر، «اشکال‌زدایی بی‌سیم» و یک وای‌فای مشترک)، تماس‌هایی که اینجا جواب می‌دهید از میکروفون و بلندگوی همین آیفون استفاده می‌کنند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Normalde aramaları iPhone’dan yönetir, Android telefondan konuşursunuz. Köprü uygulamasında iPhone’dan konuşma kuruluysa (Android 11 veya üstü, Kablosuz hata ayıklama, aynı Wi-Fi), burada aldığınız aramalar bu iPhone’un mikrofonunu ve hoparlörünü kullanır." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عادةً تتحكم في المكالمات من الآيفون وتتحدث من هاتف أندرويد. ومع إعداد «التحدث عبر الآيفون» في تطبيق الهاتف الوسيط (أندرويد 11 أو أحدث، و«تصحيح الأخطاء اللاسلكي»)، تستخدم المكالمات التي تردّ عليها هنا ميكروفون هذا الآيفون ومكبّر صوته، عبر البلوتوث أو الواي فاي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Normally you control calls from the iPhone and talk on the Android phone. With Talk on iPhone set up in the bridge app (Android 11 or later, Wireless debugging), calls you take here use this iPhone's microphone and speaker, over Bluetooth or Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "معمولاً تماس‌ها را از آیفون کنترل می‌کنید و با گوشی اندرویدی صحبت می‌کنید. با راه‌اندازی «مکالمه با آیفون» در برنامهٔ پل (اندروید ۱۱ یا جدیدتر و «اشکال‌زدایی بی‌سیم»)، تماس‌هایی که اینجا جواب می‌دهید، از راه بلوتوث یا وای‌فای، از میکروفون و بلندگوی همین آیفون استفاده می‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Normalde aramaları iPhone’dan yönetir, Android telefondan konuşursunuz. Köprü uygulamasında iPhone’dan konuşma kuruluysa (Android 11 veya üstü, Kablosuz hata ayıklama), burada aldığınız aramalar Bluetooth veya Wi-Fi üzerinden bu iPhone’un mikrofonunu ve hoparlörünü kullanır." } }
       }
     },
     "Why does call audio go back to the Android phone sometimes?" : {
@@ -393,12 +441,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi neden bazen Android telefona dönüyor?" } }
       }
     },
-    "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." : {
+    "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later and Wireless debugging (no extra app, no root). The audio goes over Bluetooth, or over Wi-Fi if you choose it in Settings › Call audio. Without it you answer here and talk on the Android phone." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، مع «التحدث عبر الآيفون»: أعدّه في تطبيق الهاتف الوسيط من الإعدادات › التحدث عبر الآيفون. يحتاج إلى أندرويد 11 أو أحدث، و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي ولا روت)، وأن يكون الهاتفان على شبكة الواي فاي نفسها. ومن دونه تردّ هنا وتتحدث من هاتف أندرويد." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later, Wireless debugging (no extra app, no root) and both phones on the same Wi-Fi. Without it you answer here and talk on the Android phone." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، با «مکالمه با آیفون»: آن را در برنامهٔ پل از تنظیمات › مکالمه با آیفون راه بیندازید. به اندروید ۱۱ یا جدیدتر، «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه و بدون روت) و اتصال هر دو گوشی به یک وای‌فای نیاز دارد. بدون آن، اینجا جواب می‌دهید و با گوشی اندرویدی صحبت می‌کنید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, iPhone’dan konuşma ile: köprü uygulamasında Ayarlar › iPhone’dan konuşma’dan kurun. Android 11 veya üstü, Kablosuz hata ayıklama (ek uygulama ve root gerekmez) ve iki telefonun aynı Wi-Fi ağında olması gerekir. Olmadan burada yanıtlar, Android telefondan konuşursunuz." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، مع «التحدث عبر الآيفون»: أعدّه في تطبيق الهاتف الوسيط من الإعدادات › التحدث عبر الآيفون. يحتاج إلى أندرويد 11 أو أحدث و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي ولا روت). ينتقل الصوت عبر البلوتوث، أو عبر الواي فاي إن اخترته في الإعدادات › صوت المكالمة. ومن دونه تردّ هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later and Wireless debugging (no extra app, no root). The audio goes over Bluetooth, or over Wi-Fi if you choose it in Settings › Call audio. Without it you answer here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، با «مکالمه با آیفون»: آن را در برنامهٔ پل از تنظیمات › مکالمه با آیفون راه بیندازید. به اندروید ۱۱ یا جدیدتر و «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه و بدون روت) نیاز دارد. صدا از راه بلوتوث می‌رود، یا اگر در تنظیمات › صدای تماس انتخاب کنید، از راه وای‌فای. بدون آن، اینجا جواب می‌دهید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, iPhone’dan konuşma ile: köprü uygulamasında Ayarlar › iPhone’dan konuşma’dan kurun. Android 11 veya üstü ve Kablosuz hata ayıklama (ek uygulama ve root gerekmez) gerekir. Ses Bluetooth üzerinden gider; Ayarlar › Arama sesi’nde seçerseniz Wi-Fi üzerinden. Olmadan burada yanıtlar, Android telefondan konuşursunuz." } }
       }
     },
     "Your answer helps Pairline pick what works on your Android phone. Nothing else is sent." : {

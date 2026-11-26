@@ -9,6 +9,7 @@ struct ThreadView: View {
     @EnvironmentObject private var bridge: BridgeController
     @EnvironmentObject private var db: AppDatabase
     @EnvironmentObject private var calls: CallCenter
+    @ObservedObject private var notifier = Notifier.shared
     @State private var messages: [StoredMessage] = []
     @State private var conversation: Conversation?
     @State private var loadingOlder = false
@@ -68,8 +69,7 @@ struct ThreadView: View {
                 proxy.scrollTo(messages.last?.key, anchor: .bottom)
                 Notifier.shared.visibleThread = thread
                 Notifier.shared.removeDelivered(thread: thread)
-                db.markRead(thread: thread)
-                bridge.updateBadge()
+                bridge.markRead(thread: thread)
                 if messages.isEmpty { Task { await loadOlder() } }
             }
             .onDisappear {
@@ -80,7 +80,7 @@ struct ThreadView: View {
                 if messages.count != lastCount {
                     lastCount = messages.count
                     withAnimation(.easeOut(duration: 0.25)) { proxy.scrollTo(messages.last?.key, anchor: .bottom) }
-                    db.markRead(thread: thread)
+                    bridge.markRead(thread: thread)
                 }
             }
         }
@@ -107,6 +107,15 @@ struct ThreadView: View {
                     }
                 }
                 Menu {
+                    Button {
+                        notifier.setMuted(thread, !notifier.isMuted(thread))
+                    } label: {
+                        if notifier.isMuted(thread) {
+                            Label { Text("Unmute", tableName: "PhoneTools") } icon: { Image(systemName: "bell") }
+                        } else {
+                            Label { Text("Mute", tableName: "PhoneTools") } icon: { Image(systemName: "bell.slash") }
+                        }
+                    }
                     if bridge.has(.block) && !address.isEmpty {
                         if isBlocked {
                             Button {

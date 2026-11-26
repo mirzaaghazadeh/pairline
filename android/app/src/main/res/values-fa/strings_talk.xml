@@ -121,4 +121,15 @@
     <string name="cap_missing_dtmf_talk">با «مکالمه با آیفون» فعال می‌شود.</string>
     <string name="cap_dtmf_next_call">در تماس بعدی فعال می‌شود.</string>
     <string name="action_set_up">راه‌اندازی</string>
+    <string name="settings_advanced">پیشرفته</string>
+    <string name="settings_root">حالت روت</string>
+    <string name="settings_root_sub">فقط برای گوشی‌های روت‌شده. دستیار «مکالمه با آیفون» به‌جای اشکال‌زدایی بی‌سیم از طریق برنامهٔ روت شما (Magisk، KernelSU و…) راه می‌افتد: گزینه‌های توسعه‌دهنده لازم نیست و بعد از روشن‌شدن دوبارهٔ گوشی، حتی بدون وای‌فای، کار می‌کند. با همان دسترسی محدود قبلی اجرا می‌شود، نه با دسترسی روت. برنامهٔ روت یک بار اجازه می‌خواهد.</string>
+    <string name="settings_bt_restart">ری‌استارت بلوتوث وقتی گیر می‌کند</string>
+    <string name="settings_bt_restart_sub">گاهی بلوتوث اندروید از کار می‌افتد تا وقتی خاموش و روشنش کنید. اگر این روشن باشد و دستیار «مکالمه با آیفون» در حال اجرا باشد، وقتی آیفون وصل نیست و بلوتوث مدام خطا می‌دهد، Pairline خودش این کار را می‌کند، حداکثر ساعتی یک بار. هدفون یا ساعت بلوتوثی بعد از چند ثانیه دوباره وصل می‌شوند.</string>
+    <string name="settings_root_none">روی این گوشی روت پیدا نشد. «مکالمه با آیفون» از اشکال‌زدایی بی‌سیم استفاده می‌کند که روت لازم ندارد.</string>
+    <string name="talk_root_title">راه‌اندازی دستیار با روت</string>
+    <string name="talk_root_idle">تا وقتی «مکالمه با آیفون» روشن است، خودش راه می‌افتد.</string>
+    <string name="talk_root_starting">در حال راه‌اندازی… اگر برنامهٔ روت پرسید، به Pairline Bridge اجازه بدهید.</string>
+    <string name="talk_root_running">در حال اجرا. بعد از هر بار روشن‌شدن گوشی خودش راه می‌افتد.</string>
+    <string name="talk_root_failed">روت دستیار را راه نینداخت. در برنامهٔ روت به Pairline Bridge اجازه بدهید و دوباره امتحان کنید، یا در تنظیمات › پیشرفته حالت روت را خاموش کنید تا از اشکال‌زدایی بی‌سیم استفاده شود.</string>
 </resources>

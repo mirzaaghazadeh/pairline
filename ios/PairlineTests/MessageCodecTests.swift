@@ -28,6 +28,86 @@ final class MessageCodecTests: XCTestCase {
         XCTAssertEqual(status.caps, ["sms.send", "ussd"], "non-string caps are skipped")
     }
 
+    /// `status.net`, `sims[].defaultData` and `net.switch` (D-073).
+    func testNetSwitches() throws {
+        let inbound = try decode([
+            "t": "status", "caps": ["net.switch"],
+            "sims": [["slot": 0, "defaultData": false], ["slot": 1, "defaultData": true]],
+            "net": ["hotspot": true, "bluetooth": false, "data": NSNull(), "future": 1],
+        ])
+        guard case .status(let status) = inbound.message else { return XCTFail() }
+        XCTAssertEqual(status.net, BridgeNetState(hotspot: true, bluetooth: false, data: nil))
+        XCTAssertEqual(status.net?.value(.hotspot), true)
+        XCTAssertNil(status.net?.value(.data), "unknown mobile data stays unknown")
+        XCTAssertEqual(status.sims?.map(\.defaultData), [false, true])
+
+        guard case .status(let old) = try decode(["t": "status", "caps": []]).message else { return XCTFail() }
+        XCTAssertNil(old.net, "an older bridge sends no net: the switches stay hidden")
+
+        let flip = try json(.netSwitch(.bluetooth, on: true))
+        XCTAssertEqual(flip["t"] as? String, "net.switch")
+        XCTAssertEqual(flip["what"] as? String, "bluetooth")
+        XCTAssertEqual(flip["on"] as? Bool, true)
+        XCTAssertEqual(flip["id"] as? Int, 5)
+        let sim = try json(.netDataSIM(slot: 1))
+        XCTAssertEqual(sim["what"] as? String, "dataSim")
+        XCTAssertEqual(sim["sim"] as? Int, 1)
+        XCTAssertNil(sim["on"])
+        XCTAssertEqual(Set(NetSwitch.allCases.map(\.rawValue)), ["hotspot", "bluetooth", "data"])
+    }
+
+    /// D-074: read sync, hold, contact edits, Find phone, the ringer, and numbers from outside Pairline.
+    func testPhoneToolsMessages() throws {
+        guard case .status(let status) = try decode(["t": "status", "caps": ["phone.ringer"], "ringer": "vibrate"]).message
+        else { return XCTFail() }
+        XCTAssertEqual(status.ringer, "vibrate")
+
+        let read = try json(.smsRead(thread: 17))
+        XCTAssertEqual(read["t"] as? String, "sms.read")
+        XCTAssertEqual(read["thread"] as? Int, 17)
+
+        let hold = try json(.callHold(.string("c1"), hold: true))
+        XCTAssertEqual(hold["t"] as? String, "call.hold")
+        XCTAssertEqual(hold["call"] as? String, "c1")
+        XCTAssertEqual(hold["hold"] as? Bool, true)
+
+        let star = try json(.contactsUpdate(key: "c:42", name: nil, numbers: nil, starred: true))
+        XCTAssertEqual(star["key"] as? String, "c:42")
+        XCTAssertEqual(star["starred"] as? Bool, true)
+        XCTAssertNil(star["name"], "unchanged parts aren't sent")
+        XCTAssertNil(star["numbers"])
+        let edit = try json(.contactsUpdate(key: "c:42", name: "Ada", numbers: [ContactNumber(n: "+15551234", label: nil)],
+                                            starred: nil))
+        XCTAssertEqual(edit["name"] as? String, "Ada")
+        XCTAssertEqual((edit["numbers"] as? [[String: Any]])?.first?["n"] as? String, "+15551234")
+
+        XCTAssertEqual(try json(.phoneFind(on: false))["on"] as? Bool, false)
+        XCTAssertEqual(try json(.phoneRinger("silent"))["mode"] as? String, "silent")
+
+        XCTAssertEqual(PhoneNumber.firstNumber(in: "+98 912 123 4567"), "+989121234567")
+        XCTAssertEqual(PhoneNumber.firstNumber(in: "۰۰۹۸۹۱۲۱۲۳۴۵۶۷"), "+989121234567")
+        XCTAssertEqual(PhoneNumber.firstNumber(in: "Call me at (555) 123-4567 tonight"), "5551234567")
+        XCTAssertNil(PhoneNumber.firstNumber(in: "no number here"))
+    }
+
+    /// D-077: notifications from Android apps, their removal, and dismissing one from here.
+    func testMirroredNotifications() throws {
+        guard case .notifPosted(let n) = try decode([
+            "t": "notif.posted", "key": "0|com.whatsapp|1|null|10123", "app": "com.whatsapp", "appName": "WhatsApp",
+            "title": "Ada", "text": "See you at 6", "time": 1_764_000_000_000,
+        ]).message else { return XCTFail() }
+        XCTAssertEqual(n.appName, "WhatsApp")
+        XCTAssertEqual(n.text, "See you at 6")
+        guard case .notifPosted(let bare) = try decode(["t": "notif.posted", "key": "k", "app": "a.b"]).message
+        else { return XCTFail() }
+        XCTAssertNil(bare.title, "title and text may be missing")
+        guard case .notifRemoved(let key) = try decode(["t": "notif.removed", "key": "k"]).message else { return XCTFail() }
+        XCTAssertEqual(key, "k")
+        let dismiss = try json(.notifDismiss(key: "k"))
+        XCTAssertEqual(dismiss["t"] as? String, "notif.dismiss")
+        XCTAssertEqual(dismiss["key"] as? String, "k")
+    }
+
     func testSMSMessagesAndHistoryPage() throws {
         let inbound = try decode([
             "t": "sms.history", "id": 9, "more": true,

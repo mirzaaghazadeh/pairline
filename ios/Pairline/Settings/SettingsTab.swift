@@ -14,7 +14,7 @@ struct SettingsTab: View {
     @State private var page: Page?
 
     enum Page: Hashable {
-        case blocked, netShare, help, diagnostics, privacy, about
+        case blocked, netShare, export, help, diagnostics, privacy, about
     }
 
     var body: some View {
@@ -26,6 +26,15 @@ struct SettingsTab: View {
                 destination(page ?? .about)
                     .id(page ?? .about)
             }
+            #if DEBUG
+            // `-PairlineSettingsPage netShare` opens that page beside the list, for checking it on the Simulator.
+            .onAppear {
+                let args = ProcessInfo.processInfo.arguments
+                if let i = args.firstIndex(of: "-PairlineSettingsPage"), i + 1 < args.count, args[i + 1] == "netShare" {
+                    page = .netShare
+                }
+            }
+            #endif
         } else {
             NavigationStack { settingsList }
         }
@@ -35,6 +44,7 @@ struct SettingsTab: View {
         switch page {
         case .blocked: BlockedNumbersView()
         case .netShare: NetShareView()
+        case .export: ExportMessagesView()
         case .help: HelpCenterView()
         case .diagnostics: DiagnosticsView()
         case .privacy: PrivacySummaryView()
@@ -82,6 +92,7 @@ struct SettingsTab: View {
                 // Shown once the bridge has reported its SIMs (D-062).
                 if !bridge.sims.isEmpty { SIMDefaultsSection() }
                 callsSection
+                callAudioSection
                 languageSection
                 helpSection
                 telegramSection
@@ -273,6 +284,19 @@ struct SettingsTab: View {
             Toggle(isOn: $settings.lowBatteryAlert) {
                 Label("Bridge battery alerts", systemImage: "battery.25")
             }
+            // D-077: the apps are chosen on the Android phone; this turns showing them here on or off.
+            Toggle(isOn: $settings.mirrorNotifications) {
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Notifications from Android apps", tableName: "PhoneTools")
+                        Text("Choose the apps in Pairline Bridge › Settings on the Android phone.", tableName: "PhoneTools")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: "app.badge")
+                }
+            }
             Toggle(isOn: $settings.trialReminder) {
                 Label("Trial reminder", systemImage: "hourglass")
             }
@@ -300,7 +324,21 @@ struct SettingsTab: View {
         } header: {
             Text("Calls")
         } footer: {
-            Text("iPhone Recents can sync to iCloud, so this is off by default. Calls are always listed in Pairline.")
+            Text("Calls show in the Phone app's Recents, where one tap calls back through Pairline. Recents can sync to iCloud: turn this off to keep calls only in Pairline.", tableName: "PhoneTools")
+        }
+    }
+
+    /// Talk on iPhone: which way a call's audio tries first (D-072). Bluetooth by default; the other is the fallback.
+    private var callAudioSection: some View {
+        Section {
+            Picker(selection: $settings.callAudioPath) {
+                Text("Bluetooth", tableName: "CallAudio").tag(CallAudioPath.link)
+                Text("Wi-Fi", tableName: "CallAudio").tag(CallAudioPath.wifi)
+            } label: {
+                Label { Text("Call audio", tableName: "CallAudio") } icon: { Image(systemName: "waveform") }
+            }
+        } footer: {
+            Text("With Talk on iPhone, a call's audio goes between your phones the way you choose here; if that one isn't connected, Pairline uses the other. Bluetooth works wherever the phones are near each other; Wi-Fi needs both on the same network or the Android phone's hotspot.", tableName: "CallAudio")
         }
     }
 
@@ -333,6 +371,9 @@ struct SettingsTab: View {
             }
             pageLink(.diagnostics) {
                 Label("Diagnostics", systemImage: "stethoscope")
+            }
+            pageLink(.export) {
+                Label { Text("Export messages", tableName: "PhoneTools") } icon: { Image(systemName: "square.and.arrow.up.on.square") }
             }
             pageLink(.privacy) {
                 Label("Privacy", systemImage: "hand.raised")

@@ -13,6 +13,8 @@ final class Notifier: NSObject, ObservableObject {
     static let otpCategory = "sms.otp"
     static let copyCodeAction = "copy-code"
     static let markReadAction = "mark-read"
+    static let replyAction = "reply"
+    static let mirrorCategory = "mirror"
     static let trialReminderID = "trial.reminder"
     static let callsPausedID = "calls.paused"
     static let incomingCallID = "calls.incoming"
@@ -23,9 +25,27 @@ final class Notifier: NSObject, ObservableObject {
     var visibleThread: Int64?
     var onOpenThread: ((Int64) -> Void)?
     var onMarkRead: ((Int64) -> Void)?
+    /// A reply typed in a message notification (D-074): thread, address, SIM, text.
+    var onReply: ((Int64, String, Int?, String) -> Void)?
+    /// A mirrored notification was dismissed here (D-077): its key on the bridge phone.
+    var onMirrorDismissed: ((String) -> Void)?
     var onOpenStatus: (() -> Void)?
     /// Remote mode (D-072): a CloudKit alert push reached the open app.
     var onRemotePush: (() -> Void)?
+
+    // MARK: Muted conversations (D-074): no banner or sound, still counted as unread.
+
+    private static let mutedKey = "messages.muted"
+
+    @Published private(set) var muted: Set<Int64> = Set(
+        (UserDefaults.standard.array(forKey: "messages.muted") as? [NSNumber] ?? []).map(\.int64Value))
+
+    func isMuted(_ thread: Int64) -> Bool { muted.contains(thread) }
+
+    func setMuted(_ thread: Int64, _ on: Bool) {
+        if on { muted.insert(thread) } else { muted.remove(thread) }
+        UserDefaults.standard.set(muted.map { NSNumber(value: $0) }, forKey: Self.mutedKey)
+    }
 
     private let center = UNUserNotificationCenter.current()
 
@@ -34,13 +54,23 @@ final class Notifier: NSObject, ObservableObject {
         let copy = UNNotificationAction(identifier: Self.copyCodeAction, title: String(localized: "Copy code"), options: [])
         let read = UNNotificationAction(identifier: Self.markReadAction, title: String(localized: "Mark as read"),
                                         options: [])
-        let sms = UNNotificationCategory(identifier: Self.smsCategory, actions: [read], intentIdentifiers: [],
+        // Sent through the bridge from the background, like a message typed in Pairline (D-074).
+        let reply = UNTextInputNotificationAction(identifier: Self.replyAction,
+                                                  title: String(localized: "Reply", table: "PhoneTools"),
+                                                  options: [.authenticationRequired],
+                                                  textInputButtonTitle: String(localized: "Send", table: "PhoneTools"),
+                                                  textInputPlaceholder: String(localized: "Message", table: "PhoneTools"))
+        let sms = UNNotificationCategory(identifier: Self.smsCategory, actions: [reply, read], intentIdentifiers: [],
                                          hiddenPreviewsBodyPlaceholder: String(localized: "New message"),
                                          options: [])
         let otp = UNNotificationCategory(identifier: Self.otpCategory, actions: [copy, read], intentIdentifiers: [],
                                          hiddenPreviewsBodyPlaceholder: String(localized: "New message"),
                                          options: [])
-        center.setNotificationCategories([sms, otp])
+        // Mirrored app notifications (D-077): swiping one away here clears it on the bridge phone too.
+        let mirror = UNNotificationCategory(identifier: Self.mirrorCategory, actions: [], intentIdentifiers: [],
+                                            hiddenPreviewsBodyPlaceholder: String(localized: "New notification", table: "PhoneTools"),
+                                            options: [.customDismissAction])
+        center.setNotificationCategories([sms, otp, mirror])
         // Remote mode's notification extension follows "Show message text" too.
         RemoteInbox.setShowsMessageText(AppSettings.shared.showMessagePreviews)
         Task { await refreshAuthorization() }
@@ -60,6 +90,8 @@ final class Notifier: NSObject, ObservableObject {
     /// A new incoming SMS. `sender` is the contact name or the number.
     func notifyMessage(_ message: StoredMessage, sender: String, isDemo: Bool) {
         guard authorization == .authorized || authorization == .provisional else { return }
+        // A muted conversation stays quiet, except for one-time codes, which are usually wanted right away.
+        if isMuted(message.thread) && OTPDetector.code(in: message.body) == nil { return }
         let content = UNMutableNotificationContent()
         content.title = sender
         let code = OTPDetector.code(in: message.body)
@@ -72,7 +104,8 @@ final class Notifier: NSObject, ObservableObject {
         content.sound = .default
         content.threadIdentifier = "thread-\(message.thread)"
         content.categoryIdentifier = code == nil ? Self.smsCategory : Self.otpCategory
-        var info: [String: Any] = ["thread": NSNumber(value: message.thread)]
+        var info: [String: Any] = ["thread": NSNumber(value: message.thread), "addr": message.addr]
+        if let sim = message.sim { info["sim"] = NSNumber(value: sim) }
         if let code { info["code"] = code }
         content.userInfo = info
         if #available(iOS 15.0, *) {
@@ -80,6 +113,40 @@ final class Notifier: NSObject, ObservableObject {
             content.relevanceScore = code == nil ? 0.5 : 1
         }
         center.add(UNNotificationRequest(identifier: "sms-\(message.key)", content: content, trigger: nil))
+    }
+
+    // MARK: Notifications from Android apps (D-077)
+
+    private static func mirrorID(_ key: String) -> String { "mirror-" + key }
+
+    /// A notification from an app the user chose on the bridge phone. The same key replaces the earlier one (an app
+    /// updating its notification); grouped by app.
+    func notifyMirrored(_ n: MirroredNotification) {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        let appName = n.appName ?? n.app
+        if let title = n.title, !title.isEmpty {
+            content.title = title
+            content.subtitle = appName
+        } else {
+            content.title = appName
+        }
+        if AppSettings.shared.showMessagePreviews {
+            content.body = n.text ?? ""
+        } else {
+            content.body = String(localized: "New notification", table: "PhoneTools")
+        }
+        content.sound = .default
+        content.threadIdentifier = "app-" + n.app
+        content.categoryIdentifier = Self.mirrorCategory
+        content.userInfo = ["mirror": n.key]
+        if #available(iOS 15.0, *) { content.relevanceScore = 0.3 }
+        center.add(UNNotificationRequest(identifier: Self.mirrorID(n.key), content: content, trigger: nil))
+    }
+
+    /// Gone on the bridge phone (read or dismissed there): gone here too.
+    func removeMirrored(key: String) {
+        center.removeDeliveredNotifications(withIdentifiers: [Self.mirrorID(key)])
     }
 
     /// One summary instead of many banners after catching up.
@@ -195,8 +262,20 @@ extension Notifier: UNUserNotificationCenterDelegate {
         let thread = (info["thread"] as? NSNumber)?.int64Value
         let code = info["code"] as? String
         let isStatus = info["status"] != nil
+        let addr = info["addr"] as? String
+        let sim = (info["sim"] as? NSNumber)?.intValue
+        let typed = (response as? UNTextInputNotificationResponse)?.userText
+        let mirrorKey = info["mirror"] as? String
         Task { @MainActor in
+            if let mirrorKey, action == UNNotificationDismissActionIdentifier {
+                Notifier.shared.onMirrorDismissed?(mirrorKey)
+                return completionHandler()
+            }
             switch action {
+            case Notifier.replyAction:
+                if let thread, let addr, let typed, !typed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Notifier.shared.onReply?(thread, addr, sim, typed)
+                }
             case Notifier.copyCodeAction:
                 if let code {
                     Clipboard.copy(code, isCode: true)

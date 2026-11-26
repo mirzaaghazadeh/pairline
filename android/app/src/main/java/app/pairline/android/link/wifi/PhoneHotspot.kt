@@ -11,7 +11,8 @@ import androidx.core.content.ContextCompat
 /**
  * Android's own hotspot (Settings › Hotspot & tethering) as Pairline sees it without any privilege: whether it's on,
  * from Android's sticky tethering broadcast, and whether this phone has an internet connection it can share. Read
- * locally, nothing is looked up. Pairline never turns this hotspot on or off (AGENTS.md rule 5, D-061).
+ * locally, nothing is looked up. Pairline turns it on or off only when the user flips the switch for it on the
+ * iPhone (AGENTS.md rule 5, D-061, D-073).
  */
 object PhoneHotspot {
     data class Info(
@@ -23,6 +24,11 @@ object PhoneHotspot {
         val vpn: Boolean,
         /** This phone is itself on a Wi-Fi network (Wireless debugging works only then). */
         val onWifi: Boolean,
+        /**
+         * Bluetooth tethering is sharing: Android 13 and later list it as soon as it's on, Android 11 and 12 only
+         * once a device has joined (D-073).
+         */
+        val bluetooth: Boolean = false,
     )
 
     // Android's own broadcasts (not in the public SDK, sent since Android 4, sticky). Their extras list the interfaces.
@@ -34,6 +40,9 @@ object PhoneHotspot {
 
     /** Tethering over USB, Bluetooth or Ethernet, which isn't a hotspot the iPhone can join. */
     private val NOT_WIFI = Regex("^(rndis|ncm|usb|bt-pan|bt|eth|rmnet).*")
+
+    /** Android's interface for Bluetooth tethering. */
+    private const val BLUETOOTH_IFACE = "bt-pan"
 
     fun filter() = IntentFilter().apply {
         addAction(ACTION_TETHER_STATE_CHANGED)
@@ -75,7 +84,8 @@ object PhoneHotspot {
                 }
             }
         }
-        return Info(on = on, upstream = upstream, vpn = vpn, onWifi = onWifi)
+        val bluetooth = tethered.orEmpty().any { it.startsWith(BLUETOOTH_IFACE) }
+        return Info(on = on, upstream = upstream, vpn = vpn, onWifi = onWifi, bluetooth = bluetooth)
     }
 
     private fun isLocalOnly(caps: NetworkCapabilities): Boolean =

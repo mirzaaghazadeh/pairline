@@ -61,10 +61,11 @@ except ImportError:
 VERSION = 0
 ROLE_R, ROLE_B = 0x52, 0x42  # 'R', 'B'
 DIR_B_TO_R, DIR_R_TO_B = 1, 2
-CONTROL_CHANNEL, MEDIA_CHANNEL, BULK_CHANNEL = 0, 1, 2
+CONTROL_CHANNEL, MEDIA_CHANNEL, BULK_CHANNEL, LINK_MEDIA_CHANNEL = 0, 1, 2, 3
 F_PAIR_HELLO, F_PAIR_OK, F_PAIR_FAIL, F_HELLO, F_RECORD, F_BULK = 0x01, 0x02, 0x03, 0x10, 0x20, 0x21
+F_MEDIA = 0x22  # call audio inside the session (D-072)
 FRAME_NAMES = {F_PAIR_HELLO: "PAIR_HELLO", F_PAIR_OK: "PAIR_OK", F_PAIR_FAIL: "PAIR_FAIL",
-               F_HELLO: "HELLO", F_RECORD: "RECORD", F_BULK: "BULK"}
+               F_HELLO: "HELLO", F_RECORD: "RECORD", F_BULK: "BULK", F_MEDIA: "MEDIA"}
 MEDIA_MAX_PAYLOAD = 1200      # PROTOCOL.md, "Media channel (UDP)"
 REPLAY_WINDOW = 64
 FILE_CHUNK = 49152            # PROTOCOL.md, "File transfer"
@@ -86,8 +87,10 @@ CALLLOG_PAGE = 20        # 30 sample entries: 2 pages
 
 ALL_CAPS = ["sms.receive", "sms.send", "sms.history", "call.observe", "call.control", "call.dial",
             "call.dtmf", "call.audio", "contacts", "calllog", "contacts.add", "ussd", "dualsim",
-            "calllog.delete", "block"]
-CAP_FOR = {"sms.threads": "sms.history", "sms.history": "sms.history", "sms.send": "sms.send",
+            "calllog.delete", "block", "net.switch", "sms.read", "call.hold", "contacts.edit", "phone.find",
+            "phone.ringer"]
+CAP_FOR = {"net.switch": "net.switch", "sms.read": "sms.read", "call.hold": "call.hold",
+           "contacts.update": "contacts.edit", "phone.find": "phone.find", "phone.ringer": "phone.ringer","sms.threads": "sms.history", "sms.history": "sms.history", "sms.send": "sms.send",
            "call.dial": "call.dial", "call.answer": "call.control", "call.reject": "call.control",
            "call.end": "call.control", "call.dtmf": "call.dtmf", "call.audio": "call.audio",
            "contacts.sync": "contacts", "calllog.sync": "calllog", "contacts.add": "contacts.add",
@@ -227,7 +230,8 @@ def session_keys(ikm: bytes, hello_r: bytes, hello_b: bytes):
 
 
 def channel_keys(okm: bytes, name: str):
-    """Wi-Fi channel keys ("media" or "bulk") of a Wi-Fi session. Returns (B→R, R→B)."""
+    """Channel keys of a session: "media" or "bulk" (Wi-Fi), "link media" (the debug link standing in for Bluetooth,
+    D-072). Returns (B→R, R→B)."""
     k = hkdf(okm, b"", b"pairline v0 " + name.encode(), 64)
     return k[:32], k[32:]
 
@@ -396,9 +400,9 @@ def fit(items, limit, size=lambda it: len(dumps(it))):
 
 SIM_SLOTS = [
     {"slot": 0, "carrier": "Irancell", "label": "SIM 1", "number": "+989121234567", "signal": 3, "net": "LTE",
-     "roaming": False, "defaultSms": True, "defaultVoice": True},
+     "roaming": False, "defaultSms": True, "defaultVoice": True, "defaultData": True},
     {"slot": 1, "carrier": "Vodafone", "label": "SIM 2", "number": None, "signal": 2, "net": "5G",
-     "roaming": False, "defaultSms": False, "defaultVoice": False},
+     "roaming": False, "defaultSms": False, "defaultVoice": False, "defaultData": False},
 ]
 
 BANK = "72975"
@@ -711,6 +715,9 @@ class Link:
         self.tx, self.rx = 0, -1  # next counter to send; last counter accepted
         self.bulk_tx_key = self.bulk_rx_key = self.media_keys = None
         self.bulk_tx, self.bulk_rx = 0, -1
+        self.link_media_keys = None  # (B→R, R→B): MEDIA frames on the debug link (D-072)
+        self.link_tx, self.link_rx = 0, -1
+        self.link_records = self.link_packets = 0
         self.ready = self.closed = False
         self.tasks = []
         self.ping_id, self.pings = 0, {}
@@ -736,6 +743,8 @@ class Link:
                 self.last_rx = time.monotonic()
                 if ftype == F_BULK and self.kind == "wifi":
                     self.on_bulk(body)
+                elif ftype == F_MEDIA and self.kind != "wifi":
+                    self.on_link_media(body)
                 elif ftype != F_RECORD:
                     raise ProtocolError(f"unexpected {FRAME_NAMES[ftype]} after the handshake")
                 else:
@@ -771,6 +780,8 @@ class Link:
         if self.kind == "wifi":
             self.bulk_tx_key, self.bulk_rx_key = channel_keys(okm, "bulk")
             self.media_keys = channel_keys(okm, "media")
+        else:
+            self.link_media_keys = channel_keys(okm, "link media")
         self.send_record(b"")
         log("→ confirm")
         ftype, body = await self.recv(HANDSHAKE_TIMEOUT)
@@ -817,6 +828,43 @@ class Link:
             raise ProtocolError(f"bulk record {counter} doesn't decrypt") from None
         self.bulk_rx = counter
         self.b.files.on_bulk(self, plaintext)
+
+    def on_link_media(self, body):
+        """A MEDIA frame (call audio inside the session, D-072): ordered like control records; anything wrong closes
+        the connection. The packets in it are echoed back in one MEDIA frame while `media echo` is on."""
+        if len(body) < 8 + 16:
+            raise ProtocolError("media record too short")
+        counter = struct.unpack(">Q", body[:8])[0]
+        if counter <= self.link_rx:
+            raise ProtocolError(f"replayed or reordered media record (counter {counter})")
+        try:
+            _, plaintext = open_record(self.link_media_keys[1], DIR_R_TO_B, LINK_MEDIA_CHANNEL, body)
+        except InvalidTag:
+            raise ProtocolError(f"media record {counter} doesn't decrypt") from None
+        self.link_rx = counter
+        packets, at = [], 0
+        while at < len(plaintext):
+            if len(plaintext) - at < 2:
+                log("media (link): a record that doesn't split into packets, ignored")
+                return
+            n = struct.unpack(">H", plaintext[at:at + 2])[0]
+            if n < 3 or n > len(plaintext) - at - 2:
+                log("media (link): a record that doesn't split into packets, ignored")
+                return
+            packets.append(plaintext[at + 2:at + 2 + n])
+            at += 2 + n
+        self.link_records += 1
+        self.link_packets += len(packets)
+        if self.link_records in (1, 10, 50) or self.link_records % 500 == 0:
+            kinds = sorted({p[0] for p in packets})
+            log(f"media (link): {self.link_records} record(s), {self.link_packets} packet(s) from the iPhone "
+                f"(kinds {kinds}, {len(plaintext)} B last)")
+        if self.b.media.echo:
+            self.send_link_media(plaintext)
+
+    def send_link_media(self, plaintext: bytes):
+        self.send_frame(F_MEDIA, seal(self.link_media_keys[0], DIR_B_TO_R, self.link_tx, LINK_MEDIA_CHANNEL, plaintext))
+        self.link_tx += 1
 
     def send_bulk(self, plaintext: bytes):
         self.send_frame(F_BULK, seal(self.bulk_tx_key, DIR_B_TO_R, self.bulk_tx, BULK_CHANNEL, plaintext))
@@ -1156,6 +1204,9 @@ class Bridge:
             self.all_caps += ["wifi", "files"]
         self.caps = list(self.all_caps)
         self.battery = {"level": 82, "charging": False}
+        # status.net (D-073): the bridge phone's own hotspot, Bluetooth tethering and mobile data, as net.switch sets.
+        self.net = {"hotspot": False, "bluetooth": False, "data": True}
+        self.ringer = "normal"  # status.ringer (D-074)
         self.app_version = args.app_version
         self.pairing = None
         # Debug TCP stands in for Bluetooth; "wifi" is the M5 Wi-Fi link. One established session per transport.
@@ -1180,7 +1231,9 @@ class Bridge:
             "contacts.sync": self.req_contacts_sync, "calllog.sync": self.req_calllog_sync,
             "contacts.add": self.req_contacts_add, "ussd.run": self.req_ussd_run,
             "calllog.delete": self.req_calllog_delete, "block.list": self.req_block_list,
-            "block.set": self.req_block_set,
+            "block.set": self.req_block_set, "net.switch": self.req_net_switch,
+            "sms.read": self.req_sms_read, "call.hold": self.req_call_hold, "contacts.update": self.req_contacts_update,
+            "phone.find": self.req_phone_find, "phone.ringer": self.req_phone_ringer,
         }
 
     # State file
@@ -1321,7 +1374,8 @@ class Bridge:
 
     def status(self) -> dict:
         return {"t": "status", "battery": dict(self.battery), "sims": [dict(s) for s in self.sims],
-                "app": self.app_version, "caps": list(self.caps), "time": now_ms()}
+                "app": self.app_version, "caps": list(self.caps), "net": dict(self.net), "ringer": self.ringer,
+                "time": now_ms()}
 
     def push_status(self):
         if self.link and self.link.ready:
@@ -1534,6 +1588,63 @@ class Bridge:
 
     def req_block_list(self, link, msg):
         return self.block_list()
+
+    def req_net_switch(self, link, msg):
+        """D-073: switches nothing real; remembers it and shows it in the status that follows."""
+        what = msg.get("what")
+        if what == "dataSim":
+            slot = msg.get("sim")
+            if not is_int(slot) or not any(s["slot"] == slot for s in self.sims):
+                raise Reject("invalid", "no SIM in that slot")
+            for s in self.sims:
+                s["defaultData"] = s["slot"] == slot
+            log(f"  data SIM is now SIM {slot + 1}")
+        elif what in self.net:
+            on = msg.get("on")
+            if not isinstance(on, bool):
+                raise Reject("invalid", "on missing")
+            self.net[what] = on
+            log(f"  {what} turned {'on' if on else 'off'}")
+        else:
+            raise Reject("invalid", "unknown switch")
+        self.emit(self.status())
+        return {"t": "ok"}
+
+    # D-074: read sync, hold, contact edits, Find phone, the ringer. Logged, nothing real happens.
+    def req_sms_read(self, link, msg):
+        thread = msg.get("thread")
+        if not is_int(thread) or thread <= 0:
+            raise Reject("invalid", "bad thread")
+        log(f"  thread {thread} marked read")
+        return {"t": "ok"}
+
+    def req_call_hold(self, link, msg):
+        c = self.call_arg(msg)
+        if not isinstance(msg.get("hold"), bool):
+            raise Reject("invalid", "hold missing")
+        self.set_call(c, "held" if msg["hold"] else "active")
+        return {"t": "ok"}
+
+    def req_contacts_update(self, link, msg):
+        key = msg.get("key")
+        if not isinstance(key, str) or not key.startswith("c:"):
+            raise Reject("invalid", "bad key")
+        changed = [k for k in ("name", "numbers", "starred") if k in msg]
+        log(f"  contact {key} edited: {', '.join(changed) or 'nothing'}")
+        return {"t": "ok"}
+
+    def req_phone_find(self, link, msg):
+        log(f"  {'ringing loudly' if msg.get('on', True) else 'stopped ringing'}")
+        return {"t": "ok"}
+
+    def req_phone_ringer(self, link, msg):
+        mode = msg.get("mode")
+        if mode not in ("normal", "vibrate", "silent"):
+            raise Reject("invalid", "unknown mode")
+        self.ringer = mode
+        log(f"  ringer set to {mode}")
+        self.emit(self.status())
+        return {"t": "ok"}
 
     def req_block_set(self, link, msg):
         lists = []

@@ -58,6 +58,7 @@ import app.pairline.android.link.WifiLinkStatus
 import app.pairline.android.link.wifi.HotspotFailure
 import app.pairline.android.link.wifi.HotspotState
 import app.pairline.android.link.wifi.PhoneHotspot
+import app.pairline.android.log.Log
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.telephony.Perms
 import app.pairline.android.ui.GrantState
@@ -202,6 +203,19 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     onClick = { navigate(Route.BlockList) },
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                // Notifications from apps the user chose, on the iPhone (D-077).
+                val mirrorCount = remember(prefsTick) { prefs.mirrorApps.size }
+                ListRow(
+                    title = stringResource(R.string.mirror_title),
+                    subtitle = if (mirrorCount == 0) {
+                        stringResource(R.string.mirror_settings_sub)
+                    } else {
+                        stringResource(R.string.mirror_settings_count, mirrorCount)
+                    },
+                    icon = PIcons.Notifications,
+                    onClick = { navigate(Route.Mirror) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(
                     title = stringResource(if (paired) R.string.home_pair_new else R.string.home_pair),
                     icon = PIcons.Qr,
@@ -268,6 +282,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
             }
 
             UpdatesSection()
+
+            AdvancedSection()
 
             SectionCard(title = stringResource(R.string.settings_support)) {
                 ListRow(
@@ -534,9 +550,50 @@ private fun WifiSection(@Suppress("UNUSED_PARAMETER") prefsTick: Int) {
 }
 
 /**
+ * Settings › Advanced (D-075): root mode, for rooted phones only. Talk on iPhone's helper then starts through the
+ * phone's own `su` as the shell user, instead of Wireless debugging: no Developer options, and it keeps working after
+ * a restart without Wi-Fi.
+ */
+@Composable
+private fun AdvancedSection() {
+    val prefs = AppGraph.prefs
+    val prefsTick by prefs.changes.collectAsState()
+    val on = remember(prefsTick) { prefs.rootMode }
+    val available = remember { AppGraph.privileged.rootAvailable() }
+    SectionCard(title = stringResource(R.string.settings_advanced)) {
+        ListRow(
+            title = stringResource(R.string.settings_root),
+            subtitle = stringResource(if (available || on) R.string.settings_root_sub else R.string.settings_root_none),
+            icon = PIcons.Shield,
+            iconTone = if (on) Tone.GOOD else Tone.NEUTRAL,
+            onClick = if (available || on) ({ setRootMode(!on) }) else null,
+            trailing = { Switch(checked = on, enabled = available || on, onCheckedChange = { setRootMode(it) }) },
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        // D-078: Bluetooth off and on when Android's stack is stuck; needs Talk on iPhone's helper.
+        val restart = remember(prefsTick) { prefs.bluetoothRestart }
+        ListRow(
+            title = stringResource(R.string.settings_bt_restart),
+            subtitle = stringResource(R.string.settings_bt_restart_sub),
+            icon = PIcons.Bluetooth,
+            iconTone = if (restart) Tone.GOOD else Tone.NEUTRAL,
+            onClick = { prefs.bluetoothRestart = !restart },
+            trailing = { Switch(checked = restart, onCheckedChange = { prefs.bluetoothRestart = it }) },
+        )
+    }
+}
+
+private fun setRootMode(on: Boolean) {
+    AppGraph.prefs.rootMode = on
+    Log.i("settings", "root mode ${if (on) "on" else "off"}")
+    AppGraph.privileged.retry()
+}
+
+/**
  * Android's own hotspot (D-061), the way to link the phones away from Wi-Fi: it shares this phone's internet and the
  * Wi-Fi link listens on it. The row opens Android's hotspot settings (only opens them; rule 5) and says whether the
- * iPhone gets internet over it, and why not.
+ * iPhone gets internet over it, and why not; also whether Bluetooth tethering is on, and, with the helper running,
+ * that the iPhone can switch these (D-073).
  */
 @Composable
 private fun PhoneHotspotRow(info: PhoneHotspot.Info) {
@@ -556,11 +613,19 @@ private fun PhoneHotspotRow(info: PhoneHotspot.Info) {
             else -> R.string.settings_phone_hotspot_on
         },
     )
+    val notes = listOfNotNull(
+        text,
+        stringResource(R.string.settings_phone_bluetooth_on).takeIf { info.bluetooth },
+        stringResource(R.string.settings_phone_hotspot_helper).takeIf { helperNote },
+        // The iPhone's switches (D-073) need the helper running, so Talk on iPhone on.
+        stringResource(R.string.settings_phone_hotspot_remote).takeIf { helper == PrivilegedManager.State.READY },
+    )
     ListRow(
         title = stringResource(R.string.settings_phone_hotspot),
-        subtitle = if (helperNote) text + "\n\n" + stringResource(R.string.settings_phone_hotspot_helper) else text,
+        subtitle = notes.joinToString("\n\n"),
         icon = PIcons.Hotspot,
         iconTone = when {
+            !info.on && info.bluetooth -> Tone.GOOD
             !info.on -> Tone.ACCENT
             !info.upstream || info.vpn || helperNote -> Tone.WARN
             else -> Tone.GOOD

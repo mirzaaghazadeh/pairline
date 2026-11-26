@@ -65,6 +65,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- The iPhone's ringer switch (D-074): lists Pairline under Do Not Disturb access, which only the user turns on.
+         Needed only to switch to or from silent. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <!-- Talk on iPhone (D-059): granted by Pairline's own helper once the user set it up, so Pairline can turn
          Developer options and Wireless debugging back on when the helper is needed again. Never granted otherwise. -->
     <uses-permission
@@ -73,6 +76,15 @@
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
+    <!-- Lists the apps on the home screen, so the user can choose whose notifications reach the iPhone (D-077).
+         Only launchable apps; no QUERY_ALL_PACKAGES. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
 
     <!-- allowBackup="false" and the extraction rules keep messages, contacts and keys out of
          Google cloud backup and device-to-device transfer (AGENTS.md rule 1). -->
@@ -142,6 +154,23 @@
         <!-- The Wireless debugging pairing code typed into Pairline's notification (D-054). -->
         <receiver
             android:name=".privileged.PairingCodeReceiver"
+            android:exported="false" />
+
+        <!-- Notifications from the apps the user chose, mirrored to the iPhone (D-077). Android binds it only after
+             the user gives Pairline Bridge notification access in Settings. -->
+        <service
+            android:name=".mirror.MirrorService"
+            android:exported="true"
+            android:label="@string/mirror_title"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Find phone's "Stop" (D-074); only this app's own notification can send it. -->
+        <receiver
+            android:name=".tools.FindPhoneReceiver"
             android:exported="false" />
 
         <!-- Only the system's SMS stack can send this (BROADCAST_SMS). -->

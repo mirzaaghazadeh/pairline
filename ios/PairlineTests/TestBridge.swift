@@ -64,8 +64,13 @@ final class TestBridge {
     private var opener: RecordOpener?
     private var bulkSealer: RecordSealer?
     private var bulkOpener: RecordOpener?
+    private var linkMediaSealer: RecordSealer?
+    private var linkMediaOpener: RecordOpener?
     private(set) var received: [Data] = []
     private(set) var receivedBulk: [Data] = []
+    /// Plaintexts of the `MEDIA` records R sent (D-072).
+    private(set) var receivedMedia: [Data] = []
+    var onMedia: ((Data) -> Void)?
     private(set) var confirmed = false
     var onMessage: (([String: Any]) -> Void)?
     var onBulk: ((Data) -> Void)?
@@ -94,6 +99,13 @@ final class TestBridge {
             self.bulkOpener = bulkOpener
             receivedBulk.append(plaintext)
             onBulk?(plaintext)
+        case .media:
+            guard var linkMediaOpener, let (_, plaintext) = try? linkMediaOpener.open(frame.body) else {
+                return transport.close()
+            }
+            self.linkMediaOpener = linkMediaOpener
+            receivedMedia.append(plaintext)
+            onMedia?(plaintext)
         default:
             transport.close()
         }
@@ -142,6 +154,9 @@ final class TestBridge {
         let bulk = keys.wifiKeys(.bulk)
         bulkSealer = RecordSealer(key: bulk.bridgeToRemote, direction: .bridgeToRemote, channel: .bulk)
         bulkOpener = RecordOpener(key: bulk.remoteToBridge, direction: .remoteToBridge, channel: .bulk)
+        let media = keys.linkMediaKeys()
+        linkMediaSealer = RecordSealer(key: media.bridgeToRemote, direction: .bridgeToRemote, channel: .linkMedia)
+        linkMediaOpener = RecordOpener(key: media.remoteToBridge, direction: .remoteToBridge, channel: .linkMedia)
         let confirm = try! sealer.seal(Data())
         self.sealer = sealer
         transport.send(Frame(type: .record, body: confirm).encoded)
@@ -174,6 +189,14 @@ final class TestBridge {
     func sendBulk(_ plaintext: Data) {
         let wire = try! bulkSealer!.seal(plaintext)
         transport.send(Frame(type: .bulk, body: wire).encoded)
+    }
+
+    /// Sends one link media record (`MEDIA` frame, D-072) and returns its wire form (for replay tests).
+    @discardableResult
+    func sendMedia(_ plaintext: Data) -> Data {
+        let wire = try! linkMediaSealer!.seal(plaintext)
+        transport.send(Frame(type: .media, body: wire).encoded)
+        return wire
     }
 
     func sendRaw(record wire: Data) {

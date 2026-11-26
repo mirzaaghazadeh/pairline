@@ -86,11 +86,14 @@ Only the pinned peer can derive the keys, because both static keys are mixed in.
 - **Nonce (12 bytes):** a 4-byte big-endian direction label (`B→R` = `00000001`, `R→B` = `00000002`) followed by an
   8-byte big-endian counter.
 - **Associated data (2 bytes):** protocol version ‖ channel (0 = control, on every transport including the Wi-Fi
-  TCP link; 1 = Wi-Fi media; 2 = Wi-Fi bulk).
+  TCP link; 1 = Wi-Fi media; 2 = Wi-Fi bulk; 3 = link media: call audio inside a Bluetooth or debug TCP session).
 - **Record on the wire:** counter (8 bytes, big-endian) ‖ ciphertext ‖ tag.
 - **Replay:**
   - The control channel is ordered, so the receiver rejects any counter ≤ the last one it accepted and drops the connection.
   - The bulk channel is ordered too (it shares the Wi-Fi TCP connection) and follows the same rule.
+  - The link media channel is ordered too (it shares the Bluetooth or debug TCP connection) and follows the same rule.
+    Counters may skip; a counter at or below the last accepted one, or a record that doesn't authenticate, closes the
+    connection.
   - The UDP media channel uses a 64-record sliding replay window instead (below).
 - **Rekeying:** new keys on every reconnect, and the connection is closed and re-established before any counter
   reaches 2³².
@@ -98,6 +101,9 @@ Only the pinned peer can derive the keys, because both static keys are mixed in.
   `"pairline v0 bulk"`; the first 32 bytes are B→R, the last 32 R→B. `okm` is the one of the **Wi-Fi TCP session**
   the channel belongs to (M5, D-044): each Wi-Fi connection runs its own handshake, and its media and bulk keys die
   with it.
+- **Link media keys (D-072):** `HKDF-SHA256(okm, salt = empty, info = "pairline v0 link media", L = 64)`; the first
+  32 bytes are B→R, the last 32 R→B. `okm` is the one of the Bluetooth (or debug TCP) session that carries the
+  `MEDIA` frames. They differ from the Wi-Fi media keys, so the two media paths never share a key and nonce.
 - **Counters per channel:** each direction of each channel has its own counter, starting at 0. On the control
   channel counter 0 is the confirm; on the bulk and media channels counter 0 is an ordinary record.
 - **Media replay window (64 records):** the receiver keeps the highest counter it has accepted (`top`) and a 64-bit
@@ -119,11 +125,14 @@ A frame is one complete unit after transport reassembly. Its first byte is the f
 | `0x10` | `HELLO` | 99-byte hello body |
 | `0x20` | `RECORD` | encrypted record (control channel) |
 | `0x21` | `BULK` | encrypted record on the bulk channel (M5): Wi-Fi TCP only, after the handshake |
+| `0x22` | `MEDIA` | encrypted record on the link media channel (call audio, D-072): BLE and debug TCP only, after the handshake |
 
 Frames are at most 65,535 bytes. Unknown frame types close the connection. `BULK` is new in M5 but needs no version
 bump: a side sends it only for a file transfer the peer accepted with `file.answer`, which an older app never sends.
 A `BULK` frame on BLE or the debug TCP link, before the handshake, or one that doesn't authenticate closes the
-connection.
+connection. `MEDIA` needs no version bump for the same reason: a side sends it only for call audio the bridge
+accepted with `call.media.start` `via: "link"`, which an older app never asks for or accepts. A `MEDIA` frame on a
+Wi-Fi session, before the handshake, or one that doesn't authenticate closes the connection.
 
 ## Transports
 
@@ -197,6 +206,8 @@ bulk channels.
   it's established, and everything else on BLE when it's established (iOS wakes the app for Bluetooth, not for
   sockets), otherwise on whichever is up. A bulk request whose Wi-Fi session closes before the reply arrives is sent
   again on BLE.
+- `call.media.start` with `via: "link"` goes on the Bluetooth (or debug TCP) session, whose `MEDIA` frames then carry
+  the call audio (D-072).
 - `link.switch` isn't used: replies follow their request (D-044).
 - After each handshake each side sends `device.info`, and B sends `status`, on that session. B re-sends calls in
   progress (`call.incoming` / `call.state`) only when its event session changes.
@@ -250,10 +261,13 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 {"key": "sms:1234", "thread": 17, "addr": "+15551234567", "body": "text", "time": 1764000000000,
  "box": "in" | "out", "sim": 0, "state": "received" | "pending" | "sent" | "delivered" | "failed"}
 
-// SIM, in status.sims
+// SIM, in status.sims (defaultData: Android's data SIM, D-073)
 {"slot": 0, "carrier": "Carrier", "label": "SIM 1", "number": "+15551234567" | null,
  "signal": 0-4, "net": "5G" | "LTE" | "3G" | "2G" | "none", "roaming": false,
- "defaultSms": true, "defaultVoice": true}
+ "defaultSms": true, "defaultVoice": true, "defaultData": true}
+
+// The bridge phone's own internet sharing, in status.net (D-073)
+{"hotspot": false, "bluetooth": false, "data": true | null}
 
 // Contact
 {"key": "c:42", "name": "Ada Lovelace", "starred": false,
@@ -270,7 +284,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | Type | Direction | Milestone | Body |
 |------|-----------|-----------|------|
 | `device.info` | either | M1 | `name`, `platform` (`android`/`ios`), `os`, `app` (version), `proto` (0), `caps` (R only, M5: what R can receive, see below) |
-| `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `time`. Sent after the handshake, on every change, and at least every 60 s |
+| `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `net` (D-073: the bridge phone's hotspot, Bluetooth tethering and mobile data; older bridges omit it), `ringer` (D-074: `normal` / `vibrate` / `silent`), `time`. Sent after the handshake, on every change, and at least every 60 s |
 | `status.get` | R→B | M1 | `id` → `status` with the same `id` |
 | `ping` / `pong` | either | M1 | `id`. Keep-alive; also used to measure latency |
 | `unpair` | either | M1 | — The receiver deletes the pinned key and closes the link |
@@ -287,10 +301,18 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events |
 | `call.dtmf` | R→B | M3 | `id`, `call`, `digit` (needs capability `call.dtmf`) |
 | `call.audio` | R→B | M3 | `id`, `call`, `mute`, `speaker` (either optional; needs `call.audio`) |
-| `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true) → `ok` once audio flows, or `error` (`unsupported`: not set up, the bridge's helper isn't running or no Wi-Fi link; `failed`: capture didn't start). Needs `call.media` |
+| `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true), `via` (`"wifi"`, the default: the Wi-Fi session's UDP media channel; `"link"`: `MEDIA` frames on the session this request arrives on, which must be Bluetooth or debug TCP, D-072) → `ok` once audio flows, or `error` (`unsupported`: not set up, the bridge's helper isn't running, no Wi-Fi link for `wifi`, a Wi-Fi session or no `call.media.link` for `link`; `failed`: capture didn't start). Needs `call.media` |
 | `call.media.stop` | R→B | M6 | `id`, `call` → `ok`. The relay also stops by itself when the call ends or the Wi-Fi link drops |
 | `call.media.state` | B→R | M6 | `call`, `state` (`active` / `stopped` / `failed`), `listen`, `talk`, `reason` (English, for diagnostics) |
 | `call.media.feedback` | R→B | M6 | `id`, `heard` (the iPhone heard the caller), `heardMe` (the caller heard the iPhone); either may be null → `ok`. The bridge uses it to pick the capture source and mic handling that work on this phone |
+| `sms.read` | R→B | M2 | `id`, `thread` (> 0): the user read this conversation on R → `ok`; B marks its received messages read (best effort: Android applies it only with Pairline's WRITE_SMS app-op). Needs `sms.read` (D-074) |
+| `call.hold` | R→B | M3 | `id`, `call`, `hold` → `ok`, then `call.state` `held` / `active`. Taking a held call off hold while another is active swaps them (Android holds the other). Needs `call.hold` (D-074) |
+| `contacts.update` | R→B | M4 | `id`, `key` (a contact key) and any of `name`, `numbers` (replace all of the contact's numbers), `starred` → `ok`; the next `contacts.sync` brings the change back. Needs `contacts.edit` (D-074) |
+| `phone.find` | R→B | — | `id`, `on` (default true) → `ok`: B rings loudly on the alarm stream for up to a minute, or stops. Needs `phone.find` (D-074) |
+| `phone.ringer` | R→B | — | `id`, `mode` (`normal` / `vibrate` / `silent`) → `ok`, then `status.ringer`; `error` `permission` when switching to or from silent without Do Not Disturb access (B then asks its user for it). Needs `phone.ringer` (D-074) |
+| `notif.posted` | B→R | — | `key` (Android's notification key), `app` (package), `appName`, `title`, `text` (up to 1,000 characters), `time`: a notification from an app the bridge's user chose. The same `key` again replaces it. Only while `notif.mirror` is listed (D-077) |
+| `notif.removed` | B→R | — | `key`: it went away on the bridge (read, dismissed or replaced there); R removes it |
+| `notif.dismiss` | R→B | — | `id`, `key`: the user dismissed it on R → `ok`; B clears it (only keys it mirrored). Needs `notif.mirror` |
 | `contacts.sync` | R→B, B→R | M4 | request: `id`, `since` (cursor or null) / reply: `id`, `contacts` [Contact], `deleted` [key], `cursor`, `more` |
 | `calllog.sync` | R→B, B→R | M4 | request: `id`, `since` / reply: `id`, `calls` [Call-log entry], `cursor`, `more` |
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
@@ -307,6 +329,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `file.done` | either | M5 | `fid` (the peer's), `ok`, `reason` (`cancelled` / `failed` / `no_space`, when not ok) |
 | `file.cancel` | either | M5 | `fid` (the sender's own), `reason` |
 | `net.share` | R→B, B→R | M8 | request: `id`, `on` / reply (same `id`) or event (no `id`, when the bridge's user stops it): `on`, and while on `host`, `port` (one port for SOCKS5 and HTTP), `user`, `pass` (new for every start), `pac` (`http://host:port/proxy.pac`), `vpn` (the bridge's traffic goes through a VPN), `direct` [domain suffix]. `error` `permission` while the bridge's user hasn't allowed sharing. Needs `net.share` |
+| `net.switch` | R→B | M8 | `id`, `what` (`"hotspot"`: the bridge phone's own Wi-Fi hotspot; `"bluetooth"`: Bluetooth tethering; `"data"`: mobile data on the data SIM) and `on`, or `what: "dataSim"` and `sim` (slot) → `ok` once Android applied it (turning a hotspot off is answered first, then done), then `status` shows it. `error`: `unsupported` (the helper isn't running), `permission` (the carrier's entitlement check or Android refused), `invalid`, `failed` (`msg` has Android's reason, in English). Sent only when the user flips the switch on R. Needs `net.switch` (D-073) |
 
 ### Capabilities (`status.caps`)
 
@@ -316,8 +339,14 @@ version supports it. The iPhone hides or explains anything missing instead of gu
 `sms.receive`, `sms.send`, `sms.history`, `call.observe`, `call.control` (answer/reject/end), `call.dial`,
 `call.dtmf`, `call.audio`, `contacts`, `calllog`, `contacts.add`, `ussd`, `dualsim`, `call.media` (call audio can
 be relayed to the iPhone: "Talk on iPhone" is on and the bridge's helper is running, D-054), `call.media.talk` (the iPhone's microphone
-can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone), `net.share`
-(the bridge's user allows internet sharing, M8), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
+can also be fed into the call; without it the iPhone listens and the user talks on the bridge phone),
+`call.media.link` (listed with `call.media`: the call audio can also travel inside the Bluetooth session as Opus,
+`via: "link"`; the bridge has an Opus encoder and decoder, D-072), `net.share`
+(the bridge's user allows internet sharing, M8), `net.switch` (R may switch the bridge phone's hotspot, Bluetooth
+tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's helper running, D-073), `sms.read`
+(messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `contacts.edit`
+(with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `notif.mirror` (notification access given:
+chosen apps' notifications are sent as `notif.posted`, D-077), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),
 `block` (the bridge keeps a block list, M4)
 
@@ -350,23 +379,41 @@ in `BULK` frames on the same connection. Without a Wi-Fi session, no transfer st
 
 ### Call audio (M6)
 
-Call audio travels only on the Wi-Fi link's **media channel** (UDP, channel 1, media keys, 64-record replay window;
-see "Records"). Each media record's plaintext is one packet:
+Call audio takes one of two paths, chosen by R in `call.media.start` (`via`):
+
+- **`wifi`:** the Wi-Fi link's **media channel** (UDP, channel 1, media keys, 64-record replay window; see
+  "Records"). Each media record's plaintext is one packet.
+- **`link` (D-072):** `MEDIA` frames inside the Bluetooth (or debug TCP) session the request arrived on (channel 3,
+  link media keys, ordered). Needs `call.media.link`. Each `MEDIA` record's plaintext holds **one or more packets**,
+  each preceded by its length (2 bytes, big-endian, at least 3): `length ‖ packet ‖ length ‖ packet …`, at most 1200
+  bytes in all. A record that doesn't split exactly into such packets is ignored (the connection stays up).
+
+A packet is the same on both paths:
 
 | Bytes | Field |
 |-------|-------|
-| 1 | kind: `0x01` = 16-bit little-endian mono PCM at 16 kHz, one 20 ms frame |
+| 1 | kind: `0x01` = 16-bit little-endian mono PCM at 16 kHz, one 20 ms frame; `0x02` = one Opus packet of 20 ms (D-072) |
 | 2 | sequence number, big-endian, +1 per frame, wraps at 65 536 |
-| 640 | 320 samples (kind `0x01`) |
+| 640 or 1–400 | 320 samples (kind `0x01`), or the Opus packet (kind `0x02`) |
 
-- Both directions use the same format; packets are sent every 20 ms while the relay is active. Receivers drop
-  unknown kinds and wrong sizes, play frames in sequence order behind a 60 ms jitter buffer, and cover a lost frame by
-  repeating the previous one at half volume (twice at most), then silence.
-- Uncompressed PCM (32 KB/s each way) is fine on a local network and needs no codec on either side; a compressed kind
-  can be added later without breaking older receivers.
-- R starts the relay with `call.media.start` once the call is in progress and its media channel is open, and plays
-  silence (not nothing) while muted, so B's jitter buffer stays steady. Audio is never stored on either phone.
-- A call-audio packet is 643 bytes, well under the media channel's 1200-byte limit (M5).
+- **Kinds per path:** `wifi` sends kind `0x01` (32 KB/s each way is nothing on a local network and adds no codec
+  delay). `link` sends kind `0x02`: Bluetooth LE can't carry raw PCM reliably. Opus is encoded from 16 kHz mono with
+  20 ms frames, the VoIP application and about 32 kbit/s (packets of about 80 bytes); a receiver accepts any valid
+  Opus packet of 20 ms and resamples what its decoder outputs to 16 kHz. Receivers drop unknown kinds and wrong sizes.
+- Packets are produced every 20 ms while the relay is active. Receivers play frames in sequence order behind a jitter
+  buffer (60 ms on `wifi`; 80 ms on `link`, whose deliveries come in bursts) and cover a lost frame by repeating the
+  previous one at half volume (twice at most), then silence.
+- **Sending on `link`:** audio goes ahead of control frames that haven't started yet (a frame already being sent is
+  finished first: BLE fragments of two frames never interleave). When the link can't keep up, the sender puts every
+  packet that is waiting into the next `MEDIA` record instead of one record per packet, and drops the oldest
+  packets beyond 200 ms waiting, so a stall never builds lasting delay. While a `link` relay runs, B asks Android for
+  its fastest Bluetooth connection (high connection priority, 2M PHY where available) and returns to balanced after.
+- R starts the relay with `call.media.start` once the call is in progress (on `wifi`: once its media channel is open),
+  and sends silence (not nothing) while muted, so B's jitter buffer stays steady. Audio is never stored on either phone.
+- The relay ends when the call ends, with `call.media.stop`, or when the session or channel it runs on closes; B then
+  sends `call.media.state` `stopped`, and R may start it again on the other path.
+- A PCM packet is 643 bytes, under the media channel's 1200-byte limit (M5). An Opus packet with its length prefix is
+  about 85 bytes, so one `MEDIA` frame of a single packet fits one BLE fragment.
 
 ### Clarifications (v0)
 
@@ -619,7 +666,8 @@ keys as v0.
 
 `protocol/test-vectors/v0.json` holds fixed keys and inputs with the expected ECDH results, HKDF outputs, pairing
 MACs, hello bodies, session keys, confirm records, encrypted records (control, media and bulk), records that must
-fail, the media replay window, a pair link with the Wi-Fi parameters, BLE fragments and TCP framing. It is generated by an independent Python implementation (`protocol/tools/gen_vectors.py`). Unit tests
+fail, the media replay window, a pair link with the Wi-Fi parameters, BLE fragments and TCP framing, and the link
+media keys with a `MEDIA` frame of two batched packets (D-072). It is generated by an independent Python implementation (`protocol/tools/gen_vectors.py`). Unit tests
 in both apps must reproduce every value.
 
 ## Open questions for review

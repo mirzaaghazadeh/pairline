@@ -1,0 +1,374 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Allow Do Not Disturb access for Pairline Bridge on the Android phone (it shows a notification for it), then try again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسمح بـ«الوصول إلى عدم الإزعاج» لـ Pairline Bridge على هاتف أندرويد (يعرض إشعارًا لذلك)، ثم حاول مرة أخرى." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Allow Do Not Disturb access for Pairline Bridge on the Android phone (it shows a notification for it), then try again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی «دسترسی به مزاحم نشوید» را برای Pairline Bridge روشن کنید (یک اعلان برایش نشان می‌دهد) و دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonda Pairline Bridge’e Rahatsız Etmeyin erişimi verin (bunun için bir bildirim gösterir), sonra yeniden deneyin." } }
+      }
+    },
+    "Android phone's ringer" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رنين هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android phone's ringer" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "زنگ گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun zili" } }
+      }
+    },
+    "Audio" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خروجی صدا" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses" } }
+      }
+    },
+    "Call with Pairline" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصل عبر Pairline" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call with Pairline" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس با Pairline" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline ile ara" } }
+      }
+    },
+    "Calls a number through your bridge phone's SIM." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يتصل برقم عبر شريحة الهاتف الوسيط." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls a number through your bridge phone's SIM." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "با سیم‌کارت گوشی پل به یک شماره زنگ می‌زند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonun SIM’i üzerinden bir numarayı arar." } }
+      }
+    },
+    "Calls show in the Phone app's Recents, where one tap calls back through Pairline. Recents can sync to iCloud: turn this off to keep calls only in Pairline." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تظهر المكالمات في «الأخيرة» في تطبيق الهاتف، حيث تعاود الاتصال عبر Pairline بضغطة واحدة. قد تتزامن «الأخيرة» مع iCloud: أوقف هذا الخيار لإبقاء المكالمات في Pairline فقط." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls show in the Phone app's Recents, where one tap calls back through Pairline. Recents can sync to iCloud: turn this off to keep calls only in Pairline." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها در بخش «اخیر» برنامهٔ Phone نشان داده می‌شوند و با یک ضربه از طریق Pairline دوباره تماس می‌گیرید. «اخیر» ممکن است با iCloud همگام شود: برای اینکه تماس‌ها فقط در Pairline بمانند، این را خاموش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar Telefon uygulamasının Son Aramalar listesinde görünür; tek dokunuşla Pairline üzerinden geri ararsınız. Son Aramalar iCloud ile eşzamanlanabilir: aramaları yalnızca Pairline’da tutmak için bunu kapatın." } }
+      }
+    },
+    "The App Store couldn't complete this (%@). Check that you're signed in under Settings › your name › Media & Purchases and that in-app purchases are allowed in Screen Time, then try again. If it still fails, restart the iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر على App Store إكمال ذلك (%@). تأكد من تسجيل الدخول في الإعدادات › اسمك › الوسائط والمشتريات، ومن السماح بعمليات الشراء داخل التطبيقات في «مدة استخدام الجهاز»، ثم حاول مرة أخرى. إن استمر الفشل، أعد تشغيل الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The App Store couldn't complete this (%@). Check that you're signed in under Settings › your name › Media & Purchases and that in-app purchases are allowed in Screen Time, then try again. If it still fails, restart the iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اپ‌استور نتوانست این کار را انجام دهد (%@). مطمئن شوید در تنظیمات › نام شما › رسانه و خریدها وارد شده‌اید و در «زمان استفاده» خرید درون‌برنامه‌ای مجاز است، سپس دوباره امتحان کنید. اگر باز هم نشد، آیفون را یک بار خاموش و روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "App Store bunu tamamlayamadı (%@). Ayarlar › adınız › Medya ve Satın Alımlar’da oturum açtığınızdan ve Ekran Süresi’nde uygulama içi satın alımlara izin verildiğinden emin olun, sonra yeniden deneyin. Yine olmazsa iPhone’u yeniden başlatın." } }
+      }
+    },
+    "Edit" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعديل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ویرایش" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Düzenle" } }
+      }
+    },
+    "Edit Contact" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعديل جهة الاتصال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit Contact" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ویرایش مخاطب" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kişiyi düzenle" } }
+      }
+    },
+    "Edit contacts from iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعديل جهات الاتصال من الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit contacts from iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ویرایش مخاطب‌ها از آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kişileri iPhone’dan düzenle" } }
+      }
+    },
+    "Export messages" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصدير الرسائل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export messages" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خروجی گرفتن از پیام‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajları dışa aktar" } }
+      }
+    },
+    "Create export" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إنشاء ملف التصدير" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create export" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ساختن فایل خروجی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dışa aktarımı oluştur" } }
+      }
+    },
+    "Makes a copy of every conversation on this iPhone: one text file to read, and one CSV file for a spreadsheet. It isn't sent anywhere: you choose where to save or share it." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ينشئ نسخة من كل المحادثات على هذا الآيفون: ملف نصي للقراءة، وملف CSV لجدول بيانات. لا يُرسل إلى أي مكان: أنت تختار أين تحفظه أو تشاركه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Makes a copy of every conversation on this iPhone: one text file to read, and one CSV file for a spreadsheet. It isn't sent anywhere: you choose where to save or share it." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از همهٔ گفتگوهای این آیفون یک نسخه می‌سازد: یک فایل متنی برای خواندن و یک فایل CSV برای صفحه‌گسترده. به جایی فرستاده نمی‌شود: خودتان انتخاب می‌کنید کجا ذخیره یا ارسالش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone’daki tüm konuşmaların bir kopyasını oluşturur: okumak için bir metin dosyası ve bir tablo için bir CSV dosyası. Hiçbir yere gönderilmez: nereye kaydedeceğinizi ya da paylaşacağınızı siz seçersiniz." } }
+      }
+    },
+    "The files hold your messages as plain text. Keep them somewhere safe, and delete them when you no longer need them." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحتوي الملفات على رسائلك كنص عادي. احفظها في مكان آمن، واحذفها عندما لا تحتاج إليها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The files hold your messages as plain text. Keep them somewhere safe, and delete them when you no longer need them." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این فایل‌ها پیام‌های شما را به‌صورت متن ساده دارند. جای امنی نگهشان دارید و وقتی لازم نیستند پاکشان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dosyalar mesajlarınızı düz metin olarak içerir. Güvenli bir yerde saklayın ve artık gerekmediğinde silin." } }
+      }
+    },
+    "Favourite" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفضّلة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Favourite" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "علاقه‌مندی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Favori" } }
+      }
+    },
+    "Find phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "العثور على الهاتف" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Find phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیدا کردن گوشی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonu bul" } }
+      }
+    },
+    "Hold the Android phone's screen up to this Mac's camera." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ارفع شاشة هاتف أندرويد أمام كاميرا هذا الـMac." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hold the Android phone's screen up to this Mac's camera." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صفحهٔ گوشی اندرویدی را جلوی دوربین این مک بگیرید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun ekranını bu Mac’in kamerasına tutun." } }
+      }
+    },
+    "Hold" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعليق" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hold" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نگه‌داشتن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Beklet" } }
+      }
+    },
+    "Hold calls" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعليق المكالمات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hold calls" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نگه‌داشتن تماس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramaları beklet" } }
+      }
+    },
+    "It rings loudly for a minute, even on silent. Stop it here or on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يرن بصوت عالٍ لمدة دقيقة، حتى في الوضع الصامت. أوقفه من هنا أو من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "It rings loudly for a minute, even on silent. Stop it here or on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک دقیقه با صدای بلند زنگ می‌زند، حتی روی بی‌صدا. از اینجا یا روی گوشی اندرویدی قطعش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sessizde olsa bile bir dakika yüksek sesle çalar. Buradan ya da Android telefondan durdurun." } }
+      }
+    },
+    "Message" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رسالة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Message" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesaj" } }
+      }
+    },
+    "Mute" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كتم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mute" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بی‌صدا کردن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sessize al" } }
+      }
+    },
+    "Muted" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مكتوم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Muted" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بی‌صدا شده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sessizde" } }
+      }
+    },
+    "Needs Talk on iPhone on, and the latest Pairline Bridge, on your Android phone. Until then, messages you read here stay unread there." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يتطلب تشغيل «التحدث عبر الآيفون» وأحدث إصدار من Pairline Bridge على هاتف أندرويد. وحتى ذلك الحين، تبقى الرسائل التي تقرؤها هنا غير مقروءة هناك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Needs Talk on iPhone on, and the latest Pairline Bridge, on your Android phone. Until then, messages you read here stay unread there." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به روشن بودن «مکالمه با آیفون» و آخرین نسخهٔ Pairline Bridge روی گوشی اندرویدی نیاز دارد. تا آن موقع، پیام‌هایی که اینجا می‌خوانید آنجا خوانده‌نشده می‌مانند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda iPhone’dan konuşma’nın açık olması ve en son Pairline Bridge gerekir. O zamana kadar burada okuduğunuz mesajlar orada okunmamış kalır." } }
+      }
+    },
+    "New notification" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إشعار جديد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New notification" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اعلان جدید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeni bildirim" } }
+      }
+    },
+    "Notifications from Android apps" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إشعارات تطبيقات أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notifications from Android apps" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اعلان برنامه‌های اندروید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android uygulamalarının bildirimleri" } }
+      }
+    },
+    "Choose the apps in Pairline Bridge › Settings on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختر التطبيقات من Pairline Bridge › الإعدادات على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose the apps in Pairline Bridge › Settings on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برنامه‌ها را در Pairline Bridge › تنظیمات روی گوشی اندرویدی انتخاب کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uygulamaları Android telefondaki Pairline Bridge › Ayarlar’dan seçin." } }
+      }
+    },
+    "In Pairline Bridge › Settings › Notifications from apps on your Android phone, allow notification access and choose the apps." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في Pairline Bridge › الإعدادات › إشعارات التطبيقات على هاتف أندرويد، اسمح بالوصول إلى الإشعارات واختر التطبيقات." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "In Pairline Bridge › Settings › Notifications from apps on your Android phone, allow notification access and choose the apps." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی، در Pairline Bridge › تنظیمات › اعلان برنامه‌ها، دسترسی به اعلان‌ها را مجاز کنید و برنامه‌ها را انتخاب کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda Pairline Bridge › Ayarlar › Uygulama bildirimleri’nde bildirim erişimine izin verin ve uygulamaları seçin." } }
+      }
+    },
+    "No phone number to call." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يوجد رقم هاتف للاتصال به." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No phone number to call." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شماره‌ای برای تماس پیدا نشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aranacak telefon numarası yok." } }
+      }
+    },
+    "Number" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرقم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Number" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شماره" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Numara" } }
+      }
+    },
+    "Read on both phones" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مقروءة على الهاتفين" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Read on both phones" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خوانده‌شدن روی هر دو گوشی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İki telefonda da okundu" } }
+      }
+    },
+    "Reply" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reply" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاسخ" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yanıtla" } }
+      }
+    },
+    "Ring the Android phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اجعل هاتف أندرويد يرن" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ring the Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به صدا درآوردن گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonu çaldır" } }
+      }
+    },
+    "Ring the Android phone, or switch it to silent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اجعل هاتف أندرويد يرن، أو حوّله إلى الوضع الصامت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ring the Android phone, or switch it to silent" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی را به صدا درآورید یا بی‌صدایش کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonu çaldırın ya da sessize alın" } }
+      }
+    },
+    "Ringer" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرنين" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ringer" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "زنگ" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Zil" } }
+      }
+    },
+    "Ringer switch" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفتاح الرنين" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ringer switch" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کلید زنگ" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Zil anahtarı" } }
+      }
+    },
+    "Second call" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مكالمة ثانية" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Second call" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس دوم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İkinci arama" } }
+      }
+    },
+    "Swap" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تبديل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Swap" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "جابه‌جایی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Değiştir" } }
+      }
+    },
+    "Send" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إرسال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ارسال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gönder" } }
+      }
+    },
+    "Silent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "صامت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Silent" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بی‌صدا" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sessiz" } }
+      }
+    },
+    "Silent needs Do Not Disturb access for Pairline Bridge: the Android phone asks for it the first time." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يتطلب الوضع الصامت «الوصول إلى عدم الإزعاج» لـ Pairline Bridge: يطلبه هاتف أندرويد في المرة الأولى." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Silent needs Do Not Disturb access for Pairline Bridge: the Android phone asks for it the first time." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای بی‌صدا کردن، Pairline Bridge به «دسترسی به مزاحم نشوید» نیاز دارد: گوشی اندرویدی بار اول آن را می‌خواهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sessiz için Pairline Bridge’in Rahatsız Etmeyin erişimi gerekir: Android telefon ilk seferde bunu ister." } }
+      }
+    },
+    "Sound" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "صوت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sound" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses" } }
+      }
+    },
+    "Stop ringing" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إيقاف الرنين" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stop ringing" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "قطع زنگ" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Çalmayı durdur" } }
+      }
+    },
+    "Unmute" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إلغاء الكتم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unmute" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "باصدا کردن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sesi aç" } }
+      }
+    },
+    "Update Pairline Bridge on your Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حدّث Pairline Bridge على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Update Pairline Bridge on your Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge را روی گوشی اندرویدی به‌روز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda Pairline Bridge’i güncelleyin." } }
+      }
+    },
+    "Vibrate" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اهتزاز" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Vibrate" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "لرزش" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Titreşim" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

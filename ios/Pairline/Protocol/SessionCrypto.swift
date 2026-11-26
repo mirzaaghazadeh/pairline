@@ -65,6 +65,8 @@ enum Channel: UInt8 {
     case control = 0
     case media = 1
     case bulk = 2
+    /// Call audio inside a Bluetooth or debug TCP session (`MEDIA` frames, D-072).
+    case linkMedia = 3
 }
 
 /// Session keys from the handshake: `okm = HKDF(ikm, SHA-256(helloR ‖ helloB), "pairline v0 session", 64)`.
@@ -74,6 +76,7 @@ struct SessionKeys {
     static let sessionInfo = Data("pairline v0 session".utf8)
     static let mediaInfo = Data("pairline v0 media".utf8)
     static let bulkInfo = Data("pairline v0 bulk".utf8)
+    static let linkMediaInfo = Data("pairline v0 link media".utf8)
 
     init(okm: Data) {
         self.okm = okm
@@ -97,6 +100,12 @@ struct SessionKeys {
     func wifiKeys(_ channel: Channel) -> (bridgeToRemote: Data, remoteToBridge: Data) {
         let info = channel == .media ? SessionKeys.mediaInfo : SessionKeys.bulkInfo
         let out = CryptoPrimitives.hkdf(ikm: okm, salt: Data(), info: info, length: 64)
+        return (out.prefix(32), out.suffix(32))
+    }
+
+    /// Link media keys (D-072): call audio inside this Bluetooth or debug TCP session, first half B→R.
+    func linkMediaKeys() -> (bridgeToRemote: Data, remoteToBridge: Data) {
+        let out = CryptoPrimitives.hkdf(ikm: okm, salt: Data(), info: SessionKeys.linkMediaInfo, length: 64)
         return (out.prefix(32), out.suffix(32))
     }
 }

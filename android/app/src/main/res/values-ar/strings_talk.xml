@@ -121,4 +121,15 @@
     <string name="cap_missing_dtmf_talk">تأتي مع «التحدث عبر الآيفون».</string>
     <string name="cap_dtmf_next_call">تعمل في مكالمتك التالية.</string>
     <string name="action_set_up">إعداد</string>
+    <string name="settings_advanced">متقدّم</string>
+    <string name="settings_root">وضع الروت</string>
+    <string name="settings_root_sub">للهواتف التي عليها روت فقط. يبدأ مساعد «التحدث عبر الآيفون» عبر تطبيق الروت لديك (Magisk أو KernelSU…) بدلًا من «تصحيح الأخطاء اللاسلكي»: لا حاجة إلى خيارات المطوّرين، ويبقى يعمل بعد إعادة التشغيل حتى دون واي فاي. يعمل بالصلاحيات المحدودة نفسها كما من قبل، لا بصلاحيات الروت. يطلب تطبيق الروت الإذن مرة واحدة.</string>
+    <string name="settings_bt_restart">إعادة تشغيل البلوتوث عند تعطّله</string>
+    <string name="settings_bt_restart_sub">أحيانًا يتوقف بلوتوث أندرويد عن العمل حتى يُطفأ ويُشغَّل من جديد. إن فعّلت هذا وكان مساعد «التحدث عبر الآيفون» يعمل، يقوم Pairline بذلك تلقائيًا عندما يستمر البلوتوث في الفشل والآيفون غير متصل، مرة واحدة في الساعة على الأكثر. تعود سماعات البلوتوث أو الساعة للاتصال بعد ثوانٍ.</string>
+    <string name="settings_root_none">لم يُعثر على روت في هذا الهاتف. يستخدم «التحدث عبر الآيفون» تصحيح الأخطاء اللاسلكي، الذي لا يحتاج إلى روت.</string>
+    <string name="talk_root_title">تشغيل المساعد عبر الروت</string>
+    <string name="talk_root_idle">يبدأ تلقائيًا ما دام «التحدث عبر الآيفون» مفعّلًا.</string>
+    <string name="talk_root_starting">جارٍ التشغيل… إن سألك تطبيق الروت، فاسمح لـ Pairline Bridge.</string>
+    <string name="talk_root_running">يعمل. يبدأ تلقائيًا بعد كل إعادة تشغيل.</string>
+    <string name="talk_root_failed">لم يشغّل الروت المساعد. اسمح لـ Pairline Bridge في تطبيق الروت ثم حاول مرة أخرى، أو أوقف وضع الروت من الإعدادات › متقدّم لاستخدام تصحيح الأخطاء اللاسلكي.</string>
 </resources>
