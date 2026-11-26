@@ -189,19 +189,22 @@ class RemoteLinkTest {
         now += 20_000
         assertEquals(60_000L, link.step())
         now += 60_000
-        assertEquals(RemoteLink.FAST_CHECK_MS, link.step())
+        // 90 s after remote.config: still within the burst after hearing from the iPhone.
+        assertEquals(RemoteLink.BURST_CHECK_MS, link.step())
         assertFalse(link.state.value.retrying)
     }
 
     @Test
-    fun checksEvery30SecondsWhileThePhoneWasHeardRecentlyOtherwiseEvery2Minutes() {
+    fun checksOftenRightAfterThePhoneThenEvery30SecondsThenEvery2Minutes() {
         on() // remote.config just came from the iPhone
+        assertEquals(RemoteLink.BURST_CHECK_MS, link.step())
+        now += RemoteLink.BURST_MS
         assertEquals(RemoteLink.FAST_CHECK_MS, link.step())
         now += RemoteLink.RECENT_MS
         assertEquals(RemoteLink.SLOW_CHECK_MS, link.step())
         phoneSends(JSONObject().put("t", Msg.PING).put("id", 2))
         now += RemoteLink.SLOW_CHECK_MS
-        assertEquals(RemoteLink.FAST_CHECK_MS, link.step())
+        assertEquals(RemoteLink.BURST_CHECK_MS, link.step())
     }
 
     @Test

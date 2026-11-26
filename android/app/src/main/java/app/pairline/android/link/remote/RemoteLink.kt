@@ -361,7 +361,13 @@ class RemoteLink(
         private const val SWEEP_EVERY_MS = 3_600_000L
         private const val SENT_KEEP_MS = 24 * 3_600_000L
 
-        /** The iPhone was heard from this recently: check every [FAST_CHECK_MS], otherwise every [SLOW_CHECK_MS]. */
+        /**
+         * How often to check the R→B mailbox (Apple pushes only to Apple devices, so the bridge has to look): every
+         * [BURST_CHECK_MS] for [BURST_MS] after a record from the iPhone, so a conversation feels live; every
+         * [FAST_CHECK_MS] while the iPhone was heard from in the last [RECENT_MS]; otherwise every [SLOW_CHECK_MS].
+         */
+        const val BURST_MS = 2 * 60_000L
+        const val BURST_CHECK_MS = 5_000L
         const val RECENT_MS = 10 * 60_000L
         const val FAST_CHECK_MS = 30_000L
         const val SLOW_CHECK_MS = 120_000L
@@ -407,8 +413,11 @@ class RemoteLink(
             }
         }.toString()
 
-        fun checkInterval(now: Long, lastHeard: Long): Long =
-            if (now - lastHeard < RECENT_MS) FAST_CHECK_MS else SLOW_CHECK_MS
+        fun checkInterval(now: Long, lastHeard: Long): Long = when {
+            now - lastHeard < BURST_MS -> BURST_CHECK_MS
+            now - lastHeard < RECENT_MS -> FAST_CHECK_MS
+            else -> SLOW_CHECK_MS
+        }
 
         /** 30 s, 1, 2, 4, 8 minutes, then 10 minutes. */
         fun backoff(failures: Int): Long =

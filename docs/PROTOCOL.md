@@ -540,8 +540,9 @@ There are three mailboxes: **B→R alert** (things the user should see: an SMS, 
 
 R subscribes to its two mailboxes: the alert one with an alert push that its notification service extension may
 modify (it unseals the record and shows the message or rings the call), the quiet one with a silent push. B can't
-receive Apple's pushes; it checks the R→B mailbox while no session is up (every 30 s while R was seen in the last
-10 minutes, otherwise every 2 minutes). B writes and reads through CloudKit Web Services with a web auth token from
+receive Apple's pushes; it checks the R→B mailbox while no session is up: every 5 s for 2 minutes after a record from
+R (so a conversation feels live), every 30 s while R was heard from in the last 10 minutes, otherwise every 2 minutes.
+While R waits for a reply with the app open, it checks its quiet mailbox every 3 s, since silent pushes can lag. B writes and reads through CloudKit Web Services with a web auth token from
 R; R uses CloudKit on the iPhone. The recipient deletes each record once handled; a sender deletes its own records
 older than one day.
 

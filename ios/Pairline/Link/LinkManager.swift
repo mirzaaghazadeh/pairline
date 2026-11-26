@@ -151,10 +151,12 @@ final class LinkManager: BridgeLink {
     static let wifiIdleLimit: TimeInterval = 45
     static let handshakeLimit: TimeInterval = 30
     /// A request through remote mode's mailbox waits this long for its reply: the bridge checks the mailbox every
-    /// 30 s while this iPhone was active in the last 10 minutes, otherwise every 2 minutes (PROTOCOL.md).
+    /// 5 s for 2 minutes after hearing from this iPhone, every 30 s within 10 minutes, otherwise every 2 minutes
+    /// (PROTOCOL.md).
     static let mailboxTimeout: TimeInterval = 180
-    /// While such a request waits and the app is open, look for the reply this often (silent pushes can lag).
-    static let mailboxPollInterval: TimeInterval = 10
+    /// While such a request waits and the app is open, look for the reply this often (silent pushes can lag; the
+    /// bridge checks every 5 s right after hearing from this iPhone, so a reply is usually there within seconds).
+    static let mailboxPollInterval: TimeInterval = 3
     /// Posted (object: the link manager) when `mediaChannel` changes.
     static let mediaChannelDidChange = Notification.Name("PairlineMediaChannelDidChange")
 
@@ -1008,8 +1010,8 @@ final class LinkManager: BridgeLink {
         }
     }
 
-    /// While a request waits for its reply through iCloud and the app is open, look for it every 10 s rather than
-    /// rely on the silent push alone, which iOS may hold back.
+    /// While a request waits for its reply through iCloud and the app is open, look for it every few seconds rather
+    /// than rely on the silent push alone, which iOS may hold back.
     private func pollMailboxWhileWaiting() {
         guard mailboxPoll == nil else { return }
         mailboxPoll = Timer.scheduledTimer(withTimeInterval: Self.mailboxPollInterval, repeats: true) { [weak self] _ in

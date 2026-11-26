@@ -92,7 +92,7 @@ readable only by the iCloud account that wrote it; the design, and release build
 | iPhone app | Apple App Store (StoreKit) | Purchases |
 | Android bridge, only while internet sharing is on (M8) | The sites your iPhone visits | Forwards your iPhone's own traffic; Pairline starts no connections of its own |
 | Android bridge, only with Talk on iPhone | This phone's own Wireless debugging on `127.0.0.1`; its port is found from this phone's own `_adb-tls-*` announcements on the Wi-Fi network | Pairs with it once and starts Pairline's helper (D-054). Never connects to another device's Wireless debugging |
-| Android bridge, only with remote mode on | `api.apple-cloudkit.com` (Apple's CloudKit Web Services) | Writes and reads the sealed remote-mode records in your iCloud, with your iCloud web access token; Apple sees the bridge's IP address. Checks every 30 seconds while the iPhone was heard from in the last 10 minutes, otherwise every 2 minutes, and not at all while a local link is up |
+| Android bridge, only with remote mode on | `api.apple-cloudkit.com` (Apple's CloudKit Web Services) | Writes and reads the sealed remote-mode records in your iCloud, with your iCloud web access token; Apple sees the bridge's IP address. Checks every 5 seconds for 2 minutes after hearing from the iPhone, every 30 seconds within 10 minutes, otherwise every 2 minutes, and not at all while a local link is up |
 | iPhone app, only with remote mode on | iCloud (CloudKit) and Apple's push service | Writes and reads the same sealed records, and gets a push when one arrives |
 
 Nothing else. The Android app's network code is confined by CI to five places: the update check (GitHub only),

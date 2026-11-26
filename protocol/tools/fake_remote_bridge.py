@@ -193,7 +193,8 @@ def cmd_serve(args):
                 print("dropped a record that didn't open")
                 continue
             kind = msg.get("t")
-            print(f"got {kind} (id {msg.get('id')})", flush=True)
+            # cid tells a retry (same cid) from a new message; the text itself isn't printed.
+            print(f"got {kind} (id {msg.get('id')}, cid {msg.get('cid')}) at {time.strftime('%H:%M:%S')}", flush=True)
             if kind == "remote.token" and msg.get("token"):
                 ckm.write_secret(ck.chain_path, ckm.normalize_token(msg["token"]))
             if msg.get("id") is not None:
