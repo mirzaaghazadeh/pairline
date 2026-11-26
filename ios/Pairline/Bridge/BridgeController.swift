@@ -174,6 +174,11 @@ final class BridgeController: ObservableObject {
             }
         case .status(let s):
             applyStatus(s)
+        case .notifPosted(let notification):
+            // D-077: only for the real bridge, and only while the user wants them here.
+            if mode == .real, AppSettings.shared.mirrorNotifications { Notifier.shared.notifyMirrored(notification) }
+        case .notifRemoved(let key):
+            if mode == .real { Notifier.shared.removeMirrored(key: key) }
         case .smsNew(let message):
             let inserted = db.upsertMessages([message], countUnread: Notifier.shared.visibleThread != message.thread)
             for stored in inserted where !stored.isOutgoing {

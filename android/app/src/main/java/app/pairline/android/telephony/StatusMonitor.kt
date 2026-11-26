@@ -177,6 +177,7 @@ class StatusMonitor(
                 netSwitch = netSwitch(),
                 smsWrite = smsWrite(),
                 phoneTools = true,
+                notifMirror = app.pairline.android.mirror.NotificationMirror.accessGranted(context),
             ),
         )
     }

@@ -77,6 +77,15 @@
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
+    <!-- Lists the apps on the home screen, so the user can choose whose notifications reach the iPhone (D-077).
+         Only launchable apps; no QUERY_ALL_PACKAGES. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <!-- allowBackup="false" and the extraction rules keep messages, contacts and keys out of
          Google cloud backup and device-to-device transfer (AGENTS.md rule 1). -->
     <application
@@ -138,6 +147,18 @@
         <receiver
             android:name=".privileged.PairingCodeReceiver"
             android:exported="false" />
+
+        <!-- Notifications from the apps the user chose, mirrored to the iPhone (D-077). Android binds it only after
+             the user gives Pairline Bridge notification access in Settings. -->
+        <service
+            android:name=".mirror.MirrorService"
+            android:exported="true"
+            android:label="@string/mirror_title"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
         <!-- Find phone's "Stop" (D-074); only this app's own notification can send it. -->
         <receiver

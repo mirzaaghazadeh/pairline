@@ -278,6 +278,19 @@ struct SettingsTab: View {
             Toggle(isOn: $settings.lowBatteryAlert) {
                 Label("Bridge battery alerts", systemImage: "battery.25")
             }
+            // D-077: the apps are chosen on the Android phone; this turns showing them here on or off.
+            Toggle(isOn: $settings.mirrorNotifications) {
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Notifications from Android apps", tableName: "PhoneTools")
+                        Text("Choose the apps in Pairline Bridge › Settings on the Android phone.", tableName: "PhoneTools")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: "app.badge")
+                }
+            }
             Toggle(isOn: $settings.trialReminder) {
                 Label("Trial reminder", systemImage: "hourglass")
             }

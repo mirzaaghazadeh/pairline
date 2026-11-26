@@ -309,6 +309,9 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `contacts.update` | R→B | M4 | `id`, `key` (a contact key) and any of `name`, `numbers` (replace all of the contact's numbers), `starred` → `ok`; the next `contacts.sync` brings the change back. Needs `contacts.edit` (D-074) |
 | `phone.find` | R→B | — | `id`, `on` (default true) → `ok`: B rings loudly on the alarm stream for up to a minute, or stops. Needs `phone.find` (D-074) |
 | `phone.ringer` | R→B | — | `id`, `mode` (`normal` / `vibrate` / `silent`) → `ok`, then `status.ringer`; `error` `permission` when switching to or from silent without Do Not Disturb access (B then asks its user for it). Needs `phone.ringer` (D-074) |
+| `notif.posted` | B→R | — | `key` (Android's notification key), `app` (package), `appName`, `title`, `text` (up to 1,000 characters), `time`: a notification from an app the bridge's user chose. The same `key` again replaces it. Only while `notif.mirror` is listed (D-077) |
+| `notif.removed` | B→R | — | `key`: it went away on the bridge (read, dismissed or replaced there); R removes it |
+| `notif.dismiss` | R→B | — | `id`, `key`: the user dismissed it on R → `ok`; B clears it (only keys it mirrored). Needs `notif.mirror` |
 | `contacts.sync` | R→B, B→R | M4 | request: `id`, `since` (cursor or null) / reply: `id`, `contacts` [Contact], `deleted` [key], `cursor`, `more` |
 | `calllog.sync` | R→B, B→R | M4 | request: `id`, `since` / reply: `id`, `calls` [Call-log entry], `cursor`, `more` |
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
@@ -341,7 +344,8 @@ can also be fed into the call; without it the iPhone listens and the user talks 
 (the bridge's user allows internet sharing, M8), `net.switch` (R may switch the bridge phone's hotspot, Bluetooth
 tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's helper running, D-073), `sms.read`
 (messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `contacts.edit`
-(with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
+(with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `notif.mirror` (notification access given:
+chosen apps' notifications are sent as `notif.posted`, D-077), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),
 `block` (the bridge keeps a block list, M4)
 

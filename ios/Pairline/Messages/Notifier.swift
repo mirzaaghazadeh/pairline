@@ -14,6 +14,7 @@ final class Notifier: NSObject, ObservableObject {
     static let copyCodeAction = "copy-code"
     static let markReadAction = "mark-read"
     static let replyAction = "reply"
+    static let mirrorCategory = "mirror"
     static let trialReminderID = "trial.reminder"
     static let callsPausedID = "calls.paused"
     static let incomingCallID = "calls.incoming"
@@ -26,6 +27,8 @@ final class Notifier: NSObject, ObservableObject {
     var onMarkRead: ((Int64) -> Void)?
     /// A reply typed in a message notification (D-074): thread, address, SIM, text.
     var onReply: ((Int64, String, Int?, String) -> Void)?
+    /// A mirrored notification was dismissed here (D-077): its key on the bridge phone.
+    var onMirrorDismissed: ((String) -> Void)?
     var onOpenStatus: (() -> Void)?
 
     // MARK: Muted conversations (D-074): no banner or sound, still counted as unread.
@@ -61,7 +64,11 @@ final class Notifier: NSObject, ObservableObject {
         let otp = UNNotificationCategory(identifier: Self.otpCategory, actions: [copy, read], intentIdentifiers: [],
                                          hiddenPreviewsBodyPlaceholder: String(localized: "New message"),
                                          options: [])
-        center.setNotificationCategories([sms, otp])
+        // Mirrored app notifications (D-077): swiping one away here clears it on the bridge phone too.
+        let mirror = UNNotificationCategory(identifier: Self.mirrorCategory, actions: [], intentIdentifiers: [],
+                                            hiddenPreviewsBodyPlaceholder: String(localized: "New notification", table: "PhoneTools"),
+                                            options: [.customDismissAction])
+        center.setNotificationCategories([sms, otp, mirror])
         Task { await refreshAuthorization() }
     }
 
@@ -102,6 +109,40 @@ final class Notifier: NSObject, ObservableObject {
             content.relevanceScore = code == nil ? 0.5 : 1
         }
         center.add(UNNotificationRequest(identifier: "sms-\(message.key)", content: content, trigger: nil))
+    }
+
+    // MARK: Notifications from Android apps (D-077)
+
+    private static func mirrorID(_ key: String) -> String { "mirror-" + key }
+
+    /// A notification from an app the user chose on the bridge phone. The same key replaces the earlier one (an app
+    /// updating its notification); grouped by app.
+    func notifyMirrored(_ n: MirroredNotification) {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        let appName = n.appName ?? n.app
+        if let title = n.title, !title.isEmpty {
+            content.title = title
+            content.subtitle = appName
+        } else {
+            content.title = appName
+        }
+        if AppSettings.shared.showMessagePreviews {
+            content.body = n.text ?? ""
+        } else {
+            content.body = String(localized: "New notification", table: "PhoneTools")
+        }
+        content.sound = .default
+        content.threadIdentifier = "app-" + n.app
+        content.categoryIdentifier = Self.mirrorCategory
+        content.userInfo = ["mirror": n.key]
+        if #available(iOS 15.0, *) { content.relevanceScore = 0.3 }
+        center.add(UNNotificationRequest(identifier: Self.mirrorID(n.key), content: content, trigger: nil))
+    }
+
+    /// Gone on the bridge phone (read or dismissed there): gone here too.
+    func removeMirrored(key: String) {
+        center.removeDeliveredNotifications(withIdentifiers: [Self.mirrorID(key)])
     }
 
     /// One summary instead of many banners after catching up.
@@ -217,7 +258,12 @@ extension Notifier: UNUserNotificationCenterDelegate {
         let addr = info["addr"] as? String
         let sim = (info["sim"] as? NSNumber)?.intValue
         let typed = (response as? UNTextInputNotificationResponse)?.userText
+        let mirrorKey = info["mirror"] as? String
         Task { @MainActor in
+            if let mirrorKey, action == UNNotificationDismissActionIdentifier {
+                Notifier.shared.onMirrorDismissed?(mirrorKey)
+                return completionHandler()
+            }
             switch action {
             case Notifier.replyAction:
                 if let thread, let addr, let typed, !typed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

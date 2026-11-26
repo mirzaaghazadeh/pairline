@@ -203,6 +203,19 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     onClick = { navigate(Route.BlockList) },
                 )
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                // Notifications from apps the user chose, on the iPhone (D-077).
+                val mirrorCount = remember(prefsTick) { prefs.mirrorApps.size }
+                ListRow(
+                    title = stringResource(R.string.mirror_title),
+                    subtitle = if (mirrorCount == 0) {
+                        stringResource(R.string.mirror_settings_sub)
+                    } else {
+                        stringResource(R.string.mirror_settings_count, mirrorCount)
+                    },
+                    icon = PIcons.Notifications,
+                    onClick = { navigate(Route.Mirror) },
+                )
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 ListRow(
                     title = stringResource(if (paired) R.string.home_pair_new else R.string.home_pair),
                     icon = PIcons.Qr,

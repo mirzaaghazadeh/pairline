@@ -90,6 +90,24 @@ final class MessageCodecTests: XCTestCase {
         XCTAssertNil(PhoneNumber.firstNumber(in: "no number here"))
     }
 
+    /// D-077: notifications from Android apps, their removal, and dismissing one from here.
+    func testMirroredNotifications() throws {
+        guard case .notifPosted(let n) = try decode([
+            "t": "notif.posted", "key": "0|com.whatsapp|1|null|10123", "app": "com.whatsapp", "appName": "WhatsApp",
+            "title": "Ada", "text": "See you at 6", "time": 1_764_000_000_000,
+        ]).message else { return XCTFail() }
+        XCTAssertEqual(n.appName, "WhatsApp")
+        XCTAssertEqual(n.text, "See you at 6")
+        guard case .notifPosted(let bare) = try decode(["t": "notif.posted", "key": "k", "app": "a.b"]).message
+        else { return XCTFail() }
+        XCTAssertNil(bare.title, "title and text may be missing")
+        guard case .notifRemoved(let key) = try decode(["t": "notif.removed", "key": "k"]).message else { return XCTFail() }
+        XCTAssertEqual(key, "k")
+        let dismiss = try json(.notifDismiss(key: "k"))
+        XCTAssertEqual(dismiss["t"] as? String, "notif.dismiss")
+        XCTAssertEqual(dismiss["key"] as? String, "k")
+    }
+
     func testSMSMessagesAndHistoryPage() throws {
         let inbound = try decode([
             "t": "sms.history", "id": 9, "more": true,

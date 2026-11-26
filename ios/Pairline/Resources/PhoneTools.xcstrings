@@ -153,6 +153,38 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda iPhone’dan konuşma’nın açık olması ve en son Pairline Bridge gerekir. O zamana kadar burada okuduğunuz mesajlar orada okunmamış kalır." } }
       }
     },
+    "New notification" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إشعار جديد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New notification" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اعلان جدید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeni bildirim" } }
+      }
+    },
+    "Notifications from Android apps" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إشعارات تطبيقات أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notifications from Android apps" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اعلان برنامه‌های اندروید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android uygulamalarının bildirimleri" } }
+      }
+    },
+    "Choose the apps in Pairline Bridge › Settings on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختر التطبيقات من Pairline Bridge › الإعدادات على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose the apps in Pairline Bridge › Settings on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برنامه‌ها را در Pairline Bridge › تنظیمات روی گوشی اندرویدی انتخاب کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uygulamaları Android telefondaki Pairline Bridge › Ayarlar’dan seçin." } }
+      }
+    },
+    "In Pairline Bridge › Settings › Notifications from apps on your Android phone, allow notification access and choose the apps." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في Pairline Bridge › الإعدادات › إشعارات التطبيقات على هاتف أندرويد، اسمح بالوصول إلى الإشعارات واختر التطبيقات." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "In Pairline Bridge › Settings › Notifications from apps on your Android phone, allow notification access and choose the apps." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی، در Pairline Bridge › تنظیمات › اعلان برنامه‌ها، دسترسی به اعلان‌ها را مجاز کنید و برنامه‌ها را انتخاب کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda Pairline Bridge › Ayarlar › Uygulama bildirimleri’nde bildirim erişimine izin verin ve uygulamaları seçin." } }
+      }
+    },
     "No phone number to call." : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يوجد رقم هاتف للاتصال به." } },

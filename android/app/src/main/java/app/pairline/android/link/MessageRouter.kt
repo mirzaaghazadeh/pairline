@@ -6,6 +6,7 @@ import app.pairline.android.AppPrefs
 import app.pairline.android.BuildConfig
 import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.log.Log
+import app.pairline.android.mirror.NotificationMirror
 import app.pairline.android.netshare.NetShare
 import app.pairline.android.netshare.NetSwitchRequest
 import app.pairline.android.netshare.NetSwitches
@@ -269,6 +270,11 @@ class MessageRouter(
             Msg.PHONE_RINGER -> request(message) { id ->
                 Ringer.set(appContext, message.stringOrNull("mode") ?: invalid("mode missing"))
                 statusChanged()
+                Messages.ok(id)
+            }
+            Msg.NOTIF_DISMISS -> request(message) { id ->
+                // Dismissed on the iPhone: clear the mirrored notification here too (D-077).
+                NotificationMirror.dismiss(message.stringOrNull("key") ?: invalid("key missing"))
                 Messages.ok(id)
             }
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }

@@ -13,6 +13,8 @@ final class AppSettings: ObservableObject {
     /// CallKit calls in iPhone Recents, where a tap calls back (D-074). On by default since D-074, the maintainer's
     /// decision; Recents can sync to iCloud, which the setting's footer says, and turning it off keeps calls in Pairline.
     @AppStorage("calls.recents") var callsInRecents = true
+    /// Notifications from the apps chosen on the bridge phone show here (D-077). The apps are chosen there.
+    @AppStorage("notifications.mirror") var mirrorNotifications = true
     /// Where a call's audio travels first when it's on this iPhone: Bluetooth (default) or Wi-Fi; the other is used
     /// when the first isn't up (D-072).
     @AppStorage("calls.audioPath") var callAudioPath: CallAudioPath = .link

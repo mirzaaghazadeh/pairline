@@ -37,6 +37,9 @@ object Msg {
     const val CONTACTS_UPDATE = "contacts.update"
     const val PHONE_FIND = "phone.find"
     const val PHONE_RINGER = "phone.ringer"
+    const val NOTIF_POSTED = "notif.posted"
+    const val NOTIF_REMOVED = "notif.removed"
+    const val NOTIF_DISMISS = "notif.dismiss"
     const val CONTACTS_SYNC = "contacts.sync"
     const val CALLLOG_SYNC = "calllog.sync"
     const val CONTACTS_ADD = "contacts.add"
@@ -104,6 +107,9 @@ object Caps {
     /** The iPhone can switch the ringer between sound, vibrate and silent (`phone.ringer`, D-074). */
     const val PHONE_RINGER = "phone.ringer"
 
+    /** Notifications from apps the user chose are mirrored (`notif.posted`, notification access given, D-077). */
+    const val NOTIF_MIRROR = "notif.mirror"
+
     /** Call-history entries can be deleted on the bridge too (D-043). */
     const val CALLLOG_DELETE = "calllog.delete"
 
@@ -114,7 +120,8 @@ object Caps {
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
         CALL_HOLD, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK,
-        CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, WIFI, FILES, CALLLOG_DELETE, BLOCK,
+        CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, NOTIF_MIRROR, WIFI, FILES, CALLLOG_DELETE,
+        BLOCK,
     )
 }
 

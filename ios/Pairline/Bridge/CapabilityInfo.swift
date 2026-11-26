@@ -35,6 +35,7 @@ struct CapabilityInfo: Identifiable {
         case .contactsEdit: return "person.crop.circle.badge.checkmark"
         case .phoneFind: return "bell.and.waves.left.and.right"
         case .phoneRinger: return "speaker.wave.2.circle"
+        case .notifMirror: return "app.badge"
         case .wifi: return "wifi"
         case .files: return "doc.on.doc"
         case .calllogDelete: return "trash"
@@ -67,6 +68,7 @@ struct CapabilityInfo: Identifiable {
         case .contactsEdit: return String(localized: "Edit contacts from iPhone", table: "PhoneTools")
         case .phoneFind: return String(localized: "Find phone", table: "PhoneTools")
         case .phoneRinger: return String(localized: "Ringer switch", table: "PhoneTools")
+        case .notifMirror: return String(localized: "Notifications from Android apps", table: "PhoneTools")
         case .wifi: return String(localized: "Wi-Fi link")
         case .files: return String(localized: "Send files")
         case .calllogDelete: return String(localized: "Delete calls on the bridge phone")
@@ -105,6 +107,8 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Turn on \"Add contacts from iPhone\" in Pairline Bridge on your Android phone.")
         case .phoneFind, .phoneRinger:
             return String(localized: "Update Pairline Bridge on your Android phone.", table: "PhoneTools")
+        case .notifMirror:
+            return String(localized: "In Pairline Bridge › Settings › Notifications from apps on your Android phone, allow notification access and choose the apps.", table: "PhoneTools")
         case .contacts:
             return String(localized: "Turn on contacts sync in Pairline Bridge on your Android phone.")
         case .calllog:

@@ -120,6 +120,16 @@ struct SIMInfo: Codable, Equatable, Identifiable, Hashable {
     var id: Int { slot }
 }
 
+/// `notif.posted` (D-077): a notification from an app the user chose on the bridge phone.
+struct MirroredNotification: Codable, Equatable {
+    var key: String
+    var app: String
+    var appName: String?
+    var title: String?
+    var text: String?
+    var time: Int64?
+}
+
 /// `status.net` (D-073): the bridge phone's own internet sharing. Switched with `net.switch` (needs `net.switch`).
 struct BridgeNetState: Codable, Equatable {
     /// Android's own Wi-Fi hotspot is on.
@@ -321,6 +331,9 @@ enum InboundMessage {
     case ok
     case error(BridgeErrorReply)
     case smsNew(SMSMessage)
+    /// A notification from an app the user chose on the bridge phone (D-077), and its removal there.
+    case notifPosted(MirroredNotification)
+    case notifRemoved(String)
     case smsState(SMSStateEvent)
     case smsThreads(SMSThreadsReply)
     case smsHistory(SMSHistoryReply)
@@ -372,6 +385,7 @@ struct Inbound {
     }
 
     private struct MsgBody: Decodable { var msg: SMSMessage }
+    private struct KeyBody: Decodable { var key: String }
     private struct ErrorBody: Decodable { var code: String?; var msg: String? }
     private struct ThreadsBody: Decodable { var threads: LossyList<SMSThreadSummary>?; var more: Bool? }
     private struct HistoryBody: Decodable { var msgs: LossyList<SMSMessage>?; var more: Bool? }
@@ -421,6 +435,8 @@ struct Inbound {
             let e = try body(ErrorBody.self)
             message = .error(BridgeErrorReply(code: e.code ?? "failed", msg: e.msg))
         case "sms.new": message = .smsNew(try body(MsgBody.self).msg)
+        case "notif.posted": message = .notifPosted(try body(MirroredNotification.self))
+        case "notif.removed": message = .notifRemoved(try body(KeyBody.self).key)
         case "sms.state": message = .smsState(try body(SMSStateEvent.self))
         case "sms.threads":
             let b = try body(ThreadsBody.self)
@@ -620,6 +636,9 @@ struct Outbound {
     /// The bridge phone's ringer: `normal`, `vibrate` or `silent` (needs `phone.ringer`, D-074).
     static func phoneRinger(_ mode: String) -> Outbound { Outbound("phone.ringer", ["mode": mode]) }
 
+    /// The user dismissed a mirrored notification here: clear it on the bridge phone too (D-077).
+    static func notifDismiss(key: String) -> Outbound { Outbound("notif.dismiss", ["key": key]) }
+
     /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
     static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {
         Outbound("call.media.feedback", ["heard": optional(heard), "heardMe": optional(heardMe)])
@@ -697,6 +716,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case phoneFind = "phone.find"
     /// The bridge phone's ringer can be switched (D-074).
     case phoneRinger = "phone.ringer"
+    /// Notifications from apps chosen on the bridge phone reach this iPhone (D-077).
+    case notifMirror = "notif.mirror"
     /// The bridge's Wi-Fi link is on (M5).
     case wifi = "wifi"
     /// The bridge sends and receives files over a Wi-Fi session (M5).

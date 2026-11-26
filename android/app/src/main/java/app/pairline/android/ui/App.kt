@@ -51,6 +51,7 @@ sealed interface Route {
     data object Help : Route
     data object Talk : Route
     data object BlockList : Route
+    data object Mirror : Route
 }
 
 @Composable
@@ -68,6 +69,7 @@ private val allRoutes: List<Route> = listOf(
     Route.Home, Route.Pairing, Route.Settings, Route.Permissions, Route.KeepAlive, Route.Diagnostics, Route.Help,
     Route.Talk,
     Route.BlockList,
+    Route.Mirror,
 )
 
 /** Keeps the back stack across activity recreation (e.g. a language change on Android 11–12). */
@@ -103,6 +105,7 @@ private fun MainNavigation() {
             Route.Help -> HelpScreen(back)
             Route.Talk -> app.pairline.android.ui.talk.TalkScreen(back)
             Route.BlockList -> BlockListScreen(back)
+            Route.Mirror -> app.pairline.android.ui.mirror.MirrorScreen(back)
         }
     }
     UpdateFlowDialog()

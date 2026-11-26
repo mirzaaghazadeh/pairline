@@ -1283,3 +1283,19 @@ The maintainer asked for a Mac app; the iPad app runs on Apple Silicon Macs as i
   screen (the existing fallback); pairing scans the Android screen with the Mac's camera (the AVFoundation scanner,
   since VisionKit's isn't on Mac), with a hint to hold the phone up to it.
 - Not tested on a Mac yet.
+
+### D-077 — Notifications from chosen Android apps, on the iPhone (2026-11-26)
+
+- **Opt-in twice:** the user gives Pairline Bridge notification access (Android's own screen; for an app installed
+  from a file that's a restricted setting first, and the setup guide says how), then chooses apps in Bridge › Settings
+  › Notifications from apps. None are chosen at first. On the iPhone, Settings › Notifications › "Notifications from
+  Android apps" (on) can hide them all.
+- **What's sent:** `notif.posted` with the app's name, the title and up to 1,000 characters of text, over the
+  encrypted link only (rule 1), never logged; a later post with the same key replaces it. `notif.removed` when it
+  goes away on Android, `notif.dismiss` when the user swipes it away on the iPhone (iOS's custom dismiss action), so
+  both phones agree. Ongoing notifications (music, navigation, downloads, foreground services), group summaries, calls
+  and Pairline's own are left out. Nothing is sent while the iPhone isn't linked; nothing is queued.
+- **Listing apps:** `<queries>` for home-screen apps (MAIN/LAUNCHER) instead of `QUERY_ALL_PACKAGES`.
+- **iPhone:** a local notification per mirrored one, grouped by app, title and app name, text unless "Show message
+  text" is off.
+- **Tested:** unit tests (caps, decoding), both apps build and lint clean; needs a real phone.

@@ -28,6 +28,8 @@ data class CapsInput(
     val smsWrite: Boolean = false,
     /** Find phone and the ringer switch are available (D-074). */
     val phoneTools: Boolean = false,
+    /** Notification access is given, so chosen apps' notifications are mirrored (D-077). */
+    val notifMirror: Boolean = false,
 )
 
 /**
@@ -71,6 +73,7 @@ object CapsCalculator {
             caps += Caps.PHONE_FIND
             caps += Caps.PHONE_RINGER
         }
+        if (input.notifMirror) caps += Caps.NOTIF_MIRROR
         if (input.activeSims >= 2) caps += Caps.DUALSIM
         if (input.netShare) caps += Caps.NET_SHARE
         if (input.netSwitch) caps += Caps.NET_SWITCH

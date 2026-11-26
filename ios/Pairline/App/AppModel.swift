@@ -72,6 +72,10 @@ final class AppModel: ObservableObject {
         notifier.onMarkRead = { [weak self] thread in
             self?.active.markRead(thread: thread)
         }
+        notifier.onMirrorDismissed = { [weak self] key in
+            guard let self, self.real.has(.notifMirror), self.real.phase.isConnected else { return }
+            Task { _ = try? await self.real.link.request(.notifDismiss(key: key)) }
+        }
         notifier.onReply = { [weak self] thread, addr, sim, text in
             guard let self else { return }
             do {
