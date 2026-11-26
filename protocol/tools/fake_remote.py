@@ -1452,6 +1452,11 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--pair-uri", metavar="URI", help="pairline://pair?... link shown by the bridge (pair only)")
     g.add_argument("--timeout", type=positive(float), default=10.0, metavar="S",
                    help="seconds to wait for each reply (default 10)")
+    g.add_argument("--device-name", metavar="NAME",
+                   help="the name in this fake iPhone's device.info (default \"Fake iPhone\"); \"\" sends none, so the "
+                        "bridge says \"iPhone\" as in the store screenshots")
+    g.add_argument("--no-files", action="store_true",
+                   help="leave `files` out of device.info's caps (the bridge then shows no Files card)")
     g = p.add_argument_group("output and checks")
     g.add_argument("--pretty", action="store_true", help="pretty-print JSON messages")
     g.add_argument("--full", action="store_true", help="don't shorten long lists in the transcript")
@@ -1572,6 +1577,13 @@ def main(argv: list[str] | None = None) -> int:
         pass
     parser = build_parser()
     a = parser.parse_intermixed_args(argv)
+    if a.device_name is not None:
+        if a.device_name:
+            DEVICE_INFO["name"] = a.device_name
+        else:
+            DEVICE_INFO.pop("name", None)
+    if a.no_files:
+        DEVICE_INFO["caps"] = []
     if a.selftest:
         if a.words:
             parser.error("--selftest takes no mode or actions")

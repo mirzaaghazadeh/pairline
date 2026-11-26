@@ -103,3 +103,12 @@ again. DNS-SD (`_pairline._tcp`) is advertised on the emulator's own virtual Wi-
 **Languages and themes.** `adb shell cmd locale set-app-locales app.pairline.android.debug --locales fa` (or `ar`,
 `en-US`), and `adb shell cmd uimode night yes|no`. Screenshots of the main screens are in
 `../docs/screenshots/android/`.
+
+**Retaking the home screenshots.** They show a connected iPhone over "Bluetooth": turn on
+`content://app.pairline.android.debug.devtools/screenshot-mode-on`, turn Settings › Wi-Fi link off (no Files card), give
+the emulator a full signal and a charging battery (`adb emu gsm signal-profile 4`, `adb emu power capacity 86`,
+`adb emu power status charging`), set the status bar's demo mode to 9:41, and keep a stand-in iPhone connected with no
+name and no file support, so the card says "iPhone":
+`python3 -I ../protocol/tools/fake_remote.py --device-name "" --no-files session status listen --seconds 120`. Take
+the shot only once `devtools/state` says `connected=true`, or it catches the "Waiting for iPhone" card. Resize to
+540×1200 (`sips -z 1200 540`); the website uses the same images as WebP (`cwebp -q 85`).

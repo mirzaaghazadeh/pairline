@@ -297,7 +297,8 @@ private fun LinkCard(
             if (paired && link.cantAdvertise && btUsable && TransportKind.BLUETOOTH !in link.transports) {
                 NoteBox(stringResource(R.string.bt_cant_advertise), Tone.WARN, PIcons.Bluetooth)
             }
-            if (paired) CloudLine(remote, viaIcloud, prefs.peerProto)
+            // The store screenshots (debug screenshot mode) show the link itself, not the "turn on Cloud mode" prompt.
+            if (paired && (remote.on || !ScreenshotMode.enabled)) CloudLine(remote, viaIcloud, prefs.peerProto)
             val direct by AppGraph.direct.status.collectAsState()
             if (paired && direct.active) DirectLine(direct)
             when {
