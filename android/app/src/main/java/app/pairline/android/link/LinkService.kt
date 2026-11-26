@@ -118,9 +118,12 @@ class LinkService : Service() {
         )
 
         scope.launch {
-            combine(link.state, graph.peers.paired, graph.prefs.changes) { s, paired, _ -> s to paired }
+            // Remote mode's state too: with no nearby link, the notification says the iPhone is reached through iCloud.
+            combine(link.state, graph.peers.paired, graph.prefs.changes, graph.remote.state) { s, paired, _, remote ->
+                Triple(s, paired, remote.on && remote.problem == null)
+            }
                 .distinctUntilChanged()
-                .collect { (s, paired) -> Notifications.updateLink(this@LinkService, s, paired, graph.prefs.peerName) }
+                .collect { (s, paired, _) -> Notifications.updateLink(this@LinkService, s, paired, graph.prefs.peerName) }
         }
         // The daily update check (D-042): looks every hour whether a day has passed since the last one.
         scope.launch {

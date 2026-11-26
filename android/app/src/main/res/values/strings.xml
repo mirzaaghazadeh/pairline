@@ -166,6 +166,12 @@
     <string name="home_waiting_title">Waiting for %1$s</string>
     <string name="home_waiting_body">Last connected %1$s. Pairline reconnects by itself when your iPhone is nearby with Pairline open or in the background.</string>
     <string name="home_waiting_never">Your iPhone hasn\'t connected yet. Open Pairline on it, nearby, with Bluetooth on.</string>
+    <!-- Remote mode (D-080): no Bluetooth or Wi-Fi link, but the iPhone is reached through its iCloud. -->
+    <string name="state_via_icloud">Via iCloud</string>
+    <string name="notif_via_icloud_text">Texts, codes and calls go to your iPhone through your iCloud until it\'s linked nearby again.</string>
+    <string name="home_via_icloud_title">Reaching %1$s through iCloud</string>
+    <string name="home_via_icloud_body">Your iPhone isn\'t linked nearby right now, so texts, one-time codes and calls go to it through your iCloud, locked with keys only your two phones hold. Calls need the direct connection to work from far away.</string>
+    <string name="home_via_icloud_retrying">Remote mode is on, but iCloud can\'t be reached right now. Check this phone\'s internet connection; Pairline keeps trying.</string>
     <string name="home_not_paired_body">Pair your iPhone to start using this phone\'s SIM from it.</string>
     <string name="home_bt_off_body">Your iPhone can\'t reach this phone while Bluetooth is off.</string>
     <string name="home_bt_perm_title">Nearby devices not allowed</string>

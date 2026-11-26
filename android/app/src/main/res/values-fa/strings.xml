@@ -165,6 +165,11 @@
     <string name="home_waiting_title">در انتظار %1$s</string>
     <string name="home_waiting_body">آخرین اتصال: %1$s. وقتی آیفون شما نزدیک باشد و Pairline روی آن باز یا در پس‌زمینه باشد، خودش دوباره وصل می‌شود.</string>
     <string name="home_waiting_never">آیفون شما هنوز وصل نشده است. برنامهٔ Pairline را روی آن، نزدیک این گوشی و با بلوتوث روشن، باز کنید.</string>
+    <string name="state_via_icloud">از طریق iCloud</string>
+    <string name="notif_via_icloud_text">تا وقتی آیفون شما دوباره از نزدیک وصل شود، پیامک‌ها، کدها و تماس‌ها از راه iCloud شما به آن می‌رسند.</string>
+    <string name="home_via_icloud_title">ارتباط با %1$s از طریق iCloud</string>
+    <string name="home_via_icloud_body">آیفون شما الان از نزدیک وصل نیست، پس پیامک‌ها، کدهای یک‌بارمصرف و تماس‌ها از راه iCloud شما به آن می‌رسند، قفل‌شده با کلیدهایی که فقط دو گوشی شما دارند. برای تماس از راه دور، اتصال مستقیم لازم است.</string>
+    <string name="home_via_icloud_retrying">حالت از راه دور روشن است، اما الان دسترسی به iCloud ممکن نیست. اتصال اینترنت این گوشی را بررسی کنید؛ Pairline دوباره تلاش می‌کند.</string>
     <string name="home_not_paired_body">آیفونتان را جفت کنید تا از طریق آن، از سیم‌کارت این گوشی استفاده کنید.</string>
     <string name="home_bt_off_body">تا وقتی بلوتوث خاموش است، آیفون شما نمی‌تواند به این گوشی وصل شود.</string>
     <string name="home_bt_perm_title">مجوز «دستگاه‌های اطراف» داده نشده</string>

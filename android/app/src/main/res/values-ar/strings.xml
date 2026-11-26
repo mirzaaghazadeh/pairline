@@ -166,6 +166,11 @@
     <string name="home_waiting_title">بانتظار %1$s</string>
     <string name="home_waiting_body">آخر اتصال %1$s. يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا وتطبيق Pairline مفتوحًا عليه أو يعمل في الخلفية.</string>
     <string name="home_waiting_never">لم يتصل آيفونك بعد. افتح Pairline عليه وهو بالقرب من هذا الهاتف، مع تشغيل البلوتوث.</string>
+    <string name="state_via_icloud">عبر iCloud</string>
+    <string name="notif_via_icloud_text">تصل الرسائل والرموز والمكالمات إلى آيفونك عبر حساب iCloud الخاص بك إلى أن يتصل عن قرب من جديد.</string>
+    <string name="home_via_icloud_title">الوصول إلى %1$s عبر iCloud</string>
+    <string name="home_via_icloud_body">آيفونك غير متصل عن قرب الآن، لذا تصل إليه الرسائل ورموز التحقق والمكالمات عبر حساب iCloud الخاص بك، مقفلةً بمفاتيح لا يملكها إلا هاتفاك. وتحتاج المكالمات من بعيد إلى الاتصال المباشر.</string>
+    <string name="home_via_icloud_retrying">الوضع عن بُعد مفعّل، لكن تعذّر الوصول إلى iCloud الآن. تحقّق من اتصال هذا الهاتف بالإنترنت؛ سيواصل Pairline المحاولة.</string>
     <string name="home_not_paired_body">قم بإقران آيفونك لتبدأ استخدام شريحة هذا الهاتف منه.</string>
     <string name="home_bt_off_body">لا يمكن لآيفونك الوصول إلى هذا الهاتف ما دام البلوتوث متوقفًا.</string>
     <string name="home_bt_perm_title">لم يُسمح بإذن «الأجهزة المجاورة»</string>

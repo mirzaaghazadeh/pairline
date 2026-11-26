@@ -233,8 +233,12 @@ private fun LinkCard(
         StoppedCard()
         return
     }
+    // Remote mode (D-080): no session, but texts, codes and calls still reach the iPhone through its iCloud.
+    val remote by AppGraph.remote.state.collectAsState()
+    val viaIcloud = paired && !link.connected && remote.on && remote.problem == null
     val (visual, tone, pill) = when {
         link.connected -> Triple(LinkVisual.CONNECTED, Tone.GOOD, R.string.state_connected)
+        viaIcloud -> Triple(LinkVisual.CONNECTED, Tone.GOOD, R.string.state_via_icloud)
         btProblem && !link.debugTcpListening && !wifiReady -> Triple(LinkVisual.PROBLEM, Tone.BAD, R.string.state_problem)
         !paired -> Triple(LinkVisual.NOT_PAIRED, Tone.NEUTRAL, R.string.state_not_paired)
         else -> Triple(LinkVisual.SEARCHING, Tone.WARN, R.string.state_searching)
@@ -258,6 +262,9 @@ private fun LinkCard(
                         TransportKind.WIFI in link.transports -> R.string.home_connected_body_wifi
                         else -> R.string.home_connected_body
                     },
+                )
+                viaIcloud -> stringResource(R.string.home_via_icloud_title, peer) to stringResource(
+                    if (remote.retrying) R.string.home_via_icloud_retrying else R.string.home_via_icloud_body,
                 )
                 link.bluetooth == BluetoothStatus.OFF && wifiReady && paired ->
                     stringResource(R.string.home_waiting_title, peer) to stringResource(R.string.home_bt_off_wifi_body)

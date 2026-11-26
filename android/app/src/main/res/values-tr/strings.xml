@@ -166,6 +166,11 @@
     <string name="home_waiting_title">%1$s bekleniyor</string>
     <string name="home_waiting_body">Son bağlantı: %1$s. iPhone\'unuz yakındayken ve üzerinde Pairline açıkken veya arka planda çalışırken Pairline kendiliğinden yeniden bağlanır.</string>
     <string name="home_waiting_never">iPhone\'unuz henüz bağlanmadı. Yakındayken ve Bluetooth açıkken iPhone\'da Pairline\'ı açın.</string>
+    <string name="state_via_icloud">iCloud üzerinden</string>
+    <string name="notif_via_icloud_text">iPhone\'unuz yeniden yakından bağlanana kadar mesajlar, kodlar ve aramalar ona iCloud\'unuz üzerinden gider.</string>
+    <string name="home_via_icloud_title">%1$s ile iCloud üzerinden bağlantı</string>
+    <string name="home_via_icloud_body">iPhone\'unuz şu anda yakından bağlı değil; bu yüzden mesajlar, tek kullanımlık kodlar ve aramalar ona iCloud\'unuz üzerinden, yalnızca iki telefonunuzdaki anahtarlarla kilitli olarak gider. Uzaktan arama için doğrudan bağlantı gerekir.</string>
+    <string name="home_via_icloud_retrying">Uzak mod açık, ancak şu anda iCloud\'a ulaşılamıyor. Bu telefonun internet bağlantısını kontrol edin; Pairline denemeye devam ediyor.</string>
     <string name="home_not_paired_body">Bu telefonun SIM kartını iPhone\'unuzdan kullanmaya başlamak için eşleştirme yapın.</string>
     <string name="home_bt_off_body">Bluetooth kapalıyken iPhone\'unuz bu telefona ulaşamaz.</string>
     <string name="home_bt_perm_title">Yakındaki cihazlar izni verilmedi</string>

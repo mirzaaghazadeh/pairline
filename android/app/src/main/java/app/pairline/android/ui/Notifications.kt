@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import app.pairline.android.AppGraph
 import app.pairline.android.MainActivity
 import app.pairline.android.R
 import app.pairline.android.link.BluetoothStatus
@@ -115,6 +116,10 @@ object Notifications {
             s.bluetooth == BluetoothStatus.OFF && !wifiReady -> r.getString(R.string.notif_bt_off_title) to
                 r.getString(R.string.notif_bt_off_text)
             !paired -> r.getString(R.string.notif_not_paired_title) to r.getString(R.string.notif_not_paired_text)
+            // Remote mode (D-080): no nearby link, but the iPhone is reached through its iCloud.
+            AppGraph.remote.state.value.let { it.on && it.problem == null } ->
+                r.getString(R.string.home_via_icloud_title, peerName ?: r.getString(R.string.generic_iphone)) to
+                    r.getString(R.string.notif_via_icloud_text)
             else -> r.getString(R.string.notif_waiting_title) to
                 r.getString(if (wifiReady) R.string.notif_waiting_text_wifi else R.string.notif_waiting_text)
         }
