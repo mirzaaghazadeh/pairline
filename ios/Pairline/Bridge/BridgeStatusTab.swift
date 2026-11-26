@@ -66,6 +66,7 @@ struct BridgeStatusTab: View {
             if proxy == .leftOn || proxy == .outdated { proxyNotice }
             batteryCard
             simCards
+            BalanceCard()
         }
     }
 
@@ -274,23 +275,54 @@ struct BridgeStatusTab: View {
                         }
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                        // The network it's on, when that isn't the SIM's own carrier (roaming, D-082).
+                        if let op = sim.op, op.caseInsensitiveCompare(sim.carrier ?? "") != .orderedSame {
+                            Label {
+                                Text(verbatim: op)
+                            } icon: {
+                                Image(systemName: "antenna.radiowaves.left.and.right")
+                            }
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                        }
                         // The SIM this iPhone's calls and messages go out on (D-062), not only Android's default.
                         HStack(spacing: 6) {
                             if bridge.effectiveSim(forSMS: true) == sim.slot { Tag(text: Text("Messages")) }
                             if bridge.effectiveSim(forSMS: false) == sim.slot { Tag(text: Text("Calls")) }
                             if sim.roaming == true { Tag(text: Text("Roaming"), tint: .brandAmber) }
+                            if sim.vm == true { Tag(text: Text("Voicemail", tableName: "Carrier"), tint: .brandAmber) }
                         }
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 6) {
                         SignalBars(level: sim.signal ?? 0, tint: (sim.signal ?? 0) <= 1 ? .brandAmber : .brandGreen)
-                        Text(verbatim: sim.net == "none" ? "—" : (sim.net ?? ""))
+                        // The exact technology when the bridge sends it (D-082), else the generation.
+                        Text(verbatim: sim.net == "none" ? "—" : (sim.rat ?? sim.net ?? ""))
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.secondary)
+                        if let dbm = sim.dbm, sim.net != "none" {
+                            LTRText("\(dbm) dBm")
+                                .font(.caption2.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 .card()
                 .accessibilityElement(children: .combine)
+                if sim.vm == true, bridge.has(.callVoicemail) {
+                    Button {
+                        bridge.calls.startVoicemailCall(sim: sim.slot)
+                    } label: {
+                        Label {
+                            Text("Call voicemail", tableName: "Carrier")
+                        } icon: {
+                            Image(systemName: "recordingtape")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
             if bridge.isDualSIM {
                 NavigationLink {

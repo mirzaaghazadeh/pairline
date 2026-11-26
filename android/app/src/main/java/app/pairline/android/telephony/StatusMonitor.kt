@@ -244,9 +244,14 @@ class StatusMonitor(
                 onCallState?.invoke(subId, state, phoneNumber?.takeIf { it.isNotBlank() })
             }
             override fun onUserMobileDataStateChanged(enabled: Boolean) = changed()
+            override fun onMessageWaitingIndicatorChanged(mwi: Boolean) {
+                sims.voicemailWaiting[subId] = mwi
+                changed()
+            }
         }
         var events = PhoneStateListener.LISTEN_SIGNAL_STRENGTHS or PhoneStateListener.LISTEN_SERVICE_STATE or
-            PhoneStateListener.LISTEN_CALL_STATE or PhoneStateListener.LISTEN_USER_MOBILE_DATA_STATE
+            PhoneStateListener.LISTEN_CALL_STATE or PhoneStateListener.LISTEN_USER_MOBILE_DATA_STATE or
+            PhoneStateListener.LISTEN_MESSAGE_WAITING_INDICATOR
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) events = events or PhoneStateListener.LISTEN_DISPLAY_INFO_CHANGED
         tm.listen(listener, events)
         return listener
@@ -260,8 +265,14 @@ class StatusMonitor(
         TelephonyCallback.DisplayInfoListener,
         TelephonyCallback.CallStateListener,
         TelephonyCallback.UserMobileDataStateListener,
-        TelephonyCallback.ActiveDataSubscriptionIdListener {
+        TelephonyCallback.ActiveDataSubscriptionIdListener,
+        TelephonyCallback.MessageWaitingIndicatorListener {
         override fun onSignalStrengthsChanged(signalStrength: SignalStrength) = changed()
+        // A voicemail is waiting on this SIM (D-082).
+        override fun onMessageWaitingIndicatorChanged(mwi: Boolean) {
+            sims.voicemailWaiting[subId] = mwi
+            changed()
+        }
         // Mobile data and the data SIM are in `status.net` and `sims` (D-073).
         override fun onUserMobileDataStateChanged(enabled: Boolean) = changed()
         override fun onActiveDataSubscriptionIdChanged(subId: Int) = changed()

@@ -96,9 +96,11 @@ final class DemoBridge: BridgeLink {
             "battery": ["level": battery, "charging": false],
             "sims": [
                 ["slot": 0, "carrier": content.carriers.0, "label": "SIM 1", "number": content.ownNumber, "signal": 4,
-                 "net": "5G", "roaming": false, "defaultSms": true, "defaultVoice": true, "defaultData": dataSlot == 0],
+                 "net": "5G", "rat": "NR NSA", "dbm": -86, "roaming": false, "defaultSms": true, "defaultVoice": true,
+                 "defaultData": dataSlot == 0, "vm": false],
                 ["slot": 1, "carrier": content.carriers.1, "label": "SIM 2", "number": NSNull(), "signal": 2,
-                 "net": "LTE", "roaming": false, "defaultSms": false, "defaultVoice": false, "defaultData": dataSlot == 1],
+                 "net": "LTE", "rat": "LTE-CA", "dbm": -104, "roaming": false, "defaultSms": false, "defaultVoice": false,
+                 "defaultData": dataSlot == 1, "vm": false],
             ],
             "net": net,
             "ringer": ringer,

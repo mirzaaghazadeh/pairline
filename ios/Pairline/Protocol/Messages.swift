@@ -116,6 +116,14 @@ struct SIMInfo: Codable, Equatable, Identifiable, Hashable {
     var defaultVoice: Bool?
     /// Android's data SIM (D-073).
     var defaultData: Bool?
+    /// Signal in dBm (RSRP on LTE and 5G), Android 10+ (D-082).
+    var dbm: Int?
+    /// The exact radio technology, such as "LTE-CA" or "NR NSA" (D-082).
+    var rat: String?
+    /// The network the SIM is registered on; differs from `carrier` when roaming (D-082).
+    var op: String?
+    /// A voicemail is waiting (the carrier's message-waiting indicator, D-082).
+    var vm: Bool?
 
     var id: Int { slot }
 }
@@ -575,6 +583,11 @@ struct Outbound {
         Outbound("call.dial", ["sim": optional(sim), "number": number])
     }
 
+    /// Calls the voicemail of the SIM in `sim`; Android looks up the number (needs `call.voicemail`, D-082).
+    static func callVoicemail(sim: Int?) -> Outbound {
+        Outbound("call.dial", ["sim": optional(sim), "voicemail": true])
+    }
+
     static func callDTMF(_ call: OpaqueValue, digit: String) -> Outbound {
         Outbound("call.dtmf", ["call": call.jsonObject, "digit": digit])
     }
@@ -710,6 +723,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case smsRead = "sms.read"
     /// A call can be put on hold (D-074).
     case callHold = "call.hold"
+    /// Voicemail can be called on a chosen SIM, and SIMs say when one is waiting (D-082).
+    case callVoicemail = "call.voicemail"
     /// Contacts can be edited from here (D-074).
     case contactsEdit = "contacts.edit"
     /// The bridge phone can be made to ring loudly (D-074).

@@ -244,6 +244,26 @@ final class AppModel: ObservableObject {
             tab = .bridge
             return
         }
+        // Runs only the code the user chose as their balance code (D-082); a link can't name a code, so a web page
+        // can't make the bridge phone run one.
+        if url.host == "balance" {
+            tab = .bridge
+            guard !settings.balanceUSSDCode.isEmpty else {
+                toast = String(localized: "Choose a balance code first: run it under Calls › USSD codes and turn on “Use as balance code”.", table: "Carrier")
+                return
+            }
+            Task { @MainActor in
+                for _ in 0..<30 where !self.active.phase.isConnected || self.active.status == nil {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                }
+                do {
+                    try await self.active.checkBalance()
+                } catch {
+                    self.toast = error.localizedDescription
+                }
+            }
+            return
+        }
         if url.host == "call" {
             let number = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "number" }?.value

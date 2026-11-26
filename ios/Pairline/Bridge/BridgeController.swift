@@ -211,6 +211,7 @@ final class BridgeController: ObservableObject {
     private func applyStatus(_ s: BridgeStatus) {
         status = s
         statusUpdatedAt = Date()
+        if mode == .real { noticeVoicemail(s) }
         if let level = s.battery?.level, s.battery?.charging != true {
             if level <= 15, !lowBatteryNotified, mode == .real {
                 lowBatteryNotified = true
@@ -221,6 +222,45 @@ final class BridgeController: ObservableObject {
         }
         saveWidget()
         requestMicrophoneIfNeeded(s)
+    }
+
+    // MARK: - Voicemail and balance (D-082)
+
+    private static let voicemailNotifiedKey = "voicemail.notified"
+
+    /// One notification each time a SIM's voicemail indicator turns on; remembered across launches so a relaunch
+    /// doesn't repeat it, and forgotten when the indicator goes off (the voicemail was heard).
+    private func noticeVoicemail(_ s: BridgeStatus) {
+        let defaults = UserDefaults.standard
+        var notified = Set((defaults.array(forKey: Self.voicemailNotifiedKey) as? [Int]) ?? [])
+        let waiting = Set((s.sims ?? []).filter { $0.vm == true }.map(\.slot))
+        for slot in waiting.subtracting(notified) {
+            Notifier.shared.notifyVoicemail(simName: isDualSIM ? simLabel(slot) : nil)
+        }
+        let known = Set((s.sims ?? []).map(\.slot))
+        notified = waiting.union(notified.subtracting(known))
+        defaults.set(Array(notified), forKey: Self.voicemailNotifiedKey)
+    }
+
+    /// The last reply to the balance code (D-082). Kept in memory only, like every USSD reply.
+    struct BalanceReply: Equatable {
+        var code: String
+        var result: USSDResult
+        var at: Date
+    }
+
+    @Published private(set) var balance: BalanceReply?
+
+    /// Runs the code the user chose as their balance code, on the SIM it was chosen for.
+    @discardableResult
+    func checkBalance() async throws -> USSDResult? {
+        let settings = AppSettings.shared
+        guard !settings.balanceUSSDCode.isEmpty else { return nil }
+        let sim = settings.balanceUSSDSim >= 0 && sims.contains(where: { $0.slot == settings.balanceUSSDSim })
+            ? settings.balanceUSSDSim : effectiveSim(forSMS: false)
+        let result = try await runUSSD(code: settings.balanceUSSDCode, sim: sim)
+        balance = BalanceReply(code: settings.balanceUSSDCode, result: result, at: Date())
+        return result
     }
 
     /// The bridge just offered "Talk on iPhone": ask for the microphone now, while the app is open, rather than in

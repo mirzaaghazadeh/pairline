@@ -1358,3 +1358,33 @@ show the language on first open. Only fresh installs: anyone who already set Pai
 - **Shown on first open, D-033 kept:** the iPhone's welcome page has a globe button with the current language's own
   name that opens iPhone Settings › Pairline, where iOS lists the languages. The app still doesn't list them itself.
 - The unit tests' host app skips the check, so tests keep the Simulator's language.
+
+### D-082 — Carrier tools: call settings, voicemail, balance and signal detail (2026-11-26)
+
+The maintainer picked a set of features built only from what the two apps already do (ROADMAP, "More from the same
+two phones"). This is the first: things a phone's own Settings › Phone and status bar offer.
+- **Call forwarding, call waiting and caller ID** (Calls › USSD codes › Call forwarding, waiting and caller ID) run the
+  standard GSM service codes of 3GPP TS 22.030 through the existing `ussd.run`: `**21*n#`, `**67*n#`, `**61*n#`,
+  `**62*n#` to forward always, when busy, unanswered or unreachable, `#xx#` off, `*#xx#` to ask, `##002#` all off;
+  `*43#`/`#43#` call waiting; `*31#`/`#31#` hide or show the number on every call. Android's `sendUssdRequest` hands
+  service codes to the same MMI handling and returns the carrier's answer, which shows in the usual result sheet. No
+  new message: the bridge's USSD check now also allows a `+` right after a `*`, for forwarding to `+90…`.
+- **Hide the number on one call:** touching and holding the keypad's call button offers "Call with my number hidden",
+  which dials `#31#` before the number (GSM's per-call caller-ID suppression), through the normal `call.dial`.
+- **Voicemail:** each SIM in `status.sims` carries `vm`, Android's message-waiting indicator (READ_PHONE_STATE, which
+  the bridge already holds). The iPhone notifies once each time it turns on (the announced SIMs are remembered in
+  user defaults so a relaunch doesn't repeat it), tags the SIM on the Bridge tab, and "Call voicemail" there or
+  touching and holding 1 on an empty keypad sends `call.dial` with `voicemail: true`; Android places a `voicemail:`
+  call on that SIM's phone account and looks up the number itself. Visual voicemail isn't possible: Android keeps
+  READ_VOICEMAIL for the dialer and carrier apps.
+- **Balance:** a successful USSD result has "Use as balance code" (saved with the SIM it ran on). The Bridge tab then
+  has a Balance card with the reply and "Check balance"; `pairline://balance` runs it too, so a Shortcut or a Home
+  Screen link can. A link can't carry a code of its own, so no web page can make the bridge run one. The reply stays
+  in memory like every USSD reply; no widget, since the widget's snapshot holds no carrier text (PRIVACY.md).
+- **Signal detail:** `dbm` (strongest `CellSignalStrength`, RSRP on LTE and 5G, Android 10+), `rat` (the exact
+  technology with Android 11's display override: "LTE-CA", "NR NSA", "HSPA+"…) and `op` (the registered network's
+  name, shown when it isn't the SIM's carrier). dBm changes every few seconds, so the bridge leaves it out when it
+  decides whether the status changed: it rides along with other changes and the 60-second status instead of sending
+  a status every 2 s over Bluetooth.
+- Capability `call.voicemail`. iOS strings in a new `Carrier` table (EN/FA/AR/TR). Unit tests on both sides; needs a
+  real phone on a GSM carrier.

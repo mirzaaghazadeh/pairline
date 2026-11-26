@@ -23,6 +23,17 @@ struct USSDView: View {
     var body: some View {
         Form {
             Section {
+                NavigationLink {
+                    CarrierSettingsView()
+                } label: {
+                    Label {
+                        Text("Call forwarding, waiting and caller ID", tableName: "Carrier")
+                    } icon: {
+                        Image(systemName: "arrowshape.turn.up.right.circle")
+                    }
+                }
+            }
+            Section {
                 HStack {
                     TextField(String(localized: "Code, for example *140#"), text: $code)
                         .keyboardType(.phonePad)
@@ -78,6 +89,9 @@ struct USSDView: View {
                             HStack {
                                 Image(systemName: "star.fill").foregroundStyle(Color.brandAmber)
                                 LTRText(saved).font(.body.monospacedDigit()).foregroundStyle(.primary)
+                                if settings.balanceUSSDCode == saved {
+                                    Tag(text: Text("Balance", tableName: "Carrier"))
+                                }
                                 Spacer()
                                 Image(systemName: "play.circle").foregroundStyle(Color.brandBlue)
                             }
@@ -135,7 +149,7 @@ struct USSDView: View {
             defer { running = false }
             do {
                 let output = try await bridge.runUSSD(code: code, sim: sim)
-                result = .init(code: code, result: output)
+                result = .init(code: code, result: output, sim: sim)
                 Haptics.success()
             } catch {
                 app.toast = error.localizedDescription
@@ -150,6 +164,8 @@ struct USSDResultSheet: View {
         let id = UUID()
         let code: String
         let result: USSDResult
+        /// The SIM it ran on, kept with the code when it becomes the balance code (D-082).
+        var sim: Int?
     }
 
     let item: Item
@@ -157,6 +173,19 @@ struct USSDResultSheet: View {
     @EnvironmentObject private var settings: AppSettings
 
     private var isSaved: Bool { settings.savedUSSDCodes.contains(item.code) }
+    private var isBalance: Bool { settings.balanceUSSDCode == item.code }
+
+    /// Saved codes can become the balance code; the Bridge tab shows its reply (D-082).
+    private func toggleBalance() {
+        if isBalance {
+            settings.balanceUSSDCode = ""
+        } else {
+            if !isSaved { settings.savedUSSDCodes = settings.savedUSSDCodes + [item.code] }
+            settings.balanceUSSDCode = item.code
+            settings.balanceUSSDSim = item.sim ?? -1
+        }
+        Haptics.selection()
+    }
 
     var body: some View {
         NavigationStack {
@@ -174,6 +203,17 @@ struct USSDResultSheet: View {
                         .card()
                     if item.result.ok, let text = item.result.text, !text.isEmpty {
                         CopyChip(label: Text("Copy reply"), value: text)
+                    }
+                    if item.result.ok {
+                        Toggle(isOn: Binding(get: { isBalance }, set: { _ in toggleBalance() })) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Use as balance code", tableName: "Carrier")
+                                Text("Shows its reply on the Bridge tab, with a button to check again.", tableName: "Carrier")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .card()
                     }
                 }
                 .padding(20)

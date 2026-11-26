@@ -10,6 +10,11 @@ the section in the same commit that raises `versionName`.
 - **Starts in your language.** On a new install, Pairline picks Persian, Arabic or Turkish from your SIM card's
   country (or the network's, or the time zone) when the phone itself is in English. Setup now opens with a Language
   step, so you can see the choice and change it.
+- **Call settings from the iPhone.** Call forwarding, call waiting and caller ID, and hiding your number on a single
+  call. Forwarding to a number that starts with + works too.
+- **Voicemail.** The iPhone hears when a voicemail is waiting on a SIM and can call your voicemail on that SIM.
+- **More signal detail on the iPhone:** strength in dBm, the exact network type (such as LTE-CA or 5G NSA) and the
+  network you're on when roaming.
 
 ## 1.7.0 (2026-11-26)
 

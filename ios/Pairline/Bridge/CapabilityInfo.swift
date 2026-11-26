@@ -32,6 +32,7 @@ struct CapabilityInfo: Identifiable {
         case .netSwitch: return "personalhotspot"
         case .smsRead: return "envelope.open"
         case .callHold: return "pause.circle"
+        case .callVoicemail: return "recordingtape"
         case .contactsEdit: return "person.crop.circle.badge.checkmark"
         case .phoneFind: return "bell.and.waves.left.and.right"
         case .phoneRinger: return "speaker.wave.2.circle"
@@ -65,6 +66,7 @@ struct CapabilityInfo: Identifiable {
         case .netSwitch: return String(localized: "Hotspot and data switches", table: "NetShare")
         case .smsRead: return String(localized: "Read on both phones", table: "PhoneTools")
         case .callHold: return String(localized: "Hold calls", table: "PhoneTools")
+        case .callVoicemail: return String(localized: "Voicemail", table: "Carrier")
         case .contactsEdit: return String(localized: "Edit contacts from iPhone", table: "PhoneTools")
         case .phoneFind: return String(localized: "Find phone", table: "PhoneTools")
         case .phoneRinger: return String(localized: "Ringer switch", table: "PhoneTools")
@@ -105,7 +107,7 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Wireless debugging).", table: "CallAudio")
         case .contactsEdit:
             return String(localized: "Turn on \"Add contacts from iPhone\" in Pairline Bridge on your Android phone.")
-        case .phoneFind, .phoneRinger:
+        case .phoneFind, .phoneRinger, .callVoicemail:
             return String(localized: "Update Pairline Bridge on your Android phone.", table: "PhoneTools")
         case .notifMirror:
             return String(localized: "In Pairline Bridge › Settings › Notifications from apps on your Android phone, allow notification access and choose the apps.", table: "PhoneTools")

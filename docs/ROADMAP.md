@@ -190,6 +190,26 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
 - [x] Find phone and the ringer switch; edit contacts and favourites from the iPhone
 - [ ] Real-phone test of all of the above
 
+## More from the same two phones (2026-11-26)
+
+The maintainer picked these from a review of what the existing capabilities allow (no new servers, no new outside
+parties). Each needs a real-phone test.
+
+- [x] Carrier tools (D-082): call forwarding, call waiting and caller ID screens; hide the number on one call;
+      balance code on the Bridge tab and `pairline://balance`; voicemail indicator and "Call voicemail" (touch and
+      hold 1); signal in dBm, radio technology and the network's name per SIM
+- [ ] Messages on the iPhone: inbox sorted into codes, banks and carriers, promotions; codes deleted after a day
+      (opt-in); quick replies; the newest code in the Dynamic Island; scheduled SMS sent by the bridge
+- [ ] "Bridge phone left behind" alert when the link stays down
+- [ ] Ring the iPhone from the Android phone (Quick Settings tile)
+- [ ] Mobile data used this month on the bridge phone, with a limit alert
+- [ ] Call screening role on Android: blocked calls never ring, silence unknown callers, blocked prefixes
+- [ ] Reply to Android app notifications from the iPhone
+- [ ] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi
+- [ ] Live captions of relayed calls on the iPhone (on-device speech recognition, nothing recorded or stored)
+- [ ] MMS and group messages
+- [ ] More than one iPhone, iPad or Mac paired with one bridge
+
 ## M9 — Android client mode: dropped (D-050)
 
 Two Android phones pairing with each other isn't planned; the started work is archived on

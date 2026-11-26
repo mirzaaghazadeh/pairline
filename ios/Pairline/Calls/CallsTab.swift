@@ -430,8 +430,13 @@ struct DialerView: View {
                     number.append(item.0)
                     Haptics.tap()
                 } onLongPress: {
-                    number.append("+")
                     Haptics.tap()
+                    // Touch and hold 1 calls voicemail on an empty keypad, like a phone's own (D-082).
+                    if item.0 == "1" {
+                        if number.isEmpty { calls.startVoicemailCall(sim: sim) } else { number.append("1") }
+                    } else {
+                        number.append("+")
+                    }
                 }
             }
         }
@@ -465,6 +470,20 @@ struct DialerView: View {
             }
             .disabled(number.isEmpty || runningUSSD)
             .accessibilityLabel(PhoneNumber.isUSSD(number) ? Text("Run code") : Text("Call"))
+            // Hide the caller ID on this call only: the GSM "#31#" prefix (D-082).
+            .contextMenu {
+                if !number.isEmpty, !PhoneNumber.isUSSD(number), !number.hasPrefix("#31#") {
+                    Button {
+                        calls.startCall(number: "#31#" + number, sim: sim)
+                    } label: {
+                        Label {
+                            Text("Call with my number hidden", tableName: "Carrier")
+                        } icon: {
+                            Image(systemName: "eye.slash")
+                        }
+                    }
+                }
+            }
             Button {
                 if !number.isEmpty { number.removeLast() }
                 Haptics.tap()
@@ -556,7 +575,7 @@ struct DialKey: View {
         }
         .buttonStyle(DialKeyStyle())
         .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-            guard digit == "0" else { return }
+            guard digit == "0" || digit == "1" else { return }
             longPressed = true
             onLongPress()
         })

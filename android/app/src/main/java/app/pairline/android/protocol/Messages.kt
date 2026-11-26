@@ -110,6 +110,12 @@ object Caps {
     /** Notifications from apps the user chose are mirrored (`notif.posted`, notification access given, D-077). */
     const val NOTIF_MIRROR = "notif.mirror"
 
+    /**
+     * `call.dial` takes `voicemail: true`, `status.sims` carries `vm`, and USSD codes may carry a '+' number after a
+     * '*' for call forwarding (D-082).
+     */
+    const val CALL_VOICEMAIL = "call.voicemail"
+
     /** Call-history entries can be deleted on the bridge too (D-043). */
     const val CALLLOG_DELETE = "calllog.delete"
 
@@ -119,7 +125,7 @@ object Caps {
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CALL_HOLD, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK,
+        CALL_HOLD, CALL_VOICEMAIL, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK,
         CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, NOTIF_MIRROR, WIFI, FILES, CALLLOG_DELETE,
         BLOCK,
     )

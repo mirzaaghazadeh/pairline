@@ -50,7 +50,7 @@ class TelephonyLogicTest {
         assertEquals(
             listOf(
                 Caps.SMS_RECEIVE, Caps.SMS_SEND, Caps.SMS_HISTORY, Caps.CALL_OBSERVE, Caps.CALL_CONTROL, Caps.CALL_DIAL,
-                Caps.CONTACTS, Caps.CALLLOG, Caps.USSD, Caps.CALLLOG_DELETE, Caps.BLOCK,
+                Caps.CALL_VOICEMAIL, Caps.CONTACTS, Caps.CALLLOG, Caps.USSD, Caps.CALLLOG_DELETE, Caps.BLOCK,
             ),
             caps(),
         )
@@ -235,6 +235,11 @@ class TelephonyLogicTest {
         assertNull(PhoneNumbers.normalizeUssd("*100"))
         assertNull(PhoneNumbers.normalizeUssd("*100#;"))
         assertNull(PhoneNumbers.normalizeUssd("+*100#"))
+        // Call forwarding to an international number (D-082): '+' only right after a '*'.
+        assertEquals("**21*+905551234567#", PhoneNumbers.normalizeUssd("**21*+90 555 123 45 67#"))
+        assertEquals("##002#", PhoneNumbers.normalizeUssd("##002#"))
+        assertNull(PhoneNumbers.normalizeUssd("**21+90555#"))
+        assertNull(PhoneNumbers.normalizeUssd("*#"))
     }
 
     @Test
@@ -348,6 +353,21 @@ class TelephonyLogicTest {
         assertEquals("3G", SimDirectory.networkGeneration(android.telephony.TelephonyManager.NETWORK_TYPE_HSPAP))
         assertEquals("2G", SimDirectory.networkGeneration(android.telephony.TelephonyManager.NETWORK_TYPE_EDGE))
         assertEquals("none", SimDirectory.networkGeneration(android.telephony.TelephonyManager.NETWORK_TYPE_UNKNOWN))
+    }
+
+    @Test
+    fun radioNames() {
+        assertEquals("LTE", SimDirectory.radioName(android.telephony.TelephonyManager.NETWORK_TYPE_LTE, null))
+        assertEquals(
+            "NR NSA",
+            SimDirectory.radioName(
+                android.telephony.TelephonyManager.NETWORK_TYPE_LTE,
+                android.telephony.TelephonyDisplayInfo.OVERRIDE_NETWORK_TYPE_NR_NSA,
+            ),
+        )
+        assertEquals("HSPA+", SimDirectory.radioName(android.telephony.TelephonyManager.NETWORK_TYPE_HSPAP, null))
+        assertEquals("EDGE", SimDirectory.radioName(android.telephony.TelephonyManager.NETWORK_TYPE_EDGE, null))
+        assertNull(SimDirectory.radioName(android.telephony.TelephonyManager.NETWORK_TYPE_UNKNOWN, null))
     }
 
     // ---- Contacts ----

@@ -170,10 +170,14 @@ class MessageRouter(
         link.send(json)
     }
 
-    /** A hash of everything but the timestamp, to skip identical status messages. */
+    /**
+     * A hash of everything but the timestamp and each SIM's dBm, to skip identical status messages. dBm moves every
+     * few seconds; it rides along with other changes and the status sent at least every 60 s (D-082).
+     */
     private fun contentKey(json: JSONObject): Long {
         val copy = JSONObject(json.toString())
         copy.remove("time")
+        copy.optJSONArray("sims")?.let { sims -> for (i in 0 until sims.length()) sims.optJSONObject(i)?.remove("dbm") }
         return copy.toString().hashCode().toLong()
     }
 
@@ -207,8 +211,11 @@ class MessageRouter(
             Msg.CALL_REJECT -> request(message) { id -> calls.reject(callId(message)); Messages.ok(id) }
             Msg.CALL_END -> request(message) { id -> calls.end(callId(message)); Messages.ok(id) }
             Msg.CALL_DIAL -> request(message) { id ->
-                val number = message.stringOrNull("number") ?: invalid("number missing")
-                calls.dial(sim(message), number)
+                if (message.boolOrNull("voicemail") == true) {
+                    calls.dialVoicemail(sim(message)) // D-082
+                } else {
+                    calls.dial(sim(message), message.stringOrNull("number") ?: invalid("number missing"))
+                }
                 Messages.ok(id)
             }
             Msg.CALL_DTMF -> request(message) { id ->

@@ -108,6 +108,27 @@ final class MessageCodecTests: XCTestCase {
         XCTAssertEqual(dismiss["key"] as? String, "k")
     }
 
+    /// D-082: signal detail and the voicemail indicator per SIM, and dialing voicemail.
+    func testCarrierTools() throws {
+        guard case .status(let s) = try decode([
+            "t": "status",
+            "sims": [["slot": 0, "carrier": "Irancell", "signal": 3, "net": "LTE", "rat": "LTE-CA", "dbm": -97,
+                      "op": "Turkcell", "vm": true],
+                     ["slot": 1, "signal": 2, "net": "3G"]],
+        ]).message else { return XCTFail() }
+        XCTAssertEqual(s.sims?.first?.rat, "LTE-CA")
+        XCTAssertEqual(s.sims?.first?.dbm, -97)
+        XCTAssertEqual(s.sims?.first?.op, "Turkcell")
+        XCTAssertEqual(s.sims?.first?.vm, true)
+        XCTAssertNil(s.sims?.last?.vm, "older bridges leave it out")
+        let vm = try json(.callVoicemail(sim: 1))
+        XCTAssertEqual(vm["t"] as? String, "call.dial")
+        XCTAssertEqual(vm["voicemail"] as? Bool, true)
+        XCTAssertEqual(vm["sim"] as? Int, 1)
+        XCTAssertNil(vm["number"])
+        XCTAssertTrue(Capability.allCases.contains(.callVoicemail))
+    }
+
     func testSMSMessagesAndHistoryPage() throws {
         let inbound = try decode([
             "t": "sms.history", "id": 9, "more": true,

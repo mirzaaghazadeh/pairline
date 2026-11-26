@@ -26,6 +26,8 @@ struct ActiveCall: Identifiable, Equatable {
     /// Whether CallKit shows this call (false in demo mode, and after it was answered on the Android phone).
     var inCallKit: Bool
     var answeredHere = false
+    /// A call to the SIM's voicemail (D-082): dialed with `voicemail: true`, no number of its own.
+    var isVoicemail = false
 
     var displayName: String {
         if let name, !name.isEmpty { return name }
@@ -745,32 +747,55 @@ final class CallCenter: ObservableObject {
 
     /// Starts a call from the dialer, contacts or call log.
     func startCall(number: String, sim: Int?) {
-        guard let bridge else { return }
+        guard let bridge, canStartCall() else { return }
+        let dialable = PhoneNumber.international(PhoneNumber.dialable(number))
+        guard !dialable.isEmpty else { return }
+        let call = ActiveCall(id: UUID(), bridgeID: nil, number: dialable, name: bridge.db.knownName(for: dialable),
+                              isOutgoing: true, state: .dialing, sim: sim, inCallKit: useCallKit)
+        place(call, handle: CXHandle(type: .phoneNumber, value: dialable))
+    }
+
+    /// Calls the voicemail of the SIM in `sim` (D-082): the bridge phone looks up the carrier's voicemail number.
+    func startVoicemailCall(sim: Int?) {
+        guard let bridge, canStartCall() else { return }
+        guard bridge.has(.callVoicemail) else {
+            notice = CapabilityInfo(.callVoicemail).missingText
+            return
+        }
+        let name = String(localized: "Voicemail", table: "Carrier")
+        var call = ActiveCall(id: UUID(), bridgeID: nil, number: "", name: name, isOutgoing: true, state: .dialing,
+                              sim: sim, inCallKit: useCallKit)
+        call.isVoicemail = true
+        place(call, handle: CXHandle(type: .generic, value: name))
+    }
+
+    private func canStartCall() -> Bool {
+        guard let bridge else { return false }
         guard bridge.canUseLink else {
             bridge.requestPaywall()
-            return
+            return false
         }
         guard bridge.phase.isConnected else {
             notice = String(localized: "Your bridge phone isn't connected right now.")
-            return
+            return false
         }
         guard bridge.has(.callDial) else {
             notice = String(localized: "Your bridge app can't place calls yet. Allow the phone permission in Pairline Bridge.")
-            return
+            return false
         }
         guard current == nil else {
             notice = String(localized: "There's already a call in progress.")
-            return
+            return false
         }
-        let dialable = PhoneNumber.international(PhoneNumber.dialable(number))
-        guard !dialable.isEmpty else { return }
-        var call = ActiveCall(id: UUID(), bridgeID: nil, number: dialable, name: bridge.db.knownName(for: dialable),
-                              isOutgoing: true, state: .dialing, sim: sim, inCallKit: useCallKit)
+        return true
+    }
+
+    private func place(_ placed: ActiveCall, handle: CXHandle) {
+        var call = placed
         call.answeredHere = true // placed from this iPhone, so its audio belongs here too
         current = call
         showCallScreen = true
         if useCallKit {
-            let handle = CXHandle(type: .phoneNumber, value: dialable)
             let action = CXStartCallAction(call: call.id, handle: handle)
             action.contactIdentifier = call.name
             request(action) { [weak self] in
@@ -917,7 +942,8 @@ final class CallCenter: ObservableObject {
     private func sendDial(_ call: ActiveCall) async -> Bool {
         guard let bridge else { return false }
         do {
-            _ = try await bridge.link.request(.callDial(sim: call.sim, number: call.number))
+            _ = try await bridge.link.request(call.isVoicemail ? .callVoicemail(sim: call.sim)
+                                                               : .callDial(sim: call.sim, number: call.number))
             watchDial(call.id)
             return true
         } catch {

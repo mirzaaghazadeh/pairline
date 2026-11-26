@@ -21,6 +21,10 @@ final class AppSettings: ObservableObject {
     @AppStorage("messages.defaultSim") var defaultSMSSim = -1
     @AppStorage("calls.defaultSim") var defaultCallSim = -1
     @AppStorage("ussd.saved") var savedUSSDCodesRaw = ""
+    /// The saved code that checks the balance, shown as a card on the Bridge tab and run by `pairline://balance`
+    /// (D-082). Only this code can run from a link: a link can't carry a code of its own.
+    @AppStorage("ussd.balance") var balanceUSSDCode = ""
+    @AppStorage("ussd.balanceSim") var balanceUSSDSim = -1
     /// The bridge's signal, network and battery as a Live Activity on the Lock Screen and in the Dynamic Island (D-053).
     @AppStorage("liveActivity.bridge") var bridgeLiveActivity = true
 

@@ -51,6 +51,7 @@ object CapsCalculator {
             if (phoneState) caps += Caps.CALL_OBSERVE
             if (phoneState && has(Manifest.permission.ANSWER_PHONE_CALLS)) caps += Caps.CALL_CONTROL
             if (has(Manifest.permission.CALL_PHONE)) caps += Caps.CALL_DIAL
+            if (has(Manifest.permission.CALL_PHONE) && phoneState) caps += Caps.CALL_VOICEMAIL
             if (input.inCallService) {
                 caps += Caps.CALL_DTMF
                 caps += Caps.CALL_AUDIO

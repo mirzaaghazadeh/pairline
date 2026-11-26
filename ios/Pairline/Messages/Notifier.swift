@@ -195,6 +195,22 @@ final class Notifier: NSObject, ObservableObject {
         center.add(UNNotificationRequest(identifier: "battery-low", content: content, trigger: nil))
     }
 
+    /// The carrier says a voicemail is waiting on a SIM of the bridge phone (D-082). Tapping opens the Bridge tab,
+    /// whose SIM card has "Call voicemail".
+    func notifyVoicemail(simName: String?) {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "New voicemail", table: "Carrier")
+        if let simName {
+            content.body = String(localized: "A voicemail is waiting on \(simName). Open Pairline to call your voicemail.", table: "Carrier")
+        } else {
+            content.body = String(localized: "A voicemail is waiting. Open Pairline to call your voicemail.", table: "Carrier")
+        }
+        content.sound = .default
+        content.userInfo = ["status": true]
+        center.add(UNNotificationRequest(identifier: "voicemail", content: content, trigger: nil))
+    }
+
     func scheduleTrialReminder(trialEnd: Date, price: String) {
         center.removePendingNotificationRequests(withIdentifiers: [Self.trialReminderID])
         guard AppSettings.shared.trialReminder else { return }

@@ -36,12 +36,27 @@ object PhoneNumbers {
         return n
     }
 
-    /** A USSD or MMI code such as `*100#` or `*123*1#`. */
+    /**
+     * A USSD or MMI code such as `*100#`, `*123*1#`, or a call-forwarding code with an international number such as
+     * `**21*+905551234567#`: a '+' may follow a '*' (D-082). Spaces, dashes and bidi marks are dropped, Persian and
+     * Arabic-Indic digits converted.
+     */
     fun normalizeUssd(raw: String): String? {
-        val n = normalizeDialable(raw) ?: return null
-        if (n.length < 2 || !(n.startsWith('*') || n.startsWith('#'))) return null
-        if (!n.endsWith('#')) return null
-        if (n.any { it == ',' || it == ';' || it == '+' }) return null
+        val out = StringBuilder()
+        for (ch in raw.trim()) {
+            val c = asciiDigit(ch)
+            when {
+                c != null -> out.append(c)
+                ch == '*' || ch == '#' -> out.append(ch)
+                ch == '+' && out.endsWith("*") -> out.append('+')
+                ch == ' ' || ch == '-' || ch == '.' || ch == '(' || ch == ')' || ch == ' ' -> Unit
+                ch == '‎' || ch == '‏' || ch == '⁦' || ch == '⁩' -> Unit // bidi marks
+                else -> return null
+            }
+        }
+        val n = out.toString()
+        if (n.length < 2 || n.length > MAX_LENGTH || !(n.startsWith('*') || n.startsWith('#'))) return null
+        if (!n.endsWith('#') || n.none { it.isDigit() }) return null
         return n
     }
 

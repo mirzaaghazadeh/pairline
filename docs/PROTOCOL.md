@@ -260,10 +260,14 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 {"key": "sms:1234", "thread": 17, "addr": "+15551234567", "body": "text", "time": 1764000000000,
  "box": "in" | "out", "sim": 0, "state": "received" | "pending" | "sent" | "delivered" | "failed"}
 
-// SIM, in status.sims (defaultData: Android's data SIM, D-073)
+// SIM, in status.sims (defaultData: Android's data SIM, D-073). D-082 adds, each optional: dbm (signal in dBm, RSRP on
+// LTE and 5G, Android 10+), rat (the exact radio technology, e.g. "LTE-CA", "NR NSA", "HSPA+"), op (the network it's
+// registered on, which differs from carrier when roaming) and vm (the carrier's voicemail-waiting indicator). B leaves
+// dbm out when deciding whether the status changed, so it travels with other changes and the 60-second status.
 {"slot": 0, "carrier": "Carrier", "label": "SIM 1", "number": "+15551234567" | null,
  "signal": 0-4, "net": "5G" | "LTE" | "3G" | "2G" | "none", "roaming": false,
- "defaultSms": true, "defaultVoice": true, "defaultData": true}
+ "defaultSms": true, "defaultVoice": true, "defaultData": true,
+ "dbm": -97, "rat": "LTE-CA", "op": "Carrier", "vm": false}
 
 // The bridge phone's own internet sharing, in status.net (D-073)
 {"hotspot": false, "bluetooth": false, "data": true | null}
@@ -297,7 +301,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `call.incoming` | B→R | M3 | `call` (id), `sim`, `from`, `name` (if the contact is known) |
 | `call.state` | B→R | M3 | `call`, `state` (`dialing` / `ringing` / `active` / `held` / `ended`), `dir` (`in`/`out`), `number`, `name`, `since`, `reason` (`local` / `remote` / `busy` / `missed` / `rejected` / `failed`, only when ended) |
 | `call.answer`, `call.reject`, `call.end` | R→B | M3 | `id`, `call` → `ok` / `error` |
-| `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events |
+| `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events. Or `voicemail: true` without `number` (needs `call.voicemail`, D-082): B calls the SIM's voicemail, whose number Android looks up. A `number` starting `#31#` hides the caller ID on that call (GSM) |
 | `call.dtmf` | R→B | M3 | `id`, `call`, `digit` (needs capability `call.dtmf`) |
 | `call.audio` | R→B | M3 | `id`, `call`, `mute`, `speaker` (either optional; needs `call.audio`) |
 | `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true), `via` (`"wifi"`, the default: the Wi-Fi session's UDP media channel; `"link"`: `MEDIA` frames on the session this request arrives on, which must be Bluetooth or debug TCP, D-072) → `ok` once audio flows, or `error` (`unsupported`: not set up, the bridge's helper isn't running, no Wi-Fi link for `wifi`, a Wi-Fi session or no `call.media.link` for `link`; `failed`: capture didn't start). Needs `call.media` |
@@ -315,7 +319,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `contacts.sync` | R→B, B→R | M4 | request: `id`, `since` (cursor or null) / reply: `id`, `contacts` [Contact], `deleted` [key], `cursor`, `more` |
 | `calllog.sync` | R→B, B→R | M4 | request: `id`, `since` / reply: `id`, `calls` [Call-log entry], `cursor`, `more` |
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
-| `ussd.run` | R→B | M4 | `id`, `sim`, `code` |
+| `ussd.run` | R→B | M4 | `id`, `sim`, `code`: a USSD or GSM service code (`*`/`#` first, `#` last). A `+` may follow a `*` (call forwarding to an international number, `**21*+905551234567#`, D-082) |
 | `ussd.result` | B→R | M4 | `id`, `ok`, `text`, `error` |
 | `calllog.delete` | R→B | M4 | `id`, `keys` [call-log key] or `all: true` → `ok` / `error` (needs capability `calllog.delete`) |
 | `block.list` | R→B, B→R | M4 | request: `id` / reply: `id`, `numbers` [`{n, time}`]. Also sent by B without `id` when the list changes on the bridge (needs `block`) |
@@ -343,7 +347,8 @@ can also be fed into the call; without it the iPhone listens and the user talks 
 `via: "link"`; the bridge has an Opus encoder and decoder, D-072), `net.share`
 (the bridge's user allows internet sharing, M8), `net.switch` (R may switch the bridge phone's hotspot, Bluetooth
 tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's helper running, D-073), `sms.read`
-(messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `contacts.edit`
+(messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `call.voicemail`
+(`call.dial` takes `voicemail: true`, SIMs carry `vm`, D-082), `contacts.edit`
 (with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `notif.mirror` (notification access given:
 chosen apps' notifications are sent as `notif.posted`, D-077), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),

@@ -35,9 +35,9 @@ Any change that adds or changes a data flow or permission must update this file 
 | That you read a conversation, held a call, edited a contact, or asked the Android phone to ring or change its ringer (D-074) | Yes, encrypted | Your bridge phone only | Android's own SMS store (read state), call and contacts; the ringer setting | As Android keeps them |
 | Call audio, only with "Talk on iPhone" on and only during a call you take on the iPhone (M6) | Yes, encrypted | Streamed live between your two phones, over Bluetooth (compressed with each phone's own Opus codec, D-072) or over your local Wi-Fi, as you choose in the iPhone's Settings › Call audio: the caller's voice to the iPhone, your iPhone's microphone into the call | Not stored, not recorded; logs keep only frame counts and loudness levels | — |
 | Wireless debugging pairing (Talk on iPhone, D-054) | No. Pairline connects only to this phone's own Wireless debugging, on 127.0.0.1; to find its port it looks for this phone's own `_adb-tls-*` announcements on the Wi-Fi network (mDNS), which every phone with Wireless debugging on sends anyway | Pairline's 2048-bit key in Pairline's no-backup storage, encrypted with an Android Keystore key; Android keeps the matching public key under Wireless debugging › Paired devices, named "Pairline". The 6-digit code you type goes only into that pairing and isn't stored | Until "Forget pairing" (and removing Pairline under Paired devices) |
-| USSD results | Yes, encrypted | Your paired iPhone only | Not stored | — |
+| USSD results, including call forwarding, call waiting and caller-ID codes and the balance code's reply on the Bridge tab (D-082) | Yes, encrypted | Your paired iPhone only | Not stored: the balance reply stays in the iPhone's memory until Pairline quits | — |
 | The SIM card's and mobile network's country, the time zone and the region setting, read once on a fresh install to pick the app's first language (D-081) | No | — | Only the language picked (Android: the app's language setting) | Until you change the language or remove the app |
-| Phone status (battery, signal, carrier, which SIM Android uses for calls and for texts, your SIM numbers if Android knows them) | Yes, encrypted | Your paired iPhone only | Not stored | — |
+| Phone status (battery, signal, carrier, which SIM Android uses for calls and for texts, your SIM numbers if Android knows them; since D-082 also each SIM's signal in dBm, radio technology, the network it's registered on and whether a voicemail is waiting) | Yes, encrypted | Your paired iPhone only | Not stored, except which SIMs' "voicemail waiting" was already announced (iOS user defaults), so it's announced once | — |
 | Device model and system version (`device.info`: e.g. "Google Pixel 7", Android 16, app version; on the iPhone side the generic model "iPhone") | Yes, encrypted | The other paired phone only | Bridge app settings: the iPhone's model and iOS/app version, to show them on screen | Until unpair |
 | Pairing keys | No | — | Android Keystore-protected storage; iOS Secure Enclave or Keychain | Until unpair |
 | Pairing code (the QR code's one-time secret) | Only as the QR code on your screen | — | Bridge app memory only, never on disk or in logs | 5 minutes, or until used once |
@@ -62,7 +62,7 @@ Any change that adds or changes a data flow or permission must update this file 
 | Identity key and pinned bridge key | No | Secure Enclave key (or Keychain key on devices without one) and Keychain items, `AfterFirstUnlockThisDeviceOnly`, never synced or migrated | Until unpair (the bridge key) / app removal (the identity key) |
 | Trial clock | No | The latest trusted time seen (D-017), in the Keychain, so turning the clock back doesn't extend the trial | Until app removal |
 | Free first sync used | No | One flag in the Keychain (D-069), so pairing again doesn't give a second free sync. No content | Like the trial clock |
-| Preferences (including the SIM for new calls and messages, D-062) and saved USSD codes | No | iOS user defaults (no message content) | Until app removal |
+| Preferences (including the SIM for new calls and messages, D-062) and saved USSD codes, with the one chosen as the balance code and its SIM (D-082) | No | iOS user defaults (no message content) | Until app removal |
 | First language (D-081): on a fresh install, the languages of the keyboards you added, the time zone and the region setting are read once to pick the app's language | No | Only the language picked, as the app's language in iPhone Settings › Pairline | Until you change it or remove the app |
 | Demo mode data | No | Made-up sample data in memory only, never mixed with real data | Until you leave demo mode |
 | App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids or message text) | Last 7 days |
@@ -109,7 +109,7 @@ log line, already redacted, to the iPhone's system log, which a connected Mac ca
 |------------|-----|-------|
 | `RECEIVE_SMS`, `READ_SMS`, `SEND_SMS` | Relay SMS both ways; read history when the iPhone asks; look up a sent message's id so both phones agree on it | Setup |
 | `READ_PHONE_STATE`, `READ_PHONE_NUMBERS` | List SIMs, pick a SIM, see calls ringing, show signal and your numbers on the iPhone | Setup |
-| `CALL_PHONE` | Place calls and run USSD codes from the iPhone | Setup |
+| `CALL_PHONE` | Place calls (including to your voicemail) and run USSD and call-settings codes from the iPhone | Setup |
 | `ANSWER_PHONE_CALLS` | Answer, decline and end calls from the iPhone | Setup |
 | `CALL_COMPANION_APP` | Receive call events as a companion app | Install |
 | `READ_CALL_LOG` | The caller's number on Android 12+, call history on the iPhone, missed vs declined | Setup, optional |

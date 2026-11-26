@@ -474,6 +474,26 @@ class CallTracker(
         }
     }
 
+    /**
+     * Calls the voicemail of the SIM in [sim] (`call.dial` with `voicemail: true`, D-082). Android looks up the
+     * carrier's voicemail number itself; without one it says so on this phone.
+     */
+    @SuppressLint("MissingPermission")
+    fun dialVoicemail(sim: Int?) {
+        requirePermission(Manifest.permission.CALL_PHONE)
+        val subId = sims.subIdFor(sim, SimDirectory.Purpose.VOICE)
+        if (sim != null && subId == null) throw RequestException(ErrorCode.INVALID, "no SIM in that slot")
+        val extras = Bundle()
+        subId?.let { sims.phoneAccountFor(it) }?.let { extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, it) }
+        lastDial = null
+        try {
+            telecom().placeCall(Uri.fromParts("voicemail", "", null), extras)
+            Log.i(TAG, "voicemail called (SIM ${sim?.let { it + 1 } ?: "default"})")
+        } catch (e: SecurityException) {
+            throw RequestException(ErrorCode.PERMISSION, "CALL_PHONE not granted")
+        }
+    }
+
     private fun <R> onCall(id: String, block: (Tracked) -> R): R {
         val result = executor.submit {
             val t = calls[id] ?: throw RequestException(ErrorCode.INVALID, "no such call")
