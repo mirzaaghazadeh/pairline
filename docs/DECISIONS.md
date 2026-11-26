@@ -1221,7 +1221,10 @@ service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch
 - **Web auth tokens are not single-use.** A token from `CKFetchWebAuthTokenOperation` works for many requests; each
   response returns a refreshed token in `X-Apple-CloudKit-Web-Auth-Token` that works only once its trailing `__` is
   removed; a refreshed chain holds. An unused token still worked after 4 hours, and a chain refreshed every 20
-  minutes kept working (Apple's archived reference says 30 minutes; that no longer holds).
+  minutes kept working for 5 hours (Apple's archived reference says 30 minutes; that no longer holds). Both ended
+  only when "Access iCloud Data on the Web" was switched off and on, which cancels every web token of the account;
+  longer lifetimes are unmeasured. The bridge uses its token every few minutes, and the iPhone sends a fresh one every
+  12 hours and whenever the bridge stops reading, so neither limit is reached.
 - **Blocker: the private database is refused** on the maintainer's account, which has no Advanced Data Protection
   and has "Access iCloud Data on the Web" on. Tokens from the iPhone get HTTP 403 `ACCESS_DENIED`, "private db
   access disabled for this account"; a token from Apple's web sign-in for the same user (a second, Development-only
