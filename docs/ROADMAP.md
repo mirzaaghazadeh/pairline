@@ -48,9 +48,9 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
       notification while the user is in Android Settings, on top of the wizard's animated illustrations
 - [x] Readable diagnostics screen with a "Share report" action that shows the exact text first
 - [x] Bridge app version in `status`; the iPhone tells the user when the Android app needs an update (no network)
-- [ ] Auto-reconnect after the Bluetooth link drops; optional, opt-in Bluetooth restart (Pairline's helper) when
+- [x] Auto-reconnect after the Bluetooth link drops; optional, opt-in Bluetooth restart (Pairline's helper) when
       it's stuck — iOS done (pending connect + scanning, backoff, idle watchdog); Android re-advertises after a drop
-      and runs keep-alive / handshake timeouts. The Bluetooth restart through the helper isn't built
+      and runs keep-alive / handshake timeouts; the opt-in restart is in Settings › Advanced (D-078)
 
 ## M2 — SMS
 
@@ -134,9 +134,9 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
       Bluetooth session with each platform's own codec, audio ahead of other traffic, a fast connection during the
       call; iPhone Settings › Call audio chooses Bluetooth (default) or Wi-Fi first — unit-tested on both sides and
       on the Simulator against the fake bridge; **real phones pending**
-- [ ] Test call with "Did you hear it?" feedback; automatic choice of the audio method (`call.media.feedback`
-      flips capture source and bridge-mic muting — bridge side done, iPhone prompt pending); known-device list
-      shipped inside the app (never fetched)
+- [x] Test call with "Did you hear it?" feedback; automatic choice of the audio method (`call.media.feedback`
+      flips capture source and bridge-mic muting; the iPhone asks after a relayed call, D-078) — a known-device list
+      shipped inside the app waits for real-device results
 - [x] Root mode in Settings › Advanced (D-075): the same helper started as the shell user with `su`, so a rooted
       phone needs no Wireless debugging and keeps Talk on iPhone after a restart without Wi-Fi — real-phone test pending
 - [x] Clean fallback to "audio on the Android phone" when a device isn't supported: caps `call.media` /

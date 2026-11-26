@@ -45,7 +45,8 @@ one, stop and ask the maintainer instead of working around it.
    or "Forget pairing" ends this and returns the permission. The iPhone's internet switches (D-073, the maintainer's
    decision) are the user asking: while Talk on iPhone's helper runs, the Android phone's hotspot, Bluetooth
    tethering, mobile data and data SIM change when, and only when, the user flips that switch on the iPhone; the
-   same holds for the ringer mode and Find phone's alarm volume (put back after), D-074.
+   same holds for the ringer mode and Find phone's alarm volume (put back after), D-074, and for turning Bluetooth
+   off and on when it's stuck, only with the user's opt-in in Settings › Advanced (D-078).
    Nothing else is ever changed.
 6. **Never install updates silently.** Android updates go through the system package-installer
    confirmation. Privileged (shell/root) access must never be used for `pm install`.

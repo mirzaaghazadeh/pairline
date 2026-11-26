@@ -66,4 +66,10 @@ interface IPrivilegedService {
      * phone too (D-074); otherwise only the default messaging app may write. Refuses any other package.
      */
     boolean allowWriteSms(String packageName, boolean allow) = 13;
+
+    /**
+     * Turns Bluetooth off and on again, only when the user turned on "Restart Bluetooth when stuck" and Android's
+     * Bluetooth keeps failing to advertise (D-078). Returns whether Bluetooth is back on.
+     */
+    boolean restartBluetooth() = 14;
 }

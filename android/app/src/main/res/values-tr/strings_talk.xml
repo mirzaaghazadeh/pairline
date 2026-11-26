@@ -124,6 +124,8 @@
     <string name="settings_advanced">Gelişmiş</string>
     <string name="settings_root">Root modu</string>
     <string name="settings_root_sub">Yalnızca root’lu telefonlar için. iPhone’dan konuşma’nın yardımcısı Kablosuz hata ayıklama yerine root uygulamanız (Magisk, KernelSU…) üzerinden başlar: Geliştirici seçenekleri gerekmez ve yeniden başlatmadan sonra Wi-Fi olmadan da çalışmaya devam eder. Önceki gibi sınırlı yetkilerle çalışır, root olarak değil. Root uygulamanız bir kez sorar.</string>
+    <string name="settings_bt_restart">Takılınca Bluetooth’u yeniden başlat</string>
+    <string name="settings_bt_restart_sub">Android’in Bluetooth’u bazen kapatıp açılana kadar çalışmaz. Bu açıksa ve iPhone’dan konuşma’nın yardımcısı çalışıyorsa, iPhone bağlı değilken Bluetooth sürekli hata verdiğinde Pairline bunu kendisi yapar, en fazla saatte bir. Bluetooth kulaklık ya da saat birkaç saniye sonra yeniden bağlanır.</string>
     <string name="settings_root_none">Bu telefonda root bulunamadı. iPhone’dan konuşma, root gerektirmeyen Kablosuz hata ayıklamayı kullanır.</string>
     <string name="talk_root_title">Yardımcıyı root ile başlat</string>
     <string name="talk_root_idle">iPhone’dan konuşma açıkken kendiliğinden başlar.</string>

@@ -150,6 +150,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getBoolean(NET_SHARE_DIRECT_IR, false)
         set(value) = edit { putBoolean(NET_SHARE_DIRECT_IR, value) }
 
+    /** Settings › Advanced › Restart Bluetooth when stuck (D-078, opt-in, needs the helper). */
+    var bluetoothRestart: Boolean
+        get() = prefs.getBoolean(BLUETOOTH_RESTART, false)
+        set(value) = edit { putBoolean(BLUETOOTH_RESTART, value) }
+
     /** Apps whose notifications are mirrored to the iPhone (package names, D-077). Empty: none. */
     var mirrorApps: Set<String>
         get() = prefs.getStringSet(MIRROR_APPS, null).orEmpty().toSet()
@@ -190,6 +195,7 @@ class AppPrefs(context: Context) {
         const val TALK_ON_IPHONE = "talk_on_iphone"
         const val ROOT_MODE = "root_mode"
         const val MIRROR_APPS = "mirror_apps"
+        const val BLUETOOTH_RESTART = "bluetooth_restart"
         const val ADB_PAIRED = "adb_paired"
         const val BRIDGE_STOPPED = "bridge_stopped"
         const val AUDIO_SOURCE = "audio_capture_source"

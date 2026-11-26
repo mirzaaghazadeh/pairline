@@ -569,6 +569,17 @@ private fun AdvancedSection() {
             onClick = if (available || on) ({ setRootMode(!on) }) else null,
             trailing = { Switch(checked = on, enabled = available || on, onCheckedChange = { setRootMode(it) }) },
         )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        // D-078: Bluetooth off and on when Android's stack is stuck; needs Talk on iPhone's helper.
+        val restart = remember(prefsTick) { prefs.bluetoothRestart }
+        ListRow(
+            title = stringResource(R.string.settings_bt_restart),
+            subtitle = stringResource(R.string.settings_bt_restart_sub),
+            icon = PIcons.Bluetooth,
+            iconTone = if (restart) Tone.GOOD else Tone.NEUTRAL,
+            onClick = { prefs.bluetoothRestart = !restart },
+            trailing = { Switch(checked = restart, onCheckedChange = { prefs.bluetoothRestart = it }) },
+        )
     }
 }
 

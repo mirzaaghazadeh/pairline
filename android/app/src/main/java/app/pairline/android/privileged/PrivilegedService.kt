@@ -41,7 +41,8 @@ import org.json.JSONObject
  *   app-op, let Pairline write secure settings (D-059), capture the call's audio, feed audio into the call, silence
  *   this phone's earpiece and ringer during a relayed call, and, when the user flips the switch on the iPhone,
  *   start or stop the phone's hotspot or Bluetooth tethering, turn mobile data on or off, or pick the data SIM
- *   (D-073), and give Pairline its WRITE_SMS app-op so reading on the iPhone marks messages read here (D-074).
+ *   (D-073), give Pairline its WRITE_SMS app-op so reading on the iPhone marks messages read here (D-074), and,
+ *   with the user's opt-in, restart Bluetooth when Android's Bluetooth is stuck (D-078).
  * - The microphone mute and earpiece silence it sets during a relayed call are restored by [stopAudio], or when
  *   Pairline's process ends; the app-op and the permission are set only once the user turned on "Talk on iPhone".
  * - It writes no logs: errors go back to the app as exceptions, and the app logs them (redacted) in its own log.
@@ -375,6 +376,18 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
         return run(CMD, "appops", "set", packageName, "WRITE_SMS", if (allow) "allow" else "default")
     }
 
+    /**
+     * Bluetooth off and on with Android's own commands, when its stack is stuck (D-078; the app asks only with the
+     * user's opt-in). `cmd bluetooth_manager` on Android 12+, `svc bluetooth` before.
+     */
+    override fun restartBluetooth(): Boolean {
+        checkCaller()
+        val off = run(CMD, "bluetooth_manager", "disable") || run(SVC, "bluetooth", "disable")
+        if (!off) return false
+        Thread.sleep(BLUETOOTH_PAUSE_MS)
+        return run(CMD, "bluetooth_manager", "enable") || run(SVC, "bluetooth", "enable")
+    }
+
     /** Pairline's process ended: give the call back its microphone and earpiece. Helper-internal, not on the binder. */
     fun releaseAudio() = synchronized(lock) { stopLocked() }
 
@@ -592,9 +605,10 @@ class PrivilegedService(private val context: Context) : IPrivilegedService.Stub(
          * Bump when [IPrivilegedService] or what the helper does changes, so the app replaces a running older helper
          * (one keeps running across app updates). 4: recorders and players made as the helper (D-065).
          * 5: silenceRinger (D-066). 6: silenceRinger as the shell package. 7: the iPhone's internet switches (D-073).
-         * 8: allowWriteSms (D-074).
+         * 8: allowWriteSms (D-074). 9: restartBluetooth (D-078).
          */
-        const val VERSION = 8
+        const val VERSION = 9
+        private const val BLUETOOTH_PAUSE_MS = 3_000L
 
         /** Not a MediaRecorder source: Android 13's call-audio interception API ([openInterceptRecord]). */
         const val SOURCE_INTERCEPT = 100

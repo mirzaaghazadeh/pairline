@@ -60,6 +60,7 @@ class LinkService : Service() {
 
         val bleTransport = BleTransport(this, link, { graph.identity.deviceId }) { bt, advertising ->
             link.updateState { it.copy(bluetooth = bt, advertising = advertising) }
+            BluetoothRecovery.onStatus(bt)
         }
         ble = bleTransport
         transports = listOf(bleTransport) + ExtraTransports.create(this, link)

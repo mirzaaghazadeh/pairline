@@ -430,6 +430,11 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
 
     fun setDataSubscription(subId: Int): Boolean? = service?.setDataSubscription(subId)
 
+    /** Bluetooth off and on (D-078, opt-in). Null without the helper. Off the main thread. */
+    fun restartBluetooth(): Boolean? = service?.let { s ->
+        runCatching { s.restartBluetooth() }.onFailure { Log.w(TAG, "couldn't restart Bluetooth", it) }.getOrDefault(false)
+    }
+
     /** Read sync (D-074): Pairline's WRITE_SMS app-op, given with Talk on iPhone. Off the main thread. */
     fun allowWriteSms(): Boolean {
         if (canWriteSms()) return true

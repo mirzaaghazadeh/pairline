@@ -1299,3 +1299,14 @@ The maintainer asked for a Mac app; the iPad app runs on Apple Silicon Macs as i
 - **iPhone:** a local notification per mirrored one, grouped by app, title and app name, text unless "Show message
   text" is off.
 - **Tested:** unit tests (caps, decoding), both apps build and lint clean; needs a real phone.
+
+### D-078 — Restart Bluetooth when stuck (opt-in, Settings › Advanced) (2026-11-26)
+
+- Android's Bluetooth stack sometimes stops advertising until Bluetooth is turned off and on. With "Restart Bluetooth
+  when stuck" on (off by default) and Talk on iPhone's helper running, three advertising failures within ten minutes
+  while the iPhone isn't linked make the helper run `cmd bluetooth_manager disable`/`enable` (`svc bluetooth` before
+  Android 12), at most once an hour. Failures during a connection don't count: some chips can't advertise while
+  connected. Helper version 9; rule 5 lists it as a setting changed only with the user's opt-in.
+- The "Did you hear it?" test after a relayed call is in place on the iPhone (`call.media.feedback`, the bridge picks
+  the capture source and mic handling); the roadmap item is closed except for a shipped list of known devices, which
+  needs real-device results first.
