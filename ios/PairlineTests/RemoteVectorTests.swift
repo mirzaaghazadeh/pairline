@@ -3,7 +3,7 @@ import XCTest
 @testable import Pairline
 
 /// Reproduces every value in protocol/test-vectors/v1-remote.json with CryptoKit (PROTOCOL.md, "Remote mode (v1,
-/// D-080)"). The identity keys sB and sR come from v0.json.
+/// D-092)"). The identity keys sB and sR come from v0.json.
 final class RemoteVectorTests: XCTestCase {
     private static func load(_ name: String) -> [String: Any] {
         let url = Bundle(for: RemoteVectorTests.self).url(forResource: name, withExtension: "json")!

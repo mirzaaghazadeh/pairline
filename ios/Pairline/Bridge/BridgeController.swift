@@ -71,13 +71,13 @@ final class BridgeController: ObservableObject {
         // Call audio (M6) rides on the Wi-Fi session's media channel (M5); nil while there's no open channel.
         calls.mediaTransport = { [weak link] in (link as? LinkManager)?.mediaChannel as? AudioPacketTransport }
         // …or inside the Bluetooth session, as Opus (D-072); Settings › Call audio picks which one a call tries first.
-        // Away from home, inside remote mode's direct connection instead (D-080).
+        // Away from home, inside remote mode's direct connection instead (D-092).
         calls.linkTransport = { [weak link] in
             guard let manager = link as? LinkManager, let channel = manager.linkMediaChannel,
                   let lane = manager.linkMediaLane else { return nil }
             return (channel, lane)
         }
-        // In the background the direct connection stays only for a call (D-080); when the call ends, it goes.
+        // In the background the direct connection stays only for a call (D-092); when the call ends, it goes.
         if let manager = link as? LinkManager {
             manager.keepsDirectInBackground = { [weak calls] in calls?.current != nil }
             calls.onCallPresenceChange = { [weak manager] active in if !active { manager?.backgroundCheck() } }
@@ -137,10 +137,10 @@ final class BridgeController: ObservableObject {
         return !RemoteFeature.compatibleVersions.contains(proto)
     }
 
-    /// The bridge speaks remote mode (D-080): it sent `proto` 1 or later.
+    /// The bridge speaks remote mode (D-092): it sent `proto` 1 or later.
     var bridgeSupportsRemote: Bool { (deviceInfo?.proto ?? 0) >= 1 }
 
-    /// The live session is remote mode's direct connection (D-080): the UI says "Direct connection".
+    /// The live session is remote mode's direct connection (D-092): the UI says "Direct connection".
     var isDirect: Bool { phase.isConnected && transports == [.direct] }
 
     func requestPaywall() { onPaywallRequest?() }
@@ -149,14 +149,16 @@ final class BridgeController: ObservableObject {
 
     private func phaseChanged(_ phase: LinkPhase) {
         let wasRemote = self.phase == .remote
+        let wasConnected = self.phase.isConnected
         self.phase = phase
+        if mode == .real { watchLeftBehind(wasConnected: wasConnected, now: phase) }
         transports = link.activeTransports
         if phase != .connected {
             latencyTimer?.invalidate()
             latencyTimer = nil
             calls.linkLost()
         }
-        // Remote mode (D-080): texts written while the bridge was away go through iCloud.
+        // Remote mode (D-092): texts written while the bridge was away go through iCloud.
         if phase == .remote, !wasRemote, canUseLink { Task { await flushOutbox() } }
         saveWidget()
     }
@@ -167,6 +169,8 @@ final class BridgeController: ObservableObject {
                 applyStatus(s)
             }
             await sync()
+            deleteOldCodes()
+            await reconcileScheduled()
             await flushOutbox()
             await refreshBlockList()
             await measureLatency()
@@ -204,6 +208,10 @@ final class BridgeController: ObservableObject {
             // Through iCloud the notification service extension may have shown it already.
             for stored in inserted where !stored.isOutgoing && !inbound.alreadyShown {
                 notify(stored)
+                // The newest code in the Dynamic Island for two minutes (D-083).
+                if Date().timeIntervalSince(stored.time) < 10 * 60, let code = OTPDetector.code(in: stored.body) {
+                    BridgeLiveActivity.shared.showCode(code, for: self)
+                }
             }
             if !inserted.isEmpty { Haptics.soft() }
             updateBadge()
@@ -223,9 +231,12 @@ final class BridgeController: ObservableObject {
         case .netShare(let info) where inbound.id == nil:
             // The bridge stopped sharing by itself (its user turned it off).
             netShare = info
-        case .blockList(let list):
+        case .blockList(let list, let unknown):
             // Changed in the bridge app itself.
-            applyBlockList(list)
+            applyBlockList(list, unknown: unknown)
+        case .remoteRing(let on):
+            // The bridge's user is looking for this iPhone (D-084).
+            if mode == .real { on ? IPhoneRinger.shared.start() : IPhoneRinger.shared.stop() }
         default:
             break
         }
@@ -234,6 +245,7 @@ final class BridgeController: ObservableObject {
     private func applyStatus(_ s: BridgeStatus) {
         status = s
         statusUpdatedAt = Date()
+        if mode == .real { noticeVoicemail(s) }
         if let level = s.battery?.level, s.battery?.charging != true {
             if level <= 15, !lowBatteryNotified, mode == .real {
                 lowBatteryNotified = true
@@ -244,6 +256,264 @@ final class BridgeController: ObservableObject {
         }
         saveWidget()
         requestMicrophoneIfNeeded(s)
+        if mode == .real { Task { await refreshDataUsage(force: false) } }
+    }
+
+    // MARK: - Picture and group messages (D-089)
+
+    /// Sends text and/or a picture as an MMS to `recipients` (several make a group message). The picture goes first in
+    /// pieces of 24 KB, which fit any session, Bluetooth too. Needs the link now: MMS isn't queued in the outbox.
+    func sendMMS(to recipients: [String], body: String, image: Data?, imageType: String = "image/jpeg", sim: Int?,
+                 thread: Int64?) async throws {
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        guard has(.mms) else { throw ActionError.missingCapability(.mms) }
+        guard phase.isConnected else { throw LinkError.notConnected }
+        guard let first = recipients.first else { return }
+        let cid = "m-" + UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(16).lowercased()
+        var parts: [MMSPart] = []
+        if let image, let thumb = Self.thumbnail(image) {
+            parts = [MMSPart(pid: 0, type: imageType, name: "image.jpg", thumb: thumb)]
+        }
+        _ = db.insertPending(thread: thread, to: first, body: body, sim: sim, cid: cid, parts: parts, group: recipients)
+        Haptics.tap()
+        do {
+            var aid: String?
+            if let image {
+                let id = String(cid.dropFirst(2))
+                let chunk = 24_000
+                var seq = 0
+                for start in stride(from: 0, to: image.count, by: chunk) {
+                    let piece = image.subdata(in: start..<min(start + chunk, image.count))
+                    _ = try await link.request(.mmsAttach(aid: id, seq: seq, data: piece, last: start + chunk >= image.count,
+                                                          type: imageType, name: "image.jpg"))
+                    seq += 1
+                }
+                aid = id
+            }
+            _ = try await link.request(.mmsSend(cid: cid, sim: sim, to: recipients, body: body.isEmpty ? nil : body, aid: aid))
+            log.info("sms", "MMS handed to the bridge (\(recipients.count) recipient(s))")
+        } catch {
+            db.markFailed(cid: cid, error: error.localizedDescription)
+            Haptics.warning()
+            throw error
+        }
+    }
+
+    /// Asks the bridge for an MMS attachment; it arrives with the file transfer (Wi-Fi).
+    func fetchPart(of message: StoredMessage, _ part: MMSPart) async throws {
+        guard has(.mms) else { throw ActionError.missingCapability(.mms) }
+        _ = try await link.request(.mmsPart(key: message.key, pid: part.pid))
+    }
+
+    /// A ~128 px JPEG of a picture, base64, for the local copy of a sent MMS.
+    static func thumbnail(_ data: Data) -> String? {
+        guard let image = UIImage(data: data) else { return nil }
+        let scale = 128 / max(image.size.width, image.size.height, 1)
+        let size = CGSize(width: max(1, image.size.width * min(scale, 1)), height: max(1, image.size.height * min(scale, 1)))
+        let small = UIGraphicsImageRenderer(size: size).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+        return small.jpegData(compressionQuality: 0.5)?.base64EncodedString()
+    }
+
+    // MARK: - Scheduled messages (D-084)
+
+    /// Whether the bridge can send at the exact minute (Android's "Alarms & reminders"); from its last list.
+    @Published private(set) var scheduledExact = true
+
+    /// Gives the message to the bridge, which keeps it and sends it at `date` even if this iPhone is away then. The
+    /// conversation shows it with a clock until the bridge reports it sent.
+    @discardableResult
+    func scheduleSMS(to address: String, body: String, sim: Int?, thread: Int64?, at date: Date) async throws -> StoredMessage {
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        guard has(.smsSchedule) else { throw ActionError.missingCapability(.smsSchedule) }
+        guard phase.isConnected else { throw LinkError.notConnected }
+        let cid = "s-" + UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(16).lowercased()
+        _ = try await link.request(.smsSchedule(cid: cid, sim: sim, to: address, body: body, at: date.milliseconds))
+        let message = db.insertScheduled(thread: thread, to: address, body: body, sim: sim, cid: cid, at: date)
+        log.info("sms", "Message scheduled on the bridge")
+        Haptics.success()
+        Task { await reconcileScheduled() }
+        return message
+    }
+
+    /// Takes it back from the bridge, then deletes it here. When it already went, the list says what became of it.
+    func cancelScheduled(_ message: StoredMessage) async throws {
+        guard let cid = message.cid else { return }
+        do {
+            _ = try await link.request(.smsUnschedule(cid: cid))
+            db.deleteMessages(keys: [message.key])
+        } catch {
+            await reconcileScheduled()
+            throw error
+        }
+    }
+
+    /// After a reconnect: messages the bridge sent while this iPhone was away get their real state and key, and a
+    /// scheduled message the bridge no longer knows (its app data was cleared) is marked as not sent.
+    func reconcileScheduled() async {
+        guard mode == .real, has(.smsSchedule), phase.isConnected,
+              let reply = try? await link.request(.smsScheduled), case .smsScheduled(let list) = reply.message else { return }
+        scheduledExact = list.exact
+        for done in list.done {
+            // "pending": handed to the radio, its result not in yet; it isn't waiting here any more either way.
+            let state = done.state == "pending" ? .sent : (MessageState(rawValue: done.state) ?? .sent)
+            db.updateState(cid: done.cid, state: state, key: done.key, error: done.error)
+        }
+        let known = Set(list.items.map(\.cid)).union(list.done.map(\.cid))
+        for message in db.scheduledMessages() {
+            guard let cid = message.cid, !known.contains(cid) else { continue }
+            db.updateState(cid: cid, state: .failed, key: nil,
+                           error: String(localized: "The Android phone no longer has this scheduled message.", table: "Extras"))
+        }
+    }
+
+    // MARK: - Mobile data meter (D-084)
+
+    struct DataUsageInfo: Equatable {
+        var bytes: Int64
+        var since: Date
+        var fetched: Date
+    }
+
+    @Published private(set) var dataUsage: DataUsageInfo?
+    /// Why the meter has no figure: nil, `permission` (Usage access not given) or `unsupported` (an older bridge).
+    @Published private(set) var dataUsageProblem: String?
+    private var lastDataAttempt: Date?
+
+    /// The start of the current data month, from the day in Settings (1–28).
+    nonisolated static func dataCycleStart(day: Int, now: Date = Date(), calendar: Calendar = .current) -> Date {
+        let day = min(max(day, 1), 28)
+        var parts = calendar.dateComponents([.year, .month, .day], from: now)
+        let today = parts.day ?? 1
+        parts.day = day
+        let thisMonth = calendar.date(from: parts) ?? now
+        return today >= day ? thisMonth : (calendar.date(byAdding: .month, value: -1, to: thisMonth) ?? thisMonth)
+    }
+
+    /// Asks the bridge for this month's mobile data: at most every 15 minutes unless forced (the card, pull to refresh).
+    func refreshDataUsage(force: Bool) async {
+        guard mode == .real, canUseLink, phase.isConnected else { return }
+        guard force || has(.dataUsage) else { return }
+        if !force, let last = lastDataAttempt, Date().timeIntervalSince(last) < 15 * 60 { return }
+        lastDataAttempt = Date()
+        let since = Self.dataCycleStart(day: AppSettings.shared.dataCycleDay)
+        do {
+            let reply = try await link.request(.dataUsage(since: since.milliseconds))
+            guard case .dataUsage(let usage) = reply.message else { return }
+            dataUsage = DataUsageInfo(bytes: usage.bytes, since: since, fetched: Date())
+            dataUsageProblem = nil
+            checkDataLimit()
+        } catch LinkError.bridge(let error) {
+            dataUsageProblem = error.code
+        } catch {
+            log.warning("data", "Data usage unavailable: \(error.localizedDescription)")
+        }
+    }
+
+    /// One notification at 80% and one at 100% of the limit, per data month.
+    private func checkDataLimit() {
+        let limitGB = AppSettings.shared.dataLimitGB
+        guard limitGB > 0, let usage = dataUsage else { return }
+        let ratio = Double(usage.bytes) / (Double(limitGB) * 1_000_000_000)
+        let month = Int(usage.since.timeIntervalSince1970)
+        let defaults = UserDefaults.standard
+        for step in [100, 80] where ratio * 100 >= Double(step) {
+            let key = "data.alerted.\(step)"
+            if defaults.integer(forKey: key) != month {
+                defaults.set(month, forKey: key)
+                if step == 100 { defaults.set(month, forKey: "data.alerted.80") }
+                Notifier.shared.notifyDataUsage(percent: step, bytes: usage.bytes)
+            }
+            break
+        }
+    }
+
+    // MARK: - Left behind and old codes (D-083)
+
+    /// The link dropped: a notification waits a few minutes and is withdrawn if the link comes back first. Not when
+    /// this iPhone's own Bluetooth is off or unpaired, locked or not allowed: the user knows why then.
+    private func watchLeftBehind(wasConnected: Bool, now: LinkPhase) {
+        switch now {
+        // Cloud mode (D-092): apart but still linked through iCloud, which is what it's for; nothing was left behind.
+        case .connected, .remote, .notPaired, .locked, .bluetoothOff, .bluetoothUnauthorized, .bluetoothUnsupported,
+             .pairing:
+            Notifier.shared.cancelLeftBehind()
+        case .searching, .securing, .waiting:
+            if wasConnected, canUseLink { Notifier.shared.scheduleLeftBehind() }
+        }
+    }
+
+    private static let codesScannedKey = "messages.codesScannedUntil"
+
+    /// With "Delete codes after a day" on: received one-time codes older than 24 hours go from this iPhone (they stay
+    /// on the Android phone, like every message deleted here). Each message is looked at once: the scan remembers how
+    /// far it got. The text check runs off the main thread, since the first run may cover the whole history.
+    func deleteOldCodes() {
+        guard AppSettings.shared.deleteOldCodes, mode == .real else { return }
+        let defaults = UserDefaults.standard
+        let from = Date(timeIntervalSince1970: defaults.double(forKey: Self.codesScannedKey))
+        let until = Date().addingTimeInterval(-24 * 3600)
+        guard until > from else { return }
+        let candidates = db.receivedMessages(after: from, before: until).map { ($0.key, $0.body) }
+        Task.detached(priority: .utility) {
+            let keys = candidates.filter { OTPDetector.code(in: $0.1) != nil }.map(\.0)
+            await MainActor.run {
+                if !keys.isEmpty {
+                    self.deleteMessages(keys)
+                    log.info("sms", "Deleted \(keys.count) one-time code(s) older than a day")
+                }
+                defaults.set(until.timeIntervalSince1970, forKey: Self.codesScannedKey)
+            }
+        }
+    }
+
+    /// The setting was turned on: start from the beginning of the history.
+    static func resetCodeScan() {
+        UserDefaults.standard.removeObject(forKey: codesScannedKey)
+    }
+
+    // MARK: - Voicemail and balance (D-082)
+
+    private static let voicemailNotifiedKey = "voicemail.notified"
+
+    /// One notification each time a SIM's voicemail indicator turns on; remembered across launches so a relaunch
+    /// doesn't repeat it, and forgotten when the indicator goes off (the voicemail was heard).
+    private func noticeVoicemail(_ s: BridgeStatus) {
+        let defaults = UserDefaults.standard
+        var notified = Set((defaults.array(forKey: Self.voicemailNotifiedKey) as? [Int]) ?? [])
+        let waiting = Set((s.sims ?? []).filter { $0.vm == true }.map(\.slot))
+        for slot in waiting.subtracting(notified) {
+            Notifier.shared.notifyVoicemail(simName: isDualSIM ? simLabel(slot) : nil)
+        }
+        let known = Set((s.sims ?? []).map(\.slot))
+        notified = waiting.union(notified.subtracting(known))
+        defaults.set(Array(notified), forKey: Self.voicemailNotifiedKey)
+    }
+
+    /// The last reply to the balance code (D-082). Kept in memory only, like every USSD reply.
+    struct BalanceReply: Equatable {
+        var code: String
+        var result: USSDResult
+        var at: Date
+    }
+
+    @Published private(set) var balance: BalanceReply?
+
+    /// Runs the code the user chose as their balance code, on the SIM it was chosen for.
+    @discardableResult
+    func checkBalance() async throws -> USSDResult? {
+        let settings = AppSettings.shared
+        guard !settings.balanceUSSDCode.isEmpty else { return nil }
+        let sim = settings.balanceUSSDSim >= 0 && sims.contains(where: { $0.slot == settings.balanceUSSDSim })
+            ? settings.balanceUSSDSim : effectiveSim(forSMS: false)
+        let result = try await runUSSD(code: settings.balanceUSSDCode, sim: sim)
+        balance = BalanceReply(code: settings.balanceUSSDCode, result: result, at: Date())
+        return result
     }
 
     /// The bridge just offered "Talk on iPhone": ask for the microphone now, while the app is open, rather than in
@@ -463,7 +733,7 @@ final class BridgeController: ObservableObject {
     }
 
     func retry(_ message: StoredMessage) {
-        guard let cid = message.cid else { return }
+        guard let cid = message.cid, !message.isLocalMMS else { return }
         guard canUseLink else { return requestPaywall() }
         db.updateState(cid: cid, state: .pending, key: nil, error: nil)
         Task { await deliver(message) }
@@ -488,6 +758,13 @@ final class BridgeController: ObservableObject {
         for conversation in db.conversations() {
             for message in db.messages(thread: conversation.thread)
             where message.state == .pending && message.key.hasPrefix("local:") {
+                if message.isLocalMMS {
+                    // A picture or group message needs the link when it's sent (D-089); one left waiting failed.
+                    if let cid = message.cid {
+                        db.markFailed(cid: cid, error: String(localized: "Not sent. Send it again.", table: "MMS"))
+                    }
+                    continue
+                }
                 await deliver(message)
             }
         }
@@ -610,9 +887,23 @@ final class BridgeController: ObservableObject {
     /// Fetches the bridge's list (after every connect).
     func refreshBlockList() async {
         guard canUseLink, phase.isConnected, has(.block) else { return }
-        if let reply = try? await link.request(.blockList), case .blockList(let list) = reply.message {
-            applyBlockList(list)
+        if let reply = try? await link.request(.blockList), case .blockList(let list, let unknown) = reply.message {
+            applyBlockList(list, unknown: unknown)
         }
+    }
+
+    /// "Silence unknown callers", as the bridge phone has it (D-085).
+    @Published private(set) var silenceUnknown = false
+
+    func setSilenceUnknown(_ on: Bool) async throws {
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        guard has(.callScreen) else { throw ActionError.missingCapability(.callScreen) }
+        let reply = try await link.request(.blockSilenceUnknown(on))
+        if case .blockList(let list, let unknown) = reply.message { applyBlockList(list, unknown: unknown) }
+        log.info("block", "Silence unknown callers \(on ? "on" : "off")")
     }
 
     /// Blocks or unblocks numbers (or sender names) on the bridge phone, which keeps the list that counts.
@@ -625,12 +916,13 @@ final class BridgeController: ObservableObject {
         guard status == nil || has(.block) else { throw ActionError.missingCapability(.block) }
         let message: Outbound = blocked ? .blockSet(add: numbers, remove: []) : .blockSet(add: [], remove: numbers)
         let reply = try await link.request(message)
-        if case .blockList(let list) = reply.message { applyBlockList(list) }
+        if case .blockList(let list, let unknown) = reply.message { applyBlockList(list, unknown: unknown) }
         log.info("block", blocked ? "Blocked \(numbers.count) number(s)" : "Unblocked \(numbers.count) number(s)")
         Haptics.success()
     }
 
-    private func applyBlockList(_ list: [BlockedNumber]) {
+    private func applyBlockList(_ list: [BlockedNumber], unknown: Bool? = nil) {
+        if let unknown { silenceUnknown = unknown }
         guard list != blockedNumbers else { return }
         blockedNumbers = list
         db.setBlockedNumbers(list)

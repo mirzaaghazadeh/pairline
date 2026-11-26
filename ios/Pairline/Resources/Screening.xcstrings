@@ -1,0 +1,46 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Call screening" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فحص المكالمات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call screening" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بررسی تماس‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama filtreleme" } }
+      }
+    },
+    "Calls from numbers that aren't in your contacts ring neither phone. They go to voicemail and show as missed. Blocked numbers don't ring at all." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا ترنّ على أيٍّ من الهاتفين مكالماتُ الأرقام غير الموجودة في جهات اتصالك؛ تذهب إلى البريد الصوتي وتظهر فائتة. والأرقام المحظورة لا ترنّ أبدًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls from numbers that aren't in your contacts ring neither phone. They go to voicemail and show as missed. Blocked numbers don't ring at all." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس شماره‌هایی که در مخاطبان شما نیستند روی هیچ‌کدام از دو گوشی زنگ نمی‌خورد؛ به پست صوتی می‌رود و بی‌پاسخ نشان داده می‌شود. شماره‌های مسدود اصلاً زنگ نمی‌خورند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kişilerinizde olmayan numaralardan gelen aramalar iki telefonda da çalmaz; sesli mesaja gider ve cevapsız olarak görünür. Engellenen numaralar hiç çalmaz." } }
+      }
+    },
+    "End a number with * to block every number that starts with it, for example +234*." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أنهِ الرقم بـ * لحظر كل رقم يبدأ به، مثلًا ‎+234*‎." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "End a number with * to block every number that starts with it, for example +234*." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شماره را با * تمام کنید تا همهٔ شماره‌هایی که با آن شروع می‌شوند مسدود شوند، مثلاً ‎+234*‎." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bir numarayı * ile bitirin; onunla başlayan tüm numaralar engellenir, örneğin +234*." } }
+      }
+    },
+    "In Pairline Bridge › Blocked numbers on your Android phone, make it the call-screening app (Android 10 or later)." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في Pairline Bridge › الأرقام المحظورة على هاتف أندرويد، اجعله تطبيق فحص المكالمات (أندرويد 10 أو أحدث)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "In Pairline Bridge › Blocked numbers on your Android phone, make it the call-screening app (Android 10 or later)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی، در Pairline Bridge › شماره‌های مسدود، آن را برنامهٔ بررسی تماس کنید (اندروید ۱۰ یا جدیدتر)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda Pairline Bridge › Engellenen numaralar’da onu arama filtreleme uygulaması yapın (Android 10 veya üstü)." } }
+      }
+    },
+    "Silence unknown callers" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إسكات المتصلين المجهولين" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Silence unknown callers" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بی‌صدا کردن تماس‌گیرندگان ناشناس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bilinmeyen arayanları sessize al" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

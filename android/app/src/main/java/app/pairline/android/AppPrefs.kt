@@ -26,6 +26,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getBoolean(CONTACTS_ADD, false)
         set(value) = edit { putBoolean(CONTACTS_ADD, value) }
 
+    /** The iPhone may browse this phone's photos and fetch them over Wi-Fi (D-088). Off by default (PRIVACY.md). */
+    var photosEnabled: Boolean
+        get() = prefs.getBoolean("photosEnabled", false)
+        set(value) = edit { putBoolean("photosEnabled", value) }
+
     /** The Wi-Fi link (M5): listen on the local network for the paired iPhone. On by default (PRIVACY.md). */
     var wifiLinkEnabled: Boolean
         get() = prefs.getBoolean(WIFI_LINK, true)
@@ -41,6 +46,14 @@ class AppPrefs(context: Context) {
         get() = prefs.getString(LANGUAGE, "") ?: ""
         set(value) = edit { putString(LANGUAGE, value) }
 
+    /**
+     * The language picked on first open from the phone's country (D-081): null before that check ran, "" when it
+     * picked nothing, else the tag it set. The setup's language step says so when it picked one.
+     */
+    var languageGuess: String?
+        get() = prefs.getString(LANGUAGE_GUESS, null)
+        set(value) = edit { putString(LANGUAGE_GUESS, value) }
+
     /** The paired iPhone's model name from its `device.info` (never a user-chosen name). */
     var peerName: String?
         get() = prefs.getString(PEER_NAME, null)
@@ -54,7 +67,7 @@ class AppPrefs(context: Context) {
         get() = prefs.getString(PEER_APP, null)
         set(value) = edit { putString(PEER_APP, value) }
 
-    /** The `proto` in the paired iPhone's `device.info`: 1 or more when it offers Cloud mode (D-080), else 0. */
+    /** The `proto` in the paired iPhone's `device.info`: 1 or more when it offers Cloud mode (D-092), else 0. */
     var peerProto: Int
         get() = prefs.getInt(PEER_PROTO, 0)
         set(value) = edit { putInt(PEER_PROTO, value) }
@@ -192,6 +205,7 @@ class AppPrefs(context: Context) {
         const val WIFI_LINK = "wifi_link"
         const val HOTSPOT_BAND = "hotspot_band"
         const val LANGUAGE = "language"
+        const val LANGUAGE_GUESS = "language_guess"
         const val PEER_NAME = "peer_name"
         const val PEER_OS = "peer_os"
         const val PEER_APP = "peer_app"

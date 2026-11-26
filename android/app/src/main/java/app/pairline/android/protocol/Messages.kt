@@ -40,6 +40,7 @@ object Msg {
     const val NOTIF_POSTED = "notif.posted"
     const val NOTIF_REMOVED = "notif.removed"
     const val NOTIF_DISMISS = "notif.dismiss"
+    const val NOTIF_REPLY = "notif.reply"
     const val CONTACTS_SYNC = "contacts.sync"
     const val CALLLOG_SYNC = "calllog.sync"
     const val CONTACTS_ADD = "contacts.add"
@@ -55,7 +56,23 @@ object Msg {
     const val BLOCK_LIST = "block.list"
     const val BLOCK_SET = "block.set"
 
-    // Remote mode (v1, D-080).
+    // D-084: messages sent later by the bridge, the mobile-data meter, and ringing the iPhone.
+    const val SMS_SCHEDULE = "sms.schedule"
+    const val SMS_UNSCHEDULE = "sms.unschedule"
+    const val SMS_SCHEDULED = "sms.scheduled"
+    const val DATA_USAGE = "data.usage"
+    const val REMOTE_RING = "remote.ring"
+
+    // D-088: the bridge phone's photos, browsed from the iPhone over Wi-Fi.
+    const val MEDIA_LIST = "media.list"
+    const val MEDIA_GET = "media.get"
+
+    // D-089: picture and group messages.
+    const val MMS_PART = "mms.part"
+    const val MMS_ATTACH = "mms.attach"
+    const val MMS_SEND = "mms.send"
+
+    // Remote mode (v1, D-092). `remote.ring` above is D-084's, not remote mode's.
     const val REMOTE_CONFIG = "remote.config"
     const val REMOTE_TOKEN = "remote.token"
     const val REMOTE_ADDR = "remote.addr"
@@ -121,19 +138,50 @@ object Caps {
     /** Notifications from apps the user chose are mirrored (`notif.posted`, notification access given, D-077). */
     const val NOTIF_MIRROR = "notif.mirror"
 
+    /**
+     * `call.dial` takes `voicemail: true`, `status.sims` carries `vm`, and USSD codes may carry a '+' number after a
+     * '*' for call forwarding (D-082).
+     */
+    const val CALL_VOICEMAIL = "call.voicemail"
+
+    /** Messages can be given to the bridge to send later (`sms.schedule`, D-084). */
+    const val SMS_SCHEDULE = "sms.schedule"
+
+    /** The bridge reports its mobile data use (`data.usage`, Usage access given, D-084). */
+    const val DATA_USAGE = "data.usage"
+
     /** Call-history entries can be deleted on the bridge too (D-043). */
     const val CALLLOG_DELETE = "calllog.delete"
 
     /** The bridge keeps a block list (D-043). */
     const val BLOCK = "block"
 
+    /**
+     * Pairline is Android's call-screening app (D-085): blocked numbers don't ring at all, and "Silence unknown
+     * callers" (`block.set` `unknown`) works.
+     */
+    const val CALL_SCREEN = "call.screen"
+
+    /** The iPhone may browse and fetch this phone's photos (opt-in, photo access given, D-088). */
+    const val MEDIA_PHOTOS = "media.photos"
+
+    /**
+     * Picture and group messages (D-089): `sms.history` and `sms.threads` include MMS, `mms.part` sends an attachment,
+     * and `mms.attach` / `mms.send` send one.
+     */
+    const val MMS = "mms"
+
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
-        SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CALL_HOLD, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK,
-        CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, NOTIF_MIRROR, WIFI, FILES, CALLLOG_DELETE,
-        BLOCK,
+        SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, SMS_SCHEDULE, MMS, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF,
+        CALL_AUDIO, CALL_HOLD, CALL_VOICEMAIL, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA,
+        CALL_MEDIA_TALK,
+        CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, NOTIF_MIRROR, DATA_USAGE, WIFI, FILES,
+        CALLLOG_DELETE, BLOCK, CALL_SCREEN, MEDIA_PHOTOS,
     )
+
+    /** What the iPhone can receive, in its `device.info` `caps`: `remote.ring` needs this (D-084). */
+    const val REMOTE_RING = "ring"
 }
 
 /** `error.code` values. */
@@ -206,7 +254,7 @@ object Messages {
         .putNullable("reason", reason)
 
     /**
-     * Where remote mode's direct connection listens (D-080): `v4` `"203.0.113.5:47830"`, `v6` `"[2001:db8::5]:47830"`,
+     * Where remote mode's direct connection listens (D-092): `v4` `"203.0.113.5:47830"`, `v6` `"[2001:db8::5]:47830"`,
      * either null.
      */
     fun remoteAddr(v4: String?, v6: String?): JSONObject = JSONObject()

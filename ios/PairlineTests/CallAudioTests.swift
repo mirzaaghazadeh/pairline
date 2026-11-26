@@ -81,7 +81,7 @@ final class CallAudioTests: XCTestCase {
         XCTAssertEqual(start?["call"] as? String, "c1")
         XCTAssertEqual(start?["talk"] as? Bool, false)
         // Over Wi-Fi it may go on any session; inside the link only on the session that carries the audio: Bluetooth,
-        // or remote mode's direct connection (D-080).
+        // or remote mode's direct connection (D-092).
         XCTAssertNil(Outbound.callMediaStart(.string("c1"), talk: true).lane)
         XCTAssertEqual(Outbound.callMediaStart(.string("c1"), talk: true, via: .link).lane, .primary)
         XCTAssertEqual(Outbound.callMediaStart(.string("c1"), talk: true, via: .link, linkLane: .direct).lane, .direct)

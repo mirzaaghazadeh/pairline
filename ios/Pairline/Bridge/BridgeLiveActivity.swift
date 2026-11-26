@@ -31,7 +31,33 @@ final class BridgeLiveActivity: ObservableObject {
     private var startedAt: Date?
     private var lastState: AnyHashable?
 
+    /// The code shown in the Dynamic Island (D-083) and copied by a tap on it (`pairline://code`).
+    private(set) var code: String?
+    private var codeExpiry: Task<Void, Never>?
+    static let codeLifetime: TimeInterval = 120
+
     private init() {}
+
+    /// A one-time code just arrived from `bridge`: show it in the Dynamic Island for two minutes, when the setting is on.
+    func showCode(_ code: String, for bridge: BridgeController) {
+        guard AppSettings.shared.codesInLiveActivity, bridge === self.bridge else { return }
+        self.code = code
+        refresh(inForeground: Self.inForeground)
+        codeExpiry?.cancel()
+        codeExpiry = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(Self.codeLifetime * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            self?.clearCode()
+        }
+    }
+
+    /// Copied or expired: back to the bridge status.
+    func clearCode() {
+        guard code != nil else { return }
+        code = nil
+        codeExpiry?.cancel()
+        refresh(inForeground: Self.inForeground)
+    }
 
     /// Follows this bridge (the real one, or the demo's while demo mode is on).
     func follow(_ bridge: BridgeController) {
@@ -66,18 +92,21 @@ final class BridgeLiveActivity: ObservableObject {
     private func refresh(inForeground: Bool) {
         guard #available(iOS 16.2, *) else { return }
         guard AppSettings.shared.bridgeLiveActivity, let bridge,
-              let state = BridgeActivityAttributes.ContentState(snapshot: bridge.statusSnapshot(),
+              var state = BridgeActivityAttributes.ContentState(snapshot: bridge.statusSnapshot(),
                                                                name: bridge.deviceInfo?.name) else {
             endAll()
             return
         }
+        state.code = AppSettings.shared.codesInLiveActivity ? code : nil
         let running = Activity<BridgeActivityAttributes>.activities.first {
             $0.activityState == .active && $0.attributes.isDemo == bridge.isDemo
         }
         if let running, !(inForeground && Self.shouldRenew(startedAt: startedAt, now: Date())) {
             guard AnyHashable(state) != lastState else { return }
             lastState = AnyHashable(state)
-            Task { await running.update(ActivityContent(state: state, staleDate: nil)) }
+            // While a code shows, the activity asks for the Dynamic Island ahead of other apps' (D-083).
+            let relevance: Double = state.code == nil ? 0 : 50
+            Task { await running.update(ActivityContent(state: state, staleDate: nil, relevanceScore: relevance)) }
             return
         }
         // From the background iOS doesn't start one; the next time Pairline is opened does.

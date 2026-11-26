@@ -21,8 +21,21 @@ final class AppSettings: ObservableObject {
     @AppStorage("messages.defaultSim") var defaultSMSSim = -1
     @AppStorage("calls.defaultSim") var defaultCallSim = -1
     @AppStorage("ussd.saved") var savedUSSDCodesRaw = ""
+    /// The saved code that checks the balance, shown as a card on the Bridge tab and run by `pairline://balance`
+    /// (D-082). Only this code can run from a link: a link can't carry a code of its own.
+    @AppStorage("ussd.balance") var balanceUSSDCode = ""
+    @AppStorage("ussd.balanceSim") var balanceUSSDSim = -1
     /// The bridge's signal, network and battery as a Live Activity on the Lock Screen and in the Dynamic Island (D-053).
     @AppStorage("liveActivity.bridge") var bridgeLiveActivity = true
+    /// The newest one-time code in that Live Activity's Dynamic Island for two minutes (D-083); never on the Lock Screen.
+    @AppStorage("liveActivity.codes") var codesInLiveActivity = true
+    /// Received one-time codes older than a day are deleted from this iPhone (D-083). Off until the user turns it on.
+    @AppStorage("messages.deleteOldCodes") var deleteOldCodes = false
+    /// A notification when the bridge phone stays out of reach for a few minutes (D-083).
+    @AppStorage("alerts.leftBehind") var leftBehindAlert = true
+    /// The data meter's month starts on this day (1–28), and warns at 80% and 100% of this many GB; 0 is no limit (D-084).
+    @AppStorage("data.cycleDay") var dataCycleDay = 1
+    @AppStorage("data.limitGB") var dataLimitGB = 0
 
     var savedUSSDCodes: [String] {
         get { savedUSSDCodesRaw.split(separator: "\n").map(String.init) }

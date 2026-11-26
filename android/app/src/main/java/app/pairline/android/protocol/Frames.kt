@@ -5,7 +5,7 @@ object Proto {
     const val VERSION: Int = 0
 
     /**
-     * What `device.info` says as `proto`: v1 adds remote mode (D-080). The local links keep [VERSION] on the wire
+     * What `device.info` says as `proto`: v1 adds remote mode (D-092). The local links keep [VERSION] on the wire
      * (hello and associated data).
      */
     const val SUPPORTED_VERSION: Int = 1

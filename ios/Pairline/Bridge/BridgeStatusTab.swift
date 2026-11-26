@@ -66,6 +66,8 @@ struct BridgeStatusTab: View {
             if proxy == .leftOn || proxy == .outdated { proxyNotice }
             batteryCard
             simCards
+            BalanceCard()
+            if !bridge.isDemo { DataUsageCard() }
         }
     }
 
@@ -153,7 +155,7 @@ struct BridgeStatusTab: View {
         bridge.phase.isConnected && !bridge.isDemo && !DebugSettings.marketingScreenshots && shownTransports == [.wifi]
     }
 
-    /// Cloud mode exists here and is off on a real bridge: worth pointing at where the user is stuck (D-080).
+    /// Cloud mode exists here and is off on a real bridge: worth pointing at where the user is stuck (D-092).
     private var offersCloudMode: Bool {
         RemoteFeature.isAvailable && !bridge.isDemo && app.link.remote != nil && app.link.remote?.isOn != true
     }
@@ -200,7 +202,7 @@ struct BridgeStatusTab: View {
                 Text("iOS pauses Wi-Fi links while Pairline is in the background, so calls and messages reach this iPhone only while Pairline is open. Over Bluetooth they keep coming while the iPhone is locked: keep Bluetooth on on both phones and the phones within about 10 meters.", tableName: "Hotspot")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                // Cloud mode (D-080) covers exactly this gap: a bridge phone that can't do Bluetooth still reaches a
+                // Cloud mode (D-092) covers exactly this gap: a bridge phone that can't do Bluetooth still reaches a
                 // closed Pairline through iCloud.
                 if app.link.remote?.isOn == true {
                     Text("With Cloud mode on, texts and codes still come through iCloud while Pairline is closed.", tableName: "RemoteMode")
@@ -299,23 +301,54 @@ struct BridgeStatusTab: View {
                         }
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                        // The network it's on, when that isn't the SIM's own carrier (roaming, D-082).
+                        if let op = sim.op, op.caseInsensitiveCompare(sim.carrier ?? "") != .orderedSame {
+                            Label {
+                                Text(verbatim: op)
+                            } icon: {
+                                Image(systemName: "antenna.radiowaves.left.and.right")
+                            }
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                        }
                         // The SIM this iPhone's calls and messages go out on (D-062), not only Android's default.
                         HStack(spacing: 6) {
                             if bridge.effectiveSim(forSMS: true) == sim.slot { Tag(text: Text("Messages")) }
                             if bridge.effectiveSim(forSMS: false) == sim.slot { Tag(text: Text("Calls")) }
                             if sim.roaming == true { Tag(text: Text("Roaming"), tint: .brandAmber) }
+                            if sim.vm == true { Tag(text: Text("Voicemail", tableName: "Carrier"), tint: .brandAmber) }
                         }
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 6) {
                         SignalBars(level: sim.signal ?? 0, tint: (sim.signal ?? 0) <= 1 ? .brandAmber : .brandGreen)
-                        Text(verbatim: sim.net == "none" ? "—" : (sim.net ?? ""))
+                        // The exact technology when the bridge sends it (D-082), else the generation.
+                        Text(verbatim: sim.net == "none" ? "—" : (sim.rat ?? sim.net ?? ""))
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.secondary)
+                        if let dbm = sim.dbm, sim.net != "none" {
+                            LTRText("\(dbm) dBm")
+                                .font(.caption2.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 .card()
                 .accessibilityElement(children: .combine)
+                if sim.vm == true, bridge.has(.callVoicemail) {
+                    Button {
+                        bridge.calls.startVoicemailCall(sim: sim.slot)
+                    } label: {
+                        Label {
+                            Text("Call voicemail", tableName: "Carrier")
+                        } icon: {
+                            Image(systemName: "recordingtape")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
             if bridge.isDualSIM {
                 NavigationLink {
@@ -403,6 +436,15 @@ struct BridgeStatusTab: View {
                                 subtitle: Text("Photos and documents over Wi-Fi, both ways"))
                     }
                     Divider().padding(.leading, 52)
+                    // D-088: browse the Android phone's photos (opt-in there).
+                    NavigationLink {
+                        PhotosView(files: app.link.files)
+                    } label: {
+                        ToolRow(symbol: "photo.on.rectangle.angled", tint: .purple,
+                                title: Text("Photos on the Android phone", tableName: "Photos"),
+                                subtitle: Text("See them here and copy the ones you want, over Wi-Fi", tableName: "Photos"))
+                    }
+                    Divider().padding(.leading, 52)
                 }
                 NavigationLink {
                     HelpCenterView()
@@ -446,7 +488,7 @@ struct BridgeStatusTab: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
             case .remote:
-                // Cloud mode (D-080): not lost, just apart; say what works and where to look.
+                // Cloud mode (D-092): not lost, just apart; say what works and where to look.
                 Text("Linked through iCloud", tableName: "RemoteMode").font(.headline)
                 Text("Your phones aren't near each other, so Cloud mode carries texts and codes through your own iCloud. Calls need the direct connection to your home.", tableName: "RemoteMode")
                     .font(.subheadline).foregroundStyle(.secondary)

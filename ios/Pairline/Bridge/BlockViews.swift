@@ -87,7 +87,31 @@ struct BlockedNumbersView: View {
                         .disabled(trimmed.isEmpty)
                 }
             } footer: {
-                Text("Texts and calls from these numbers don't reach this iPhone. Your bridge phone keeps the list, so it works while this iPhone is away. Android's own messaging app still receives their texts.")
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Texts and calls from these numbers don't reach this iPhone. Your bridge phone keeps the list, so it works while this iPhone is away. Android's own messaging app still receives their texts.")
+                    Text("End a number with * to block every number that starts with it, for example +234*.", tableName: "Screening")
+                }
+            }
+            // D-085: with Pairline as Android's call-screening app.
+            Section {
+                Toggle(isOn: Binding(get: { bridge.silenceUnknown }, set: { on in
+                    Task {
+                        do {
+                            try await bridge.setSilenceUnknown(on)
+                        } catch {
+                            app.toast = error.localizedDescription
+                        }
+                    }
+                })) {
+                    Text("Silence unknown callers", tableName: "Screening")
+                }
+                .disabled(!bridge.has(.callScreen) || !bridge.phase.isConnected)
+            } footer: {
+                if bridge.status != nil && !bridge.has(.callScreen) {
+                    Text(CapabilityInfo(.callScreen).missingText)
+                } else {
+                    Text("Calls from numbers that aren't in your contacts ring neither phone. They go to voicemail and show as missed. Blocked numbers don't ring at all.", tableName: "Screening")
+                }
             }
             Section {
                 if entries.isEmpty {

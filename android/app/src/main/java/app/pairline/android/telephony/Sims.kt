@@ -30,6 +30,14 @@ data class SimSnapshot(
     val defaultVoice: Boolean,
     /** Android's data SIM (D-073). */
     val defaultData: Boolean = false,
+    /** Signal strength in dBm (RSRP on LTE and 5G), Android 10+ (D-082). */
+    val dbm: Int? = null,
+    /** The exact radio technology, such as "LTE-CA", "NR NSA" or "HSPA+" (D-082). */
+    val rat: String? = null,
+    /** The name of the network the SIM is registered on, which differs from [carrier] when roaming (D-082). */
+    val operator: String? = null,
+    /** The carrier says a voicemail is waiting (message-waiting indicator, D-082). */
+    val voicemail: Boolean = false,
 ) {
     fun toJson(): JSONObject = JSONObject()
         .put("slot", slot)
@@ -42,6 +50,10 @@ data class SimSnapshot(
         .put("defaultSms", defaultSms)
         .put("defaultVoice", defaultVoice)
         .put("defaultData", defaultData)
+        .apply { dbm?.let { put("dbm", it) } }
+        .apply { rat?.let { put("rat", it) } }
+        .apply { operator?.let { put("op", it) } }
+        .put("vm", voicemail)
 }
 
 /** Maps SIM slots (what the protocol uses) to subscription ids (what Android uses) and describes each SIM. */
@@ -52,6 +64,9 @@ class SimDirectory(private val context: Context) {
     /** Latest radio facts per subscription, fed by [StatusMonitor]'s telephony callbacks. */
     val serviceStates = ConcurrentHashMap<Int, Int>()
     val displayOverrides = ConcurrentHashMap<Int, Int>()
+
+    /** The message-waiting indicator per subscription: a voicemail is waiting (D-082). */
+    val voicemailWaiting = ConcurrentHashMap<Int, Boolean>()
 
     @SuppressLint("MissingPermission")
     fun activeSubscriptions(): List<SubscriptionInfo> {
@@ -144,8 +159,34 @@ class SimDirectory(private val context: Context) {
                 defaultSms = info.subscriptionId == defaultSms || (list.size == 1),
                 defaultVoice = info.subscriptionId == defaultVoice || (list.size == 1),
                 defaultData = info.subscriptionId == defaultData || (list.size == 1),
+                dbm = if (inService == false) null else dbm(tm),
+                rat = if (inService == false) null else radioName(tm, info.subscriptionId),
+                operator = runCatching { tm?.networkOperatorName }.getOrNull()?.takeIf { it.isNotBlank() && inService != false },
+                voicemail = voicemailWaiting[info.subscriptionId] == true,
             )
         }
+    }
+
+    /** The strongest reading Android has, in dBm (RSRP on LTE and 5G). Android 10+; null when it has none. */
+    private fun dbm(tm: TelephonyManager?): Int? {
+        if (tm == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
+        return runCatching {
+            tm.signalStrength?.cellSignalStrengths
+                ?.map { it.dbm }
+                ?.filter { it in -150..-20 }
+                ?.maxOrNull()
+        }.getOrNull()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun radioName(tm: TelephonyManager?, subId: Int): String? {
+        if (tm == null || !Perms.granted(context, Manifest.permission.READ_PHONE_STATE)) return null
+        val type = try {
+            tm.dataNetworkType.takeIf { it != TelephonyManager.NETWORK_TYPE_UNKNOWN } ?: tm.voiceNetworkType
+        } catch (_: SecurityException) {
+            return null
+        }
+        return radioName(type, displayOverrides[subId])
     }
 
     fun simsJson(): JSONArray = JSONArray().apply { snapshots().forEach { put(it.toJson()) } }
@@ -199,6 +240,42 @@ class SimDirectory(private val context: Context) {
             TelephonyManager.NETWORK_TYPE_1xRTT, TelephonyManager.NETWORK_TYPE_IDEN, TelephonyManager.NETWORK_TYPE_GSM,
             -> "2G"
             else -> "none"
+        }
+
+        /**
+         * The exact radio technology for the SIM card on the iPhone's Bridge tab (D-082); [override] is Android 11's
+         * display override (5G NSA shows as LTE with an NR override). Null when Android doesn't know.
+         */
+        @Suppress("DEPRECATION")
+        fun radioName(type: Int, override: Int?): String? {
+            when (override) {
+                TelephonyDisplayInfo.OVERRIDE_NETWORK_TYPE_NR_NSA -> return "NR NSA"
+                TelephonyDisplayInfo.OVERRIDE_NETWORK_TYPE_NR_ADVANCED -> return "NR+"
+                TelephonyDisplayInfo.OVERRIDE_NETWORK_TYPE_LTE_ADVANCED_PRO -> return "LTE-A Pro"
+                TelephonyDisplayInfo.OVERRIDE_NETWORK_TYPE_LTE_CA -> return "LTE-CA"
+            }
+            return when (type) {
+                TelephonyManager.NETWORK_TYPE_NR -> "NR"
+                TelephonyManager.NETWORK_TYPE_LTE -> "LTE"
+                19 /* LTE_CA */ -> "LTE-CA"
+                TelephonyManager.NETWORK_TYPE_IWLAN -> "IWLAN"
+                TelephonyManager.NETWORK_TYPE_HSPAP -> "HSPA+"
+                TelephonyManager.NETWORK_TYPE_HSPA, TelephonyManager.NETWORK_TYPE_HSDPA,
+                TelephonyManager.NETWORK_TYPE_HSUPA,
+                -> "HSPA"
+                TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
+                TelephonyManager.NETWORK_TYPE_TD_SCDMA -> "TD-SCDMA"
+                TelephonyManager.NETWORK_TYPE_EVDO_0, TelephonyManager.NETWORK_TYPE_EVDO_A,
+                TelephonyManager.NETWORK_TYPE_EVDO_B,
+                -> "EV-DO"
+                TelephonyManager.NETWORK_TYPE_EHRPD -> "eHRPD"
+                TelephonyManager.NETWORK_TYPE_EDGE -> "EDGE"
+                TelephonyManager.NETWORK_TYPE_GPRS -> "GPRS"
+                TelephonyManager.NETWORK_TYPE_GSM -> "GSM"
+                TelephonyManager.NETWORK_TYPE_CDMA, TelephonyManager.NETWORK_TYPE_1xRTT -> "CDMA"
+                TelephonyManager.NETWORK_TYPE_IDEN -> "iDEN"
+                else -> null
+            }
         }
     }
 }

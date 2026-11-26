@@ -1,7 +1,7 @@
 import CryptoKit
 import Foundation
 
-// Remote mode (protocol v1, D-080; PROTOCOL.md, "Remote mode"): mailbox records sealed one by one, the remote pairing
+// Remote mode (protocol v1, D-092; PROTOCOL.md, "Remote mode"): mailbox records sealed one by one, the remote pairing
 // commitment and comparison code, and the invitation link. Nothing here logs; keys, secrets and tokens must never be.
 
 enum RemoteProtocolError: Error, Equatable {

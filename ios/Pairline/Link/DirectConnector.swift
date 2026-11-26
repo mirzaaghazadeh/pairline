@@ -1,11 +1,11 @@
 import Foundation
 import Network
 
-/// Opens remote mode's direct connection (D-080; PROTOCOL.md, "Direct connection"): TCP out to the bridge's public
+/// Opens remote mode's direct connection (D-092; PROTOCOL.md, "Direct connection"): TCP out to the bridge's public
 /// address, carrying exactly the Wi-Fi session (`WiFiTransport`). It's the one connector that dials beyond the local
 /// network, so it dials only `ConnectTarget.direct` — which `LinkManager` fills from the paired bridge's authenticated
 /// `remote.addr` alone — as IP literals `DirectAddress` accepts, and `ConnectTarget.directManual`, the port forwarding
-/// the user typed in (D-083), the one name it lets the system resolve. It never browses. Candidates are tried in order
+/// the user typed in (D-095), the one name it lets the system resolve. It never browses. Candidates are tried in order
 /// (IPv6 first; the user's entry first while the bridge's router opened nothing), each with its own time limit. Runs
 /// on the main queue.
 final class DirectConnector: LinkConnector {

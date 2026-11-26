@@ -2,7 +2,7 @@ package app.pairline.android.log
 
 /**
  * Removes personal data from log text (AGENTS.md rule 9): phone numbers, email addresses, Bluetooth/Wi-Fi
- * MAC addresses, IP addresses (remote mode, D-080: a home's internet address tells roughly where it is), pairing
+ * MAC addresses, IP addresses (remote mode, D-092: a home's internet address tells roughly where it is), pairing
  * links and long key-like tokens. Message text must never be passed to the log at all; this is the safety net, not
  * the plan.
  */

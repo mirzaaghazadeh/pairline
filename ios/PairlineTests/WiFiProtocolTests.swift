@@ -144,7 +144,7 @@ final class WiFiProtocolTests: XCTestCase {
     func testDeviceInfoListsFiles() throws {
         let json = try Outbound.deviceInfo(name: "iPhone", os: "17", app: "1.0").json(id: nil)
         let object = try JSONSerialization.jsonObject(with: json) as! [String: Any]
-        XCTAssertEqual(object["caps"] as? [String], ["files"])
+        XCTAssertEqual(object["caps"] as? [String], ["files", "ring"], "ring: D-084")
     }
 
     func testSafeNames() {

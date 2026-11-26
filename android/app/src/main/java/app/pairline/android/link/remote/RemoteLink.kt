@@ -41,7 +41,7 @@ data class RemoteStatus(
 )
 
 /**
- * Remote mode's mailbox (D-080, PROTOCOL.md "Remote mode"): the third path next to the Bluetooth and Wi-Fi sessions.
+ * Remote mode's mailbox (D-092, PROTOCOL.md "Remote mode"): the third path next to the Bluetooth and Wi-Fi sessions.
  * While no session is up, events and replies are sealed to the pinned iPhone (kind 1) and put into its alert or quiet
  * mailbox, and the R→B mailbox is checked every 30 s while the iPhone was heard from in the last 10 minutes,
  * otherwise every 2 minutes. What's found there goes to the sessions' handler with `LinkManager.MAILBOX_TOKEN`.

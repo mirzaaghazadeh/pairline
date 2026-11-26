@@ -190,12 +190,41 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
 - [x] Find phone and the ringer switch; edit contacts and favourites from the iPhone
 - [ ] Real-phone test of all of the above
 
+## More from the same two phones (2026-11-26)
+
+The maintainer picked these from a review of what the existing capabilities allow (no new servers, no new outside
+parties). Each needs a real-phone test.
+
+- [x] Carrier tools (D-082): call forwarding, call waiting and caller ID screens; hide the number on one call;
+      balance code on the Bridge tab and `pairline://balance`; voicemail indicator and "Call voicemail" (touch and
+      hold 1); signal in dBm, radio technology and the network's name per SIM
+- [x] Messages on the iPhone (D-083): inbox groups (people, codes, transactions, offers, services); codes deleted
+      after a day (opt-in); quick replies; the newest code in the Dynamic Island
+- [x] Scheduled SMS, sent by the bridge at the chosen time (D-084)
+- [x] "Bridge phone left behind" alert when the link stays down for 5 minutes (D-083)
+- [x] Ring the iPhone from the Android phone: home screen and a Quick Settings tile (D-084)
+- [x] Mobile data used this month on the bridge phone, with a limit alert (D-084)
+- [x] Call screening role on Android: blocked calls never ring, silence unknown callers, blocked prefixes (D-085)
+- [x] Reply to Android app notifications from the iPhone (D-086)
+- [x] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi (D-088)
+- [x] Live captions of relayed calls on the iPhone (on-device speech recognition, nothing recorded or stored, D-087)
+- [x] MMS and group messages: shown with thumbnails, attachments over Wi-Fi, pictures and group texts sent (D-089)
+- [ ] More than one iPhone, iPad or Mac paired with one bridge — **needs a protocol change, waiting for the
+      maintainer:** the bridge derives session keys from the one pinned iPhone key, and an iPhone's `HELLO` says
+      nothing about which device it is, so with two pinned devices the bridge can't pick the key. Proposed: a new frame
+      `HELLO_ID` (0x11) sent before `HELLO` only to a bridge listing a `multi` capability (like `BULK`/`MEDIA`, so old
+      apps are unaffected): a 16-byte nonce and `HMAC-SHA256(SHA-256(sR), "pairline remote id" ‖ nonce)[0..16]`, which
+      the bridge checks against each pinned key and which an observer can't link across connections. Then
+      `LinkManager` keeps lanes per device and sends events to each, pairing a second device stops replacing the first,
+      Wi-Fi features (files, photos, call audio over Wi-Fi) follow the device that asked, and the iPhone gets
+      "Add a device" (a fresh pairing link from the bridge as a QR code, or copied for a Mac).
+
 ## M9 — Android client mode: dropped (D-050)
 
 Two Android phones pairing with each other isn't planned; the started work is archived on
 `archive/m9-android-client-start`.
 
-## M10 — Remote mode, "Cloud mode" in the apps (opt-in, paid add-on on the iPhone; D-080, D-082)
+## M10 — Remote mode, "Cloud mode" in the apps (opt-in, paid add-on on the iPhone; D-092, D-094)
 
 The bridge stays at home; the iPhone gets calls, SMS and codes, and makes calls and sends SMS, from anywhere. Only
 Apple (the user's own iCloud) and the two phones take part. Built on the `remote-mode` branch.
@@ -204,7 +233,7 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
       (`protocol/tools/router_check.py`)
 - [x] Phase 0: CloudKit container, API and management tokens; a record written through CloudKit Web Services from a
       non-Apple client wakes a suspended iPhone; delay measured (public database, median 1.6 s; the private
-      database is refused on the maintainer's account, asked Apple, D-080)
+      database is refused on the maintainer's account, asked Apple, D-092)
 - [x] Phase 0: notification-filtering entitlement requested (2026-11-26, Apple request ID Q7U98356ZR)
 - [x] Protocol: mailbox records, remote messages, remote pairing; v1 with shared vectors (`v1-remote.json`); the Opus
       kind comes with the Opus step
@@ -212,19 +241,19 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 - [x] iPhone: subscriptions and Notification Service Extension (SMS and codes; calls as a time-sensitive notification
       until the filtering entitlement lets them ring through CallKit)
 - [x] Remote pairing: one-time invitation from the iPhone, allowed on the Android phone (tap or paste the link), 6-digit
-      code compared on a call (D-080); tested iPhone ↔ stand-in bridge through iCloud on 2026-11-26
+      code compared on a call (D-092); tested iPhone ↔ stand-in bridge through iCloud on 2026-11-26
 - [ ] Street test with a real Android bridge in another home (a tester's phone)
 - [x] Router mapping, public listener and direct session (unit-tested against a fake router; no real router yet)
 - [x] Opus call audio on the direct connection: D-072's `MEDIA` frames inside the direct session, no UDP port; in the
       background the iPhone keeps the direct session only during a call, so events go through iCloud's pushes
 - [x] Settings, status line, the before-you-turn-it-on screen, "Check my home connection" (`remote.check`, free,
       read-only on the router) and the connection log (IP addresses redacted on both phones)
-- [x] The remote-mode add-on purchase (D-081): code and the local StoreKit file; the App Store Connect product waits
+- [x] The remote-mode add-on purchase (D-093): code and the local StoreKit file; the App Store Connect product waits
       for the maintainer
-- [x] PRIVACY.md, ARCHITECTURE.md, PROTOCOL.md, README and decision entries (D-080, D-081)
+- [x] PRIVACY.md, ARCHITECTURE.md, PROTOCOL.md, README and decision entries (D-092, D-093)
 - [x] Pair over the internet: scan the invitation's QR code live on Android (or a picture, or paste the link); wording
       for pairing your own two phones
-- [x] "Cloud mode" in the apps, offered right after a normal pairing, and a full UX pass of its screens (D-082)
+- [x] "Cloud mode" in the apps, offered right after a normal pairing, and a full UX pass of its screens (D-094)
 - [ ] Street tests on real phones, with the bridge at home on charge and Wi-Fi and the iPhone on mobile data:
   - [ ] Turn Cloud mode on; the status line says "Via iCloud", then "Direct connection" where the router allows it
   - [ ] "Check my home connection" matches what the router really does (open, carrier-grade NAT, no UPnP/NAT-PMP/PCP)
@@ -244,6 +273,6 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 
 - ~~Notification mirroring from chosen Android apps~~ — done (D-077), real-phone test pending
 - ~~Mac app~~ — the iPad app on Apple Silicon Macs (D-076)
-- MMS (picture messages)
+- ~~MMS (picture messages)~~ — done (D-089), real-phone test pending
 - ~~Export of SMS history~~ — done on the iPhone (D-079); an encrypted backup format isn't planned (D-079)
 - More languages: Turkish, Urdu, Chinese, Indonesian (English, Persian and Arabic ship at launch, D-019)

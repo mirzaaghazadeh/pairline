@@ -8,7 +8,7 @@ import app.pairline.android.protocol.Messages
 import org.json.JSONObject
 
 /**
- * "Check my home connection" (`remote.check`, PROTOCOL.md "Remote messages", D-080): whether remote mode's direct
+ * "Check my home connection" (`remote.check`, PROTOCOL.md "Remote messages", D-092): whether remote mode's direct
  * connection could work on this phone's network, found by asking the router read-only ([RouterProbe]). Nothing is
  * opened, and it works whether remote mode is on or off. Never logs or sends an address.
  */

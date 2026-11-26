@@ -56,7 +56,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * The live QR scanner for a remote-pairing invitation (D-080): the back camera's preview, with every frame it can keep
+ * The live QR scanner for a remote-pairing invitation (D-092): the back camera's preview, with every frame it can keep
  * up with read by ZXing on this phone. Nothing is recorded or kept; the camera closes as the scanner does. Needs the
  * camera permission, which the caller asks for on the tap.
  */

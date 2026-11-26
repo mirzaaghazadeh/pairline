@@ -33,7 +33,7 @@ final class AppModel: ObservableObject {
     @Published var composeTo: (name: String?, number: String)?
     @Published var showPaywall = false
     @Published var showPairing = false
-    /// The pairing sheet opens at "Pair over the internet" (Cloud mode, D-080) instead of the QR code.
+    /// The pairing sheet opens at "Pair over the internet" (Cloud mode, D-092) instead of the QR code.
     @Published var pairingOverInternet = false
     @Published var toast: String?
 
@@ -88,6 +88,23 @@ final class AppModel: ObservableObject {
             guard let self, self.real.has(.notifMirror), self.real.phase.isConnected else { return }
             Task { _ = try? await self.real.link.request(.notifDismiss(key: key)) }
         }
+        // D-086: a reply typed in a mirrored notification goes back through the Android app's own reply action.
+        notifier.onMirrorReply = { [weak self] key, text in
+            guard let self else { return }
+            guard self.real.phase.isConnected, self.real.canUseLink else {
+                Notifier.shared.notifyMirrorReplyFailed()
+                return
+            }
+            Task {
+                do {
+                    _ = try await self.real.link.request(.notifReply(key: key, text: text))
+                    log.info("notify", "Replied to an Android app's notification")
+                } catch {
+                    log.warning("notify", "Couldn't reply to an Android app's notification: \(error.localizedDescription)")
+                    Notifier.shared.notifyMirrorReplyFailed()
+                }
+            }
+        }
         notifier.onReply = { [weak self] thread, addr, sim, text in
             guard let self else { return }
             do {
@@ -99,7 +116,7 @@ final class AppModel: ObservableObject {
             }
         }
         notifier.onOpenStatus = { [weak self] in self?.tab = .bridge }
-        // Remote mode (D-080): an alert push shown while Pairline is open; take what it announced.
+        // Remote mode (D-092): an alert push shown while Pairline is open; take what it announced.
         notifier.onRemotePush = { [weak self] in Task { await self?.remoteCatchUp() } }
         if link.remote?.isOn == true, !Self.isTestHost { UIApplication.shared.registerForRemoteNotifications() }
 
@@ -218,7 +235,7 @@ final class AppModel: ObservableObject {
         pairedPeer = nil
     }
 
-    // MARK: - Remote mode (D-080)
+    // MARK: - Remote mode (D-092)
 
     /// What the bridge left in iCloud, once the purchase state is known (a push can launch the app before it is).
     @discardableResult
@@ -226,12 +243,12 @@ final class AppModel: ObservableObject {
         for _ in 0..<20 where purchases.access == .loading {
             try? await Task.sleep(nanoseconds: 250_000_000)
         }
-        // Not covered any more (the trial ended without the add-on, D-081): remote mode is being turned off.
+        // Not covered any more (the trial ended without the add-on, D-093): remote mode is being turned off.
         guard purchases.remoteAccess.allowsRemote else { return false }
         return await link.remoteCatchUp()
     }
 
-    /// Remote mode is part of the trial, then an add-on (D-081). When the purchase state no longer covers it, it turns
+    /// Remote mode is part of the trial, then an add-on (D-093). When the purchase state no longer covers it, it turns
     /// off the usual way, which tells the bridge to stop and clears this iPhone's part in iCloud; Settings then shows
     /// why and, after Full Access, the add-on.
     private func remoteAccessChanged(_ access: RemoteAccess) {
@@ -305,6 +322,36 @@ final class AppModel: ObservableObject {
             tab = .bridge
             return
         }
+        // A tap on the code in the Dynamic Island (D-083): copy the code Pairline shows there. The link carries no
+        // code, so another app's link can only copy what's already on screen.
+        if url.host == "code" {
+            if let code = BridgeLiveActivity.shared.code {
+                Clipboard.copy(code, isCode: true)
+                BridgeLiveActivity.shared.clearCode()
+                toast = String(localized: "Code copied.", table: "Inbox")
+            }
+            return
+        }
+        // Runs only the code the user chose as their balance code (D-082); a link can't name a code, so a web page
+        // can't make the bridge phone run one.
+        if url.host == "balance" {
+            tab = .bridge
+            guard !settings.balanceUSSDCode.isEmpty else {
+                toast = String(localized: "Choose a balance code first: run it under Calls › USSD codes and turn on “Use as balance code”.", table: "Carrier")
+                return
+            }
+            Task { @MainActor in
+                for _ in 0..<30 where !self.active.phase.isConnected || self.active.status == nil {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                }
+                do {
+                    try await self.active.checkBalance()
+                } catch {
+                    self.toast = error.localizedDescription
+                }
+            }
+            return
+        }
         if url.host == "call" {
             let number = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "number" }?.value
@@ -360,6 +407,8 @@ final class AppModel: ObservableObject {
     func didBecomeActive() {
         Notifier.shared.clearCallsPaused()
         link.appBecameActive()
+        // Opening Pairline while the Android phone rings this iPhone means it was found (D-084).
+        IPhoneRinger.shared.stop()
         link.reconnectNow()
         link.files.collectOutbox()
         if !Self.isTestHost { BridgeLiveActivity.shared.appBecameActive() }
@@ -368,10 +417,11 @@ final class AppModel: ObservableObject {
             await Notifier.shared.refreshAuthorization()
         }
         if real.phase.isConnected { Task { await real.sync() } }
+        real.deleteOldCodes()
         Task { await remoteCatchUp() }
     }
 
-    /// Remote mode's direct connection can't wake a suspended app, so it closes unless a call is on (D-080).
+    /// Remote mode's direct connection can't wake a suspended app, so it closes unless a call is on (D-092).
     func didEnterBackground() {
         link.appMovedToBackground()
     }

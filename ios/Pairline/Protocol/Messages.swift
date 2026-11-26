@@ -116,6 +116,14 @@ struct SIMInfo: Codable, Equatable, Identifiable, Hashable {
     var defaultVoice: Bool?
     /// Android's data SIM (D-073).
     var defaultData: Bool?
+    /// Signal in dBm (RSRP on LTE and 5G), Android 10+ (D-082).
+    var dbm: Int?
+    /// The exact radio technology, such as "LTE-CA" or "NR NSA" (D-082).
+    var rat: String?
+    /// The network the SIM is registered on; differs from `carrier` when roaming (D-082).
+    var op: String?
+    /// A voicemail is waiting (the carrier's message-waiting indicator, D-082).
+    var vm: Bool?
 
     var id: Int { slot }
 }
@@ -128,6 +136,8 @@ struct MirroredNotification: Codable, Equatable {
     var title: String?
     var text: String?
     var time: Int64?
+    /// The app's notification takes a typed reply (D-086): `notif.reply` sends one through it.
+    var reply: Bool?
 }
 
 /// `status.net` (D-073): the bridge phone's own internet sharing. Switched with `net.switch` (needs `net.switch`).
@@ -168,6 +178,21 @@ struct SMSMessage: Codable, Equatable {
     var box: String
     var sim: Int?
     var state: String?
+    /// An MMS's attachments, pictures with a small thumbnail (D-089).
+    var parts: [MMSPart]?
+    /// Everyone in a group message but the bridge phone (D-089).
+    var addrs: [String]?
+}
+
+/// One attachment of a picture or group message (D-089). The full file comes with `mms.part`.
+struct MMSPart: Codable, Equatable, Hashable {
+    var pid: Int64
+    var type: String
+    var name: String?
+    /// Base64 JPEG, about 128 px, for pictures.
+    var thumb: String?
+
+    var isImage: Bool { type.lowercased().hasPrefix("image/") }
 }
 
 struct SMSStateEvent: Codable, Equatable {
@@ -252,6 +277,54 @@ struct CallStateEvent: Codable, Equatable {
 struct BlockedNumber: Codable, Equatable, Hashable {
     var n: String
     var time: Int64?
+}
+
+/// `sms.scheduled` (D-084): messages the bridge will send later, what became of the ones it sent in the last week,
+/// and whether it can send at the exact minute (Android's "Alarms & reminders").
+struct ScheduledList: Equatable {
+    struct Item: Codable, Equatable {
+        var cid: String
+        var sim: Int?
+        var to: String
+        var body: String
+        var at: Int64
+    }
+
+    struct Done: Codable, Equatable {
+        var cid: String
+        var state: String
+        var key: String?
+        var error: String?
+    }
+
+    var items: [Item]
+    var done: [Done]
+    var exact: Bool
+}
+
+/// `media.list` (D-088): a page of the bridge phone's photos, newest first, each with a small JPEG thumbnail.
+struct MediaPage: Equatable {
+    struct Item: Codable, Equatable, Identifiable {
+        var mid: Int64
+        var time: Int64?
+        var w: Int?
+        var h: Int?
+        var size: Int64?
+        /// Base64 JPEG, about 128 px on the long side.
+        var thumb: String?
+        var id: Int64 { mid }
+    }
+
+    var items: [Item]
+    var more: Bool
+    var cursor: String?
+}
+
+/// `data.usage` (D-084): mobile bytes the bridge phone used between `since` and `until` (ms).
+struct DataUsageReply: Codable, Equatable {
+    var since: Int64
+    var until: Int64
+    var bytes: Int64
 }
 
 struct USSDResult: Equatable {
@@ -351,9 +424,16 @@ enum InboundMessage {
     case fileAnswer(FileAnswerMessage)
     case fileDone(FileDoneMessage)
     case fileCancel(FileCancelMessage)
-    /// The reply to `block.list` / `block.set`, or (without an `id`) the list after it changed on the bridge.
-    case blockList([BlockedNumber])
-    /// The reply to `remote.check`: "Check my home connection" (D-080).
+    /// The reply to `block.list` / `block.set`, or (without an `id`) the list after it changed on the bridge, and
+    /// whether "Silence unknown callers" is on there (D-085; nil from an older bridge).
+    case blockList([BlockedNumber], unknown: Bool?)
+    /// D-084: the scheduled messages, the data meter, and the bridge's user ringing this iPhone.
+    case smsScheduled(ScheduledList)
+    case dataUsage(DataUsageReply)
+    case remoteRing(Bool)
+    /// D-088: a page of the bridge phone's photos.
+    case mediaList(MediaPage)
+    /// The reply to `remote.check`: "Check my home connection" (D-092).
     case remoteCheck(HomeCheckReply)
     case unknown
 }
@@ -362,7 +442,7 @@ struct Inbound {
     let type: String
     let id: Int?
     let message: InboundMessage
-    /// Remote mode (D-080): it came through the iCloud mailbox, not a live session, so it may be old news.
+    /// Remote mode (D-092): it came through the iCloud mailbox, not a live session, so it may be old news.
     var viaMailbox = false
     /// …and the notification service extension already showed it.
     var alreadyShown = false
@@ -417,7 +497,14 @@ struct Inbound {
         var password: String?
         var band: String?
     }
-    private struct BlockListBody: Decodable { var numbers: LossyList<BlockedNumber>? }
+    private struct BlockListBody: Decodable { var numbers: LossyList<BlockedNumber>?; var unknown: Bool? }
+    private struct ScheduledBody: Decodable {
+        var items: LossyList<ScheduledList.Item>?
+        var done: LossyList<ScheduledList.Done>?
+        var exact: Bool?
+    }
+    private struct OnBody: Decodable { var on: Bool? }
+    private struct MediaBody2: Decodable { var items: LossyList<MediaPage.Item>?; var more: Bool?; var cursor: String? }
 
     static func decode(_ data: Data) throws -> Inbound {
         let decoder = JSONDecoder()
@@ -478,7 +565,17 @@ struct Inbound {
         case "file.done": message = .fileDone(try body(FileDoneMessage.self))
         case "file.cancel": message = .fileCancel(try body(FileCancelMessage.self))
         case "block.list":
-            message = .blockList(try body(BlockListBody.self).numbers?.elements ?? [])
+            let b = try body(BlockListBody.self)
+            message = .blockList(b.numbers?.elements ?? [], unknown: b.unknown)
+        case "sms.scheduled":
+            let b = try body(ScheduledBody.self)
+            message = .smsScheduled(ScheduledList(items: b.items?.elements ?? [], done: b.done?.elements ?? [],
+                                                  exact: b.exact ?? true))
+        case "data.usage": message = .dataUsage(try body(DataUsageReply.self))
+        case "remote.ring": message = .remoteRing(try body(OnBody.self).on ?? true)
+        case "media.list":
+            let b = try body(MediaBody2.self)
+            message = .mediaList(MediaPage(items: b.items?.elements ?? [], more: b.more ?? false, cursor: b.cursor))
         case "remote.check": message = .remoteCheck(try body(HomeCheckReply.self))
         default:
             message = .unknown
@@ -525,8 +622,9 @@ struct Outbound {
 
     private static func optional(_ value: Any?) -> Any { value ?? NSNull() }
 
-    /// What this iPhone app can receive (PROTOCOL.md, "Capabilities"): B only offers files when `files` is listed.
-    static let remoteCaps = ["files"]
+    /// What this iPhone app can receive (PROTOCOL.md, "Capabilities"): B only offers files when `files` is listed,
+    /// and rings this iPhone (`remote.ring`) only when `ring` is (D-084).
+    static let remoteCaps = ["files", "ring"]
 
     static func deviceInfo(name: String, os: String, app: String) -> Outbound {
         Outbound("device.info", ["name": name, "platform": "ios", "os": os, "app": app,
@@ -534,7 +632,7 @@ struct Outbound {
                  isRequest: false)
     }
 
-    /// Turns remote mode on (D-080): where the mailboxes are, and a web auth token for the bridge.
+    /// Turns remote mode on (D-092): where the mailboxes are, and a web auth token for the bridge.
     static func remoteConfig(_ settings: RemoteSettings, token: String) -> Outbound {
         Outbound("remote.config", ["on": true, "backend": settings.backend.rawValue,
                                    "env": settings.environment.rawValue, "token": token,
@@ -544,7 +642,7 @@ struct Outbound {
 
     static var remoteConfigOff: Outbound { Outbound("remote.config", ["on": false]) }
 
-    /// "Check my home connection" (D-080): the bridge asks its router, read-only, whether a direct connection could
+    /// "Check my home connection" (D-092): the bridge asks its router, read-only, whether a direct connection could
     /// work. Free, and answered with remote mode on or off.
     static var remoteCheck: Outbound { Outbound("remote.check") }
 
@@ -605,6 +703,11 @@ struct Outbound {
         Outbound("call.dial", ["sim": optional(sim), "number": number])
     }
 
+    /// Calls the voicemail of the SIM in `sim`; Android looks up the number (needs `call.voicemail`, D-082).
+    static func callVoicemail(sim: Int?) -> Outbound {
+        Outbound("call.dial", ["sim": optional(sim), "voicemail": true])
+    }
+
     static func callDTMF(_ call: OpaqueValue, digit: String) -> Outbound {
         Outbound("call.dtmf", ["call": call.jsonObject, "digit": digit])
     }
@@ -617,7 +720,7 @@ struct Outbound {
     }
 
     /// Asks the bridge to relay this call's audio (PROTOCOL.md "Call audio"): over the Wi-Fi media channel, or inside
-    /// the session it's sent on (`.link`): Bluetooth (D-072) or remote mode's direct connection (D-080). That one goes
+    /// the session it's sent on (`.link`): Bluetooth (D-072) or remote mode's direct connection (D-092). That one goes
     /// only on `linkLane`, the lane whose session carries the call-audio channel.
     static func callMediaStart(_ call: OpaqueValue, talk: Bool, via: CallAudioPath = .wifi,
                                linkLane: LinkLane = .primary) -> Outbound {
@@ -671,6 +774,9 @@ struct Outbound {
     /// The user dismissed a mirrored notification here: clear it on the bridge phone too (D-077).
     static func notifDismiss(key: String) -> Outbound { Outbound("notif.dismiss", ["key": key]) }
 
+    /// A reply typed in a mirrored notification, sent through the Android app's own reply action (D-086).
+    static func notifReply(key: String, text: String) -> Outbound { Outbound("notif.reply", ["key": key, "text": text]) }
+
     /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
     static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {
         Outbound("call.media.feedback", ["heard": optional(heard), "heardMe": optional(heardMe)])
@@ -701,8 +807,47 @@ struct Outbound {
 
     static var blockList: Outbound { Outbound("block.list") }
 
+    /// The bridge sends this message at `at` (ms), keeping it while this iPhone is away (needs `sms.schedule`, D-084).
+    static func smsSchedule(cid: String, sim: Int?, to: String, body: String, at: Int64) -> Outbound {
+        Outbound("sms.schedule", ["cid": cid, "sim": optional(sim), "to": to, "body": body, "at": at])
+    }
+
+    static func smsUnschedule(cid: String) -> Outbound { Outbound("sms.unschedule", ["cid": cid]) }
+
+    static var smsScheduled: Outbound { Outbound("sms.scheduled") }
+
+    /// The bridge phone's mobile data since `since` (ms), every SIM together (needs `data.usage`, D-084).
+    static func dataUsage(since: Int64) -> Outbound { Outbound("data.usage", ["since": since]) }
+
+    /// A page of the bridge phone's photos, after `cursor` (needs `media.photos`; Wi-Fi session only, D-088).
+    static func mediaList(cursor: String?, limit: Int) -> Outbound {
+        Outbound("media.list", ["before": optional(cursor), "limit": limit], lane: .wifi)
+    }
+
+    /// The bridge sends this photo with the file transfer (needs `media.photos`, D-088).
+    static func mediaGet(mid: Int64) -> Outbound { Outbound("media.get", ["mid": mid], lane: .wifi) }
+
+    /// One attachment of an MMS, sent with the file transfer (needs `mms`, Wi-Fi, D-089).
+    static func mmsPart(key: String, pid: Int64) -> Outbound { Outbound("mms.part", ["key": key, "pid": pid], lane: .wifi) }
+
+    /// A piece of a picture for an MMS, in order; `last` on the final one (needs `mms`, D-089).
+    static func mmsAttach(aid: String, seq: Int, data: Data, last: Bool, type: String, name: String) -> Outbound {
+        Outbound("mms.attach", ["aid": aid, "seq": seq, "data": data.base64EncodedString(), "last": last,
+                                "type": type, "name": name])
+    }
+
+    /// Sends text and/or the attached picture to one or more numbers; several make a group message (D-089).
+    static func mmsSend(cid: String, sim: Int?, to: [String], body: String?, aid: String?) -> Outbound {
+        Outbound("mms.send", ["cid": cid, "sim": optional(sim), "to": to, "body": optional(body), "aid": optional(aid)])
+    }
+
     static func blockSet(add: [String], remove: [String]) -> Outbound {
         Outbound("block.set", ["add": add, "remove": remove])
+    }
+
+    /// "Silence unknown callers" on the bridge phone (needs `call.screen`, D-085).
+    static func blockSilenceUnknown(_ on: Bool) -> Outbound {
+        Outbound("block.set", ["add": [String](), "remove": [String](), "unknown": on])
     }
 }
 
@@ -740,8 +885,14 @@ enum Capability: String, CaseIterable, Identifiable {
     case netSwitch = "net.switch"
     /// A conversation read here is marked read on the bridge phone too (D-074).
     case smsRead = "sms.read"
+    /// Messages can be scheduled; the bridge sends them at the time (D-084).
+    case smsSchedule = "sms.schedule"
+    /// The bridge reports its mobile data use (Usage access given, D-084).
+    case dataUsage = "data.usage"
     /// A call can be put on hold (D-074).
     case callHold = "call.hold"
+    /// Voicemail can be called on a chosen SIM, and SIMs say when one is waiting (D-082).
+    case callVoicemail = "call.voicemail"
     /// Contacts can be edited from here (D-074).
     case contactsEdit = "contacts.edit"
     /// The bridge phone can be made to ring loudly (D-074).
@@ -758,6 +909,12 @@ enum Capability: String, CaseIterable, Identifiable {
     case calllogDelete = "calllog.delete"
     /// The bridge keeps a block list (D-043).
     case block = "block"
+    /// The bridge is Android's call-screening app: blocked calls don't ring, unknown callers can be silenced (D-085).
+    case callScreen = "call.screen"
+    /// The bridge phone's photos can be browsed and fetched over Wi-Fi (opt-in there, D-088).
+    case mediaPhotos = "media.photos"
+    /// Picture and group messages: shown in history, sent with `mms.send` (D-089).
+    case mms = "mms"
 
     var id: String { rawValue }
 }

@@ -175,8 +175,8 @@ Everything above `BridgeLink` is shared by the real link and demo mode. The tran
 |---------|---------|-------|
 | Bluetooth LE GATT | control, SMS, call signaling, contacts, status; call audio as Opus (`MEDIA` frames, D-072) | Low bandwidth; wakes the iPhone app in the background. Android is the peripheral (advertiser + GATT server); iPhone is the central. Call audio goes ahead of other frames and asks Android for its fastest connection during the call. |
 | Local Wi-Fi (M5) | everything above when Bluetooth is down; call audio (UDP media channel), files and bulk sync (TCP) | Shared network or the bridge's hotspot. A full session of its own, with its own keys; addresses come from DNS-SD, the QR code or `wifi.offer` over Bluetooth. |
-| Remote mode: mailbox in the user's iCloud (M10, opt-in, D-080) | control, SMS, codes, call signaling and status while no session is up | CloudKit records sealed one by one with the pairing keys (Noise K); Apple stores only ciphertext. The bridge writes and polls through CloudKit Web Services with a web auth token from the iPhone; the iPhone gets a push per record, and its notification service extension unseals and shows SMS, codes and calls. No Pairline server. |
-| Remote mode: direct connection (M10, opt-in, D-080) | everything a session carries, call audio as Opus (`MEDIA` frames) | One TCP port the bridge asks its home router for (NAT-PMP, PCP, UPnP IGD); its public addresses reach the iPhone only sealed, in the mailbox. The iPhone connects out; the listener accepts only the paired iPhone's handshake. Only while no Bluetooth or Wi-Fi session is up, and in the background only during a call. |
+| Remote mode: mailbox in the user's iCloud (M10, opt-in, D-092) | control, SMS, codes, call signaling and status while no session is up | CloudKit records sealed one by one with the pairing keys (Noise K); Apple stores only ciphertext. The bridge writes and polls through CloudKit Web Services with a web auth token from the iPhone; the iPhone gets a push per record, and its notification service extension unseals and shows SMS, codes and calls. No Pairline server. |
+| Remote mode: direct connection (M10, opt-in, D-092) | everything a session carries, call audio as Opus (`MEDIA` frames) | One TCP port the bridge asks its home router for (NAT-PMP, PCP, UPnP IGD); its public addresses reach the iPhone only sealed, in the mailbox. The iPhone connects out; the listener accepts only the paired iPhone's handshake. Only while no Bluetooth or Wi-Fi session is up, and in the background only during a call. |
 
 The Android app declares `INTERNET` since D-041. CI (`network-code-check.sh`) confines socket code to `link/wifi/`
 (local addresses only, checked at run time on every bind and accept), `update/` (GitHub only), the opt-in
@@ -184,7 +184,7 @@ The Android app declares `INTERNET` since D-041. CI (`network-code-check.sh`) co
 debugging, 127.0.0.1 only) and the opt-in `link/remote/` (remote mode: CloudKit Web Services and the home router
 only).
 
-**Remote mode (M10, D-080; "Cloud mode" in the apps, D-082).** The bridge stays at home; the iPhone keeps texts, codes and calls from anywhere, with only
+**Remote mode (M10, D-092; "Cloud mode" in the apps, D-094).** The bridge stays at home; the iPhone keeps texts, codes and calls from anywhere, with only
 Apple and the two phones involved. While no nearby session is up, `LinkManager` on both sides adds two paths:
 
 - **The mailbox in iCloud.** Events from the bridge go to the iPhone's *alert* mailbox (pushed as a notification the
@@ -201,8 +201,8 @@ Apple and the two phones involved. While no nearby session is up, `LinkManager` 
 
 "Pair over the internet" (remote pairing) replaces the QR code with a one-time invitation the user sends to their own
 Android phone (a link, or its QR code scanned there) and a 6-digit code checked on both phones. Cloud mode is off by
-default; the iPhone offers it right after a normal pairing (D-082); it's part of the trial, then a one-time add-on
-(D-081).
+default; the iPhone offers it right after a normal pairing (D-094); it's part of the trial, then a one-time add-on
+(D-093).
 
 **The Wi-Fi link and iOS background.** iOS keeps Bluetooth sessions alive in the background (the app is woken for
 Bluetooth events) but suspends apps with only a socket open. So with both links up, events stay on Bluetooth; over

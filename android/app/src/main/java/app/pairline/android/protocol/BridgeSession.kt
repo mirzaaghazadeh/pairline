@@ -44,7 +44,7 @@ interface SessionCallbacks {
  * A Wi-Fi session ([wifiChannels]) also derives the media and bulk keys and accepts `BULK` frames (M5). Any other
  * session (Bluetooth, debug TCP, remote mode's direct connection) derives the link media keys and accepts `MEDIA`
  * frames: call audio (D-072). Remote mode's direct connection ([allowPairing] false) closes on `PAIR_HELLO` without
- * answering (D-080).
+ * answering (D-092).
  */
 class BridgeSession(
     private val identity: StaticKey,

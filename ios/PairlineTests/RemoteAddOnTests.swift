@@ -1,7 +1,7 @@
 import XCTest
 @testable import Pairline
 
-/// The remote-mode add-on's rule (D-081): part of the trial, then a one-time add-on to Full Access.
+/// The remote-mode add-on's rule (D-093): part of the trial, then a one-time add-on to Full Access.
 final class RemoteAddOnTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 1_800_000_000)
 

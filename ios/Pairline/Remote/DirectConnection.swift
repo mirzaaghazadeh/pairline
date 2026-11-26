@@ -1,7 +1,7 @@
 import Foundation
 import Network
 
-/// Remote mode's direct connection (D-080; PROTOCOL.md, "Direct connection"): the bridge's addresses checked strictly.
+/// Remote mode's direct connection (D-092; PROTOCOL.md, "Direct connection"): the bridge's addresses checked strictly.
 /// The only non-local addresses this iPhone ever dials pass through here, and they come only from an authenticated
 /// `remote.addr` of the paired bridge.
 enum DirectAddress {
@@ -189,12 +189,12 @@ extension DirectStatus.Reason {
 struct RemoteDirect: Codable, Equatable {
     var endpoints = DirectEndpoints()
     var status: DirectStatus?
-    /// Manual port forwarding (D-083): where the user says the bridge's home can be reached, for a router without
+    /// Manual port forwarding (D-095): where the user says the bridge's home can be reached, for a router without
     /// UPnP, NAT-PMP or PCP.
     var manual: ManualForward?
 }
 
-/// Manual port forwarding (D-083): the home's internet address or DDNS name and the port the user forwarded to the
+/// Manual port forwarding (D-095): the home's internet address or DDNS name and the port the user forwarded to the
 /// bridge, typed on this iPhone. Without UPnP, NAT-PMP or PCP the bridge can't learn the home's public address, and
 /// Pairline never asks an outside "what's my IP" service, so the user enters it. This is the one place a host name is
 /// dialed (the system resolves it); the handshake still pins the bridge's key, so a wrong host only fails.

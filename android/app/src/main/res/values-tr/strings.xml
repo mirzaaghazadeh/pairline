@@ -341,6 +341,9 @@
     <string name="settings_general">Genel</string>
     <string name="settings_language">Dil</string>
     <string name="settings_language_system">Sistem varsayılanı</string>
+    <string name="language_step_title">Dilinizi seçin</string>
+    <string name="language_step_body">Daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
+    <string name="language_step_body_guessed">Bunu SIM kartınıza veya saat diliminize göre seçtik. Şimdi ya da daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="settings_iphone">iPhone\'unuz</string>
     <string name="settings_ios_version">iOS %1$s</string>
     <string name="settings_app_version">Pairline %1$s</string>
@@ -488,7 +491,7 @@
     <string name="help_q_unpair">Eşleştirmeyi kaldırdığımda ne olur?</string>
     <string name="help_a_unpair">İki telefon da birbirinin anahtarını siler, böylece artık birbirleriyle iletişim kuramazlar. Mesajlarınız ve kişileriniz bu telefonda oldukları yerde kalır.</string>
 
-    <!-- Remote pairing (D-080). -->
+    <!-- Remote pairing (D-092). -->
     <string name="remote_pair_title">İnternet üzerinden eşleştir</string>
     <string name="remote_pair_ask_title">iPhone\'unuz bu telefonla internet üzerinden eşleşmek istiyor</string>
     <string name="remote_pair_ask_body">İzin verirseniz iPhone\'unuz, Bulut modu açıkken nerede olursa olsun bu telefonun SMS mesajlarını, tek kullanımlık kodlarını ve aramalarını alır; bu telefonun SIM kartıyla SMS gönderebilir ve arama yapabilir.</string>

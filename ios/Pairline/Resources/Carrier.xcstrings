@@ -1,0 +1,278 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "A second call can ring while you're on a call." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يمكن أن يرنّ اتصال ثانٍ وأنت في مكالمة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A second call can ring while you're on a call." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی پشت خط هستید، تماس دوم هم می‌تواند زنگ بخورد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bir görüşmedeyken ikinci bir arama da çalabilir." } }
+      }
+    },
+    "A voicemail is waiting on %@. Open Pairline to call your voicemail." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "توجد رسالة في البريد الصوتي على %@. افتح Pairline للاتصال بالبريد الصوتي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A voicemail is waiting on %@. Open Pairline to call your voicemail." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک پیام در پست صوتی %@ منتظر است. Pairline را باز کنید تا با پست صوتی تماس بگیرید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ üzerinde bekleyen bir sesli mesaj var. Sesli mesajınızı aramak için Pairline’ı açın." } }
+      }
+    },
+    "A voicemail is waiting. Open Pairline to call your voicemail." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "توجد رسالة في البريد الصوتي. افتح Pairline للاتصال بالبريد الصوتي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A voicemail is waiting. Open Pairline to call your voicemail." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک پیام در پست صوتی منتظر است. Pairline را باز کنید تا با پست صوتی تماس بگیرید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bekleyen bir sesli mesaj var. Sesli mesajınızı aramak için Pairline’ı açın." } }
+      }
+    },
+    "Always" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "دائمًا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Always" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "همیشه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Her zaman" } }
+      }
+    },
+    "Balance" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرصيد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Balance" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "موجودی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bakiye" } }
+      }
+    },
+    "Call forwarding" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحويل المكالمات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call forwarding" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتقال تماس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama yönlendirme" } }
+      }
+    },
+    "Call forwarding, waiting and caller ID" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحويل المكالمات وانتظارها وإظهار الرقم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call forwarding, waiting and caller ID" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتقال تماس، انتظار تماس و نمایش شماره" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama yönlendirme, bekletme ve arayan kimliği" } }
+      }
+    },
+    "Call settings" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعدادات المكالمات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call settings" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تنظیمات تماس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama ayarları" } }
+      }
+    },
+    "Call voicemail" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الاتصال بالبريد الصوتي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call voicemail" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس با پست صوتی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sesli mesajı ara" } }
+      }
+    },
+    "Call waiting" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "انتظار المكالمات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call waiting" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتظار تماس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama bekletme" } }
+      }
+    },
+    "Call with my number hidden" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مع إخفاء رقمي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call with my number hidden" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس با شمارهٔ پنهان" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Numaramı gizleyerek ara" } }
+      }
+    },
+    "Caller ID" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إظهار رقم المتصل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Caller ID" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نمایش شماره" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arayan kimliği" } }
+      }
+    },
+    "Check" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التحقق من الحالة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بررسی وضعیت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Durumu sorgula" } }
+      }
+    },
+    "Check balance" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التحقق من الرصيد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check balance" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بررسی موجودی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bakiyeyi sorgula" } }
+      }
+    },
+    "Checked %@ ago" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم التحقق قبل %@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Checked %@ ago" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "%@ پیش بررسی شد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ önce sorgulandı" } }
+      }
+    },
+    "Choose a balance code first: run it under Calls › USSD codes and turn on “Use as balance code”." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختر رمز الرصيد أولًا: شغّله من المكالمات › رموز USSD وفعّل «استخدامه رمزًا للرصيد»." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a balance code first: run it under Calls › USSD codes and turn on “Use as balance code”." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اول کد موجودی را انتخاب کنید: آن را در تماس‌ها › کدهای USSD اجرا کنید و «استفاده به‌عنوان کد موجودی» را روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Önce bir bakiye kodu seçin: Aramalar › USSD kodları’nda çalıştırın ve “Bakiye kodu olarak kullan”ı açın." } }
+      }
+    },
+    "Forward to this number" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التحويل إلى هذا الرقم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Forward to this number" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتقال به این شماره" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu numaraya yönlendir" } }
+      }
+    },
+    "Hide my number on every call" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إخفاء رقمي في كل المكالمات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hide my number on every call" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پنهان کردن شماره در همهٔ تماس‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tüm aramalarda numaramı gizle" } }
+      }
+    },
+    "New voicemail" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رسالة جديدة في البريد الصوتي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New voicemail" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام جدید در پست صوتی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeni sesli mesaj" } }
+      }
+    },
+    "Not checked since Pairline opened." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يتم التحقق منذ فتح Pairline." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not checked since Pairline opened." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از وقتی Pairline باز شده بررسی نشده است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline açıldığından beri sorgulanmadı." } }
+      }
+    },
+    "Number to forward to" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرقم المراد التحويل إليه" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Number to forward to" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شمارهٔ مقصد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendirilecek numara" } }
+      }
+    },
+    "Send calls to another number. Your carrier may charge for forwarded calls." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حوّل المكالمات إلى رقم آخر. قد يفرض المشغّل رسومًا على المكالمات المحوّلة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send calls to another number. Your carrier may charge for forwarded calls." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها را به شمارهٔ دیگری بفرستید. ممکن است اپراتور برای تماس‌های منتقل‌شده هزینه بگیرد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramaları başka bir numaraya gönderin. Operatörünüz yönlendirilen aramalar için ücret alabilir." } }
+      }
+    },
+    "Show my number on every call" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إظهار رقمي في كل المكالمات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show my number on every call" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نمایش شماره در همهٔ تماس‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tüm aramalarda numaramı göster" } }
+      }
+    },
+    "Shows its reply on the Bridge tab, with a button to check again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يظهر ردّه في تبويب الوسيط مع زر للتحقق مجددًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Shows its reply on the Bridge tab, with a button to check again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاسخش در زبانهٔ پل نشان داده می‌شود، با دکمه‌ای برای بررسی دوباره." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yanıtını Köprü sekmesinde, yeniden sorgulama düğmesiyle gösterir." } }
+      }
+    },
+    "These are the standard codes for GSM carriers; not every carrier supports each of them. The carrier's reply shows here and isn't stored." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هذه هي الرموز القياسية لمشغّلي GSM، ولا يدعمها كل مشغّل. يظهر ردّ المشغّل هنا ولا يُحفظ." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "These are the standard codes for GSM carriers; not every carrier supports each of them. The carrier's reply shows here and isn't stored." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این‌ها کدهای استاندارد اپراتورهای GSM هستند و هر اپراتوری همهٔ آن‌ها را پشتیبانی نمی‌کند. پاسخ اپراتور اینجا نشان داده می‌شود و ذخیره نمی‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bunlar GSM operatörlerinin standart kodlarıdır; her operatör hepsini desteklemez. Operatörün yanıtı burada görünür ve saklanmaz." } }
+      }
+    },
+    "To hide your number on one call only, touch and hold the call button on the keypad." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لإخفاء رقمك في مكالمة واحدة فقط، المس زر الاتصال في لوحة المفاتيح مطولًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "To hide your number on one call only, touch and hold the call button on the keypad." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای پنهان کردن شماره فقط در یک تماس، دکمهٔ تماس را در صفحه‌کلید نگه دارید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Numaranızı yalnızca bir aramada gizlemek için tuş takımındaki arama düğmesine dokunup basılı tutun." } }
+      }
+    },
+    "Turn off" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إيقاف" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn off" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خاموش کردن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kapat" } }
+      }
+    },
+    "Turn off all forwarding" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إيقاف كل التحويلات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn off all forwarding" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خاموش کردن همهٔ انتقال‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tüm yönlendirmeleri kapat" } }
+      }
+    },
+    "Turn on" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تشغيل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن کردن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aç" } }
+      }
+    },
+    "Use as balance code" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استخدامه رمزًا للرصيد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use as balance code" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "استفاده به‌عنوان کد موجودی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bakiye kodu olarak kullan" } }
+      }
+    },
+    "Voicemail" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بريد صوتي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Voicemail" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پست صوتی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sesli mesaj" } }
+      }
+    },
+    "When busy" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عند الانشغال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "When busy" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی مشغول هستم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Meşgulken" } }
+      }
+    },
+    "When not answered" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عند عدم الرد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "When not answered" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی جواب نمی‌دهم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Cevap verilmediğinde" } }
+      }
+    },
+    "When unreachable" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عند تعذّر الوصول" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "When unreachable" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی در دسترس نیستم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ulaşılamadığında" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

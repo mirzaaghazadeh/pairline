@@ -130,7 +130,7 @@
     <string name="pair_replaces">Pairing a new iPhone replaces %1$s.</string>
     <string name="pair_success_title">Paired!</string>
     <string name="pair_success_text">Your iPhone and this phone now trust each other. Only they can read what goes between them.</string>
-    <!-- Cloud mode (D-080) is turned on from the iPhone, which gives this phone its iCloud access. -->
+    <!-- Cloud mode (D-092) is turned on from the iPhone, which gives this phone its iCloud access. -->
     <string name="pair_success_cloud">Want your phones to stay connected when they\'re apart? Turn on Cloud mode in Pairline on your iPhone.</string>
     <string name="pair_connecting">Connecting…</string>
     <string name="pair_connected">Connected. Your iPhone can use this phone\'s SIM now.</string>
@@ -168,7 +168,7 @@
     <string name="home_waiting_title">Waiting for %1$s</string>
     <string name="home_waiting_body">Last connected %1$s. Pairline reconnects by itself when your iPhone is nearby with Pairline open or in the background.</string>
     <string name="home_waiting_never">Your iPhone hasn\'t connected yet. Open Pairline on it, nearby, with Bluetooth on.</string>
-    <!-- Cloud mode (D-080; "remote mode" in the code): no Bluetooth or Wi-Fi link, but the iPhone is reached through its iCloud. -->
+    <!-- Cloud mode (D-092; "remote mode" in the code): no Bluetooth or Wi-Fi link, but the iPhone is reached through its iCloud. -->
     <string name="state_via_icloud">Via iCloud</string>
     <string name="state_cloud_offline">iCloud unreachable</string>
     <string name="notif_via_icloud_text">Cloud mode: texts, codes and calls reach your iPhone through your iCloud until your phones are linked nearby again.</string>
@@ -345,6 +345,9 @@
     <string name="settings_general">General</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_system">System default</string>
+    <string name="language_step_title">Choose your language</string>
+    <string name="language_step_body">You can change it later in Settings.</string>
+    <string name="language_step_body_guessed">We picked this from your SIM card or time zone. You can change it now, or later in Settings.</string>
     <string name="settings_iphone">Your iPhone</string>
     <string name="settings_ios_version">iOS %1$s</string>
     <string name="settings_app_version">Pairline %1$s</string>
@@ -494,7 +497,7 @@
     <string name="help_q_unpair">What happens when I unpair?</string>
     <string name="help_a_unpair">Both phones delete each other\'s key, so they can\'t talk to each other anymore. Your messages and contacts stay where they are on this phone.</string>
 
-    <!-- Pair over the internet (remote pairing, D-080): an invitation from the user's own iPhone when the phones aren't together. The code is always shown left to right. -->
+    <!-- Pair over the internet (remote pairing, D-092): an invitation from the user's own iPhone when the phones aren't together. The code is always shown left to right. -->
     <string name="remote_pair_title">Pair over the internet</string>
     <string name="remote_pair_ask_title">Your iPhone wants to pair with this phone over the internet</string>
     <string name="remote_pair_ask_body">If you allow it, your iPhone gets this phone\'s text messages, one-time codes and calls wherever it is, with Cloud mode on, and can send texts and make calls with this phone\'s SIM.</string>
@@ -539,7 +542,7 @@
     <string name="remote_pair_scan_denied">Pairline needs the camera only to read the QR code. Allow it to scan, or choose a picture of the QR code or paste the link instead.</string>
     <string name="remote_pair_paste_none">There\'s no Pairline invitation on the clipboard. Copy the whole link (it starts with pairline://invite) and try again.</string>
 
-    <!-- Cloud mode's direct connection through the home router (D-080): the link card's line while Cloud mode is on. -->
+    <!-- Cloud mode's direct connection through the home router (D-092): the link card's line while Cloud mode is on. -->
     <string name="home_connected_body_direct">Cloud mode\'s direct connection: over the internet, straight through your home router. Calls and messages are being relayed to your iPhone.</string>
     <string name="notif_connected_text_direct">Cloud mode\'s direct connection, over the internet. Calls and messages are being relayed to your iPhone.</string>
     <string name="direct_checking">Direct connection: checking…</string>
@@ -557,7 +560,7 @@
     <string name="direct_hint_router">Texts and codes still work. For calls from far away, turn on UPnP or NAT-PMP in your router\'s settings. Step by step: Help › Allow calls from far away, in Pairline on your iPhone.</string>
     <string name="direct_hint_modem">Texts and codes still work. For calls from far away, turn on UPnP on your provider\'s modem too, or put the modem in bridge mode. Step by step: Help › Allow calls from far away, in Pairline on your iPhone.</string>
     <string name="direct_hint_provider">Texts and codes still work. Calls from far away need your own internet address: ask your internet provider for a public IPv4 address or IPv6.</string>
-    <!-- Manual port forwarding (D-083). %1$s is the port (47830), %2$s this phone's address on the home network; both shown left to right. -->
+    <!-- Manual port forwarding (D-095). %1$s is the port (47830), %2$s this phone's address on the home network; both shown left to right. -->
     <string name="direct_hint_router_manual">Texts and codes still work. For calls from far away: if your router has UPnP or NAT-PMP, turn it on, and Pairline sets everything up by itself. If it doesn\'t, forward TCP port %1$s to this phone (%2$s) in your router, give this phone a fixed address there, and enter your home\'s internet address or DDNS name in Pairline on your iPhone: Settings › Cloud mode › Port forwarding. Step by step: Help › Allow calls from far away, on your iPhone.</string>
     <string name="direct_hint_modem_manual">Texts and codes still work. For calls from far away: your provider\'s modem sits in front of your router. Turn on UPnP or NAT-PMP on the modem too, or put the modem in bridge mode. Or forward TCP port %1$s to this phone (%2$s) on both, give this phone a fixed address, and enter your home\'s internet address or DDNS name in Pairline on your iPhone: Settings › Cloud mode › Port forwarding. Step by step: Help › Allow calls from far away, on your iPhone.</string>
     <string name="direct_hint_device_mac">On this phone, set this Wi-Fi network\'s privacy to Use device MAC so the router keeps its address.</string>

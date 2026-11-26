@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The bridge's answer to "Check my home connection" (`remote.check`, PROTOCOL.md "Remote messages", D-080): whether
+/// The bridge's answer to "Check my home connection" (`remote.check`, PROTOCOL.md "Remote messages", D-092): whether
 /// remote mode's direct connection could work at its home, found by asking the router read-only.
 struct HomeCheckReply: Equatable {
     enum Router: String, Equatable {
@@ -80,7 +80,7 @@ extension HomeCheckReply {
 struct HomeConnectionCheckRow: View {
     @EnvironmentObject private var app: AppModel
     @ObservedObject var bridge: BridgeController
-    /// For the Port forwarding screen (D-083), and whether the user set it up; the parent observes it.
+    /// For the Port forwarding screen (D-095), and whether the user set it up; the parent observes it.
     var remote: RemoteLink?
     var manualSet = false
     @State private var running = false
@@ -133,7 +133,7 @@ struct HomeConnectionCheckRow: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
-                // Manual port forwarding (D-083): covers a router that opens nothing, not a shared provider address.
+                // Manual port forwarding (D-095): covers a router that opens nothing, not a shared provider address.
                 if manualSet, result.reason == .router || result.reason == .noPublicAddress {
                     Text("You set up port forwarding yourself; Pairline uses it while you're away.", tableName: "RemoteMode")
                         .font(.footnote)

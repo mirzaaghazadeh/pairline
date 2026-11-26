@@ -1,8 +1,11 @@
 package app.pairline.android.mirror
 
 import android.app.Notification
+import android.app.PendingIntent
+import android.app.RemoteInput
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -51,6 +54,10 @@ object NotificationMirror {
     private val sent = ConcurrentHashMap<String, Long>()
     private val labels = ConcurrentHashMap<String, String>()
 
+    /** The app's own reply action of each mirrored notification that has one (D-086), by key. */
+    private val replyActions = ConcurrentHashMap<String, Notification.Action>()
+    private const val MAX_REPLY = 2_000
+
     private const val MAX_TITLE = 200
     private const val MAX_TEXT = 1_000
     private const val MAX_TRACKED = 500
@@ -69,6 +76,7 @@ object NotificationMirror {
             ?.toString()?.trim()?.take(MAX_TEXT)
         if (title.isNullOrEmpty() && text.isNullOrEmpty()) return
         if (!AppGraph.link.isConnected) return
+        val reply = replyAction(sbn.notification)
         AppGraph.link.send(
             JSONObject()
                 .put("t", Msg.NOTIF_POSTED)
@@ -77,16 +85,57 @@ object NotificationMirror {
                 .put("appName", label(context, sbn.packageName))
                 .putNullable("title", title)
                 .putNullable("text", text)
-                .put("time", sbn.postTime),
+                .put("time", sbn.postTime)
+                .put("reply", reply != null),
         )
-        if (sent.size > MAX_TRACKED) sent.clear()
+        if (sent.size > MAX_TRACKED) {
+            sent.clear()
+            replyActions.clear()
+        }
         sent[sbn.key] = sbn.postTime
+        if (reply != null) replyActions[sbn.key] = reply else replyActions.remove(sbn.key)
         Log.i(TAG, "mirrored a notification")
     }
 
     fun removed(sbn: StatusBarNotification) {
+        replyActions.remove(sbn.key)
         if (sent.remove(sbn.key) == null || !AppGraph.link.isConnected) return
         AppGraph.link.send(JSONObject().put("t", Msg.NOTIF_REMOVED).put("key", sbn.key))
+    }
+
+    /**
+     * The app's reply action: the one marked as "reply", else the first that takes free text. The same action a
+     * watch or Android Auto uses, so the app handles it as if the user had replied in the notification here.
+     */
+    private fun replyAction(n: Notification): Notification.Action? {
+        val actions = n.actions ?: return null
+        fun takesText(a: Notification.Action) = a.actionIntent != null &&
+            a.remoteInputs?.any { it.allowFreeFormInput } == true
+        return actions.firstOrNull { takesText(it) && it.semanticAction == Notification.Action.SEMANTIC_ACTION_REPLY }
+            ?: actions.firstOrNull(::takesText)
+    }
+
+    /**
+     * Sends [text] through the app's own reply action of a mirrored notification (`notif.reply`, D-086). Returns
+     * false when it has none (any more). The text goes only to that app, as if typed in the notification here.
+     */
+    fun reply(context: Context, key: String, text: String): Boolean {
+        if (!sent.containsKey(key)) return false
+        val action = replyActions[key] ?: return false
+        val inputs = action.remoteInputs?.takeIf { it.isNotEmpty() } ?: return false
+        val results = Bundle()
+        for (input in inputs) if (input.allowFreeFormInput) results.putCharSequence(input.resultKey, text.take(MAX_REPLY))
+        val intent = Intent()
+        RemoteInput.addResultsToIntent(inputs, intent, results)
+        RemoteInput.setResultsSource(intent, RemoteInput.SOURCE_FREE_FORM_INPUT)
+        return try {
+            action.actionIntent.send(context, 0, intent)
+            Log.i(TAG, "replied to a mirrored notification")
+            true
+        } catch (e: PendingIntent.CanceledException) {
+            replyActions.remove(key)
+            false
+        }
     }
 
     /** The user dismissed it on the iPhone: clear it here too. Only keys Pairline mirrored. */

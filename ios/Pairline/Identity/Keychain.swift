@@ -6,7 +6,7 @@ import Security
 ///
 /// Items stored `shared` go into the app group, which doubles as a Keychain access group, so the notification
 /// service extension can read them (the identity and the paired bridge's key: remote mode's extension unseals records
-/// with them, D-080). Reads and deletes look in every group the process may use.
+/// with them, D-092). Reads and deletes look in every group the process may use.
 enum Keychain {
     static let service = "app.pairline.ios"
     static let sharedGroup = "group.app.pairline.ios"

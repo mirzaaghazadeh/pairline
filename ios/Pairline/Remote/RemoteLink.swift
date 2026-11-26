@@ -114,7 +114,7 @@ enum RemoteReceiving {
     }
 }
 
-/// Remote mode's mailbox path (D-080; PROTOCOL.md, "Remote mode"): the third way to the bridge after Bluetooth and
+/// Remote mode's mailbox path (D-092; PROTOCOL.md, "Remote mode"): the third way to the bridge after Bluetooth and
 /// Wi-Fi, used while no session is up. It seals messages for the bridge into the user's iCloud, catches up on what
 /// the bridge left there, and keeps the bridge supplied with web auth tokens. `LinkManager` routes through it.
 ///
@@ -205,7 +205,7 @@ final class RemoteLink: ObservableObject {
         return direct.endpoints.candidates.filter { !droppedEndpoints.contains($0) }
     }
 
-    /// The user's manual port forwarding (D-083), while remote mode is on.
+    /// The user's manual port forwarding (D-095), while remote mode is on.
     var manualEndpoint: WiFiEndpoint? {
         guard isOn else { return nil }
         return direct.manual?.endpoint

@@ -69,7 +69,7 @@ class DirectLinkTest {
     }
 
     /**
-     * Manual port forwarding (D-083): a router with no NAT-PMP, PCP or UPnP still gets a listener, and the screen shows
+     * Manual port forwarding (D-095): a router with no NAT-PMP, PCP or UPnP still gets a listener, and the screen shows
      * the address and port to forward by hand. Neither goes into a message.
      */
     @Test

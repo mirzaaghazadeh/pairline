@@ -340,6 +340,9 @@
     <string name="settings_general">عمومی</string>
     <string name="settings_language">زبان</string>
     <string name="settings_language_system">پیش‌فرض سیستم</string>
+    <string name="language_step_title">زبان خود را انتخاب کنید</string>
+    <string name="language_step_body">بعداً هم می‌توانید آن را در تنظیمات عوض کنید.</string>
+    <string name="language_step_body_guessed">این زبان را از روی سیم‌کارت یا منطقهٔ زمانی گوشی انتخاب کردیم. همین حالا یا بعداً در تنظیمات می‌توانید عوضش کنید.</string>
     <string name="settings_iphone">آیفون شما</string>
     <string name="settings_ios_version">نسخهٔ iOS: %1$s</string>
     <string name="settings_app_version">نسخهٔ Pairline: %1$s</string>
@@ -488,7 +491,7 @@
     <string name="help_q_unpair">وقتی جفت‌سازی را لغو کنم چه می‌شود؟</string>
     <string name="help_a_unpair">هر دو گوشی کلید یکدیگر را پاک می‌کنند و دیگر نمی‌توانند با هم ارتباط داشته باشند. پیامک‌ها و مخاطبین شما همان‌جا که هستند، روی این گوشی می‌مانند.</string>
 
-    <!-- Remote pairing (D-080). -->
+    <!-- Remote pairing (D-092). -->
     <string name="remote_pair_title">جفت کردن از راه اینترنت</string>
     <string name="remote_pair_ask_title">آیفون شما می‌خواهد از راه اینترنت با این گوشی جفت شود</string>
     <string name="remote_pair_ask_body">اگر اجازه بدهید، آیفون شما با حالت ابریِ روشن، هر جا که باشد پیامک‌ها، کدهای یک‌بارمصرف و تماس‌های این گوشی را دریافت می‌کند و می‌تواند با سیم‌کارت این گوشی پیامک بفرستد و تماس بگیرد.</string>

@@ -36,12 +36,27 @@ object PhoneNumbers {
         return n
     }
 
-    /** A USSD or MMI code such as `*100#` or `*123*1#`. */
+    /**
+     * A USSD or MMI code such as `*100#`, `*123*1#`, or a call-forwarding code with an international number such as
+     * `**21*+905551234567#`: a '+' may follow a '*' (D-082). Spaces, dashes and bidi marks are dropped, Persian and
+     * Arabic-Indic digits converted.
+     */
     fun normalizeUssd(raw: String): String? {
-        val n = normalizeDialable(raw) ?: return null
-        if (n.length < 2 || !(n.startsWith('*') || n.startsWith('#'))) return null
-        if (!n.endsWith('#')) return null
-        if (n.any { it == ',' || it == ';' || it == '+' }) return null
+        val out = StringBuilder()
+        for (ch in raw.trim()) {
+            val c = asciiDigit(ch)
+            when {
+                c != null -> out.append(c)
+                ch == '*' || ch == '#' -> out.append(ch)
+                ch == '+' && out.endsWith("*") -> out.append('+')
+                ch == ' ' || ch == '-' || ch == '.' || ch == '(' || ch == ')' || ch == ' ' -> Unit
+                ch == '‎' || ch == '‏' || ch == '⁦' || ch == '⁩' -> Unit // bidi marks
+                else -> return null
+            }
+        }
+        val n = out.toString()
+        if (n.length < 2 || n.length > MAX_LENGTH || !(n.startsWith('*') || n.startsWith('#'))) return null
+        if (!n.endsWith('#') || n.none { it.isDigit() }) return null
         return n
     }
 
@@ -86,11 +101,42 @@ object PhoneNumbers {
      */
     fun blockMatches(blocked: String?, number: String?): Boolean {
         if (blocked == null || number == null) return false
+        blockPrefix(blocked)?.let { return prefixMatches(it, number) }
         val a = digits(blocked)
         val b = digits(number)
         if (a.length >= MIN_MATCH && b.length >= MIN_MATCH) return sameEnding(a, b)
         val ka = matchKey(blocked) ?: return false
         return ka == matchKey(number)
+    }
+
+    /**
+     * A block-list entry that ends with '*' blocks every number starting with it (D-085): "+234*" a country, "0900*" a
+     * range of premium numbers. Two digits at least. Null for an ordinary entry.
+     */
+    data class BlockPrefix(val international: Boolean, val digits: String)
+
+    fun blockPrefix(entry: String): BlockPrefix? {
+        val t = entry.trim()
+        if (!t.endsWith('*') || t.count { it == '*' } != 1) return null
+        val body = t.dropLast(1)
+        if (body.any { !(asciiDigit(it) != null || it == '+' || it == ' ' || it == '-') }) return null
+        val d = digits(body)
+        if (d.length < 2) return null
+        val international = body.trimStart().startsWith('+') || d.startsWith("00")
+        return BlockPrefix(international, if (!body.trimStart().startsWith('+') && d.startsWith("00")) d.drop(2) else d)
+    }
+
+    /** International prefixes match numbers written with "+" or "00"; others match the digits as they come. */
+    fun prefixMatches(prefix: BlockPrefix, number: String): Boolean {
+        val trimmed = number.trim()
+        val d = digits(trimmed)
+        if (!prefix.international) return d.startsWith(prefix.digits)
+        val intl = when {
+            trimmed.startsWith('+') -> d
+            d.startsWith("00") -> d.drop(2)
+            else -> return false
+        }
+        return intl.startsWith(prefix.digits)
     }
 
     /** Both digit strings have at least [MIN_MATCH] digits: compare as many trailing digits as the shorter has, up to 9. */

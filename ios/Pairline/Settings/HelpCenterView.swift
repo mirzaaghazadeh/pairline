@@ -29,7 +29,7 @@ struct HelpCenterView: View {
                     ToolRow(symbol: "phone.fill", tint: .brandFill, title: Text("How calls work"),
                             subtitle: Text("Answer here; talk here too with Talk on iPhone", tableName: "CallAudio"))
                 }
-                // Cloud mode (D-080): the same plain-words explanation as before turning it on.
+                // Cloud mode (D-092): the same plain-words explanation as before turning it on.
                 if RemoteFeature.isAvailable {
                     NavigationLink {
                         ScrollView {
@@ -273,7 +273,7 @@ struct FAQ: Identifiable {
         FAQ(id: 7, question: "Can I see the source code?",
             answer: "Yes. Pairline's source code is public so anyone can check what it does."),
         FAQ(id: 8, question: "Does Pairline work with group messages or MMS?",
-            answer: "Not yet. Pairline handles SMS text messages. Picture messages (MMS) are planned."),
+            answer: "Yes, with the latest Pairline Bridge. Picture and group messages show here with their pictures and everyone in the group, and you can send a picture or a group message. Sending needs mobile data on the Android phone, and full pictures open over Wi-Fi."),
     ]
 }
 

@@ -36,7 +36,7 @@ enum TransportKind: String, Codable {
     case tcp
     /// The production Wi-Fi link (M5): a full session over TCP on the local network, plus media and bulk channels.
     case wifi
-    /// Remote mode's direct connection (D-080): the Wi-Fi session over TCP to the bridge's public address. Call audio
+    /// Remote mode's direct connection (D-092): the Wi-Fi session over TCP to the bridge's public address. Call audio
     /// rides inside it as `MEDIA` frames, like Bluetooth (no UDP media channel); no bulk channel for now.
     case direct
     case demo
@@ -98,7 +98,7 @@ final class LinkSession {
     /// `BULK` frames exist only on the Wi-Fi link (PROTOCOL.md, "Frames"); not on the direct connection yet.
     var carriesBulk: Bool { transport.kind == .wifi }
     /// `MEDIA` frames (call audio, D-072) exist on Bluetooth, the debug TCP link and remote mode's direct connection
-    /// (D-080): Wi-Fi has its UDP channel.
+    /// (D-092): Wi-Fi has its UDP channel.
     var carriesLinkMedia: Bool { transport.kind == .bluetooth || transport.kind == .tcp || transport.kind == .direct }
 
     init(transport: FrameTransport, identity: KeyAgreementPrivateKey, pinnedBridgeKey: Data?, pairing: PairingLink?,

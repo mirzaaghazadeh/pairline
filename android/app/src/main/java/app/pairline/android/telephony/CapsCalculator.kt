@@ -30,6 +30,12 @@ data class CapsInput(
     val phoneTools: Boolean = false,
     /** Notification access is given, so chosen apps' notifications are mirrored (D-077). */
     val notifMirror: Boolean = false,
+    /** Usage access is given, so the iPhone can show the mobile data used (D-084). */
+    val dataUsage: Boolean = false,
+    /** Pairline holds Android's call-screening role (D-085). */
+    val callScreen: Boolean = false,
+    /** "Photos for the iPhone" is on and photo access is given (D-088). */
+    val photos: Boolean = false,
 )
 
 /**
@@ -46,11 +52,16 @@ object CapsCalculator {
             if (has(Manifest.permission.SEND_SMS)) caps += Caps.SMS_SEND
             if (has(Manifest.permission.READ_SMS)) caps += Caps.SMS_HISTORY
             if (has(Manifest.permission.READ_SMS) && input.smsWrite) caps += Caps.SMS_READ
+            // The bridge keeps them and sends them at the time (D-084).
+            if (has(Manifest.permission.SEND_SMS)) caps += Caps.SMS_SCHEDULE
+            // Picture and group messages: read from Android's store, sent through its MMS service (D-089).
+            if (has(Manifest.permission.READ_SMS) && has(Manifest.permission.SEND_SMS)) caps += Caps.MMS
         }
         if (input.hasCalling) {
             if (phoneState) caps += Caps.CALL_OBSERVE
             if (phoneState && has(Manifest.permission.ANSWER_PHONE_CALLS)) caps += Caps.CALL_CONTROL
             if (has(Manifest.permission.CALL_PHONE)) caps += Caps.CALL_DIAL
+            if (has(Manifest.permission.CALL_PHONE) && phoneState) caps += Caps.CALL_VOICEMAIL
             if (input.inCallService) {
                 caps += Caps.CALL_DTMF
                 caps += Caps.CALL_AUDIO
@@ -74,6 +85,7 @@ object CapsCalculator {
             caps += Caps.PHONE_RINGER
         }
         if (input.notifMirror) caps += Caps.NOTIF_MIRROR
+        if (input.dataUsage) caps += Caps.DATA_USAGE
         if (input.activeSims >= 2) caps += Caps.DUALSIM
         if (input.netShare) caps += Caps.NET_SHARE
         if (input.netSwitch) caps += Caps.NET_SWITCH
@@ -85,6 +97,9 @@ object CapsCalculator {
         if (has(Manifest.permission.READ_CALL_LOG) && has(Manifest.permission.WRITE_CALL_LOG)) caps += Caps.CALLLOG_DELETE
         // The block list needs no permission: it filters what the bridge relays (D-043).
         caps += Caps.BLOCK
+        if (input.callScreen && input.hasCalling) caps += Caps.CALL_SCREEN
+        // Photos travel with the file transfer, so only with the Wi-Fi link on.
+        if (input.photos && input.wifiLink) caps += Caps.MEDIA_PHOTOS
         return Caps.ALL.filter { it in caps }
     }
 }

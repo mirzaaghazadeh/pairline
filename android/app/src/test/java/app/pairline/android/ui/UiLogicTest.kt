@@ -42,10 +42,11 @@ class UiLogicTest {
     }
 
     @Test
-    fun wizardStartsWithWelcomeAndEndsWithPairingThenDone() {
+    fun wizardStartsWithLanguageThenWelcomeAndEndsWithPairingThenDone() {
         val steps = SetupStep.all(sdk = 36, maker = Maker.SAMSUNG)
-        assertEquals(SetupStep.Welcome, steps.first())
-        assertEquals(SetupStep.Privacy, steps[1])
+        assertEquals(SetupStep.Language, steps.first())
+        assertEquals(SetupStep.Welcome, steps[1])
+        assertEquals(SetupStep.Privacy, steps[2])
         assertEquals(SetupStep.Pair, steps[steps.size - 3])
         assertEquals(SetupStep.Talk, steps[steps.size - 2])
         assertEquals(SetupStep.Done, steps.last())
@@ -53,6 +54,34 @@ class UiLogicTest {
         assertFalse(SetupStep.Talk in SetupStep.all(sdk = 28, maker = Maker.OTHER))
         val battery = steps.indexOf(SetupStep.Battery)
         assertTrue(steps.subList(0, battery).any { it is SetupStep.Permission } || steps.none { it is SetupStep.Permission })
+    }
+
+    @Test
+    fun firstLanguageComesFromTheFirstKnownCountry() {
+        // SIM, network, time zone, region: the first one known decides.
+        assertEquals("fa", FirstLanguage.suggest(listOf("ir", "tr", "TR", "US"), "en"))
+        assertEquals("tr", FirstLanguage.suggest(listOf("", null, "TR", "US"), "en"))
+        assertEquals("ar", FirstLanguage.suggest(listOf(null, "ae", "AE", ""), "en"))
+        assertEquals("fa", FirstLanguage.suggest(listOf("", "", "001", "AF"), "de"))
+        // A German SIM keeps the phone's language; the region setting isn't reached.
+        assertEquals(null, FirstLanguage.suggest(listOf("de", "de", "DE", "IR"), "en", "DE"))
+        assertEquals(null, FirstLanguage.suggest(listOf(null, null, null, ""), "en"))
+    }
+
+    @Test
+    fun tehransTimeZoneMeansPersianWhateverTheSim() {
+        assertEquals("fa", FirstLanguage.suggest(listOf("us", "us", "IR", "US"), "en", "IR"))
+        assertEquals("fa", FirstLanguage.suggest(listOf("tr", "tr", "IR", "TR"), "de", "IR"))
+        // Only Tehran's: a US SIM in Istanbul's time zone keeps English.
+        assertEquals(null, FirstLanguage.suggest(listOf("us", "us", "TR", "US"), "en", "TR"))
+    }
+
+    @Test
+    fun firstLanguageKeepsAPhoneAlreadyInOneOfOurLanguages() {
+        assertEquals(null, FirstLanguage.suggest(listOf("tr"), "tr", "IR"))
+        assertEquals(null, FirstLanguage.suggest(listOf("ir"), "tr"))
+        assertEquals(null, FirstLanguage.suggest(listOf("tr"), "fa"))
+        assertEquals(null, FirstLanguage.suggest(listOf("sa"), "ar"))
     }
 
     @Test

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_channel">اجازه‌ها برای آیفون</string>
+    <string name="schedule_access_title">ارسال به‌موقع پیام‌های زمان‌بندی‌شده</string>
+    <string name="schedule_access_text">پیام‌هایی که روی آیفون زمان‌بندی می‌کنید با این گوشی فرستاده می‌شوند. Pairline Bridge را در «هشدارها و یادآوری‌ها» روشن کنید تا دقیقاً در همان دقیقه‌ای که انتخاب کرده‌اید فرستاده شوند. بدون آن، اندروید ممکن است چند دقیقه دیرتر بفرستد.</string>
+    <string name="usage_access_title">اجازهٔ دسترسی به آمار مصرف برای سنجش اینترنت</string>
+    <string name="usage_access_text">آیفون پرسیده این گوشی چقدر اینترنت همراه مصرف کرده است. Pairline Bridge را در «دسترسی به میزان استفاده» روشن کنید. فقط مجموع مصرف به آیفون می‌رود، نه اینکه کدام برنامه‌ها مصرف کرده‌اند.</string>
+    <string name="ring_iphone_tile">زنگ آیفون</string>
+    <string name="ring_iphone">آیفونم را زنگ بزن</string>
+    <string name="ring_iphone_sub">۳۰ ثانیه روی آیفون صدا پخش می‌کند، حتی در حالت بی‌صدا</string>
+    <string name="ring_iphone_offline">آیفون الان وصل نیست.</string>
+    <string name="ring_iphone_update">برای زنگ زدن آیفون از اینجا، Pairline را روی آیفون به‌روز کنید.</string>
+    <string name="ring_iphone_sent">آیفون شما در حال زنگ خوردن است…</string>
+    <string name="screen_title">بررسی تماس‌ها</string>
+    <string name="screen_role">مسدود کردن تماس‌ها پیش از زنگ خوردن</string>
+    <string name="screen_role_on">روشن: Pairline Bridge تماس‌های ورودی را بررسی می‌کند</string>
+    <string name="screen_role_off">بزنید تا Pairline Bridge برنامهٔ بررسی تماس اندروید شود. بدون آن، تماس مسدودشده قبل از رد شدن یک لحظه اینجا زنگ می‌خورد.</string>
+    <string name="screen_unknown">بی‌صدا کردن تماس‌گیرندگان ناشناس</string>
+    <string name="screen_unknown_sub">تماس شماره‌هایی که در مخاطبان شما نیستند روی هیچ‌کدام از دو گوشی زنگ نمی‌خورد؛ به پست صوتی می‌رود و بی‌پاسخ نشان داده می‌شود.</string>
+    <string name="block_prefix_note">شماره را با * تمام کنید تا همهٔ شماره‌هایی که با آن شروع می‌شوند مسدود شوند، مثلاً ‎+234*‎.</string>
+    <string name="photos_title">عکس‌ها برای آیفون</string>
+    <string name="photos_sub">عکس‌های این گوشی را روی آیفون ببینید و هرکدام را که بزنید کپی کنید؛ فقط از راه وای‌فای</string>
+</resources>

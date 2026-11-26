@@ -3,8 +3,8 @@
 > **Status: draft.** The wire version is `0` until an outside cryptographer has reviewed this
 > design (required before 1.0, see ROADMAP M7). Nothing has shipped yet, so v0 is still being filled in;
 > after the first release, any change to the wire format bumps the version and updates the shared test
-> vectors in `protocol/test-vectors/`. Remote mode (D-080) is version 1: v0 plus the section "Remote mode (v1,
-> D-080)", with its own vectors in `protocol/test-vectors/v1-remote.json`; the local links stay v0 on the wire.
+> vectors in `protocol/test-vectors/`. Remote mode (D-092) is version 1: v0 plus the section "Remote mode (v1,
+> D-092)", with its own vectors in `protocol/test-vectors/v1-remote.json`; the local links stay v0 on the wire.
 
 ## Roles and keys
 
@@ -103,7 +103,7 @@ Only the pinned peer can derive the keys, because both static keys are mixed in.
   with it.
 - **Link media keys (D-072):** `HKDF-SHA256(okm, salt = empty, info = "pairline v0 link media", L = 64)`; the first
   32 bytes are B→R, the last 32 R→B. `okm` is the one of the Bluetooth (or debug TCP) session, or of remote mode's
-  direct connection (D-080), that carries the `MEDIA` frames. They differ from the Wi-Fi media keys, so the two media
+  direct connection (D-092), that carries the `MEDIA` frames. They differ from the Wi-Fi media keys, so the two media
   paths never share a key and nonce.
 - **Counters per channel:** each direction of each channel has its own counter, starting at 0. On the control
   channel counter 0 is the confirm; on the bulk and media channels counter 0 is an ordinary record.
@@ -126,7 +126,7 @@ A frame is one complete unit after transport reassembly. Its first byte is the f
 | `0x10` | `HELLO` | 99-byte hello body |
 | `0x20` | `RECORD` | encrypted record (control channel) |
 | `0x21` | `BULK` | encrypted record on the bulk channel (M5): Wi-Fi TCP only, after the handshake |
-| `0x22` | `MEDIA` | encrypted record on the link media channel (call audio, D-072): BLE, debug TCP and remote mode's direct connection (D-080) only, after the handshake |
+| `0x22` | `MEDIA` | encrypted record on the link media channel (call audio, D-072): BLE, debug TCP and remote mode's direct connection (D-092) only, after the handshake |
 
 Frames are at most 65,535 bytes. Unknown frame types close the connection. `BULK` is new in M5 but needs no version
 bump: a side sends it only for a file transfer the peer accepted with `file.answer`, which an older app never sends.
@@ -208,7 +208,7 @@ bulk channels.
   sockets), otherwise on whichever is up. A bulk request whose Wi-Fi session closes before the reply arrives is sent
   again on BLE.
 - `call.media.start` with `via: "link"` goes on the Bluetooth (or debug TCP) session, whose `MEDIA` frames then carry
-  the call audio (D-072); away from home, with no Bluetooth session, on remote mode's direct connection (D-080).
+  the call audio (D-072); away from home, with no Bluetooth session, on remote mode's direct connection (D-092).
 - `link.switch` isn't used: replies follow their request (D-044).
 - After each handshake each side sends `device.info`, and B sends `status`, on that session. B re-sends calls in
   progress (`call.incoming` / `call.state`) only when its event session changes.
@@ -262,10 +262,22 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 {"key": "sms:1234", "thread": 17, "addr": "+15551234567", "body": "text", "time": 1764000000000,
  "box": "in" | "out", "sim": 0, "state": "received" | "pending" | "sent" | "delivered" | "failed"}
 
-// SIM, in status.sims (defaultData: Android's data SIM, D-073)
+// Message (MMS, D-089, with `mms`): key "mms:<id>"; body is the text parts (may be empty); addr is the sender of an
+// incoming one, the first recipient of an outgoing one. `parts` lists the attachments besides text and SMIL, pictures
+// with a base64 JPEG thumbnail of 128 px at most; `addrs` lists everyone in a group message but B. Both are left out
+// when empty. They arrive in `sms.history` and `sms.new` like texts, and `sms.threads` lists MMS-only and group threads.
+{"key": "mms:88", "thread": 21, "addr": "+15551234567", "body": "", "time": 1764000000000, "box": "in", "sim": 0,
+ "state": "received", "parts": [{"pid": 412, "type": "image/jpeg", "name": "IMG_1.jpg", "thumb": "/9j/4AAQ…"}],
+ "addrs": ["+15551234567", "+15557654321"]}
+
+// SIM, in status.sims (defaultData: Android's data SIM, D-073). D-082 adds, each optional: dbm (signal in dBm, RSRP on
+// LTE and 5G, Android 10+), rat (the exact radio technology, e.g. "LTE-CA", "NR NSA", "HSPA+"), op (the network it's
+// registered on, which differs from carrier when roaming) and vm (the carrier's voicemail-waiting indicator). B leaves
+// dbm out when deciding whether the status changed, so it travels with other changes and the 60-second status.
 {"slot": 0, "carrier": "Carrier", "label": "SIM 1", "number": "+15551234567" | null,
  "signal": 0-4, "net": "5G" | "LTE" | "3G" | "2G" | "none", "roaming": false,
- "defaultSms": true, "defaultVoice": true, "defaultData": true}
+ "defaultSms": true, "defaultVoice": true, "defaultData": true,
+ "dbm": -97, "rat": "LTE-CA", "op": "Carrier", "vm": false}
 
 // The bridge phone's own internet sharing, in status.net (D-073)
 {"hotspot": false, "bluetooth": false, "data": true | null}
@@ -299,7 +311,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `call.incoming` | B→R | M3 | `call` (id), `sim`, `from`, `name` (if the contact is known) |
 | `call.state` | B→R | M3 | `call`, `state` (`dialing` / `ringing` / `active` / `held` / `ended`), `dir` (`in`/`out`), `number`, `name`, `since`, `reason` (`local` / `remote` / `busy` / `missed` / `rejected` / `failed`, only when ended) |
 | `call.answer`, `call.reject`, `call.end` | R→B | M3 | `id`, `call` → `ok` / `error` |
-| `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events |
+| `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events. Or `voicemail: true` without `number` (needs `call.voicemail`, D-082): B calls the SIM's voicemail, whose number Android looks up. A `number` starting `#31#` hides the caller ID on that call (GSM) |
 | `call.dtmf` | R→B | M3 | `id`, `call`, `digit` (needs capability `call.dtmf`) |
 | `call.audio` | R→B | M3 | `id`, `call`, `mute`, `speaker` (either optional; needs `call.audio`) |
 | `call.media.start` | R→B | M6 | `id`, `call` (in progress), `talk` (default true), `via` (`"wifi"`, the default: the Wi-Fi session's UDP media channel; `"link"`: `MEDIA` frames on the session this request arrives on, which must be Bluetooth or debug TCP, D-072) → `ok` once audio flows, or `error` (`unsupported`: not set up, the bridge's helper isn't running, no Wi-Fi link for `wifi`, a Wi-Fi session or no `call.media.link` for `link`; `failed`: capture didn't start). Needs `call.media` |
@@ -311,17 +323,28 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `contacts.update` | R→B | M4 | `id`, `key` (a contact key) and any of `name`, `numbers` (replace all of the contact's numbers), `starred` → `ok`; the next `contacts.sync` brings the change back. Needs `contacts.edit` (D-074) |
 | `phone.find` | R→B | — | `id`, `on` (default true) → `ok`: B rings loudly on the alarm stream for up to a minute, or stops. Needs `phone.find` (D-074) |
 | `phone.ringer` | R→B | — | `id`, `mode` (`normal` / `vibrate` / `silent`) → `ok`, then `status.ringer`; `error` `permission` when switching to or from silent without Do Not Disturb access (B then asks its user for it). Needs `phone.ringer` (D-074) |
-| `notif.posted` | B→R | — | `key` (Android's notification key), `app` (package), `appName`, `title`, `text` (up to 1,000 characters), `time`: a notification from an app the bridge's user chose. The same `key` again replaces it. Only while `notif.mirror` is listed (D-077) |
+| `notif.posted` | B→R | — | `key` (Android's notification key), `app` (package), `appName`, `title`, `text` (up to 1,000 characters), `time`: a notification from an app the bridge's user chose. The same `key` again replaces it. Only while `notif.mirror` is listed (D-077). `reply` (D-086): the app's notification takes a typed reply |
 | `notif.removed` | B→R | — | `key`: it went away on the bridge (read, dismissed or replaced there); R removes it |
 | `notif.dismiss` | R→B | — | `id`, `key`: the user dismissed it on R → `ok`; B clears it (only keys it mirrored). Needs `notif.mirror` |
+| `notif.reply` | R→B | — | `id`, `key`, `text` (up to 2,000 characters): the user replied in the mirrored notification on R → `ok` once B handed it to the app's own reply action; `invalid` when that notification has no reply action (any more). Only for a `notif.posted` with `reply: true` (D-086) |
 | `contacts.sync` | R→B, B→R | M4 | request: `id`, `since` (cursor or null) / reply: `id`, `contacts` [Contact], `deleted` [key], `cursor`, `more` |
 | `calllog.sync` | R→B, B→R | M4 | request: `id`, `since` / reply: `id`, `calls` [Call-log entry], `cursor`, `more` |
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
-| `ussd.run` | R→B | M4 | `id`, `sim`, `code` |
+| `ussd.run` | R→B | M4 | `id`, `sim`, `code`: a USSD or GSM service code (`*`/`#` first, `#` last). A `+` may follow a `*` (call forwarding to an international number, `**21*+905551234567#`, D-082) |
 | `ussd.result` | B→R | M4 | `id`, `ok`, `text`, `error` |
 | `calllog.delete` | R→B | M4 | `id`, `keys` [call-log key] or `all: true` → `ok` / `error` (needs capability `calllog.delete`) |
-| `block.list` | R→B, B→R | M4 | request: `id` / reply: `id`, `numbers` [`{n, time}`]. Also sent by B without `id` when the list changes on the bridge (needs `block`) |
-| `block.set` | R→B | M4 | `id`, `add` [number], `remove` [number] → `block.list` with the same `id` (needs `block`) |
+| `block.list` | R→B, B→R | M4 | request: `id` / reply: `id`, `numbers` [`{n, time}`], `unknown` ("Silence unknown callers" is on, D-085; older bridges leave it out). Also sent by B without `id` when the list changes on the bridge (needs `block`). An entry ending with `*` and at least two digits before it (`+234*`, `0900*`) blocks every number starting with it; with `+` or `00` first it's an international prefix (D-085) |
+| `block.set` | R→B | M4 | `id`, `add` [number], `remove` [number], `unknown` (optional, turns "Silence unknown callers" on or off; needs `call.screen`, D-085) → `block.list` with the same `id` (needs `block`) |
+| `sms.schedule` | R→B | — | `id`, `cid` (R's id for the message, as in `sms.send`), `sim`, `to`, `body`, `at` (ms; from 5 minutes ago up to a year ahead) → `ok`. B keeps it and sends it at `at` with that `cid`, so `sms.state` events follow when R is linked. At most 100 waiting; `busy` beyond that or for a `cid` in use. Needs `sms.schedule` (D-084) |
+| `sms.unschedule` | R→B | — | `id`, `cid` → `ok`; `invalid` when B no longer has it (already sent) |
+| `sms.scheduled` | R→B, B→R | — | request: `id` / reply: `id`, `items` [`{cid, sim, to, body, at}`] (waiting, soonest first), `done` [`{cid, state, key, error}`] (what became of the ones sent in the last 7 days, at most 50; `state` is `pending` until the radio answers, then as in `sms.state`), `exact` (B can send at the exact minute: Android's "Alarms & reminders") |
+| `data.usage` | R→B, B→R | — | request: `id`, `since` (ms, at most 62 days back) / reply: `id`, `since`, `until`, `bytes` (mobile data received and sent, every SIM together, from Android's statistics). `error` `permission` while Usage access isn't given (B then asks its user). Needs `data.usage` (D-084) |
+| `remote.ring` | B→R | — | `on` (default true): B's user is looking for R; R plays a sound for up to 30 seconds, or stops. Sent only to an R that listed `ring` in its `device.info` `caps` (D-084) |
+| `media.list` | R→B, B→R | — | Wi-Fi session only. request: `id`, `before` (the last page's `cursor`, or null), `limit` (default 30, at most 60) / reply: `id`, `items` [`{mid, time, w, h, size, thumb}`] (newest first; `thumb` a base64 JPEG of 128 px at most, about 4 KB), `more`, `cursor` (opaque). Pages stay under 30 KB, so they may hold fewer than `limit`. `unsupported` on another session. Needs `media.photos` (D-088) |
+| `media.get` | R→B | — | `id`, `mid` → `ok`, then B offers the photo with the normal file transfer (`file.offer` on the Wi-Fi session). Needs `media.photos` (D-088) |
+| `mms.part` | R→B | — | `id`, `key` ("mms:…"), `pid` → `ok`, then B offers that attachment with the file transfer (Wi-Fi session). `unsupported` without one. Needs `mms` (D-089) |
+| `mms.attach` | R→B | — | `id`, `aid` (R's id, letters, digits and `-`, up to 64), `seq` (0, 1, 2…), `data` (base64, a piece of the picture, about 24 KB), `last`, and on `seq` 0 `type` (an `image/` type) and `name` → `ok`. Pieces in order, 1 MB in all at most, 3 pictures at a time, kept 10 minutes. Any session, so a picture can go over Bluetooth (D-089) |
+| `mms.send` | R→B | — | `id`, `cid`, `sim`, `to` [number] (1 to 20; several make a group message), `body` (text or null), `aid` (a complete `mms.attach`, or null) → `ok` once Android's MMS service has it; then `sms.state` `sent` (with the stored message's `key`) or `failed`. No delivery reports. Needs `mms` and, on the bridge, mobile data (D-089) |
 | `wifi.offer` | B→R | M5 | `ip` [address], `port`, `ssid` and `password` (only while B's hotspot is on, else null), `band` (`"2.4"` / `"5"` / `"6"` or null). Sent on B's event session after `status` and whenever any of it changes; `ip: []` means B has no Wi-Fi now |
 | `wifi.media` | B→R | M5 | `port` (UDP) or null. On each Wi-Fi session, right after the handshake |
 | `link.switch` | — | M5 | Not used: replies follow their request's session (D-044) |
@@ -345,14 +368,20 @@ can also be fed into the call; without it the iPhone listens and the user talks 
 `via: "link"`; the bridge has an Opus encoder and decoder, D-072), `net.share`
 (the bridge's user allows internet sharing, M8), `net.switch` (R may switch the bridge phone's hotspot, Bluetooth
 tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's helper running, D-073), `sms.read`
-(messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `contacts.edit`
+(messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `call.voicemail`
+(`call.dial` takes `voicemail: true`, SIMs carry `vm`, D-082), `sms.schedule` (B keeps and sends scheduled messages,
+D-084), `data.usage` (Usage access given, D-084), `call.screen` (B is Android's call-screening app: blocked numbers
+are turned away before they ring and `block.set` `unknown` works, D-085), `media.photos` (B's user turned on
+"Photos for the iPhone" and gave photo access, with the Wi-Fi link on, D-088), `mms` (picture and group messages in
+history, `mms.part`, `mms.attach`, `mms.send`, D-089), `contacts.edit`
 (with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `notif.mirror` (notification access given:
 chosen apps' notifications are sent as `notif.posted`, D-077), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),
 `block` (the bridge keeps a block list, M4)
 
 R lists what it can receive in its own `device.info` as `caps` (M5): `["files"]` when it accepts `file.offer`. B
-offers files only to an R that listed `files`; R offers only to a B whose `status.caps` has `files`.
+offers files only to an R that listed `files`; R offers only to a B whose `status.caps` has `files`. `ring` (D-084):
+R plays a sound on `remote.ring`; B sends it to no other R.
 
 ### File transfer (M5, D-045)
 
@@ -385,7 +414,7 @@ Call audio takes one of two paths, chosen by R in `call.media.start` (`via`):
 - **`wifi`:** the Wi-Fi link's **media channel** (UDP, channel 1, media keys, 64-record replay window; see
   "Records"). Each media record's plaintext is one packet.
 - **`link` (D-072):** `MEDIA` frames inside the Bluetooth (or debug TCP) session, or remote mode's direct connection
-  (D-080), that the request arrived on (channel 3,
+  (D-092), that the request arrived on (channel 3,
   link media keys, ordered). Needs `call.media.link`. Each `MEDIA` record's plaintext holds **one or more packets**,
   each preceded by its length (2 bytes, big-endian, at least 3): `length ‖ packet ‖ length ‖ packet …`, at most 1200
   bytes in all. A record that doesn't split exactly into such packets is ignored (the connection stays up).
@@ -521,7 +550,7 @@ an unknown request with `error` / `unsupported`, so the wire version stays 0.
   `InCallService`, or `ANSWER_PHONE_CALLS`); incoming, missed, declined and blocked entries from it are left out of
   `calllog.sync`. A call R already shows when the number arrives late is left alone.
 
-## Remote mode (v1, D-080)
+## Remote mode (v1, D-092)
 
 Remote mode lets the phones work while apart: the iPhone gets calls, SMS and codes, and sends commands, through a
 mailbox in the user's own iCloud, plus a direct connection through the bridge's home router when one is possible.
@@ -584,7 +613,7 @@ There are three mailboxes: **B→R alert** (things the user should see: an SMS, 
 
 - **Private backend** (the design): the user's private database, zones `ToPhone` (alert), `ToPhoneQuiet` and
   `ToBridge`.
-- **Public backend** (debug builds while D-080's question to Apple is open): the public database's default zone; a
+- **Public backend** (debug builds while D-092's question to Apple is open): the public database's default zone; a
   record's `mailbox` names its mailbox, and only the iCloud user who wrote a record can read it.
 
 R subscribes to its two mailboxes: the alert one with an alert push that its notification service extension may
@@ -620,7 +649,7 @@ No UDP port is opened on the router. R tries IPv6 first, then IPv4, only while n
 (a local session replaces the direct one), and retries after 5, 15 and 30 s, then every 2 minutes, and at once when its
 network changes or a new `remote.addr` arrives. An address whose handshake fails on the keys is skipped until the next
 `remote.addr`. B listens whenever remote mode is on and it's on Wi-Fi, mapped or not, so a user whose router has no
-NAT-PMP, PCP or UPnP can forward the port by hand (D-083): R then also tries the address or DNS name the user entered,
+NAT-PMP, PCP or UPnP can forward the port by hand (D-095): R then also tries the address or DNS name the user entered,
 with the same handshake (the pinned key decides; a wrong host just fails, and the entry stays). No wire change. On the
 public listener B:
 
@@ -632,7 +661,7 @@ public listener B:
 
 ### Remote pairing
 
-Pairing while the phones are apart (D-080). It replaces "seeing the QR code" with an invitation the user sends by any
+Pairing while the phones are apart (D-092). It replaces "seeing the QR code" with an invitation the user sends by any
 means plus a 6-digit code the two people compare on a phone call. Release builds start it only from "Pair a phone
 that's far away" on the iPhone and accept it only after the person at home allows it on the Android phone.
 

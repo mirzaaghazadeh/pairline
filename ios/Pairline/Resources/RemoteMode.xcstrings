@@ -167,7 +167,7 @@
       }
     },
     "The router's forwarding rule points at one address on your home network. If the Android phone gets a different one (after a restart or a while away), calls from far away stop working until you fix the rule." : {
-      "comment" : "Manual port forwarding (D-083): why the Android phone needs a fixed address on the home network.",
+      "comment" : "Manual port forwarding (D-095): why the Android phone needs a fixed address on the home network.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "تشير قاعدة إعادة التوجيه في الموجّه إلى عنوان واحد على شبكة منزلك. إذا حصل هاتف أندرويد على عنوان آخر (بعد إعادة التشغيل أو غياب لبعض الوقت)، تتوقف المكالمات من بعيد إلى أن تصلح القاعدة." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "قانون هدایت پورت در مودم به یک نشانی در شبکهٔ خانه اشاره می‌کند. اگر گوشی اندرویدی نشانی دیگری بگیرد (بعد از راه‌اندازی دوباره یا مدتی دوری)، تماس از راه دور کار نمی‌کند تا وقتی قانون را درست کنید." } },
@@ -231,7 +231,7 @@
       }
     },
     "Port forwarding" : {
-      "comment" : "Settings › Cloud mode row and screen title (D-083): the user forwards the bridge's port in the router by hand, for a router without UPnP, NAT-PMP or PCP.",
+      "comment" : "Settings › Cloud mode row and screen title (D-095): the user forwards the bridge's port in the router by hand, for a router without UPnP, NAT-PMP or PCP.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعادة توجيه المنفذ" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "هدایت پورت" } },
@@ -406,7 +406,7 @@
       }
     },
     "Cloud mode" : {
-      "comment" : "The feature's name (D-080, code name remote mode): the phones keep working over the internet, through the user's own iCloud and, where the home router allows, a direct connection. Settings section header and switch, and the title of its explanation screen.",
+      "comment" : "The feature's name (D-092, code name remote mode): the phones keep working over the internet, through the user's own iCloud and, where the home router allows, a direct connection. Settings section header and switch, and the title of its explanation screen.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع السحابي" } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode" } },
@@ -688,7 +688,7 @@
       }
     },
     "Pair over the internet" : {
-      "comment" : "Pairing your own two phones while they aren't next to each other, through an invitation (D-080). Pairing screens and Settings.",
+      "comment" : "Pairing your own two phones while they aren't next to each other, through an invitation (D-092). Pairing screens and Settings.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإقران عبر الإنترنت" } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Pair over the internet" } },

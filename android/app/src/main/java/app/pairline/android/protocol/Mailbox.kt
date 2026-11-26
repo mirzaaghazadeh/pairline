@@ -7,7 +7,7 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * Remote mode (PROTOCOL.md, "Remote mode (v1, D-080)"): mailbox records, each sealed on its own, and the crypto and
+ * Remote mode (PROTOCOL.md, "Remote mode (v1, D-092)"): mailbox records, each sealed on its own, and the crypto and
  * invitation link of remote pairing. Pure Kotlin on JCA, tested against protocol/test-vectors/v1-remote.json.
  */
 

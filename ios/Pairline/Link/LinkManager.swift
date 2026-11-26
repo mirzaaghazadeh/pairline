@@ -13,7 +13,7 @@ enum LinkPhase: Equatable {
     case connected
     case waiting(until: Date)
     case pairing
-    /// Remote mode (D-080): no session, but messages reach the bridge through the user's iCloud ("Via iCloud").
+    /// Remote mode (D-092): no session, but messages reach the bridge through the user's iCloud ("Via iCloud").
     /// Texts, status and history work; calls don't, since there's no audio without a direct connection yet.
     case remote
 
@@ -102,7 +102,7 @@ enum LinkLane: String, CaseIterable {
     /// Bluetooth (or the debug TCP link in debug builds).
     case primary
     case wifi
-    /// Remote mode's direct connection (D-080): only while no nearby session is up.
+    /// Remote mode's direct connection (D-092): only while no nearby session is up.
     case direct
 }
 
@@ -161,6 +161,9 @@ final class LinkManager: BridgeLink {
     /// While such a request waits and the app is open, look for the reply this often (silent pushes can lag; the
     /// bridge checks every 5 s right after hearing from this iPhone, so a reply is usually there within seconds).
     static let mailboxPollInterval: TimeInterval = 3
+    /// Remote mode's own message types from the bridge (PROTOCOL.md, "Remote messages"), handled by the link itself.
+    nonisolated static let remoteModeTypes: Set<String> = ["remote.config", "remote.token", "remote.addr", "remote.state",
+                                                           "remote.check"]
     /// The direct connection retries after 5 s, 15 s and 30 s, then every 2 minutes; at once when the network
     /// changes, a nearby session ends or new addresses arrive.
     nonisolated static func directRetryDelay(attempt: Int) -> TimeInterval {
@@ -192,7 +195,7 @@ final class LinkManager: BridgeLink {
     var onPeerChange: (() -> Void)?
     /// The iPhone just joined the bridge's own hotspot, which has no internet (iOS says "No Internet Connection").
     var onJoinedBridgeHotspot: (() -> Void)?
-    /// Remote pairing (D-080): the bridge's `rpair.confirm` arrived through a catch-up.
+    /// Remote pairing (D-092): the bridge's `rpair.confirm` arrived through a catch-up.
     var onRemotePairConfirm: (() -> Void)?
 
     /// The open media channel of the Wi-Fi session, or nil (no Wi-Fi session, or its UDP path isn't verified yet).
@@ -200,7 +203,7 @@ final class LinkManager: BridgeLink {
     /// Called on the main queue whenever `mediaChannel` changes (opened, or closed with nil).
     var onMediaChannelChange: ((MediaChannel?) -> Void)?
     /// Call audio inside the Bluetooth (or debug TCP) session while it's established (D-072), else inside remote mode's
-    /// direct connection (D-080), or nil.
+    /// direct connection (D-092), or nil.
     private(set) var linkMediaChannel: LinkMediaChannel?
     /// The lane whose session carries `linkMediaChannel`: `call.media.start` with `via: "link"` must go on it.
     private(set) var linkMediaLane: LinkLane?
@@ -209,7 +212,7 @@ final class LinkManager: BridgeLink {
     let hotspot = HotspotJoiner()
     let identityStore: IdentityStore
     let peerStore: PeerStore
-    /// Remote mode's mailbox in iCloud (D-080): the path while no session is up. nil where it isn't available.
+    /// Remote mode's mailbox in iCloud (D-092): the path while no session is up. nil where it isn't available.
     let remote: RemoteLink?
     private let makeConnector: (TransportKind) -> LinkConnector
     private var connectors: [TransportKind: LinkConnector] = [:]
@@ -433,7 +436,7 @@ final class LinkManager: BridgeLink {
         let token = lane.token
         var target = ConnectTarget(deviceID: peer.deviceID, knownPeripheral: peer.peripheralID)
         // The only non-local addresses the iPhone dials: from the paired bridge's authenticated `remote.addr`, and the
-        // port forwarding the user typed in (D-083).
+        // port forwarding the user typed in (D-095).
         if lane.id == .direct, let remote {
             target.direct = remote.directCandidates
             target.directManual = remote.manualEndpoint
@@ -502,7 +505,7 @@ final class LinkManager: BridgeLink {
         connectIfNeeded(wifi)
     }
 
-    // MARK: - Direct connection (D-080)
+    // MARK: - Direct connection (D-092)
 
     /// Something suggests the direct connection may work now (new addresses, the network changed, the nearby link
     /// ended): restart its attempt without waiting for its backoff. A direct session already up is kept.
@@ -840,7 +843,7 @@ final class LinkManager: BridgeLink {
             }
         }
         sendRaw(deviceInfo, id: nil, on: lane)
-        // The user's port forwarding (D-083) worked: Settings says so.
+        // The user's port forwarding (D-095) worked: Settings says so.
         if lane.id == .direct, let dialed = lane.session?.frameTransport.dialed, dialed == remote?.manualEndpoint {
             remote?.noteManualAttempt(worked: true)
         }
@@ -971,9 +974,10 @@ final class LinkManager: BridgeLink {
         }
         inbound.viaMailbox = lane == nil
         inbound.alreadyShown = alreadyShown
-        // Remote mode's own events stay here; a reply to a request (`remote.check`) goes to whoever asked.
+        // Remote mode's own events stay here; a reply to a request (`remote.check`) goes to whoever asked. Only its own
+        // types: `remote.ring` (D-084, the bridge ringing this iPhone) goes to the app like any other event.
         let answersRequest = inbound.id.map { pending[$0] != nil } ?? false
-        if !answersRequest, inbound.type.hasPrefix("remote.") || inbound.type.hasPrefix("rpair.") {
+        if !answersRequest, Self.remoteModeTypes.contains(inbound.type) || inbound.type.hasPrefix("rpair.") {
             return handleRemote(inbound, plaintext: plaintext)
         }
         switch inbound.message {
@@ -1017,7 +1021,7 @@ final class LinkManager: BridgeLink {
         onEvent?(inbound)
     }
 
-    /// Remote mode's own messages (D-080); none is for the app above the link.
+    /// Remote mode's own messages (D-092); none is for the app above the link.
     private func handleRemote(_ inbound: Inbound, plaintext: Data) {
         switch inbound.type {
         case "rpair.confirm":
@@ -1312,7 +1316,7 @@ final class LinkManager: BridgeLink {
         }
     }
 
-    // MARK: - Remote mode (D-080)
+    // MARK: - Remote mode (D-092)
 
     /// Remote mode's catch-up (on launch, when the app becomes active, on a push, and while a reply is awaited):
     /// what the bridge left in iCloud, handled like a session's messages. Returns whether anything arrived.

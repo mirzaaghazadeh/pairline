@@ -36,6 +36,10 @@ struct RootView: View {
         .overlay(alignment: .top) {
             ToastOverlay(text: $app.toast)
         }
+        // The Android phone is ringing this iPhone (D-084).
+        .overlay(alignment: .bottom) {
+            RingingOverlay()
+        }
         .tint(.brandBlue)
     }
 }
@@ -134,6 +138,7 @@ struct MainView: View {
 struct OngoingCallInset: ViewModifier {
     @ObservedObject var calls: CallCenter
     let open: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
         content
@@ -142,7 +147,7 @@ struct OngoingCallInset: ViewModifier {
                 if let call = calls.current, !calls.callScreenVisible {
                     OngoingCallBar(call: call, open: open)
                         .padding(.vertical, 8)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .transition(.slide(from: .bottom, reduceMotion: reduceMotion))
                 }
             }
     }
@@ -169,7 +174,7 @@ struct OngoingCallBar: View {
             .foregroundStyle(.white)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(Capsule().fill(Color.brandGreen))
+            .background(Capsule().fill(Color.brandGreenFill))
             .padding(.horizontal, 16)
             .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
         }
@@ -179,6 +184,7 @@ struct OngoingCallBar: View {
 
 struct ToastOverlay: View {
     @Binding var text: String?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -192,7 +198,7 @@ struct ToastOverlay: View {
                     .shadow(color: .black.opacity(0.12), radius: 10, y: 4)
                     .padding(.horizontal, 24)
                     .padding(.top, 8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .transition(.slide(from: .top, reduceMotion: reduceMotion))
                     .onTapGesture { self.text = nil }
                     .task(id: text) {
                         // Long enough to read: 3.5 s, or about 15 characters a second for longer notes. A tap closes it.
@@ -203,7 +209,7 @@ struct ToastOverlay: View {
                     .accessibilityAddTraits(.isStaticText)
             }
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: text)
+        .animation(.motion(.spring(response: 0.4, dampingFraction: 0.85), reduceMotion: reduceMotion), value: text)
     }
 }
 
@@ -292,7 +298,7 @@ struct OfflineBanner: View {
         }
     }
 
-    /// Remote mode (D-080) says what works through iCloud: calls need the direct connection.
+    /// Remote mode (D-092) says what works through iCloud: calls need the direct connection.
     private var text: Text {
         phase == .remote
             ? Text("Via iCloud: texts and codes work. Calls need the direct connection to your home.")

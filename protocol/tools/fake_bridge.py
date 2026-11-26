@@ -1591,7 +1591,7 @@ class Bridge:
         return self.block_list()
 
     def req_remote_check(self, link, msg):
-        """"Check my home connection" (D-080): a canned answer; this fake never asks a router anything."""
+        """"Check my home connection" (D-092): a canned answer; this fake never asks a router anything."""
         return {"t": "remote.check", "direct": "likely", "reason": None, "router": "nat-pmp", "ipv6": False}
 
     def req_net_switch(self, link, msg):

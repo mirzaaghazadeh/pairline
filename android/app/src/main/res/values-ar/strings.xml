@@ -341,6 +341,9 @@
     <string name="settings_general">عام</string>
     <string name="settings_language">اللغة</string>
     <string name="settings_language_system">لغة النظام الافتراضية</string>
+    <string name="language_step_title">اختر لغتك</string>
+    <string name="language_step_body">يمكنك تغييرها لاحقاً من الإعدادات.</string>
+    <string name="language_step_body_guessed">اخترنا هذه اللغة حسب شريحة SIM أو المنطقة الزمنية لهاتفك. يمكنك تغييرها الآن أو لاحقاً من الإعدادات.</string>
     <string name="settings_iphone">آيفونك</string>
     <string name="settings_ios_version">نظام iOS %1$s</string>
     <string name="settings_app_version">تطبيق Pairline %1$s</string>
@@ -489,7 +492,7 @@
     <string name="help_q_unpair">ماذا يحدث عند إلغاء الإقران؟</string>
     <string name="help_a_unpair">يحذف كل هاتف مفتاح الآخر، فلا يعود بإمكانهما التواصل. وتبقى رسائلك وجهات اتصالك في مكانها على هذا الهاتف.</string>
 
-    <!-- Remote pairing (D-080). -->
+    <!-- Remote pairing (D-092). -->
     <string name="remote_pair_title">الإقران عبر الإنترنت</string>
     <string name="remote_pair_ask_title">آيفونك يريد الإقران بهذا الهاتف عبر الإنترنت</string>
     <string name="remote_pair_ask_body">إذا سمحت بذلك، فسيستلم آيفونك رسائل هذا الهاتف النصية ورموز التحقق ومكالماته أينما كان، مع تفعيل الوضع السحابي، وسيتمكن من إرسال الرسائل وإجراء المكالمات بشريحة هذا الهاتف.</string>

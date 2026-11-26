@@ -8,7 +8,7 @@
 # - app/pairline/android/link/wifi/  the Wi-Fi link to the paired iPhone, local addresses only
 # - app/pairline/android/netshare/   opt-in internet sharing (M8): forwards only the iPhone's own traffic
 # - app/pairline/android/privileged/adb/  this phone's own Wireless debugging, on 127.0.0.1 only (D-054)
-# - app/pairline/android/link/remote/  opt-in remote mode (D-080): CloudKit Web Services (hosts checked below), the
+# - app/pairline/android/link/remote/  opt-in remote mode (D-092): CloudKit Web Services (hosts checked below), the
 #                                       home router's port mapping (router/: NAT-PMP, PCP, UPnP on the LAN) and the
 #                                       direct connection from the paired iPhone (DirectListener)
 # Debug-only code (src/debug) is exempt: it never ships (D-018).

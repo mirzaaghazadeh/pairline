@@ -1,7 +1,7 @@
 import CryptoKit
 import Foundation
 
-/// Remote pairing on the iPhone (D-080; PROTOCOL.md, "Remote pairing", the R side): an invitation the owner sends to
+/// Remote pairing on the iPhone (D-092; PROTOCOL.md, "Remote pairing", the R side): an invitation the owner sends to
 /// their own Android phone, the bridge's commitment, the 6-digit code checked on both phones, and both confirms.
 /// The screen polls (`poll()` every 3 s); everything else happens here, so tests can drive it with a fake mailbox.
 ///

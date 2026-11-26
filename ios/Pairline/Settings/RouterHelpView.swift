@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Help › "Allow calls from far away" (Cloud mode's direct connection, D-080, D-082, D-083): what the home router has
+/// Help › "Allow calls from far away" (Cloud mode's direct connection, D-092, D-094, D-095): what the home router has
 /// to allow, for any router brand. First choice: turn on UPnP or NAT-PMP, and Pairline sets everything up by itself.
 /// Otherwise: forward the port by hand and enter the home's address (Settings › Cloud mode › Port forwarding). Then
 /// what to do when the internet provider or a second modem is the reason. Opened from Help, from "Check my home
@@ -70,7 +70,7 @@ struct RouterHelpView: View {
 }
 
 /// Why manual port forwarding needs the Android phone at a fixed address on the home network, and how to give it one
-/// (D-083). Shared by the Help article and the Port forwarding screen.
+/// (D-095). Shared by the Help article and the Port forwarding screen.
 enum FixedAddressText {
     static let why = Text("The router's forwarding rule points at one address on your home network. If the Android phone gets a different one (after a restart or a while away), calls from far away stop working until you fix the rule.", tableName: "RemoteMode")
     static let best = Text("Best: in the router, reserve the phone's current address for it (\"DHCP reservation\", \"static lease\", \"address reservation\" or \"always use this IP address\"; Pairline Bridge shows the address). On Android 10 and later, first set that Wi-Fi network's privacy to \"Use device MAC\", or the router won't recognize the phone.", tableName: "RemoteMode")

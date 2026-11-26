@@ -2,7 +2,7 @@ import CryptoKit
 import XCTest
 @testable import Pairline
 
-// Remote mode's direct connection (D-080) on the iPhone: which addresses it takes, when the direct lane runs (a nearby
+// Remote mode's direct connection (D-092) on the iPhone: which addresses it takes, when the direct lane runs (a nearby
 // session beats it, it beats the iCloud mailbox), its retries, and that nothing but an authenticated `remote.addr` of
 // the paired bridge makes the app dial anywhere.
 
@@ -289,7 +289,7 @@ final class DirectLaneTests: XCTestCase {
         XCTAssertEqual(directConnector.targets.count, attempts + 1)
     }
 
-    /// Away from home, call audio rides inside the direct session as `MEDIA` frames (D-080), both ways, and
+    /// Away from home, call audio rides inside the direct session as `MEDIA` frames (D-092), both ways, and
     /// `call.media.start` with `via: "link"` goes on that session; a nearby link takes the call audio over.
     func testCallAudioRidesTheDirectSessionUntilANearbyLinkTakesOver() async throws {
         await mail(addr)
@@ -340,7 +340,7 @@ final class DirectLaneTests: XCTestCase {
         await waitFor("direct again") { manager.isDirect }
     }
 
-    /// Manual port forwarding (D-083): with no `remote.addr` at all (the router opened nothing), the address the user
+    /// Manual port forwarding (D-095): with no `remote.addr` at all (the router opened nothing), the address the user
     /// entered brings the direct session up, and it's kept with the rest of the direct connection.
     func testManualPortForwardingAloneBringsUpTheDirectSession() async throws {
         await mail(["t": "remote.state", "direct": "none", "reason": "no_mapping"])

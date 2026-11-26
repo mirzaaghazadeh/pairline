@@ -15,6 +15,9 @@ final class Notifier: NSObject, ObservableObject {
     static let markReadAction = "mark-read"
     static let replyAction = "reply"
     static let mirrorCategory = "mirror"
+    /// A mirrored notification whose Android app takes a typed reply (D-086).
+    static let mirrorReplyCategory = "mirror.reply"
+    static let mirrorReplyAction = "mirror-reply"
     static let trialReminderID = "trial.reminder"
     static let callsPausedID = "calls.paused"
     static let incomingCallID = "calls.incoming"
@@ -29,8 +32,10 @@ final class Notifier: NSObject, ObservableObject {
     var onReply: ((Int64, String, Int?, String) -> Void)?
     /// A mirrored notification was dismissed here (D-077): its key on the bridge phone.
     var onMirrorDismissed: ((String) -> Void)?
+    /// A reply typed in a mirrored notification (D-086): its key and the text.
+    var onMirrorReply: ((String, String) -> Void)?
     var onOpenStatus: (() -> Void)?
-    /// Remote mode (D-080): a CloudKit alert push reached the open app.
+    /// Remote mode (D-092): a CloudKit alert push reached the open app.
     var onRemotePush: (() -> Void)?
 
     // MARK: Muted conversations (D-074): no banner or sound, still counted as unread.
@@ -70,7 +75,17 @@ final class Notifier: NSObject, ObservableObject {
         let mirror = UNNotificationCategory(identifier: Self.mirrorCategory, actions: [], intentIdentifiers: [],
                                             hiddenPreviewsBodyPlaceholder: String(localized: "New notification", table: "PhoneTools"),
                                             options: [.customDismissAction])
-        center.setNotificationCategories([sms, otp, mirror])
+        // …and with a reply field when the Android app's notification takes one (D-086).
+        let mirrorReply = UNTextInputNotificationAction(identifier: Self.mirrorReplyAction,
+                                                        title: String(localized: "Reply", table: "PhoneTools"),
+                                                        options: [.authenticationRequired],
+                                                        textInputButtonTitle: String(localized: "Send", table: "PhoneTools"),
+                                                        textInputPlaceholder: String(localized: "Message", table: "PhoneTools"))
+        let mirrorWithReply = UNNotificationCategory(identifier: Self.mirrorReplyCategory, actions: [mirrorReply],
+                                                     intentIdentifiers: [],
+                                                     hiddenPreviewsBodyPlaceholder: String(localized: "New notification", table: "PhoneTools"),
+                                                     options: [.customDismissAction])
+        center.setNotificationCategories([sms, otp, mirror, mirrorWithReply])
         // Remote mode's notification extension follows "Show message text" too.
         RemoteInbox.setShowsMessageText(AppSettings.shared.showMessagePreviews)
         Task { await refreshAuthorization() }
@@ -96,7 +111,9 @@ final class Notifier: NSObject, ObservableObject {
         content.title = sender
         let code = OTPDetector.code(in: message.body)
         if AppSettings.shared.showMessagePreviews {
-            content.body = message.body
+            // A picture message without text (D-089).
+            content.body = message.body.isEmpty && !message.parts.isEmpty
+                ? "📷 " + String(localized: "Picture message", table: "MMS") : message.body
         } else {
             content.body = code == nil ? String(localized: "New message") : String(localized: "New one-time code")
         }
@@ -138,10 +155,21 @@ final class Notifier: NSObject, ObservableObject {
         }
         content.sound = .default
         content.threadIdentifier = "app-" + n.app
-        content.categoryIdentifier = Self.mirrorCategory
+        content.categoryIdentifier = n.reply == true ? Self.mirrorReplyCategory : Self.mirrorCategory
         content.userInfo = ["mirror": n.key]
         if #available(iOS 15.0, *) { content.relevanceScore = 0.3 }
         center.add(UNNotificationRequest(identifier: Self.mirrorID(n.key), content: content, trigger: nil))
+    }
+
+    /// A reply typed in a mirrored notification couldn't go (D-086): the bridge isn't linked, or the notification is
+    /// gone there. Said once, without the text.
+    func notifyMirrorReplyFailed() {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Reply not sent", table: "Extras")
+        content.body = String(localized: "The Android phone isn't connected, or that notification is gone there. Reply on the Android phone instead.", table: "Extras")
+        content.sound = .default
+        center.add(UNNotificationRequest(identifier: "mirror-reply-failed", content: content, trigger: nil))
     }
 
     /// Gone on the bridge phone (read or dismissed there): gone here too.
@@ -197,6 +225,82 @@ final class Notifier: NSObject, ObservableObject {
         content.sound = .default
         content.userInfo = ["status": true]
         center.add(UNNotificationRequest(identifier: "battery-low", content: content, trigger: nil))
+    }
+
+    // MARK: Data meter and ringing (D-084)
+
+    /// The bridge phone's mobile data reached 80% or 100% of the user's monthly limit.
+    func notifyDataUsage(percent: Int, bytes: Int64) {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        let used = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .decimal)
+        content.title = percent >= 100
+            ? String(localized: "Mobile data limit reached", table: "Extras")
+            : String(localized: "Mobile data almost used up", table: "Extras")
+        content.body = String(localized: "The Android phone has used \(used) of mobile data this month (\(percent)% of your limit).", table: "Extras")
+        content.sound = .default
+        content.userInfo = ["status": true]
+        center.add(UNNotificationRequest(identifier: "data-\(percent)", content: content, trigger: nil))
+    }
+
+    static let ringingID = "iphone.ringing"
+
+    /// Shown while the Android phone rings this iPhone, so the user knows why it's ringing; a tap opens Pairline,
+    /// which stops it.
+    func notifyRinging() {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Your Android phone is looking for this iPhone", table: "Extras")
+        content.body = String(localized: "Open Pairline to stop the sound.", table: "Extras")
+        if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
+        center.add(UNNotificationRequest(identifier: Self.ringingID, content: content, trigger: nil))
+    }
+
+    func clearRinging() {
+        center.removeDeliveredNotifications(withIdentifiers: [Self.ringingID])
+    }
+
+    // MARK: Bridge phone left behind (D-083)
+
+    static let leftBehindID = "bridge.leftBehind"
+    /// How long the link may stay down before the alert: long enough for a walk to the next room and back.
+    static let leftBehindDelay: TimeInterval = 5 * 60
+
+    /// Scheduled when the link drops; iOS delivers it only if the link isn't back by then, because reconnecting
+    /// removes it ([cancelLeftBehind]). Works while Pairline is suspended, since iOS holds the timer.
+    func scheduleLeftBehind() {
+        guard AppSettings.shared.leftBehindAlert,
+              authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Bridge phone out of reach", table: "Inbox")
+        content.body = String(localized: "Calls and texts to your Android phone's SIM can't reach this iPhone. Did you leave it behind?", table: "Inbox")
+        content.sound = .default
+        content.userInfo = ["status": true]
+        if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
+        center.add(UNNotificationRequest(identifier: Self.leftBehindID, content: content,
+                                         trigger: UNTimeIntervalNotificationTrigger(timeInterval: Self.leftBehindDelay,
+                                                                                    repeats: false)))
+    }
+
+    func cancelLeftBehind() {
+        center.removePendingNotificationRequests(withIdentifiers: [Self.leftBehindID])
+        center.removeDeliveredNotifications(withIdentifiers: [Self.leftBehindID])
+    }
+
+    /// The carrier says a voicemail is waiting on a SIM of the bridge phone (D-082). Tapping opens the Bridge tab,
+    /// whose SIM card has "Call voicemail".
+    func notifyVoicemail(simName: String?) {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "New voicemail", table: "Carrier")
+        if let simName {
+            content.body = String(localized: "A voicemail is waiting on \(simName). Open Pairline to call your voicemail.", table: "Carrier")
+        } else {
+            content.body = String(localized: "A voicemail is waiting. Open Pairline to call your voicemail.", table: "Carrier")
+        }
+        content.sound = .default
+        content.userInfo = ["status": true]
+        center.add(UNNotificationRequest(identifier: "voicemail", content: content, trigger: nil))
     }
 
     func scheduleTrialReminder(trialEnd: Date, price: String) {
@@ -269,6 +373,12 @@ extension Notifier: UNUserNotificationCenterDelegate {
         Task { @MainActor in
             if let mirrorKey, action == UNNotificationDismissActionIdentifier {
                 Notifier.shared.onMirrorDismissed?(mirrorKey)
+                return completionHandler()
+            }
+            if let mirrorKey, action == Notifier.mirrorReplyAction {
+                if let typed, !typed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Notifier.shared.onMirrorReply?(mirrorKey, typed)
+                }
                 return completionHandler()
             }
             switch action {

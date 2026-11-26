@@ -23,23 +23,42 @@ struct BridgeLiveActivityWidget: Widget {
                         .padding(.trailing, 6)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    ActivityBottomRow(state: state, isDemo: context.attributes.isDemo)
-                        .padding(.horizontal, 6)
+                    if let code = state.code {
+                        ActivityCodeRow(code: code).padding(.horizontal, 6)
+                    } else {
+                        ActivityBottomRow(state: state, isDemo: context.attributes.isDemo)
+                            .padding(.horizontal, 6)
+                    }
                 }
             } compactLeading: {
-                CompactSignalView(state: state)
+                // A one-time code for two minutes after it arrived (D-083), else the bridge's signal.
+                if state.code != nil {
+                    Image(systemName: "key.fill").font(.caption.weight(.semibold)).foregroundStyle(activityGreen)
+                } else {
+                    CompactSignalView(state: state)
+                }
             } compactTrailing: {
-                CompactTrailingView(state: state)
+                if let code = state.code {
+                    Text(verbatim: code).font(.caption.monospacedDigit().weight(.bold)).lineLimit(1)
+                } else {
+                    CompactTrailingView(state: state)
+                }
             } minimal: {
-                CompactSignalView(state: state)
+                if state.code != nil {
+                    Image(systemName: "key.fill").font(.caption2.weight(.semibold)).foregroundStyle(activityGreen)
+                } else {
+                    CompactSignalView(state: state)
+                }
             }
-            .widgetURL(statusURL)
+            .widgetURL(state.code == nil ? statusURL : codeURL)
             .keylineTint(activityGreen)
         }
     }
 }
 
 private let statusURL = URL(string: "pairline://status")
+/// Opens Pairline, which copies the code shown (it keeps it in memory; the link carries no code).
+private let codeURL = URL(string: "pairline://code")
 private let activityGreen = Color(red: 0x12 / 255, green: 0xB8 / 255, blue: 0x86 / 255)
 private let activityAmber = Color(red: 0xF5 / 255, green: 0x9F / 255, blue: 0x00 / 255)
 private let activityRed = Color(red: 0xE0 / 255, green: 0x31 / 255, blue: 0x31 / 255)
@@ -126,6 +145,25 @@ private struct ActivityBottomRow: View {
     private var nameText: Text {
         if let name = state.name { return Text(verbatim: name) }
         return Text("Bridge phone")
+    }
+}
+
+/// The expanded Dynamic Island while a one-time code shows (D-083).
+private struct ActivityCodeRow: View {
+    let code: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "key.fill").foregroundStyle(activityGreen)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("One-time code").font(.caption).foregroundStyle(.secondary)
+                Text(verbatim: code)
+                    .font(.title2.monospacedDigit().weight(.bold))
+                    .environment(\.layoutDirection, .leftToRight)
+            }
+            Spacer(minLength: 4)
+            Text("Tap to copy").font(.caption.weight(.semibold)).foregroundStyle(activityGreen)
+        }
     }
 }
 

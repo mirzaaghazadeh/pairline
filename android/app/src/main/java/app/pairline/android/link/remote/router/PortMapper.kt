@@ -45,7 +45,7 @@ sealed interface V4Result {
 }
 
 /**
- * Opens one TCP port on the home router for remote mode's direct connection (D-080): NAT-PMP, then PCP, then UPnP IGD;
+ * Opens one TCP port on the home router for remote mode's direct connection (D-092): NAT-PMP, then PCP, then UPnP IGD;
  * the first that maps wins. When the router's own internet address isn't public (carrier-grade NAT, double NAT), no
  * mapping is made and that's reported instead. For IPv6, PCP opens a pinhole for this phone's global address.
  * Talks only to [network]'s gateway and, for UPnP, to LAN addresses next to it. Every call blocks (seconds).

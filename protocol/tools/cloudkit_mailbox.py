@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remote mode's mailbox from a non-Apple client (D-080): what the Android bridge does, in Python.
+"""Remote mode's mailbox from a non-Apple client (D-092): what the Android bridge does, in Python.
 
 Talks only to CloudKit Web Services (api.apple-cloudkit.com, and Apple's webcourier long-poll host for the
 `webcourier` command), on the private database of the iCloud user whose iPhone minted the web auth token.
@@ -9,7 +9,7 @@ Configuration lives outside the repo:
   ~/.config/pairline/ck-webauth-<name>.token     the current web auth token of a chain (mode 600)
 
 Every response carries a refreshed web auth token (`X-Apple-CloudKit-Web-Auth-Token`), which replaces the stored one
-before anything else happens; requests on one chain never overlap. Measured in Phase 0 (D-080): a token from the
+before anything else happens; requests on one chain never overlap. Measured in Phase 0 (D-092): a token from the
 iPhone works for more than one request, and the returned one works only without the trailing `__` it comes with.
 
 Commands:

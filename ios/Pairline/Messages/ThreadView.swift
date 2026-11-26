@@ -21,6 +21,9 @@ struct ThreadView: View {
 
     private var address: String { conversation?.primaryAddress ?? messages.last?.addr ?? "" }
     private var name: String { db.displayName(for: address) }
+    /// Everyone in a group conversation besides the bridge phone (D-089); one address otherwise.
+    private var participants: [String] { conversation?.addresses ?? [address] }
+    private var isGroup: Bool { participants.count > 1 }
     private var isBlocked: Bool { bridge.isBlocked(address) }
 
     var body: some View {
@@ -48,6 +51,17 @@ struct ThreadView: View {
                             .padding(.bottom, 6)
                         ForEach(Array(group.messages.enumerated()), id: \.element.key) { index, message in
                             let next = index + 1 < group.messages.count ? group.messages[index + 1] : nil
+                            let previous = index > 0 ? group.messages[index - 1] : nil
+                            // In a group, an incoming message says who sent it when the sender changes (D-089).
+                            if isGroup, !message.isOutgoing,
+                               previous == nil || previous?.isOutgoing == true || previous?.addr != message.addr {
+                                Text(verbatim: db.displayName(for: message.addr))
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading, 14)
+                                    .padding(.top, 6)
+                            }
                             MessageBubble(message: message, isLastInGroup: next?.isOutgoing != message.isOutgoing,
                                           simLabel: bridge.isDualSIM ? message.sim : nil,
                                           onDelete: { confirmDeleteMessage = message })
@@ -60,7 +74,7 @@ struct ThreadView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .safeAreaInset(edge: .bottom) {
-                Composer(thread: thread, address: address) {
+                Composer(thread: thread, address: address, group: isGroup ? participants : []) {
                     withAnimation { proxy.scrollTo(messages.last?.key, anchor: .bottom) }
                 }
             }
@@ -90,9 +104,16 @@ struct ThreadView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 1) {
-                    titleText.font(.headline).lineLimit(1)
-                    if name != address {
-                        LTRText(address).font(.caption2).foregroundStyle(.secondary)
+                    if isGroup {
+                        // A group conversation (D-089): everyone's names.
+                        Text(verbatim: participants.map { db.displayName(for: $0) }.joined(separator: ", "))
+                            .font(.headline).lineLimit(1)
+                        Text("\(participants.count) people", tableName: "MMS").font(.caption2).foregroundStyle(.secondary)
+                    } else {
+                        titleText.font(.headline).lineLimit(1)
+                        if name != address {
+                            LTRText(address).font(.caption2).foregroundStyle(.secondary)
+                        }
                     }
                 }
                 .accessibilityElement(children: .combine)
@@ -219,20 +240,26 @@ struct MessageBubble: View {
         HStack(alignment: .bottom) {
             if message.isOutgoing { Spacer(minLength: 48) }
             VStack(alignment: message.isOutgoing ? .trailing : .leading, spacing: 4) {
-                Text(LinkDetector.attributed(message.body))
-                    .font(.body)
-                    .multilineTextAlignment(.leading)
-                    .environment(\.layoutDirection, rtl ? .rightToLeft : .leftToRight)
-                    .foregroundStyle(message.isOutgoing ? Color.white : Color.primary)
-                    .tint(message.isOutgoing ? .white : .brandBlue)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 9)
-                    .background(bubbleShape.fill(message.isOutgoing ? bubbleColor : Color.bubbleIncoming))
-                    .textSelection(.enabled)
+                // An MMS's pictures and other attachments (D-089).
+                ForEach(message.parts, id: \.self) { part in
+                    MMSPartView(message: message, part: part)
+                }
+                if !message.body.isEmpty || message.parts.isEmpty {
+                    Text(LinkDetector.attributed(message.body))
+                        .font(.body)
+                        .multilineTextAlignment(.leading)
+                        .environment(\.layoutDirection, rtl ? .rightToLeft : .leftToRight)
+                        .foregroundStyle(message.isOutgoing ? Color.white : Color.primary)
+                        .tint(message.isOutgoing ? .white : .brandBlue)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
+                        .background(bubbleShape.fill(message.isOutgoing ? bubbleColor : Color.bubbleIncoming))
+                        .textSelection(.enabled)
+                }
                 if let code {
                     CopyChip(label: Text("Copy code \(PhoneNumber.ltr(code))"), value: code, isCode: true)
                 }
-                if isLastInGroup || message.state == .failed || message.state == .pending {
+                if isLastInGroup || message.state == .failed || message.state == .pending || message.state == .scheduled {
                     footer
                 }
             }
@@ -250,6 +277,23 @@ struct MessageBubble: View {
                         bridge.retry(message)
                     } label: { Label("Try again", systemImage: "arrow.clockwise") }
                 }
+                if message.state == .scheduled {
+                    Button(role: .destructive) {
+                        Task {
+                            do {
+                                try await bridge.cancelScheduled(message)
+                            } catch {
+                                AppModel.shared.toast = error.localizedDescription
+                            }
+                        }
+                    } label: {
+                        Label {
+                            Text("Cancel scheduled message", tableName: "Extras")
+                        } icon: {
+                            Image(systemName: "calendar.badge.minus")
+                        }
+                    }
+                }
                 if let onDelete {
                     Button(role: .destructive, action: onDelete) {
                         Label("Delete", systemImage: "trash")
@@ -265,7 +309,11 @@ struct MessageBubble: View {
     }
 
     private var bubbleColor: Color {
-        message.state == .failed ? Color.brandRed.opacity(0.85) : Color.brandFill
+        switch message.state {
+        case .failed: return Color.brandRed.opacity(0.85)
+        case .scheduled: return Color.brandFill.opacity(0.55)
+        default: return Color.brandFill
+        }
     }
 
     private var bubbleShape: some Shape {
@@ -277,9 +325,14 @@ struct MessageBubble: View {
             if let simLabel {
                 SIMBadge(slot: simLabel)
             }
-            Text(message.time, style: .time)
+            if message.state != .scheduled {
+                Text(message.time, style: .time)
+            }
             if message.isOutgoing {
                 switch message.state {
+                case .scheduled:
+                    Image(systemName: "calendar.badge.clock")
+                    Text("Scheduled for \(message.time.formatted(date: .abbreviated, time: .shortened))", tableName: "Extras")
                 case .pending:
                     Image(systemName: "clock")
                     Text(bridge.phase.canReachBridge ? "Sending…" : "Waiting for bridge")
@@ -327,22 +380,32 @@ struct MessageBubble: View {
 struct Composer: View {
     let thread: Int64?
     let address: String
+    /// Everyone in a group conversation (D-089); empty for one person.
+    var group: [String] = []
     var onSend: () -> Void = {}
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var bridge: BridgeController
     @State private var draft: String
     @State private var sim: Int?
+    @State private var scheduling = false
+    /// A picture to send as an MMS (D-089), already made small enough for carriers.
+    @State private var picture: Data?
+    @State private var sending = false
     @FocusState private var focused: Bool
 
-    init(thread: Int64?, address: String, onSend: @escaping () -> Void = {}) {
+    init(thread: Int64?, address: String, group: [String] = [], onSend: @escaping () -> Void = {}) {
         self.thread = thread
         self.address = address
+        self.group = group
         self.onSend = onSend
         _draft = State(initialValue: ComposerDrafts.text(for: thread))
     }
 
     private var segments: SMSSegments.Info { SMSSegments.info(for: draft) }
-    private var canSend: Bool { !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !address.isEmpty }
+    private var hasText: Bool { !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    private var canSend: Bool { (hasText || picture != nil) && !address.isEmpty && !sending }
+    /// A picture, or more than one person, makes it an MMS (D-089).
+    private var isMMS: Bool { picture != nil || group.count > 1 }
 
     var body: some View {
         VStack(spacing: 6) {
@@ -367,6 +430,14 @@ struct Composer: View {
                     if bridge.isDualSIM {
                         simMenu
                     }
+                    // Saved replies (D-083): one tap puts one in the field, to send as it is or edit first.
+                    QuickReplyMenu { reply in
+                        draft = draft.trimmingCharacters(in: .whitespaces).isEmpty ? reply : draft + " " + reply
+                    }
+                    // A picture makes it an MMS (D-089).
+                    if bridge.has(.mms) {
+                        PicturePicker(picture: $picture)
+                    }
                     TextField(String(localized: "Text message"), text: $draft, axis: .vertical)
                         .lineLimit(1...6)
                         .focused($focused)
@@ -382,8 +453,41 @@ struct Composer: View {
                     }
                     .disabled(!canSend)
                     .accessibilityLabel(Text("Send"))
+                    // Touch and hold: the bridge sends it later, even if this iPhone is away then (D-084).
+                    .contextMenu {
+                        if canSend, !isMMS, bridge.has(.smsSchedule) {
+                            Button {
+                                scheduling = true
+                            } label: {
+                                Label {
+                                    Text("Send later…", tableName: "Extras")
+                                } icon: {
+                                    Image(systemName: "calendar.badge.clock")
+                                }
+                            }
+                        }
+                    }
                 }
-                if segments.parts > 1 || (segments.parts == 1 && segments.remaining < 20) {
+                if let picture, let image = UIImage(data: picture) {
+                    HStack(spacing: 10) {
+                        Image(uiImage: image).resizable().scaledToFill().frame(width: 56, height: 56)
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        Text("Picture message", tableName: "MMS").font(.footnote).foregroundStyle(.secondary)
+                        Spacer()
+                        Button {
+                            self.picture = nil
+                        } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                        }
+                        .accessibilityLabel(Text("Remove picture", tableName: "MMS"))
+                    }
+                } else if group.count > 1 {
+                    Text("Group message: everyone in this conversation gets it as an MMS.", tableName: "MMS")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                if !isMMS, segments.parts > 1 || (segments.parts == 1 && segments.remaining < 20) {
                     Text("SMS parts: \(segments.parts) · left: \(segments.remaining)")
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(.secondary)
@@ -398,6 +502,26 @@ struct Composer: View {
             sim = bridge.effectiveSim(forSMS: true)
         }
         .onValueChange(draft) { ComposerDrafts.set($0, for: thread) }
+        .sheet(isPresented: $scheduling) {
+            ScheduleSheet(exact: bridge.scheduledExact) { date in
+                scheduling = false
+                schedule(at: date)
+            }
+        }
+    }
+
+    private func schedule(at date: Date) {
+        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        Task {
+            do {
+                try await bridge.scheduleSMS(to: address, body: text, sim: sim, thread: thread, at: date)
+                draft = ""
+                onSend()
+            } catch {
+                app.toast = error.localizedDescription
+            }
+        }
     }
 
     private var simMenu: some View {
@@ -426,6 +550,24 @@ struct Composer: View {
 
     private func send() {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        if isMMS {
+            // A picture or a group: one MMS to everyone (D-089).
+            let image = picture
+            let recipients = group.count > 1 ? group : [address]
+            sending = true
+            Task {
+                defer { sending = false }
+                do {
+                    try await bridge.sendMMS(to: recipients, body: text, image: image, sim: sim, thread: thread)
+                    draft = ""
+                    picture = nil
+                    onSend()
+                } catch {
+                    app.toast = error.localizedDescription
+                }
+            }
+            return
+        }
         guard !text.isEmpty else { return }
         do {
             try bridge.sendSMS(to: address, body: text, sim: sim, thread: thread)

@@ -2,20 +2,20 @@ import Foundation
 import StoreKit
 import UIKit
 
-/// StoreKit 2 purchases (D-017, D-036, D-081). Three non-consumables: a free "7-day Trial", "Pairline Full Access",
+/// StoreKit 2 purchases (D-017, D-036, D-093). Three non-consumables: a free "7-day Trial", "Pairline Full Access",
 /// and the remote-mode add-on. Entitlements are verified on the device from Apple-signed transactions; there's no
 /// receipt server.
 @MainActor
 final class PurchaseManager: ObservableObject {
     static let trialID = "app.pairline.ios.trial7day"
     static let fullID = "app.pairline.ios.full"
-    /// Remote mode after the trial (D-081): bought only once Full Access is.
+    /// Remote mode after the trial (D-093): bought only once Full Access is.
     static let remoteID = "app.pairline.ios.remote"
     static let fallbackPrice = "$9.99"
     static let remoteFallbackPrice = "$9.99"
 
     @Published private(set) var access: AccessState = .loading
-    /// Whether remote mode may run (D-081): during the trial, or with Full Access and the add-on.
+    /// Whether remote mode may run (D-093): during the trial, or with Full Access and the add-on.
     @Published private(set) var remoteAccess: RemoteAccess = .loading
     @Published private(set) var fullProduct: Product?
     @Published private(set) var trialProduct: Product?
@@ -74,7 +74,7 @@ final class PurchaseManager: ObservableObject {
         return fullProduct?.displayPrice ?? Self.fallbackPrice
     }
 
-    /// The remote-mode add-on's price in the user's storefront (D-081).
+    /// The remote-mode add-on's price in the user's storefront (D-093).
     var remotePriceText: String {
         remoteProduct?.displayPrice ?? Self.remoteFallbackPrice
     }
@@ -169,7 +169,7 @@ final class PurchaseManager: ObservableObject {
         }
     }
 
-    /// Debug builds only: `-PairlineRemoteAccess purchased|none` fakes the remote-mode add-on (D-081), remembered like
+    /// Debug builds only: `-PairlineRemoteAccess purchased|none` fakes the remote-mode add-on (D-093), remembered like
     /// `-PairlineAccess` until `-PairlineRemoteAccess reset`. Without it, a faked access state of "purchased" counts as
     /// everything bought (so a test iPhone set up with `-PairlineAccess purchased` keeps remote mode); use
     /// `-PairlineRemoteAccess none` to see the add-on for sale. Unit tests ignore the remembered value.
@@ -224,7 +224,7 @@ final class PurchaseManager: ObservableObject {
         return await purchase(product)
     }
 
-    /// Buys the remote-mode add-on (D-081). Offered only once Full Access is bought (`RemoteAccess.offersPurchase`).
+    /// Buys the remote-mode add-on (D-093). Offered only once Full Access is bought (`RemoteAccess.offersPurchase`).
     @discardableResult
     func buyRemote() async -> Bool {
         if remoteProduct == nil { await loadProducts() }

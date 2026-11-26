@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Cloud mode (remote mode, D-080) in Settings: what it is in plain words, whether it's working, and the switch (off by
+/// Cloud mode (remote mode, D-092) in Settings: what it is in plain words, whether it's working, and the switch (off by
 /// default). Shown only where remote mode is available (`RemoteFeature`) and a bridge is paired. Its strings live in the
 /// "RemoteMode" table, apart from the link states shared with the rest of the app.
 struct RemoteModeSection: View {
@@ -53,7 +53,7 @@ struct RemoteModeSection: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
-            // Manual port forwarding (D-083), for a router without UPnP, NAT-PMP or PCP.
+            // Manual port forwarding (D-095), for a router without UPnP, NAT-PMP or PCP.
             if remote.isOn {
                 NavigationLink {
                     PortForwardingView(remote: remote)
@@ -165,7 +165,7 @@ struct RemoteModeSection: View {
     /// What the bridge said about its direct connection (`remote.state`), or that it's in use; nil before it said.
     private var directText: Text? {
         if bridge.isDirect { return Text("Connected") }
-        // The router opened nothing, but the user forwarded the port by hand (D-083): say that instead of the reason.
+        // The router opened nothing, but the user forwarded the port by hand (D-095): say that instead of the reason.
         if remote.direct.manual != nil, remote.direct.status?.availability != .open,
            remote.direct.status?.reason != .carrierNAT, remote.direct.status?.reason != .notOnWiFi {
             switch remote.manualAttempt?.worked {
@@ -187,7 +187,7 @@ struct RemoteModeSection: View {
 
     /// Why it can't be turned on right now: the bridge gets its settings over a nearby session, and must speak v1.
     private var blocker: Text? {
-        // The purchase state first (D-081): Cloud mode is part of the trial, then an add-on to Full Access.
+        // The purchase state first (D-093): Cloud mode is part of the trial, then an add-on to Full Access.
         if let addOn = RemoteAddOnText.blocker(purchases.remoteAccess) { return addOn }
         if !bridge.phase.isConnected {
             return Text("Turn Cloud mode on while your phones are linked nearby, over Bluetooth or the same Wi-Fi.", tableName: "RemoteMode")
@@ -200,7 +200,7 @@ struct RemoteModeSection: View {
 
     private func change(to on: Bool) {
         guard !busy, on != remote.isOn else { return }
-        // The first time, the plain-words screen comes first; its "Turn on" turns it on (D-080).
+        // The first time, the plain-words screen comes first; its "Turn on" turns it on (D-092).
         if on, !introSeen {
             intro = .beforeTurningOn
             return

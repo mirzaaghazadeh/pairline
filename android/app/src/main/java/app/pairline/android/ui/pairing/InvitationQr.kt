@@ -14,7 +14,7 @@ import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.QRCodeReader
 
 /**
- * Reads the QR code of a remote-pairing invitation (D-080): in the live scanner's camera frames
+ * Reads the QR code of a remote-pairing invitation (D-092): in the live scanner's camera frames
  * ([InvitationScanner]), or in a picture the user chose (a screenshot of the iPhone's invitation). It all happens on
  * this phone, with ZXing, which Pairline already uses to draw its own QR codes: no other library.
  */

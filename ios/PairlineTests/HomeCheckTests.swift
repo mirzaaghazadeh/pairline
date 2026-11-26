@@ -1,7 +1,7 @@
 import XCTest
 @testable import Pairline
 
-// "Check my home connection" (`remote.check`, D-080) and the log's IP-address redaction (AGENTS.md rule 9).
+// "Check my home connection" (`remote.check`, D-092) and the log's IP-address redaction (AGENTS.md rule 9).
 final class HomeCheckTests: XCTestCase {
     private func decode(_ json: String) throws -> Inbound { try Inbound.decode(Data(json.utf8)) }
 

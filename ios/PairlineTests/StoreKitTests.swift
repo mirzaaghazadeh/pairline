@@ -44,7 +44,7 @@ final class StoreKitTests: XCTestCase {
         XCTAssertEqual(trial?.displayName, "7-day Trial")
     }
 
-    /// The remote-mode add-on (D-081): a one-time $9.99 non-consumable.
+    /// The remote-mode add-on (D-093): a one-time $9.99 non-consumable.
     func testRemoteAddOnProductMatchesD081() async throws {
         let products = try await Product.products(for: [PurchaseManager.remoteID])
         let remote = products.first

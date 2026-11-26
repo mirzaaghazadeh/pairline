@@ -2,7 +2,7 @@ import Network
 import XCTest
 @testable import Pairline
 
-/// Manual port forwarding (D-083): what the user may type as the home's address and port.
+/// Manual port forwarding (D-095): what the user may type as the home's address and port.
 final class ManualForwardTests: XCTestCase {
     private func make(_ host: String, _ port: String = "47830") -> Result<ManualForward, ManualForward.Problem> {
         ManualForward.make(host: host, port: port)

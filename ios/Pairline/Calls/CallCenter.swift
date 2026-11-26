@@ -26,6 +26,8 @@ struct ActiveCall: Identifiable, Equatable {
     /// Whether CallKit shows this call (false in demo mode, and after it was answered on the Android phone).
     var inCallKit: Bool
     var answeredHere = false
+    /// A call to the SIM's voicemail (D-082): dialed with `voicemail: true`, no number of its own.
+    var isVoicemail = false
 
     var displayName: String {
         if let name, !name.isEmpty { return name }
@@ -64,7 +66,7 @@ final class CallCenter: ObservableObject {
     weak var bridge: BridgeController?
     /// The Wi-Fi media channel while one is open (M5); nil without a Wi-Fi link.
     var mediaTransport: (() -> AudioPacketTransport?)?
-    /// The call-audio channel inside the Bluetooth session (D-072) or remote mode's direct connection (D-080), and the
+    /// The call-audio channel inside the Bluetooth session (D-072) or remote mode's direct connection (D-092), and the
     /// lane it's on; nil without either.
     var linkTransport: (() -> (channel: AudioPacketTransport, lane: LinkLane)?)?
     /// The path and channel of the relay the bridge accepted.
@@ -131,7 +133,7 @@ final class CallCenter: ObservableObject {
     var audioOnIPhone: Bool { if case .iphone = audioRoute { return true } else { return false } }
     /// The path a call's audio takes now (D-072): the one chosen in Settings › Call audio when it's up, else the
     /// other. Bluetooth needs a bridge that lists `call.media.link`; Wi-Fi needs an open media channel. Away from home,
-    /// the `.link` path is remote mode's direct connection (D-080); `lane` says which session carries it.
+    /// the `.link` path is remote mode's direct connection (D-092); `lane` says which session carries it.
     private func availablePath(excluding excluded: CallAudioPath? = nil)
         -> (path: CallAudioPath, transport: AudioPacketTransport, lane: LinkLane?)? {
         let order: [CallAudioPath] = AppSettings.shared.callAudioPath == .wifi ? [.wifi, .link] : [.link, .wifi]
@@ -474,7 +476,7 @@ final class CallCenter: ObservableObject {
             let stoppedPath = relayPath, stoppedLane = relayLane
             stopRelay(callEnded: false, tellBridge: false) // the bridge has stopped already
             // The session it ran in changed mid-call (walking home from remote mode's direct connection to Bluetooth,
-            // or leaving again, D-080): move the audio to the session that's up now, as often as that happens.
+            // or leaving again, D-092): move the audio to the session that's up now, as often as that happens.
             if call.state == .active, call.answeredHere, let next = availablePath(), next.path == .link,
                stoppedPath == .link, next.lane != stoppedLane {
                 log.info("audio", "Moving the call's audio to \(Self.pathName(next.path, lane: next.lane))")
@@ -570,8 +572,11 @@ final class CallCenter: ObservableObject {
     /// Echo cancellation first; if the engine won't start with it (some routes and devices refuse), a fresh engine
     /// without it, so the call's audio still comes here. Remembered for the rest of the call.
     private func startedEngine(_ transport: AudioPacketTransport, path: CallAudioPath) throws -> CallAudioEngine {
+        // The caller's voice also feeds live captions while they're on (D-087); nothing else reads it.
+        let captions = LiveCaptions.shared
         if !echoCancellationFailed {
             let engine = try CallAudioEngine(transport: transport, voiceProcessing: true, path: path)
+            engine.onCallerFrame = { captions.append($0) }
             do {
                 try engine.start()
                 return engine
@@ -581,6 +586,7 @@ final class CallCenter: ObservableObject {
             }
         }
         let engine = try CallAudioEngine(transport: transport, voiceProcessing: false, path: path)
+        engine.onCallerFrame = { captions.append($0) }
         try engine.start()
         return engine
     }
@@ -628,6 +634,7 @@ final class CallCenter: ObservableObject {
         let wasRelaying = audioOnIPhone
         let relayedFor = relayStartedAt.map { Date().timeIntervalSince($0) } ?? 0
         stopEngine()
+        LiveCaptions.shared.stop()
         if relayAccepted, !callEnded, tellBridge, let bridgeID = current?.bridgeID, let bridge {
             Task { _ = try? await bridge.link.request(.callMediaStop(bridgeID)) }
         }
@@ -775,36 +782,59 @@ final class CallCenter: ObservableObject {
 
     /// Starts a call from the dialer, contacts or call log.
     func startCall(number: String, sim: Int?) {
-        guard let bridge else { return }
-        guard bridge.canUseLink else {
-            bridge.requestPaywall()
+        guard let bridge, canStartCall() else { return }
+        let dialable = PhoneNumber.international(PhoneNumber.dialable(number))
+        guard !dialable.isEmpty else { return }
+        let call = ActiveCall(id: UUID(), bridgeID: nil, number: dialable, name: bridge.db.knownName(for: dialable),
+                              isOutgoing: true, state: .dialing, sim: sim, inCallKit: useCallKit)
+        place(call, handle: CXHandle(type: .phoneNumber, value: dialable))
+    }
+
+    /// Calls the voicemail of the SIM in `sim` (D-082): the bridge phone looks up the carrier's voicemail number.
+    func startVoicemailCall(sim: Int?) {
+        guard let bridge, canStartCall() else { return }
+        guard bridge.has(.callVoicemail) else {
+            notice = CapabilityInfo(.callVoicemail).missingText
             return
         }
+        let name = String(localized: "Voicemail", table: "Carrier")
+        var call = ActiveCall(id: UUID(), bridgeID: nil, number: "", name: name, isOutgoing: true, state: .dialing,
+                              sim: sim, inCallKit: useCallKit)
+        call.isVoicemail = true
+        place(call, handle: CXHandle(type: .generic, value: name))
+    }
+
+    private func canStartCall() -> Bool {
+        guard let bridge else { return false }
+        guard bridge.canUseLink else {
+            bridge.requestPaywall()
+            return false
+        }
         guard bridge.phase.isConnected else {
-            // Remote mode (D-080): iCloud carries no call audio; the direct connection does, and then the phase is
+            // Remote mode (D-092): iCloud carries no call audio; the direct connection does, and then the phase is
             // connected and this guard passes.
             notice = bridge.phase == .remote
                 ? String(localized: "Calls need the direct connection to your home, which isn't up right now. Settings › Cloud mode › Check my home connection shows why.")
                 : String(localized: "Your bridge phone isn't connected right now.")
-            return
+            return false
         }
         guard bridge.has(.callDial) else {
             notice = String(localized: "Your bridge app can't place calls yet. Allow the phone permission in Pairline Bridge.")
-            return
+            return false
         }
         guard current == nil else {
             notice = String(localized: "There's already a call in progress.")
-            return
+            return false
         }
-        let dialable = PhoneNumber.international(PhoneNumber.dialable(number))
-        guard !dialable.isEmpty else { return }
-        var call = ActiveCall(id: UUID(), bridgeID: nil, number: dialable, name: bridge.db.knownName(for: dialable),
-                              isOutgoing: true, state: .dialing, sim: sim, inCallKit: useCallKit)
+        return true
+    }
+
+    private func place(_ placed: ActiveCall, handle: CXHandle) {
+        var call = placed
         call.answeredHere = true // placed from this iPhone, so its audio belongs here too
         current = call
         showCallScreen = true
         if useCallKit {
-            let handle = CXHandle(type: .phoneNumber, value: dialable)
             let action = CXStartCallAction(call: call.id, handle: handle)
             action.contactIdentifier = call.name
             request(action) { [weak self] in
@@ -951,7 +981,8 @@ final class CallCenter: ObservableObject {
     private func sendDial(_ call: ActiveCall) async -> Bool {
         guard let bridge else { return false }
         do {
-            _ = try await bridge.link.request(.callDial(sim: call.sim, number: call.number))
+            _ = try await bridge.link.request(call.isVoicemail ? .callVoicemail(sim: call.sim)
+                                                               : .callDial(sim: call.sim, number: call.number))
             watchDial(call.id)
             return true
         } catch {

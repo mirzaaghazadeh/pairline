@@ -106,6 +106,35 @@ final class MessageCodecTests: XCTestCase {
         let dismiss = try json(.notifDismiss(key: "k"))
         XCTAssertEqual(dismiss["t"] as? String, "notif.dismiss")
         XCTAssertEqual(dismiss["key"] as? String, "k")
+        // D-086: a notification that takes a reply, and the reply.
+        guard case .notifPosted(let replyable) = try decode(["t": "notif.posted", "key": "k", "app": "a.b", "reply": true])
+            .message else { return XCTFail() }
+        XCTAssertEqual(replyable.reply, true)
+        XCTAssertNil(bare.reply, "older bridges leave it out")
+        let reply = try json(.notifReply(key: "k", text: "On my way"))
+        XCTAssertEqual(reply["t"] as? String, "notif.reply")
+        XCTAssertEqual(reply["text"] as? String, "On my way")
+    }
+
+    /// D-082: signal detail and the voicemail indicator per SIM, and dialing voicemail.
+    func testCarrierTools() throws {
+        guard case .status(let s) = try decode([
+            "t": "status",
+            "sims": [["slot": 0, "carrier": "Irancell", "signal": 3, "net": "LTE", "rat": "LTE-CA", "dbm": -97,
+                      "op": "Turkcell", "vm": true],
+                     ["slot": 1, "signal": 2, "net": "3G"]],
+        ]).message else { return XCTFail() }
+        XCTAssertEqual(s.sims?.first?.rat, "LTE-CA")
+        XCTAssertEqual(s.sims?.first?.dbm, -97)
+        XCTAssertEqual(s.sims?.first?.op, "Turkcell")
+        XCTAssertEqual(s.sims?.first?.vm, true)
+        XCTAssertNil(s.sims?.last?.vm, "older bridges leave it out")
+        let vm = try json(.callVoicemail(sim: 1))
+        XCTAssertEqual(vm["t"] as? String, "call.dial")
+        XCTAssertEqual(vm["voicemail"] as? Bool, true)
+        XCTAssertEqual(vm["sim"] as? Int, 1)
+        XCTAssertNil(vm["number"])
+        XCTAssertTrue(Capability.allCases.contains(.callVoicemail))
     }
 
     func testSMSMessagesAndHistoryPage() throws {
@@ -194,12 +223,20 @@ final class MessageCodecTests: XCTestCase {
         let reply = try decode(["t": "block.list", "id": 4,
                                 "numbers": [["n": "+15551234", "time": 1_764_000_000_000], ["time": 1], "bad"]])
         XCTAssertEqual(reply.id, 4)
-        guard case .blockList(let list) = reply.message else { return XCTFail() }
+        guard case .blockList(let list, let oldBridge) = reply.message else { return XCTFail() }
         XCTAssertEqual(list, [BlockedNumber(n: "+15551234", time: 1_764_000_000_000)], "bad entries are skipped")
-        let event = try decode(["t": "block.list", "numbers": []])
+        XCTAssertNil(oldBridge, "an older bridge doesn't send unknown")
+        let event = try decode(["t": "block.list", "numbers": [], "unknown": true])
         XCTAssertNil(event.id, "the bridge's own changes arrive as an event")
-        guard case .blockList(let empty) = event.message else { return XCTFail() }
+        guard case .blockList(let empty, let unknown) = event.message else { return XCTFail() }
         XCTAssertTrue(empty.isEmpty)
+        XCTAssertEqual(unknown, true, "D-085: silence unknown callers")
+        XCTAssertEqual(try json(.blockSilenceUnknown(false))["unknown"] as? Bool, false)
+        XCTAssertTrue(PhoneNumber.blockMatches("+234*", "+2348012345678"), "D-085: a prefix")
+        XCTAssertTrue(PhoneNumber.blockMatches("+234*", "002348012345678"))
+        XCTAssertFalse(PhoneNumber.blockMatches("+234*", "08012345678"))
+        XCTAssertTrue(PhoneNumber.blockMatches("0900*", "0900 123 4567"))
+        XCTAssertFalse(PhoneNumber.blockMatches("+2*", "+2348012345678"), "one digit is no prefix")
 
         let set = try json(.blockSet(add: ["+15551234"], remove: []))
         XCTAssertEqual(set["t"] as? String, "block.set")
@@ -242,7 +279,7 @@ final class MessageCodecTests: XCTestCase {
         let info = try json(.deviceInfo(name: "iPhone", os: "17.2", app: "0.1.0"), id: nil)
         XCTAssertNil(info["id"], "events carry no id")
         XCTAssertEqual(info["platform"] as? String, "ios")
-        // 1 where remote mode is available (D-080), 0 otherwise.
+        // 1 where remote mode is available (D-092), 0 otherwise.
         XCTAssertEqual(info["proto"] as? Int, RemoteFeature.isAvailable ? 1 : 0)
 
         XCTAssertEqual(Outbound.ussdRun(sim: 0, code: "*140#").timeout, 60)

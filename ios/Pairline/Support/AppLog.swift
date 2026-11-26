@@ -2,7 +2,7 @@ import Foundation
 import os
 
 /// Removes personal data from log text (AGENTS.md rule 9): phone numbers, emails, MAC addresses, UUIDs and IP
-/// addresses (remote mode, D-080: a home's internet address tells roughly where it is). Callers never pass message
+/// addresses (remote mode, D-092: a home's internet address tells roughly where it is). Callers never pass message
 /// text or contact names to the log in the first place; this is the second fence.
 enum Redactor {
     private static let rules: [(NSRegularExpression, String)] = {

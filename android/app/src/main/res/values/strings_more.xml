@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Features from "More from the same two phones" (D-082 onward). Kept apart from strings.xml so parallel work
+     doesn't collide; the same names in values-fa, values-ar and values-tr. -->
+<resources>
+    <string name="access_channel">Permissions for the iPhone</string>
+    <string name="schedule_access_title">Send scheduled messages on time</string>
+    <string name="schedule_access_text">Messages you schedule on the iPhone are sent by this phone. Turn on Pairline Bridge under Alarms &amp; reminders so they go out at the minute you chose. Without it, Android may send them a few minutes late.</string>
+    <string name="usage_access_title">Allow usage access for the data meter</string>
+    <string name="usage_access_text">The iPhone asked how much mobile data this phone used. Turn on Pairline Bridge under Usage access. Only the total goes to the iPhone, never which apps used it.</string>
+    <string name="ring_iphone_tile">Ring iPhone</string>
+    <string name="ring_iphone">Ring my iPhone</string>
+    <string name="ring_iphone_sub">Plays a sound on the iPhone for 30 seconds, even on silent</string>
+    <string name="ring_iphone_offline">The iPhone isn’t connected right now.</string>
+    <string name="ring_iphone_update">Update Pairline on the iPhone to ring it from here.</string>
+    <string name="ring_iphone_sent">Ringing your iPhone…</string>
+    <string name="screen_title">Call screening</string>
+    <string name="screen_role">Block calls before they ring</string>
+    <string name="screen_role_on">On: Pairline Bridge screens incoming calls</string>
+    <string name="screen_role_off">Tap to make Pairline Bridge Android’s call-screening app. Without it, a blocked call rings here for a moment before it’s declined.</string>
+    <string name="screen_unknown">Silence unknown callers</string>
+    <string name="screen_unknown_sub">Calls from numbers that aren’t in your contacts ring neither phone. They go to voicemail and show as missed.</string>
+    <string name="block_prefix_note">End a number with * to block every number that starts with it, for example +234*.</string>
+    <string name="photos_title">Photos for the iPhone</string>
+    <string name="photos_sub">Browse this phone’s photos on the iPhone and copy the ones you tap, over Wi-Fi only</string>
+</resources>

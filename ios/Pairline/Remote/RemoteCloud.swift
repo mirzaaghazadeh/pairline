@@ -1,7 +1,7 @@
 import CloudKit
 import Foundation
 
-/// Remote mode's doorbell and mailbox: the user's own private CloudKit database (D-080). Records hold only sealed
+/// Remote mode's doorbell and mailbox: the user's own private CloudKit database (D-092). Records hold only sealed
 /// payloads; the bridge phone reaches the same database through CloudKit Web Services with a web auth token that this
 /// iPhone fetches and sends it over the encrypted link.
 enum RemoteCloud {

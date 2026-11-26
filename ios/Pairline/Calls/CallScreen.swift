@@ -92,6 +92,7 @@ struct CallScreen: View {
                 Spacer(minLength: 12)
                 callerInfo(call, avatarSize: 96)
                 Spacer(minLength: 12)
+                if captionsAvailable { CaptionsPanel().padding(.horizontal, 16).padding(.bottom, 12) }
             }
         } second: {
             // The keypad or controls and the call buttons as one group, centred in their half, level with the caller:
@@ -115,6 +116,7 @@ struct CallScreen: View {
                 Spacer(minLength: 12)
                 callerInfo(call, avatarSize: 104)
                 Spacer(minLength: 16)
+                if captionsAvailable { CaptionsPanel().padding(.horizontal, 16).padding(.bottom, 12) }
                 middleControls(call)
                 Spacer(minLength: 16)
                 actions(call)
@@ -148,10 +150,20 @@ struct CallScreen: View {
             .font(.footnote.weight(.semibold))
             .foregroundStyle(.white.opacity(0.7))
             Spacer()
-            Color.clear.frame(width: 44, height: 44)
+            // Live captions of the caller (D-087): only while the call's audio is on this iPhone.
+            if captionsAvailable {
+                CaptionsButton()
+            } else {
+                Color.clear.frame(width: 44, height: 44)
+            }
         }
         .padding(.horizontal, 12)
         .foregroundStyle(.white)
+    }
+
+    private var captionsAvailable: Bool {
+        if case .iphone = calls.audioRoute { return !bridge.isDemo }
+        return false
     }
 
     /// The caller, the call's state and where its audio is.
@@ -225,10 +237,10 @@ struct CallScreen: View {
             Spacer(minLength: 8)
             if other.state == .ringing {
                 Button { calls.endOther() } label: { Image(systemName: "phone.down.fill") }
-                    .buttonStyle(.borderedProminent).tint(.brandRed)
+                    .buttonStyle(.borderedProminent).tint(.brandRedFill)
                     .accessibilityLabel(Text("Decline"))
                 Button { calls.answerOther() } label: { Image(systemName: "phone.fill") }
-                    .buttonStyle(.borderedProminent).tint(.brandGreen)
+                    .buttonStyle(.borderedProminent).tint(.brandGreenFill)
                     .accessibilityLabel(Text("Accept"))
             } else {
                 if other.state == .held && calls.canHold {
@@ -236,7 +248,7 @@ struct CallScreen: View {
                         .buttonStyle(.bordered).tint(.white)
                 }
                 Button { calls.endOther() } label: { Image(systemName: "phone.down.fill") }
-                    .buttonStyle(.borderedProminent).tint(.brandRed)
+                    .buttonStyle(.borderedProminent).tint(.brandRedFill)
                     .accessibilityLabel(Text("End"))
             }
         }
@@ -351,11 +363,11 @@ struct CallScreen: View {
     @ViewBuilder private func actions(_ call: ActiveCall) -> some View {
         if call.state == .ringing && !call.isOutgoing {
             HStack(spacing: 80) {
-                RoundCallButton(symbol: "phone.down.fill", color: .brandRed, title: Text("Decline")) {
+                RoundCallButton(symbol: "phone.down.fill", color: .brandRedFill, title: Text("Decline")) {
                     Haptics.tap()
                     calls.hangUp()
                 }
-                RoundCallButton(symbol: "phone.fill", color: .brandGreen, title: Text("Accept")) {
+                RoundCallButton(symbol: "phone.fill", color: .brandGreenFill, title: Text("Accept")) {
                     Haptics.success()
                     calls.answer()
                 }
@@ -366,7 +378,7 @@ struct CallScreen: View {
             RoundCallButton(symbol: "phone.down.fill", color: .gray, title: Text("Ended")) {}
                 .disabled(true)
         } else {
-            RoundCallButton(symbol: "phone.down.fill", color: .brandRed, title: Text("End")) {
+            RoundCallButton(symbol: "phone.down.fill", color: .brandRedFill, title: Text("End")) {
                 Haptics.tap()
                 calls.hangUp()
             }

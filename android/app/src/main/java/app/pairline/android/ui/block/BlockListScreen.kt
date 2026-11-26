@@ -34,7 +34,12 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import app.pairline.android.AppGraph
 import app.pairline.android.R
+import app.pairline.android.telephony.CallScreening
 import app.pairline.android.telephony.PhoneNumbers
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Switch
+import androidx.compose.ui.platform.LocalContext
 import app.pairline.android.ui.PIcons
 import app.pairline.android.ui.components.ListRow
 import app.pairline.android.ui.components.NoteBox
@@ -42,6 +47,49 @@ import app.pairline.android.ui.components.PairlineTopBar
 import app.pairline.android.ui.components.SectionCard
 import app.pairline.android.ui.components.Tone
 import app.pairline.android.ui.components.ltr
+
+/**
+ * Call screening (D-085, Android 10+): make Pairline Bridge the call-screening app so blocked numbers never ring, and
+ * "Silence unknown callers", which the iPhone can switch too.
+ */
+@Composable
+private fun ScreeningCard(tick: Int) {
+    if (!CallScreening.supported()) return
+    val context = LocalContext.current
+    var held by remember { mutableStateOf(CallScreening.held(context)) }
+    val request = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        held = CallScreening.held(context)
+        AppGraph.router.statusChanged()
+    }
+    val silence = remember(tick) { AppGraph.blockList.silenceUnknown }
+    SectionCard(title = stringResource(R.string.screen_title)) {
+        ListRow(
+            title = stringResource(R.string.screen_role),
+            subtitle = stringResource(if (held) R.string.screen_role_on else R.string.screen_role_off),
+            icon = PIcons.Block,
+            iconTone = if (held) Tone.GOOD else Tone.ACCENT,
+            onClick = if (held) null else {
+                { CallScreening.requestIntent(context)?.let(request::launch) }
+            },
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        ListRow(
+            title = stringResource(R.string.screen_unknown),
+            subtitle = stringResource(R.string.screen_unknown_sub),
+            icon = PIcons.Person,
+            iconTone = Tone.NEUTRAL,
+            trailing = {
+                Switch(
+                    checked = silence && held,
+                    enabled = held,
+                    onCheckedChange = { on ->
+                        if (AppGraph.blockList.setSilenceUnknown(on)) AppGraph.router.blockListChanged()
+                    },
+                )
+            },
+        )
+    }
+}
 
 /** The bridge's own view of the block list (D-043): the same list the iPhone edits. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,6 +125,7 @@ fun BlockListScreen(back: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             NoteBox(stringResource(R.string.block_intro), Tone.NEUTRAL, PIcons.Info)
+            ScreeningCard(tick)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = input,
@@ -96,6 +145,11 @@ fun BlockListScreen(back: () -> Unit) {
                 )
                 TextButton(onClick = { submit() }, enabled = input.isNotBlank()) { Text(stringResource(R.string.block_add)) }
             }
+            Text(
+                stringResource(R.string.block_prefix_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             SectionCard(title = stringResource(R.string.block_title)) {
                 if (entries.isEmpty()) {
                     Text(

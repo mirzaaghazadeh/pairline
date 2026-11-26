@@ -13,7 +13,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Remote mode's mailbox in the user's own iCloud (D-080, docs/PROTOCOL.md "Mailboxes in iCloud"), through CloudKit
+ * Remote mode's mailbox in the user's own iCloud (D-092, docs/PROTOCOL.md "Mailboxes in iCloud"), through CloudKit
  * Web Services. It reaches only [HOST], with Pairline's API token and the web auth token the user's iPhone handed
  * over; nothing else of the user's goes into a request but sealed records and their mailbox ids.
  *
@@ -46,7 +46,7 @@ class CloudKitWebClient(
     /** The token is missing or no longer accepted: the iPhone has to send a fresh one (`remote.token`). */
     class TokenRejected(val status: Int) : IOException("web auth token rejected ($status)")
 
-    /** Apple refuses this account's private database to web clients (D-080). */
+    /** Apple refuses this account's private database to web clients (D-092). */
     class PrivateDatabaseRefused : IOException("private database refused")
 
     class ServerError(val status: Int, val code: String?) : IOException("CloudKit $status ${code ?: ""}".trim())
@@ -149,7 +149,7 @@ class CloudKitWebClient(
 
         /**
          * CloudKit API tokens are made for web pages (CloudKit Console › Tokens & Keys); one alone reads nothing, a
-         * signed-in user's web auth token is needed too. Production gets its token when the add-on ships (D-080).
+         * signed-in user's web auth token is needed too. Production gets its token when the add-on ships (D-092).
          */
         private val API_TOKENS = mapOf(
             RemoteEnvironment.DEVELOPMENT to "88f1d920f369a9d3976a70aa7d7ddb5ac7faca8b1545f01fc9c2aef5ce435a1b",
@@ -160,7 +160,7 @@ class CloudKitWebClient(
 
         private val TOKEN_HEADERS = listOf("X-Apple-CloudKit-Web-Auth-Token", "X-Apple-CloudKit-Session")
 
-        /** CloudKit returns refreshed tokens with a trailing `__` that it then refuses (D-080, measured). */
+        /** CloudKit returns refreshed tokens with a trailing `__` that it then refuses (D-092, measured). */
         fun normalizeToken(token: String): String = token.trim().removeSuffix("__")
 
         internal fun refreshedToken(headers: Map<String, String>): String? {

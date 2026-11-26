@@ -150,7 +150,7 @@ internal class RemotePairingSteps(
 }
 
 /**
- * Remote pairing on the bridge (D-080, PROTOCOL.md "Remote pairing"): the person at home opens the iPhone's
+ * Remote pairing on the bridge (D-092, PROTOCOL.md "Remote pairing"): the person at home opens the iPhone's
  * invitation, allows it, and both people compare a 6-digit code on a phone call. Nothing is sent before [allow]. The
  * phones meet in the invitation's mailboxes; the records are deleted once handled.
  */

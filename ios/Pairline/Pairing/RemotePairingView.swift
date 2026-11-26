@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// "Pair over the internet" (D-080; PROTOCOL.md, "Remote pairing"): the owner pairs their own two phones while they
+/// "Pair over the internet" (D-092; PROTOCOL.md, "Remote pairing"): the owner pairs their own two phones while they
 /// aren't next to each other, which also turns Cloud mode on. A short explanation, then the invitation they send to
 /// their Android phone, the code to check on both phones, and the confirmation. Only where `RemoteFeature.isAvailable`.
 struct RemotePairingView: View {

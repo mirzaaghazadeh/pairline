@@ -227,12 +227,15 @@ struct CallLogRow: View {
     let call: () -> Void
     @EnvironmentObject private var db: AppDatabase
     @EnvironmentObject private var bridge: BridgeController
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var name: String? { item.name ?? db.knownName(for: item.number) }
     private var isMissed: Bool { item.type == .missed || item.type == .rejected }
 
     var body: some View {
-        HStack(spacing: 12) {
+        // At the accessibility text sizes the details and the time go under the name, and nothing is cut short.
+        let large = typeSize.isAccessibilitySize
+        HStack(alignment: large ? .top : .center, spacing: 12) {
             Image(systemName: symbol)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(isMissed ? Color.brandRed : .secondary)
@@ -247,22 +250,29 @@ struct CallLogRow: View {
                 }
                 .font(.body.weight(.semibold))
                 .foregroundStyle(isMissed ? Color.brandRed : .primary)
-                .lineLimit(1)
-                HStack(spacing: 6) {
-                    if bridge.isDualSIM, let sim = item.sim { SIMBadge(slot: sim) }
-                    typeText
-                    if item.duration > 0 {
-                        Text(verbatim: "·")
-                        Text(Formatters.duration(item.duration))
+                .lineLimit(large ? nil : 1)
+                AdaptiveStack(spacing: large ? 2 : 6) {
+                    HStack(spacing: 6) {
+                        if bridge.isDualSIM, let sim = item.sim { SIMBadge(slot: sim) }
+                        typeText
                     }
+                    if item.duration > 0 {
+                        HStack(spacing: 6) {
+                            if !large { Text(verbatim: "·") }
+                            Text(Formatters.duration(item.duration))
+                        }
+                    }
+                    if large { Text(Formatters.listTime(item.time)) }
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
-            Spacer()
-            Text(Formatters.listTime(item.time))
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Spacer(minLength: 0)
+            if !large {
+                Text(Formatters.listTime(item.time))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             if let showContact, let contact = db.contact(forNumber: item.number) {
                 Button {
                     showContact(contact)
@@ -430,8 +440,13 @@ struct DialerView: View {
                     number.append(item.0)
                     Haptics.tap()
                 } onLongPress: {
-                    number.append("+")
                     Haptics.tap()
+                    // Touch and hold 1 calls voicemail on an empty keypad, like a phone's own (D-082).
+                    if item.0 == "1" {
+                        if number.isEmpty { calls.startVoicemailCall(sim: sim) } else { number.append("1") }
+                    } else {
+                        number.append("+")
+                    }
                 }
             }
         }
@@ -452,7 +467,7 @@ struct DialerView: View {
             .frame(width: key + 6, height: key + 6)
             Button(action: primaryAction) {
                 ZStack {
-                    Circle().fill(Color.brandGreen)
+                    Circle().fill(Color.brandGreenFill)
                     if runningUSSD {
                         ProgressView().tint(.white)
                     } else {
@@ -465,6 +480,20 @@ struct DialerView: View {
             }
             .disabled(number.isEmpty || runningUSSD)
             .accessibilityLabel(PhoneNumber.isUSSD(number) ? Text("Run code") : Text("Call"))
+            // Hide the caller ID on this call only: the GSM "#31#" prefix (D-082).
+            .contextMenu {
+                if !number.isEmpty, !PhoneNumber.isUSSD(number), !number.hasPrefix("#31#") {
+                    Button {
+                        calls.startCall(number: "#31#" + number, sim: sim)
+                    } label: {
+                        Label {
+                            Text("Call with my number hidden", tableName: "Carrier")
+                        } icon: {
+                            Image(systemName: "eye.slash")
+                        }
+                    }
+                }
+            }
             Button {
                 if !number.isEmpty { number.removeLast() }
                 Haptics.tap()
@@ -556,7 +585,7 @@ struct DialKey: View {
         }
         .buttonStyle(DialKeyStyle())
         .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-            guard digit == "0" else { return }
+            guard digit == "0" || digit == "1" else { return }
             longPressed = true
             onLongPress()
         })

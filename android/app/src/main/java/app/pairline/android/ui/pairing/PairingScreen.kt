@@ -164,7 +164,7 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                // Cloud mode is turned on from the iPhone (D-080); the iPhone's device.info says whether it offers it.
+                // Cloud mode is turned on from the iPhone (D-092); the iPhone's device.info says whether it offers it.
                 val prefsTick by AppGraph.prefs.changes.collectAsState()
                 if (prefsTick >= 0 && CloudModeUi.offered(AppGraph.prefs.peerProto)) {
                     Text(
@@ -257,7 +257,7 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 /**
- * Remote pairing (D-080) for an invitation that didn't arrive as a link that opens Pairline: scan its QR code live
+ * Remote pairing (D-092) for an invitation that didn't arrive as a link that opens Pairline: scan its QR code live
  * (the camera permission is asked on that tap and used only there), choose a picture of the QR code (a screenshot), or
  * paste the whole link. The clipboard is read only on a tap.
  */

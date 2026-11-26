@@ -34,7 +34,7 @@ struct ConnectTarget {
     /// The direct connection: the bridge's public addresses from its authenticated `remote.addr`, IPv6 first.
     /// Nothing else ever fills it.
     var direct: [WiFiEndpoint] = []
-    /// The direct connection: the user's manual port forwarding (D-083), the one endpoint that may be a host name.
+    /// The direct connection: the user's manual port forwarding (D-095), the one endpoint that may be a host name.
     var directManual: WiFiEndpoint?
     /// Try `directManual` before `direct` (the bridge's router didn't open a port).
     var directManualFirst = false

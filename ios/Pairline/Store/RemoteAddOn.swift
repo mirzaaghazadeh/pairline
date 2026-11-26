@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Whether remote mode ("Cloud mode" on screen) may run, under D-081: it's part of the free trial, and after the trial
+/// Whether remote mode ("Cloud mode" on screen) may run, under D-093: it's part of the free trial, and after the trial
 /// it's a one-time add-on (`app.pairline.ios.remote`) to Full Access. Remote pairing ("Pair over the internet") follows
 /// the same rule.
 enum RemoteAccess: Equatable {
@@ -36,7 +36,7 @@ enum RemoteAddOnPolicy {
     }
 }
 
-/// The add-on's lines in remote mode's Settings section (D-081). Strings live in the "RemoteAddOn" table.
+/// The add-on's lines in remote mode's Settings section (D-093). Strings live in the "RemoteAddOn" table.
 enum RemoteAddOnText {
     /// Why remote mode can't be turned on for this purchase state, or nil when it can.
     static func blocker(_ access: RemoteAccess) -> Text? {
@@ -59,7 +59,7 @@ enum RemoteAddOnText {
     }
 }
 
-/// The add-on's buy button (D-081): only once Full Access is bought, and only where remote mode exists, so a build
+/// The add-on's buy button (D-093): only once Full Access is bought, and only where remote mode exists, so a build
 /// without remote mode (App Review before it ships) never offers it.
 struct RemoteAddOnButton: View {
     @EnvironmentObject private var purchases: PurchaseManager

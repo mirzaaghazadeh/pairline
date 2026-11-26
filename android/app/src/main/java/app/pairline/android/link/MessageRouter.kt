@@ -31,7 +31,10 @@ import app.pairline.android.telephony.BlockList
 import app.pairline.android.telephony.BlockRules
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
+import app.pairline.android.telephony.DataUsage
 import app.pairline.android.telephony.PhoneNumbers
+import app.pairline.android.telephony.ScheduledMessage
+import app.pairline.android.telephony.ScheduledSms
 import app.pairline.android.telephony.SmsMapping
 import app.pairline.android.telephony.SmsSender
 import app.pairline.android.telephony.SmsStore
@@ -68,6 +71,11 @@ class MessageRouter(
     private val blockList: BlockList,
     private val netSwitches: NetSwitches,
     private val appContext: Context,
+    private val scheduled: ScheduledSms,
+    private val dataUsage: DataUsage,
+    private val photos: app.pairline.android.files.PhotoLibrary,
+    private val mmsStore: app.pairline.android.telephony.MmsStore,
+    private val mmsSender: app.pairline.android.telephony.MmsSender,
     private val remote: RemoteLink,
     /** "Check my home connection" (`remote.check`): asks the router read-only; blocks for seconds. */
     private val checkHome: () -> HomeCheck.Result,
@@ -159,7 +167,7 @@ class MessageRouter(
     }
 
     /**
-     * Remote mode just started (D-080). A phone paired from far away may never have had a session, so the iPhone
+     * Remote mode just started (D-092). A phone paired from far away may never have had a session, so the iPhone
      * learns this phone's name, model and status through the mailbox (or the session, if one is up).
      */
     fun remoteStarted() {
@@ -188,10 +196,14 @@ class MessageRouter(
         link.send(json)
     }
 
-    /** A hash of everything but the timestamp, to skip identical status messages. */
+    /**
+     * A hash of everything but the timestamp and each SIM's dBm, to skip identical status messages. dBm moves every
+     * few seconds; it rides along with other changes and the status sent at least every 60 s (D-082).
+     */
     private fun contentKey(json: JSONObject): Long {
         val copy = JSONObject(json.toString())
         copy.remove("time")
+        copy.optJSONArray("sims")?.let { sims -> for (i in 0 until sims.length()) sims.optJSONObject(i)?.remove("dbm") }
         return copy.toString().hashCode().toLong()
     }
 
@@ -227,8 +239,11 @@ class MessageRouter(
             Msg.CALL_REJECT -> request(message) { id -> calls.reject(callId(message)); Messages.ok(id) }
             Msg.CALL_END -> request(message) { id -> calls.end(callId(message)); Messages.ok(id) }
             Msg.CALL_DIAL -> request(message) { id ->
-                val number = message.stringOrNull("number") ?: invalid("number missing")
-                calls.dial(sim(message), number)
+                if (message.boolOrNull("voicemail") == true) {
+                    calls.dialVoicemail(sim(message)) // D-082
+                } else {
+                    calls.dial(sim(message), message.stringOrNull("number") ?: invalid("number missing"))
+                }
                 Messages.ok(id)
             }
             Msg.CALL_DTMF -> request(message) { id ->
@@ -297,6 +312,82 @@ class MessageRouter(
                 NotificationMirror.dismiss(message.stringOrNull("key") ?: invalid("key missing"))
                 Messages.ok(id)
             }
+            Msg.NOTIF_REPLY -> request(message) { id ->
+                // Typed in the mirrored notification on the iPhone: through the app's own reply action (D-086).
+                val key = message.stringOrNull("key") ?: invalid("key missing")
+                val text = message.stringOrNull("text")?.takeIf { it.isNotBlank() } ?: invalid("text missing")
+                if (!NotificationMirror.reply(appContext, key, text)) invalid("no reply action")
+                Messages.ok(id)
+            }
+            // D-084: messages the bridge sends later, and the mobile-data meter.
+            Msg.SMS_SCHEDULE -> request(message) { id ->
+                val cid = message.stringOrNull("cid") ?: invalid("cid missing")
+                scheduled.add(
+                    ScheduledMessage(
+                        cid = cid,
+                        sim = sim(message),
+                        to = message.stringOrNull("to") ?: invalid("to missing"),
+                        body = message.stringOrNull("body") ?: invalid("body missing"),
+                        at = message.longOrNull("at") ?: invalid("at missing"),
+                    ),
+                )
+                scheduled.askForExactTiming()
+                Messages.ok(id)
+            }
+            Msg.SMS_UNSCHEDULE -> request(message) { id ->
+                val cid = message.stringOrNull("cid") ?: invalid("cid missing")
+                if (!scheduled.remove(cid)) invalid("not scheduled (already sent?)")
+                Messages.ok(id)
+            }
+            Msg.SMS_SCHEDULED -> request(message) { id -> scheduled.toMessage(id) }
+            Msg.DATA_USAGE -> request(message) { id ->
+                dataUsage.toMessage(id, message.longOrNull("since") ?: invalid("since missing"))
+            }
+            // D-088: photos, over the Wi-Fi session only (thumbnails are too heavy for Bluetooth).
+            Msg.MEDIA_LIST -> request(message) { id ->
+                if (link.wifiToken != token) throw RequestException(ErrorCode.UNSUPPORTED, "photos need the Wi-Fi link")
+                photos.list(
+                    id,
+                    message.stringOrNull("before"),
+                    app.pairline.android.files.PhotoLibrary.limit(message.longOrNull("limit")),
+                )
+            }
+            // D-089: picture and group messages.
+            Msg.MMS_PART -> request(message) { id ->
+                if (link.wifiToken == null) throw RequestException(ErrorCode.UNSUPPORTED, "attachments need the Wi-Fi link")
+                val source = mmsStore.partSource(
+                    message.stringOrNull("key") ?: invalid("key missing"),
+                    message.longOrNull("pid") ?: invalid("pid missing"),
+                )
+                app.pairline.android.AppGraph.files.enqueue(source)
+                Messages.ok(id)
+            }
+            Msg.MMS_ATTACH -> request(message) { id ->
+                mmsSender.attach(
+                    aid = message.stringOrNull("aid") ?: invalid("aid missing"),
+                    seq = message.intOrNull("seq") ?: invalid("seq missing"),
+                    data = message.stringOrNull("data") ?: invalid("data missing"),
+                    last = message.boolOrNull("last") ?: false,
+                    type = message.stringOrNull("type"),
+                    name = message.stringOrNull("name"),
+                )
+                Messages.ok(id)
+            }
+            Msg.MMS_SEND -> request(message) { id ->
+                mmsSender.send(
+                    cid = message.stringOrNull("cid") ?: invalid("cid missing"),
+                    sim = sim(message),
+                    to = strings(message.optJSONArray("to"), 20),
+                    body = message.stringOrNull("body"),
+                    aid = message.stringOrNull("aid"),
+                )
+                Messages.ok(id)
+            }
+            Msg.MEDIA_GET -> request(message) { id ->
+                if (link.wifiToken == null) throw RequestException(ErrorCode.UNSUPPORTED, "photos need the Wi-Fi link")
+                photos.get(message.longOrNull("mid") ?: invalid("mid missing"))
+                Messages.ok(id)
+            }
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }
             Msg.CONTACTS_ADD -> request(message) { id -> contactsAdd(id, message) }
@@ -310,7 +401,7 @@ class MessageRouter(
                 null // the reply is the ussd.result with the same id, sent when the network answers
             }
             Msg.REMOTE_CONFIG -> request(message) { id -> remoteConfig(id, message, token) }
-            // Free, with remote mode on or off: asks the router read-only, never opens a port (D-080).
+            // Free, with remote mode on or off: asks the router read-only, never opens a port (D-092).
             Msg.REMOTE_CHECK -> request(message) { id -> HomeCheck.reply(id, checkHome()) }
             // An event in PROTOCOL.md; answered with `ok` only if R gave it an id anyway.
             Msg.REMOTE_TOKEN -> if (message.requestId != null) {
@@ -418,9 +509,15 @@ class MessageRouter(
     private fun blockSet(id: Long, m: JSONObject): JSONObject {
         val add = strings(m.optJSONArray("add"), BlockRules.MAX_PER_REQUEST)
         val remove = strings(m.optJSONArray("remove"), BlockRules.MAX_PER_REQUEST)
-        if (add.isEmpty() && remove.isEmpty()) invalid("add or remove missing")
+        val unknown = m.boolOrNull("unknown") // D-085
+        if (add.isEmpty() && remove.isEmpty() && unknown == null) invalid("add, remove or unknown missing")
         if (add.any { PhoneNumbers.normalizeBlockable(it) == null }) invalid("bad number")
-        if (blockList.update(add, remove)) Log.i(TAG, "block list changed from the iPhone (${blockList.all().size} entries)")
+        if (add.isNotEmpty() || remove.isNotEmpty()) {
+            if (blockList.update(add, remove)) Log.i(TAG, "block list changed from the iPhone (${blockList.all().size} entries)")
+        }
+        if (unknown != null && blockList.setSilenceUnknown(unknown)) {
+            Log.i(TAG, "silence unknown callers ${if (unknown) "on" else "off"} from the iPhone")
+        }
         return blockList.toMessage(id)
     }
 
@@ -430,7 +527,7 @@ class MessageRouter(
     }
 
     /**
-     * `remote.config` (D-080): `on: true` stores the mailboxes and token and starts checking; `on: false` stops remote
+     * `remote.config` (D-092): `on: true` stores the mailboxes and token and starts checking; `on: false` stops remote
      * mode and deletes its state and records. An `on: false` read from the mailbox gets no `ok`: the iPhone has
      * already taken its mailboxes down, so nobody would read or delete it. Release builds refuse the public backend,
      * which is for testing only.
@@ -465,6 +562,7 @@ class MessageRouter(
         prefs.peerProto = (m.opt("proto") as? Number)?.toInt()?.coerceIn(0, 99) ?: 0
         val caps = m.optJSONArray("caps")
         link.peerAcceptsFiles = caps != null && (0 until caps.length()).any { caps.opt(it) == Caps.FILES }
+        link.peerCanRing = caps != null && (0 until caps.length()).any { caps.opt(it) == Caps.REMOTE_RING }
         files.onPeerCaps()
         Log.i(TAG, "iPhone app ${prefs.peerApp ?: "?"}, iOS ${prefs.peerOs ?: "?"}, protocol ${m.opt("proto")}")
     }

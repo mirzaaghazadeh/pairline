@@ -2,9 +2,9 @@ name: Android release
 
 # The only way a release APK is made: push a tag android-v<versionName>, e.g. android-v0.1.0.
 # Builds the unsigned release APK from that commit, runs the policy checks, signs it, scans it on
-# VirusTotal, and attaches it to a DRAFT GitHub Release with its SHA-256, signing-certificate digest
-# and VirusTotal report link. A person reviews and publishes the draft. Setup and verification:
-# docs/RELEASING.md and SECURITY.md.
+# VirusTotal, and attaches it to a DRAFT GitHub Release with what's new (android/CHANGELOG.md), the
+# contributors, its SHA-256, signing-certificate digest and VirusTotal report link. A person reviews and
+# publishes the draft. Setup and verification: docs/RELEASING.md and SECURITY.md.
 
 on:
   push:
@@ -34,6 +34,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # The whole history and tags: the release notes list the contributors since the last release.
+          fetch-depth: 0
 
       - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         with:
@@ -60,6 +62,14 @@ jobs:
             exit 1
           fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      # What's new from android/CHANGELOG.md and the contributors since the last published release (D-080). Before
+      # the build, so a version without a changelog section fails at once.
+      - name: What's new and contributors
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: ../.github/scripts/release-notes.sh "$VERSION" CHANGELOG.md > "$RUNNER_TEMP/whatsnew.md"
 
       - name: Build the unsigned release APK
         run: ./gradlew --no-daemon --no-build-cache assembleRelease
@@ -113,6 +123,8 @@ jobs:
           sum="$(sha256sum "$apk" | cut -d' ' -f1)"
           run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           {
+            cat "$RUNNER_TEMP/whatsnew.md"
+            echo
             echo "## Pairline Bridge $VERSION (Android)"
             echo
             echo "Built by [this GitHub Actions run]($run_url) from commit \`$GITHUB_SHA\`."

@@ -228,7 +228,7 @@
       }
     },
     "Direct connection" : {
-      "comment" : "Link state in the widget and Live Activity: Cloud mode's live session goes straight to the bridge phone at home over the internet (D-080).",
+      "comment" : "Link state in the widget and Live Activity: Cloud mode's live session goes straight to the bridge phone at home over the internet (D-092).",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -251,7 +251,7 @@
       }
     },
     "Via iCloud" : {
-      "comment" : "Link state in the widget and Live Activity: no nearby link, but Cloud mode reaches the bridge through iCloud (D-080).",
+      "comment" : "Link state in the widget and Live Activity: no nearby link, but Cloud mode reaches the bridge through iCloud (D-092).",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -335,6 +335,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sinyal %lld/4"
+          }
+        }
+      }
+    },
+    "One-time code" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رمز لمرة واحدة"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "کد یک‌بارمصرف"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tek kullanımlık kod"
+          }
+        }
+      }
+    },
+    "Tap to copy" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "انقر للنسخ"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "برای کپی بزنید"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopyalamak için dokunun"
           }
         }
       }

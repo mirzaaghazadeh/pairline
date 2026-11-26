@@ -39,7 +39,7 @@ interface DirectServer {
 }
 
 /**
- * Remote mode's public listener (D-080, PROTOCOL.md "Direct connection"): the one socket in the app that accepts
+ * Remote mode's public listener (D-092, PROTOCOL.md "Direct connection"): the one socket in the app that accepts
  * connections from any address, because the home router forwards the internet to it. Framing as on Wi-Fi (a 4-byte
  * length before each frame), and each connection becomes a [TransportKind.DIRECT] session through the
  * [ConnectionListener] (LinkManager). Until the session handshake has authenticated the pinned iPhone it reads

@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
         AppGraph.updates.onResume()
     }
 
-    /** `pairline://invite?…` (remote pairing, D-080): shown over everything until the user allows or cancels it. */
+    /** `pairline://invite?…` (remote pairing, D-092): shown over everything until the user allows or cancels it. */
     private fun openInvitation(intent: Intent?) {
         if (intent?.action != Intent.ACTION_VIEW) return
         if (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0) return

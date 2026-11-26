@@ -53,7 +53,7 @@ account, so almost every user will buy the official app.
 
 No accounts, analytics, crash reporting or license server. The only network party is Apple, via StoreKit.
 A future remote-mode relay must be opt-in and end-to-end encrypted, and must be documented in PRIVACY.md before it ships.
-(Superseded for remote mode by D-080: no relay; the user's own iCloud and a direct connection.)
+(Superseded for remote mode by D-092: no relay; the user's own iCloud and a direct connection.)
 
 ### D-007 — Package IDs (2026-11-24)
 
@@ -1325,13 +1325,237 @@ The maintainer asked for a Mac app; the iPad app runs on Apple Silicon Macs as i
   code and underlying error to diagnostics and tell the user what to check (signed in under Media & Purchases,
   in-app purchases allowed in Screen Time, restart).
 
-### D-080 — Remote mode: the user's own iCloud as doorbell and mailbox, a direct connection through the home router (2026-11-26)
+### D-080 — Every Android release lists what's new and its contributors (2026-11-26)
 
-The maintainer's design, built on the `remote-mode` branch as milestone M10 (written there as D-072 and renumbered
-when `main`'s D-072–D-079 were merged in). **Supersedes D-006's "future remote-mode relay" sentence:** there is still
-no Pairline server. The bridge stays at home (on charge, on home Wi-Fi) and the iPhone keeps getting calls, SMS and
-one-time codes, and makes calls and sends SMS, from anywhere. Only Apple and the user's own two phones take part: no
-third-party service (no STUN/TURN, Firebase or Tailscale).
+The maintainer asked for a changelog and a contributors list on every release. Only 1.1.1 to 1.3.1 had a "What's new",
+written by hand into the published notes; the others had only the build table.
+- **`android/CHANGELOG.md`** holds each version's notes, written for the people who use the app, newest first. It's the
+  one source: the release workflow copies from it, and a tag whose version has no section fails before the build.
+- **What's new** in a release covers every version since the newest *published* release older than it, one heading
+  each, so 1.7.0 published after the 1.4.0 to 1.6.0 drafts still lists everything people get.
+- **Contributors** are the GitHub accounts (a name when a commit has no account) behind the commits in that range that
+  touch `android/` or `protocol/`, most commits first, bots left out. Mentions make GitHub show the avatars.
+- `.github/scripts/release-notes.sh` builds both parts with git and `gh` (no new dependency); the workflow checks out
+  the full history for it. Every existing release, 1.0.0 to 1.7.0, got the same notes from it.
+
+### D-081 — The first language comes from the phone's country (2026-11-26)
+
+The maintainer asked both apps to open in the right language the first time, from the carrier or time zone, and to
+show the language on first open. Only fresh installs: anyone who already set Pairline up keeps their language.
+- **Android:** before setup starts, Pairline reads the SIM card's country, else the mobile network's, else the time
+  zone's region (ICU), else the region setting; the first one known decides (a US SIM keeps English even in Tehran's
+  time zone). Iran and Afghanistan give Persian, Turkey Turkish, the Arab League countries Arabic, and it applies only
+  when the phone itself is in English or a language Pairline doesn't have. It sets the app's own language (Android
+  13+'s per-app language, the stored choice before). No permission is needed and nothing leaves the phone. Setup gets
+  a first step, **Language**, listing the four languages in their own names with the current one selected; when it was
+  picked from the country, the text says so ("from your SIM card or time zone").
+- **iPhone:** the iPhone usually has no SIM of the bridge's country, and a time zone alone would put everyone with an
+  English iPhone in Istanbul or Dubai into Turkish or Arabic. So the keyboards decide: with one Persian, Arabic or
+  Turkish keyboard added, that language; with several, the time zone, then the region picks among them; with none,
+  the iPhone's language stays. (`UITextInputMode.activeInputModes`; only when iOS gives no keyboard list do the time
+  zone and region decide alone.) It's written as the app's own `AppleLanguages`, the same setting as iPhone Settings ›
+  Pairline › Language, before SwiftUI starts (`PairlineMain`), so the first screen is already in that language; checked
+  on the Simulator: a fresh install with a Persian keyboard opened in Persian, right to left in Estedad.
+- **Shown on first open, D-033 kept:** the iPhone's welcome page has a globe button with the current language's own
+  name that opens iPhone Settings › Pairline, where iOS lists the languages. The app still doesn't list them itself.
+- The unit tests' host app skips the check, so tests keep the Simulator's language.
+
+### D-082 — Carrier tools: call settings, voicemail, balance and signal detail (2026-11-26)
+
+The maintainer picked a set of features built only from what the two apps already do (ROADMAP, "More from the same
+two phones"). This is the first: things a phone's own Settings › Phone and status bar offer.
+- **Call forwarding, call waiting and caller ID** (Calls › USSD codes › Call forwarding, waiting and caller ID) run the
+  standard GSM service codes of 3GPP TS 22.030 through the existing `ussd.run`: `**21*n#`, `**67*n#`, `**61*n#`,
+  `**62*n#` to forward always, when busy, unanswered or unreachable, `#xx#` off, `*#xx#` to ask, `##002#` all off;
+  `*43#`/`#43#` call waiting; `*31#`/`#31#` hide or show the number on every call. Android's `sendUssdRequest` hands
+  service codes to the same MMI handling and returns the carrier's answer, which shows in the usual result sheet. No
+  new message: the bridge's USSD check now also allows a `+` right after a `*`, for forwarding to `+90…`.
+- **Hide the number on one call:** touching and holding the keypad's call button offers "Call with my number hidden",
+  which dials `#31#` before the number (GSM's per-call caller-ID suppression), through the normal `call.dial`.
+- **Voicemail:** each SIM in `status.sims` carries `vm`, Android's message-waiting indicator (READ_PHONE_STATE, which
+  the bridge already holds). The iPhone notifies once each time it turns on (the announced SIMs are remembered in
+  user defaults so a relaunch doesn't repeat it), tags the SIM on the Bridge tab, and "Call voicemail" there or
+  touching and holding 1 on an empty keypad sends `call.dial` with `voicemail: true`; Android places a `voicemail:`
+  call on that SIM's phone account and looks up the number itself. Visual voicemail isn't possible: Android keeps
+  READ_VOICEMAIL for the dialer and carrier apps.
+- **Balance:** a successful USSD result has "Use as balance code" (saved with the SIM it ran on). The Bridge tab then
+  has a Balance card with the reply and "Check balance"; `pairline://balance` runs it too, so a Shortcut or a Home
+  Screen link can. A link can't carry a code of its own, so no web page can make the bridge run one. The reply stays
+  in memory like every USSD reply; no widget, since the widget's snapshot holds no carrier text (PRIVACY.md).
+- **Signal detail:** `dbm` (strongest `CellSignalStrength`, RSRP on LTE and 5G, Android 10+), `rat` (the exact
+  technology with Android 11's display override: "LTE-CA", "NR NSA", "HSPA+"…) and `op` (the registered network's
+  name, shown when it isn't the SIM's carrier). dBm changes every few seconds, so the bridge leaves it out when it
+  decides whether the status changed: it rides along with other changes and the 60-second status instead of sending
+  a status every 2 s over Bluetooth.
+- Capability `call.voicemail`. iOS strings in a new `Carrier` table (EN/FA/AR/TR). Unit tests on both sides; needs a
+  real phone on a GSM carrier.
+
+### D-083 — The iPhone's inbox: groups, old codes, quick replies, codes in the Dynamic Island, "left behind" (2026-11-26)
+
+The second part of "More from the same two phones". All on the iPhone; no protocol change.
+- **Groups:** chips over the conversation list (All, People, Codes, Transactions, Offers, Services) with each group's
+  unread conversations counted. Sorted on the iPhone each time the list shows, from the sender and the latest
+  message: a sender in the bridge's contacts is always People; otherwise a one-time code (the existing detector), then
+  bank and payment words, then offer words (EN/FA/AR/TR, specific words such as "لغو11", "% off", "kampanya"), then
+  the sender (a full phone number is People, except Iran's bulk-sender ranges 1000…, 2000…, 3000…, 5000…, 20004…;
+  short codes and names are Services). Keyword lists rather than a model: predictable, nothing to download, and wrong
+  guesses only move a conversation between filters. Only the chosen filter is stored.
+- **Delete codes after a day** (Settings › Messages and alerts, off by default): received messages with a one-time
+  code are deleted from the iPhone 24 hours after they arrive, through the normal delete (tombstones, D-043), so a sync
+  doesn't bring them back; they stay on the Android phone, which only its default SMS app can change. The scan
+  remembers how far it got, so each message is checked once; the text check runs off the main thread.
+- **Quick replies:** a speech-bubble button in the composer puts a saved reply into the message field (not sent
+  straight away, so it can be edited). Four defaults in the user's language until they edit the list; kept in user
+  defaults.
+- **Codes in the Dynamic Island** (on by default): a new code shows in the bridge Live Activity's Dynamic Island for
+  two minutes (`code` in its content state, relevance raised so it takes the island), and a tap opens
+  `pairline://code`, which copies it the same way as "Copy code" (this iPhone only, expires after 3 minutes). Never in
+  the Lock Screen view: the Dynamic Island shows only while the iPhone is unlocked. The link carries no code.
+- **Bridge phone left behind** (on by default): when a connected link drops (not when this iPhone's Bluetooth is
+  off, or the app is locked or unpaired), a local notification is scheduled 5 minutes ahead and withdrawn if the link
+  comes back first. iOS holds the timer, so it works while Pairline is suspended. It uses no location.
+- Strings in a new `Inbox` table; the widget extension's two new strings in its own catalog. Unit tests for the
+  grouping; needs real use to tune the word lists.
+
+### D-084 — Scheduled SMS sent by the bridge, a mobile-data meter, and ringing the iPhone from Android (2026-11-26)
+
+The third part of "More from the same two phones": three things only the two phones together can do.
+- **Scheduled SMS:** touching and holding the send button offers "Send later…" (date and time, up to a year).
+  `sms.schedule` gives the message to the bridge, which keeps it in private storage and sends it at that time
+  through the normal sender with the iPhone's `cid`, so it goes even when the iPhone is off or away, and `sms.state`
+  follows when the iPhone is linked. The iPhone shows it in the conversation at its time with a clock (a new
+  `scheduled` state the outbox never sends), and "Cancel scheduled message" sends `sms.unschedule`. For an iPhone
+  that was away at the time, `sms.scheduled` lists what's waiting and `done` (each sent message's state and the key
+  Android stored it under, kept 7 days) so the iPhone's copy merges with the synced one; a message the bridge no
+  longer knows is marked not sent. One alarm for the earliest message, re-armed when the link service starts (alarms
+  don't survive a restart or update). **Exact timing** needs `SCHEDULE_EXACT_ALARM`: Android 12 grants it, 13 and
+  later ask the user (Alarms & reminders), so the bridge falls back to Doze-friendly inexact alarms, shows a
+  notification leading to the setting, and tells the iPhone (`exact`), which says it may be a few minutes late.
+  `USE_EXACT_ALARM` was not used: it's meant for alarm-clock and calendar apps.
+- **Mobile-data meter:** a Bridge-tab card with the bridge phone's mobile data since the start of the user's data
+  month (day 1–28) and an optional monthly limit, with a notification at 80% and 100% once a month. `data.usage`
+  reads Android's `NetworkStatsManager` total for mobile networks (every SIM; Android 9 needs each SIM's subscriber
+  id, which READ_PHONE_STATE still gives there). Usage access (`PACKAGE_USAGE_STATS`) is a special access only the
+  user can give; without it the bridge answers `permission` and shows a notification leading to the screen. Only the
+  total in bytes leaves the phone, never per-app figures. Refreshed with the status at most every 15 minutes.
+- **Ring my iPhone:** the reverse of Find phone, from the bridge app's home screen or a Quick Settings tile.
+  `remote.ring` goes only to an iPhone that listed `ring` in its `device.info` caps. The iPhone makes a two-tone beep
+  itself (no sound file) through the playback audio category, so it sounds with the ring switch on silent at the
+  media volume (iOS doesn't let an app raise it); its existing `audio` background mode lets it start when the
+  Bluetooth link wakes the app. 30 seconds at most, never during a call; a notification says why, and "Found it" or
+  opening Pairline stops it.
+- Android strings in a new `strings_more.xml` per language, iOS strings in a new `Extras` table. Unit tests on both
+  sides; needs real phones (exact alarms on Android 13+, Usage access, background audio on the iPhone).
+
+### D-085 — Call screening: blocked calls never ring, silence unknown callers, blocked prefixes (2026-11-26)
+
+Until now a blocked call was kept off the iPhone and declined on the bridge (D-043), but it rang there for a moment
+first, and nothing could quiet callers who aren't in the contacts.
+- **Android's call-screening role** (Android 10+), which any app may hold once the user agrees in Android's own
+  dialog: Pairline Bridge › Blocked numbers › "Block calls before they ring". `PairlineScreeningService` sees each
+  incoming call's number before it rings: a blocked number is turned away (rejected, no notification, still in the
+  call log), and with **Silence unknown callers** a number that isn't in the bridge's contacts (or a hidden one) is
+  silenced, which sends it to voicemail. The call tracker keeps a silenced call off the iPhone too (the service
+  notes it for 30 seconds), so it rings neither phone, like the iPhone's own setting. Capability `call.screen`.
+- **The setting lives on the bridge** with the block list, so it works while the iPhone is away; `block.list` carries
+  `unknown` and `block.set` takes it, so the iPhone's Blocked numbers screen has the same switch. Android 9 and phones
+  without the role keep the D-043 behaviour.
+- **Prefixes:** an entry ending with `*` and two or more digits blocks every number starting with it: `+234*` (with
+  `+` or `00` it's an international prefix, matching numbers written with either), `0900*` (as the digits come).
+  The same rule on both phones (`PhoneNumbers.blockPrefix`, `PhoneNumber.blockPrefix`), for calls and texts alike.
+- Strings: Android `strings_more.xml`, iOS `Screening` table. Unit tests on both sides; needs a real phone.
+
+### D-086 — Reply to Android app notifications from the iPhone (2026-11-26)
+
+With D-077 the iPhone shows notifications from apps the user chose on the Android phone; now it can answer them, so
+a second WhatsApp or Telegram on the Android phone's number is usable from the iPhone.
+- The bridge keeps, for each mirrored notification, the app's own **reply action**: the one marked
+  `SEMANTIC_ACTION_REPLY`, else the first that takes free text (`RemoteInput`). That's the action Wear OS and Android
+  Auto use, so apps handle it as a reply typed in the notification. `notif.posted` says `reply: true` when there is one.
+- The iPhone gives those notifications a Reply field (a second category, `mirror.reply`; authentication required, as
+  for SMS replies). `notif.reply` carries the key and the text; the bridge fills the action's `RemoteInput` results
+  and fires its intent. When the link is down or the notification is gone, the iPhone says "Reply not sent" (without
+  the text). Nothing is stored, logged or queued.
+- No other actions (mark as read, like) for now: their meaning differs between apps, and a wrong tap can't be undone.
+- No new permission: notification access already covers reading and firing a notification's actions.
+
+### D-087 — Live captions of relayed calls, on the iPhone only (2026-11-26)
+
+Asked for "using the call-audio relay, without call recording". Captions help in noise, for the hard of hearing,
+and in a language the user reads better than they hear.
+- A **CC** button on Pairline's call screen while the call's audio is on the iPhone (Talk on iPhone). The call
+  engine hands each decoded 20 ms frame of the **caller's** voice to `LiveCaptions` (nothing of the iPhone's own
+  microphone); Apple's `SFSpeechRecognizer` turns it into text with `requiresOnDeviceRecognition`, and a request is
+  renewed every 55 seconds so long calls keep going. The panel shows the last ~240 characters.
+- **On the device or not at all:** only languages the iPhone reports `supportsOnDeviceRecognition` for are offered
+  (Pairline's four first, then the user's own); otherwise the panel explains how to add a dictation language. Server
+  recognition would send call audio to Apple, which rule 1 rules out.
+- **No recording, no transcript:** the text lives in memory during the call and goes when it ends or CC is turned off.
+  CallKit's own call screen can't show captions, so they're on Pairline's call screen only. Touching and holding CC
+  picks the language.
+- New iOS permission: Speech Recognition (`NSSpeechRecognitionUsageDescription`), asked the first time CC is tapped.
+  Strings in a `Captions` table. Needs a real relayed call to tune.
+
+### D-088 — Browse the Android phone's photos from the iPhone (2026-11-26)
+
+Files already go both ways (D-045), but only what the Android side chooses to send. This lets the iPhone pick.
+- **Opt-in on the Android phone:** Pairline Bridge › Settings › "Photos for the iPhone", off by default; turning it on
+  asks for `READ_MEDIA_IMAGES` (`READ_EXTERNAL_STORAGE` up to Android 12). Capability `media.photos`, listed only with
+  the Wi-Fi link on.
+- **`media.list`** pages the photos newest first (MediaStore, ordered by when added, then id; the cursor is
+  "seconds:id"), each with a thumbnail made on the phone (Android's own `loadThumbnail`, at most 128 px and ~4 KB as
+  JPEG), within the usual 30 KB page. Answered only on the Wi-Fi session: thumbnails would crowd the Bluetooth link.
+- **`media.get`** hands the photo to the existing file transfer, so it arrives like any file (Files › Pairline ›
+  Received) and the iPhone opens it in Quick Look, where Share › Save Image puts it in Photos. No iOS Photos
+  permission is needed for that.
+- Only photos for now; videos would need streaming rather than copying to be pleasant. Strings: Android
+  `strings_more.xml`, iOS `Photos` table. Unit tests on both sides; needs real phones.
+
+### D-089 — Picture and group messages (MMS) (2026-11-26)
+
+The Help FAQ promised MMS, and group conversations didn't show at all. No new permission: `READ_SMS` reads Android's
+MMS store and `SEND_SMS` lets an app that isn't the default messaging app send through Android's own MMS service.
+- **Reading:** `MmsStore` reads `content://mms` (messages the default app sent or downloaded; a notification not yet
+  downloaded has nothing to show), with each message's addresses and parts. A Message gets `parts` (attachments
+  besides text and SMIL, pictures with a ~4 KB thumbnail made on the phone) and `addrs` (everyone in a group but this
+  phone, whose SIM numbers are left out). `sms.history` merges SMS and MMS in one time order (the top of the merged
+  list is within the top of each list, so one page is right); `sms.threads` lists MMS-only and group threads; a
+  content observer announces newly downloaded MMS as `sms.new`, a moment after Android writes their parts.
+- **Attachments** come in full with `mms.part`, through the file transfer (Wi-Fi), and open in Quick Look.
+- **Sending:** the composer's picture button (iOS's own picker; the picture is scaled to at most 1280 px and ~280 KB,
+  which carriers take) and any message in a group conversation go as MMS. The picture travels in `mms.attach` pieces of
+  24 KB (any session, Bluetooth too), then `mms.send` builds an `m-send-req` PDU (`MmsPdu`, OMA-WAP-MMS-ENC 1.2:
+  multipart/mixed, text as UTF-8, pictures by their well-known types) in the private cache, hands it to
+  `SmsManager.sendMultimediaMessage` through Pairline's FileProvider (read granted to Android's phone and MMS
+  service only) and reports `sms.state` sent or failed; Android stores the sent message itself. MMS needs mobile data
+  on the bridge phone; there are no delivery reports. An MMS isn't kept in the iPhone's outbox: it needs the link
+  when sent, and one left waiting is marked not sent.
+- iPhone database version 3 adds `parts` and `addrs` to messages. Group conversations show everyone's names, and the
+  sender above each incoming run of messages.
+- Strings in an `MMS` table. Unit tests: the PDU's encoding, keys, participants, the merged history's storage, the
+  picture sizing. Needs real phones and carriers.
+
+### D-090 — Tehran's time zone always means Persian (2026-11-26)
+
+The maintainer asked that Tehran's time zone give Persian on first open, amending D-081. Asia/Tehran is used only in
+Iran, so unlike Istanbul's or Dubai's it says little about visitors and a lot about the person.
+- **Android:** a time zone whose country (ICU) is Iran gives Persian before the SIM is looked at, so an Iranian with a
+  foreign SIM, or with none, starts in Persian. Other time zones keep D-081's order (SIM, network, time zone, region).
+- **iPhone:** Tehran's time zone gives Persian whatever keyboards were added; other time zones still only choose among
+  the keyboards' languages.
+- Still only on a fresh install, and only when the phone itself isn't in Persian, Arabic or Turkish (a Turkish phone
+  in Tehran stays Turkish). Nothing new is read; PRIVACY.md already lists the time zone.
+- **Open:** iPhone Settings › Pairline shows a Language row only when the iPhone has two or more languages in General
+  › Language & Region. On an iPhone with one, a person put in Persian this way has no way back to English short of
+  adding a language there.
+
+### D-092 — Remote mode: the user's own iCloud as doorbell and mailbox, a direct connection through the home router (2026-11-26)
+
+The maintainer's design, built on the `remote-mode` branch as milestone M10 (written there as D-072, then D-080, and
+renumbered each time `main`'s new decisions were merged in). **Supersedes D-006's "future remote-mode relay"
+sentence:** there is still no Pairline server. The bridge stays at home (on charge, on home Wi-Fi) and the iPhone keeps
+getting calls, SMS and one-time codes, and makes calls and sends SMS, from anywhere. Only Apple and the user's own two
+phones take part: no third-party service (no STUN/TURN, Firebase or Tailscale).
 
 - **Doorbell and mailbox: CloudKit in the user's own iCloud** (container `iCloud.app.pairline.ios`). The iPhone
   fetches a CloudKit web auth token (`CKFetchWebAuthTokenOperation` with the app's CloudKit API token) and sends it
@@ -1364,24 +1588,25 @@ third-party service (no STUN/TURN, Firebase or Tailscale).
   between the phones; the home router opens one port only the paired iPhone can use; Apple and internet providers can
   see that the phones talk, not what they say. Off by default. A status line shows "Direct connection" or "Via
   iCloud"; the local log records connections, redacted (rule 9).
-- **Remote pairing** (the maintainer's request, also for testing with a tester's phone in another home): pairing
-  while the phones are apart. "Pair a phone that's far away" on the iPhone makes a one-time invitation (10 minutes,
-  single use); the person at home opens or pastes it in Pairline on the Android phone and allows it there; the phones
-  meet through the mailbox and both show a 6-digit code from the handshake, which the two people compare on a call and
-  confirm on both phones. A copied invitation produces different codes, and the pairing stops. This replaces "seeing
-  the QR code" as the trust anchor for this one flow only, chosen explicitly on both phones; outside it, release
-  builds still pair only from the camera. Known limit: an intercepted invitation's iCloud token reaches only
+- **Remote pairing** ("Pair over the internet" in the apps, D-094): pairing while the phones are apart. The iPhone
+  makes a one-time invitation (10 minutes, single use); it's opened, pasted or scanned in Pairline on the Android
+  phone and allowed there; the phones meet through the mailbox and both show a 6-digit code from the handshake, which
+  is checked on both phones. A copied invitation produces different codes, and the pairing stops. This replaces
+  "seeing the QR code" as the trust anchor for this one flow only, chosen explicitly on both phones; outside it,
+  release builds still pair only from the camera. Known limit: an intercepted invitation's iCloud token reaches only
   Pairline's records in that user's iCloud, which stay sealed, until Apple expires it.
-- **Protocol:** v1 is v0 plus remote mode (PROTOCOL.md "Remote mode (v1, D-080)", vectors `v1-remote.json`); local
+- **Protocol:** v1 is v0 plus remote mode (PROTOCOL.md "Remote mode (v1, D-092)", vectors `v1-remote.json`); local
   links stay v0 on the wire. Status goes to the mailbox at once only when something that matters changes (network,
   SIMs, charging, each 10 % of battery), signal bars and battery percent at most every 10 minutes; `remote.state`
-  reasons are fixed codes.
+  reasons are fixed codes. Remote mode's own message types are listed (`remote.config`, `remote.token`, `remote.addr`,
+  `remote.state`, `remote.check`, `rpair.*`); D-084's `remote.ring` is not one of them.
 
 **Phase 0 results (2026-11-26):**
 
-- **Router** (`protocol/tools/router_check.py`, read-only): the maintainer's OpenWrt router answers none of NAT-PMP,
-  PCP or UPnP IGD (no miniupnpd installed), and the home network has no global IPv6. A direct connection isn't
-  possible there as configured; whether the router's WAN address is public or carrier-grade NAT is still open.
+- **Router** (`protocol/tools/router_check.py`, read-only): the maintainer's OpenWrt router first answered none of
+  NAT-PMP, PCP or UPnP IGD, and the home network has no global IPv6. With miniupnpd installed and its "Start service"
+  ticked, it answered NAT-PMP and UPnP with a public IPv4 address, and the bridge mapped TCP 47830 through NAT-PMP:
+  the direct connection opened (Check my home connection now maps at once when the router answers).
 - **CloudKit setup:** container `iCloud.app.pairline.ios`, iCloud and push on `app.pairline.ios`, App ID
   `app.pairline.ios.notifications` with the App Group, the `Mail` record type in Development only, an API token
   (outside the repo, mode 600) and a management token (Keychain, `cktool`). Command-line device builds sign with
@@ -1417,25 +1642,27 @@ third-party service (no STUN/TURN, Firebase or Tailscale).
   modification, so the notification service extension can unlock them before they're shown.
 - **Filtering entitlement** requested on 2026-11-26 (Apple request ID Q7U98356ZR), for the extension
   `app.pairline.ios.notifications`, use case end-to-end encrypted messaging.
-- **Tested on the maintainer's iPhone 16e** with a stand-in bridge (`protocol/tools/fake_remote_bridge.py`): remote
-  pairing through iCloud (both showed the same code), SMS with a one-time code shown on the locked iPhone by the
-  extension (the Secure Enclave key opened in the extension), texts sent from the iPhone through the mailbox, and the
-  bridge's name, battery and signal shown "Via iCloud" in the app, the Live Activity and the widget.
+- **Tested on the maintainer's iPhone 16e** with a stand-in bridge (`protocol/tools/fake_remote_bridge.py`), then with
+  a real bridge (a Galaxy Note 3 on Android 10, paired over the internet): codes checked on both phones, SMS with a
+  one-time code shown on the locked iPhone by the extension, texts sent from the iPhone through the mailbox, the
+  bridge's name, battery and signal shown "Via iCloud" in the app, the Live Activity and the widget, and the direct
+  connection through the router. That Note 3 can't advertise over Bluetooth LE ("too many advertisers") and can't run
+  Talk on iPhone (Android 10), so calls with sound wait for an Android 11+ phone.
 
-### D-081 — Remote mode is a $9.99 one-time add-on after Full Access, included in the free trial (2026-11-26)
+### D-093 — Remote mode is a $9.99 one-time add-on after Full Access, included in the free trial (2026-11-26)
 
-The maintainer's pricing for remote mode (D-080). Extends D-017 and D-036; the Android app stays free.
+The maintainer's pricing for remote mode (D-092). Extends D-017 and D-036; the Android app stays free.
 
 - **Product:** `app.pairline.ios.remote`, a non-consumable In-App Purchase, $9.99 once, no subscription. Like Full
   Access it's verified on the iPhone from Apple-signed transactions (StoreKit 2, `Transaction.currentEntitlements`
   and `Transaction.updates`); there's no receipt server, and Restore Purchases brings it back.
-- **The rule** (`RemoteAddOnPolicy`, unit-tested): remote mode, and pairing a phone that's far away, work while the
-  7-day trial runs, and afterwards only with Full Access **and** the add-on. The trial shows a line that remote mode
-  is part of it and becomes a $9.99 add-on after Full Access. No trial and no Full Access: the app's own paywall comes
-  first, and the add-on isn't offered.
-- **Sold only after Full Access:** the "Buy remote mode" button appears only once Full Access is bought, and only in
-  a build where remote mode is available (`RemoteFeature`), so a build without remote mode (App Review before it
-  ships) never shows a purchase button for it.
+- **The rule** (`RemoteAddOnPolicy`, unit-tested): remote mode, and pairing over the internet, work while the 7-day
+  trial runs, and afterwards only with Full Access **and** the add-on. The trial shows a line that Cloud mode is part
+  of it and becomes a $9.99 add-on after Full Access. No trial and no Full Access: the app's own paywall comes first,
+  and the add-on isn't offered.
+- **Sold only after Full Access:** the "Buy Cloud mode" button appears only once Full Access is bought, and only in a
+  build where remote mode is available (`RemoteFeature`), so a build without it (App Review before it ships) never
+  shows a purchase button for it.
 - **When it stops being covered** (the trial ended without the add-on, or a refund) while remote mode is on, the iPhone
   turns it off the usual way: `remote.config` off to the bridge (over a session, or one last mailbox record), then its
   records and subscriptions in iCloud go. Nothing is turned off while the purchase state is still loading.
@@ -1445,7 +1672,7 @@ The maintainer's pricing for remote mode (D-080). Extends D-017 and D-036; the A
   description in English, Arabic and Turkish, review screenshot) waits for the maintainer's OK; until then it exists
   only in `ios/Pairline/Store/Pairline.storekit` for Xcode and the unit tests.
 
-### D-082 — Remote mode is called "Cloud mode"; normal pairing offers it; pairing from far away is "Pair over the internet" (2026-11-26)
+### D-094 — Remote mode is called "Cloud mode"; normal pairing offers it; pairing from far away is "Pair over the internet" (2026-11-26)
 
 The maintainer's decision, after testing remote mode on real phones: "away" and "remote" read as a special situation,
 while the feature is simply how the phones stay connected over the internet whenever they aren't linked nearby.
@@ -1453,32 +1680,33 @@ while the feature is simply how the phones stay connected over the internet when
 - **Names in the apps:** the feature is **Cloud mode** (fa «حالت ابری», ar «الوضع السحابي», tr «Bulut modu»); remote
   pairing is **Pair over the internet** (fa «جفت کردن از راه اینترنت», ar «الإقران عبر الإنترنت», tr «İnternet üzerinden
   eşleştir»). The link states keep saying how the phones are linked right now: "Via iCloud" (texts and codes; calls
-  need the direct connection) and "Direct connection". The add-on (D-081) is the Cloud mode add-on; its product id
+  need the direct connection) and "Direct connection". The add-on (D-093) is the Cloud mode add-on; its product id
   `app.pairline.ios.remote` stays.
 - **The code, the protocol and the docs' internals keep "remote mode"** (`remote.*` messages, `link/remote/`,
-  `Remote/`, PROTOCOL.md's "Remote mode (v1, D-080)"), so nothing on the wire or in storage changes. User-facing docs
+  `Remote/`, PROTOCOL.md's "Remote mode (v1, D-092)"), so nothing on the wire or in storage changes. User-facing docs
   say "Cloud mode (remote mode in the code)".
 - **"Cloud" never means a Pairline server.** Every screen that explains it says the records go through the user's own
   iCloud, locked with keys only their two phones hold, and that calls go straight between the phones where the home
   router allows.
 - **Normal pairing offers it.** After pairing with the QR code, the iPhone offers to turn Cloud mode on (with the same
-  explanation as the before-you-turn-it-on screen), where it's available and the purchase state allows it (D-081);
+  explanation as the before-you-turn-it-on screen), where it's available and the purchase state allows it (D-093);
   "Not now" leaves it off and it stays in Settings. The Android phone can't turn it on (the iPhone supplies the iCloud
   access); its home screen says whether it's on and where to turn it on.
 - **Automatic, no mode switching:** with Cloud mode on, the phones use Bluetooth or Wi-Fi when they're near each other
-  and the internet (iCloud, and the direct connection) whenever they aren't, without the user doing anything.
+  and the internet (iCloud, and the direct connection) whenever they aren't, without the user doing anything. While
+  Cloud mode links them, D-083's "left your bridge phone behind" alert doesn't fire: being apart is the point.
 
-### D-083 — Manual port forwarding when the router can't open the port by itself (2026-11-26)
+### D-095 — Manual port forwarding when the router can't open the port by itself (2026-11-26)
 
 The maintainer's decision: "if [UPnP or NAT-PMP] can be enabled, enable it; if not, the user does it manually."
 
 - **First choice stays automatic:** the apps tell users to turn on UPnP or NAT-PMP (or PCP) when their router has it;
-  Pairline then opens and closes the port itself (D-080).
+  Pairline then opens and closes the port itself (D-092).
 - **Otherwise, by hand:** the user forwards TCP 47830 in the router to the Android phone (Pairline Bridge shows its
   home-network address and port), gives that phone a fixed address there (DHCP reservation; "Use device MAC" for that
-  Wi-Fi on Android 10+), and enters the home's internet address, or a DDNS name from the router's own DDNS feature for
-  a changing address, on the iPhone: Settings › Cloud mode › Port forwarding. Help › "Allow calls from far away"
-  explains both ways for any router brand.
+  Wi-Fi on Android 10+; Help explains why), and enters the home's internet address, or a DDNS name from the router's
+  own DDNS feature for a changing address, on the iPhone: Settings › Cloud mode › Port forwarding. Help › "Allow calls
+  from far away" explains both ways for any router brand.
 - **Why the user types the address:** without NAT-PMP, PCP or UPnP the router doesn't tell the Android phone the
   home's internet address, and Pairline never asks outside "what's my IP" services (AGENTS.md rule 2).
 - **New outside party, by the user's choice:** a DDNS name the user entered is looked up through the iPhone's normal

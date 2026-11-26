@@ -2,7 +2,7 @@ import CloudKit
 import CryptoKit
 import UserNotifications
 
-/// Remote mode's notification service extension (D-080): an alert-mailbox push carries a record sealed for this
+/// Remote mode's notification service extension (D-092): an alert-mailbox push carries a record sealed for this
 /// iPhone (PROTOCOL.md, "Mailbox records"). It unseals it with the identity key and the paired bridge's key from the
 /// shared Keychain group, shows the message or call the way the app would, and leaves the plaintext in the app group
 /// for the app (RemoteInbox). Anything it can't open keeps CloudKit's generic placeholder; the app fetches it later.
@@ -98,7 +98,7 @@ enum RemoteNotification {
         return content
     }
 
-    /// Until the filtering entitlement lets the extension ring the call through CallKit (D-080), an incoming call
+    /// Until the filtering entitlement lets the extension ring the call through CallKit (D-092), an incoming call
     /// is a time-sensitive notification.
     private static func incomingCall(_ message: [String: Any], from original: UNNotificationContent) -> UNNotificationContent {
         let caller = (message["name"] as? String) ?? (message["from"] as? String) ?? String(localized: "Unknown caller")

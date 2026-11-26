@@ -1,0 +1,54 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Copying the photo over Wi-Fi…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ نسخ الصورة عبر الواي فاي…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Copying the photo over Wi-Fi…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال کپی عکس از راه وای‌فای…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Fotoğraf Wi-Fi üzerinden kopyalanıyor…" } }
+      }
+    },
+    "Photos come over the Wi-Fi link. Put both phones on the same Wi-Fi, or join the Android phone's hotspot." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصل الصور عبر اتصال الواي فاي. صِل الهاتفين بشبكة الواي فاي نفسها، أو انضم إلى نقطة اتصال هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Photos come over the Wi-Fi link. Put both phones on the same Wi-Fi, or join the Android phone's hotspot." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "عکس‌ها از راه اتصال وای‌فای می‌آیند. هر دو گوشی را به یک وای‌فای وصل کنید، یا به هات‌اسپات گوشی اندرویدی بپیوندید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Fotoğraflar Wi-Fi bağlantısıyla gelir. İki telefonu aynı Wi-Fi’ye bağlayın ya da Android telefonun hotspot’una katılın." } }
+      }
+    },
+    "Photos on the Android phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصور على هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Photos on the Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "عکس‌های گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefondaki fotoğraflar" } }
+      }
+    },
+    "See them here and copy the ones you want, over Wi-Fi" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شاهدها هنا وانسخ ما تريده عبر الواي فاي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "See them here and copy the ones you want, over Wi-Fi" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اینجا ببینیدشان و هرکدام را خواستید از راه وای‌فای کپی کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Burada görün ve istediklerinizi Wi-Fi üzerinden kopyalayın" } }
+      }
+    },
+    "The photo didn't arrive. Try again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم تصل الصورة. حاول مرة أخرى." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The photo didn't arrive. Try again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "عکس نرسید. دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Fotoğraf gelmedi. Yeniden deneyin." } }
+      }
+    },
+    "Turn on Photos for the iPhone in Pairline Bridge › Settings on your Android phone, with the Wi-Fi link on." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل «الصور للآيفون» في Pairline Bridge › الإعدادات على هاتف أندرويد، مع تشغيل اتصال الواي فاي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Photos for the iPhone in Pairline Bridge › Settings on your Android phone, with the Wi-Fi link on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی، «عکس‌ها برای آیفون» را در Pairline Bridge › تنظیمات روشن کنید و اتصال وای‌فای را هم روشن بگذارید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda Pairline Bridge › Ayarlar’da Wi-Fi bağlantısı açıkken iPhone için fotoğraflar’ı açın." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

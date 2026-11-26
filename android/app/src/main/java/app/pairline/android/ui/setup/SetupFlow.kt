@@ -24,11 +24,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +46,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -52,6 +55,7 @@ import app.pairline.android.R
 import app.pairline.android.link.LinkService
 import app.pairline.android.link.PairingOutcome
 import app.pairline.android.ui.GrantState
+import app.pairline.android.ui.LocaleHelper
 import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
 import app.pairline.android.ui.PermissionGroup
@@ -73,6 +77,7 @@ import app.pairline.android.ui.talk.TalkSetupContent
 
 /** One screen of the setup wizard. */
 sealed interface SetupStep {
+    data object Language : SetupStep
     data object Welcome : SetupStep
     data object Privacy : SetupStep
     data object Android11 : SetupStep
@@ -87,6 +92,8 @@ sealed interface SetupStep {
 
     companion object {
         fun all(sdk: Int = Build.VERSION.SDK_INT, maker: Maker = Maker.detect()): List<SetupStep> = buildList {
+            // First, so everything after it is in the user's language (D-081).
+            add(Language)
             add(Welcome)
             add(Privacy)
             if (sdk <= Build.VERSION_CODES.R) add(Android11)
@@ -146,6 +153,7 @@ fun SetupFlow(onFinished: () -> Unit) {
                 modifier = Modifier.weight(1f),
             ) { s ->
                 when (s) {
+                    SetupStep.Language -> LanguageStep(next)
                     SetupStep.Welcome -> WelcomeStep(next)
                     SetupStep.Privacy -> PrivacyStep(next)
                     SetupStep.Android11 -> Android11Step(next)
@@ -210,6 +218,50 @@ private fun Bullet(icon: ImageVector, text: String, tone: Tone = Tone.ACCENT) {
         Spacer(Modifier.width(14.dp))
         Text(text, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
     }
+}
+
+/**
+ * The language, before anything else (D-081): each language in its own name, the current one selected. On a fresh
+ * install that's the one picked from the phone's country, and the text says so.
+ */
+@Composable
+private fun LanguageStep(next: () -> Unit) {
+    val context = LocalContext.current
+    val activity = LocalActivity.current
+    val shown = LocaleHelper.shown(context)
+    val guessed = AppGraph.prefs.languageGuess.orEmpty()
+    StepScaffold(
+        illustration = { PulseIcon(PIcons.Language) },
+        title = stringResource(R.string.language_step_title),
+        body = stringResource(
+            if (guessed.isNotEmpty() && guessed == shown) R.string.language_step_body_guessed else R.string.language_step_body,
+        ),
+        buttons = { PrimaryButton(stringResource(R.string.action_continue), next) },
+        extra = {
+            for ((tag, name) in LocaleHelper.NAMES) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = tag == shown,
+                            role = Role.RadioButton,
+                            onClick = {
+                                if (tag == shown) return@selectable
+                                LocaleHelper.set(context, tag)
+                                // Android 13+ recreates the screen itself; before that, we do. The step index is kept.
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) activity?.recreate()
+                            },
+                        )
+                        .padding(vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadioButton(selected = tag == shown, onClick = null)
+                    Spacer(Modifier.width(12.dp))
+                    Text(name, style = MaterialTheme.typography.titleMedium)
+                }
+            }
+        },
+    )
 }
 
 @Composable

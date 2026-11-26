@@ -60,7 +60,7 @@ class LinkService : Service() {
         link.handler = graph.router
         link.wifiListener = graph.files
         link.start()
-        // Remote mode (D-080): checks the mailbox in iCloud while no session is up, if the iPhone turned it on.
+        // Remote mode (D-092): checks the mailbox in iCloud while no session is up, if the iPhone turned it on.
         graph.remote.start()
         // Its direct connection: while remote mode is on and the phone is on Wi-Fi, a public listener and a port
         // opened on the home router; closed and deleted when remote mode ends.
@@ -105,6 +105,10 @@ class LinkService : Service() {
         graph.status.onCallState = graph.calls::onTelephonyState
         graph.status.start()
         graph.netSwitches.start()
+        // Alarms don't survive a restart or an app update: set the next scheduled message's again (D-084).
+        graph.io.execute { runCatching { graph.scheduledSms.arm() } }
+        // Picture messages the default messaging app downloads go to the iPhone right away (D-089).
+        graph.io.execute { runCatching { graph.mmsStore.watch { graph.link.send(it) } } }
 
         ContextCompat.registerReceiver(
             this,
@@ -191,6 +195,7 @@ class LinkService : Service() {
         runCatching { unregisterReceiver(phoneStateReceiver) }
         graph.status.stop()
         graph.netSwitches.stop()
+        graph.mmsStore.unwatch()
         transports.forEach { it.stop() }
         transports = emptyList()
         wifi?.stop()

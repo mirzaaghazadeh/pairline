@@ -2,9 +2,10 @@ import ActivityKit
 import Foundation
 
 /// The bridge-status Live Activity on the Lock Screen and in the Dynamic Island (D-053). Built into the app (which
-/// starts and updates it) and the widget extension (which draws it). Like the widget it carries only status — link
+/// starts and updates it) and the widget extension (which draws it). Like the widget it carries status — link
 /// state, the bridge's name, battery, carrier, network type and signal — never numbers, messages or contacts, and it
-/// is updated on the device only (no push server: rule 2).
+/// is updated on the device only (no push server: rule 2). The one exception is a just-received one-time code for two
+/// minutes, with the user's setting (D-083).
 @available(iOS 16.2, *)
 struct BridgeActivityAttributes: ActivityAttributes {
     struct ContentState: Codable, Hashable {
@@ -14,6 +15,9 @@ struct BridgeActivityAttributes: ActivityAttributes {
         var batteryLevel: Int?
         var charging: Bool?
         var sims: [WidgetSnapshot.SIM]
+        /// The newest one-time code, for two minutes after it arrived (D-083). Drawn only in the Dynamic Island, which
+        /// shows while the iPhone is unlocked, never on the Lock Screen.
+        var code: String?
 
         /// The SIM the compact Dynamic Island shows: the first slot.
         var primarySIM: WidgetSnapshot.SIM? { sims.first }

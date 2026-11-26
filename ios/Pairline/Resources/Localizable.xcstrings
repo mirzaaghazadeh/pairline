@@ -6442,24 +6442,24 @@
         }
       }
     },
-    "Not yet. Pairline handles SMS text messages. Picture messages (MMS) are planned." : {
+    "Yes, with the latest Pairline Bridge. Picture and group messages show here with their pictures and everyone in the group, and you can send a picture or a group message. Sending needs mobile data on the Android phone, and full pictures open over Wi-Fi." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ليس بعد. يدعم Pairline الرسائل النصية القصيرة (SMS)، ودعم رسائل الصور (MMS) مُخطط له."
+            "value" : "نعم، مع أحدث إصدار من Pairline Bridge. تظهر هنا رسائل الصور والرسائل الجماعية بصورها وبكل من في المجموعة، ويمكنك إرسال صورة أو رسالة جماعية. يحتاج الإرسال إلى بيانات الجوال على هاتف أندرويد، وتُفتح الصور كاملة عبر الواي فاي."
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هنوز نه. Pairline فعلاً پیامک‌های متنی را پشتیبانی می‌کند. پیام‌های تصویری (MMS) در برنامه‌های آینده است."
+            "value" : "بله، با جدیدترین Pairline Bridge. پیام‌های تصویری و گروهی با عکس‌هایشان و همهٔ افراد گروه اینجا نشان داده می‌شوند و می‌توانید عکس یا پیام گروهی بفرستید. ارسال به اینترنت همراه روشن روی گوشی اندرویدی نیاز دارد و عکس کامل از راه وای‌فای باز می‌شود."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Henüz değil. Pairline SMS metin mesajlarını destekler. Resimli mesajlar (MMS) planlanıyor."
+            "value" : "Evet, en son Pairline Bridge ile. Resimli ve grup mesajları resimleri ve gruptaki herkesle burada görünür; resim ya da grup mesajı da gönderebilirsiniz. Göndermek için Android telefonda mobil veri açık olmalı; resimlerin tamamı Wi-Fi üzerinden açılır."
           }
         }
       }
@@ -11963,7 +11963,7 @@
       }
     },
     "Via iCloud: texts and codes work. Calls need the direct connection to your home." : {
-      "comment" : "Cloud mode (D-080): the banner while the bridge is reached only through iCloud. Call audio needs the direct connection through the home router.",
+      "comment" : "Cloud mode (D-092): the banner while the bridge is reached only through iCloud. Call audio needs the direct connection through the home router.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud: تصلك الرسائل والرموز. أما المكالمات فتحتاج إلى الاتصال المباشر بمنزلك." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق iCloud: پیامک‌ها و کدها کار می‌کنند. تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند." } },
@@ -11971,7 +11971,7 @@
       }
     },
     "Calls need the direct connection to your home, which isn't up right now. Settings › Cloud mode › Check my home connection shows why." : {
-      "comment" : "Cloud mode (D-080): the user tried to call while the bridge is reached only through iCloud. Use the same names as the Settings section and its button.",
+      "comment" : "Cloud mode (D-092): the user tried to call while the bridge is reached only through iCloud. Use the same names as the Settings section and its button.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحتاج المكالمات إلى الاتصال المباشر بمنزلك، وهو غير متاح الآن. يعرض الإعدادات › الوضع السحابي › فحص اتصال منزلي السبب." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند که الان برقرار نیست. تنظیمات › حالت ابری › بررسی اتصال خانه دلیلش را نشان می‌دهد." } },
@@ -12056,7 +12056,7 @@
       }
     },
     "For when your Android phone with the SIM isn't next to you, like at home. Send yourself the invitation, open it on the Android phone, and allow it there." : {
-      "comment" : "Remote pairing (D-080): the owner pairs their own two phones while they're apart. No helper.",
+      "comment" : "Remote pairing (D-092): the owner pairs their own two phones while they're apart. No helper.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "حين لا يكون هاتف أندرويد الذي يحمل شريحتك بجانبك، كأن يكون في المنزل. أرسل الدعوة إلى نفسك، وافتحها على هاتف أندرويد، واسمح بالإقران هناك." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای وقتی که گوشی اندرویدیِ دارای سیم‌کارت کنارتان نیست، مثلاً در خانه است. دعوت‌نامه را برای خودتان بفرستید، روی گوشی اندرویدی بازش کنید و همان‌جا اجازه بدهید." } },
@@ -12218,7 +12218,7 @@
       }
     },
     "Texts and codes from your Android phone's SIM now come to this iPhone through iCloud. Calls work once the direct connection to its home is up." : {
-      "comment" : "Remote pairing (D-080) finished while the phones are apart. Call audio needs the direct connection through the home router.",
+      "comment" : "Remote pairing (D-092) finished while the phones are apart. Call audio needs the direct connection through the home router.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصل الآن الرسائل والرموز من شريحة هاتف أندرويد إلى هذا الآيفون عبر iCloud. وتعمل المكالمات حين يُتاح الاتصال المباشر بمنزله." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "از این پس، پیامک‌ها و کدهای سیم‌کارت گوشی اندرویدی شما از طریق iCloud به این آیفون می‌آیند. تماس‌ها وقتی کار می‌کنند که اتصال مستقیم به خانهٔ آن گوشی برقرار باشد." } },
@@ -12246,7 +12246,7 @@
       }
     },
     "Direct connection" : {
-      "comment" : "Cloud mode (D-080): the live session goes straight to the bridge phone at home over the internet, not through iCloud. Link state and a Settings row title.",
+      "comment" : "Cloud mode (D-092): the live session goes straight to the bridge phone at home over the internet, not through iCloud. Link state and a Settings row title.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مباشر" } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال مستقیم" } },

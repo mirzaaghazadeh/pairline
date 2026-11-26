@@ -36,7 +36,9 @@ reinstall. Keep at least two offline backups (for example, a password manager an
 
 ### Making a release
 
-1. In `android/app/build.gradle.kts`, raise `versionCode` and set `versionName`, e.g. `0.2.0`. Commit to `main`.
+1. In `android/app/build.gradle.kts`, raise `versionCode` and set `versionName`, e.g. `0.2.0`. In the same commit,
+   add a `## 0.2.0 (date)` section to `android/CHANGELOG.md`: what's new, written for the people who use the app
+   (bold lead, then what changed and what it needs). Commit to `main`.
 2. Tag that commit and push the tag:
 
    ```sh
@@ -44,10 +46,14 @@ reinstall. Keep at least two offline backups (for example, a password manager an
    git push origin android-v0.2.0
    ```
 
-3. The workflow checks that the tag matches `versionName`, builds, runs the policy checks
-   (`.github/scripts/android-policy-check.sh`), signs, scans the signed APK on VirusTotal
-   (`.github/scripts/virustotal-scan.sh`), and creates a **draft** GitHub Release with the APK, its SHA-256, the
-   signing-certificate digest and the VirusTotal report link. Versions starting with `0.` are marked as pre-releases.
+3. The workflow checks that the tag matches `versionName` and that `CHANGELOG.md` has its section, builds, runs the
+   policy checks (`.github/scripts/android-policy-check.sh`), signs, scans the signed APK on VirusTotal
+   (`.github/scripts/virustotal-scan.sh`), and creates a **draft** GitHub Release with what's new, the contributors,
+   the APK, its SHA-256, the signing-certificate digest and the VirusTotal report link
+   (`.github/scripts/release-notes.sh`, D-080). What's new covers every version since the last *published* release,
+   so publishing 1.7.0 after leaving 1.4.0 to 1.6.0 as drafts still tells people everything they get. Contributors
+   are the GitHub accounts behind the commits in that range that touch `android/` or `protocol/`. Versions starting
+   with `0.` are marked as pre-releases.
 4. Review the draft and publish it. If the VirusTotal row shows detections or "not scanned", open the report (or the
    run's warnings) first. One or two engines flagging a new APK is usually a false positive; check which engines and
    what they call it before publishing.
@@ -55,6 +61,11 @@ reinstall. Keep at least two offline backups (for example, a password manager an
 To scan a release that already exists (made before the scan was added, or when the scan didn't finish), run the
 **VirusTotal scan of a release** workflow from the Actions tab with the release tag
 (`gh workflow run virustotal.yml -f tag=android-v1.0.1`). It adds or replaces the VirusTotal row in that release's notes.
+
+To redo an existing release's what's new and contributors (after fixing its changelog section, or after publishing an
+earlier draft changes what counts as "since the last published release"), run
+`GH_REPO=mirzaaghazadeh/pairline .github/scripts/release-notes.sh 1.7.0 android/CHANGELOG.md` and replace the part
+of the notes above "## Pairline Bridge …" with its output (`gh release edit android-v1.7.0 --notes-file …`).
 5. The first release only: copy the certificate digest into `SECURITY.md` ("Verifying a release").
 
 ### Why signing happens outside Gradle

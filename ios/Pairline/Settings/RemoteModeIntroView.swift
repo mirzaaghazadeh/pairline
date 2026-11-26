@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// What Cloud mode (remote mode, D-080) is, in plain words ("What users are told"): before it's turned on the first
+/// What Cloud mode (remote mode, D-092) is, in plain words ("What users are told"): before it's turned on the first
 /// time, from "How Cloud mode works", and as the step after pairing. Strings live in the "RemoteMode" table.
 struct RemoteModeIntroContent: View {
     var body: some View {

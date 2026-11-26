@@ -5,6 +5,7 @@ import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.audio.MediaChannelTransport
 import app.pairline.android.files.FileNotifications
 import app.pairline.android.files.FileTransfers
+import app.pairline.android.files.PhotoLibrary
 import app.pairline.android.link.IdentityStore
 import app.pairline.android.netshare.NetShare
 import app.pairline.android.netshare.NetSwitches
@@ -27,6 +28,10 @@ import app.pairline.android.log.Log
 import app.pairline.android.telephony.BlockList
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
+import app.pairline.android.telephony.DataUsage
+import app.pairline.android.telephony.MmsSender
+import app.pairline.android.telephony.MmsStore
+import app.pairline.android.telephony.ScheduledSms
 import app.pairline.android.telephony.SimDirectory
 import app.pairline.android.telephony.SmsSender
 import app.pairline.android.telephony.SmsStore
@@ -63,7 +68,7 @@ object AppGraph {
         LinkManager({ identity.identity() }, pairing, peers, prefs).also { it.remote = remote }
     }
 
-    /** Remote mode (D-080): the mailbox in the user's own iCloud, the path next to the sessions. */
+    /** Remote mode (D-092): the mailbox in the user's own iCloud, the path next to the sessions. */
     val remote: RemoteLink by lazy {
         RemoteLink(
             RemoteStore.create(app),
@@ -75,14 +80,14 @@ object AppGraph {
     }
 
     /**
-     * Remote mode's direct connection through the home router (D-080): a public listener whose sessions join
+     * Remote mode's direct connection through the home router (D-092): a public listener whose sessions join
      * [link] on their own lane, and the router's port mapping. Its `remote.addr` / `remote.state` go out like events.
      */
     val direct: DirectLink by lazy {
         DirectLink(DirectListener(link), link::send, PrefsKeyValueStore(app, "pairline.direct"))
     }
 
-    /** Pairing from far away through an invitation (D-080). */
+    /** Pairing from far away through an invitation (D-092). */
     val remotePairing: RemotePairingFlow by lazy {
         RemotePairingFlow(
             object : RemotePairingFlow.Host {
@@ -105,7 +110,10 @@ object AppGraph {
 
     /** Numbers whose texts and calls don't reach the iPhone (D-043). */
     val blockList: BlockList by lazy { BlockList(app) }
-    val smsStore: SmsStore by lazy { SmsStore(app, sims, blockList::isBlocked) }
+    /** Picture and group messages (D-089). */
+    val mmsStore: MmsStore by lazy { MmsStore(app, sims, blockList::isBlocked) }
+    val mmsSender: MmsSender by lazy { MmsSender(app, sims, link::send) }
+    val smsStore: SmsStore by lazy { SmsStore(app, sims, blockList::isBlocked, mmsStore) }
     val smsSender: SmsSender by lazy { SmsSender(app, sims, smsStore, link::send) }
     val calls: CallTracker by lazy {
         CallTracker(app, sims, prefs, link::send) { router.statusChanged() }.also { tracker ->
@@ -129,12 +137,24 @@ object AppGraph {
             netSwitch = { netSwitches.canSwitch },
             smsWrite = { privileged.canWriteSms() },
             ringer = { Ringer.mode(app) },
+            dataUsage = { dataUsage.accessGranted() },
+            photos = { photos.available() },
         )
     }
+
+    /** This phone's photos for the iPhone, opt-in (D-088). */
+    val photos: PhotoLibrary by lazy { PhotoLibrary(app, prefs, files) }
+
+    /** Messages the iPhone asked to send later (D-084). */
+    val scheduledSms: ScheduledSms by lazy { ScheduledSms(app, smsSender, link::send) }
+
+    /** Mobile data used, for the iPhone's meter (D-084). */
+    val dataUsage: DataUsage by lazy { DataUsage(app, sims) }
     val router: MessageRouter by lazy {
         MessageRouter(
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
-            netSwitches, app, remote, checkHome = { direct.check() },
+            netSwitches, app, scheduledSms, dataUsage, photos, mmsStore, mmsSender, remote,
+            checkHome = { direct.check() },
         ).also { router ->
             remote.onConfigured = {
                 router.remoteStarted()

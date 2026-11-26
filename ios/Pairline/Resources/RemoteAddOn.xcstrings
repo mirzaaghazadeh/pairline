@@ -2,7 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Buy Cloud mode · %@" : {
-      "comment" : "Cloud mode add-on (D-081): the buy button, shown only after Pairline Full Access is bought. %@ is the price, e.g. $9.99.",
+      "comment" : "Cloud mode add-on (D-093): the buy button, shown only after Pairline Full Access is bought. %@ is the price, e.g. $9.99.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "شراء الوضع السحابي · %@" } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Buy Cloud mode · %@" } },
@@ -11,7 +11,7 @@
       }
     },
     "Pairing over the internet is part of Cloud mode, a one-time %@ add-on to Pairline Full Access." : {
-      "comment" : "Cloud mode add-on (D-081): shown instead of pairing over the internet when Full Access is bought but the add-on isn't. %@ is the price.",
+      "comment" : "Cloud mode add-on (D-093): shown instead of pairing over the internet when Full Access is bought but the add-on isn't. %@ is the price.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإقران عبر الإنترنت جزء من الوضع السحابي، وهو إضافة تُشترى مرة واحدة بسعر %@ إلى الوصول الكامل إلى Pairline." } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairing over the internet is part of Cloud mode, a one-time %@ add-on to Pairline Full Access." } },
@@ -20,7 +20,7 @@
       }
     },
     "Cloud mode is a one-time add-on to Pairline Full Access. Everything nearby keeps working without it." : {
-      "comment" : "Cloud mode add-on (D-081): Settings footer and the step after pairing, when Full Access is bought but the add-on isn't.",
+      "comment" : "Cloud mode add-on (D-093): Settings footer and the step after pairing, when Full Access is bought but the add-on isn't.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع السحابي إضافة تُشترى مرة واحدة إلى الوصول الكامل إلى Pairline. كل ما يعمل والهاتفان قريبان يظل يعمل من دونها." } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode is a one-time add-on to Pairline Full Access. Everything nearby keeps working without it." } },
@@ -29,7 +29,7 @@
       }
     },
     "Cloud mode is part of your free trial. After you buy Pairline, it's a one-time %@ add-on." : {
-      "comment" : "Cloud mode add-on (D-081): Settings footer and the step after pairing during the free trial. %@ is the add-on's price.",
+      "comment" : "Cloud mode add-on (D-093): Settings footer and the step after pairing during the free trial. %@ is the add-on's price.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع السحابي جزء من فترتك التجريبية المجانية. بعد شراء Pairline يصبح إضافة تُشترى مرة واحدة بسعر %@." } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode is part of your free trial. After you buy Pairline, it's a one-time %@ add-on." } },
@@ -38,7 +38,7 @@
       }
     },
     "Cloud mode needs the free trial or Pairline Full Access." : {
-      "comment" : "Cloud mode add-on (D-081): Settings footer when there's no trial running and no Full Access.",
+      "comment" : "Cloud mode add-on (D-093): Settings footer when there's no trial running and no Full Access.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج الوضع السحابي إلى الفترة التجريبية المجانية أو الوصول الكامل إلى Pairline." } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode needs the free trial or Pairline Full Access." } },

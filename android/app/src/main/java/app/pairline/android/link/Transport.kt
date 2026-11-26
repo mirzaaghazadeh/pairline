@@ -8,7 +8,7 @@ enum class TransportKind {
     WIFI,
 
     /**
-     * Remote mode's direct connection through the home router (D-080): the Wi-Fi session's framing, handshake and
+     * Remote mode's direct connection through the home router (D-092): the Wi-Fi session's framing, handshake and
      * messages from anywhere on the internet, without media or bulk channels, on a lane of its own.
      */
     DIRECT;

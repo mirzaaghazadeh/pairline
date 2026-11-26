@@ -6,9 +6,9 @@ import Foundation
 struct WidgetSnapshot: Codable, Equatable {
     enum Link: String, Codable {
         case connected
-        /// A live session over remote mode's direct connection to the bridge's home (D-080): "Direct connection".
+        /// A live session over remote mode's direct connection to the bridge's home (D-092): "Direct connection".
         case direct
-        /// No nearby link, but remote mode reaches the bridge through iCloud (D-080).
+        /// No nearby link, but remote mode reaches the bridge through iCloud (D-092).
         case remote
         case connecting
         case offline

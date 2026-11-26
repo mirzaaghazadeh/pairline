@@ -11,7 +11,7 @@
          back, needs this permission. Release builds never use mobile data for the link and don't declare it. -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
-    <!-- Pair over the internet (remote pairing, D-080): the live scanner for the iPhone's invitation QR code. Asked
+    <!-- Pair over the internet (remote pairing, D-092): the live scanner for the iPhone's invitation QR code. Asked
          on the "Scan" tap only; frames are read on the phone and never kept. Debug builds only while the pairing
          screen shows that section only there (release iPhones can't make invitations yet); it moves to the main
          manifest when Cloud mode ships. -->

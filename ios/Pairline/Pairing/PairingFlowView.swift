@@ -2,7 +2,7 @@ import AVFoundation
 import SwiftUI
 
 /// Guided pairing: install the free bridge app on Android, scan its QR code, connect, allow notifications, and offer
-/// Cloud mode. Where Cloud mode (remote mode, D-080) is available, "Pair over the internet" pairs through an invitation
+/// Cloud mode. Where Cloud mode (remote mode, D-092) is available, "Pair over the internet" pairs through an invitation
 /// instead.
 struct PairingFlowView: View {
     enum Step {
@@ -20,6 +20,7 @@ struct PairingFlowView: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var purchases: PurchaseManager
     @EnvironmentObject private var settings: AppSettings
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var step: Step
     @State private var error: String?
     @State private var camera: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
@@ -39,6 +40,11 @@ struct PairingFlowView: View {
         _step = State(initialValue: overInternet && RemoteFeature.isAvailable ? .remote : Self.initialStep)
     }
 
+    /// The next step slides in from the trailing edge; with Reduce Motion it fades in.
+    private var stepTransition: AnyTransition {
+        .asymmetric(insertion: reduceMotion ? .opacity : .move(edge: .trailing), removal: .opacity)
+    }
+
     /// Debug builds launched with `-PairlinePairingScan` start at the scan step, with `-PairlinePairingRemote` at
     /// "Pair over the internet", with `-PairlinePairingCloudStep` at the Cloud mode step.
     private static var initialStep: Step {
@@ -55,15 +61,15 @@ struct PairingFlowView: View {
             ZStack {
                 Color(.systemGroupedBackground).ignoresSafeArea()
                 switch step {
-                case .install: install.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
-                case .scan: scan.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
+                case .install: install.transition(stepTransition)
+                case .scan: scan.transition(stepTransition)
                 case .connecting: connecting.transition(.opacity)
                 case .remote: remote.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
                 case .done: done.transition(.opacity)
                 case .cloud: cloud.transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
                 }
             }
-            .animation(.spring(response: 0.45, dampingFraction: 0.9), value: step)
+            .animation(.motion(.spring(response: 0.45, dampingFraction: 0.9), reduceMotion: reduceMotion), value: step)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if !isOnboarding || step == .scan || step == .remote {
@@ -318,7 +324,7 @@ struct PairingFlowView: View {
     }
     #endif
 
-    // MARK: - Over the internet (remote mode, "Cloud mode", D-080)
+    // MARK: - Over the internet (remote mode, "Cloud mode", D-092)
 
     private var farAwayButton: some View {
         Button {
@@ -336,7 +342,7 @@ struct PairingFlowView: View {
     }
 
     /// Needs a trial or the purchase: through iCloud there's no free first sync (D-069) to lead to. After the trial it
-    /// is part of the remote-mode add-on (D-081).
+    /// is part of the remote-mode add-on (D-093).
     @ViewBuilder private var remote: some View {
         if purchases.remoteAccess.allowsRemote {
             RemotePairingView { step = .done }
@@ -353,7 +359,7 @@ struct PairingFlowView: View {
         }
     }
 
-    /// Full Access is bought but not the Cloud mode add-on, which pairing over the internet is part of (D-081).
+    /// Full Access is bought but not the Cloud mode add-on, which pairing over the internet is part of (D-093).
     private var remoteAddOnOffer: some View {
         VStack(spacing: 12) {
             Image(systemName: "icloud.and.arrow.up").font(.largeTitle).foregroundStyle(Color.brandBlue)
@@ -441,7 +447,7 @@ struct PairingFlowView: View {
         .padding(24)
     }
 
-    // MARK: - Cloud mode after pairing nearby (D-080, D-081)
+    // MARK: - Cloud mode after pairing nearby (D-092, D-093)
 
     /// After pairing nearby, Cloud mode is offered once: where it exists, while the new bridge is linked and speaks it,
     /// it isn't on yet, and the purchase state covers it (the trial, or Full Access with the add-on) or offers the

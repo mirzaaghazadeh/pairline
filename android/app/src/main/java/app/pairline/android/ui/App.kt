@@ -74,7 +74,7 @@ fun PairlineAppUi() {
                 MainNavigation()
             }
         }
-        // An invitation from an iPhone far away (D-080) opens over everything, during setup too.
+        // An invitation from an iPhone far away (D-092) opens over everything, during setup too.
         if (pairingRemotely) RemotePairingScreen()
     }
 }

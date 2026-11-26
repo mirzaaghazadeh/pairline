@@ -89,6 +89,7 @@ struct SettingsTab: View {
                 }
                 liveActivitySection
                 notificationSection
+                InboxSettingsSection() // D-083
                 // Shown once the bridge has reported its SIMs (D-062).
                 if !bridge.sims.isEmpty { SIMDefaultsSection() }
                 callsSection
@@ -166,7 +167,7 @@ struct SettingsTab: View {
         }
     }
 
-    /// Pairing your own two phones while they aren't next to each other (Cloud mode, D-080).
+    /// Pairing your own two phones while they aren't next to each other (Cloud mode, D-092).
     @ViewBuilder private var pairOverInternetRow: some View {
         if RemoteFeature.isAvailable, !app.isDemo {
             Button {
@@ -377,10 +378,7 @@ struct SettingsTab: View {
         }
     }
 
-    private var currentLanguageName: String {
-        let code = Bundle.main.preferredLocalizations.first ?? "en"
-        return Locale(identifier: code).localizedString(forLanguageCode: code)?.capitalized ?? code
-    }
+    private var currentLanguageName: String { AppLanguage.shownName }
 
     private var helpSection: some View {
         Section {

@@ -163,6 +163,15 @@ fun HomeScreen(navigate: (Route) -> Unit) {
                     onClick = { navigate(Route.Pairing) },
                 )
                 if (paired) {
+                    // Find phone the other way round (D-084); also a Quick Settings tile.
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                    ListRow(
+                        title = stringResource(R.string.ring_iphone),
+                        subtitle = stringResource(R.string.ring_iphone_sub),
+                        icon = PIcons.Notifications,
+                        onClick = { app.pairline.android.tools.RingIphone.ring(context) },
+                    )
                     HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                     ListRow(
                         title = stringResource(R.string.home_unpair),
@@ -238,7 +247,7 @@ private fun LinkCard(
         StoppedCard()
         return
     }
-    // Cloud mode (remote mode, D-080): no session, but texts, codes and calls still reach the iPhone through its iCloud.
+    // Cloud mode (remote mode, D-092): no session, but texts, codes and calls still reach the iPhone through its iCloud.
     val remote by AppGraph.remote.state.collectAsState()
     val viaIcloud = paired && !link.connected && remote.on && remote.problem == null
     val (visual, tone, pill) = when {
@@ -301,7 +310,7 @@ private fun LinkCard(
 }
 
 /**
- * Cloud mode in one line (remote mode, D-080): on, paused and why, or off with where to turn it on (the iPhone). Not
+ * Cloud mode in one line (remote mode, D-092): on, paused and why, or off with where to turn it on (the iPhone). Not
  * shown while the card itself says "Via iCloud", nor for an iPhone that doesn't offer Cloud mode.
  */
 @Composable
@@ -331,7 +340,7 @@ private fun CloudLine(remote: RemoteStatus, viaIcloud: Boolean, peerProto: Int) 
     }
 }
 
-/** Cloud mode's direct connection through the home router (D-080): open, or why not. */
+/** Cloud mode's direct connection through the home router (D-092): open, or why not. */
 @Composable
 private fun DirectLine(s: DirectStatus) {
     val open = s.direct == Direct.OPEN
@@ -350,7 +359,7 @@ private fun DirectLine(s: DirectStatus) {
         )
         Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-    // What fixes it, when the home's router, modem or provider is the reason (D-082): texts and codes work anyway.
+    // What fixes it, when the home's router, modem or provider is the reason (D-094): texts and codes work anyway.
     // UPnP or NAT-PMP first (Pairline then does it all); otherwise the user's own port forwarding, which needs this
     // phone's home address and port, shown left to right in every language.
     val bidi = BidiFormatter.getInstance()
@@ -371,7 +380,7 @@ private fun DirectLine(s: DirectStatus) {
     if (hint != null) {
         HintText(hint)
         if ((routerReason || modemReason) && forwardable) {
-            // A hand-made rule points at one address: why this phone must keep it, and how (D-083).
+            // A hand-made rule points at one address: why this phone must keep it, and how (D-095).
             HintText(stringResource(R.string.direct_hint_fixed_address, address!!))
             // Android 10+ gives each Wi-Fi network a random hardware address, which can break the router's reservation.
             if (Build.VERSION.SDK_INT >= 29) HintText(stringResource(R.string.direct_hint_device_mac))
