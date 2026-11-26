@@ -121,6 +121,14 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sesi durdurmak için Pairline’ı açın." } }
       }
     },
+    "Reply not sent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يُرسل الرد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reply not sent" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاسخ فرستاده نشد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yanıt gönderilmedi" } }
+      }
+    },
     "Schedule" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "جدولة" } },
@@ -191,6 +199,14 @@
         "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone has used %@ of mobile data this month (%lld%% of your limit)." } },
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی این ماه %@ اینترنت همراه مصرف کرده است (%lld%% سقف شما)." } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon bu ay %@ mobil veri kullandı (sınırınızın %%%lld kadarı)." } }
+      }
+    },
+    "The Android phone isn't connected, or that notification is gone there. Reply on the Android phone instead." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتف أندرويد غير متصل، أو أن ذلك الإشعار لم يعد موجودًا هناك. ردّ من هاتف أندرويد بدلًا من ذلك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone isn't connected, or that notification is gone there. Reply on the Android phone instead." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی وصل نیست، یا آن اعلان دیگر آنجا نیست. به‌جای آن از گوشی اندرویدی پاسخ دهید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon bağlı değil ya da o bildirim artık orada yok. Bunun yerine Android telefondan yanıtlayın." } }
       }
     },
     "The Android phone no longer has this scheduled message." : {

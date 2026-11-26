@@ -15,6 +15,9 @@ final class Notifier: NSObject, ObservableObject {
     static let markReadAction = "mark-read"
     static let replyAction = "reply"
     static let mirrorCategory = "mirror"
+    /// A mirrored notification whose Android app takes a typed reply (D-086).
+    static let mirrorReplyCategory = "mirror.reply"
+    static let mirrorReplyAction = "mirror-reply"
     static let trialReminderID = "trial.reminder"
     static let callsPausedID = "calls.paused"
     static let incomingCallID = "calls.incoming"
@@ -29,6 +32,8 @@ final class Notifier: NSObject, ObservableObject {
     var onReply: ((Int64, String, Int?, String) -> Void)?
     /// A mirrored notification was dismissed here (D-077): its key on the bridge phone.
     var onMirrorDismissed: ((String) -> Void)?
+    /// A reply typed in a mirrored notification (D-086): its key and the text.
+    var onMirrorReply: ((String, String) -> Void)?
     var onOpenStatus: (() -> Void)?
 
     // MARK: Muted conversations (D-074): no banner or sound, still counted as unread.
@@ -68,7 +73,17 @@ final class Notifier: NSObject, ObservableObject {
         let mirror = UNNotificationCategory(identifier: Self.mirrorCategory, actions: [], intentIdentifiers: [],
                                             hiddenPreviewsBodyPlaceholder: String(localized: "New notification", table: "PhoneTools"),
                                             options: [.customDismissAction])
-        center.setNotificationCategories([sms, otp, mirror])
+        // …and with a reply field when the Android app's notification takes one (D-086).
+        let mirrorReply = UNTextInputNotificationAction(identifier: Self.mirrorReplyAction,
+                                                        title: String(localized: "Reply", table: "PhoneTools"),
+                                                        options: [.authenticationRequired],
+                                                        textInputButtonTitle: String(localized: "Send", table: "PhoneTools"),
+                                                        textInputPlaceholder: String(localized: "Message", table: "PhoneTools"))
+        let mirrorWithReply = UNNotificationCategory(identifier: Self.mirrorReplyCategory, actions: [mirrorReply],
+                                                     intentIdentifiers: [],
+                                                     hiddenPreviewsBodyPlaceholder: String(localized: "New notification", table: "PhoneTools"),
+                                                     options: [.customDismissAction])
+        center.setNotificationCategories([sms, otp, mirror, mirrorWithReply])
         Task { await refreshAuthorization() }
     }
 
@@ -134,10 +149,21 @@ final class Notifier: NSObject, ObservableObject {
         }
         content.sound = .default
         content.threadIdentifier = "app-" + n.app
-        content.categoryIdentifier = Self.mirrorCategory
+        content.categoryIdentifier = n.reply == true ? Self.mirrorReplyCategory : Self.mirrorCategory
         content.userInfo = ["mirror": n.key]
         if #available(iOS 15.0, *) { content.relevanceScore = 0.3 }
         center.add(UNNotificationRequest(identifier: Self.mirrorID(n.key), content: content, trigger: nil))
+    }
+
+    /// A reply typed in a mirrored notification couldn't go (D-086): the bridge isn't linked, or the notification is
+    /// gone there. Said once, without the text.
+    func notifyMirrorReplyFailed() {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Reply not sent", table: "Extras")
+        content.body = String(localized: "The Android phone isn't connected, or that notification is gone there. Reply on the Android phone instead.", table: "Extras")
+        content.sound = .default
+        center.add(UNNotificationRequest(identifier: "mirror-reply-failed", content: content, trigger: nil))
     }
 
     /// Gone on the bridge phone (read or dismissed there): gone here too.
@@ -338,6 +364,12 @@ extension Notifier: UNUserNotificationCenterDelegate {
         Task { @MainActor in
             if let mirrorKey, action == UNNotificationDismissActionIdentifier {
                 Notifier.shared.onMirrorDismissed?(mirrorKey)
+                return completionHandler()
+            }
+            if let mirrorKey, action == Notifier.mirrorReplyAction {
+                if let typed, !typed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Notifier.shared.onMirrorReply?(mirrorKey, typed)
+                }
                 return completionHandler()
             }
             switch action {

@@ -313,9 +313,10 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `contacts.update` | R→B | M4 | `id`, `key` (a contact key) and any of `name`, `numbers` (replace all of the contact's numbers), `starred` → `ok`; the next `contacts.sync` brings the change back. Needs `contacts.edit` (D-074) |
 | `phone.find` | R→B | — | `id`, `on` (default true) → `ok`: B rings loudly on the alarm stream for up to a minute, or stops. Needs `phone.find` (D-074) |
 | `phone.ringer` | R→B | — | `id`, `mode` (`normal` / `vibrate` / `silent`) → `ok`, then `status.ringer`; `error` `permission` when switching to or from silent without Do Not Disturb access (B then asks its user for it). Needs `phone.ringer` (D-074) |
-| `notif.posted` | B→R | — | `key` (Android's notification key), `app` (package), `appName`, `title`, `text` (up to 1,000 characters), `time`: a notification from an app the bridge's user chose. The same `key` again replaces it. Only while `notif.mirror` is listed (D-077) |
+| `notif.posted` | B→R | — | `key` (Android's notification key), `app` (package), `appName`, `title`, `text` (up to 1,000 characters), `time`: a notification from an app the bridge's user chose. The same `key` again replaces it. Only while `notif.mirror` is listed (D-077). `reply` (D-086): the app's notification takes a typed reply |
 | `notif.removed` | B→R | — | `key`: it went away on the bridge (read, dismissed or replaced there); R removes it |
 | `notif.dismiss` | R→B | — | `id`, `key`: the user dismissed it on R → `ok`; B clears it (only keys it mirrored). Needs `notif.mirror` |
+| `notif.reply` | R→B | — | `id`, `key`, `text` (up to 2,000 characters): the user replied in the mirrored notification on R → `ok` once B handed it to the app's own reply action; `invalid` when that notification has no reply action (any more). Only for a `notif.posted` with `reply: true` (D-086) |
 | `contacts.sync` | R→B, B→R | M4 | request: `id`, `since` (cursor or null) / reply: `id`, `contacts` [Contact], `deleted` [key], `cursor`, `more` |
 | `calllog.sync` | R→B, B→R | M4 | request: `id`, `since` / reply: `id`, `calls` [Call-log entry], `cursor`, `more` |
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |

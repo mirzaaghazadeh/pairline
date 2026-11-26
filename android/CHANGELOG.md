@@ -25,6 +25,8 @@ the section in the same commit that raises `versionName`.
   10 and later): blocked numbers are turned away before they ring, and **Silence unknown callers** sends calls from
   numbers that aren't in your contacts to voicemail on both phones. Block whole ranges by ending a number with *, such
   as +234*.
+- **Reply to app notifications from the iPhone.** Notifications from apps you chose (WhatsApp, Telegram…) get a Reply
+  field on the iPhone; the reply goes through that app on this phone, as if you had typed it here.
 
 ## 1.7.0 (2026-11-26)
 

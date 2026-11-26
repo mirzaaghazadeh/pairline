@@ -76,6 +76,23 @@ final class AppModel: ObservableObject {
             guard let self, self.real.has(.notifMirror), self.real.phase.isConnected else { return }
             Task { _ = try? await self.real.link.request(.notifDismiss(key: key)) }
         }
+        // D-086: a reply typed in a mirrored notification goes back through the Android app's own reply action.
+        notifier.onMirrorReply = { [weak self] key, text in
+            guard let self else { return }
+            guard self.real.phase.isConnected, self.real.canUseLink else {
+                Notifier.shared.notifyMirrorReplyFailed()
+                return
+            }
+            Task {
+                do {
+                    _ = try await self.real.link.request(.notifReply(key: key, text: text))
+                    log.info("notify", "Replied to an Android app's notification")
+                } catch {
+                    log.warning("notify", "Couldn't reply to an Android app's notification: \(error.localizedDescription)")
+                    Notifier.shared.notifyMirrorReplyFailed()
+                }
+            }
+        }
         notifier.onReply = { [weak self] thread, addr, sim, text in
             guard let self else { return }
             do {

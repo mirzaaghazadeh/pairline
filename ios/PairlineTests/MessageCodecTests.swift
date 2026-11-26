@@ -106,6 +106,14 @@ final class MessageCodecTests: XCTestCase {
         let dismiss = try json(.notifDismiss(key: "k"))
         XCTAssertEqual(dismiss["t"] as? String, "notif.dismiss")
         XCTAssertEqual(dismiss["key"] as? String, "k")
+        // D-086: a notification that takes a reply, and the reply.
+        guard case .notifPosted(let replyable) = try decode(["t": "notif.posted", "key": "k", "app": "a.b", "reply": true])
+            .message else { return XCTFail() }
+        XCTAssertEqual(replyable.reply, true)
+        XCTAssertNil(bare.reply, "older bridges leave it out")
+        let reply = try json(.notifReply(key: "k", text: "On my way"))
+        XCTAssertEqual(reply["t"] as? String, "notif.reply")
+        XCTAssertEqual(reply["text"] as? String, "On my way")
     }
 
     /// D-082: signal detail and the voicemail indicator per SIM, and dialing voicemail.

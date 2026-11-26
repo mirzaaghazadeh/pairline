@@ -136,6 +136,8 @@ struct MirroredNotification: Codable, Equatable {
     var title: String?
     var text: String?
     var time: Int64?
+    /// The app's notification takes a typed reply (D-086): `notif.reply` sends one through it.
+    var reply: Bool?
 }
 
 /// `status.net` (D-073): the bridge phone's own internet sharing. Switched with `net.switch` (needs `net.switch`).
@@ -700,6 +702,9 @@ struct Outbound {
 
     /// The user dismissed a mirrored notification here: clear it on the bridge phone too (D-077).
     static func notifDismiss(key: String) -> Outbound { Outbound("notif.dismiss", ["key": key]) }
+
+    /// A reply typed in a mirrored notification, sent through the Android app's own reply action (D-086).
+    static func notifReply(key: String, text: String) -> Outbound { Outbound("notif.reply", ["key": key, "text": text]) }
 
     /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
     static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {

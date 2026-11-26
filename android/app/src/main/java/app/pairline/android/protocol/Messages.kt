@@ -40,6 +40,7 @@ object Msg {
     const val NOTIF_POSTED = "notif.posted"
     const val NOTIF_REMOVED = "notif.removed"
     const val NOTIF_DISMISS = "notif.dismiss"
+    const val NOTIF_REPLY = "notif.reply"
     const val CONTACTS_SYNC = "contacts.sync"
     const val CALLLOG_SYNC = "calllog.sync"
     const val CONTACTS_ADD = "contacts.add"

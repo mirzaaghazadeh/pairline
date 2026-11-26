@@ -1463,3 +1463,17 @@ first, and nothing could quiet callers who aren't in the contacts.
   `+` or `00` it's an international prefix, matching numbers written with either), `0900*` (as the digits come).
   The same rule on both phones (`PhoneNumbers.blockPrefix`, `PhoneNumber.blockPrefix`), for calls and texts alike.
 - Strings: Android `strings_more.xml`, iOS `Screening` table. Unit tests on both sides; needs a real phone.
+
+### D-086 — Reply to Android app notifications from the iPhone (2026-11-26)
+
+With D-077 the iPhone shows notifications from apps the user chose on the Android phone; now it can answer them, so
+a second WhatsApp or Telegram on the Android phone's number is usable from the iPhone.
+- The bridge keeps, for each mirrored notification, the app's own **reply action**: the one marked
+  `SEMANTIC_ACTION_REPLY`, else the first that takes free text (`RemoteInput`). That's the action Wear OS and Android
+  Auto use, so apps handle it as a reply typed in the notification. `notif.posted` says `reply: true` when there is one.
+- The iPhone gives those notifications a Reply field (a second category, `mirror.reply`; authentication required, as
+  for SMS replies). `notif.reply` carries the key and the text; the bridge fills the action's `RemoteInput` results
+  and fires its intent. When the link is down or the notification is gone, the iPhone says "Reply not sent" (without
+  the text). Nothing is stored, logged or queued.
+- No other actions (mark as read, like) for now: their meaning differs between apps, and a wrong tap can't be undone.
+- No new permission: notification access already covers reading and firing a notification's actions.

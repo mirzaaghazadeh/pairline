@@ -289,6 +289,13 @@ class MessageRouter(
                 NotificationMirror.dismiss(message.stringOrNull("key") ?: invalid("key missing"))
                 Messages.ok(id)
             }
+            Msg.NOTIF_REPLY -> request(message) { id ->
+                // Typed in the mirrored notification on the iPhone: through the app's own reply action (D-086).
+                val key = message.stringOrNull("key") ?: invalid("key missing")
+                val text = message.stringOrNull("text")?.takeIf { it.isNotBlank() } ?: invalid("text missing")
+                if (!NotificationMirror.reply(appContext, key, text)) invalid("no reply action")
+                Messages.ok(id)
+            }
             // D-084: messages the bridge sends later, and the mobile-data meter.
             Msg.SMS_SCHEDULE -> request(message) { id ->
                 val cid = message.stringOrNull("cid") ?: invalid("cid missing")
