@@ -165,7 +165,30 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios.tests
         GENERATE_INFOPLIST_FILE: YES
 
+  # The accessibility audit behind the App Store labels (D-096): run by tools/accessibility-audit.sh, never by CI.
+  PairlineAccessibilityTests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: PairlineAccessibilityTests
+    dependencies:
+      - target: Pairline
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios.accessibilitytests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Pairline
+
 schemes:
+  Accessibility:
+    build:
+      targets:
+        Pairline: all
+        PairlineAccessibilityTests: [test]
+    test:
+      config: Debug
+      targets:
+        - PairlineAccessibilityTests
   Pairline:
     build:
       targets:
