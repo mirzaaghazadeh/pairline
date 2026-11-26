@@ -1,17 +1,19 @@
 name: Android release
 
 # The only way a release APK is made: push a tag android-v<versionName>, e.g. android-v0.1.0.
-# Builds the unsigned release APK from that commit, runs the policy checks, signs it, scans it on
-# VirusTotal, and attaches it to a DRAFT GitHub Release with what's new (android/CHANGELOG.md), the
-# contributors, its SHA-256, signing-certificate digest and VirusTotal report link. A person reviews and
-# publishes the draft. Setup and verification: docs/RELEASING.md and SECURITY.md.
+# Builds the unsigned release APK from that commit, runs the policy checks, signs it, attests its build
+# provenance, scans it on VirusTotal, and attaches it to a DRAFT GitHub Release with what's new
+# (android/CHANGELOG.md), the contributors, its SHA-256, signing-certificate digest, provenance and VirusTotal
+# report link. Meanwhile a second runner builds the same commit again (android-rebuild.yml); when both are done,
+# the release APK is compared with that rebuild and checked for trackers, and the draft gets those two rows
+# (D-100). A person reviews and publishes the draft. Setup and verification: docs/RELEASING.md and SECURITY.md.
 
 on:
   push:
     tags: ['android-v*']
 
 permissions:
-  contents: write # create the draft release
+  contents: read
 
 concurrency:
   group: android-release-${{ github.ref }}
@@ -24,9 +26,23 @@ env:
   CMAKE: 3.22.1
 
 jobs:
+  # The independent second build for the reproducible-build check, on its own runner, in parallel with the release.
+  rebuild:
+    # A reusable workflow called with ./ is read from this same commit, not from the runner's files.
+    uses: ./.github/workflows/android-rebuild.yml # zizmor: ignore[self-repository]
+    with:
+      ref: ${{ github.sha }}
+
   release:
+    name: Build, sign and draft the release
     runs-on: ubuntu-24.04
     timeout-minutes: 45 # the VirusTotal scan can take up to 10 minutes
+    permissions:
+      contents: write # create the draft release
+      id-token: write # sign the provenance attestation (Sigstore)
+      attestations: write # store the attestation
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     defaults:
       run:
         working-directory: android
@@ -55,6 +71,7 @@ jobs:
           [ -d "$ANDROID_HOME/cmake/$CMAKE" ] || yes | "$sdk" "cmake;$CMAKE" > /dev/null
 
       - name: Check the tag matches versionName
+        id: version
         run: |
           version="$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app/build.gradle.kts)"
           if [ "$GITHUB_REF_NAME" != "android-v$version" ]; then
@@ -62,6 +79,7 @@ jobs:
             exit 1
           fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       # What's new from android/CHANGELOG.md and the contributors since the last published release (D-080). Before
       # the build, so a version without a changelog section fails at once.
@@ -107,6 +125,20 @@ jobs:
           if [ -z "$cert" ]; then echo "::error::Couldn't read the signing certificate digest"; exit 1; fi
           echo "CERT=$cert" >> "$GITHUB_ENV"
 
+      # Signed build provenance (D-100): a statement that this exact APK (by its SHA-256) was built by this workflow
+      # from this commit, signed through Sigstore with this run's GitHub identity and recorded in Sigstore's public
+      # transparency log. Anyone can check it with `gh attestation verify`. Sends only the hash, never the APK.
+      - name: Attest build provenance
+        id: attest
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ runner.temp }}/pairline-bridge-${{ env.VERSION }}.apk
+
+      - name: Keep the attestation bundle for the release
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: cp "$BUNDLE" "$RUNNER_TEMP/pairline-bridge-$VERSION.apk.sigstore.json"
+
       # Uploads the signed APK (and nothing else) to VirusTotal for the report link in the notes (D-039).
       # Never fails the release; problems show up as a warning and in the draft's VirusTotal row.
       - name: VirusTotal scan
@@ -116,12 +148,18 @@ jobs:
           ../.github/scripts/virustotal-scan.sh "$RUNNER_TEMP/pairline-bridge-$VERSION.apk" "$RUNNER_TEMP/virustotal.md"
 
       - name: Write release notes
+        env:
+          ATTESTATION_URL: ${{ steps.attest.outputs.attestation-url }}
         run: |
           apk="$RUNNER_TEMP/pairline-bridge-$VERSION.apk"
           cert="$CERT"
           vt="$(cat "$RUNNER_TEMP/virustotal.md")"
           sum="$(sha256sum "$apk" | cut -d' ' -f1)"
           run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          provenance="[signed by GitHub Actions]($ATTESTATION_URL) for this run and commit; check it with"
+          provenance="$provenance \`gh attestation verify pairline-bridge-$VERSION.apk --repo $GITHUB_REPOSITORY\`"
+          # The "check" and "notes" jobs below replace the two pending rows once the second build is done.
+          pending="pending (this run fills it in when its second build is done)"
           {
             cat "$RUNNER_TEMP/whatsnew.md"
             echo
@@ -133,7 +171,10 @@ jobs:
             echo "|---|---|"
             echo "| APK SHA-256 | \`$sum\` |"
             echo "| Signing certificate SHA-256 | \`$cert\` |"
+            echo "| Build provenance | $provenance |"
             echo "| VirusTotal | $vt |"
+            echo "| Reproducible build | $pending |"
+            echo "| Trackers | $pending |"
             echo "| Toolchain | Temurin JDK 17, Gradle wrapper, build-tools $BUILD_TOOLS, NDK $NDK, CMake $CMAKE, ubuntu-24.04 |"
             echo
             echo "How to verify: [SECURITY.md](../../blob/$GITHUB_SHA/SECURITY.md#verifying-a-release)."
@@ -147,7 +188,10 @@ jobs:
         run: |
           prerelease=""
           case "$VERSION" in 0.*) prerelease="--prerelease" ;; esac
+          # The attestation bundle goes along for checking offline (gh attestation verify --bundle). The app's update
+          # check only ever takes pairline-bridge-<version>.apk.
           gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/pairline-bridge-$VERSION.apk" \
+            "$RUNNER_TEMP/pairline-bridge-$VERSION.apk.sigstore.json" \
             --draft $prerelease --verify-tag \
             --title "Pairline Bridge $VERSION (Android)" \
             --notes-file "$RUNNER_TEMP/notes.md"
@@ -158,3 +202,95 @@ jobs:
           name: pairline-bridge-${{ env.VERSION }}
           path: ${{ runner.temp }}/pairline-bridge-${{ env.VERSION }}.apk
           retention-days: 90
+
+  # Compares the release APK with the second build and looks for trackers (D-100). Third-party code (apksigcopier)
+  # runs only here, with a read-only token, so it can't touch the release; the "notes" job writes the result.
+  check:
+    name: Compare with the second build, look for trackers
+    needs: [rebuild, release]
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      VERSION: ${{ needs.release.outputs.version }}
+      REBUILD_RESULT: ${{ needs.rebuild.result }}
+    outputs:
+      reproducible: ${{ steps.cells.outputs.reproducible }}
+      trackers: ${{ steps.cells.outputs.trackers }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: pairline-bridge-${{ env.VERSION }}
+          path: ${{ runner.temp }}/release
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: needs.rebuild.result == 'success'
+        with:
+          name: rebuilt-unsigned-apk
+          path: ${{ runner.temp }}/rebuilt
+
+      - name: Install build-tools and apksigcopier
+        run: |
+          sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -d "$ANDROID_HOME/build-tools/$BUILD_TOOLS" ] || yes | "$sdk" "build-tools;$BUILD_TOOLS" > /dev/null
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --require-hashes --no-deps -r .github/requirements/apksigcopier.txt
+          { echo "$RUNNER_TEMP/venv/bin"; echo "$ANDROID_HOME/build-tools/$BUILD_TOOLS"; } >> "$GITHUB_PATH"
+
+      - name: Reproducible build
+        run: |
+          apk="$RUNNER_TEMP/release/pairline-bridge-$VERSION.apk"
+          rebuild_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ "$REBUILD_RESULT" = success ]; then
+            .github/scripts/reproducible-check.sh "$apk" "$RUNNER_TEMP/rebuilt/rebuilt-unsigned.apk" "$rebuild_url" \
+              "$RUNNER_TEMP/reproducible.md"
+          else
+            echo "not checked ([the second build]($rebuild_url) failed)" > "$RUNNER_TEMP/reproducible.md"
+            echo "::warning title=Reproducible build::The second build failed, so the release wasn't compared with it."
+          fi
+
+      - name: Trackers
+        run: python3 -I .github/scripts/trackers-scan.py "$RUNNER_TEMP/release/pairline-bridge-$VERSION.apk" "$RUNNER_TEMP/trackers.md"
+
+      - name: Results
+        id: cells
+        run: |
+          reproducible="$(cat "$RUNNER_TEMP/reproducible.md")"
+          trackers="$(cat "$RUNNER_TEMP/trackers.md")"
+          { echo "reproducible=$reproducible"; echo "trackers=$trackers"; } >> "$GITHUB_OUTPUT"
+          { echo "**Reproducible build:** $reproducible"; echo; echo "**Trackers:** $trackers"; } >> "$GITHUB_STEP_SUMMARY"
+
+  notes:
+    name: Fill in the draft's pending rows
+    needs: [release, check]
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write # edit the draft release's notes
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      CHECK_RESULT: ${{ needs.check.result }}
+      REPRODUCIBLE: ${{ needs.check.outputs.reproducible }}
+      TRACKERS: ${{ needs.check.outputs.trackers }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set the rows
+        run: |
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          failed="not checked ([the check]($run_url) failed)"
+          if [ "$CHECK_RESULT" != success ] || [ -z "$REPRODUCIBLE" ]; then REPRODUCIBLE="$failed"; fi
+          if [ "$CHECK_RESULT" != success ] || [ -z "$TRACKERS" ]; then TRACKERS="$failed"; fi
+          gh release view "$GITHUB_REF_NAME" --json body --jq .body > "$RUNNER_TEMP/old.md"
+          .github/scripts/notes-row.sh "$RUNNER_TEMP/old.md" "Reproducible build" "$REPRODUCIBLE" VirusTotal > "$RUNNER_TEMP/mid.md"
+          .github/scripts/notes-row.sh "$RUNNER_TEMP/mid.md" "Trackers" "$TRACKERS" "Reproducible build" > "$RUNNER_TEMP/new.md"
+          diff "$RUNNER_TEMP/old.md" "$RUNNER_TEMP/new.md" || true
+          gh release edit "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/new.md"

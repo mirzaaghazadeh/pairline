@@ -62,8 +62,9 @@ jobs:
         env:
           # Passed to the tests as CI: StoreKitTests skip when the runner can't serve StoreKit test products.
           TEST_RUNNER_CI: 'true'
+          SIMULATOR: ${{ steps.sim.outputs.udid }}
         run: >
-          xcodebuild -scheme Pairline -destination "id=${{ steps.sim.outputs.udid }}"
+          xcodebuild -scheme Pairline -destination "id=$SIMULATOR"
           -derivedDataPath build -resultBundlePath build/Tests.xcresult
           CODE_SIGN_IDENTITY=- test
 

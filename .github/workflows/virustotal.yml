@@ -16,7 +16,7 @@ on:
         default: true
 
 permissions:
-  contents: write # read the release asset and edit the release notes
+  contents: read
 
 concurrency:
   group: virustotal-${{ inputs.tag }}
@@ -26,6 +26,8 @@ jobs:
   scan:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      contents: write # read the release asset and edit the release notes
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}

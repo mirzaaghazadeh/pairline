@@ -1819,3 +1819,52 @@ The maintainer's pricing, superseding D-093's bundle price: "full mode in first 
 - **Where it changed** (the maintainer's OK, 2026-11-27): App Store Connect's price schedule for `fullcloud` (US
   price, other storefronts equalized by Apple, like the other products), `Pairline.storekit` and its tests, AGENTS.md,
   README.md, and the website's default `BUNDLE_PRICE_USD`.
+
+### D-100 — Release APKs get signed build provenance, an independent rebuild and an εxodus tracker check (2026-11-27)
+
+VirusTotal (D-039) only says an APK isn't known malware. Three more checks let anyone confirm what the release is,
+each a row in the draft's notes:
+- **Build provenance.** `android-release.yml` attests the signed APK with `actions/attest-build-provenance`
+  (GitHub's own action, MIT, pinned by commit): a statement that this SHA-256 was built by this workflow from this
+  commit, signed through Sigstore with the run's short-lived GitHub identity and logged in Sigstore's public
+  transparency log. Checked with `gh attestation verify` (SECURITY.md). Only the hash leaves the run. The attestation
+  is also attached to the release as `pairline-bridge-<version>.apk.sigstore.json`; the app's update check only
+  takes `pairline-bridge-<version>.apk`, so it's unaffected. Free for public repositories. An attestation can only be
+  made by the run that built the file, so 1.8.0 and earlier have none.
+- **Reproducible build, checked on every release.** `android-rebuild.yml` builds the same commit on a second, fresh
+  runner in parallel; a later job copies our signature onto that build with apksigcopier (F-Droid's tool for this,
+  GPL-3.0-or-later, with click, BSD-3-Clause; CI only, pinned with hashes in `.github/requirements/`) and compares
+  the bytes. The row says identical, or names the files that differ. Rebuilding 1.8.0 on a Mac found the one thing
+  that wasn't reproducible across machines: the NDK's `crtbegin_so.o` names a different clang build in the macOS
+  NDK than in the Linux one, and that string lands in the native library's `.comment` section (the code itself was
+  identical). The library is now built without `.comment` (`llvm-objcopy --remove-section=.comment` after linking),
+  so releases after 1.8.0 reproduce on Linux and macOS alike; 1.8.0 and earlier reproduce on Linux.
+  `android-release-checks.yml` runs the same rebuild and comparison for a release that already exists.
+- **Trackers.** `.github/scripts/trackers-scan.py` checks the APK against every tracker code signature in εxodus
+  Privacy's public list, the same way εxodus's own scanner does (dexdump class paths matched against the
+  signatures). It's our own standard-library script rather than εxodus's Python package, whose dependencies
+  (androguard, Pillow, cryptography and more, pinned to old versions) don't install cleanly. On 1.8.0 it gives the
+  same answer as εxodus's own code: no trackers, 2,492 class paths. εxodus can't publish its own report for us: it
+  only analyzes apps from Google Play. `android.yml` runs the scan on every build too and fails if a tracker shows up,
+  so one is caught in its pull request.
+- **Network:** all of this is CI only: GitHub's attestation API and Sigstore (the APK's hash), PyPI (apksigcopier),
+  and εxodus's tracker list (a download; nothing sent). The apps make no new requests (rules 1–3).
+- **Only GitHub's own code touches the release.** apksigcopier runs in a job with a read-only token, and a separate
+  job with no third-party code writes its result into the draft, so a compromised tool couldn't change the APK or the
+  release. Like VirusTotal, none of these checks blocks a release: a difference, a tracker or a failed check is a
+  workflow warning and shows in its row, for the person publishing the draft. A failed attestation does fail the
+  release, since the notes and SECURITY.md promise one.
+
+### D-101 — CI audits its own workflows (zizmor), and Dependabot keeps pinned versions current (2026-11-27)
+
+The release workflow holds the signing key, so its workflows get checked like code:
+- **zizmor** (MIT; CI only, pinned with hashes) audits `.github/` on every change and weekly: template injection,
+  credentials left in checkouts, permissions broader than needed, unpinned, impostor or known-vulnerable actions.
+  It fails on any finding. The first run found two workflows giving write access to every job (now only the jobs that
+  write releases have it) and a step output pasted into a shell command in `ios.yml` (now passed through the
+  environment). The calls to our reusable workflow keep the `./` form, which GitHub already reads from the same
+  commit, instead of the newer `$/` form zizmor suggests.
+- **Dependabot** opens pull requests for the SHA-pinned actions and the Android libraries (weekly) and CI's Python
+  tools (monthly). Each update waits seven days after its release (`cooldown`), which keeps a hijacked release from
+  reaching us on day one. Minor and patch updates of the Android libraries come as one grouped pull request. It only
+  raises versions of what we already use; a new dependency still needs its entry here.

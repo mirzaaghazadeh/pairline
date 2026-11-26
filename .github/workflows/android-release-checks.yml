@@ -1,0 +1,122 @@
+name: Checks of a release
+
+# Manual: runs the reproducible-build and tracker checks (D-100) on the APK of a GitHub Release that already exists
+# (made before the checks were added, or when a check couldn't finish), and sets the "Reproducible build" and
+# "Trackers" rows of its notes. New releases get both from android-release.yml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag, e.g. android-v1.8.0
+        required: true
+        type: string
+      update_notes:
+        description: Set the rows in the release notes
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-checks-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    # A reusable workflow called with ./ is read from this same commit, not from the runner's files.
+    uses: ./.github/workflows/android-rebuild.yml # zizmor: ignore[self-repository]
+    with:
+      ref: ${{ inputs.tag }}
+
+  # Third-party code (apksigcopier) runs only here, with a read-only token: it can't touch the release.
+  check:
+    name: Compare and look for trackers
+    needs: rebuild
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      BUILD_TOOLS: 37.0.0
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag }}
+      REBUILD_RESULT: ${{ needs.rebuild.result }}
+    outputs:
+      reproducible: ${{ steps.cells.outputs.reproducible }}
+      trackers: ${{ steps.cells.outputs.trackers }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download the release APK
+        run: |
+          gh release download "$TAG" --pattern '*.apk' --dir "$RUNNER_TEMP/release"
+          count="$(find "$RUNNER_TEMP/release" -name '*.apk' | wc -l)"
+          if [ "$count" -ne 1 ]; then echo "::error::Expected one APK in release $TAG, found $count"; exit 1; fi
+          echo "APK=$(find "$RUNNER_TEMP/release" -name '*.apk')" >> "$GITHUB_ENV"
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: needs.rebuild.result == 'success'
+        with:
+          name: rebuilt-unsigned-apk
+          path: ${{ runner.temp }}/rebuilt
+
+      - name: Install build-tools and apksigcopier
+        run: |
+          sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -d "$ANDROID_HOME/build-tools/$BUILD_TOOLS" ] || yes | "$sdk" "build-tools;$BUILD_TOOLS" > /dev/null
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --require-hashes --no-deps -r .github/requirements/apksigcopier.txt
+          { echo "$RUNNER_TEMP/venv/bin"; echo "$ANDROID_HOME/build-tools/$BUILD_TOOLS"; } >> "$GITHUB_PATH"
+
+      - name: Reproducible build
+        run: |
+          rebuild_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ "$REBUILD_RESULT" = success ]; then
+            .github/scripts/reproducible-check.sh "$APK" "$RUNNER_TEMP/rebuilt/rebuilt-unsigned.apk" "$rebuild_url" \
+              "$RUNNER_TEMP/reproducible.md"
+          else
+            echo "not checked ([the rebuild]($rebuild_url) failed)" > "$RUNNER_TEMP/reproducible.md"
+            echo "::warning title=Reproducible build::The rebuild failed, so the release wasn't compared with it."
+          fi
+
+      - name: Trackers
+        run: python3 -I .github/scripts/trackers-scan.py "$APK" "$RUNNER_TEMP/trackers.md"
+
+      - name: Results
+        id: cells
+        run: |
+          reproducible="$(cat "$RUNNER_TEMP/reproducible.md")"
+          trackers="$(cat "$RUNNER_TEMP/trackers.md")"
+          { echo "reproducible=$reproducible"; echo "trackers=$trackers"; } >> "$GITHUB_OUTPUT"
+          { echo "**$TAG** reproducible build: $reproducible"; echo; echo "**$TAG** trackers: $trackers"; } >> "$GITHUB_STEP_SUMMARY"
+
+  notes:
+    name: Set the rows in the release notes
+    needs: check
+    if: inputs.update_notes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write # edit the release notes
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag }}
+      REPRODUCIBLE: ${{ needs.check.outputs.reproducible }}
+      TRACKERS: ${{ needs.check.outputs.trackers }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set the rows
+        run: |
+          gh release view "$TAG" --json body --jq .body > "$RUNNER_TEMP/old.md"
+          .github/scripts/notes-row.sh "$RUNNER_TEMP/old.md" "Reproducible build" "$REPRODUCIBLE" VirusTotal > "$RUNNER_TEMP/mid.md"
+          .github/scripts/notes-row.sh "$RUNNER_TEMP/mid.md" "Trackers" "$TRACKERS" "Reproducible build" > "$RUNNER_TEMP/new.md"
+          diff "$RUNNER_TEMP/old.md" "$RUNNER_TEMP/new.md" || true
+          gh release edit "$TAG" --notes-file "$RUNNER_TEMP/new.md"
