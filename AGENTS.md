@@ -79,9 +79,9 @@ one, stop and ask the maintainer instead of working around it.
   from Apple-signed transactions; there is no receipt server.
 - iOS pricing: 7 free days through a free "7-day Trial" item, then a one-time $9.99 purchase (D-017, D-036).
   Cloud mode (remote mode) is included in the trial; at the first purchase it can be added as Full Access + Cloud mode
-  for $20.99 (`app.pairline.ios.fullcloud`, about 30% off the two apart, the saving computed from the store's prices),
-  or bought later as a one-time $19.99 add-on (`app.pairline.ios.remote`) sold only after Full Access (D-093). Demo
-  mode is always free (D-020).
+  for $19.99 (`app.pairline.ios.fullcloud`, about 33% off the two apart, the saving computed from the store's prices),
+  or bought later as a one-time $19.99 add-on (`app.pairline.ios.remote`) sold only after Full Access (D-093, D-098).
+  Demo mode is always free (D-020).
 
 ## Tech stack
 

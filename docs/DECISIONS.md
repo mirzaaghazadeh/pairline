@@ -1675,6 +1675,8 @@ phones take part: no third-party service (no STUN/TURN, Firebase or Tailscale).
 
 ### D-093 — Cloud mode is a one-time add-on to Full Access: $20.99 together at the first purchase, $19.99 added later, included in the free trial (2026-11-26)
 
+(The bundle's price superseded by D-098: $19.99 together at the first purchase.)
+
 The maintainer's pricing for remote mode (D-092), "Cloud mode" in the apps (D-094): "during the purchase you can add the
 add-on; a first-time buyer gets it about 30% off; added later it costs $19.99". Extends D-017 and D-036; the Android
 app stays free.
@@ -1779,3 +1781,21 @@ what changed for the next build:
 - **Left as they are, the maintainer's call:** the always-on bridge Live Activity, on by default (D-053), which some
   reviewers question because Apple describes Live Activities as having a start and an end; "Android" in the subtitle
   (allowed, since the app works with an Android phone).
+
+### D-098 — Full Access + Cloud mode costs $19.99 at the first purchase (2026-11-27)
+
+The maintainer's pricing, superseding D-093's bundle price: "full mode in first purchase 19.99, normal 9.99, later 9.99 +
+19.99". Everything else in D-093 stands.
+
+- **Prices** (one time, no subscription): Full Access `app.pairline.ios.full` $9.99; Full Access + Cloud mode
+  `app.pairline.ios.fullcloud` **$19.99** at the first purchase (was $20.99); Cloud mode `app.pairline.ios.remote`
+  $19.99 added later, on top of Full Access ($29.98 in all). The 7-day trial includes everything, Cloud mode too.
+- **The saving** stays computed from the store's prices: 1 − 19.99 ÷ 29.98 = 33 % in the US ("Save 33%", "both for
+  $19.99 instead of $29.98").
+- **One sentence reworded:** with the bundle and the add-on now the same amount, the trial note "buy it together with
+  Pairline for $19.99, or add it later for $19.99" read as if they cost the same. It now says the first is the total
+  and the second comes on top: "Pairline with Cloud mode costs $19.99 in all; added later, Cloud mode costs $19.99
+  more." All four languages.
+- **Where it changed** (the maintainer's OK, 2026-11-27): App Store Connect's price schedule for `fullcloud` (US
+  price, other storefronts equalized by Apple, like the other products), `Pairline.storekit` and its tests, AGENTS.md,
+  README.md, and the website's default `BUNDLE_PRICE_USD`.

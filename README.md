@@ -13,7 +13,7 @@ end-to-end encrypted link between your own two phones.
 | App | Get it | Needs |
 |-----|--------|-------|
 | **Pairline Bridge** for the Android phone with the SIM (free) | **[Download the latest APK](https://getpairline.com/download/android)** · [latest release on GitHub](https://github.com/mirzaaghazadeh/pairline/releases/latest) · [all versions](https://github.com/mirzaaghazadeh/pairline/releases) | Android 9 or later |
-| **Pairline** for iPhone | Coming soon to the App Store · [getpairline.com](https://getpairline.com/download) | iOS 16 or later |
+| **Pairline** for iPhone, iPad and Mac | **[Get it on the App Store](https://getpairline.com/download)** | iOS 16 or later |
 
 Both links always point to the newest release. Each release's notes list the APK's SHA-256, its signing
 certificate and its [VirusTotal](https://www.virustotal.com) report; see [Verifying releases](#verifying-releases).
@@ -23,6 +23,9 @@ Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 Everything goes through the Android phone's SIM, so the people you call and text see that phone's number.
 
+- **Nearby or anywhere:** with the phones near each other they talk directly over Bluetooth and Wi-Fi. With
+  **Cloud mode** the Android phone can stay at home on its charger, and your iPhone still gets calls, texts and codes,
+  and calls and texts back, from anywhere with internet.
 - **Calls** on the iPhone's own call screen: answer, decline, hold, call waiting and swap, and move the sound to a
   headset or the car. With **Talk on iPhone** you hear and talk on the iPhone itself, over Bluetooth or Wi-Fi.
 - **Call back from the iPhone's Recents**, with Siri ("Call with Pairline") or from a Shortcut.
@@ -43,7 +46,8 @@ Hearing calls on the iPhone, the internet switches and read status on Android ne
 ## Our promise
 
 - **Your data stays on your phones.** Messages, contacts, call history and call audio go only
-  between your two paired phones. They never touch our servers — in version 1 we don't run any.
+  between your two paired phones. They never touch our servers — in version 1 we don't run any. In Cloud mode they
+  pass through your own iCloud locked, so only your two phones can open them.
 - **No accounts, no analytics, no ads, no trackers.**
 - **No settings changed behind your back.** Pairline changes no system setting you didn't ask for. The one
   exception is Talk on iPhone: once you've set it up, and only while it's on, it turns Developer options and
@@ -64,24 +68,31 @@ Hearing calls on the iPhone, the internet switches and read status on Android ne
    (a rooted phone can start it through its own `su` instead, under Settings › Advanced).
    While the iPhone is linked, the Android phone stops ringing too ("Ring only on the iPhone", on by default).
 
-The phones talk over Bluetooth LE, call audio included. Local Wi-Fi (or the Android phone's own hotspot) carries files,
-and call audio too if you choose it.
-Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md).
+### Two ways to connect
 
-**Cloud mode (in development, off unless you turn it on).** Leave the Android phone at home and keep your texts,
-codes and calls on the iPhone anywhere: when the phones aren't near each other, they stay connected over the internet. There is still no Pairline server: messages travel as locked records through
-your own iCloud, which only your two phones can open, and calls go straight to your home through one port your router
-opens for your paired iPhone alone. [docs/PRIVACY.md](docs/PRIVACY.md) lists exactly what Apple and your router see.
+- **Nearby** works by itself, for example with the Android phone in your bag or on your desk. The phones talk over
+  Bluetooth LE, call audio included. Local Wi-Fi (or the Android phone's own hotspot) carries files, and call audio too
+  if you choose it.
+- **Cloud mode**, for example with the Android phone at home while you're at work or travelling. Turn it on in the
+  iPhone app, during pairing or later in Settings, and leave the Android phone on its charger and Wi-Fi. Calls, texts
+  and codes keep reaching your iPhone anywhere, and you call and text back. There is still no Pairline server:
+  messages travel as locked records through your own iCloud, which only your two phones can open, and calls go
+  straight to your home through one port your router opens for your paired iPhone alone. Most routers open it by
+  themselves; for the rest the app shows how to do it by hand. [docs/PRIVACY.md](docs/PRIVACY.md) lists exactly what
+  Apple and your router see.
+
+Both can be on: near each other the phones use Bluetooth and Wi-Fi, and Cloud mode takes over when you leave.
+Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md).
 A three-minute intro video, in English, Persian, Turkish and Arabic, is on [getpairline.com](https://getpairline.com).
 
 ## Pricing
 
 - **Android app:** free.
 - **iPhone app:** free download. Pair your Android phone first: the first sync of your messages, contacts and call
-  history is free, then a free week, then a one-time $9.99 In-App Purchase with free updates. No subscription.
-  Demo mode is always free.
-- **Cloud mode (when it ships):** included in the free week; then $20.99 together with Full Access at the first purchase
-  (about 30% off), or a one-time $19.99 add-on later. No subscription.
+  history is free, then a free week with every feature, Cloud mode included. After that, Full Access is a one-time
+  $9.99 In-App Purchase with free updates. No subscription. Demo mode is always free.
+- **Cloud mode:** add it at your first purchase and pay $19.99 for both (instead of $29.98, about 33% off), or add it
+  later as a one-time $19.99 add-on to Full Access. No subscription.
 
 ## License
 

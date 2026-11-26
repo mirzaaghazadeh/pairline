@@ -27,7 +27,7 @@ enum RemoteAccess: Equatable {
 /// The "Add Cloud mode" choice at the first purchase (D-093): Full Access and Cloud mode together for less than the two
 /// apart. Every price on it is the user's own storefront's; the saving is worked out from them, never written in.
 struct BundleOffer: Equatable {
-    /// Full Access + Cloud mode, e.g. "$20.99".
+    /// Full Access + Cloud mode, e.g. "$19.99".
     let bundlePrice: String
     /// Full Access and the add-on bought apart, e.g. "$29.98".
     let separatePrice: String
@@ -81,7 +81,7 @@ enum RemoteAddOnText {
     static func trialNote(_ access: RemoteAccess, price: String, bundlePrice: String? = nil) -> Text? {
         guard access == .trial else { return nil }
         if let bundlePrice {
-            return Text("Cloud mode is part of your free trial. Buy it together with Pairline for \(bundlePrice), or add it later for \(price).",
+            return Text("Cloud mode is part of your free trial. Pairline with Cloud mode costs \(bundlePrice) in all; added later, Cloud mode costs \(price) more.",
                         tableName: "RemoteAddOn")
         }
         return Text("Cloud mode is part of your free trial. After you buy Pairline, it's a one-time \(price) add-on.",

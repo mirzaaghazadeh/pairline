@@ -63,10 +63,10 @@ final class RemoteAddOnTests: XCTestCase {
         XCTAssertNil(RemoteAddOnText.blocker(.loading))
 
         XCTAssertNotNil(RemoteAddOnText.trialNote(.trial, price: "$19.99"))
-        XCTAssertNotNil(RemoteAddOnText.trialNote(.trial, price: "$19.99", bundlePrice: "$20.99"))
+        XCTAssertNotNil(RemoteAddOnText.trialNote(.trial, price: "$19.99", bundlePrice: "$19.99"))
         for access in [RemoteAccess.loading, .purchased, .needsAddOn, .needsFullAccess] {
             XCTAssertNil(RemoteAddOnText.trialNote(access, price: "$19.99"))
-            XCTAssertNil(RemoteAddOnText.trialNote(access, price: "$19.99", bundlePrice: "$20.99"))
+            XCTAssertNil(RemoteAddOnText.trialNote(access, price: "$19.99", bundlePrice: "$19.99"))
         }
     }
 
@@ -75,9 +75,10 @@ final class RemoteAddOnTests: XCTestCase {
         XCTAssertEqual(PurchaseManager.bundleID, "app.pairline.ios.fullcloud")
     }
 
-    /// The bundle's saving comes from the store's prices (D-093): $9.99 + $19.99 against $20.99 is 30 % (29.99 %,
-    /// rounded to the nearest whole percent), and nothing is claimed when the bundle doesn't cost less.
+    /// The bundle's saving comes from the store's prices (D-093, D-098): $9.99 + $19.99 against $19.99 is 33 %
+    /// (33.3 %, rounded to the nearest whole percent), and nothing is claimed when the bundle doesn't cost less.
     func testBundleSavingIsWorkedOutFromThePrices() {
+        XCTAssertEqual(BundleOffer.savingPercent(full: dec("9.99"), remote: dec("19.99"), bundle: dec("19.99")), 33)
         XCTAssertEqual(BundleOffer.savingPercent(full: dec("9.99"), remote: dec("19.99"), bundle: dec("20.99")), 30)
         XCTAssertEqual(BundleOffer.savingPercent(full: 10, remote: 10, bundle: 15), 25)
         // Another storefront's prices give their own percentage.

@@ -44,7 +44,7 @@ final class StoreKitTests: XCTestCase {
         XCTAssertEqual(trial?.displayName, "7-day Trial")
     }
 
-    /// The Cloud mode add-on and the first-purchase bundle (D-093): one-time non-consumables, $19.99 and $20.99.
+    /// The Cloud mode add-on and the first-purchase bundle (D-093, D-098): one-time non-consumables, both $19.99.
     func testCloudModeProductsMatchD093() async throws {
         let products = try await Product.products(for: [PurchaseManager.remoteID, PurchaseManager.bundleID])
         let remote = products.first { $0.id == PurchaseManager.remoteID }
@@ -53,19 +53,19 @@ final class StoreKitTests: XCTestCase {
         XCTAssertEqual(remote?.displayName, "Cloud Mode")
         let bundle = products.first { $0.id == PurchaseManager.bundleID }
         XCTAssertEqual(bundle?.type, .nonConsumable)
-        XCTAssertEqual(bundle?.price, Decimal(string: "20.99"))
+        XCTAssertEqual(bundle?.price, Decimal(string: "19.99"))
         XCTAssertEqual(bundle?.displayName, "Full Access + Cloud Mode")
     }
 
-    /// "Add Cloud mode" at the first purchase (D-093): offered before Full Access, priced from the store (30 % off the
-    /// two apart), and buying it unlocks both; a fresh start (or Restore) reads both back; a refund takes both away.
+    /// "Add Cloud mode" at the first purchase (D-093, D-098): offered before Full Access, priced from the store (33 %
+    /// off the two apart), and buying it unlocks both; a fresh start (or Restore) reads both back; a refund takes both away.
     func testBundleUnlocksFullAccessAndCloudMode() async throws {
         let manager = PurchaseManager(timeStore: MemoryTimeStore())
         await manager.refresh()
         await manager.loadProducts()
         let offer = try XCTUnwrap(manager.bundleOffer)
-        XCTAssertEqual(offer.savingPercent, 30)
-        XCTAssertEqual(offer.bundlePrice, "$20.99")
+        XCTAssertEqual(offer.savingPercent, 33)
+        XCTAssertEqual(offer.bundlePrice, "$19.99")
         XCTAssertEqual(offer.separatePrice, "$29.98")
         XCTAssertEqual(offer.remotePrice, "$19.99")
 
