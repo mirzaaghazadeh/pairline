@@ -105,7 +105,11 @@ class NetSwitches(
     fun start() {
         if (started) return
         started = true
-        val filter = PhoneHotspot.filter().apply { addAction(BluetoothAdapter.ACTION_STATE_CHANGED) }
+        val filter = PhoneHotspot.filter().apply {
+            addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+            // The ringer mode is in the status too (D-074).
+            addAction(android.media.AudioManager.RINGER_MODE_CHANGED_ACTION)
+        }
         // Protected system broadcasts; see WifiTransport for why the receiver is registered exported.
         ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_EXPORTED)
     }

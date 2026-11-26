@@ -8,6 +8,7 @@ import app.pairline.android.files.FileTransfers
 import app.pairline.android.link.IdentityStore
 import app.pairline.android.netshare.NetShare
 import app.pairline.android.netshare.NetSwitches
+import app.pairline.android.tools.Ringer
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.privileged.TalkReminder
 import app.pairline.android.link.LinkManager
@@ -85,12 +86,14 @@ object AppGraph {
             mediaLink = { audioRelay.canLink },
             net = { netSwitches.state().toJson() },
             netSwitch = { netSwitches.canSwitch },
+            smsWrite = { privileged.canWriteSms() },
+            ringer = { Ringer.mode(app) },
         )
     }
     val router: MessageRouter by lazy {
         MessageRouter(
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
-            netSwitches,
+            netSwitches, app,
         )
     }
 
@@ -122,6 +125,8 @@ object AppGraph {
                             io.execute {
                                 manager.allowOngoingCalls()
                                 manager.allowSecureSettings()
+                                // Messages read on the iPhone get marked read here too (D-074).
+                                if (manager.allowWriteSms()) router.statusChanged()
                             }
                         }
                     }

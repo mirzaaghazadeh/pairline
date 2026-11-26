@@ -1,3 +1,4 @@
+import AVKit
 import SwiftUI
 
 /// The in-app call screen: incoming calls in demo mode, and every call placed or answered from the iPhone.
@@ -200,6 +201,49 @@ struct CallScreen: View {
             .buttonStyle(.plain)
             .padding(.top, 18)
         }
+        if let other = calls.other { otherCall(other) }
+    }
+
+    /// The second call (call waiting, D-074): answer or decline it while it rings, switch to it or end it on hold.
+    private func otherCall(_ other: ActiveCall) -> some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
+                Group {
+                    if other.state == .ringing {
+                        Text("Second call", tableName: "PhoneTools")
+                    } else {
+                        Text("On hold")
+                    }
+                }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.7))
+                Text(verbatim: other.displayName)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 8)
+            if other.state == .ringing {
+                Button { calls.endOther() } label: { Image(systemName: "phone.down.fill") }
+                    .buttonStyle(.borderedProminent).tint(.brandRed)
+                    .accessibilityLabel(Text("Decline"))
+                Button { calls.answerOther() } label: { Image(systemName: "phone.fill") }
+                    .buttonStyle(.borderedProminent).tint(.brandGreen)
+                    .accessibilityLabel(Text("Accept"))
+            } else {
+                if other.state == .held && calls.canHold {
+                    Button { calls.swapCalls() } label: { Text("Swap", tableName: "PhoneTools") }
+                        .buttonStyle(.bordered).tint(.white)
+                }
+                Button { calls.endOther() } label: { Image(systemName: "phone.down.fill") }
+                    .buttonStyle(.borderedProminent).tint(.brandRed)
+                    .accessibilityLabel(Text("End"))
+            }
+        }
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 16).fill(.white.opacity(0.12)))
+        .padding(.horizontal, 24)
+        .padding(.top, 14)
     }
 
     /// The keypad while it's open, otherwise mute, keypad and speaker (not while an incoming call rings).
@@ -239,6 +283,21 @@ struct CallScreen: View {
     }
 
     private func controls(_ call: ActiveCall) -> some View {
+        VStack(spacing: 22) {
+            firstRow(call)
+            HStack(spacing: 28) {
+                // D-074: hold on the bridge phone, and where this iPhone plays the call (headset, car, speaker).
+                CallControlButton(symbol: "pause.fill", title: Text("Hold", tableName: "PhoneTools"),
+                                  isOn: call.state == .held, isAvailable: calls.canHold) {
+                    calls.setHeld(call.state != .held)
+                }
+                .disabled(call.state != .active && call.state != .held)
+                if calls.audioOnIPhone { AudioRouteButton() }
+            }
+        }
+    }
+
+    private func firstRow(_ call: ActiveCall) -> some View {
         HStack(spacing: 28) {
             CallControlButton(symbol: call.muted ? "mic.slash.fill" : "mic.slash", title: Text("Mute"),
                               isOn: call.muted, isAvailable: calls.canAudio) {
@@ -312,6 +371,33 @@ struct CallScreen: View {
                 calls.hangUp()
             }
         }
+    }
+}
+
+/// Moves the call's audio on this iPhone to a Bluetooth headset, the car or the speaker and back: iOS's own route
+/// picker (D-074).
+struct AudioRouteButton: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            RoutePicker()
+                .frame(width: 72, height: 72)
+                .background(Circle().fill(Color.white.opacity(0.14)))
+            Text("Audio", tableName: "PhoneTools")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.white.opacity(0.9))
+        }
+    }
+
+    private struct RoutePicker: UIViewRepresentable {
+        func makeUIView(context: Context) -> AVRoutePickerView {
+            let picker = AVRoutePickerView()
+            picker.tintColor = .white
+            picker.activeTintColor = .white
+            picker.prioritizesVideoDevices = false
+            return picker
+        }
+
+        func updateUIView(_ uiView: AVRoutePickerView, context: Context) {}
     }
 }
 

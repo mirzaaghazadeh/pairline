@@ -46,6 +46,8 @@ final class CallCenter: ObservableObject {
     }
 
     @Published private(set) var current: ActiveCall?
+    /// A second call during a call (call waiting, D-074): ringing, or on hold after the user switched calls.
+    @Published private(set) var other: ActiveCall?
     @Published private(set) var audioRoute: AudioRoute = .bridge
     /// Set after a call whose audio was on this iPhone, so the app can ask how it sounded.
     @Published var askAudioFeedback = false
@@ -90,6 +92,8 @@ final class CallCenter: ObservableObject {
             adapter.onEnd = { [weak self] id, action in self?.performEnd(id, action) }
             adapter.onStart = { [weak self] id, action in self?.performStart(id, action) }
             adapter.onMute = { [weak self] id, muted, action in self?.performMute(id, muted, action) }
+            adapter.onHold = { [weak self] id, held, action in self?.performHold(id, held, action) }
+            adapter.canHold = { [weak self] in self?.canHold == true }
             adapter.onDTMF = { [weak self] id, digits, action in self?.performDTMF(id, digits, action) }
             adapter.onAudioActivated = { [weak self] in
                 self?.audioSessionActive = true
@@ -103,6 +107,7 @@ final class CallCenter: ObservableObject {
                 // CallKit dropped its calls; the call on the Android phone goes on, so keep it in the app.
                 guard let self, self.current != nil else { return }
                 self.current?.inCallKit = false
+                self.other?.inCallKit = false
                 if UIApplication.shared.applicationState == .active { self.showCallScreen = true }
             }
         }
@@ -177,10 +182,14 @@ final class CallCenter: ObservableObject {
 
     func handleIncoming(_ event: CallIncomingEvent) {
         if let current, current.bridgeID == event.call { return }
-        if current != nil {
-            // One call at a time in v0; the Android phone still shows the waiting call.
-            log.info("calls", "Ignoring a second incoming call")
-            return
+        if let other, other.bridgeID == event.call { return }
+        if let existing = current {
+            if case .ended = existing.state {
+                // The last call's "ended" moment: this one takes the call screen.
+                current = nil
+            } else {
+                return handleWaiting(event)
+            }
         }
         let number = PhoneNumber.international(event.from ?? "")
         let name = event.name ?? bridge?.db.knownName(for: number)
@@ -208,9 +217,93 @@ final class CallCenter: ObservableObject {
         }
     }
 
+    // MARK: Call waiting (D-074)
+
+    /// A second call rings during a call: CallKit offers Hold & Accept (or End & Accept), the call screen too.
+    private func handleWaiting(_ event: CallIncomingEvent) {
+        guard other == nil else {
+            log.info("calls", "Ignoring a third call")
+            return
+        }
+        let number = PhoneNumber.international(event.from ?? "")
+        let call = ActiveCall(id: UUID(), bridgeID: event.call, number: number,
+                              name: event.name ?? bridge?.db.knownName(for: number), isOutgoing: false,
+                              state: .ringing, sim: event.sim, inCallKit: useCallKit && current?.inCallKit == true)
+        other = call
+        log.info("calls", "Call waiting")
+        if call.inCallKit, let adapter {
+            adapter.reportIncoming(call) { [weak self] error in
+                guard error != nil, let self, self.other?.id == call.id else { return }
+                self.other?.inCallKit = false
+            }
+        }
+    }
+
+    /// A state change of the second call. When it becomes the one talking, it takes the call screen and the first
+    /// waits on hold (Android holds it when the second is answered).
+    private func updateOther(_ event: CallStateEvent) {
+        guard var call = other else { return }
+        let newState = mapState(event.state)
+        if newState == .active, call.state != .active {
+            if call.connectedAt == nil { call.connectedAt = Date(milliseconds: event.since ?? Date().milliseconds) }
+            if !call.answeredHere, call.state == .ringing, call.inCallKit {
+                adapter?.reportEnded(call.id, reason: .answeredElsewhere)
+                call.inCallKit = false
+            }
+        }
+        call.state = newState
+        if call.number.isEmpty, let number = event.number, !number.isEmpty {
+            call.number = PhoneNumber.international(number)
+            if call.name == nil { call.name = bridge?.db.knownName(for: number) }
+        }
+        if newState == .active {
+            other = current
+            current = call
+            log.info("calls", "Switched to the other call")
+        } else {
+            other = call
+        }
+    }
+
+    /// Answers the waiting call; Android holds the first.
+    func answerOther() {
+        guard let call = other else { return }
+        if call.inCallKit {
+            request(CXAnswerCallAction(call: call.id))
+        } else {
+            Task { await sendAnswer(call.id) }
+        }
+    }
+
+    /// Declines the waiting call, or ends the one on hold.
+    func endOther() {
+        guard let call = other else { return }
+        if call.inCallKit {
+            request(CXEndCallAction(call: call.id))
+        } else {
+            Task { await sendEnd(call) }
+        }
+    }
+
+    /// Switches calls: the held one comes back and Android holds the other.
+    func swapCalls() {
+        guard let call = other, call.state == .held else { return }
+        if call.inCallKit {
+            request(CXSetHeldCallAction(call: call.id, onHold: false))
+        } else {
+            Task { await sendHold(false, bridgeID: call.bridgeID) }
+        }
+    }
+
     func handleState(_ event: CallStateEvent) {
         if case .ended = mapState(event.state) {
             return handleEnded(event)
+        }
+        if let other, other.bridgeID == event.call { return updateOther(event) }
+        // A second call ringing that call.incoming didn't announce first.
+        if let current, current.bridgeID != nil, current.bridgeID != event.call, event.state == "ringing",
+           event.dir != "out" {
+            return handleIncoming(CallIncomingEvent(call: event.call, sim: event.sim, from: event.number, name: event.name))
         }
         if current == nil {
             if event.state == "ringing", event.dir != "out" {
@@ -265,12 +358,29 @@ final class CallCenter: ObservableObject {
     }
 
     private func handleEnded(_ event: CallStateEvent) {
+        if let waiting = other, waiting.bridgeID == event.call {
+            // The second call ended (declined, missed, or hung up while on hold): the first goes on as it was.
+            if waiting.inCallKit { adapter?.reportEnded(waiting.id, reason: endReason(event.reason, call: waiting)) }
+            other = nil
+            log.info("calls", "The other call ended: \(event.reason ?? "-")")
+            return
+        }
         guard var call = current, call.bridgeID == event.call || call.bridgeID == nil else { return }
         call.state = .ended(event.reason)
         if call.inCallKit {
             adapter?.reportEnded(call.id, reason: endReason(event.reason, call: call))
         }
         Notifier.shared.clearIncomingCall()
+        if let next = other {
+            // Two calls and this one ended: the other takes the call screen (D-074).
+            other = nil
+            current = next
+            stopRelay(callEnded: true)
+            log.info("calls", "Call ended; the other call goes on")
+            if next.answeredHere, next.state == .active { startRelayIfPossible() }
+            bridge?.callEnded()
+            return
+        }
         if let message = endNotice(event.reason, call: call) { notice = message }
         current = call
         stopRelay(callEnded: true)
@@ -320,6 +430,10 @@ final class CallCenter: ObservableObject {
     /// The link dropped: CallKit can't control a call we can't reach.
     func linkLost() {
         stopRelay(callEnded: false)
+        if let waiting = other {
+            if waiting.inCallKit { adapter?.reportEnded(waiting.id, reason: .failed) }
+            other = nil
+        }
         guard let call = current else { return }
         if call.inCallKit { adapter?.reportEnded(call.id, reason: .failed) }
         current = nil
@@ -568,6 +682,43 @@ final class CallCenter: ObservableObject {
         }
     }
 
+    /// Whether the bridge can hold calls (D-074).
+    var canHold: Bool { bridge?.has(.callHold) == true }
+
+    /// Puts the call on hold or takes it off, on the bridge phone (D-074). `call.state` then says `held` or `active`.
+    func setHeld(_ held: Bool) {
+        guard let call = current else { return }
+        guard canHold else {
+            notice = CapabilityInfo(.callHold).missingText
+            return
+        }
+        if call.inCallKit {
+            request(CXSetHeldCallAction(call: call.id, onHold: held))
+        } else {
+            Task { await sendHold(held, bridgeID: call.bridgeID) }
+        }
+    }
+
+    @discardableResult
+    private func sendHold(_ held: Bool, bridgeID: OpaqueValue?) async -> Bool {
+        guard let bridgeID, let bridge else { return false }
+        do {
+            _ = try await bridge.link.request(.callHold(bridgeID, hold: held))
+            return true
+        } catch {
+            notice = error.localizedDescription
+            return false
+        }
+    }
+
+    /// CallKit's Hold button, Hold & Accept, or switching calls: for whichever of the two calls it names.
+    private func performHold(_ id: UUID, _ held: Bool, _ action: CXSetHeldCallAction) {
+        guard canHold else { return action.fail() }
+        let bridgeID = current?.id == id ? current?.bridgeID : (other?.id == id ? other?.bridgeID : nil)
+        guard let bridgeID else { return action.fail() }
+        Task { if await sendHold(held, bridgeID: bridgeID) { action.fulfill() } else { action.fail() } }
+    }
+
     func setSpeaker(_ on: Bool) {
         // On its way here counts too (D-065): sent to the bridge then, it put the Android phone on its loudspeaker,
         // which played the caller out loud there. The engine applies it when it starts.
@@ -658,14 +809,20 @@ final class CallCenter: ObservableObject {
     // MARK: - CallKit actions → link
 
     private func performAnswer(_ id: UUID, _ action: CXAnswerCallAction) {
-        guard current?.id == id else { return action.fail() }
+        guard current?.id == id || other?.id == id else { return action.fail() }
         prepareCallKitAudioSession()
         Task {
-            if await sendAnswer() { action.fulfill() } else { action.fail() }
+            if await sendAnswer(id) { action.fulfill() } else { action.fail() }
         }
     }
 
     private func performEnd(_ id: UUID, _ action: CXEndCallAction) {
+        if let waiting = other, waiting.id == id {
+            other?.inCallKit = false
+            action.fulfill()
+            Task { await sendEnd(waiting) }
+            return
+        }
         guard let call = current, call.id == id else { return action.fulfill() }
         current?.inCallKit = false
         action.fulfill()
@@ -711,7 +868,20 @@ final class CallCenter: ObservableObject {
     // MARK: - Link requests
 
     @discardableResult
-    private func sendAnswer() async -> Bool {
+    /// Answers the current call, or the waiting one when [id] is its (D-074).
+    private func sendAnswer(_ id: UUID? = nil) async -> Bool {
+        if let id, let waiting = other, waiting.id == id {
+            guard let bridgeID = waiting.bridgeID, let bridge, canControl else { return false }
+            do {
+                _ = try await bridge.link.request(.callAnswer(bridgeID))
+                other?.answeredHere = true
+                showCallScreen = true
+                return true
+            } catch {
+                notice = error.localizedDescription
+                return false
+            }
+        }
         guard let call = current, let bridgeID = call.bridgeID, let bridge else { return false }
         guard canControl else {
             notice = String(localized: "Your bridge app can't answer calls yet. Answer on the Android phone.")
@@ -798,6 +968,9 @@ final class CallKitAdapter: NSObject, CXProviderDelegate {
     var onEnd: ((UUID, CXEndCallAction) -> Void)?
     var onStart: ((UUID, CXStartCallAction) -> Void)?
     var onMute: ((UUID, Bool, CXSetMutedCallAction) -> Void)?
+    var onHold: ((UUID, Bool, CXSetHeldCallAction) -> Void)?
+    /// The bridge can hold calls (D-074): CallKit then shows its Hold button.
+    var canHold: () -> Bool = { false }
     var onDTMF: ((UUID, String, CXPlayDTMFCallAction) -> Void)?
     var onReset: (() -> Void)?
     var onAudioActivated: (() -> Void)?
@@ -812,7 +985,8 @@ final class CallKitAdapter: NSObject, CXProviderDelegate {
     static func configuration(includeInRecents: Bool) -> CXProviderConfiguration {
         let configuration = CXProviderConfiguration()
         configuration.supportsVideo = false
-        configuration.maximumCallGroups = 1
+        // Two: a waiting call can ring during a call (D-074). No conference calls.
+        configuration.maximumCallGroups = 2
         configuration.maximumCallsPerCallGroup = 1
         configuration.supportedHandleTypes = [.phoneNumber, .generic]
         configuration.includesCallsInRecents = includeInRecents
@@ -832,7 +1006,7 @@ final class CallKitAdapter: NSObject, CXProviderDelegate {
                                        value: call.number)
         update.localizedCallerName = call.name
         update.hasVideo = false
-        update.supportsHolding = false
+        update.supportsHolding = canHold()
         update.supportsGrouping = false
         update.supportsUngrouping = false
         update.supportsDTMF = true
@@ -855,6 +1029,13 @@ final class CallKitAdapter: NSObject, CXProviderDelegate {
 
     func reportConnected(_ id: UUID, at date: Date) {
         provider.reportOutgoingCall(with: id, connectedAt: date)
+        // An outgoing call starts with CallKit's defaults: offer Hold once the bridge can (D-074).
+        let update = CXCallUpdate()
+        update.supportsHolding = canHold()
+        update.supportsDTMF = true
+        update.supportsGrouping = false
+        update.supportsUngrouping = false
+        provider.reportCall(with: id, updated: update)
     }
 
     func reportEnded(_ id: UUID, reason: CXCallEndedReason) {
@@ -872,7 +1053,10 @@ final class CallKitAdapter: NSObject, CXProviderDelegate {
     func provider(_ provider: CXProvider, perform action: CXPlayDTMFCallAction) {
         onDTMF?(action.callUUID, action.digits, action)
     }
-    func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) { action.fail() }
+    func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
+        guard let onHold else { return action.fail() }
+        onHold(action.callUUID, action.isOnHold, action)
+    }
     func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) { onAudioActivated?() }
     func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) { onAudioDeactivated?() }
 }

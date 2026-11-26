@@ -87,8 +87,10 @@ CALLLOG_PAGE = 20        # 30 sample entries: 2 pages
 
 ALL_CAPS = ["sms.receive", "sms.send", "sms.history", "call.observe", "call.control", "call.dial",
             "call.dtmf", "call.audio", "contacts", "calllog", "contacts.add", "ussd", "dualsim",
-            "calllog.delete", "block", "net.switch"]
-CAP_FOR = {"net.switch": "net.switch","sms.threads": "sms.history", "sms.history": "sms.history", "sms.send": "sms.send",
+            "calllog.delete", "block", "net.switch", "sms.read", "call.hold", "contacts.edit", "phone.find",
+            "phone.ringer"]
+CAP_FOR = {"net.switch": "net.switch", "sms.read": "sms.read", "call.hold": "call.hold",
+           "contacts.update": "contacts.edit", "phone.find": "phone.find", "phone.ringer": "phone.ringer","sms.threads": "sms.history", "sms.history": "sms.history", "sms.send": "sms.send",
            "call.dial": "call.dial", "call.answer": "call.control", "call.reject": "call.control",
            "call.end": "call.control", "call.dtmf": "call.dtmf", "call.audio": "call.audio",
            "contacts.sync": "contacts", "calllog.sync": "calllog", "contacts.add": "contacts.add",
@@ -1204,6 +1206,7 @@ class Bridge:
         self.battery = {"level": 82, "charging": False}
         # status.net (D-073): the bridge phone's own hotspot, Bluetooth tethering and mobile data, as net.switch sets.
         self.net = {"hotspot": False, "bluetooth": False, "data": True}
+        self.ringer = "normal"  # status.ringer (D-074)
         self.app_version = args.app_version
         self.pairing = None
         # Debug TCP stands in for Bluetooth; "wifi" is the M5 Wi-Fi link. One established session per transport.
@@ -1229,6 +1232,8 @@ class Bridge:
             "contacts.add": self.req_contacts_add, "ussd.run": self.req_ussd_run,
             "calllog.delete": self.req_calllog_delete, "block.list": self.req_block_list,
             "block.set": self.req_block_set, "net.switch": self.req_net_switch,
+            "sms.read": self.req_sms_read, "call.hold": self.req_call_hold, "contacts.update": self.req_contacts_update,
+            "phone.find": self.req_phone_find, "phone.ringer": self.req_phone_ringer,
         }
 
     # State file
@@ -1369,7 +1374,8 @@ class Bridge:
 
     def status(self) -> dict:
         return {"t": "status", "battery": dict(self.battery), "sims": [dict(s) for s in self.sims],
-                "app": self.app_version, "caps": list(self.caps), "net": dict(self.net), "time": now_ms()}
+                "app": self.app_version, "caps": list(self.caps), "net": dict(self.net), "ringer": self.ringer,
+                "time": now_ms()}
 
     def push_status(self):
         if self.link and self.link.ready:
@@ -1601,6 +1607,42 @@ class Bridge:
             log(f"  {what} turned {'on' if on else 'off'}")
         else:
             raise Reject("invalid", "unknown switch")
+        self.emit(self.status())
+        return {"t": "ok"}
+
+    # D-074: read sync, hold, contact edits, Find phone, the ringer. Logged, nothing real happens.
+    def req_sms_read(self, link, msg):
+        thread = msg.get("thread")
+        if not is_int(thread) or thread <= 0:
+            raise Reject("invalid", "bad thread")
+        log(f"  thread {thread} marked read")
+        return {"t": "ok"}
+
+    def req_call_hold(self, link, msg):
+        c = self.call_arg(msg)
+        if not isinstance(msg.get("hold"), bool):
+            raise Reject("invalid", "hold missing")
+        self.set_call(c, "held" if msg["hold"] else "active")
+        return {"t": "ok"}
+
+    def req_contacts_update(self, link, msg):
+        key = msg.get("key")
+        if not isinstance(key, str) or not key.startswith("c:"):
+            raise Reject("invalid", "bad key")
+        changed = [k for k in ("name", "numbers", "starred") if k in msg]
+        log(f"  contact {key} edited: {', '.join(changed) or 'nothing'}")
+        return {"t": "ok"}
+
+    def req_phone_find(self, link, msg):
+        log(f"  {'ringing loudly' if msg.get('on', True) else 'stopped ringing'}")
+        return {"t": "ok"}
+
+    def req_phone_ringer(self, link, msg):
+        mode = msg.get("mode")
+        if mode not in ("normal", "vibrate", "silent"):
+            raise Reject("invalid", "unknown mode")
+        self.ringer = mode
+        log(f"  ringer set to {mode}")
         self.emit(self.status())
         return {"t": "ok"}
 

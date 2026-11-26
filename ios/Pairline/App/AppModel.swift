@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import Intents
 import SwiftUI
 import UIKit
 
@@ -69,8 +70,17 @@ final class AppModel: ObservableObject {
             self?.openThread = thread
         }
         notifier.onMarkRead = { [weak self] thread in
-            self?.active.db.markRead(thread: thread)
-            self?.active.updateBadge()
+            self?.active.markRead(thread: thread)
+        }
+        notifier.onReply = { [weak self] thread, addr, sim, text in
+            guard let self else { return }
+            do {
+                try self.active.sendSMS(to: addr, body: text, sim: sim, thread: thread)
+                self.active.markRead(thread: thread)
+                log.info("notify", "Replied from a notification")
+            } catch {
+                log.warning("notify", "Couldn't reply from a notification: \(error.localizedDescription)")
+            }
         }
         notifier.onOpenStatus = { [weak self] in self?.tab = .bridge }
 
@@ -190,9 +200,53 @@ final class AppModel: ObservableObject {
     }
 
     /// Debug builds accept `pairline://pair?…` links (Simulator testing, D-018). Release builds pair only by scanning.
+    // MARK: - Calls asked for outside Pairline (D-074)
+
+    /// A number for the keypad, from a `pairline://call?number=…` link. A link only fills in the keypad: any web page
+    /// or app can open one, so the user still taps Call.
+    @Published var dialerPrefill: String?
+
+    /// A call the user asked for in the iPhone's Recents or with Siri or a Shortcut: placed once the bridge phone is
+    /// linked (after a cold start that takes a few seconds).
+    func dialFromOutside(_ text: String) {
+        guard let number = PhoneNumber.firstNumber(in: text) else {
+            toast = String(localized: "No phone number to call.", table: "PhoneTools")
+            return
+        }
+        tab = .calls
+        Task { @MainActor in
+            for _ in 0..<30 where !self.active.phase.isConnected || self.active.status == nil {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
+            log.info("calls", "Calling back from outside Pairline")
+            self.active.calls.startCall(number: number, sim: nil)
+        }
+    }
+
+    /// iPhone Recents (and Siri) hand a CallKit app's call back as an `INStartCallIntent`.
+    func handleCallActivity(_ activity: NSUserActivity) {
+        let intent = activity.interaction?.intent
+        let handle = (intent as? INStartCallIntent)?.contacts?.first?.personHandle?.value
+            ?? (intent as? INStartAudioCallIntent)?.contacts?.first?.personHandle?.value
+        guard let handle else {
+            log.warning("calls", "A call from Recents came without a number")
+            return
+        }
+        dialFromOutside(handle)
+    }
+
     func handleURL(_ url: URL) {
         if url.host == "status" {
             tab = .bridge
+            return
+        }
+        if url.host == "call" {
+            let number = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first { $0.name == "number" }?.value
+            if let number, let dialable = PhoneNumber.firstNumber(in: number) {
+                tab = .calls
+                dialerPrefill = dialable
+            }
             return
         }
         #if DEBUG

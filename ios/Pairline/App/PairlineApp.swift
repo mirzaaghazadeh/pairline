@@ -16,6 +16,9 @@ struct PairlineApp: App {
                 .environmentObject(model.purchases)
                 .environmentObject(model.settings)
                 .onOpenURL { model.handleURL($0) }
+                // A Pairline call tapped in the iPhone's Recents, or Siri (D-074).
+                .onContinueUserActivity("INStartCallIntent") { model.handleCallActivity($0) }
+                .onContinueUserActivity("INStartAudioCallIntent") { model.handleCallActivity($0) }
                 .onValueChange(scenePhase) { phase in
                     if phase == .active { model.didBecomeActive() }
                 }

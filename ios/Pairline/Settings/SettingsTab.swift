@@ -305,7 +305,7 @@ struct SettingsTab: View {
         } header: {
             Text("Calls")
         } footer: {
-            Text("iPhone Recents can sync to iCloud, so this is off by default. Calls are always listed in Pairline.")
+            Text("Calls show in the Phone app's Recents, where one tap calls back through Pairline. Recents can sync to iCloud: turn this off to keep calls only in Pairline.", tableName: "PhoneTools")
         }
     }
 

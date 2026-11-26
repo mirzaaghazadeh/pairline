@@ -320,6 +320,81 @@ class ContactsSync(
         }
     }
 
+    /**
+     * `contacts.update` (opt-in, D-074): what the user changed on the iPhone. A new [name] replaces the display name
+     * (Android splits it into its parts); [numbers] replace all of the contact's numbers, kept on its first raw contact;
+     * [starred] sets the favourite. Only the contact with that key.
+     */
+    fun update(contactId: Long, name: String?, numbers: List<Pair<String, String?>>?, starred: Boolean?) {
+        require(Manifest.permission.WRITE_CONTACTS)
+        val rawIds = resolver.query(
+            ContactsContract.RawContacts.CONTENT_URI,
+            arrayOf(ContactsContract.RawContacts._ID),
+            "${ContactsContract.RawContacts.CONTACT_ID} = ? AND ${ContactsContract.RawContacts.DELETED} = 0",
+            arrayOf(contactId.toString()),
+            ContactsContract.RawContacts._ID,
+        )?.use { c -> buildList { while (c.moveToNext()) add(c.getLong(0)) } }.orEmpty()
+        if (rawIds.isEmpty()) throw RequestException(ErrorCode.INVALID, "no such contact")
+        val ops = ArrayList<ContentProviderOperation>()
+        if (name != null) {
+            val nameRow = resolver.query(
+                ContactsContract.Data.CONTENT_URI,
+                arrayOf(ContactsContract.Data._ID),
+                "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
+                arrayOf(contactId.toString(), StructuredName.CONTENT_ITEM_TYPE),
+                null,
+            )?.use { c -> if (c.moveToFirst()) c.getLong(0) else null }
+            ops += if (nameRow != null) {
+                ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+                    .withSelection("${ContactsContract.Data._ID} = ?", arrayOf(nameRow.toString()))
+                    // Only the display name changes: Android splits it into given and family names again.
+                    .withValue(StructuredName.DISPLAY_NAME, name)
+                    .withValue(StructuredName.GIVEN_NAME, null)
+                    .withValue(StructuredName.FAMILY_NAME, null)
+                    .withValue(StructuredName.MIDDLE_NAME, null)
+                    .withValue(StructuredName.PREFIX, null)
+                    .withValue(StructuredName.SUFFIX, null)
+                    .build()
+            } else {
+                ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValue(ContactsContract.Data.RAW_CONTACT_ID, rawIds.first())
+                    .withValue(ContactsContract.Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(StructuredName.DISPLAY_NAME, name)
+                    .build()
+            }
+        }
+        if (numbers != null) {
+            ops += ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI)
+                .withSelection(
+                    "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
+                    arrayOf(contactId.toString(), Phone.CONTENT_ITEM_TYPE),
+                )
+                .build()
+            for ((number, label) in numbers) {
+                val type = ContactLabels.phoneType(label)
+                ops += ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValue(ContactsContract.Data.RAW_CONTACT_ID, rawIds.first())
+                    .withValue(ContactsContract.Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE)
+                    .withValue(Phone.NUMBER, number)
+                    .withValue(Phone.TYPE, type)
+                    .apply { if (type == Phone.TYPE_CUSTOM) withValue(Phone.LABEL, label) }
+                    .build()
+            }
+        }
+        if (starred != null) {
+            ops += ContentProviderOperation.newUpdate(ContactsContract.Contacts.CONTENT_URI)
+                .withSelection("${ContactsContract.Contacts._ID} = ?", arrayOf(contactId.toString()))
+                .withValue(ContactsContract.Contacts.STARRED, if (starred) 1 else 0)
+                .build()
+        }
+        if (ops.isEmpty()) return
+        try {
+            resolver.applyBatch(ContactsContract.AUTHORITY, ops)
+        } catch (e: Exception) {
+            throw RequestException(ErrorCode.FAILED, "the contact couldn't be saved")
+        }
+    }
+
     private fun budget(): Int = app.pairline.android.protocol.Proto.PAGE_BUDGET_BYTES - DELETED_RESERVE
 
     private companion object {

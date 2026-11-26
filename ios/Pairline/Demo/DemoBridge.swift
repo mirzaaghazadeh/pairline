@@ -25,6 +25,7 @@ final class DemoBridge: BridgeLink {
     /// The demo bridge's hotspot, Bluetooth tethering, mobile data and data SIM (D-073).
     private var net: [String: Bool] = ["hotspot": false, "bluetooth": false, "data": true]
     private var dataSlot = 0
+    private var ringer = "normal"
     private var nextKey = 1000
     private var activeCall: (id: Int64, number: String, dir: String, state: String)?
     private var nextCallID: Int64 = 1
@@ -100,6 +101,7 @@ final class DemoBridge: BridgeLink {
                  "net": "LTE", "roaming": false, "defaultSms": false, "defaultVoice": false, "defaultData": dataSlot == 1],
             ],
             "net": net,
+            "ringer": ringer,
             "app": "0.1.0",
             // Everything a fully set-up bridge can do, so the demo shows Talk on iPhone and internet sharing as
             // ready. Demo calls show their audio on this iPhone without playing any (CallCenter).
@@ -193,6 +195,17 @@ final class DemoBridge: BridgeLink {
             return ["t": "net.share", "id": id, "on": true, "host": "192.168.43.1", "port": 47830,
                     "user": "pairline", "pass": "demo-k7f2q9", "pac": "http://192.168.43.1:47830/proxy.pac",
                     "vpn": false]
+        case "phone.ringer":
+            guard let mode = f["mode"] as? String, ["normal", "vibrate", "silent"].contains(mode) else {
+                return ["t": "error", "id": id, "code": "invalid", "msg": "bad mode"]
+            }
+            ringer = mode
+            let status = statusBody(id: nil)
+            DispatchQueue.main.async { [weak self] in self?.emit(status) }
+            return ["t": "ok", "id": id]
+        case "sms.read", "call.hold", "contacts.update", "phone.find":
+            // Nothing to do on a made-up phone (D-074).
+            return ["t": "ok", "id": id]
         case "net.switch":
             // Nothing is switched anywhere: the demo only remembers it and shows it in the next status.
             if let what = f["what"] as? String, what == "dataSim", let slot = f["sim"] as? Int, (0...1).contains(slot) {

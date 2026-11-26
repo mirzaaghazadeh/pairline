@@ -226,6 +226,14 @@
     <string name="settings_phone_hotspot_vpn">قيد التشغيل، لكن شبكة VPN مفعّلة هنا، وأندرويد يمرّر حركة نقطة الاتصال بجانب الـVPN لا عبرها. فيحصل الآيفون على اتصال هذا الهاتف دون الـVPN، ولا يحصل على أي إنترنت إن كانت الـVPN وحدها تصل إليه. لاستخدام الـVPN على الآيفون، فعّل «مشاركة الإنترنت» أدناه.</string>
     <string name="settings_phone_hotspot_no_internet">قيد التشغيل، لكن لا يوجد إنترنت على هذا الهاتف الآن (هل بيانات الجوال مفعّلة؟)، لذلك يعرض الآيفون «لا يوجد اتصال بالإنترنت». تبقى المكالمات والرسائل تعمل عبرها.</string>
     <string name="settings_phone_hotspot_helper">التحدث عبر الآيفون: لا يبدأ مساعده إلا عندما يكون هذا الهاتف على شبكة واي فاي. بعد كل إعادة تشغيل، اتصل بالواي فاي مرة واحدة قبل تشغيل نقطة الاتصال؛ ثم يبقى المساعد يعمل.</string>
+    <string name="guide_channel">دليل الإعداد</string>
+    <string name="guide_back">عند الانتهاء، اضغط هنا للعودة إلى Pairline Bridge.</string>
+    <string name="find_channel">العثور على الهاتف</string>
+    <string name="find_title">الآيفون يبحث عن هذا الهاتف</string>
+    <string name="find_text">اضغط «إيقاف» أو اسحب هذا الإشعار لإيقاف الرنين.</string>
+    <string name="find_stop">إيقاف</string>
+    <string name="ringer_access_title">اسمح للآيفون بكتم هذا الهاتف</string>
+    <string name="ringer_access_text">لتحويل هذا الهاتف إلى الوضع الصامت من الآيفون، فعّل «الوصول إلى عدم الإزعاج» لـ Pairline Bridge. اضغط لفتحه.</string>
     <string name="settings_phone_bluetooth_on">مشاركة الإنترنت عبر البلوتوث مفعّلة: على الآيفون، اضغط على هذا الهاتف في الإعدادات › Bluetooth (وأقرن الجهازين مرة واحدة عند الطلب) لاستخدام إنترنته دون واي فاي. وهي أبطأ من نقطة الاتصال.</string>
     <string name="settings_phone_hotspot_remote">عند تشغيل «التحدث عبر الآيفون»، يستطيع الآيفون أيضًا تشغيل نقطة الاتصال ومشاركة الإنترنت عبر البلوتوث وبيانات الجوال أو إيقافها: Pairline › الإعدادات › مشاركة الإنترنت.</string>
     <string name="settings_pairline_hotspot">نقطة اتصال Pairline الخاصة (بلا إنترنت)</string>

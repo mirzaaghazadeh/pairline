@@ -44,7 +44,8 @@ one, stop and ask the maintainer instead of working around it.
    Android switched them off), and keeps debugging authorizations from expiring. Turning Talk on iPhone off
    or "Forget pairing" ends this and returns the permission. The iPhone's internet switches (D-073, the maintainer's
    decision) are the user asking: while Talk on iPhone's helper runs, the Android phone's hotspot, Bluetooth
-   tethering, mobile data and data SIM change when, and only when, the user flips that switch on the iPhone.
+   tethering, mobile data and data SIM change when, and only when, the user flips that switch on the iPhone; the
+   same holds for the ringer mode and Find phone's alarm volume (put back after), D-074.
    Nothing else is ever changed.
 6. **Never install updates silently.** Android updates go through the system package-installer
    confirmation. Privileged (shell/root) access must never be used for `pm install`.
@@ -56,7 +57,8 @@ one, stop and ask the maintainer instead of working around it.
    stops at every restart. The helper may grant Pairline itself WRITE_SECURE_SETTINGS (Talk on iPhone only,
    D-059); Pairline uses it only for the debugging settings in rule 5. The helper's tethering, mobile-data and
    data-SIM operations (D-073) accept only the Wi-Fi hotspot and Bluetooth tethering kinds and an active SIM, and run
-   only for the iPhone's switches in rule 5.
+   only for the iPhone's switches in rule 5. It may give Pairline itself the WRITE_SMS app-op (Talk on iPhone only,
+   D-074), used only to mark messages read that the user read on the iPhone.
 8. **Crypto only as specified in `docs/PROTOCOL.md`,** using platform primitives (Android JCA,
    iOS CryptoKit). No home-made algorithms. Any wire-format change bumps the protocol version and
    updates `PROTOCOL.md` and the shared test vectors.

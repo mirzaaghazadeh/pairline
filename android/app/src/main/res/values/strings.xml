@@ -226,6 +226,14 @@
     <string name="settings_phone_hotspot_vpn">On, but a VPN is on here, and Android sends hotspot traffic around VPNs, not through them. The iPhone gets this phone’s connection without the VPN, and no internet at all if only the VPN gets through. To use the VPN on the iPhone, turn on Internet sharing below.</string>
     <string name="settings_phone_hotspot_no_internet">On, but this phone has no internet right now (is mobile data on?), so the iPhone shows “No Internet Connection”. Calls and messages still work over it.</string>
     <string name="settings_phone_hotspot_helper">Talk on iPhone: its helper starts only while this phone is on Wi-Fi. After a restart, connect to Wi-Fi once before you turn on the hotspot; the helper then keeps running.</string>
+    <string name="guide_channel">Setup guide</string>
+    <string name="guide_back">When you’re done, tap here to go back to Pairline Bridge.</string>
+    <string name="find_channel">Find phone</string>
+    <string name="find_title">Your iPhone is looking for this phone</string>
+    <string name="find_text">Tap Stop or swipe this away to stop ringing.</string>
+    <string name="find_stop">Stop</string>
+    <string name="ringer_access_title">Let your iPhone silence this phone</string>
+    <string name="ringer_access_text">To switch this phone to silent from the iPhone, turn on Do Not Disturb access for Pairline Bridge. Tap to open it.</string>
     <string name="settings_phone_bluetooth_on">Bluetooth tethering is on: on the iPhone, tap this phone in Settings › Bluetooth (pair once when asked) to use its internet without Wi-Fi. It’s slower than the hotspot.</string>
     <string name="settings_phone_hotspot_remote">With Talk on iPhone on, the iPhone can also turn the hotspot, Bluetooth tethering and mobile data on or off: Pairline › Settings › Internet sharing.</string>
     <string name="settings_pairline_hotspot">Pairline’s own hotspot (no internet)</string>

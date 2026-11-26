@@ -1220,3 +1220,39 @@ maintainer asked for switches on the iPhone, and for Bluetooth tethering to be s
 - **Tested:** unit tests on both sides (requests, errors, caps, status decoding), `fake_bridge.py` answers
   `net.switch`, and the iPhone screen in English and Persian on the Simulator in demo mode. The helper's tethering,
   mobile-data and data-SIM calls need a real phone next.
+
+### D-074 — Calls from Recents, Siri and links; reply, read sync and mute; hold and call waiting; Find phone; contact edits; a setup guide instead of videos (2026-11-26)
+
+The maintainer asked to finish what users expect of a phone app, to make a Pairline call in the iPhone's Recents work,
+to show calls in Recents by default, and to drop the setup videos for guidance inside the app.
+- **Recents:** tapping a Pairline call in the Phone app's Recents did nothing: iOS hands the app an
+  `INStartCallIntent`, which Pairline didn't take (`NSUserActivityTypes` and `onContinueUserActivity` now do; the call
+  is placed once the bridge is linked, after a cold start). "Show calls in iPhone Recents" is now **on by default**
+  (the maintainer's decision; ARCHITECTURE.md had it off because Recents can sync to iCloud, which the setting says).
+  A user who turned it off keeps it off.
+- **Siri and Shortcuts:** "Call with Pairline", an App Intent (text shared into a Shortcut works: its first phone
+  number is called). `pairline://call?number=…` links only fill in the keypad: any page could open one. Pairline as
+  iOS's default calling app (iOS 18.2+) needs an entitlement from Apple; not requested.
+- **Messages:** reply from the notification (sent through the bridge like a typed message, queued if the bridge is
+  away); mute a conversation on the iPhone (no banner or sound; one-time codes still notify); read sync: `sms.read`
+  marks a conversation's received messages read on Android. Only the default messaging app may write Android's SMS
+  store, so Talk on iPhone's helper gives Pairline its own WRITE_SMS app-op (helper version 8, Pairline's package only,
+  returned with "Forget pairing"); capability `sms.read`. Whether the default messaging app shows the change depends on
+  that app.
+- **Calls:** `call.hold` (the companion call service's `Call.hold`/`unhold`), CallKit's Hold button and an in-app one;
+  call waiting: a second call rings in CallKit (two call groups) and on the call screen; answering it puts the first on
+  hold (Android does), Swap brings the held one back, and either can be ended. An Audio button (iOS's route picker)
+  moves the call's audio on the iPhone to a headset or the car.
+- **Find phone** (`phone.find`): the Android phone rings on the alarm stream at full volume for up to a minute, even
+  on silent, with a Stop button in its notification; the alarm volume is put back. **Ringer** (`phone.ringer`, status
+  `ringer`): sound, vibrate or silent from the iPhone. Silent is Do Not Disturb to Android: it needs Do Not Disturb
+  access, which only the user grants (`ACCESS_NOTIFICATION_POLICY` declared so Pairline is listed; the bridge shows a
+  notification that opens the setting when it's missing).
+- **Contacts:** `contacts.update` (name, numbers, favourite), under the same opt-in as adding (`contacts.edit`).
+- **Setup guide instead of videos:** when a step opens Android Settings (Developer options, Wireless debugging, the
+  maker's battery settings), its exact instructions wait in a notification to pull down there, with a tap back; it
+  clears when Pairline is on screen again. The videos item in the roadmap is closed by this.
+- **Not done:** the preferred network type (D-073); Pairline as iOS's default calling app.
+- **Tested:** unit tests on both sides (caps, requests, status, number detection), `fake_bridge.py` answers the new
+  requests, both apps build and lint clean. CallKit, Recents, Siri, hold and call waiting, read sync and the ringer
+  need real phones.

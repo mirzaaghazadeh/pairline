@@ -293,6 +293,10 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
                 runCatching { s.allowSecureSettings(context.packageName, false) }
                 Log.i(TAG, "secure-settings permission returned")
             }
+            if (revokeSettings && canWriteSms()) {
+                runCatching { s.allowWriteSms(context.packageName, false) }
+                Log.i(TAG, "write-SMS app-op returned")
+            }
             runCatching { s.destroy() }
         }
         Log.i(TAG, "helper stopped (not needed)")
@@ -387,6 +391,29 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
     fun setMobileData(on: Boolean): Boolean? = service?.setMobileData(on)
 
     fun setDataSubscription(subId: Int): Boolean? = service?.setDataSubscription(subId)
+
+    /** Read sync (D-074): Pairline's WRITE_SMS app-op, given with Talk on iPhone. Off the main thread. */
+    fun allowWriteSms(): Boolean {
+        if (canWriteSms()) return true
+        val s = service ?: return false
+        return runCatching { s.allowWriteSms(context.packageName, true) }
+            .onFailure { Log.w(TAG, "couldn't get the write-SMS app-op", it) }
+            .getOrDefault(false)
+            .also { if (it) Log.i(TAG, "messages read on the iPhone are now marked read here too") }
+    }
+
+    /** Pairline may mark SMS read (its WRITE_SMS app-op is allowed, or it's the default messaging app). */
+    fun canWriteSms(): Boolean = runCatching {
+        val ops = context.getSystemService(android.app.AppOpsManager::class.java)
+        val uid = android.os.Process.myUid()
+        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ops.unsafeCheckOpNoThrow(OPSTR_WRITE_SMS, uid, context.packageName)
+        } else {
+            @Suppress("DEPRECATION")
+            ops.checkOpNoThrow(OPSTR_WRITE_SMS, uid, context.packageName)
+        }
+        mode == android.app.AppOpsManager.MODE_ALLOWED
+    }.getOrDefault(false)
 
     fun allowOngoingCalls(): Boolean {
         val s = service ?: return false
@@ -498,6 +525,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         private const val TAG = "privileged"
         private const val ADB_WIFI_ENABLED = "adb_wifi_enabled"
         private const val WRITE_SECURE_SETTINGS = "android.permission.WRITE_SECURE_SETTINGS"
+        private const val OPSTR_WRITE_SMS = "android:write_sms"
         private const val ADB_ALLOWED_CONNECTION_TIME = "adb_allowed_connection_time"
         /** 15 s, doubled after each try that didn't bring the helper back (at most ~32 min). */
         private const val AUTO_ENABLE_BASE_MS = 15_000L

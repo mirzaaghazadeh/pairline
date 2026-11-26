@@ -44,8 +44,8 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
 - [x] `status` message (battery, signal, carrier) shown on the iPhone — iOS: bridge dashboard, widget
 - [x] Unpair from either side
 - [x] Android setup wizard: permissions, battery-optimization request, OEM autostart tips
-- [ ] Setup guide videos (EN/FA), bundled in the app, shown in picture-in-picture over Android Settings — Android
-      has animated illustrations in each wizard step for now; no videos have been recorded yet
+- [x] Setup guidance over Android Settings — instead of videos (dropped, D-074): each step's instructions wait in a
+      notification while the user is in Android Settings, on top of the wizard's animated illustrations
 - [x] Readable diagnostics screen with a "Share report" action that shows the exact text first
 - [x] Bridge app version in `status`; the iPhone tells the user when the Android app needs an update (no network)
 - [ ] Auto-reconnect after the Bluetooth link drops; optional, opt-in Bluetooth restart (Pairline's helper) when
@@ -180,6 +180,15 @@ After the first release so it doesn't delay it; move it earlier if it matters mo
       own traffic; PRIVACY.md updated
 - [x] Switch the Android phone's hotspot, Bluetooth tethering, mobile data and data SIM from the iPhone, through Talk
       on iPhone's helper (D-073) — real-phone test pending
+
+## Phone-app basics (D-074)
+
+- [x] Recents callback (`INStartCallIntent`), calls in Recents on by default, "Call with Pairline" for Siri and
+      Shortcuts, `pairline://call` fills the keypad
+- [x] Reply from the notification, mute a conversation, read state synced to the Android phone
+- [x] Hold, call waiting (answer, swap, end either), Audio route button
+- [x] Find phone and the ringer switch; edit contacts and favourites from the iPhone
+- [ ] Real-phone test of all of the above
 
 ## M9 — Android client mode: dropped (D-050)
 

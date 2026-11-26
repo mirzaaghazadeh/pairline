@@ -1,5 +1,6 @@
 package app.pairline.android.link
 
+import android.content.Context
 import android.os.Build
 import app.pairline.android.AppPrefs
 import app.pairline.android.BuildConfig
@@ -8,6 +9,8 @@ import app.pairline.android.log.Log
 import app.pairline.android.netshare.NetShare
 import app.pairline.android.netshare.NetSwitchRequest
 import app.pairline.android.netshare.NetSwitches
+import app.pairline.android.tools.FindPhone
+import app.pairline.android.tools.Ringer
 import app.pairline.android.protocol.Caps
 import app.pairline.android.protocol.ErrorCode
 import app.pairline.android.protocol.Messages
@@ -59,6 +62,7 @@ class MessageRouter(
     private val files: FileMessageHandler,
     private val blockList: BlockList,
     private val netSwitches: NetSwitches,
+    private val appContext: Context,
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -242,6 +246,31 @@ class MessageRouter(
                 statusChanged()
                 Messages.ok(id)
             }
+            // D-074: the iPhone read a conversation, held a call, edited a contact, or looks for this phone.
+            Msg.SMS_READ -> request(message) { id ->
+                val thread = message.longOrNull("thread")?.takeIf { it > 0 } ?: invalid("bad thread")
+                val changed = smsStore.markRead(thread)
+                if (changed > 0) Log.i(TAG, "$changed messages marked read from the iPhone")
+                Messages.ok(id)
+            }
+            Msg.CALL_HOLD -> request(message) { id ->
+                calls.hold(callId(message), message.boolOrNull("hold") ?: invalid("hold missing"))
+                Messages.ok(id)
+            }
+            Msg.CONTACTS_UPDATE -> request(message) { id -> contactsUpdate(id, message) }
+            Msg.PHONE_FIND -> request(message) { id ->
+                if (message.boolOrNull("on") == false) {
+                    FindPhone.stop(appContext, "stopped by the iPhone")
+                } else {
+                    FindPhone.start(appContext)
+                }
+                Messages.ok(id)
+            }
+            Msg.PHONE_RINGER -> request(message) { id ->
+                Ringer.set(appContext, message.stringOrNull("mode") ?: invalid("mode missing"))
+                statusChanged()
+                Messages.ok(id)
+            }
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }
             Msg.CONTACTS_ADD -> request(message) { id -> contactsAdd(id, message) }
@@ -295,8 +324,31 @@ class MessageRouter(
         if (!prefs.contactsAddEnabled) {
             throw RequestException(ErrorCode.PERMISSION, "adding contacts is turned off in the bridge app")
         }
-        val name = m.stringOrNull("name")?.trim()?.takeIf { it.isNotEmpty() && it.length <= 200 } ?: invalid("bad name")
-        val array = m.optJSONArray("numbers") ?: JSONArray()
+        val name = contactName(m) ?: invalid("bad name")
+        val numbers = contactNumbers(m.optJSONArray("numbers") ?: JSONArray())
+        if (numbers.isEmpty()) invalid("numbers missing")
+        contacts.add(name, numbers)
+        Log.i(TAG, "contact added from the iPhone")
+        return Messages.ok(id)
+    }
+
+    /** `contacts.update` (D-074): `key` ("c:<id>") and any of `name`, `numbers`, `starred`. Opt-in, like adding. */
+    private fun contactsUpdate(id: Long, m: JSONObject): JSONObject {
+        if (!prefs.contactsAddEnabled) {
+            throw RequestException(ErrorCode.PERMISSION, "editing contacts is turned off in the bridge app")
+        }
+        val contactId = m.stringOrNull("key")?.removePrefix("c:")?.toLongOrNull()?.takeIf { it > 0 } ?: invalid("bad key")
+        val name = if (m.has("name")) contactName(m) ?: invalid("bad name") else null
+        val numbers = m.optJSONArray("numbers")?.let(::contactNumbers)
+        contacts.update(contactId, name, numbers, m.boolOrNull("starred"))
+        Log.i(TAG, "contact edited from the iPhone")
+        return Messages.ok(id)
+    }
+
+    private fun contactName(m: JSONObject): String? =
+        m.stringOrNull("name")?.trim()?.takeIf { it.isNotEmpty() && it.length <= 200 }
+
+    private fun contactNumbers(array: JSONArray): List<Pair<String, String?>> {
         val numbers = ArrayList<Pair<String, String?>>()
         for (i in 0 until minOf(array.length(), 10)) {
             val entry = array.opt(i)
@@ -308,10 +360,7 @@ class MessageRouter(
             val n = raw?.let(PhoneNumbers::normalizeDialable) ?: invalid("bad number")
             numbers += n to label?.take(40)
         }
-        if (numbers.isEmpty()) invalid("numbers missing")
-        contacts.add(name, numbers)
-        Log.i(TAG, "contact added from the iPhone")
-        return Messages.ok(id)
+        return numbers
     }
 
     /** `calllog.delete`: `keys` (call-log keys) or `all: true`. Only what the user deleted on the iPhone. */

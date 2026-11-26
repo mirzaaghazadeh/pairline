@@ -56,6 +56,40 @@ final class MessageCodecTests: XCTestCase {
         XCTAssertEqual(Set(NetSwitch.allCases.map(\.rawValue)), ["hotspot", "bluetooth", "data"])
     }
 
+    /// D-074: read sync, hold, contact edits, Find phone, the ringer, and numbers from outside Pairline.
+    func testPhoneToolsMessages() throws {
+        guard case .status(let status) = try decode(["t": "status", "caps": ["phone.ringer"], "ringer": "vibrate"]).message
+        else { return XCTFail() }
+        XCTAssertEqual(status.ringer, "vibrate")
+
+        let read = try json(.smsRead(thread: 17))
+        XCTAssertEqual(read["t"] as? String, "sms.read")
+        XCTAssertEqual(read["thread"] as? Int, 17)
+
+        let hold = try json(.callHold(.string("c1"), hold: true))
+        XCTAssertEqual(hold["t"] as? String, "call.hold")
+        XCTAssertEqual(hold["call"] as? String, "c1")
+        XCTAssertEqual(hold["hold"] as? Bool, true)
+
+        let star = try json(.contactsUpdate(key: "c:42", name: nil, numbers: nil, starred: true))
+        XCTAssertEqual(star["key"] as? String, "c:42")
+        XCTAssertEqual(star["starred"] as? Bool, true)
+        XCTAssertNil(star["name"], "unchanged parts aren't sent")
+        XCTAssertNil(star["numbers"])
+        let edit = try json(.contactsUpdate(key: "c:42", name: "Ada", numbers: [ContactNumber(n: "+15551234", label: nil)],
+                                            starred: nil))
+        XCTAssertEqual(edit["name"] as? String, "Ada")
+        XCTAssertEqual((edit["numbers"] as? [[String: Any]])?.first?["n"] as? String, "+15551234")
+
+        XCTAssertEqual(try json(.phoneFind(on: false))["on"] as? Bool, false)
+        XCTAssertEqual(try json(.phoneRinger("silent"))["mode"] as? String, "silent")
+
+        XCTAssertEqual(PhoneNumber.firstNumber(in: "+98 912 123 4567"), "+989121234567")
+        XCTAssertEqual(PhoneNumber.firstNumber(in: "۰۰۹۸۹۱۲۱۲۳۴۵۶۷"), "+989121234567")
+        XCTAssertEqual(PhoneNumber.firstNumber(in: "Call me at (555) 123-4567 tonight"), "5551234567")
+        XCTAssertNil(PhoneNumber.firstNumber(in: "no number here"))
+    }
+
     func testSMSMessagesAndHistoryPage() throws {
         let inbound = try decode([
             "t": "sms.history", "id": 9, "more": true,

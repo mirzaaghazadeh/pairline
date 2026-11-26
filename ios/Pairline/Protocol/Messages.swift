@@ -145,6 +145,8 @@ struct BridgeStatus: Codable, Equatable {
     var caps: [String]?
     var time: Int64?
     var net: BridgeNetState?
+    /// The bridge phone's ringer (D-074): `normal`, `vibrate` or `silent`.
+    var ringer: String?
 }
 
 struct SMSMessage: Codable, Equatable {
@@ -366,6 +368,7 @@ struct Inbound {
         var caps: LossyList<String>?
         var time: Int64?
         var net: BridgeNetState?
+        var ringer: String?
     }
 
     private struct MsgBody: Decodable { var msg: SMSMessage }
@@ -409,7 +412,7 @@ struct Inbound {
         case "status":
             let s = try body(StatusBody.self)
             message = .status(BridgeStatus(battery: s.battery, sims: s.sims?.elements, app: s.app,
-                                           caps: s.caps?.elements, time: s.time, net: s.net))
+                                           caps: s.caps?.elements, time: s.time, net: s.net, ringer: s.ringer))
         case "ping": message = .ping
         case "pong": message = .pong
         case "unpair": message = .unpair
@@ -594,6 +597,29 @@ struct Outbound {
         Outbound("net.switch", ["what": "dataSim", "sim": slot])
     }
 
+    /// The conversation was read on this iPhone: mark it read on the bridge phone too (needs `sms.read`, D-074).
+    static func smsRead(thread: Int64) -> Outbound { Outbound("sms.read", ["thread": thread]) }
+
+    /// Puts the call on hold or takes it off (needs `call.hold`, D-074).
+    static func callHold(_ call: OpaqueValue, hold: Bool) -> Outbound {
+        Outbound("call.hold", ["call": call.jsonObject, "hold": hold])
+    }
+
+    /// Edits a contact on the bridge phone: any of name, numbers and favourite (needs `contacts.edit`, D-074).
+    static func contactsUpdate(key: String, name: String?, numbers: [ContactNumber]?, starred: Bool?) -> Outbound {
+        var fields: [String: Any] = ["key": key]
+        if let name { fields["name"] = name }
+        if let numbers { fields["numbers"] = numbers.map { ["n": $0.n, "label": optional($0.label)] as [String: Any] } }
+        if let starred { fields["starred"] = starred }
+        return Outbound("contacts.update", fields)
+    }
+
+    /// Makes the bridge phone ring loudly, or stops it (needs `phone.find`, D-074).
+    static func phoneFind(on: Bool) -> Outbound { Outbound("phone.find", ["on": on]) }
+
+    /// The bridge phone's ringer: `normal`, `vibrate` or `silent` (needs `phone.ringer`, D-074).
+    static func phoneRinger(_ mode: String) -> Outbound { Outbound("phone.ringer", ["mode": mode]) }
+
     /// After a relayed call: whether each side could hear the other, so the bridge settles on what works.
     static func callMediaFeedback(heard: Bool?, heardMe: Bool?) -> Outbound {
         Outbound("call.media.feedback", ["heard": optional(heard), "heardMe": optional(heardMe)])
@@ -661,6 +687,16 @@ enum Capability: String, CaseIterable, Identifiable {
     case netShare = "net.share"
     /// This iPhone may switch the bridge phone's hotspot, Bluetooth tethering, mobile data and data SIM (D-073).
     case netSwitch = "net.switch"
+    /// A conversation read here is marked read on the bridge phone too (D-074).
+    case smsRead = "sms.read"
+    /// A call can be put on hold (D-074).
+    case callHold = "call.hold"
+    /// Contacts can be edited from here (D-074).
+    case contactsEdit = "contacts.edit"
+    /// The bridge phone can be made to ring loudly (D-074).
+    case phoneFind = "phone.find"
+    /// The bridge phone's ringer can be switched (D-074).
+    case phoneRinger = "phone.ringer"
     /// The bridge's Wi-Fi link is on (M5).
     case wifi = "wifi"
     /// The bridge sends and receives files over a Wi-Fi session (M5).

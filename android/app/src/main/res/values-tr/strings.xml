@@ -226,6 +226,14 @@
     <string name="settings_phone_hotspot_vpn">Açık, ancak bu telefonda bir VPN açık ve Android erişim noktası trafiğini VPN’in içinden değil yanından geçirir. iPhone bu telefonun bağlantısını VPN’siz alır; internete yalnızca VPN ulaşıyorsa hiç internet alamaz. iPhone’da VPN’i kullanmak için aşağıdan İnternet paylaşımı’nı açın.</string>
     <string name="settings_phone_hotspot_no_internet">Açık, ancak bu telefonun şu anda interneti yok (mobil veri açık mı?), bu yüzden iPhone “İnternet Bağlantısı Yok” gösterir. Aramalar ve mesajlar onun üzerinden yine çalışır.</string>
     <string name="settings_phone_hotspot_helper">iPhone’dan konuşma: yardımcısı yalnızca bu telefon bir Wi-Fi ağındayken başlar. Her yeniden başlatmadan sonra erişim noktasını açmadan önce bir kez Wi-Fi’a bağlanın; yardımcı ondan sonra çalışmaya devam eder.</string>
+    <string name="guide_channel">Kurulum rehberi</string>
+    <string name="guide_back">Bitirince Pairline Bridge’e dönmek için buraya dokunun.</string>
+    <string name="find_channel">Telefonu bul</string>
+    <string name="find_title">iPhone’unuz bu telefonu arıyor</string>
+    <string name="find_text">Çalmayı durdurmak için Durdur’a dokunun ya da bunu kaydırıp kapatın.</string>
+    <string name="find_stop">Durdur</string>
+    <string name="ringer_access_title">iPhone’un bu telefonu sessize almasına izin verin</string>
+    <string name="ringer_access_text">Bu telefonu iPhone’dan sessize almak için Pairline Bridge’e Rahatsız Etmeyin erişimi verin. Açmak için dokunun.</string>
     <string name="settings_phone_bluetooth_on">Bluetooth ile internet paylaşımı açık: Wi-Fi olmadan bu telefonun internetini kullanmak için iPhone’da Ayarlar › Bluetooth’ta bu telefona dokunun (istendiğinde bir kez eşleştirin). Erişim noktasından daha yavaştır.</string>
     <string name="settings_phone_hotspot_remote">iPhone’dan konuşma açıkken iPhone da erişim noktasını, Bluetooth ile paylaşımı ve mobil veriyi açıp kapatabilir: Pairline › Ayarlar › İnternet paylaşımı.</string>
     <string name="settings_pairline_hotspot">Pairline’ın kendi erişim noktası (internetsiz)</string>

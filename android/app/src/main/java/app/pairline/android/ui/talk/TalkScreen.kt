@@ -53,8 +53,10 @@ import app.pairline.android.privileged.HelperCommand
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.privileged.PrivilegedManager.Pairing
 import app.pairline.android.privileged.PrivilegedManager.State
+import app.pairline.android.ui.ClearSetupGuideOnResume
 import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
+import app.pairline.android.ui.SetupGuide
 import app.pairline.android.ui.SystemActions
 import app.pairline.android.ui.components.ListRow
 import app.pairline.android.ui.components.NoteBox
@@ -196,21 +198,33 @@ private fun WirelessSteps(state: State, pairing: Pairing, tick: Int) {
     val notifications = remember(tick) { NotificationManagerCompat.from(context).areNotificationsEnabled() }
     val maker = remember { Maker.detect() }
 
+    // The step's instructions wait in a notification while the user is in Android Settings (D-074).
+    ClearSetupGuideOnResume()
+    val devTitle = stringResource(R.string.talk_step_dev)
+    val devText = stringResource(devSteps(maker))
+    val wirelessTitle = stringResource(R.string.talk_step_wireless)
+    val wirelessText = stringResource(R.string.talk_step_wireless_sub)
     SectionCard(title = stringResource(R.string.talk_steps)) {
         StepRow(
             done = developer,
-            title = stringResource(R.string.talk_step_dev),
-            subtitle = stringResource(if (developer) R.string.talk_step_dev_done else devSteps(maker)),
+            title = devTitle,
+            subtitle = if (developer) stringResource(R.string.talk_step_dev_done) else devText,
             action = if (!developer) stringResource(R.string.talk_open_about) else null,
-            onAction = { start(context, DeveloperSettings.aboutPhone()) },
+            onAction = {
+                SetupGuide.show(context, devTitle, devText)
+                start(context, DeveloperSettings.aboutPhone())
+            },
         )
         HorizontalDivider(Modifier.padding(horizontal = 16.dp))
         StepRow(
             done = wireless,
-            title = stringResource(R.string.talk_step_wireless),
-            subtitle = stringResource(if (wireless) R.string.talk_step_wireless_done else R.string.talk_step_wireless_sub),
+            title = wirelessTitle,
+            subtitle = if (wireless) stringResource(R.string.talk_step_wireless_done) else wirelessText,
             action = if (developer && !wireless) stringResource(R.string.talk_open_developer) else null,
-            onAction = { openWirelessDebugging(context) },
+            onAction = {
+                SetupGuide.show(context, wirelessTitle, wirelessText)
+                openWirelessDebugging(context)
+            },
         )
         HorizontalDivider(Modifier.padding(horizontal = 16.dp))
         val pairSub = when {

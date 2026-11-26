@@ -225,6 +225,14 @@
     <string name="settings_phone_hotspot_vpn">روشن است، اما یک VPN روی این گوشی روشن است و اندروید ترافیک هات‌اسپات را از کنار VPN رد می‌کند، نه از داخل آن. آیفون اتصال این گوشی را بدون VPN می‌گیرد، و اگر فقط VPN به اینترنت می‌رسد، اصلاً اینترنت ندارد. برای استفاده از VPN روی آیفون، «اشتراک اینترنت» را در پایین روشن کنید.</string>
     <string name="settings_phone_hotspot_no_internet">روشن است، اما این گوشی الان اینترنت ندارد (اینترنت همراه روشن است؟)، برای همین آیفون «No Internet Connection» نشان می‌دهد. تماس‌ها و پیام‌ها از طریق آن کار می‌کنند.</string>
     <string name="settings_phone_hotspot_helper">مکالمه با آیفون: دستیار آن فقط وقتی این گوشی به وای‌فای وصل است راه می‌افتد. بعد از هر بار روشن شدن گوشی، یک بار به وای‌فای وصل شوید و بعد هات‌اسپات را روشن کنید؛ دستیار بعد از آن روشن می‌ماند.</string>
+    <string name="guide_channel">راهنمای راه‌اندازی</string>
+    <string name="guide_back">وقتی تمام شد، اینجا بزنید تا به Pairline Bridge برگردید.</string>
+    <string name="find_channel">پیدا کردن گوشی</string>
+    <string name="find_title">آیفون شما دنبال این گوشی است</string>
+    <string name="find_text">برای قطع زنگ، «قطع» را بزنید یا این را کنار بکشید.</string>
+    <string name="find_stop">قطع</string>
+    <string name="ringer_access_title">اجازه بدهید آیفون این گوشی را بی‌صدا کند</string>
+    <string name="ringer_access_text">برای بی‌صدا کردن این گوشی از آیفون، «دسترسی به مزاحم نشوید» را برای Pairline Bridge روشن کنید. برای باز کردن آن بزنید.</string>
     <string name="settings_phone_bluetooth_on">اشتراک اینترنت با بلوتوث روشن است: در آیفون، در تنظیمات › Bluetooth روی این گوشی بزنید (بار اول جفت‌شدن را تأیید کنید) تا بدون وای‌فای از اینترنت آن استفاده کنید. از هات‌اسپات کندتر است.</string>
     <string name="settings_phone_hotspot_remote">وقتی «مکالمه با آیفون» روشن است، آیفون هم می‌تواند هات‌اسپات، اشتراک اینترنت با بلوتوث و اینترنت همراه را روشن و خاموش کند: Pairline › تنظیمات › اشتراک اینترنت.</string>
     <string name="settings_pairline_hotspot">هات‌اسپات خودِ Pairline (بدون اینترنت)</string>

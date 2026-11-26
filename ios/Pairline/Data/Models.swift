@@ -139,6 +139,19 @@ enum PhoneNumber {
         return digits.count >= 3 && !text.contains(where: { $0.isLetter })
     }
 
+    /// The number to call in [text]: the text itself when it's a number (Recents, a keypad link), else the first phone
+    /// number found in it (text shared into a Shortcut, D-074). Dialable characters only; nil if there's none.
+    static func firstNumber(in text: String) -> String? {
+        let direct = international(dialable(text))
+        if digits(direct).count >= 3, !text.contains(where: { $0.isLetter }) { return direct }
+        let ascii = asciiDigits(text)
+        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.phoneNumber.rawValue),
+              let match = detector.firstMatch(in: ascii, range: NSRange(ascii.startIndex..., in: ascii)),
+              let found = match.phoneNumber else { return nil }
+        let number = international(dialable(found))
+        return digits(number).count >= 3 ? number : nil
+    }
+
     /// Wraps text in Unicode left-to-right isolates so numbers keep their order inside right-to-left text.
     static func ltr(_ text: String) -> String { "\u{2066}\(text)\u{2069}" }
 

@@ -400,6 +400,16 @@ final class BridgeController: ObservableObject {
 
     // MARK: - Messages
 
+    /// Marks a conversation read here and, when the bridge can (`sms.read`, D-074), on the Android phone too.
+    func markRead(thread: Int64) {
+        let unread = db.unread(thread: thread)
+        db.markRead(thread: thread)
+        updateBadge()
+        // Bridge threads have positive ids; a conversation started here has a synthetic one until the bridge sends it.
+        guard unread > 0, thread > 0, mode == .real, has(.smsRead), phase.isConnected else { return }
+        Task { _ = try? await link.request(.smsRead(thread: thread)) }
+    }
+
     /// Adds the message to the conversation right away and sends it when the bridge is connected.
     @discardableResult
     func sendSMS(to address: String, body: String, sim: Int?, thread: Int64?) throws -> StoredMessage {
@@ -468,6 +478,18 @@ final class BridgeController: ObservableObject {
         }
         guard has(.contactsAdd) else { throw ActionError.missingCapability(.contactsAdd) }
         _ = try await link.request(.contactsAdd(name: name, numbers: numbers))
+        await syncContacts()
+    }
+
+    /// Edits a contact on the bridge phone (D-074); nil leaves that part as it is. The next sync brings it back here.
+    func updateContact(_ contact: Contact, name: String?, numbers: [ContactNumber]?, starred: Bool?) async throws {
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        guard has(.contactsEdit) else { throw ActionError.missingCapability(.contactsEdit) }
+        guard name != nil || numbers != nil || starred != nil else { return }
+        _ = try await link.request(.contactsUpdate(key: contact.key, name: name, numbers: numbers, starred: starred))
         await syncContacts()
     }
 

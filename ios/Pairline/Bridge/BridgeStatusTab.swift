@@ -361,6 +361,15 @@ struct BridgeStatusTab: View {
                             subtitle: Text("Balance, packages and carrier services"))
                 }
                 Divider().padding(.leading, 52)
+                // D-074: ring the Android phone, and its ringer.
+                NavigationLink {
+                    PhoneToolsView()
+                } label: {
+                    ToolRow(symbol: "bell.and.waves.left.and.right.fill", tint: .orange,
+                            title: Text("Find phone", tableName: "PhoneTools"),
+                            subtitle: Text("Ring the Android phone, or switch it to silent", tableName: "PhoneTools"))
+                }
+                Divider().padding(.leading, 52)
                 if !bridge.isDemo {
                     NavigationLink {
                         FilesView(files: app.link.files)

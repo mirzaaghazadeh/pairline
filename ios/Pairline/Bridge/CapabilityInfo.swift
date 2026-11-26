@@ -30,6 +30,11 @@ struct CapabilityInfo: Identifiable {
         case .callMediaLink: return "dot.radiowaves.left.and.right"
         case .netShare: return "network"
         case .netSwitch: return "personalhotspot"
+        case .smsRead: return "envelope.open"
+        case .callHold: return "pause.circle"
+        case .contactsEdit: return "person.crop.circle.badge.checkmark"
+        case .phoneFind: return "bell.and.waves.left.and.right"
+        case .phoneRinger: return "speaker.wave.2.circle"
         case .wifi: return "wifi"
         case .files: return "doc.on.doc"
         case .calllogDelete: return "trash"
@@ -57,6 +62,11 @@ struct CapabilityInfo: Identifiable {
         case .callMediaLink: return String(localized: "Call audio over Bluetooth", table: "CallAudio")
         case .netShare: return String(localized: "Internet sharing", table: "NetShare")
         case .netSwitch: return String(localized: "Hotspot and data switches", table: "NetShare")
+        case .smsRead: return String(localized: "Read on both phones", table: "PhoneTools")
+        case .callHold: return String(localized: "Hold calls", table: "PhoneTools")
+        case .contactsEdit: return String(localized: "Edit contacts from iPhone", table: "PhoneTools")
+        case .phoneFind: return String(localized: "Find phone", table: "PhoneTools")
+        case .phoneRinger: return String(localized: "Ringer switch", table: "PhoneTools")
         case .wifi: return String(localized: "Wi-Fi link")
         case .files: return String(localized: "Send files")
         case .calllogDelete: return String(localized: "Delete calls on the bridge phone")
@@ -87,6 +97,14 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Turn on Internet sharing in Pairline Bridge › Settings on your Android phone.", table: "NetShare")
         case .netSwitch:
             return String(localized: "Needs Talk on iPhone on, and the latest Pairline Bridge, on your Android phone (Android 11 or later).", table: "NetShare")
+        case .smsRead:
+            return String(localized: "Needs Talk on iPhone on, and the latest Pairline Bridge, on your Android phone. Until then, messages you read here stay unread there.", table: "PhoneTools")
+        case .callHold:
+            return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Wireless debugging).", table: "CallAudio")
+        case .contactsEdit:
+            return String(localized: "Turn on \"Add contacts from iPhone\" in Pairline Bridge on your Android phone.")
+        case .phoneFind, .phoneRinger:
+            return String(localized: "Update Pairline Bridge on your Android phone.", table: "PhoneTools")
         case .contacts:
             return String(localized: "Turn on contacts sync in Pairline Bridge on your Android phone.")
         case .calllog:

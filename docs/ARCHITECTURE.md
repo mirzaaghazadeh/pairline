@@ -152,7 +152,8 @@ Everything above `BridgeLink` is shared by the real link and demo mode. The tran
 
 **Calls**
 - Incoming calls are reported with `CXProvider.reportNewIncomingCall`, which shows the native call screen, including on the lock screen.
-- Calls bridged through CallKit can appear in iPhone Recents, which may sync to iCloud. Keep this off by default (`includesCallsInRecents = false`) and make it a setting.
+- Calls bridged through CallKit appear in iPhone Recents, where a tap calls back through Pairline (`INStartCallIntent`). On by default since D-074 (the maintainer's decision; it was off before); Recents may sync to iCloud, which the setting says, and turning it off keeps calls only in Pairline.
+- Siri and Shortcuts: "Call with Pairline" (an App Intent). A `pairline://call?number=…` link only fills in the keypad (D-074).
 
 **Messages**
 - Local database protected with `completeUntilFirstUserAuthentication`, so messages arriving while the phone is locked can still be saved.

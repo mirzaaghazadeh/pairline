@@ -60,4 +60,10 @@ interface IPrivilegedService {
 
     /** The user's choice on the iPhone (D-073): the active SIM with subscription id [subId] becomes the data SIM. */
     boolean setDataSubscription(int subId) = 12;
+
+    /**
+     * Gives ([allow]) or returns Pairline's WRITE_SMS app-op, so a message read on the iPhone is marked read on this
+     * phone too (D-074); otherwise only the default messaging app may write. Refuses any other package.
+     */
+    boolean allowWriteSms(String packageName, boolean allow) = 13;
 }

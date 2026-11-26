@@ -32,6 +32,11 @@ object Msg {
     const val CALL_MEDIA_FEEDBACK = "call.media.feedback"
     const val NET_SHARE = "net.share"
     const val NET_SWITCH = "net.switch"
+    const val SMS_READ = "sms.read"
+    const val CALL_HOLD = "call.hold"
+    const val CONTACTS_UPDATE = "contacts.update"
+    const val PHONE_FIND = "phone.find"
+    const val PHONE_RINGER = "phone.ringer"
     const val CONTACTS_SYNC = "contacts.sync"
     const val CALLLOG_SYNC = "calllog.sync"
     const val CONTACTS_ADD = "contacts.add"
@@ -84,6 +89,21 @@ object Caps {
      */
     const val NET_SWITCH = "net.switch"
 
+    /** A conversation read on the iPhone is marked read on the bridge too (`sms.read`, D-074). */
+    const val SMS_READ = "sms.read"
+
+    /** A call can be put on hold from the iPhone (`call.hold`, the companion call service, D-074). */
+    const val CALL_HOLD = "call.hold"
+
+    /** Contacts can be edited from the iPhone (`contacts.update`, with "Add contacts from iPhone", D-074). */
+    const val CONTACTS_EDIT = "contacts.edit"
+
+    /** The iPhone can make this phone ring loudly (`phone.find`, D-074). */
+    const val PHONE_FIND = "phone.find"
+
+    /** The iPhone can switch the ringer between sound, vibrate and silent (`phone.ringer`, D-074). */
+    const val PHONE_RINGER = "phone.ringer"
+
     /** Call-history entries can be deleted on the bridge too (D-043). */
     const val CALLLOG_DELETE = "calllog.delete"
 
@@ -92,9 +112,9 @@ object Caps {
 
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
-        SMS_RECEIVE, SMS_SEND, SMS_HISTORY, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CONTACTS, CALLLOG, CONTACTS_ADD, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK, CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH,
-        WIFI, FILES, CALLLOG_DELETE, BLOCK,
+        SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
+        CALL_HOLD, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK,
+        CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, WIFI, FILES, CALLLOG_DELETE, BLOCK,
     )
 }
 

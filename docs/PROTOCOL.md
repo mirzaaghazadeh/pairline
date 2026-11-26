@@ -283,7 +283,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | Type | Direction | Milestone | Body |
 |------|-----------|-----------|------|
 | `device.info` | either | M1 | `name`, `platform` (`android`/`ios`), `os`, `app` (version), `proto` (0), `caps` (R only, M5: what R can receive, see below) |
-| `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `net` (D-073: the bridge phone's hotspot, Bluetooth tethering and mobile data; older bridges omit it), `time`. Sent after the handshake, on every change, and at least every 60 s |
+| `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `net` (D-073: the bridge phone's hotspot, Bluetooth tethering and mobile data; older bridges omit it), `ringer` (D-074: `normal` / `vibrate` / `silent`), `time`. Sent after the handshake, on every change, and at least every 60 s |
 | `status.get` | R→B | M1 | `id` → `status` with the same `id` |
 | `ping` / `pong` | either | M1 | `id`. Keep-alive; also used to measure latency |
 | `unpair` | either | M1 | — The receiver deletes the pinned key and closes the link |
@@ -304,6 +304,11 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `call.media.stop` | R→B | M6 | `id`, `call` → `ok`. The relay also stops by itself when the call ends or the Wi-Fi link drops |
 | `call.media.state` | B→R | M6 | `call`, `state` (`active` / `stopped` / `failed`), `listen`, `talk`, `reason` (English, for diagnostics) |
 | `call.media.feedback` | R→B | M6 | `id`, `heard` (the iPhone heard the caller), `heardMe` (the caller heard the iPhone); either may be null → `ok`. The bridge uses it to pick the capture source and mic handling that work on this phone |
+| `sms.read` | R→B | M2 | `id`, `thread` (> 0): the user read this conversation on R → `ok`; B marks its received messages read (best effort: Android applies it only with Pairline's WRITE_SMS app-op). Needs `sms.read` (D-074) |
+| `call.hold` | R→B | M3 | `id`, `call`, `hold` → `ok`, then `call.state` `held` / `active`. Taking a held call off hold while another is active swaps them (Android holds the other). Needs `call.hold` (D-074) |
+| `contacts.update` | R→B | M4 | `id`, `key` (a contact key) and any of `name`, `numbers` (replace all of the contact's numbers), `starred` → `ok`; the next `contacts.sync` brings the change back. Needs `contacts.edit` (D-074) |
+| `phone.find` | R→B | — | `id`, `on` (default true) → `ok`: B rings loudly on the alarm stream for up to a minute, or stops. Needs `phone.find` (D-074) |
+| `phone.ringer` | R→B | — | `id`, `mode` (`normal` / `vibrate` / `silent`) → `ok`, then `status.ringer`; `error` `permission` when switching to or from silent without Do Not Disturb access (B then asks its user for it). Needs `phone.ringer` (D-074) |
 | `contacts.sync` | R→B, B→R | M4 | request: `id`, `since` (cursor or null) / reply: `id`, `contacts` [Contact], `deleted` [key], `cursor`, `more` |
 | `calllog.sync` | R→B, B→R | M4 | request: `id`, `since` / reply: `id`, `calls` [Call-log entry], `cursor`, `more` |
 | `contacts.add` | R→B | M4 | `id`, `name`, `numbers` (only when the user turned this on in the bridge app) |
@@ -334,7 +339,9 @@ can also be fed into the call; without it the iPhone listens and the user talks 
 `call.media.link` (listed with `call.media`: the call audio can also travel inside the Bluetooth session as Opus,
 `via: "link"`; the bridge has an Opus encoder and decoder, D-072), `net.share`
 (the bridge's user allows internet sharing, M8), `net.switch` (R may switch the bridge phone's hotspot, Bluetooth
-tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's helper running, D-073), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
+tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's helper running, D-073), `sms.read`
+(messages can be marked read on B, D-074), `call.hold` (with the companion call service, D-074), `contacts.edit`
+(with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),
 `block` (the bridge keeps a block list, M4)
 

@@ -46,6 +46,10 @@ class StatusMonitor(
     /** This phone's internet sharing for `status.net`, and whether the iPhone may switch it (D-073). */
     private val net: () -> JSONObject? = { null },
     private val netSwitch: () -> Boolean = { false },
+    /** Pairline may mark SMS read (D-074). */
+    private val smsWrite: () -> Boolean = { false },
+    /** `status.ringer` (D-074): normal, vibrate or silent. */
+    private val ringer: () -> String? = { null },
 ) {
     /** Called (on a background thread) whenever something in the status may have changed. */
     var onChange: (() -> Unit)? = null
@@ -171,6 +175,8 @@ class StatusMonitor(
                 netShare = prefs.netShareAllowed,
                 wifiLink = prefs.wifiLinkEnabled,
                 netSwitch = netSwitch(),
+                smsWrite = smsWrite(),
+                phoneTools = true,
             ),
         )
     }
@@ -186,6 +192,7 @@ class StatusMonitor(
             .put("app", appVersion)
             .put("caps", JSONArray(caps()))
             .apply { runCatching { net() }.getOrNull()?.let { put("net", it) } }
+            .apply { runCatching { ringer() }.getOrNull()?.let { put("ringer", it) } }
             .put("time", System.currentTimeMillis())
     }
 

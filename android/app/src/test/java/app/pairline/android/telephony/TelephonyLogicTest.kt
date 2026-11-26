@@ -35,7 +35,11 @@ class TelephonyLogicTest {
         wifi: Boolean = false,
         link: Boolean = false,
         switches: Boolean = false,
-    ) = CapsCalculator.compute(CapsInput(granted, messaging, calling, sims, inCall, add, listen, talk, share, wifi, link, switches))
+        smsWrite: Boolean = false,
+        tools: Boolean = false,
+    ) = CapsCalculator.compute(
+        CapsInput(granted, messaging, calling, sims, inCall, add, listen, talk, share, wifi, link, switches, smsWrite, tools),
+    )
 
     @Test
     fun allPermissionsSingleSim() {
@@ -54,9 +58,20 @@ class TelephonyLogicTest {
             Caps.ALL,
             caps(
                 sims = 2, inCall = true, add = true, listen = true, talk = true, share = true, wifi = true, link = true,
-                switches = true,
+                switches = true, smsWrite = true, tools = true,
             ),
         )
+    }
+
+    @Test
+    fun readSyncHoldEditAndPhoneTools() {
+        // D-074: read sync needs READ_SMS and the write app-op; hold the companion call service; editing the opt-in.
+        assertEquals(false, Caps.SMS_READ in caps())
+        assertEquals(true, Caps.SMS_READ in caps(smsWrite = true))
+        assertEquals(false, Caps.SMS_READ in caps(granted = everything - Manifest.permission.READ_SMS, smsWrite = true))
+        assertEquals(listOf(false, true), listOf(Caps.CALL_HOLD in caps(), Caps.CALL_HOLD in caps(inCall = true)))
+        assertEquals(listOf(false, true), listOf(Caps.CONTACTS_EDIT in caps(), Caps.CONTACTS_EDIT in caps(add = true)))
+        assertEquals(listOf(Caps.PHONE_FIND, Caps.PHONE_RINGER, Caps.BLOCK), caps(granted = emptySet(), tools = true))
     }
 
     @Test
