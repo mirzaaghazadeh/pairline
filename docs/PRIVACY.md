@@ -80,6 +80,8 @@ readable only by the iCloud account that wrote it; the design, and release build
 | Unsealed messages from remote-mode notifications (iPhone) | No | Pairline's notification extension unseals a pushed record, shows it (sender and, if "Show message text" is on, the text) and leaves it in the app group container for the app | Until the app next runs and takes it (minutes to hours) |
 | Ids of handled records, mailbox ids, remote-mode settings | No | iPhone: app storage and the app group container; Android: app storage | Handled ids 14 days; the rest until remote mode is off |
 | Identity key and pinned bridge key (iPhone) | No | Now in a Keychain group shared with Pairline's own notification extension, so it can unseal records | As before |
+| The bridge's home internet addresses and port, for the direct connection | Yes, sealed for your iPhone (`remote.addr`, in the mailbox or over a session) | Your iPhone only | iPhone: a Keychain item on this device only; Android: a note of a permanent router mapping it made (so it can delete it after a crash) | Until remote mode is off or you forget the pairing |
+| That your bridge phone accepts connections on one TCP port of your home's internet address | Yes, visible to anyone who connects to that port | Your router opens the port when the bridge asks (NAT-PMP, PCP or UPnP, on your local network only). Whoever connects without your iPhone's key is disconnected within 10 seconds and learns nothing beyond the handshake's first message; at most 10 attempts a minute per address | Not stored | While remote mode is on and the bridge is on Wi-Fi; the mapping is removed when remote mode goes off or you forget the pairing |
 
 ## Network connections
 
@@ -94,11 +96,14 @@ readable only by the iCloud account that wrote it; the design, and release build
 | Android bridge, only with Talk on iPhone | This phone's own Wireless debugging on `127.0.0.1`; its port is found from this phone's own `_adb-tls-*` announcements on the Wi-Fi network | Pairs with it once and starts Pairline's helper (D-054). Never connects to another device's Wireless debugging |
 | Android bridge, only with remote mode on | `api.apple-cloudkit.com` (Apple's CloudKit Web Services) | Writes and reads the sealed remote-mode records in your iCloud, with your iCloud web access token; Apple sees the bridge's IP address. Checks every 5 seconds for 2 minutes after hearing from the iPhone, every 30 seconds within 10 minutes, otherwise every 2 minutes, and not at all while a local link is up |
 | iPhone app, only with remote mode on | iCloud (CloudKit) and Apple's push service | Writes and reads the same sealed records, and gets a push when one arrives |
+| Android bridge, only with remote mode on and on Wi-Fi | Your home router, on your local network (NAT-PMP and PCP on UDP 5351, UPnP: an SSDP search and HTTP to the router's own LAN address) | Asks it to forward one TCP port (47830) to the bridge, and to tell the bridge your home's internet address. Never anything outside your local network |
+| Android bridge, only with remote mode on | Listens on that one TCP port, reachable from the internet through your router | Your iPhone connects to it from anywhere (the direct connection: the same encrypted session as Wi-Fi, used for messages and, later, call audio). Anyone else is disconnected at the handshake |
+| iPhone app, only with remote mode on and no nearby link | Your bridge phone's home internet address (from a sealed `remote.addr`), on that port | The direct connection. It never connects to any other address on the internet |
 
 Nothing else. The Android app's network code is confined by CI to five places: the update check (GitHub only),
 the Wi-Fi link (addresses on your local network only), internet sharing (M8, only while you have it on), Talk on
 iPhone's connection to this phone's own Wireless debugging (`127.0.0.1` only) and remote mode (Apple's CloudKit Web
-Services host only).
+Services host, your router on the local network, and the one listening port for your iPhone).
 **Debug builds only** (never the release APK): the bridge also listens on `127.0.0.1:47800` inside the phone or
 emulator, so developers can connect a test iPhone app through `adb forward` (D-018); it isn't reachable from any
 network. On an emulator (never on a phone), a debug build's Wi-Fi link also listens on the emulator's emulated
