@@ -72,8 +72,10 @@ def write_secret(path, text):
 
 
 class CloudKit:
-    def __init__(self, chain="main", keep_token=False, show_headers=False):
+    def __init__(self, chain="main", keep_token=False, show_headers=False, environment=None):
         self.env = load_env()
+        if environment:
+            self.env["CK_ENVIRONMENT"] = environment
         self.chain_path = os.path.join(CONFIG_DIR, f"ck-webauth-{chain}.token")
         self.next_path = os.path.join(CONFIG_DIR, f"ck-webauth-{chain}-next.token")
         self.keep_token = keep_token  # diagnosis: save the returned token beside the chain instead of replacing it
@@ -387,6 +389,8 @@ def cmd_webcourier(ck, args):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--chain", default="main", help="which stored token chain to use")
+    ap.add_argument("--environment", choices=["development", "production"],
+                    help="override CK_ENVIRONMENT (diagnosis: which environment a token belongs to)")
     ap.add_argument("--keep-token", action="store_true",
                     help="diagnosis: don't replace the chain's token; save the returned one as <chain>-next")
     ap.add_argument("--show-headers", action="store_true",
@@ -422,7 +426,8 @@ def main():
         return 0
     if args.cmd == "match":
         return 0 if cmd_match(args) else 1
-    ck = CloudKit(args.chain, keep_token=args.keep_token, show_headers=args.show_headers)
+    ck = CloudKit(args.chain, keep_token=args.keep_token, show_headers=args.show_headers,
+                  environment=args.environment)
     ok = {"whoami": cmd_whoami, "zones": cmd_zones, "put": cmd_put, "delete": cmd_delete, "changes": cmd_changes,
           "latency": cmd_latency, "tokens": cmd_tokens, "webcourier": cmd_webcourier}[args.cmd](ck, args)
     return 0 if ok else 1
