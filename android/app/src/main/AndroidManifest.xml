@@ -68,9 +68,6 @@
     <!-- The iPhone's ringer switch (D-074): lists Pairline under Do Not Disturb access, which only the user turns on.
          Needed only to switch to or from silent. -->
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-    <!-- Remote pairing (D-080): the live scanner for the iPhone's invitation QR code. Asked on the "Scan" tap only;
-         frames are read on the phone and never kept. -->
-    <uses-permission android:name="android.permission.CAMERA" />
     <!-- Talk on iPhone (D-059): granted by Pairline's own helper once the user set it up, so Pairline can turn
          Developer options and Wireless debugging back on when the helper is needed again. Never granted otherwise. -->
     <uses-permission
@@ -79,7 +76,6 @@
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- Lists the apps on the home screen, so the user can choose whose notifications reach the iPhone (D-077).
          Only launchable apps; no QUERY_ALL_PACKAGES. -->
