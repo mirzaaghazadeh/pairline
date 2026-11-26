@@ -127,8 +127,8 @@ struct DirectStatus: Codable, Equatable {
         case blocked
     }
 
-    /// `reason` is English text for the bridge's log; the app recognizes a few causes by their words and shows only
-    /// those (the text itself is neither shown nor logged: it may hold addresses).
+    /// `reason` is one of PROTOCOL.md's codes (`cgnat`, `no_public_address`, `no_mapping`, `not_wifi`,
+    /// `listener_failed`); anything else is matched by its words, and never shown or logged (it may hold addresses).
     enum Reason: String, Codable {
         case carrierNAT
         case noPublicAddress
@@ -160,6 +160,14 @@ extension DirectStatus {
 
 extension DirectStatus.Reason {
     init?(text: String) {
+        switch text {
+        case "cgnat": self = .carrierNAT; return
+        case "no_public_address": self = .noPublicAddress; return
+        case "no_mapping": self = .router; return
+        case "not_wifi": self = .notOnWiFi; return
+        case "listener_failed": return nil
+        default: break
+        }
         let words = text.prefix(300).lowercased()
         func has(_ any: String...) -> Bool { any.contains { words.contains($0) } }
         if has("cgnat", "carrier", "100.64") {

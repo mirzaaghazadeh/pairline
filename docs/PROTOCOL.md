@@ -552,8 +552,8 @@ older than one day.
 |------|-----------|------|
 | `remote.config` | R→B | `id`, `on`, `backend` (`private` / `public`), `env` (`production` / `development`), `token` (web auth token), `mb` `{b, a, q}` (the R→B, alert and quiet mailbox ids) → `ok`. `on: false` stops remote mode on B: it stops checking, closes its router mapping and listener, and deletes its records |
 | `remote.token` | R→B | `token`: a fresh web auth token. R sends one in the R→B mailbox every 12 hours, and at once when its records there stay unread for 10 minutes |
-| `remote.addr` | B→R | `v4` (`"203.0.113.5:47830"`) and `v6` (`"[2001:db8::5]:47830"`), either null: where the direct connection listens. Sent (quiet) whenever it changes |
-| `remote.state` | B→R | `direct` (`open` / `none` / `blocked`), `reason` (English, for the log): why there's no direct connection |
+| `remote.addr` | B→R | `v4` (`"203.0.113.5:47830"`) and `v6` (`"[2001:db8::5]:47830"`), either null: where the direct connection listens. Sent (quiet) whenever it changes; each one replaces the previous. Only public addresses: IPv4 not private, carrier-grade NAT, loopback, link-local, multicast, reserved or documentation ranges (so the examples here are refused); IPv6 in 2000::/3, not 2001:db8::/32, 2002::/16 or 2001::/23. R ignores anything else, and connects only to addresses from this message |
+| `remote.state` | B→R | `direct` (`open` / `none` / `blocked`), `reason` (null when open): `cgnat` (the router's external IPv4 is carrier-grade NAT), `no_public_address` (it's private or otherwise not public), `no_mapping` (no NAT-PMP, PCP or UPnP mapping could be made), `not_wifi` (the bridge isn't on Wi-Fi or Ethernet), `listener_failed` (its listener couldn't start). Receivers show unknown codes as no reason |
 | `rpair.hello`, `rpair.nonce`, `rpair.reveal`, `rpair.confirm` | see below | remote pairing |
 
 B→R events go on a session when one is up, otherwise in the mailbox: `sms.new`, `call.incoming` and missed calls in
@@ -563,8 +563,11 @@ timer.
 ### Direct connection
 
 B opens one TCP port on its router (NAT-PMP, then PCP, then UPnP IGD) and listens on it; R connects to the address in
-`remote.addr` and runs exactly the Wi-Fi session (framing, handshake, messages; no media or bulk channel until M10's
-Opus step). On the public listener B:
+`remote.addr` and runs exactly the Wi-Fi session, version 0 on the wire (framing, handshake, messages; no media or
+bulk channel until M10's Opus step). R tries IPv6 first, then IPv4, only while no Bluetooth or Wi-Fi session is up
+(a local session replaces the direct one), and retries after 5, 15 and 30 s, then every 2 minutes, and at once when its
+network changes or a new `remote.addr` arrives. An address whose handshake fails on the keys is skipped until the next
+`remote.addr`. On the public listener B:
 
 - accepts no pairing frames: anything but `HELLO` first closes the connection;
 - parses only the frame length and the hello before the handshake has authenticated the peer;
