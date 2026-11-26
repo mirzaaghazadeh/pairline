@@ -1753,6 +1753,26 @@ The maintainer's decision: "if [UPnP or NAT-PMP] can be enabled, enable it; if n
 - The entry lives in the iPhone's Keychain (this device only), is never logged (rule 9), and goes when Cloud mode is
   turned off or the pairing is forgotten. Carrier-grade NAT still can't be helped by any router setting.
 
+### D-096 — An accessibility audit keeps the App Store's accessibility labels true (2026-11-26)
+
+D-091 claims Larger Text, Sufficient Contrast (through Increase Contrast), Reduced Motion, Dark Interface and
+Differentiate Without Color for the iPhone app, so a UI change can quietly make the App Store page wrong. A check
+that anyone can rerun now stands behind those claims:
+- **`ios/tools/accessibility-audit.sh`:** first a static pass over the Swift sources (`accessibility_report.py
+  static`) that flags motion not guarded by Reduce Motion (`.move(edge:)`, `.push(from:)`, scale transitions,
+  `repeatForever`, conditional offsets). Then it makes its own simulator (deleted at the end), builds the new
+  `Accessibility` scheme and runs `PairlineAccessibilityTests`, which opens each screen demo mode can reach (by launch
+  arguments, or by tapping English labels from there) and runs Apple's `performAccessibilityAudit` on it, saving a
+  screenshot. `quick` runs light, accessibility-size text and Increase Contrast in English (about 15 minutes); the full
+  run adds Increase Contrast in dark, dark, and large text in Persian and Arabic (about 40 minutes).
+- **The report** (`accessibility_report.py audit`) lists what breaks Larger Text or Sufficient Contrast and exits 1
+  for anything not in `ios/tools/accessibility-baseline.txt`, where each accepted finding (a false alarm such as
+  text behind the tab bar) keeps its reason.
+- **When:** `quick` after any UI change, the full run before every release (AGENTS.md). It needs ImageMagick and isn't
+  run by CI (15 to 40 minutes on a simulator). A new screen gets a line in
+  `PairlineAccessibilityTests/AccessibilityAudit.swift`.
+- Found on the way: the link status pill still pulsed with Reduce Motion on; it now stays still.
+
 ### D-097 — Ready for App Review: no "Allow" before a permission prompt, privacy manifests, Add to Photos, a review video (2026-11-27)
 
 A pass over the iPhone app as App Review would see it, while 1.0.1 (build 16) waits for review. What it found and

@@ -167,6 +167,11 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 - Translations: `xcodebuild -exportLocalizations -project Pairline.xcodeproj -localizationPath <dir> -exportLanguage fa -exportLanguage ar`,
   translate the XLIFF files, then `xcodebuild -importLocalizations -project Pairline.xcodeproj -localizationPath <file>.xliff` (D-028).
 - App icon: `swift tools/make_icon.swift Pairline/Resources/Assets.xcassets`
+- Accessibility (D-096): `tools/accessibility-audit.sh quick` after any UI change, the full `tools/accessibility-audit.sh`
+  before every release. It checks Reduce Motion in the code, then runs Apple's accessibility audit on every screen it can
+  open in demo mode (`PairlineAccessibilityTests`, its own `Accessibility` scheme, not run by CI) and lists what breaks
+  the App Store's Larger Text and Sufficient Contrast labels. A new screen gets a line in
+  `PairlineAccessibilityTests/AccessibilityAudit.swift`. Needs ImageMagick
 
 **CI:** `.github/workflows/android.yml` runs on every push and pull request that touches `android/` or `protocol/`.
 `.github/workflows/ios.yml` runs on pull requests that touch `ios/` or `protocol/`, and manually (D-022).
@@ -197,6 +202,11 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
 - User-visible strings in English, Persian, Arabic and Turkish from the start (D-019, D-033). Persian and Arabic are
   right-to-left; check every screen mirrored, with phone numbers and codes kept left-to-right. The App Store listing
   is English, Arabic and Turkish, and the iPhone app doesn't list its languages on its own screens (D-033).
+- The iPhone app's App Store page promises Larger Text, Sufficient Contrast (through Increase Contrast), Reduced
+  Motion, Dark Interface and Differentiate Without Color (D-091), so new UI keeps them true: text styles or
+  `@ScaledMetric`, no cut-off text at the accessibility sizes (`AdaptiveStack`), `.slide(from:reduceMotion:)` instead of
+  `.move`, `brandGreenFill`/`brandRedFill`/`brandFill` behind white text, `Color(.secondaryLabel)` on materials, and
+  never color alone for meaning. Rules and evidence: `docs/app-store/accessibility.md`.
 - Persian text uses the bundled Estedad typeface (D-032). On iOS use text styles (`.font(.headline)`) or
   `.font(.rounded(_:weight:))`, not `.system(...)`, for anything that shows words; on Android use
   `MaterialTheme.typography`. Both switch to Estedad in Persian automatically.

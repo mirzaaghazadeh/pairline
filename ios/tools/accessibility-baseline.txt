@@ -1,0 +1,2 @@
+# Accepted findings of tools/accessibility-audit.sh (D-096), one per line: screen|kind|label prefix  # why
+# `*` matches any screen; an empty label prefix matches any label. Keep each entry's reason.

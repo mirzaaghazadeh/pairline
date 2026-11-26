@@ -280,6 +280,7 @@ struct LinkStatusPill: View {
         .padding(.vertical, 5)
         .background(Capsule().fill(color.opacity(0.12)))
         .onAppear {
+            guard !reduceMotion else { return }
             withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) { pulse = true }
         }
         .accessibilityElement(children: .combine)
