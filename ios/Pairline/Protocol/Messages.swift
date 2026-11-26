@@ -608,10 +608,12 @@ struct Outbound {
     }
 
     /// Asks the bridge to relay this call's audio (PROTOCOL.md "Call audio"): over the Wi-Fi media channel, or inside
-    /// the Bluetooth session it's sent on (`.link`, D-072), which is why that one goes only on the Bluetooth lane.
-    static func callMediaStart(_ call: OpaqueValue, talk: Bool, via: CallAudioPath = .wifi) -> Outbound {
+    /// the session it's sent on (`.link`): Bluetooth (D-072) or remote mode's direct connection (D-080). That one goes
+    /// only on `linkLane`, the lane whose session carries the call-audio channel.
+    static func callMediaStart(_ call: OpaqueValue, talk: Bool, via: CallAudioPath = .wifi,
+                               linkLane: LinkLane = .primary) -> Outbound {
         Outbound("call.media.start", ["call": call.jsonObject, "talk": talk, "via": via.wire],
-                 lane: via == .link ? .primary : nil)
+                 lane: via == .link ? linkLane : nil)
     }
 
     static func callMediaStop(_ call: OpaqueValue) -> Outbound {

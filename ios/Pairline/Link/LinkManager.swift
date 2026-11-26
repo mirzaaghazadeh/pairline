@@ -199,8 +199,11 @@ final class LinkManager: BridgeLink {
     private(set) var mediaChannel: MediaChannel?
     /// Called on the main queue whenever `mediaChannel` changes (opened, or closed with nil).
     var onMediaChannelChange: ((MediaChannel?) -> Void)?
-    /// Call audio inside the Bluetooth (or debug TCP) session while it's established, or nil (D-072).
+    /// Call audio inside the Bluetooth (or debug TCP) session while it's established (D-072), else inside remote mode's
+    /// direct connection (D-080), or nil.
     private(set) var linkMediaChannel: LinkMediaChannel?
+    /// The lane whose session carries `linkMediaChannel`: `call.media.start` with `via: "link"` must go on it.
+    private(set) var linkMediaLane: LinkLane?
 
     let files = FileTransferManager()
     let hotspot = HotspotJoiner()
@@ -771,7 +774,7 @@ final class LinkManager: BridgeLink {
             self.files.handleBulk(data)
         }
         session.onLinkMedia = { [weak self, weak session, weak lane] data in
-            guard let self, let session, let lane, session === lane.session, lane.id == .primary else { return }
+            guard let self, let session, let lane, session === lane.session, lane.id == self.linkMediaLane else { return }
             lane.lastReceived = Date()
             self.linkMediaChannel?.receive(data)
         }
@@ -800,10 +803,13 @@ final class LinkManager: BridgeLink {
             }
         }
         sendRaw(deviceInfo, id: nil, on: lane)
-        if lane.id == .primary, let session = lane.session, session.carriesLinkMedia {
+        // Call audio rides inside the Bluetooth session, or inside the direct connection while no Bluetooth one is up.
+        if lane.id == .primary || (lane.id == .direct && linkMediaLane != .primary),
+           let session = lane.session, session.carriesLinkMedia {
             closeLinkMedia()
             let channel = LinkMediaChannel(session: session)
             linkMediaChannel = channel
+            linkMediaLane = lane.id
             mediaChanged()
             #if DEBUG
             if DebugSettings.linkMediaSelfTest { LinkMediaSelfTest.run(channel) }
@@ -826,7 +832,7 @@ final class LinkManager: BridgeLink {
         lane.connectedSince = nil
         if let error { lastSessionError = error }
         log.info("link", "\(lane.id.rawValue) session closed: \(error.map { "\($0)" } ?? "by us")")
-        if lane.id == .primary { closeLinkMedia() }
+        if lane.id == linkMediaLane { closeLinkMedia() }
         if lane.id == .wifi {
             closeMedia()
             if error == .keyMismatch, let endpoint = transport?.resolvedEndpoint ?? transport?.dialed {
@@ -1052,9 +1058,11 @@ final class LinkManager: BridgeLink {
 
     private func closeLinkMedia() {
         guard let channel = linkMediaChannel else { return }
+        let lane = linkMediaLane
         linkMediaChannel = nil
+        linkMediaLane = nil
         channel.close()
-        log.info("media", "Bluetooth call-audio channel closed: \(channel.framesSent) frames, \(channel.packetsSent) packets sent, \(channel.packetsDropped) dropped as late")
+        log.info("media", "Call-audio channel inside the \(lane == .direct ? "direct" : "Bluetooth") session closed: \(channel.framesSent) frames, \(channel.packetsSent) packets sent, \(channel.packetsDropped) dropped as late")
         mediaChanged()
     }
 

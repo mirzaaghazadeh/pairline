@@ -285,6 +285,36 @@ final class DirectLaneTests: XCTestCase {
         XCTAssertEqual(directConnector.targets.count, attempts + 1)
     }
 
+    /// Away from home, call audio rides inside the direct session as `MEDIA` frames (D-080), both ways, and
+    /// `call.media.start` with `via: "link"` goes on that session; a nearby link takes the call audio over.
+    func testCallAudioRidesTheDirectSessionUntilANearbyLinkTakesOver() async throws {
+        await mail(addr)
+        await waitFor("direct") { manager.isDirect }
+        XCTAssertEqual(manager.linkMediaLane, .direct)
+        let channel = try XCTUnwrap(manager.linkMediaChannel)
+        let fromIPhone = Data(repeating: 0x11, count: 40)
+        channel.send(fromIPhone)
+        await waitFor("the bridge got the iPhone's audio") { directBridge?.receivedMedia.isEmpty == false }
+        XCTAssertEqual(directBridge?.receivedMedia.first.flatMap(LinkMediaPackets.unpack), [fromIPhone])
+        let fromBridge = Data(repeating: 0x22, count: 40)
+        let heard = expectation(description: "the iPhone got the bridge's audio")
+        channel.onPacket = { if $0 == fromBridge { heard.fulfill() } }
+        directBridge?.sendMedia(LinkMediaPackets.pack([fromBridge]))
+        await fulfillment(of: [heard], timeout: 3)
+        var startedOnDirect: Bool?
+        onMessage = { [unowned self] bridge, object in
+            guard object["t"] as? String == "call.media.start", let id = object["id"] as? Int else { return }
+            startedOnDirect = bridge === self.directBridge
+            bridge.send(["t": "ok", "id": id])
+        }
+        _ = try await manager.request(.callMediaStart(.string("c1"), talk: true, via: .link, linkLane: .direct))
+        XCTAssertEqual(startedOnDirect, true)
+        primaryConnector.enable()
+        await waitFor("the nearby link carries the call audio") { manager.linkMediaLane == .primary }
+        XCTAssertFalse(channel.isOpen)
+        XCTAssertNotNil(manager.linkMediaChannel)
+    }
+
     func testNoDirectAttemptWhileANearbyLinkIsUp() async {
         primaryConnector.enable()
         await waitFor("nearby") { manager.activeTransports == [.tcp] }

@@ -7,6 +7,7 @@ import app.pairline.android.protocol.Messages
 import app.pairline.android.protocol.SessionCallbacks
 import app.pairline.android.protocol.StaticKey
 import app.pairline.android.protocol.WifiHint
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -82,7 +83,7 @@ interface FileMessageHandler {
 }
 
 /**
- * Remote mode's mailbox in iCloud (D-072), the path next to the sessions: it carries events and replies while no
+ * Remote mode's mailbox in iCloud (D-080), the path next to the sessions: it carries events and replies while no
  * session is up. Implemented by `link.remote.RemoteLink`.
  */
 interface MailboxRoute {
@@ -111,7 +112,7 @@ interface WifiSessionListener {
 /**
  * Owns every connection's [BridgeSession] on one thread ("link thread"). At most one established session per lane:
  * Bluetooth (or the debug TCP link), Wi-Fi (PROTOCOL.md, "Two sessions at once") and remote mode's direct connection
- * (D-072). Events go to the Bluetooth session when there is one, otherwise to Wi-Fi, otherwise to the direct session,
+ * (D-080). Events go to the Bluetooth session when there is one, otherwise to Wi-Fi, otherwise to the direct session,
  * otherwise (remote mode) to the mailbox in iCloud; replies go back on the session the request came from. Requests
  * read from the mailbox carry [MAILBOX_TOKEN]. Runs keep-alive and handshake timeouts, and opens the media channel for
  * each Wi-Fi session. The direct session is a Wi-Fi session without media, bulk data or pairing: none of the Wi-Fi
@@ -137,7 +138,7 @@ class LinkManager(
         var token: Long = 0
         var media: MediaEndpoint? = null
 
-        /** Call audio inside this Bluetooth or debug TCP session (D-072); null on Wi-Fi. */
+        /** Call audio inside this Bluetooth, debug TCP or direct session (D-072, D-080); null on Wi-Fi. */
         var linkMedia: LinkMediaChannel? = null
         val wifi: Boolean get() = connection.kind.isWifi
 
@@ -164,7 +165,7 @@ class LinkManager(
     var handler: MessageHandler? = null
     var wifiListener: WifiSessionListener? = null
 
-    /** Remote mode's mailbox (D-072); set once by AppGraph. */
+    /** Remote mode's mailbox (D-080); set once by AppGraph. */
     var remote: MailboxRoute? = null
 
     /** The iPhone listed `files` in its `device.info` caps (M5). */
@@ -182,15 +183,17 @@ class LinkManager(
      */
     val media: StateFlow<MediaChannel?> = _media
 
-    /** The Bluetooth (or debug TCP) session's token and its link media channel (D-072). Read on any thread. */
-    @Volatile
-    private var radioMedia: Pair<Long, LinkMediaChannel>? = null
+    /**
+     * The link media channel of each established Bluetooth, debug TCP or direct session, by token (D-072; remote mode's
+     * direct connection, D-080). Written on the link thread, read on any thread.
+     */
+    private val linkMedias = ConcurrentHashMap<Long, LinkMediaChannel>()
 
     /**
-     * The link media channel of the established Bluetooth or debug TCP session [token], or null (the session ended,
-     * or [token] is a Wi-Fi session). Call audio with `via: "link"` uses it (D-072).
+     * The link media channel of the established Bluetooth, debug TCP or direct session [token], or null (the session
+     * ended, or [token] is a Wi-Fi session). Call audio with `via: "link"` uses it (D-072, D-080).
      */
-    fun linkMedia(token: Long): LinkMediaChannel? = radioMedia?.takeIf { it.first == token }?.second
+    fun linkMedia(token: Long): LinkMediaChannel? = linkMedias[token]
 
     /** A session's link media channel closed with it. Called on the link thread with the session's token. */
     var onLinkMediaClosed: ((Long) -> Unit)? = null
@@ -222,7 +225,7 @@ class LinkManager(
                     onLinkMediaClosed?.invoke(e.token)
                 }
             }
-            radioMedia = null
+            linkMedias.clear()
             entries.clear()
             radio = null
             wifi = null
@@ -252,7 +255,7 @@ class LinkManager(
                 pairing,
                 callbacks,
                 wifiChannels = kind.isWifi,
-                // Pairing needs the QR code or an invitation, never a connection from the internet (D-072).
+                // Pairing needs the QR code or an invitation, never a connection from the internet (D-080).
                 allowPairing = kind != TransportKind.DIRECT,
             ),
             clock(),
@@ -346,7 +349,7 @@ class LinkManager(
     }
 
     /**
-     * Remote pairing (D-072): the user confirmed the codes, so [remotePublicKey] is pinned now and replaces any paired
+     * Remote pairing (D-080): the user confirmed the codes, so [remotePublicKey] is pinned now and replaces any paired
      * iPhone, like a pairing from the QR code. Safe from any thread; the key is on disk when this returns.
      */
     fun pairedRemotely(remotePublicKey: ByteArray) {
@@ -418,7 +421,7 @@ class LinkManager(
         entry.media = null
         entry.linkMedia?.let { channel ->
             channel.close()
-            if (radioMedia?.second === channel) radioMedia = null
+            linkMedias.remove(entry.token, channel)
             onLinkMediaClosed?.invoke(entry.token)
         }
         entry.linkMedia = null
@@ -562,7 +565,7 @@ class LinkManager(
                 e.session.takeLinkMediaSealer()?.let { sealer ->
                     val channel = LinkMediaChannel(connection, sealer)
                     e.linkMedia = channel
-                    radioMedia = e.token to channel
+                    linkMedias[e.token] = channel
                 }
             }
             handler?.onEstablished(e.token, connection.kind, carriesEvents)
@@ -596,7 +599,7 @@ class LinkManager(
     }
 
     companion object {
-        /** The "session" of messages read from the mailbox in iCloud (remote mode, D-072). Session tokens are positive. */
+        /** The "session" of messages read from the mailbox in iCloud (remote mode, D-080). Session tokens are positive. */
         const val MAILBOX_TOKEN = -1L
 
         private const val TAG = "link"

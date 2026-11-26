@@ -11962,18 +11962,20 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden" } }
       }
     },
-    "Via iCloud: texts and codes work. Calls stay on the Android phone for now." : {
+    "Via iCloud: texts and codes work. Calls need the direct connection to your home." : {
+      "comment" : "Remote mode (D-080): the banner while the bridge is reached only through iCloud. Call audio needs the direct connection through the home router.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud: تصلك الرسائل والرموز، أما المكالمات فتبقى على هاتف أندرويد حاليًا." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق iCloud: پیامک‌ها و کدها کار می‌کنند. تماس‌ها فعلاً روی گوشی اندرویدی می‌مانند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden: mesajlar ve kodlar çalışıyor. Aramalar şimdilik Android telefonda kalıyor." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud: تصلك الرسائل والرموز. أما المكالمات فتحتاج إلى الاتصال المباشر بمنزلك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق iCloud: پیامک‌ها و کدها کار می‌کنند. تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden: mesajlar ve kodlar çalışıyor. Aramalar için evinize doğrudan bağlantı gerekiyor." } }
       }
     },
-    "Calls don't work via iCloud yet. Make the call on the Android phone, or bring the phones together." : {
+    "Calls need the direct connection to your home, and it isn't up right now. Make the call on the Android phone, or bring the phones together." : {
+      "comment" : "Remote mode (D-080): the user tried to call while the bridge is reached only through iCloud.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا تعمل المكالمات عبر iCloud بعد. أجرِ المكالمة من هاتف أندرويد نفسه، أو اجمع الهاتفين في مكان واحد." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس هنوز از طریق iCloud کار نمی‌کند. با خود گوشی اندرویدی تماس بگیرید، یا دو گوشی را کنار هم بیاورید." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar henüz iCloud üzerinden çalışmıyor. Aramayı Android telefondan yapın ya da iki telefonu bir araya getirin." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحتاج المكالمات إلى الاتصال المباشر بمنزلك، وهو غير متاح الآن. أجرِ المكالمة من هاتف أندرويد نفسه، أو اجمع الهاتفين في مكان واحد." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند و این اتصال الان برقرار نیست. با خود گوشی اندرویدی تماس بگیرید، یا دو گوشی را کنار هم بیاورید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar için evinize doğrudan bağlantı gerekiyor ve bu bağlantı şu anda kurulu değil. Aramayı Android telefondan yapın ya da iki telefonu bir araya getirin." } }
       }
     },
     "Remote mode" : {

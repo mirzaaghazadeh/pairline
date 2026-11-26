@@ -98,8 +98,8 @@ class CallAudioRelay(
         if (t == null) stopIf("media channel closed") { it.via == Via.WIFI }
     }
 
-    /** The Bluetooth (or debug TCP) session [token] ended: a relay inside it stops. */
-    fun linkClosed(token: Long) = stopIf("Bluetooth session closed") { it.via == Via.LINK && it.token == token }
+    /** The Bluetooth, debug TCP or direct session [token] ended: a relay inside it stops. */
+    fun linkClosed(token: Long) = stopIf("link session closed") { it.via == Via.LINK && it.token == token }
 
     /**
      * `call.media.start`: [callId] must be an active call (checked by the caller). [token] is the session the request
@@ -116,7 +116,10 @@ class CallAudioRelay(
             Via.LINK -> {
                 if (!opusAvailable()) throw RequestException(ErrorCode.UNSUPPORTED, "this phone has no Opus codec")
                 linkMedia(token)?.takeIf { it.isOpen }
-                    ?: throw RequestException(ErrorCode.UNSUPPORTED, "call audio over Bluetooth needs a Bluetooth session")
+                    ?: throw RequestException(
+                        ErrorCode.UNSUPPORTED,
+                        "call audio inside the link needs a Bluetooth session or remote mode's direct connection",
+                    )
             }
         }
         synchronized(lock) {

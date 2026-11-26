@@ -102,8 +102,9 @@ Only the pinned peer can derive the keys, because both static keys are mixed in.
   the channel belongs to (M5, D-044): each Wi-Fi connection runs its own handshake, and its media and bulk keys die
   with it.
 - **Link media keys (D-072):** `HKDF-SHA256(okm, salt = empty, info = "pairline v0 link media", L = 64)`; the first
-  32 bytes are B→R, the last 32 R→B. `okm` is the one of the Bluetooth (or debug TCP) session that carries the
-  `MEDIA` frames. They differ from the Wi-Fi media keys, so the two media paths never share a key and nonce.
+  32 bytes are B→R, the last 32 R→B. `okm` is the one of the Bluetooth (or debug TCP) session, or of remote mode's
+  direct connection (D-080), that carries the `MEDIA` frames. They differ from the Wi-Fi media keys, so the two media
+  paths never share a key and nonce.
 - **Counters per channel:** each direction of each channel has its own counter, starting at 0. On the control
   channel counter 0 is the confirm; on the bulk and media channels counter 0 is an ordinary record.
 - **Media replay window (64 records):** the receiver keeps the highest counter it has accepted (`top`) and a 64-bit
@@ -125,7 +126,7 @@ A frame is one complete unit after transport reassembly. Its first byte is the f
 | `0x10` | `HELLO` | 99-byte hello body |
 | `0x20` | `RECORD` | encrypted record (control channel) |
 | `0x21` | `BULK` | encrypted record on the bulk channel (M5): Wi-Fi TCP only, after the handshake |
-| `0x22` | `MEDIA` | encrypted record on the link media channel (call audio, D-072): BLE and debug TCP only, after the handshake |
+| `0x22` | `MEDIA` | encrypted record on the link media channel (call audio, D-072): BLE, debug TCP and remote mode's direct connection (D-080) only, after the handshake |
 
 Frames are at most 65,535 bytes. Unknown frame types close the connection. `BULK` is new in M5 but needs no version
 bump: a side sends it only for a file transfer the peer accepted with `file.answer`, which an older app never sends.
@@ -207,7 +208,7 @@ bulk channels.
   sockets), otherwise on whichever is up. A bulk request whose Wi-Fi session closes before the reply arrives is sent
   again on BLE.
 - `call.media.start` with `via: "link"` goes on the Bluetooth (or debug TCP) session, whose `MEDIA` frames then carry
-  the call audio (D-072).
+  the call audio (D-072); away from home, with no Bluetooth session, on remote mode's direct connection (D-080).
 - `link.switch` isn't used: replies follow their request (D-044).
 - After each handshake each side sends `device.info`, and B sends `status`, on that session. B re-sends calls in
   progress (`call.incoming` / `call.state`) only when its event session changes.
@@ -383,7 +384,8 @@ Call audio takes one of two paths, chosen by R in `call.media.start` (`via`):
 
 - **`wifi`:** the Wi-Fi link's **media channel** (UDP, channel 1, media keys, 64-record replay window; see
   "Records"). Each media record's plaintext is one packet.
-- **`link` (D-072):** `MEDIA` frames inside the Bluetooth (or debug TCP) session the request arrived on (channel 3,
+- **`link` (D-072):** `MEDIA` frames inside the Bluetooth (or debug TCP) session, or remote mode's direct connection
+  (D-080), that the request arrived on (channel 3,
   link media keys, ordered). Needs `call.media.link`. Each `MEDIA` record's plaintext holds **one or more packets**,
   each preceded by its length (2 bytes, big-endian, at least 3): `length ‖ packet ‖ length ‖ packet …`, at most 1200
   bytes in all. A record that doesn't split exactly into such packets is ignored (the connection stays up).
@@ -610,8 +612,10 @@ timer.
 ### Direct connection
 
 B opens one TCP port on its router (NAT-PMP, then PCP, then UPnP IGD) and listens on it; R connects to the address in
-`remote.addr` and runs exactly the Wi-Fi session, version 0 on the wire (framing, handshake, messages; no media or
-bulk channel until M10's Opus step). R tries IPv6 first, then IPv4, only while no Bluetooth or Wi-Fi session is up
+`remote.addr` and runs the Wi-Fi session, version 0 on the wire (framing, handshake, messages), with two differences:
+there is no UDP media channel and no bulk channel, and call audio rides inside the session as `MEDIA` frames with the
+link media keys, exactly as on Bluetooth (`call.media.start` `via: "link"` sent on this session; see "Call audio").
+No UDP port is opened on the router. R tries IPv6 first, then IPv4, only while no Bluetooth or Wi-Fi session is up
 (a local session replaces the direct one), and retries after 5, 15 and 30 s, then every 2 minutes, and at once when its
 network changes or a new `remote.addr` arrives. An address whose handshake fails on the keys is skipped until the next
 `remote.addr`. On the public listener B:
