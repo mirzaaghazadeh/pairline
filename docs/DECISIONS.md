@@ -1323,3 +1323,16 @@ The maintainer asked for a Mac app; the iPad app runs on Apple Silicon Macs as i
   (`Product.purchase(confirmIn:)`, iOS 17+) so the sheet attaches to Pairline's window; failures log their domain,
   code and underlying error to diagnostics and tell the user what to check (signed in under Media & Purchases,
   in-app purchases allowed in Screen Time, restart).
+
+### D-080 — Every Android release lists what's new and its contributors (2026-11-26)
+
+The maintainer asked for a changelog and a contributors list on every release. Only 1.1.1 to 1.3.1 had a "What's new",
+written by hand into the published notes; the others had only the build table.
+- **`android/CHANGELOG.md`** holds each version's notes, written for the people who use the app, newest first. It's the
+  one source: the release workflow copies from it, and a tag whose version has no section fails before the build.
+- **What's new** in a release covers every version since the newest *published* release older than it, one heading
+  each, so 1.7.0 published after the 1.4.0 to 1.6.0 drafts still lists everything people get.
+- **Contributors** are the GitHub accounts (a name when a commit has no account) behind the commits in that range that
+  touch `android/` or `protocol/`, most commits first, bots left out. Mentions make GitHub show the avatars.
+- `.github/scripts/release-notes.sh` builds both parts with git and `gh` (no new dependency); the workflow checks out
+  the full history for it. Every existing release, 1.0.0 to 1.7.0, got the same notes from it.
