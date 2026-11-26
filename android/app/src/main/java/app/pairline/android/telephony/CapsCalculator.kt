@@ -54,6 +54,8 @@ object CapsCalculator {
             if (has(Manifest.permission.READ_SMS) && input.smsWrite) caps += Caps.SMS_READ
             // The bridge keeps them and sends them at the time (D-084).
             if (has(Manifest.permission.SEND_SMS)) caps += Caps.SMS_SCHEDULE
+            // Picture and group messages: read from Android's store, sent through its MMS service (D-089).
+            if (has(Manifest.permission.READ_SMS) && has(Manifest.permission.SEND_SMS)) caps += Caps.MMS
         }
         if (input.hasCalling) {
             if (phoneState) caps += Caps.CALL_OBSERVE

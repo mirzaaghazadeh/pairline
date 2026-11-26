@@ -22,6 +22,8 @@ import app.pairline.android.telephony.BlockList
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
 import app.pairline.android.telephony.DataUsage
+import app.pairline.android.telephony.MmsSender
+import app.pairline.android.telephony.MmsStore
 import app.pairline.android.telephony.ScheduledSms
 import app.pairline.android.telephony.SimDirectory
 import app.pairline.android.telephony.SmsSender
@@ -67,7 +69,10 @@ object AppGraph {
 
     /** Numbers whose texts and calls don't reach the iPhone (D-043). */
     val blockList: BlockList by lazy { BlockList(app) }
-    val smsStore: SmsStore by lazy { SmsStore(app, sims, blockList::isBlocked) }
+    /** Picture and group messages (D-089). */
+    val mmsStore: MmsStore by lazy { MmsStore(app, sims, blockList::isBlocked) }
+    val mmsSender: MmsSender by lazy { MmsSender(app, sims, link::send) }
+    val smsStore: SmsStore by lazy { SmsStore(app, sims, blockList::isBlocked, mmsStore) }
     val smsSender: SmsSender by lazy { SmsSender(app, sims, smsStore, link::send) }
     val calls: CallTracker by lazy {
         CallTracker(app, sims, prefs, link::send) { router.statusChanged() }.also { tracker ->
@@ -107,7 +112,7 @@ object AppGraph {
     val router: MessageRouter by lazy {
         MessageRouter(
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
-            netSwitches, app, scheduledSms, dataUsage, photos,
+            netSwitches, app, scheduledSms, dataUsage, photos, mmsStore, mmsSender,
         )
     }
 

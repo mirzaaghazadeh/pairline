@@ -208,7 +208,7 @@ parties). Each needs a real-phone test.
 - [x] Reply to Android app notifications from the iPhone (D-086)
 - [x] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi (D-088)
 - [x] Live captions of relayed calls on the iPhone (on-device speech recognition, nothing recorded or stored, D-087)
-- [ ] MMS and group messages
+- [x] MMS and group messages: shown with thumbnails, attachments over Wi-Fi, pictures and group texts sent (D-089)
 - [ ] More than one iPhone, iPad or Mac paired with one bridge
 
 ## M9 — Android client mode: dropped (D-050)
@@ -221,6 +221,6 @@ Two Android phones pairing with each other isn't planned; the started work is ar
 - Remote mode through an end-to-end encrypted relay (paid, opt-in)
 - ~~Notification mirroring from chosen Android apps~~ — done (D-077), real-phone test pending
 - ~~Mac app~~ — the iPad app on Apple Silicon Macs (D-076)
-- MMS (picture messages)
+- ~~MMS (picture messages)~~ — done (D-089), real-phone test pending
 - ~~Export of SMS history~~ — done on the iPhone (D-079); an encrypted backup format isn't planned (D-079)
 - More languages: Turkish, Urdu, Chinese, Indonesian (English, Persian and Arabic ship at launch, D-019)

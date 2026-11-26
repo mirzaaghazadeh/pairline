@@ -253,7 +253,7 @@ struct FAQ: Identifiable {
         FAQ(id: 7, question: "Can I see the source code?",
             answer: "Yes. Pairline's source code is public so anyone can check what it does."),
         FAQ(id: 8, question: "Does Pairline work with group messages or MMS?",
-            answer: "Not yet. Pairline handles SMS text messages. Picture messages (MMS) are planned."),
+            answer: "Yes, with the latest Pairline Bridge. Picture and group messages show here with their pictures and everyone in the group, and you can send a picture or a group message. Sending needs mobile data on the Android phone, and full pictures open over Wi-Fi."),
     ]
 }
 

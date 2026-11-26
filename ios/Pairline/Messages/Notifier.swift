@@ -107,7 +107,9 @@ final class Notifier: NSObject, ObservableObject {
         content.title = sender
         let code = OTPDetector.code(in: message.body)
         if AppSettings.shared.showMessagePreviews {
-            content.body = message.body
+            // A picture message without text (D-089).
+            content.body = message.body.isEmpty && !message.parts.isEmpty
+                ? "📷 " + String(localized: "Picture message", table: "MMS") : message.body
         } else {
             content.body = code == nil ? String(localized: "New message") : String(localized: "New one-time code")
         }

@@ -76,6 +76,20 @@ final class AppDatabase: ObservableObject {
                 try db.execute("PRAGMA user_version = 2")
             }
         }
+        if version < 3 {
+            // Picture and group messages (D-089): an MMS's attachments (JSON, with small thumbnails) and a group
+            // message's participants.
+            try db.transaction {
+                try db.execute("ALTER TABLE messages ADD COLUMN parts TEXT")
+                try db.execute("ALTER TABLE messages ADD COLUMN addrs TEXT")
+                try db.execute("PRAGMA user_version = 3")
+            }
+        }
+    }
+
+    private func encodeParts(_ parts: [MMSPart]?) -> SQLValue {
+        guard let parts, !parts.isEmpty, let data = try? JSONEncoder().encode(parts) else { return .null }
+        return .text(String(decoding: data, as: UTF8.self))
     }
 
     private func changed() {
@@ -143,17 +157,23 @@ final class AppDatabase: ObservableObject {
             """, [.text(m.body), .int(m.time)]).first?.string("key") {
             try db.execute("UPDATE messages SET key = ?, thread = ?, state = ? WHERE key = ?",
                            [.text(m.key), .int(thread), .text(state), .text(local)])
+            if m.parts?.isEmpty == false {
+                try db.execute("UPDATE messages SET parts = ? WHERE key = ?", [encodeParts(m.parts), .text(m.key)])
+            }
             if thread >= 0 { try adoptSyntheticThread(for: m.addr, into: thread) }
-            try touchThread(thread, addr: m.addr, body: m.body, time: m.time, newMessage: false, unread: false)
+            try touchThread(thread, addr: m.addr, body: m.body, time: m.time, newMessage: false, unread: false,
+                            group: m.addrs)
             return false
         }
         try db.execute("""
-            INSERT INTO messages(key, thread, addr, body, time, box, sim, state) VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO messages(key, thread, addr, body, time, box, sim, state, parts, addrs)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, [.text(m.key), .int(thread), .text(m.addr), .text(m.body), .int(m.time), .text(m.box),
-                  .from(m.sim), .text(state)])
+                  .from(m.sim), .text(state), encodeParts(m.parts),
+                  m.addrs?.isEmpty == false ? .text(encodeList(m.addrs ?? [])) : .null])
         if thread >= 0 { try adoptSyntheticThread(for: m.addr, into: thread) }
-        try touchThread(thread, addr: m.addr, body: m.body, time: m.time, newMessage: countUnread,
-                        unread: countUnread && m.box == "in")
+        try touchThread(thread, addr: m.addr, body: m.body.isEmpty && m.parts?.isEmpty == false ? "📷" : m.body,
+                        time: m.time, newMessage: countUnread, unread: countUnread && m.box == "in", group: m.addrs)
         return true
     }
 
@@ -206,10 +226,14 @@ final class AppDatabase: ObservableObject {
     }
 
     private func touchThread(_ thread: Int64, addr: String, body: String, time: Int64, newMessage: Bool,
-                             unread: Bool) throws {
+                             unread: Bool, group: [String]? = nil) throws {
         if let row = try db.query("SELECT time, addrs FROM threads WHERE thread = ?", [.int(thread)]).first {
             var addrs = decodeList(row.string("addrs"))
-            if !addrs.contains(where: { PhoneNumber.matchKey($0) == PhoneNumber.matchKey(addr) }) { addrs.append(addr) }
+            // A group message brings everyone in it (D-089).
+            for a in [addr] + (group ?? []) where !a.isEmpty
+                && !addrs.contains(where: { PhoneNumber.matchKey($0) == PhoneNumber.matchKey(a) }) {
+                addrs.append(a)
+            }
             if time >= row.int64("time") ?? 0 {
                 try db.execute("UPDATE threads SET snippet = ?, time = ?, addrs = ? WHERE thread = ?",
                                [.text(body), .int(time), .text(encodeList(addrs)), .int(thread)])
@@ -224,9 +248,10 @@ final class AppDatabase: ObservableObject {
             }
         } else {
             // Count unknown until the bridge reports it.
+            let addrs = group?.isEmpty == false ? (group ?? []) : [addr]
             try db.execute("""
                 INSERT INTO threads(thread, addrs, snippet, time, count, unread, has_older) VALUES(?, ?, ?, ?, NULL, ?, ?)
-                """, [.int(thread), .text(encodeList([addr])), .text(body), .int(time), .int(unread ? 1 : 0),
+                """, [.int(thread), .text(encodeList(addrs)), .text(body), .int(time), .int(unread ? 1 : 0),
                       .int(thread >= 0 && !historyComplete ? 1 : 0)])
         }
     }
@@ -263,19 +288,24 @@ final class AppDatabase: ObservableObject {
     }
 
     /// A message typed on the iPhone, before the bridge confirms it.
-    func insertPending(thread: Int64?, to address: String, body: String, sim: Int?, cid: String) -> StoredMessage {
+    func insertPending(thread: Int64?, to address: String, body: String, sim: Int?, cid: String,
+                       parts: [MMSPart] = [], group: [String] = []) -> StoredMessage {
         let threadID = thread ?? existingThread(for: address) ?? PhoneNumber.syntheticThreadID(for: address)
         let now = Date().milliseconds
         let key = "local:\(cid)"
         try? db.transaction {
             try db.execute("""
-                INSERT INTO messages(key, thread, addr, body, time, box, sim, state, cid) VALUES(?, ?, ?, ?, ?, 'out', ?, 'pending', ?)
-                """, [.text(key), .int(threadID), .text(address), .text(body), .int(now), .from(sim), .text(cid)])
-            try touchThread(threadID, addr: address, body: body, time: now, newMessage: true, unread: false)
+                INSERT INTO messages(key, thread, addr, body, time, box, sim, state, cid, parts, addrs)
+                VALUES(?, ?, ?, ?, ?, 'out', ?, 'pending', ?, ?, ?)
+                """, [.text(key), .int(threadID), .text(address), .text(body), .int(now), .from(sim), .text(cid),
+                      encodeParts(parts), group.count > 1 ? .text(encodeList(group)) : .null])
+            try touchThread(threadID, addr: address, body: body.isEmpty && !parts.isEmpty ? "📷" : body, time: now,
+                            newMessage: true, unread: false, group: group)
         }
         changed()
         return StoredMessage(key: key, thread: threadID, addr: address, body: body, time: Date(milliseconds: now),
-                             isOutgoing: true, sim: sim, state: .pending, cid: cid, error: nil)
+                             isOutgoing: true, sim: sim, state: .pending, cid: cid, error: nil, parts: parts,
+                             addrs: group.count > 1 ? group : [])
     }
 
     /// A message the bridge will send at `at` (D-084): shown in the conversation at that time with a clock, while the
@@ -736,12 +766,18 @@ private extension StoredMessage {
                   isOutgoing: row.string("box") == "out", sim: row.int("sim"),
                   state: MessageState(rawValue: row.string("state") ?? "") ?? .received,
                   cid: row.string("cid"), error: row.string("error"))
+        if let json = row.string("parts")?.data(using: .utf8) {
+            parts = (try? JSONDecoder().decode([MMSPart].self, from: json)) ?? []
+        }
+        if let json = row.string("addrs")?.data(using: .utf8) {
+            addrs = (try? JSONDecoder().decode([String].self, from: json)) ?? []
+        }
     }
 
     init(dto m: SMSMessage) {
         self.init(key: m.key, thread: m.thread ?? PhoneNumber.syntheticThreadID(for: m.addr), addr: m.addr, body: m.body,
                   time: Date(milliseconds: m.time), isOutgoing: m.box == "out", sim: m.sim,
                   state: MessageState(rawValue: m.state ?? "") ?? (m.box == "out" ? .sent : .received),
-                  cid: nil, error: nil)
+                  cid: nil, error: nil, parts: m.parts ?? [], addrs: m.addrs ?? [])
     }
 }

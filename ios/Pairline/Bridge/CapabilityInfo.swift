@@ -45,6 +45,7 @@ struct CapabilityInfo: Identifiable {
         case .block: return "hand.raised"
         case .callScreen: return "phone.badge.waveform.fill"
         case .mediaPhotos: return "photo.on.rectangle"
+        case .mms: return "photo.badge.plus"
         }
     }
 
@@ -83,6 +84,7 @@ struct CapabilityInfo: Identifiable {
         case .block: return String(localized: "Block list")
         case .callScreen: return String(localized: "Call screening", table: "Screening")
         case .mediaPhotos: return String(localized: "Photos on the Android phone", table: "Photos")
+        case .mms: return String(localized: "Picture and group messages", table: "MMS")
         }
     }
 
@@ -115,7 +117,7 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Wireless debugging).", table: "CallAudio")
         case .contactsEdit:
             return String(localized: "Turn on \"Add contacts from iPhone\" in Pairline Bridge on your Android phone.")
-        case .phoneFind, .phoneRinger, .callVoicemail, .smsSchedule:
+        case .phoneFind, .phoneRinger, .callVoicemail, .smsSchedule, .mms:
             return String(localized: "Update Pairline Bridge on your Android phone.", table: "PhoneTools")
         case .dataUsage:
             return String(localized: "Allow Usage access for Pairline Bridge on your Android phone: open the data meter here and it shows a notification there that leads to it.", table: "Extras")

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Files received from the iPhone on Android 9 (FileStore.LegacySink). Nothing else is shared. -->
+<!-- Files received from the iPhone on Android 9 (FileStore.LegacySink), and MMS send requests built for the iPhone
+     (D-089), which Android's MMS service reads once. Nothing else is shared. -->
 <paths>
     <external-files-path name="received" path="Download/Pairline/" />
+    <cache-path name="mms" path="mms-out/" />
 </paths>

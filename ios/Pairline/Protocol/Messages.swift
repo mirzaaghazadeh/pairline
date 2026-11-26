@@ -178,6 +178,21 @@ struct SMSMessage: Codable, Equatable {
     var box: String
     var sim: Int?
     var state: String?
+    /// An MMS's attachments, pictures with a small thumbnail (D-089).
+    var parts: [MMSPart]?
+    /// Everyone in a group message but the bridge phone (D-089).
+    var addrs: [String]?
+}
+
+/// One attachment of a picture or group message (D-089). The full file comes with `mms.part`.
+struct MMSPart: Codable, Equatable, Hashable {
+    var pid: Int64
+    var type: String
+    var name: String?
+    /// Base64 JPEG, about 128 px, for pictures.
+    var thumb: String?
+
+    var isImage: Bool { type.lowercased().hasPrefix("image/") }
 }
 
 struct SMSStateEvent: Codable, Equatable {
@@ -780,6 +795,20 @@ struct Outbound {
     /// The bridge sends this photo with the file transfer (needs `media.photos`, D-088).
     static func mediaGet(mid: Int64) -> Outbound { Outbound("media.get", ["mid": mid], lane: .wifi) }
 
+    /// One attachment of an MMS, sent with the file transfer (needs `mms`, Wi-Fi, D-089).
+    static func mmsPart(key: String, pid: Int64) -> Outbound { Outbound("mms.part", ["key": key, "pid": pid], lane: .wifi) }
+
+    /// A piece of a picture for an MMS, in order; `last` on the final one (needs `mms`, D-089).
+    static func mmsAttach(aid: String, seq: Int, data: Data, last: Bool, type: String, name: String) -> Outbound {
+        Outbound("mms.attach", ["aid": aid, "seq": seq, "data": data.base64EncodedString(), "last": last,
+                                "type": type, "name": name])
+    }
+
+    /// Sends text and/or the attached picture to one or more numbers; several make a group message (D-089).
+    static func mmsSend(cid: String, sim: Int?, to: [String], body: String?, aid: String?) -> Outbound {
+        Outbound("mms.send", ["cid": cid, "sim": optional(sim), "to": to, "body": optional(body), "aid": optional(aid)])
+    }
+
     static func blockSet(add: [String], remove: [String]) -> Outbound {
         Outbound("block.set", ["add": add, "remove": remove])
     }
@@ -852,6 +881,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case callScreen = "call.screen"
     /// The bridge phone's photos can be browsed and fetched over Wi-Fi (opt-in there, D-088).
     case mediaPhotos = "media.photos"
+    /// Picture and group messages: shown in history, sent with `mms.send` (D-089).
+    case mms = "mms"
 
     var id: String { rawValue }
 }

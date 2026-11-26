@@ -260,6 +260,14 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 {"key": "sms:1234", "thread": 17, "addr": "+15551234567", "body": "text", "time": 1764000000000,
  "box": "in" | "out", "sim": 0, "state": "received" | "pending" | "sent" | "delivered" | "failed"}
 
+// Message (MMS, D-089, with `mms`): key "mms:<id>"; body is the text parts (may be empty); addr is the sender of an
+// incoming one, the first recipient of an outgoing one. `parts` lists the attachments besides text and SMIL, pictures
+// with a base64 JPEG thumbnail of 128 px at most; `addrs` lists everyone in a group message but B. Both are left out
+// when empty. They arrive in `sms.history` and `sms.new` like texts, and `sms.threads` lists MMS-only and group threads.
+{"key": "mms:88", "thread": 21, "addr": "+15551234567", "body": "", "time": 1764000000000, "box": "in", "sim": 0,
+ "state": "received", "parts": [{"pid": 412, "type": "image/jpeg", "name": "IMG_1.jpg", "thumb": "/9j/4AAQ…"}],
+ "addrs": ["+15551234567", "+15557654321"]}
+
 // SIM, in status.sims (defaultData: Android's data SIM, D-073). D-082 adds, each optional: dbm (signal in dBm, RSRP on
 // LTE and 5G, Android 10+), rat (the exact radio technology, e.g. "LTE-CA", "NR NSA", "HSPA+"), op (the network it's
 // registered on, which differs from carrier when roaming) and vm (the carrier's voicemail-waiting indicator). B leaves
@@ -332,6 +340,9 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `remote.ring` | B→R | — | `on` (default true): B's user is looking for R; R plays a sound for up to 30 seconds, or stops. Sent only to an R that listed `ring` in its `device.info` `caps` (D-084) |
 | `media.list` | R→B, B→R | — | Wi-Fi session only. request: `id`, `before` (the last page's `cursor`, or null), `limit` (default 30, at most 60) / reply: `id`, `items` [`{mid, time, w, h, size, thumb}`] (newest first; `thumb` a base64 JPEG of 128 px at most, about 4 KB), `more`, `cursor` (opaque). Pages stay under 30 KB, so they may hold fewer than `limit`. `unsupported` on another session. Needs `media.photos` (D-088) |
 | `media.get` | R→B | — | `id`, `mid` → `ok`, then B offers the photo with the normal file transfer (`file.offer` on the Wi-Fi session). Needs `media.photos` (D-088) |
+| `mms.part` | R→B | — | `id`, `key` ("mms:…"), `pid` → `ok`, then B offers that attachment with the file transfer (Wi-Fi session). `unsupported` without one. Needs `mms` (D-089) |
+| `mms.attach` | R→B | — | `id`, `aid` (R's id, letters, digits and `-`, up to 64), `seq` (0, 1, 2…), `data` (base64, a piece of the picture, about 24 KB), `last`, and on `seq` 0 `type` (an `image/` type) and `name` → `ok`. Pieces in order, 1 MB in all at most, 3 pictures at a time, kept 10 minutes. Any session, so a picture can go over Bluetooth (D-089) |
+| `mms.send` | R→B | — | `id`, `cid`, `sim`, `to` [number] (1 to 20; several make a group message), `body` (text or null), `aid` (a complete `mms.attach`, or null) → `ok` once Android's MMS service has it; then `sms.state` `sent` (with the stored message's `key`) or `failed`. No delivery reports. Needs `mms` and, on the bridge, mobile data (D-089) |
 | `wifi.offer` | B→R | M5 | `ip` [address], `port`, `ssid` and `password` (only while B's hotspot is on, else null), `band` (`"2.4"` / `"5"` / `"6"` or null). Sent on B's event session after `status` and whenever any of it changes; `ip: []` means B has no Wi-Fi now |
 | `wifi.media` | B→R | M5 | `port` (UDP) or null. On each Wi-Fi session, right after the handshake |
 | `link.switch` | — | M5 | Not used: replies follow their request's session (D-044) |
@@ -359,7 +370,8 @@ tethering, mobile data and data SIM: Android 11 or later and Talk on iPhone's he
 (`call.dial` takes `voicemail: true`, SIMs carry `vm`, D-082), `sms.schedule` (B keeps and sends scheduled messages,
 D-084), `data.usage` (Usage access given, D-084), `call.screen` (B is Android's call-screening app: blocked numbers
 are turned away before they ring and `block.set` `unknown` works, D-085), `media.photos` (B's user turned on
-"Photos for the iPhone" and gave photo access, with the Wi-Fi link on, D-088), `contacts.edit`
+"Photos for the iPhone" and gave photo access, with the Wi-Fi link on, D-088), `mms` (picture and group messages in
+history, `mms.part`, `mms.attach`, `mms.send`, D-089), `contacts.edit`
 (with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `notif.mirror` (notification access given:
 chosen apps' notifications are sent as `notif.posted`, D-077), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),

@@ -29,6 +29,8 @@ the section in the same commit that raises `versionName`.
   field on the iPhone; the reply goes through that app on this phone, as if you had typed it here.
 - **Photos for the iPhone** (Settings, off by default): browse this phone's photos on the iPhone and copy the ones you
   tap, over Wi-Fi only.
+- **Picture and group messages (MMS).** They show on the iPhone with their pictures and everyone in the group, and the
+  iPhone can send a picture or a group message through this phone. Sending MMS needs mobile data on.
 
 ## 1.7.0 (2026-11-26)
 

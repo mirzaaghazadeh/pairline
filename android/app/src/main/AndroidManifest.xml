@@ -206,6 +206,11 @@
             </intent-filter>
         </service>
 
+        <!-- Android's answer for an MMS the iPhone sent (D-089); reached only through our own PendingIntent. -->
+        <receiver
+            android:name=".telephony.MmsResultReceiver"
+            android:exported="false" />
+
         <!-- The alarm for messages scheduled on the iPhone (D-084); reached only through our own PendingIntent. -->
         <receiver
             android:name=".telephony.ScheduledSmsReceiver"

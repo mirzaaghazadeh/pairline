@@ -71,6 +71,8 @@ class SmsStore(
     private val context: Context,
     private val sims: SimDirectory,
     private val isBlocked: (String?) -> Boolean = { false },
+    /** Picture and group messages, merged into history and threads (D-089). */
+    private val mms: MmsStore? = null,
 ) {
 
     private fun hidden(row: SmsRow) = row.type == Telephony.Sms.MESSAGE_TYPE_INBOX && isBlocked(row.address)
@@ -128,13 +130,26 @@ class SmsStore(
             bound = batch.last().time
             inclusive = true
         }
-        val (page, _) = JsonPager.pageByTime(rows, limit, exhausted, { it.time }) { it.toJson(slots[it.subId]) }
+        // Picture and group messages in the same bounds (D-089): the top of both lists together is within the top of
+        // each, so one merged page is right.
+        val mmsRows = mms?.history(thread, before, after, fetch).orEmpty()
+        val mmsExhausted = mmsRows.size < fetch
+        val items = (rows.map { HistoryItem(it.time, 0, it.id) { s -> it.toJson(s[it.subId]) } } +
+            mmsRows.map { m -> HistoryItem(m.time, 1, m.id) { s -> mms!!.toJson(m, s) } })
+            .let { all ->
+                val byTime = compareBy<HistoryItem>({ it.time }, { it.kind }, { it.id })
+                if (after != null) all.sortedWith(byTime) else all.sortedWith(byTime.reversed())
+            }
+        val (page, _) = JsonPager.pageByTime(items, limit, exhausted && mmsExhausted, { it.time }) { it.encode(slots) }
         return JSONObject()
             .put("t", Msg.SMS_HISTORY)
             .put("id", id)
             .put("msgs", page.items)
             .put("more", page.more)
     }
+
+    /** One SMS or MMS of a history page (D-089). */
+    private class HistoryItem(val time: Long, val kind: Int, val id: Long, val encode: (Map<Int, Int>) -> JSONObject)
 
     /**
      * `sms.read` (D-074): the iPhone read this conversation, so its received messages are marked read here too. Android
@@ -176,10 +191,26 @@ class SmsStore(
                 c.getString(1)?.takeIf { it.isNotBlank() }?.let { if (agg.addrs.size < 10) agg.addrs += it }
             }
         }
-        val candidates = all.values.filter { before == null || it.time < before }
+        // Threads whose newest message is an MMS, and group threads that have only MMS (D-089).
+        val merged = LinkedHashMap(all)
+        for ((thread, latest) in mms?.latestPerThread().orEmpty()) {
+            val (row, count) = latest
+            val sms = merged[thread]
+            if (sms != null && sms.time >= row.time) {
+                sms.count += count
+                continue
+            }
+            val agg = ThreadAgg(thread, -1, row.time)
+            agg.count = (sms?.count ?: 0) + count
+            mms?.participants(row)?.forEach { if (agg.addrs.size < 10) agg.addrs += it }
+            sms?.addrs?.forEach { if (agg.addrs.size < 10) agg.addrs += it }
+            agg.snippet = SmsMapping.snippet(row.text.ifEmpty { MMS_SNIPPET })
+            merged[thread] = agg
+        }
+        val candidates = merged.values.sortedByDescending { it.time }.filter { before == null || it.time < before }
         val window = candidates.take(limit + SAME_TIME_SLACK)
-        val bodies = bodiesOf(window.map { it.latestId })
-        window.forEach { it.snippet = SmsMapping.snippet(bodies[it.latestId].orEmpty()) }
+        val bodies = bodiesOf(window.map { it.latestId }.filter { it > 0 })
+        window.filter { it.latestId > 0 }.forEach { it.snippet = SmsMapping.snippet(bodies[it.latestId].orEmpty()) }
         val (page, _) = JsonPager.pageByTime(window, limit, window.size == candidates.size, { it.time }) { it.toJson() }
         return JSONObject()
             .put("t", Msg.SMS_THREADS)
@@ -231,6 +262,9 @@ class SmsStore(
 
     private companion object {
         const val SAME_TIME_SLACK = 200
+
+        /** A thread snippet for a picture message without text; the iPhone shows its own words for attachments. */
+        const val MMS_SNIPPET = "📷"
 
         /** History queries per page when blocked senders' texts are skipped (each reads `limit + 200` rows). */
         const val MAX_ROUNDS = 20

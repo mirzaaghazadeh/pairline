@@ -21,8 +21,14 @@ struct StoredMessage: Identifiable, Equatable {
     var state: MessageState
     var cid: String?
     var error: String?
+    /// An MMS's attachments (D-089).
+    var parts: [MMSPart] = []
+    /// A group message's participants besides the bridge phone (D-089).
+    var addrs: [String] = []
 
     var id: String { key }
+    /// A picture or group message sent from this iPhone: it goes with `mms.send`, never the SMS outbox.
+    var isLocalMMS: Bool { cid?.hasPrefix("m-") == true }
 }
 
 struct Conversation: Identifiable, Equatable {

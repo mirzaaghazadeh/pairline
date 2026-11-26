@@ -6442,24 +6442,24 @@
         }
       }
     },
-    "Not yet. Pairline handles SMS text messages. Picture messages (MMS) are planned." : {
+    "Yes, with the latest Pairline Bridge. Picture and group messages show here with their pictures and everyone in the group, and you can send a picture or a group message. Sending needs mobile data on the Android phone, and full pictures open over Wi-Fi." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ليس بعد. يدعم Pairline الرسائل النصية القصيرة (SMS)، ودعم رسائل الصور (MMS) مُخطط له."
+            "value" : "نعم، مع أحدث إصدار من Pairline Bridge. تظهر هنا رسائل الصور والرسائل الجماعية بصورها وبكل من في المجموعة، ويمكنك إرسال صورة أو رسالة جماعية. يحتاج الإرسال إلى بيانات الجوال على هاتف أندرويد، وتُفتح الصور كاملة عبر الواي فاي."
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هنوز نه. Pairline فعلاً پیامک‌های متنی را پشتیبانی می‌کند. پیام‌های تصویری (MMS) در برنامه‌های آینده است."
+            "value" : "بله، با جدیدترین Pairline Bridge. پیام‌های تصویری و گروهی با عکس‌هایشان و همهٔ افراد گروه اینجا نشان داده می‌شوند و می‌توانید عکس یا پیام گروهی بفرستید. ارسال به اینترنت همراه روشن روی گوشی اندرویدی نیاز دارد و عکس کامل از راه وای‌فای باز می‌شود."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Henüz değil. Pairline SMS metin mesajlarını destekler. Resimli mesajlar (MMS) planlanıyor."
+            "value" : "Evet, en son Pairline Bridge ile. Resimli ve grup mesajları resimleri ve gruptaki herkesle burada görünür; resim ya da grup mesajı da gönderebilirsiniz. Göndermek için Android telefonda mobil veri açık olmalı; resimlerin tamamı Wi-Fi üzerinden açılır."
           }
         }
       }

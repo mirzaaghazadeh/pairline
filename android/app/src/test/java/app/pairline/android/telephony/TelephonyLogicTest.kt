@@ -52,7 +52,7 @@ class TelephonyLogicTest {
     fun allPermissionsSingleSim() {
         assertEquals(
             listOf(
-                Caps.SMS_RECEIVE, Caps.SMS_SEND, Caps.SMS_HISTORY, Caps.SMS_SCHEDULE, Caps.CALL_OBSERVE,
+                Caps.SMS_RECEIVE, Caps.SMS_SEND, Caps.SMS_HISTORY, Caps.SMS_SCHEDULE, Caps.MMS, Caps.CALL_OBSERVE,
                 Caps.CALL_CONTROL, Caps.CALL_DIAL, Caps.CALL_VOICEMAIL, Caps.CONTACTS, Caps.CALLLOG, Caps.USSD,
                 Caps.CALLLOG_DELETE, Caps.BLOCK,
             ),

@@ -93,6 +93,8 @@ class LinkService : Service() {
         graph.netSwitches.start()
         // Alarms don't survive a restart or an app update: set the next scheduled message's again (D-084).
         graph.io.execute { runCatching { graph.scheduledSms.arm() } }
+        // Picture messages the default messaging app downloads go to the iPhone right away (D-089).
+        graph.io.execute { runCatching { graph.mmsStore.watch { graph.link.send(it) } } }
 
         ContextCompat.registerReceiver(
             this,
@@ -176,6 +178,7 @@ class LinkService : Service() {
         runCatching { unregisterReceiver(phoneStateReceiver) }
         graph.status.stop()
         graph.netSwitches.stop()
+        graph.mmsStore.unwatch()
         transports.forEach { it.stop() }
         transports = emptyList()
         wifi?.stop()

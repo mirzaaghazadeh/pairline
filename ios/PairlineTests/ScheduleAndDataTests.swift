@@ -1,4 +1,5 @@
 @testable import Pairline
+import UIKit
 import XCTest
 
 /// D-084: scheduled messages, the data meter and ringing this iPhone.
@@ -57,6 +58,58 @@ final class ScheduleAndDataTests: XCTestCase {
         XCTAssertEqual(Outbound.mediaList(cursor: nil, limit: 30).lane, .wifi)
         XCTAssertEqual(Outbound.mediaGet(mid: 42).lane, .wifi)
         XCTAssertTrue(try json(.mediaList(cursor: nil, limit: 30))["before"] is NSNull)
+    }
+
+    /// D-089: an MMS in history, its attachment request, and the send messages.
+    func testMMSMessages() throws {
+        guard case .smsHistory(let page) = try decode([
+            "t": "sms.history", "id": 1, "more": false,
+            "msgs": [["key": "mms:9", "thread": 4, "addr": "+905551111111", "body": "", "time": 1, "box": "in",
+                      "parts": [["pid": 3, "type": "image/jpeg", "name": "a.jpg", "thumb": "AAAA"]],
+                      "addrs": ["+905551111111", "+905552222222"]]],
+        ]).message else { return XCTFail() }
+        XCTAssertEqual(page.msgs.first?.parts?.first?.pid, 3)
+        XCTAssertEqual(page.msgs.first?.parts?.first?.isImage, true)
+        XCTAssertEqual(page.msgs.first?.addrs?.count, 2)
+        XCTAssertEqual(Outbound.mmsPart(key: "mms:9", pid: 3).lane, .wifi)
+        let attach = try json(.mmsAttach(aid: "a1", seq: 0, data: Data([1, 2, 3]), last: true, type: "image/jpeg", name: "x.jpg"))
+        XCTAssertEqual(attach["data"] as? String, "AQID")
+        let send = try json(.mmsSend(cid: "m-1", sim: nil, to: ["+1", "+2"], body: nil, aid: "a1"))
+        XCTAssertEqual(send["to"] as? [String], ["+1", "+2"])
+        XCTAssertTrue(send["body"] is NSNull)
+    }
+
+    /// D-089: attachments and participants are kept with the message, and a group thread lists everyone.
+    @MainActor
+    func testMMSStored() throws {
+        let db = AppDatabase.inMemory()
+        let part = MMSPart(pid: 3, type: "image/jpeg", name: "a.jpg", thumb: "AAAA")
+        db.upsertMessages([SMSMessage(key: "mms:9", thread: 4, addr: "+905551111111", body: "", time: 1_000, box: "in",
+                                      sim: nil, state: "received", parts: [part],
+                                      addrs: ["+905551111111", "+905552222222"])], countUnread: true)
+        let stored = try XCTUnwrap(db.messages(thread: 4).first)
+        XCTAssertEqual(stored.parts, [part])
+        XCTAssertEqual(stored.addrs.count, 2)
+        XCTAssertEqual(db.conversation(thread: 4)?.addresses.count, 2)
+        XCTAssertEqual(db.conversation(thread: 4)?.snippet, "📷", "a picture without text")
+        let local = db.insertPending(thread: 4, to: "+905551111111", body: "hi", sim: nil, cid: "m-1",
+                                     group: ["+905551111111", "+905552222222"])
+        XCTAssertTrue(local.isLocalMMS)
+    }
+
+    /// D-089: a picture is made small enough for an MMS.
+    func testPictureFitsAnMMS() throws {
+        let big = UIGraphicsImageRenderer(size: CGSize(width: 3000, height: 2000)).image { context in
+            for i in 0..<60 {
+                UIColor(hue: CGFloat(i) / 60, saturation: 1, brightness: 1, alpha: 1).setFill()
+                context.fill(CGRect(x: i * 50, y: 0, width: 50, height: 2000))
+            }
+        }
+        let data = try XCTUnwrap(big.pngData())
+        let small = try XCTUnwrap(PicturePicker.forMMS(data))
+        XCTAssertLessThanOrEqual(small.count, PicturePicker.maxBytes)
+        let image = try XCTUnwrap(UIImage(data: small))
+        XCTAssertLessThanOrEqual(max(image.size.width, image.size.height), 1280)
     }
 
     /// D-087: the captions panel keeps the last ~240 characters, cut at a word.

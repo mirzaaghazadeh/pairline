@@ -1509,3 +1509,27 @@ Files already go both ways (D-045), but only what the Android side chooses to se
   permission is needed for that.
 - Only photos for now; videos would need streaming rather than copying to be pleasant. Strings: Android
   `strings_more.xml`, iOS `Photos` table. Unit tests on both sides; needs real phones.
+
+### D-089 — Picture and group messages (MMS) (2026-11-26)
+
+The Help FAQ promised MMS, and group conversations didn't show at all. No new permission: `READ_SMS` reads Android's
+MMS store and `SEND_SMS` lets an app that isn't the default messaging app send through Android's own MMS service.
+- **Reading:** `MmsStore` reads `content://mms` (messages the default app sent or downloaded; a notification not yet
+  downloaded has nothing to show), with each message's addresses and parts. A Message gets `parts` (attachments
+  besides text and SMIL, pictures with a ~4 KB thumbnail made on the phone) and `addrs` (everyone in a group but this
+  phone, whose SIM numbers are left out). `sms.history` merges SMS and MMS in one time order (the top of the merged
+  list is within the top of each list, so one page is right); `sms.threads` lists MMS-only and group threads; a
+  content observer announces newly downloaded MMS as `sms.new`, a moment after Android writes their parts.
+- **Attachments** come in full with `mms.part`, through the file transfer (Wi-Fi), and open in Quick Look.
+- **Sending:** the composer's picture button (iOS's own picker; the picture is scaled to at most 1280 px and ~280 KB,
+  which carriers take) and any message in a group conversation go as MMS. The picture travels in `mms.attach` pieces of
+  24 KB (any session, Bluetooth too), then `mms.send` builds an `m-send-req` PDU (`MmsPdu`, OMA-WAP-MMS-ENC 1.2:
+  multipart/mixed, text as UTF-8, pictures by their well-known types) in the private cache, hands it to
+  `SmsManager.sendMultimediaMessage` through Pairline's FileProvider (read granted to Android's phone and MMS
+  service only) and reports `sms.state` sent or failed; Android stores the sent message itself. MMS needs mobile data
+  on the bridge phone; there are no delivery reports. An MMS isn't kept in the iPhone's outbox: it needs the link
+  when sent, and one left waiting is marked not sent.
+- iPhone database version 3 adds `parts` and `addrs` to messages. Group conversations show everyone's names, and the
+  sender above each incoming run of messages.
+- Strings in an `MMS` table. Unit tests: the PDU's encoding, keys, participants, the merged history's storage, the
+  picture sizing. Needs real phones and carriers.

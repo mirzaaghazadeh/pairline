@@ -315,7 +315,12 @@ struct ConversationRow: View {
     let match: StoredMessage?
     @EnvironmentObject private var db: AppDatabase
 
-    private var name: String { db.displayName(for: conversation.primaryAddress) }
+    /// A group conversation lists its people (D-089).
+    private var name: String {
+        guard conversation.addresses.count > 1 else { return db.displayName(for: conversation.primaryAddress) }
+        return conversation.addresses.prefix(3).map { db.displayName(for: $0) }.joined(separator: ", ")
+            + (conversation.addresses.count > 3 ? " +\(conversation.addresses.count - 3)" : "")
+    }
     private var snippet: String { match?.body ?? conversation.snippet }
     private var code: String? {
         guard match == nil, !conversation.lastIsOutgoing, Date().timeIntervalSince(conversation.time) < 30 * 60 else {

@@ -70,6 +70,8 @@ class MessageRouter(
     private val scheduled: ScheduledSms,
     private val dataUsage: DataUsage,
     private val photos: app.pairline.android.files.PhotoLibrary,
+    private val mmsStore: app.pairline.android.telephony.MmsStore,
+    private val mmsSender: app.pairline.android.telephony.MmsSender,
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -329,6 +331,37 @@ class MessageRouter(
                     message.stringOrNull("before"),
                     app.pairline.android.files.PhotoLibrary.limit(message.longOrNull("limit")),
                 )
+            }
+            // D-089: picture and group messages.
+            Msg.MMS_PART -> request(message) { id ->
+                if (link.wifiToken == null) throw RequestException(ErrorCode.UNSUPPORTED, "attachments need the Wi-Fi link")
+                val source = mmsStore.partSource(
+                    message.stringOrNull("key") ?: invalid("key missing"),
+                    message.longOrNull("pid") ?: invalid("pid missing"),
+                )
+                app.pairline.android.AppGraph.files.enqueue(source)
+                Messages.ok(id)
+            }
+            Msg.MMS_ATTACH -> request(message) { id ->
+                mmsSender.attach(
+                    aid = message.stringOrNull("aid") ?: invalid("aid missing"),
+                    seq = message.intOrNull("seq") ?: invalid("seq missing"),
+                    data = message.stringOrNull("data") ?: invalid("data missing"),
+                    last = message.boolOrNull("last") ?: false,
+                    type = message.stringOrNull("type"),
+                    name = message.stringOrNull("name"),
+                )
+                Messages.ok(id)
+            }
+            Msg.MMS_SEND -> request(message) { id ->
+                mmsSender.send(
+                    cid = message.stringOrNull("cid") ?: invalid("cid missing"),
+                    sim = sim(message),
+                    to = strings(message.optJSONArray("to"), 20),
+                    body = message.stringOrNull("body"),
+                    aid = message.stringOrNull("aid"),
+                )
+                Messages.ok(id)
             }
             Msg.MEDIA_GET -> request(message) { id ->
                 if (link.wifiToken == null) throw RequestException(ErrorCode.UNSUPPORTED, "photos need the Wi-Fi link")

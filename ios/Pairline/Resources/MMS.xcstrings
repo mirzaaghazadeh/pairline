@@ -1,0 +1,78 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%lld people" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عدد الأشخاص: %lld" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%lld people" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "%lld نفر" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%lld kişi" } }
+      }
+    },
+    "Add a picture" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إضافة صورة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add a picture" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "افزودن عکس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Resim ekle" } }
+      }
+    },
+    "Connect to the bridge phone over Wi-Fi to open attachments." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اتصل بالهاتف الوسيط عبر الواي فاي لفتح المرفقات." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connect to the bridge phone over Wi-Fi to open attachments." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای باز کردن پیوست‌ها، از راه وای‌فای به گوشی پل وصل شوید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ekleri açmak için köprü telefona Wi-Fi üzerinden bağlanın." } }
+      }
+    },
+    "Group message: everyone in this conversation gets it as an MMS." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رسالة جماعية: تصل إلى كل من في هذه المحادثة كرسالة MMS." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Group message: everyone in this conversation gets it as an MMS." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام گروهی: همهٔ افراد این گفتگو آن را به‌صورت MMS می‌گیرند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Grup mesajı: bu konuşmadaki herkes bunu MMS olarak alır." } }
+      }
+    },
+    "Not sent. Send it again." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم تُرسل. أرسلها مرة أخرى." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not sent. Send it again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فرستاده نشد. دوباره بفرستید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gönderilmedi. Yeniden gönderin." } }
+      }
+    },
+    "Picture" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "صورة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Picture" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "عکس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Resim" } }
+      }
+    },
+    "Picture and group messages" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رسائل الصور والرسائل الجماعية" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Picture and group messages" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام‌های تصویری و گروهی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Resimli ve grup mesajları" } }
+      }
+    },
+    "Picture message" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رسالة مصوّرة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Picture message" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام تصویری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Resimli mesaj" } }
+      }
+    },
+    "Remove picture" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إزالة الصورة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Remove picture" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حذف عکس" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Resmi kaldır" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -236,6 +236,64 @@ final class BridgeController: ObservableObject {
         if mode == .real { Task { await refreshDataUsage(force: false) } }
     }
 
+    // MARK: - Picture and group messages (D-089)
+
+    /// Sends text and/or a picture as an MMS to `recipients` (several make a group message). The picture goes first in
+    /// pieces of 24 KB, which fit any session, Bluetooth too. Needs the link now: MMS isn't queued in the outbox.
+    func sendMMS(to recipients: [String], body: String, image: Data?, imageType: String = "image/jpeg", sim: Int?,
+                 thread: Int64?) async throws {
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        guard has(.mms) else { throw ActionError.missingCapability(.mms) }
+        guard phase.isConnected else { throw LinkError.notConnected }
+        guard let first = recipients.first else { return }
+        let cid = "m-" + UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(16).lowercased()
+        var parts: [MMSPart] = []
+        if let image, let thumb = Self.thumbnail(image) {
+            parts = [MMSPart(pid: 0, type: imageType, name: "image.jpg", thumb: thumb)]
+        }
+        _ = db.insertPending(thread: thread, to: first, body: body, sim: sim, cid: cid, parts: parts, group: recipients)
+        Haptics.tap()
+        do {
+            var aid: String?
+            if let image {
+                let id = String(cid.dropFirst(2))
+                let chunk = 24_000
+                var seq = 0
+                for start in stride(from: 0, to: image.count, by: chunk) {
+                    let piece = image.subdata(in: start..<min(start + chunk, image.count))
+                    _ = try await link.request(.mmsAttach(aid: id, seq: seq, data: piece, last: start + chunk >= image.count,
+                                                          type: imageType, name: "image.jpg"))
+                    seq += 1
+                }
+                aid = id
+            }
+            _ = try await link.request(.mmsSend(cid: cid, sim: sim, to: recipients, body: body.isEmpty ? nil : body, aid: aid))
+            log.info("sms", "MMS handed to the bridge (\(recipients.count) recipient(s))")
+        } catch {
+            db.markFailed(cid: cid, error: error.localizedDescription)
+            Haptics.warning()
+            throw error
+        }
+    }
+
+    /// Asks the bridge for an MMS attachment; it arrives with the file transfer (Wi-Fi).
+    func fetchPart(of message: StoredMessage, _ part: MMSPart) async throws {
+        guard has(.mms) else { throw ActionError.missingCapability(.mms) }
+        _ = try await link.request(.mmsPart(key: message.key, pid: part.pid))
+    }
+
+    /// A ~128 px JPEG of a picture, base64, for the local copy of a sent MMS.
+    static func thumbnail(_ data: Data) -> String? {
+        guard let image = UIImage(data: data) else { return nil }
+        let scale = 128 / max(image.size.width, image.size.height, 1)
+        let size = CGSize(width: max(1, image.size.width * min(scale, 1)), height: max(1, image.size.height * min(scale, 1)))
+        let small = UIGraphicsImageRenderer(size: size).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+        return small.jpegData(compressionQuality: 0.5)?.base64EncodedString()
+    }
+
     // MARK: - Scheduled messages (D-084)
 
     /// Whether the bridge can send at the exact minute (Android's "Alarms & reminders"); from its last list.
@@ -641,7 +699,7 @@ final class BridgeController: ObservableObject {
     }
 
     func retry(_ message: StoredMessage) {
-        guard let cid = message.cid else { return }
+        guard let cid = message.cid, !message.isLocalMMS else { return }
         guard canUseLink else { return requestPaywall() }
         db.updateState(cid: cid, state: .pending, key: nil, error: nil)
         Task { await deliver(message) }
@@ -666,6 +724,13 @@ final class BridgeController: ObservableObject {
         for conversation in db.conversations() {
             for message in db.messages(thread: conversation.thread)
             where message.state == .pending && message.key.hasPrefix("local:") {
+                if message.isLocalMMS {
+                    // A picture or group message needs the link when it's sent (D-089); one left waiting failed.
+                    if let cid = message.cid {
+                        db.markFailed(cid: cid, error: String(localized: "Not sent. Send it again.", table: "MMS"))
+                    }
+                    continue
+                }
                 await deliver(message)
             }
         }
