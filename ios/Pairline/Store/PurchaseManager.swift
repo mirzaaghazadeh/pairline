@@ -2,24 +2,27 @@ import Foundation
 import StoreKit
 import UIKit
 
-/// StoreKit 2 purchases (D-017, D-036, D-093). Three non-consumables: a free "7-day Trial", "Pairline Full Access",
-/// and the remote-mode add-on. Entitlements are verified on the device from Apple-signed transactions; there's no
-/// receipt server.
+/// StoreKit 2 purchases (D-017, D-036, D-093). Four non-consumables: a free "7-day Trial", "Pairline Full Access",
+/// the Cloud mode add-on, and Full Access + Cloud mode together. Entitlements are verified on the device from
+/// Apple-signed transactions; there's no receipt server.
 @MainActor
 final class PurchaseManager: ObservableObject {
     static let trialID = "app.pairline.ios.trial7day"
     static let fullID = "app.pairline.ios.full"
-    /// Remote mode after the trial (D-093): bought only once Full Access is.
+    /// Cloud mode (remote mode) added later (D-093): sold only once Full Access is bought.
     static let remoteID = "app.pairline.ios.remote"
+    /// Full Access and Cloud mode together, offered at the first purchase (D-093): unlocks both.
+    static let bundleID = "app.pairline.ios.fullcloud"
     static let fallbackPrice = "$9.99"
-    static let remoteFallbackPrice = "$9.99"
+    static let remoteFallbackPrice = "$19.99"
 
     @Published private(set) var access: AccessState = .loading
-    /// Whether remote mode may run (D-093): during the trial, or with Full Access and the add-on.
+    /// Whether remote mode may run (D-093): during the trial, or with Full Access and the add-on (or the bundle).
     @Published private(set) var remoteAccess: RemoteAccess = .loading
     @Published private(set) var fullProduct: Product?
     @Published private(set) var trialProduct: Product?
     @Published private(set) var remoteProduct: Product?
+    @Published private(set) var bundleProduct: Product?
     @Published private(set) var busy = false
     @Published var message: String?
     @Published private(set) var trustedNow = Date()
@@ -74,18 +77,33 @@ final class PurchaseManager: ObservableObject {
         return fullProduct?.displayPrice ?? Self.fallbackPrice
     }
 
-    /// The remote-mode add-on's price in the user's storefront (D-093).
+    /// The Cloud mode add-on's price in the user's storefront (D-093).
     var remotePriceText: String {
         remoteProduct?.displayPrice ?? Self.remoteFallbackPrice
     }
 
+    /// The "Add Cloud mode" choice at the first purchase (D-093): only before Full Access is owned, and only once all
+    /// three products loaded, so every price on it comes from the user's own storefront. Where it's shown also depends
+    /// on `RemoteFeature` (the paywall checks that).
+    var bundleOffer: BundleOffer? {
+        guard !access.isPurchased, let full = fullProduct, let remote = remoteProduct, let bundle = bundleProduct else {
+            return nil
+        }
+        return BundleOffer(bundlePrice: bundle.displayPrice,
+                           separatePrice: (full.price + remote.price).formatted(full.priceFormatStyle),
+                           remotePrice: remote.displayPrice,
+                           savingPercent: BundleOffer.savingPercent(full: full.price, remote: remote.price,
+                                                                    bundle: bundle.price))
+    }
+
     func loadProducts() async {
         do {
-            let products = try await Product.products(for: [Self.trialID, Self.fullID, Self.remoteID])
+            let products = try await Product.products(for: [Self.trialID, Self.fullID, Self.remoteID, Self.bundleID])
             for product in products {
                 if product.id == Self.fullID { fullProduct = product }
                 if product.id == Self.trialID { trialProduct = product }
                 if product.id == Self.remoteID { remoteProduct = product }
+                if product.id == Self.bundleID { bundleProduct = product }
             }
         } catch {
             log.warning("store", "Couldn't load products: \(error.localizedDescription)")
@@ -107,6 +125,10 @@ final class PurchaseManager: ObservableObject {
             case Self.trialID:
                 start = min(start ?? transaction.originalPurchaseDate, transaction.originalPurchaseDate)
             case Self.remoteID:
+                boughtRemote = true
+            case Self.bundleID:
+                // Full Access and Cloud mode in one purchase (D-093).
+                bought = true
                 boughtRemote = true
             default:
                 break
@@ -224,11 +246,22 @@ final class PurchaseManager: ObservableObject {
         return await purchase(product)
     }
 
-    /// Buys the remote-mode add-on (D-093). Offered only once Full Access is bought (`RemoteAccess.offersPurchase`).
+    /// Buys the Cloud mode add-on (D-093). Offered only once Full Access is bought (`RemoteAccess.offersPurchase`).
     @discardableResult
     func buyRemote() async -> Bool {
         if remoteProduct == nil { await loadProducts() }
         guard let product = remoteProduct else {
+            message = String(localized: "The App Store isn't available right now. Check your connection and try again.")
+            return false
+        }
+        return await purchase(product)
+    }
+
+    /// Buys Full Access and Cloud mode together (D-093), the paywall's "Add Cloud mode" choice at the first purchase.
+    @discardableResult
+    func buyBundle() async -> Bool {
+        if bundleProduct == nil { await loadProducts() }
+        guard let product = bundleProduct else {
             message = String(localized: "The App Store isn't available right now. Check your connection and try again.")
             return false
         }

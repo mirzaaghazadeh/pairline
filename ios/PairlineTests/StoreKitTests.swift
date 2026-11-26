@@ -17,8 +17,8 @@ final class StoreKitTests: XCTestCase {
         // runner that can be well over 4 s.
         for _ in 0..<75 {
             let products = try await Product.products(for: [PurchaseManager.trialID, PurchaseManager.fullID,
-                                                            PurchaseManager.remoteID])
-            if products.count == 3 { return }
+                                                            PurchaseManager.remoteID, PurchaseManager.bundleID])
+            if products.count == 4 { return }
             try await Task.sleep(nanoseconds: 200_000_000)
         }
         // GitHub's macOS runners often never serve a local StoreKit test session (no StoreKit daemon session on a
@@ -44,14 +44,55 @@ final class StoreKitTests: XCTestCase {
         XCTAssertEqual(trial?.displayName, "7-day Trial")
     }
 
-    /// The remote-mode add-on (D-093): a one-time $9.99 non-consumable.
-    func testRemoteAddOnProductMatchesD081() async throws {
-        let products = try await Product.products(for: [PurchaseManager.remoteID])
-        let remote = products.first
-        XCTAssertEqual(remote?.id, PurchaseManager.remoteID)
+    /// The Cloud mode add-on and the first-purchase bundle (D-093): one-time non-consumables, $19.99 and $20.99.
+    func testCloudModeProductsMatchD093() async throws {
+        let products = try await Product.products(for: [PurchaseManager.remoteID, PurchaseManager.bundleID])
+        let remote = products.first { $0.id == PurchaseManager.remoteID }
         XCTAssertEqual(remote?.type, .nonConsumable)
-        XCTAssertEqual(remote?.price, Decimal(string: "9.99"))
+        XCTAssertEqual(remote?.price, Decimal(string: "19.99"))
         XCTAssertEqual(remote?.displayName, "Cloud Mode")
+        let bundle = products.first { $0.id == PurchaseManager.bundleID }
+        XCTAssertEqual(bundle?.type, .nonConsumable)
+        XCTAssertEqual(bundle?.price, Decimal(string: "20.99"))
+        XCTAssertEqual(bundle?.displayName, "Full Access + Cloud Mode")
+    }
+
+    /// "Add Cloud mode" at the first purchase (D-093): offered before Full Access, priced from the store (30 % off the
+    /// two apart), and buying it unlocks both; a fresh start (or Restore) reads both back; a refund takes both away.
+    func testBundleUnlocksFullAccessAndCloudMode() async throws {
+        let manager = PurchaseManager(timeStore: MemoryTimeStore())
+        await manager.refresh()
+        await manager.loadProducts()
+        let offer = try XCTUnwrap(manager.bundleOffer)
+        XCTAssertEqual(offer.savingPercent, 30)
+        XCTAssertEqual(offer.bundlePrice, "$20.99")
+        XCTAssertEqual(offer.separatePrice, "$29.98")
+        XCTAssertEqual(offer.remotePrice, "$19.99")
+
+        let bought = await manager.buyBundle()
+        XCTAssertTrue(bought)
+        XCTAssertEqual(manager.access, .purchased)
+        XCTAssertEqual(manager.remoteAccess, .purchased)
+        XCTAssertFalse(manager.remoteAccess.offersPurchase, "a bundle owner is never offered the add-on")
+        XCTAssertNil(manager.bundleOffer, "the bundle is only for a first purchase")
+
+        // A new start of the app (what Restore Purchases ends in, too) reads both entitlements from the bundle.
+        let relaunched = PurchaseManager(timeStore: MemoryTimeStore())
+        await relaunched.refresh()
+        XCTAssertEqual(relaunched.access, .purchased)
+        XCTAssertEqual(relaunched.remoteAccess, .purchased)
+
+        let transaction = session.allTransactions().first { $0.productIdentifier == PurchaseManager.bundleID }
+        XCTAssertNotNil(transaction)
+        if let transaction {
+            try session.refundTransaction(identifier: transaction.identifier)
+        }
+        for _ in 0..<20 where manager.access == .purchased {
+            try await Task.sleep(nanoseconds: 200_000_000)
+            await manager.refresh()
+        }
+        XCTAssertNotEqual(manager.access, .purchased)
+        XCTAssertFalse(manager.remoteAccess.allowsRemote)
     }
 
     /// Remote mode is part of the trial; after Full Access it's an add-on, sold only then; a refund takes it away.

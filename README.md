@@ -80,7 +80,8 @@ A three-minute intro video, in English, Persian, Turkish and Arabic, is on [getp
 - **iPhone app:** free download. Pair your Android phone first: the first sync of your messages, contacts and call
   history is free, then a free week, then a one-time $9.99 In-App Purchase with free updates. No subscription.
   Demo mode is always free.
-- **Cloud mode (when it ships):** included in the free week, then a one-time $9.99 add-on after the main purchase.
+- **Cloud mode (when it ships):** included in the free week; then $20.99 together with Full Access at the first purchase
+  (about 30% off), or a one-time $19.99 add-on later. No subscription.
 
 ## License
 

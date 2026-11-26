@@ -62,13 +62,33 @@ final class RemoteAddOnTests: XCTestCase {
         XCTAssertNil(RemoteAddOnText.blocker(.purchased))
         XCTAssertNil(RemoteAddOnText.blocker(.loading))
 
-        XCTAssertNotNil(RemoteAddOnText.trialNote(.trial, price: "$9.99"))
+        XCTAssertNotNil(RemoteAddOnText.trialNote(.trial, price: "$19.99"))
+        XCTAssertNotNil(RemoteAddOnText.trialNote(.trial, price: "$19.99", bundlePrice: "$20.99"))
         for access in [RemoteAccess.loading, .purchased, .needsAddOn, .needsFullAccess] {
-            XCTAssertNil(RemoteAddOnText.trialNote(access, price: "$9.99"))
+            XCTAssertNil(RemoteAddOnText.trialNote(access, price: "$19.99"))
+            XCTAssertNil(RemoteAddOnText.trialNote(access, price: "$19.99", bundlePrice: "$20.99"))
         }
     }
 
-    func testProductID() {
+    func testProductIDs() {
         XCTAssertEqual(PurchaseManager.remoteID, "app.pairline.ios.remote")
+        XCTAssertEqual(PurchaseManager.bundleID, "app.pairline.ios.fullcloud")
     }
+
+    /// The bundle's saving comes from the store's prices (D-093): $9.99 + $19.99 against $20.99 is 30 % (29.99 %,
+    /// rounded to the nearest whole percent), and nothing is claimed when the bundle doesn't cost less.
+    func testBundleSavingIsWorkedOutFromThePrices() {
+        XCTAssertEqual(BundleOffer.savingPercent(full: dec("9.99"), remote: dec("19.99"), bundle: dec("20.99")), 30)
+        XCTAssertEqual(BundleOffer.savingPercent(full: 10, remote: 10, bundle: 15), 25)
+        // Another storefront's prices give their own percentage.
+        XCTAssertEqual(BundleOffer.savingPercent(full: dec("349"), remote: dec("699"), bundle: dec("749")), 29)
+        XCTAssertNil(BundleOffer.savingPercent(full: dec("9.99"), remote: dec("19.99"), bundle: dec("29.98")))
+        XCTAssertNil(BundleOffer.savingPercent(full: dec("9.99"), remote: dec("19.99"), bundle: dec("31")))
+        XCTAssertNil(BundleOffer.savingPercent(full: 0, remote: dec("19.99"), bundle: dec("9.99")))
+        XCTAssertNil(BundleOffer.savingPercent(full: dec("9.99"), remote: dec("19.99"), bundle: 0))
+        // Less than half a percent saved rounds to nothing to claim.
+        XCTAssertNil(BundleOffer.savingPercent(full: 100, remote: 100, bundle: dec("199.5")))
+    }
+
+    private func dec(_ text: String) -> Decimal { Decimal(string: text)! }
 }

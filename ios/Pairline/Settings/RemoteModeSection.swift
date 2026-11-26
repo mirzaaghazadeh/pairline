@@ -144,7 +144,8 @@ struct RemoteModeSection: View {
                 if !remote.isOn, let blocker {
                     blocker
                 }
-                if let note = RemoteAddOnText.trialNote(purchases.remoteAccess, price: purchases.remotePriceText) {
+                if let note = RemoteAddOnText.trialNote(purchases.remoteAccess, price: purchases.remotePriceText,
+                                                        bundlePrice: purchases.bundleOffer?.bundlePrice) {
                     note
                 }
                 if remote.isOn, notifier.authorization == .denied || notifier.authorization == .notDetermined {

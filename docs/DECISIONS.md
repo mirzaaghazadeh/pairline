@@ -1658,6 +1658,12 @@ phones take part: no third-party service (no STUN/TURN, Firebase or Tailscale).
   iCloud user. Result: **20 of 20 records written through CloudKit Web Services woke the locked iPhone**, a median
   1.61 s from the start of the write (1.14 to 2.44 s; the write itself takes about 1 s). The pushes allow
   modification, so the notification service extension can unlock them before they're shown.
+- **TestFlight builds get Cloud mode too** (the maintainer's decision, 2026-11-26): the schema (`Mail`, readable and
+  writable only by its creator) was deployed to CloudKit Production on 2026-11-26, and builds archived with
+  `PAIRLINE_CLOUD_TESTFLIGHT` that run from TestFlight use the public database in Production with the Production API
+  token (docs/RELEASING.md); debug builds keep Development. Release Android bridges take the public database in
+  Production (what TestFlight iPhones send), still not in Development. The App Store build keeps Cloud mode off until
+  the private database works, and a TestFlight-made build is never submitted for review.
 - **Filtering entitlement** requested on 2026-11-26 (Apple request ID Q7U98356ZR), for the extension
   `app.pairline.ios.notifications`, use case end-to-end encrypted messaging.
 - **Tested on the maintainer's iPhone 16e** with a stand-in bridge (`protocol/tools/fake_remote_bridge.py`), then with
@@ -1667,28 +1673,42 @@ phones take part: no third-party service (no STUN/TURN, Firebase or Tailscale).
   connection through the router. That Note 3 can't advertise over Bluetooth LE ("too many advertisers") and can't run
   Talk on iPhone (Android 10), so calls with sound wait for an Android 11+ phone.
 
-### D-093 — Remote mode is a $9.99 one-time add-on after Full Access, included in the free trial (2026-11-26)
+### D-093 — Cloud mode is a one-time add-on to Full Access: $20.99 together at the first purchase, $19.99 added later, included in the free trial (2026-11-26)
 
-The maintainer's pricing for remote mode (D-092). Extends D-017 and D-036; the Android app stays free.
+The maintainer's pricing for remote mode (D-092), "Cloud mode" in the apps (D-094): "during the purchase you can add the
+add-on; a first-time buyer gets it about 30% off; added later it costs $19.99". Extends D-017 and D-036; the Android
+app stays free.
 
-- **Product:** `app.pairline.ios.remote`, a non-consumable In-App Purchase, $9.99 once, no subscription. Like Full
-  Access it's verified on the iPhone from Apple-signed transactions (StoreKit 2, `Transaction.currentEntitlements`
-  and `Transaction.updates`); there's no receipt server, and Restore Purchases brings it back.
+- **Products** (non-consumable In-App Purchases, one time, no subscription; created in App Store Connect with English,
+  Arabic and Turkish names): `app.pairline.ios.full` Full Access $9.99 (unchanged), `app.pairline.ios.remote` "Cloud
+  Mode" $19.99, and `app.pairline.ios.fullcloud` "Full Access + Cloud Mode" $20.99, which unlocks both. Like Full
+  Access they're verified on the iPhone from Apple-signed transactions (StoreKit 2, `Transaction.currentEntitlements`
+  and `Transaction.updates`); there's no receipt server, and Restore Purchases brings them back. Full Access = `full`
+  or `fullcloud`; Cloud mode = `remote` or `fullcloud`.
+- **At the first purchase** the paywall, where remote mode is available (`RemoteFeature`) and nothing is owned yet,
+  has an "Add Cloud mode" switch: off buys Full Access at its price, on buys the bundle at its price. The badge
+  "Save N%" and "both for $20.99 instead of $29.98" are worked out from the three products' prices in the user's own
+  storefront (1 − bundle ÷ (Full Access + add-on), rounded to the nearest whole percent: 30 % in the US), never
+  written into the app; the switch isn't shown unless all three products loaded, and the badge isn't shown when the
+  bundle doesn't cost less. Where remote mode isn't available (an App Store build before it ships) the paywall is as
+  before.
 - **The rule** (`RemoteAddOnPolicy`, unit-tested): remote mode, and pairing over the internet, work while the 7-day
-  trial runs, and afterwards only with Full Access **and** the add-on. The trial shows a line that Cloud mode is part
-  of it and becomes a $9.99 add-on after Full Access. No trial and no Full Access: the app's own paywall comes first,
-  and the add-on isn't offered.
-- **Sold only after Full Access:** the "Buy Cloud mode" button appears only once Full Access is bought, and only in a
-  build where remote mode is available (`RemoteFeature`), so a build without it (App Review before it ships) never
-  shows a purchase button for it.
+  trial runs, and afterwards only with Full Access **and** the add-on (or the bundle). The trial shows a line that
+  Cloud mode is part of it and what it costs then ($20.99 with Pairline, or $19.99 later). No trial and no Full Access:
+  the app's own paywall comes first, and the add-on alone isn't offered.
+- **Added later:** the "Buy Cloud mode" button ($19.99) appears only once Full Access is bought without Cloud mode,
+  and only in a build where remote mode is available, so a build without it (App Review before it ships) never shows
+  a purchase button for it. A bundle owner never sees it.
+- **Known trade-off:** a buyer of Full Access alone pays $29.98 in all for both, a first-time bundle buyer $20.99. A
+  launch price for existing owners (Apple's offer codes) can soften that when Cloud mode ships.
 - **When it stops being covered** (the trial ended without the add-on, or a refund) while remote mode is on, the iPhone
   turns it off the usual way: `remote.config` off to the bridge (over a session, or one last mailbox record), then its
   records and subscriptions in iCloud go. Nothing is turned off while the purchase state is still loading.
 - **Debug builds** fake it with `-PairlineRemoteAccess purchased|none|reset` (remembered like `-PairlineAccess`); a
   faked "purchased" access state counts as the add-on bought too, so a test iPhone keeps remote mode.
-- **Not done yet:** the product doesn't exist in App Store Connect. Creating it there (price tier, localized name and
-  description in English, Arabic and Turkish, review screenshot) waits for the maintainer's OK; until then it exists
-  only in `ios/Pairline/Store/Pairline.storekit` for Xcode and the unit tests.
+- **In App Store Connect** (the maintainer's OK, 2026-11-26): `remote` and `fullcloud` exist with their prices and
+  names; each still needs a review screenshot before it's submitted with the build that sells it. Xcode and the unit
+  tests use `ios/Pairline/Store/Pairline.storekit`, with the same products and prices.
 
 ### D-094 — Remote mode is called "Cloud mode"; normal pairing offers it; pairing from far away is "Pair over the internet" (2026-11-26)
 

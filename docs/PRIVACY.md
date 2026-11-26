@@ -87,8 +87,9 @@ Any change that adds or changes a data flow or permission must update this file 
 
 Off until you turn it on (on the iPhone: in Settings, when it's offered right after pairing, or by pairing over the
 internet). There is no Pairline server: "cloud" here means your own iCloud. Until Apple answers D-092's question about the
-private database, it exists in debug builds only and uses the app's public CloudKit database, where each record is
-readable only by the iCloud account that wrote it; the design, and release builds, use your private iCloud database.
+private database, it exists in test builds only (debug builds, and TestFlight builds made for it) and uses the app's
+public CloudKit database, where each record is readable only by the iCloud account that wrote it; the design, and App
+Store builds once it ships there, use your private iCloud database.
 
 | Data | Leaves the device? | Goes to | Stored where | How long |
 |------|--------------------|---------|--------------|----------|
@@ -202,7 +203,7 @@ log line, already redacted, to the iPhone's system log, which a connected Mac ca
 | CallKit (no prompt) | Shows calls on the iPhone call screen. Calls are added to iPhone Recents unless you turn that off in Settings › Calls (D-074), and a tap there calls back through Pairline | — |
 | Photo picker (no prompt, D-089) | The composer's picture button uses iOS's own picker, which runs outside Pairline: Pairline gets only the one photo you choose, never the library | — |
 | Siri and Shortcuts (no prompt) | "Call with Pairline" calls the number you give it; runs only when you run it (D-074) | — |
-| In-App Purchase (no prompt) | The free 7-day trial, the one-time purchase (D-017, D-036) and the one-time remote-mode add-on (D-093) | — |
+| In-App Purchase (no prompt) | The free 7-day trial, the one-time purchase (D-017, D-036), and Cloud mode: bought with it as one purchase, or as a one-time add-on later (D-093) | — |
 | App Group `group.app.pairline.ios` (no prompt) | Shares the bridge status with Pairline's widget | — |
 | Live Activities (`NSSupportsLiveActivities`, no prompt) | The bridge status on the Lock Screen and in the Dynamic Island (D-053). You can turn it off in Pairline's Settings or for Pairline in iOS Settings | — |
 | Local Network (`NSLocalNetworkUsageDescription`, Bonjour service `_pairline._tcp`) (M5) | The Wi-Fi link: find the bridge phone on your Wi-Fi network and connect to it. Only local addresses, only your paired bridge | The first time Pairline looks for the bridge on Wi-Fi |

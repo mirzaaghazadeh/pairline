@@ -1,11 +1,24 @@
 import SwiftUI
 
 /// One-time purchase with a free 7-day trial (D-017, D-036). Before the trial starts it states the duration, what stops
-/// working afterwards, and the price (App Review guideline 3.1.1).
+/// working afterwards, and the price (App Review guideline 3.1.1). Where Cloud mode exists, the first purchase can add
+/// it as Full Access + Cloud mode for less than the two apart (D-093); elsewhere the paywall is exactly as before.
 struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var purchases: PurchaseManager
     var onFinished: (() -> Void)?
+    /// The "Add Cloud mode" switch: buy Full Access + Cloud mode instead of Full Access alone.
+    @State private var addCloud = false
+
+    /// The first-purchase bundle, where Cloud mode exists in this build and every price loaded.
+    private var cloudOffer: BundleOffer? { RemoteFeature.isAvailable ? purchases.bundleOffer : nil }
+    private var buyingBundle: Bool { addCloud && cloudOffer != nil }
+    /// The price of what the buy buttons buy now.
+    private var chosenPrice: String { buyingBundle ? cloudOffer?.bundlePrice ?? purchases.priceText : purchases.priceText }
+
+    private func buyChosen() async -> Bool {
+        buyingBundle ? await purchases.buyBundle() : await purchases.buyFull()
+    }
 
     var body: some View {
         NavigationStack {
@@ -24,7 +37,10 @@ struct PaywallView: View {
             } second: {
                 CenteredScroll {
                     VStack(spacing: 18) {
-                        if !purchases.access.isPurchased { priceCard }
+                        if !purchases.access.isPurchased {
+                            priceCard
+                            if let cloudOffer { cloudChoice(cloudOffer) }
+                        }
                         offer
                         footer
                             .padding(.top, 8)
@@ -77,7 +93,10 @@ struct PaywallView: View {
         ScrollView {
             VStack(spacing: 22) {
                 hero
-                if !purchases.access.isPurchased { priceCard }
+                if !purchases.access.isPurchased {
+                    priceCard
+                    if let cloudOffer { cloudChoice(cloudOffer) }
+                }
                 features
                 footer
             }
@@ -156,10 +175,10 @@ struct PaywallView: View {
                 .disabled(purchases.busy)
                 Button {
                     Task {
-                        if await purchases.buyFull() { finish() }
+                        if await buyChosen() { finish() }
                     }
                 } label: {
-                    Text("Buy now for \(purchases.priceText)")
+                    Text("Buy now for \(chosenPrice)")
                 }
                 .buttonStyle(SecondaryButtonStyle())
                 .disabled(purchases.busy)
@@ -197,13 +216,48 @@ struct PaywallView: View {
     private var buyButton: some View {
         Button {
             Task {
-                if await purchases.buyFull() { finish() }
+                if await buyChosen() { finish() }
             }
         } label: {
-            busyLabel(Text("Buy Pairline for \(purchases.priceText)"))
+            busyLabel(buyingBundle
+                      ? Text("Buy Pairline and Cloud mode for \(chosenPrice)", tableName: "RemoteAddOn")
+                      : Text("Buy Pairline for \(purchases.priceText)"))
         }
         .buttonStyle(PrimaryButtonStyle())
         .disabled(purchases.busy)
+    }
+
+    /// "Add Cloud mode" (D-093): the first purchase can include it for less than buying it later. The saving comes
+    /// from the three products' prices in this storefront; it isn't shown when the bundle doesn't cost less.
+    private func cloudChoice(_ offer: BundleOffer) -> some View {
+        Toggle(isOn: $addCloud) {
+            VStack(alignment: .leading, spacing: 6) {
+                AdaptiveStack(spacing: 8) {
+                    Label {
+                        Text("Add Cloud mode", tableName: "RemoteAddOn")
+                    } icon: {
+                        Image(systemName: "icloud.fill").foregroundStyle(Color.brandBlue)
+                    }
+                    .font(.headline)
+                    if let saving = offer.savingPercent {
+                        Text("Save \(saving)%", tableName: "RemoteAddOn")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Capsule().fill(Color.brandGreenFill))
+                    }
+                }
+                Text("Texts, codes and calls over the internet when your phones are apart. Both for \(offer.bundlePrice) instead of \(offer.separatePrice); added later, Cloud mode alone costs \(offer.remotePrice).",
+                     tableName: "RemoteAddOn")
+                    .font(.footnote)
+                    .foregroundStyle(Color(.secondaryLabel))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .tint(Color.brandGreenFill)
+        .disabled(purchases.busy)
+        .card(padding: 18)
     }
 
     private func busyLabel(_ text: Text) -> some View {
@@ -217,12 +271,17 @@ struct PaywallView: View {
         HStack(alignment: .center, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("One-time purchase").font(.headline)
+                if buyingBundle {
+                    Text("Pairline Full Access and Cloud mode", tableName: "RemoteAddOn")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
                 Text("No subscription, no account.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text(verbatim: purchases.priceText)
+            Text(verbatim: chosenPrice)
                 .font(.rounded(.title, weight: .bold))
                 .foregroundStyle(Color.brandBlue)
         }

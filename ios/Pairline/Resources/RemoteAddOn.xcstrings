@@ -1,8 +1,62 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add Cloud mode" : {
+      "comment" : "Paywall (D-093): a switch at the first purchase that buys Pairline Full Access together with Cloud mode, for less than the two apart.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إضافة الوضع السحابي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Cloud mode" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "افزودن حالت ابری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modunu ekle" } }
+      }
+    },
+    "Save %lld%%" : {
+      "comment" : "Paywall (D-093): a badge on \"Add Cloud mode\": the whole percent saved buying Full Access and Cloud mode together, worked out from the store's own prices (e.g. 30).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "وفّر %lld٪" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save %lld%%" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "%lld٪ صرفه‌جویی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%%%lld tasarruf" } }
+      }
+    },
+    "Texts, codes and calls over the internet when your phones are apart. Both for %@ instead of %@; added later, Cloud mode alone costs %@." : {
+      "comment" : "Paywall (D-093), under \"Add Cloud mode\". The first %@ is the bundle's price (e.g. $20.99), the second Full Access and Cloud mode bought apart (e.g. $29.98), the third Cloud mode alone bought later (e.g. $19.99).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرسائل والرموز والمكالمات عبر الإنترنت حين يكون هاتفاك بعيدين. كلاهما معًا بسعر %1$@ بدلًا من %2$@؛ وإذا أضفته لاحقًا فسعر الوضع السحابي وحده %3$@." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts, codes and calls over the internet when your phones are apart. Both for %1$@ instead of %2$@; added later, Cloud mode alone costs %3$@." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها، کدها و تماس‌ها از راه اینترنت، وقتی گوشی‌هایتان از هم دورند. هر دو با هم %1$@ به‌جای %2$@؛ اگر بعداً اضافه کنید، حالت ابری به‌تنهایی %3$@ است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirinden uzaktayken internet üzerinden mesaj, kod ve arama. İkisi birlikte %2$@ yerine %1$@; sonradan eklerseniz Bulut modu tek başına %3$@." } }
+      }
+    },
+    "Buy Pairline and Cloud mode for %@" : {
+      "comment" : "Paywall (D-093): the buy button with \"Add Cloud mode\" switched on. %@ is the bundle's price, e.g. $20.99.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شراء Pairline والوضع السحابي مقابل %@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Buy Pairline and Cloud mode for %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خرید Pairline و حالت ابری به قیمت %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline ve Bulut modunu %@ karşılığında satın al" } }
+      }
+    },
+    "Pairline Full Access and Cloud mode" : {
+      "comment" : "Paywall (D-093): the price card's line with \"Add Cloud mode\" switched on.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوصول الكامل إلى Pairline والوضع السحابي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Full Access and Cloud mode" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دسترسی کامل Pairline و حالت ابری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Tam Erişim ve Bulut modu" } }
+      }
+    },
+    "Cloud mode is part of your free trial. Buy it together with Pairline for %@, or add it later for %@." : {
+      "comment" : "Cloud mode's Settings section and pairing step during the free trial (D-093). The first %@ is Full Access + Cloud mode at the first purchase (e.g. $20.99), the second Cloud mode added later (e.g. $19.99).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع السحابي جزء من فترتك التجريبية المجانية. اشترِه مع Pairline بسعر %1$@، أو أضفه لاحقًا مقابل %2$@." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode is part of your free trial. Buy it together with Pairline for %1$@, or add it later for %2$@." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری بخشی از دوره آزمایشی رایگان شماست. می‌توانید آن را همراه Pairline به قیمت %1$@ بخرید، یا بعداً با %2$@ اضافه کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu ücretsiz denemenize dahildir. Pairline ile birlikte %1$@ karşılığında alın ya da sonradan %2$@ karşılığında ekleyin." } }
+      }
+    },
     "Buy Cloud mode · %@" : {
-      "comment" : "Cloud mode add-on (D-093): the buy button, shown only after Pairline Full Access is bought. %@ is the price, e.g. $9.99.",
+      "comment" : "Cloud mode add-on (D-093): the buy button, shown only after Pairline Full Access is bought. %@ is the price, e.g. $19.99.",
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "شراء الوضع السحابي · %@" } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Buy Cloud mode · %@" } },

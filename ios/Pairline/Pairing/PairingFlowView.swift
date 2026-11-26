@@ -473,7 +473,8 @@ struct PairingFlowView: View {
                 Group {
                     if purchases.remoteAccess.offersPurchase {
                         RemoteAddOnText.blocker(.needsAddOn)
-                    } else if let note = RemoteAddOnText.trialNote(purchases.remoteAccess, price: purchases.remotePriceText) {
+                    } else if let note = RemoteAddOnText.trialNote(purchases.remoteAccess, price: purchases.remotePriceText,
+                                                                   bundlePrice: purchases.bundleOffer?.bundlePrice) {
                         note
                     }
                 }
