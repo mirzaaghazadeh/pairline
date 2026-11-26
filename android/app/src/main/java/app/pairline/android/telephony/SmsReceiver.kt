@@ -48,7 +48,7 @@ class SmsReceiver : BroadcastReceiver() {
             return
         }
         Log.i(TAG, "SMS received")
-        if (!AppGraph.link.isConnected) {
+        if (!AppGraph.link.canSendEvents) {
             Log.i(TAG, "iPhone not connected; it will get the message from history when it reconnects")
             return
         }

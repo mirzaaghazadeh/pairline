@@ -81,6 +81,24 @@ interface FileMessageHandler {
     fun onPeerCaps() {}
 }
 
+/**
+ * Remote mode's mailbox in iCloud (D-072), the path next to the sessions: it carries events and replies while no
+ * session is up. Implemented by `link.remote.RemoteLink`.
+ */
+interface MailboxRoute {
+    /** Remote mode is on and running, so events can go into the mailbox. */
+    val isActive: Boolean
+
+    /** Queues an event or a reply for the mailbox. Called on the link thread; never blocks. */
+    fun send(message: JSONObject)
+
+    /** A session is now up ([up]) or the last one ended. Called on the link thread. */
+    fun onSessionChanged(up: Boolean)
+
+    /** The pairing is forgotten: remote mode ends, its state and records are deleted. [farewell] still goes out first. */
+    fun forget(farewell: JSONObject?)
+}
+
 /** File transfers follow the Wi-Fi session (PROTOCOL.md, "File transfer"). */
 interface WifiSessionListener {
     /** The established Wi-Fi session changed; null when there's none. */
@@ -93,8 +111,9 @@ interface WifiSessionListener {
 /**
  * Owns every connection's [BridgeSession] on one thread ("link thread"). At most one established session per lane:
  * Bluetooth (or the debug TCP link) and Wi-Fi (PROTOCOL.md, "Two sessions at once"). Events go to the Bluetooth
- * session when there is one, otherwise to Wi-Fi; replies go back on the session the request came from. Runs
- * keep-alive and handshake timeouts, and opens the media channel for each Wi-Fi session.
+ * session when there is one, otherwise to Wi-Fi, otherwise (remote mode, D-072) to the mailbox in iCloud; replies go
+ * back on the session the request came from. Requests read from the mailbox carry [MAILBOX_TOKEN]. Runs keep-alive
+ * and handshake timeouts, and opens the media channel for each Wi-Fi session.
  */
 class LinkManager(
     private val identity: () -> StaticKey,
@@ -134,6 +153,9 @@ class LinkManager(
 
     var handler: MessageHandler? = null
     var wifiListener: WifiSessionListener? = null
+
+    /** Remote mode's mailbox (D-072); set once by AppGraph. */
+    var remote: MailboxRoute? = null
 
     /** The iPhone listed `files` in its `device.info` caps (M5). */
     @Volatile
@@ -217,13 +239,23 @@ class LinkManager(
         laneLost(entry)
     }
 
-    /** Sends an event to the iPhone on the session that carries events. Returns immediately; safe from any thread. */
+    /**
+     * Sends an event to the iPhone on the session that carries events, or into the mailbox while none is up and
+     * remote mode is on. Returns immediately; safe from any thread.
+     */
     fun send(message: JSONObject) = post {
-        primary?.session?.send(message)
+        sendOnEventPath(message)
     }
 
-    /** Sends a reply on the session [token] if it's still established; otherwise drops it. */
+    /**
+     * Sends a reply on the session [token] if it's still established; otherwise drops it. A reply to a request from
+     * the mailbox ([MAILBOX_TOKEN]) goes on the event session if one is up now, otherwise back into the mailbox.
+     */
     fun reply(token: Long, message: JSONObject) = post {
+        if (token == MAILBOX_TOKEN) {
+            sendOnEventPath(message)
+            return@post
+        }
         val entry = established(token)
         if (entry == null) {
             Log.d(TAG, "dropped a reply for a session that has ended")
@@ -253,24 +285,63 @@ class LinkManager(
 
     val isConnected: Boolean get() = _state.value.connected
 
-    /** The user unpaired on this phone: tell the iPhone on every session, then forget it. */
+    /** Events reach the iPhone: a session is up, or remote mode's mailbox takes them. */
+    val canSendEvents: Boolean get() = isConnected || remote?.isActive == true
+
+    /** The user unpaired on this phone: tell the iPhone on every session (or through the mailbox), then forget it. */
     fun unpairLocally() = post {
-        listOfNotNull(radio, wifi).forEach { e ->
+        val sessions = listOfNotNull(radio, wifi)
+        sessions.forEach { e ->
             e.session.send(Messages.unpair())
             e.session.close("unpaired on this phone")
         }
-        forgetPeer()
+        forgetPeer(farewell = if (sessions.isEmpty()) Messages.unpair() else null)
         Log.i(TAG, "unpaired on this phone")
     }
 
     /** The iPhone sent `unpair`. */
     fun onRemoteUnpair() = post {
         listOfNotNull(radio, wifi).forEach { it.session.close("unpaired by the iPhone") }
-        forgetPeer()
+        forgetPeer(farewell = null)
         Log.i(TAG, "the iPhone unpaired")
     }
 
-    private fun forgetPeer() {
+    /**
+     * Remote pairing (D-072): the user confirmed the codes, so [remotePublicKey] is pinned now and replaces any paired
+     * iPhone, like a pairing from the QR code. Safe from any thread; the key is on disk when this returns.
+     */
+    fun pairedRemotely(remotePublicKey: ByteArray) {
+        remote?.forget(farewell = null)
+        pairing.onPaired(remotePublicKey)
+        post {
+            entries.values.toList().forEach { it.session.close("another iPhone paired") }
+            prefs.clearPeer()
+            prefs.pairedAt = clock()
+            peerAcceptsFiles = false
+        }
+    }
+
+    /** A message read from the mailbox: handled like one from a session, with [MAILBOX_TOKEN]. */
+    fun deliverFromMailbox(message: JSONObject) = post {
+        try {
+            handler?.onMessage(message, MAILBOX_TOKEN)
+        } catch (e: Exception) {
+            Log.e(TAG, "handling a message from the mailbox failed", e)
+        }
+    }
+
+    private fun sendOnEventPath(message: JSONObject) {
+        val session = primary?.session
+        if (session != null) {
+            session.send(message)
+        } else {
+            remote?.takeIf { it.isActive }?.send(message)
+        }
+    }
+
+    private fun forgetPeer(farewell: JSONObject?) {
+        // Remote mode first: its farewell is sealed to the key that's about to be forgotten.
+        remote?.forget(farewell)
         peers.clear()
         prefs.clearPeer()
         pairing.resetOutcome()
@@ -322,7 +393,9 @@ class LinkManager(
     private fun refreshPrimary(): Boolean {
         val now = radio ?: wifi
         val changed = now !== primary
+        val wasUp = primary != null
         primary = now
+        if (wasUp != (now != null)) remote?.onSessionChanged(now != null)
         val kinds = listOfNotNull(radio, wifi).map { it.connection.kind }.toSet()
         updateState {
             it.copy(
@@ -400,6 +473,8 @@ class LinkManager(
         override fun pinnedRemoteKey(): ByteArray? = peers.pinned()
 
         override fun onPaired() {
+            // Remote mode belonged to the previous pairing; the iPhone turns it on again with remote.config.
+            remote?.forget(farewell = null)
             prefs.clearPeer()
             prefs.pairedAt = clock()
             peerAcceptsFiles = false
@@ -447,16 +522,19 @@ class LinkManager(
         }
     }
 
-    private companion object {
-        const val TAG = "link"
-        const val WATCHDOG_INTERVAL_MS = 5_000L
-        const val HANDSHAKE_TIMEOUT_MS = 30_000L
-        const val PING_AFTER_MS = 60_000L
-        const val IDLE_TIMEOUT_MS = 180_000L
+    companion object {
+        /** The "session" of messages read from the mailbox in iCloud (remote mode, D-072). Session tokens are positive. */
+        const val MAILBOX_TOKEN = -1L
+
+        private const val TAG = "link"
+        private const val WATCHDOG_INTERVAL_MS = 5_000L
+        private const val HANDSHAKE_TIMEOUT_MS = 30_000L
+        private const val PING_AFTER_MS = 60_000L
+        private const val IDLE_TIMEOUT_MS = 180_000L
 
         /** Wi-Fi drops must be noticed fast so traffic falls back to Bluetooth (PROTOCOL.md, "Wi-Fi"). */
-        const val WIFI_PING_AFTER_MS = 15_000L
-        const val WIFI_IDLE_TIMEOUT_MS = 45_000L
-        const val MAX_UNFINISHED_WIFI = 4
+        private const val WIFI_PING_AFTER_MS = 15_000L
+        private const val WIFI_IDLE_TIMEOUT_MS = 45_000L
+        private const val MAX_UNFINISHED_WIFI = 4
     }
 }

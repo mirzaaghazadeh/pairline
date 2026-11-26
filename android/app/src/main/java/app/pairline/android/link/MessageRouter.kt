@@ -4,6 +4,9 @@ import android.os.Build
 import app.pairline.android.AppPrefs
 import app.pairline.android.BuildConfig
 import app.pairline.android.audio.CallAudioRelay
+import app.pairline.android.link.remote.RemoteConfig
+import app.pairline.android.link.remote.RemoteConfigRequest
+import app.pairline.android.link.remote.RemoteLink
 import app.pairline.android.log.Log
 import app.pairline.android.netshare.NetShare
 import app.pairline.android.protocol.Caps
@@ -56,6 +59,7 @@ class MessageRouter(
     private val netShare: NetShare,
     private val files: FileMessageHandler,
     private val blockList: BlockList,
+    private val remote: RemoteLink,
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -145,7 +149,7 @@ class MessageRouter(
 
     /** Something in the status may have changed; sends it if it really did (at most every 2 s). */
     fun statusChanged() {
-        if (!link.isConnected) return
+        if (!link.canSendEvents) return
         if (statusPushPending?.isActive == true) return
         statusPushPending = scope.launch {
             delay(STATUS_DEBOUNCE_MS)
@@ -178,7 +182,9 @@ class MessageRouter(
         when (type) {
             Msg.DEVICE_INFO -> onDeviceInfo(message)
             Msg.PING -> message.requestId?.let { link.reply(token, Messages.pong(it)) }
-            Msg.FILE_OFFER, Msg.FILE_ANSWER, Msg.FILE_DONE, Msg.FILE_CANCEL -> files.onMessage(message, token)
+            // Files go over a Wi-Fi session only, never through the mailbox.
+            Msg.FILE_OFFER, Msg.FILE_ANSWER, Msg.FILE_DONE, Msg.FILE_CANCEL ->
+                if (token != LinkManager.MAILBOX_TOKEN) files.onMessage(message, token)
             Msg.PONG -> Unit
             Msg.UNPAIR -> link.onRemoteUnpair()
             Msg.STATUS_GET -> request(message) { id -> status.build(id) }
@@ -242,6 +248,19 @@ class MessageRouter(
                     link.reply(token, it)
                 }
                 null // the reply is the ussd.result with the same id, sent when the network answers
+            }
+            Msg.REMOTE_CONFIG -> request(message) { id -> remoteConfig(id, message, token) }
+            // An event in PROTOCOL.md; answered with `ok` only if R gave it an id anyway.
+            Msg.REMOTE_TOKEN -> if (message.requestId != null) {
+                request(message) { id -> remoteToken(message); Messages.ok(id) }
+            } else {
+                scope.launch {
+                    try {
+                        remoteToken(message)
+                    } catch (_: RequestException) {
+                        Log.w(TAG, "remote.token without a usable token")
+                    }
+                }
             }
             else -> message.requestId?.let { id ->
                 // Unknown request: answer so the iPhone doesn't wait (PROTOCOL.md clarifications).
@@ -325,7 +344,30 @@ class MessageRouter(
 
     /** After the list changed in the bridge app itself: the iPhone's copy follows (`block.list` without an id). */
     fun blockListChanged() {
-        if (link.isConnected) scope.launch { link.send(blockList.toMessage(null)) }
+        if (link.canSendEvents) scope.launch { link.send(blockList.toMessage(null)) }
+    }
+
+    /**
+     * `remote.config` (D-072): `on: true` stores the mailboxes and token and starts checking; `on: false` stops remote
+     * mode and deletes its state and records. An `on: false` read from the mailbox gets no `ok`: the iPhone has
+     * already taken its mailboxes down, so nobody would read or delete it. Release builds refuse the public backend,
+     * which is for testing only.
+     */
+    private fun remoteConfig(id: Long, m: JSONObject, token: Long): JSONObject? =
+        when (val request = RemoteConfigRequest.parse(m, allowPublic = BuildConfig.DEBUG)) {
+            is RemoteConfigRequest.On -> {
+                remote.configure(request.config, request.token)
+                Messages.ok(id)
+            }
+            RemoteConfigRequest.Off -> {
+                remote.turnOff()
+                Messages.ok(id).takeIf { token != LinkManager.MAILBOX_TOKEN }
+            }
+        }
+
+    /** `remote.token`: a fresh web auth token from the iPhone. */
+    private fun remoteToken(m: JSONObject) {
+        remote.updateToken(m.stringOrNull("token")?.takeIf(RemoteConfig::isToken) ?: invalid("bad token"))
     }
 
     private fun strings(array: JSONArray?, max: Int): List<String> {

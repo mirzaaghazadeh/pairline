@@ -57,6 +57,8 @@ class LinkService : Service() {
         link.handler = graph.router
         link.wifiListener = graph.files
         link.start()
+        // Remote mode (D-072): checks the mailbox in iCloud while no session is up, if the iPhone turned it on.
+        graph.remote.start()
 
         val bleTransport = BleTransport(this, link, { graph.identity.deviceId }) { bt, advertising ->
             link.updateState { it.copy(bluetooth = bt, advertising = advertising) }
@@ -172,6 +174,7 @@ class LinkService : Service() {
         transports = emptyList()
         wifi?.stop()
         wifi = null
+        graph.remote.stop()
         graph.link.stop()
         scope.cancel()
         super.onDestroy()

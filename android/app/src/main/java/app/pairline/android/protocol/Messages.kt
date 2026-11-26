@@ -45,6 +45,14 @@ object Msg {
     const val CALLLOG_DELETE = "calllog.delete"
     const val BLOCK_LIST = "block.list"
     const val BLOCK_SET = "block.set"
+
+    // Remote mode (v1, D-072).
+    const val REMOTE_CONFIG = "remote.config"
+    const val REMOTE_TOKEN = "remote.token"
+    const val RPAIR_HELLO = "rpair.hello"
+    const val RPAIR_NONCE = "rpair.nonce"
+    const val RPAIR_REVEAL = "rpair.reveal"
+    const val RPAIR_CONFIRM = "rpair.confirm"
 }
 
 /** Capabilities in `status.caps` (PROTOCOL.md, "Capabilities"). */
@@ -119,7 +127,7 @@ object Messages {
         .put("platform", "android")
         .put("os", os)
         .put("app", app)
-        .put("proto", Proto.VERSION)
+        .put("proto", Proto.SUPPORTED_VERSION)
 
     /** Where the iPhone can reach this bridge over Wi-Fi; `ip: []` when there's no Wi-Fi now (M5). */
     fun wifiOffer(hint: WifiHint?, band: String?): JSONObject = JSONObject()

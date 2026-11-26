@@ -451,4 +451,36 @@
     <string name="help_a_logs">تفاصيل تقنية مثل الإصدارات والأذونات وأحداث الاتصال. وتُحذف منه أرقام الهواتف وعناوين البريد الإلكتروني والأسماء ونصوص الرسائل والمفاتيح. وترى التقرير كاملًا قبل أن تقرر مشاركته.</string>
     <string name="help_q_unpair">ماذا يحدث عند إلغاء الإقران؟</string>
     <string name="help_a_unpair">يحذف كل هاتف مفتاح الآخر، فلا يعود بإمكانهما التواصل. وتبقى رسائلك وجهات اتصالك في مكانها على هذا الهاتف.</string>
+
+    <!-- Remote pairing (D-072). -->
+    <string name="remote_pair_title">الإقران عن بُعد</string>
+    <string name="remote_pair_ask_title">آيفون يريد الإقران بهذا الهاتف عن بُعد</string>
+    <string name="remote_pair_ask_body">إذا سمحت بذلك، فسيستلم من يحمل ذلك الآيفون رسائل هذا الهاتف النصية ورموز التحقق ومكالماته أينما كان، وسيتمكن من إرسال الرسائل وإجراء المكالمات بشريحة هذا الهاتف.</string>
+    <string name="remote_pair_ask_only_if">لا تسمح بذلك إلا إذا كنت تعرف من أرسل إليك هذه الدعوة وكنت تنتظرها. لا يُرسَل أي شيء قبل أن تضغط «السماح».</string>
+    <string name="remote_pair_replaces">هذا الهاتف مقترن الآن بـ %1$s. وإذا سمحت بهذه الدعوة فستحلّ محلّ ذلك الإقران.</string>
+    <string name="remote_pair_ask_next">بعد ذلك يعرض الهاتفان رمزًا من ٦ أرقام. اتصل بمن يحمل الآيفون وتأكّدا من تطابق الرمزين.</string>
+    <string name="remote_pair_expires">تنتهي صلاحية الدعوة خلال %1$s</string>
+    <string name="remote_pair_waiting">في انتظار الآيفون…</string>
+    <string name="remote_pair_waiting_body">يصل ردّ هذا الهاتف إلى الآيفون عبر حساب iCloud الخاص بصاحبه. أبقِ هذه الشاشة مفتوحة.</string>
+    <string name="remote_pair_network">تعذّر الوصول إلى iCloud الآن. تحقّق من اتصال هذا الهاتف بالإنترنت؛ سيواصل Pairline المحاولة.</string>
+    <string name="remote_pair_code_title">قارِن الرمزين</string>
+    <string name="remote_pair_code_body">اتصل بمن يحمل الآيفون واقرآ الرمزين أحدكما للآخر. لا تضغط «الرمزان متطابقان» إلا إذا عرض الهاتفان الأرقام الستة نفسها.</string>
+    <string name="remote_pair_code_expires">تنتهي صلاحية الرمزين خلال %1$s</string>
+    <string name="remote_pair_code_mismatch">إذا اختلف الرمزان، فقد تكون الدعوة قد وصلت إلى شخص آخر أيضًا. اضغط «إلغاء» واطلب دعوة جديدة.</string>
+    <string name="remote_pair_match">الرمزان متطابقان</string>
+    <string name="remote_pair_confirming">في انتظار تأكيد الآيفون…</string>
+    <string name="remote_pair_confirming_body">يجب على من يحمل الآيفون أيضًا أن يؤكّد تطابق الرمزين.</string>
+    <string name="remote_pair_done_title">تم الإقران</string>
+    <string name="remote_pair_done_body">أصبح هذا الهاتف والآيفون يثق كلٌّ منهما بالآخر. وحين يكونان بعيدين، يتواصلان عبر حساب iCloud الخاص بصاحب الآيفون، ويبقى كل شيء مقفلًا بمفاتيح لا يملكها إلا هذان الهاتفان.</string>
+    <string name="remote_pair_refused_title">لا يمكن استخدام هذه الدعوة</string>
+    <string name="remote_pair_refused_malformed">الرابط ناقص أو تالف. اطلب من صاحب الآيفون أن يرسل دعوة جديدة.</string>
+    <string name="remote_pair_refused_expired">انتهت صلاحية هذه الدعوة. تعمل كل دعوة لمدة ١٠ دقائق؛ اطلب من صاحب الآيفون دعوة جديدة.</string>
+    <string name="remote_pair_refused_unsupported">هذه الدعوة مخصّصة لنسخة تجريبية من Pairline ولا تعمل مع هذه النسخة.</string>
+    <string name="remote_pair_failed_title">توقّف الإقران</string>
+    <string name="remote_pair_failed_expired">لم يردّ الآيفون قبل انتهاء صلاحية الدعوة. اطلب دعوة جديدة وحاول مرة أخرى.</string>
+    <string name="remote_pair_failed_timeout">لم يُؤكَّد الرمزان على الهاتفين خلال ١٠ دقائق. ابدأ من جديد بدعوة جديدة.</string>
+    <string name="remote_pair_failed_token">لم يعد iCloud يقبل هذه الدعوة. اطلب دعوة جديدة.</string>
+    <string name="remote_pair_failed_icloud">لا تسمح Apple لتطبيق Pairline بالوصول إلى حساب iCloud هذا من هاتف آخر، لذا لا يمكن الإقران عن بُعد مع هذا الحساب حاليًا.</string>
+    <string name="remote_pair_failed_bad_answer">لم يجتز ردّ الآيفون عمليات التحقق، لذا توقّف الإقران حفاظًا على أمان هذا الهاتف. اطلب دعوة جديدة.</string>
+    <string name="remote_pair_failed_internal">حدث خطأ ما على هذا الهاتف. حاول مجددًا بدعوة جديدة.</string>
 </resources>

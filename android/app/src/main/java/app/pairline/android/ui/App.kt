@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,9 +26,11 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.LayoutDirection
 import app.pairline.android.AppGraph
 import app.pairline.android.R
+import app.pairline.android.link.remote.RemotePairingFlow
 import app.pairline.android.ui.block.BlockListScreen
 import app.pairline.android.ui.components.PairlineTopBar
 import app.pairline.android.ui.diagnostics.DiagnosticsScreen
@@ -35,6 +38,7 @@ import app.pairline.android.ui.help.HelpScreen
 import app.pairline.android.ui.home.HomeScreen
 import app.pairline.android.ui.keepalive.KeepAliveScreen
 import app.pairline.android.ui.pairing.PairingContent
+import app.pairline.android.ui.remote.RemotePairingScreen
 import app.pairline.android.ui.settings.PermissionsScreen
 import app.pairline.android.ui.settings.SettingsScreen
 import app.pairline.android.ui.setup.SetupFlow
@@ -57,10 +61,20 @@ sealed interface Route {
 fun PairlineAppUi() {
     val prefsTick by AppGraph.prefs.changes.collectAsState()
     val setupDone = remember(prefsTick) { AppGraph.prefs.setupDone }
-    if (!setupDone) {
-        SetupFlow(onFinished = {})
-    } else {
-        MainNavigation()
+    val remotePairing by AppGraph.remotePairing.state.collectAsState()
+    val pairingRemotely = remotePairing != RemotePairingFlow.State.Idle
+    Box(Modifier.fillMaxSize()) {
+        // Hidden from TalkBack while remote pairing covers it; kept composed so its place (setup step, back stack)
+        // is still there afterwards.
+        Box(if (pairingRemotely) Modifier.fillMaxSize().clearAndSetSemantics {} else Modifier.fillMaxSize()) {
+            if (!setupDone) {
+                SetupFlow(onFinished = {})
+            } else {
+                MainNavigation()
+            }
+        }
+        // An invitation from an iPhone far away (D-072) opens over everything, during setup too.
+        if (pairingRemotely) RemotePairingScreen()
     }
 }
 

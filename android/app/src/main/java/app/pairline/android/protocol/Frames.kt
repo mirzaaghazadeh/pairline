@@ -3,6 +3,12 @@ package app.pairline.android.protocol
 /** Constants from docs/PROTOCOL.md (wire version 0). */
 object Proto {
     const val VERSION: Int = 0
+
+    /**
+     * What `device.info` says as `proto`: v1 adds remote mode (D-072). The local links keep [VERSION] on the wire
+     * (hello and associated data).
+     */
+    const val SUPPORTED_VERSION: Int = 1
     const val ROLE_REMOTE: Byte = 0x52 // 'R'
     const val ROLE_BRIDGE: Byte = 0x42 // 'B'
 

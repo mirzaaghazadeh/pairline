@@ -98,6 +98,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Remote pairing (D-072): an invitation from the iPhone, pairline://invite?…. Opening it only shows what
+                 it asks for; nothing is sent until the user taps Allow. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="pairline" android:host="invite" />
+            </intent-filter>
         </activity>
 
         <!-- The link to the iPhone (BLE GATT server). -->

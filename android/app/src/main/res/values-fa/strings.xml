@@ -450,4 +450,36 @@
     <string name="help_a_logs">جزئیات فنی مثل نسخه‌ها، مجوزها و رویدادهای اتصال. شماره تلفن‌ها، ایمیل‌ها، نام‌ها، متن پیام‌ها و کلیدها حذف می‌شوند. پیش از اینکه تصمیم بگیرید آن را به اشتراک بگذارید، کل گزارش را می‌بینید.</string>
     <string name="help_q_unpair">وقتی جفت‌سازی را لغو کنم چه می‌شود؟</string>
     <string name="help_a_unpair">هر دو گوشی کلید یکدیگر را پاک می‌کنند و دیگر نمی‌توانند با هم ارتباط داشته باشند. پیامک‌ها و مخاطبین شما همان‌جا که هستند، روی این گوشی می‌مانند.</string>
+
+    <!-- Remote pairing (D-072). -->
+    <string name="remote_pair_title">جفت کردن از راه دور</string>
+    <string name="remote_pair_ask_title">یک آیفون می‌خواهد از راه دور با این گوشی جفت شود</string>
+    <string name="remote_pair_ask_body">اگر اجازه بدهید، کسی که آن آیفون دستش است هر جا که باشد پیامک‌ها، کدهای یک‌بارمصرف و تماس‌های این گوشی را دریافت می‌کند و می‌تواند با سیم‌کارت این گوشی پیامک بفرستد و تماس بگیرد.</string>
+    <string name="remote_pair_ask_only_if">فقط وقتی اجازه بدهید که می‌دانید این دعوت را چه کسی فرستاده و منتظرش بودید. تا روی «اجازه دادن» نزنید، چیزی فرستاده نمی‌شود.</string>
+    <string name="remote_pair_replaces">این گوشی الان با %1$s جفت است. اگر اجازه بدهید، این جفت‌سازی جای آن را می‌گیرد.</string>
+    <string name="remote_pair_ask_next">بعد هر دو گوشی یک کد ۶ رقمی نشان می‌دهند. به کسی که آیفون دستش است زنگ بزنید و مطمئن شوید کدها یکی هستند.</string>
+    <string name="remote_pair_expires">دعوت تا %1$s دیگر معتبر است</string>
+    <string name="remote_pair_waiting">در انتظار آیفون…</string>
+    <string name="remote_pair_waiting_body">پاسخ این گوشی از راه iCloud صاحب آیفون به آن می‌رسد. این صفحه را باز نگه دارید.</string>
+    <string name="remote_pair_network">الان دسترسی به iCloud ممکن نیست. اتصال اینترنت این گوشی را بررسی کنید؛ Pairline دوباره تلاش می‌کند.</string>
+    <string name="remote_pair_code_title">کدها را مقایسه کنید</string>
+    <string name="remote_pair_code_body">به کسی که آیفون دستش است زنگ بزنید و کدهایتان را برای هم بخوانید. فقط اگر هر دو گوشی همین شش رقم را نشان می‌دهند، روی «کدها یکی است» بزنید.</string>
+    <string name="remote_pair_code_expires">کدها تا %1$s دیگر معتبرند</string>
+    <string name="remote_pair_code_mismatch">اگر کدها فرق دارند، ممکن است دعوت دست کس دیگری هم افتاده باشد. روی «لغو» بزنید و دعوت تازه‌ای بخواهید.</string>
+    <string name="remote_pair_match">کدها یکی است</string>
+    <string name="remote_pair_confirming">در انتظار تأیید آیفون…</string>
+    <string name="remote_pair_confirming_body">کسی که آیفون دستش است هم باید تأیید کند که کدها یکی است.</string>
+    <string name="remote_pair_done_title">جفت شد</string>
+    <string name="remote_pair_done_body">حالا این گوشی و آن آیفون به هم اعتماد دارند. وقتی از هم دورند، از راه iCloud صاحب آیفون به هم می‌رسند و همه‌چیز با کلیدهایی قفل می‌ماند که فقط همین دو گوشی دارند.</string>
+    <string name="remote_pair_refused_title">از این دعوت نمی‌شود استفاده کرد</string>
+    <string name="remote_pair_refused_malformed">پیوند ناقص یا خراب است. از صاحب آیفون بخواهید دعوت تازه‌ای بفرستد.</string>
+    <string name="remote_pair_refused_expired">مهلت این دعوت تمام شده است. هر دعوت ۱۰ دقیقه اعتبار دارد؛ از صاحب آیفون دعوت تازه‌ای بخواهید.</string>
+    <string name="remote_pair_refused_unsupported">این دعوت برای نسخهٔ آزمایشی Pairline است و با این نسخه کار نمی‌کند.</string>
+    <string name="remote_pair_failed_title">جفت‌سازی متوقف شد</string>
+    <string name="remote_pair_failed_expired">آیفون پیش از تمام شدن مهلت دعوت پاسخی نداد. دعوت تازه‌ای بخواهید و دوباره امتحان کنید.</string>
+    <string name="remote_pair_failed_timeout">کدها ظرف ۱۰ دقیقه روی هر دو گوشی تأیید نشدند. با یک دعوت تازه از نو شروع کنید.</string>
+    <string name="remote_pair_failed_token">iCloud دیگر این دعوت را نمی‌پذیرد. دعوت تازه‌ای بخواهید.</string>
+    <string name="remote_pair_failed_icloud">اپل اجازه نمی‌دهد Pairline از گوشی دیگری به این حساب iCloud دسترسی داشته باشد، پس فعلاً جفت کردن از راه دور با این حساب ممکن نیست.</string>
+    <string name="remote_pair_failed_bad_answer">پاسخ آیفون در بررسی‌ها تأیید نشد، پس برای امنیت این گوشی جفت‌سازی متوقف شد. دعوت تازه‌ای بخواهید.</string>
+    <string name="remote_pair_failed_internal">در این گوشی مشکلی پیش آمد. با یک دعوت تازه دوباره امتحان کنید.</string>
 </resources>

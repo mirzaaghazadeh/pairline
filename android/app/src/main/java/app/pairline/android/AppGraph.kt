@@ -12,6 +12,10 @@ import app.pairline.android.link.LinkManager
 import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
 import app.pairline.android.link.PrefsPeerKeyStore
+import app.pairline.android.link.remote.RemoteConfig
+import app.pairline.android.link.remote.RemoteLink
+import app.pairline.android.link.remote.RemotePairingFlow
+import app.pairline.android.link.remote.RemoteStore
 import app.pairline.android.link.wifi.BridgeHotspot
 import app.pairline.android.log.Log
 import app.pairline.android.telephony.BlockList
@@ -49,7 +53,33 @@ object AppGraph {
             wifiHint = { link.state.value.wifiHint },
         )
     }
-    val link: LinkManager by lazy { LinkManager({ identity.identity() }, pairing, peers, prefs) }
+    val link: LinkManager by lazy {
+        LinkManager({ identity.identity() }, pairing, peers, prefs).also { it.remote = remote }
+    }
+
+    /** Remote mode (D-072): the mailbox in the user's own iCloud, the path next to the sessions. */
+    val remote: RemoteLink by lazy {
+        RemoteLink(
+            RemoteStore.create(app),
+            identity = { identity.identity() },
+            peerKey = peers::pinned,
+            lastSeen = { prefs.lastSeen },
+            deliver = { link.deliverFromMailbox(it) },
+        )
+    }
+
+    /** Pairing from far away through an invitation (D-072). */
+    val remotePairing: RemotePairingFlow by lazy {
+        RemotePairingFlow(
+            object : RemotePairingFlow.Host {
+                override fun identity() = identity.identity()
+                override fun deviceId() = identity.deviceId
+                override fun pin(remoteKey: ByteArray) = link.pairedRemotely(remoteKey)
+                override fun complete(config: RemoteConfig, token: String) = remote.configure(config, token)
+                override fun abandon() = link.unpairLocally()
+            },
+        )
+    }
 
     /** The bridge's own hotspot for the iPhone (M5, user-started). */
     val hotspot by lazy { BridgeHotspot(app) }
@@ -83,7 +113,9 @@ object AppGraph {
         )
     }
     val router: MessageRouter by lazy {
-        MessageRouter(link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList)
+        MessageRouter(
+            link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList, remote,
+        )
     }
 
     /** Internet sharing for the paired iPhone (M8, D-048). */

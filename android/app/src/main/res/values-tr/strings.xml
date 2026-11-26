@@ -450,4 +450,36 @@
     <string name="help_a_logs">Sürümler, izinler ve bağlantı olayları gibi teknik ayrıntılar. Telefon numaraları, e-postalar, adlar, mesaj metinleri ve anahtarlar çıkarılır. Paylaşmaya karar vermeden önce raporun tamamını görürsünüz.</string>
     <string name="help_q_unpair">Eşleştirmeyi kaldırdığımda ne olur?</string>
     <string name="help_a_unpair">İki telefon da birbirinin anahtarını siler, böylece artık birbirleriyle iletişim kuramazlar. Mesajlarınız ve kişileriniz bu telefonda oldukları yerde kalır.</string>
+
+    <!-- Remote pairing (D-072). -->
+    <string name="remote_pair_title">Uzaktan eşleştir</string>
+    <string name="remote_pair_ask_title">Bir iPhone bu telefonla uzaktan eşleşmek istiyor</string>
+    <string name="remote_pair_ask_body">İzin verirseniz o iPhone\'u elinde tutan kişi, nerede olursa olsun bu telefonun SMS mesajlarını, tek kullanımlık kodlarını ve aramalarını alır; bu telefonun SIM kartıyla SMS gönderebilir ve arama yapabilir.</string>
+    <string name="remote_pair_ask_only_if">Yalnızca bu daveti kimin gönderdiğini biliyor ve bekliyorsanız izin verin. \"İzin ver\"e dokunmadan hiçbir şey gönderilmez.</string>
+    <string name="remote_pair_replaces">Bu telefon şu anda %1$s ile eşleştirilmiş. İzin verirseniz yeni eşleştirme bunun yerini alır.</string>
+    <string name="remote_pair_ask_next">Ardından iki telefon da 6 haneli bir kod gösterir. iPhone\'u elinde tutan kişiyi arayın ve kodların aynı olduğunu kontrol edin.</string>
+    <string name="remote_pair_expires">Davetin kalan süresi: %1$s</string>
+    <string name="remote_pair_waiting">iPhone bekleniyor…</string>
+    <string name="remote_pair_waiting_body">Bu telefonun yanıtı, iPhone sahibinin iCloud\'u üzerinden iPhone\'a ulaşır. Bu ekranı açık tutun.</string>
+    <string name="remote_pair_network">Şu anda iCloud\'a ulaşılamıyor. Bu telefonun internet bağlantısını kontrol edin; Pairline denemeye devam ediyor.</string>
+    <string name="remote_pair_code_title">Kodları karşılaştırın</string>
+    <string name="remote_pair_code_body">iPhone\'u elinde tutan kişiyi arayın ve kodlarınızı birbirinize okuyun. Yalnızca iki telefon da aynı altı rakamı gösteriyorsa \"Kodlar aynı\"ya dokunun.</string>
+    <string name="remote_pair_code_expires">Kodların kalan süresi: %1$s</string>
+    <string name="remote_pair_code_mismatch">Kodlar farklıysa davet başka birinin eline de geçmiş olabilir. \"İptal\"e dokunun ve yeni bir davet isteyin.</string>
+    <string name="remote_pair_match">Kodlar aynı</string>
+    <string name="remote_pair_confirming">iPhone\'un onayı bekleniyor…</string>
+    <string name="remote_pair_confirming_body">iPhone\'u elinde tutan kişinin de kodların aynı olduğunu onaylaması gerekiyor.</string>
+    <string name="remote_pair_done_title">Eşleştirildi</string>
+    <string name="remote_pair_done_body">Bu telefon ve iPhone artık birbirine güveniyor. Birbirlerinden uzaktayken iPhone sahibinin iCloud\'u üzerinden haberleşirler ve her şey yalnızca bu iki telefonda bulunan anahtarlarla kilitli kalır.</string>
+    <string name="remote_pair_refused_title">Bu davet kullanılamıyor</string>
+    <string name="remote_pair_refused_malformed">Bağlantı eksik veya bozuk. iPhone sahibinden yeni bir davet göndermesini isteyin.</string>
+    <string name="remote_pair_refused_expired">Bu davetin süresi doldu. Davetler 10 dakika geçerlidir; iPhone sahibinden yeni bir davet isteyin.</string>
+    <string name="remote_pair_refused_unsupported">Bu davet Pairline\'ın bir test sürümü içindir ve bu sürümle çalışmaz.</string>
+    <string name="remote_pair_failed_title">Eşleştirme durduruldu</string>
+    <string name="remote_pair_failed_expired">iPhone, davetin süresi dolmadan yanıt vermedi. Yeni bir davet isteyip tekrar deneyin.</string>
+    <string name="remote_pair_failed_timeout">Kodlar 10 dakika içinde iki telefonda da onaylanmadı. Yeni bir davetle baştan başlayın.</string>
+    <string name="remote_pair_failed_token">iCloud bu daveti artık kabul etmiyor. Yeni bir davet isteyin.</string>
+    <string name="remote_pair_failed_icloud">Apple, Pairline\'ın bu iCloud hesabına başka bir telefondan erişmesine izin vermiyor; bu yüzden bu hesapla uzaktan eşleştirme şu anda mümkün değil.</string>
+    <string name="remote_pair_failed_bad_answer">iPhone\'un yanıtı doğrulanamadı, bu yüzden bu telefonu korumak için eşleştirme durduruldu. Yeni bir davet isteyin.</string>
+    <string name="remote_pair_failed_internal">Bu telefonda bir sorun oluştu. Yeni bir davetle tekrar deneyin.</string>
 </resources>
