@@ -5,21 +5,29 @@ import java.io.File
 import java.security.SecureRandom
 import java.security.interfaces.ECPublicKey
 
-/** Loads `protocol/test-vectors/v0.json` (path passed by Gradle; falls back to walking up from the working dir). */
+/**
+ * Loads `protocol/test-vectors/v0.json` and, for remote mode, `v1-remote.json` (paths passed by Gradle; falls back to
+ * walking up from the working dir).
+ */
 object TestVectors {
-    val json: JSONObject by lazy { JSONObject(file().readText(Charsets.UTF_8)) }
+    val json: JSONObject by lazy { load("pairline.vectors", "v0.json") }
 
-    private fun file(): File {
-        System.getProperty("pairline.vectors")?.let { path ->
+    /** `v1-remote.json`; its identity keys are v0's `sB` and `sR`. */
+    val remote: JSONObject by lazy { load("pairline.vectors.remote", "v1-remote.json") }
+
+    private fun load(property: String, name: String) = JSONObject(file(property, name).readText(Charsets.UTF_8))
+
+    private fun file(property: String, name: String): File {
+        System.getProperty(property)?.let { path ->
             File(path).takeIf { it.isFile }?.let { return it }
         }
         var dir: File? = File("").absoluteFile
         while (dir != null) {
-            val candidate = File(dir, "protocol/test-vectors/v0.json")
+            val candidate = File(dir, "protocol/test-vectors/$name")
             if (candidate.isFile) return candidate
             dir = dir.parentFile
         }
-        error("protocol/test-vectors/v0.json not found")
+        error("protocol/test-vectors/$name not found")
     }
 
     fun hex(path: String): ByteArray = Hex.decode(string(path))

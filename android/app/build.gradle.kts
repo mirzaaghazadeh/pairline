@@ -5,6 +5,7 @@ plugins {
 
 // Shared protocol test vectors (docs/PROTOCOL.md). Unit tests must reproduce every value.
 val protocolVectors: File = file("../../protocol/test-vectors/v0.json")
+val remoteProtocolVectors: File = file("../../protocol/test-vectors/v1-remote.json")
 
 android {
     namespace = "app.pairline.android"
@@ -82,6 +83,8 @@ android {
         unitTests.all {
             it.systemProperty("pairline.vectors", protocolVectors.absolutePath)
             it.inputs.file(protocolVectors).withPropertyName("protocolVectors")
+            it.systemProperty("pairline.vectors.remote", remoteProtocolVectors.absolutePath)
+            it.inputs.file(remoteProtocolVectors).withPropertyName("remoteProtocolVectors")
         }
     }
 

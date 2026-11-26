@@ -174,7 +174,10 @@ def main():
         },
         "mailbox_r_to_b": {
             "ephemeral_private": hx(e2.private_numbers().private_value.to_bytes(32, "big")),
+            "ephemeral_public": hx(pub(e2)),
             "record_id": hx(rid2), "time_ms": time_ms + 1000,
+            "header": hx(rec2[:HEADER_SEALED]), "ikm": hx(ecdh(e2, sB) + ecdh(sR, sB)),
+            "key": hx(mailbox_key(ecdh(e2, sB) + ecdh(sR, sB), rec2[:HEADER_SEALED])),
             "plaintext_utf8": send.decode(), "sealed": hx(rec2),
         },
         "mailbox_must_fail": [
@@ -184,13 +187,18 @@ def main():
         ],
         "invite": {
             "invite_secret": hx(invite_secret), "uri": uri, "token": token, "mailboxes": mb, "expiry": 1795700600,
+            "backend": "public", "env": "development",
             "k_br": hx(k_br), "k_rb": hx(k_rb),
             "nonce_r": hx(nonce_r), "nonce_b": hx(nonce_b), "device_id": hx(device_id),
             "commit": hx(c), "code": the_code,
-            "hello_json": hello.decode(), "hello_record_id": hx(rid_h), "hello_sealed": hx(inv_hello),
-            "nonce_json": nonce_msg.decode(), "nonce_record_id": hx(rid_n), "nonce_sealed": hx(inv_nonce),
-            "reveal_json": reveal.decode(), "reveal_record_id": hx(rid_v), "reveal_sealed": hx(inv_reveal),
+            "hello_json": hello.decode(), "hello_record_id": hx(rid_h), "hello_time_ms": time_ms,
+            "hello_sealed": hx(inv_hello),
+            "nonce_json": nonce_msg.decode(), "nonce_record_id": hx(rid_n), "nonce_time_ms": time_ms + 2000,
+            "nonce_sealed": hx(inv_nonce),
+            "reveal_json": reveal.decode(), "reveal_record_id": hx(rid_v), "reveal_time_ms": time_ms + 4000,
+            "reveal_sealed": hx(inv_reveal),
             "confirm_ephemeral_private": hx(e3.private_numbers().private_value.to_bytes(32, "big")),
+            "confirm_ephemeral_public": hx(pub(e3)), "confirm_json": '{"t":"rpair.confirm"}',
             "confirm_record_id": hx(rid_c), "confirm_time_ms": time_ms + 9000, "confirm_sealed": hx(confirm),
         },
     }

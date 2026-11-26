@@ -8,11 +8,13 @@
 # - app/pairline/android/link/wifi/  the Wi-Fi link to the paired iPhone, local addresses only
 # - app/pairline/android/netshare/   opt-in internet sharing (M8): forwards only the iPhone's own traffic
 # - app/pairline/android/privileged/adb/  this phone's own Wireless debugging, on 127.0.0.1 only (D-054)
+# - app/pairline/android/link/remote/  opt-in remote mode (D-072): CloudKit Web Services (hosts checked below), the
+#                                       home router's port mapping and the direct connection from the paired iPhone
 # Debug-only code (src/debug) is exempt: it never ships (D-018).
 set -euo pipefail
 cd "$(dirname "$0")/../../android/app/src/main/java"
 
-allowed='^app/pairline/android/(update|link/wifi|netshare|privileged/adb)/'
+allowed='^app/pairline/android/(update|link/wifi|link/remote|netshare|privileged/adb)/'
 # Classes and calls that open or prepare connections.
 pattern='java\.net\.(Socket|ServerSocket|DatagramSocket|MulticastSocket|URL|HttpURLConnection|InetSocketAddress)|javax\.net\.ssl|\bHttpsURLConnection\b|\bopenConnection\(|\bSocketChannel\b|\bDatagramChannel\b|\bServerSocketChannel\b|okhttp|ktor|retrofit|volley|cronet'
 fail=0
@@ -36,5 +38,22 @@ if [[ -d app/pairline/android/update ]]; then
   done < <(grep -rhoE 'https?://[^"[:space:]]+' app/pairline/android/update || true)
 fi
 
-[[ "$fail" -eq 0 ]] && echo "Network code is confined to update/, link/wifi/, netshare/ and privileged/adb/."
+# Remote mode talks to Apple's CloudKit Web Services host and nothing else on the internet (the router and the
+# iPhone are reached by address, never by a URL).
+if [[ -d app/pairline/android/link/remote ]]; then
+  while IFS= read -r url; do
+    host="$(sed -E 's#^https?://([^/:"]+).*#\1#' <<<"$url")"
+    case "$host" in
+      api.apple-cloudkit.com) ;;
+      '$HOST') ;;  # the HOST constant, whose literal the check below verifies
+      *) echo "::error::The remote package refers to an unexpected host: $host"; fail=1 ;;
+    esac
+  done < <(grep -rhoE 'https?://[^"[:space:]]+' app/pairline/android/link/remote || true)
+  if grep -rnE '"[a-z0-9.-]+\.(com|net|org|io|dev)"' app/pairline/android/link/remote | grep -v 'api\.apple-cloudkit\.com' | grep -q .; then
+    echo "::error::The remote package names a host other than api.apple-cloudkit.com."
+    fail=1
+  fi
+fi
+
+[[ "$fail" -eq 0 ]] && echo "Network code is confined to update/, link/wifi/, link/remote/, netshare/ and privileged/adb/."
 exit "$fail"

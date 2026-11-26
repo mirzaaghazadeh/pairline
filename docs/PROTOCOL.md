@@ -12,11 +12,11 @@
 - **Identity key:** each device creates a long-term P-256 key pair on first launch.
   - **iOS:** Secure Enclave key (`SecureEnclave.P256.KeyAgreement.PrivateKey`) when available; otherwise Keychain with
     `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`. The Simulator has no Secure Enclave, so it uses the Keychain path.
-  - **Android:** key agreement inside Android Keystore (`PURPOSE_AGREE_KEY`) exists only on API 31+. On
-    API 30, keep the private key in no-backup app storage, encrypted with an AES-GCM key held in
-    Android Keystore. On API 31+, use the keystore key directly.
-- **Why P-256 and not X25519:** P-256 ECDH is built into both platforms at our minimum versions (Android API 30,
-  iOS 16). X25519 isn't reliably available in Android's built-in crypto providers at API 30.
+  - **Android:** key agreement inside Android Keystore (`PURPOSE_AGREE_KEY`) exists only on API 31+. Below
+    API 31 (the app supports API 28 and later, D-038), keep the private key in no-backup app storage, encrypted with an
+    AES-GCM key held in Android Keystore. On API 31+, use the keystore key directly.
+- **Why P-256 and not X25519:** P-256 ECDH is built into both platforms at our minimum versions (Android API 28,
+  iOS 16). X25519 isn't reliably available in Android's built-in crypto providers at those API levels.
 - **Primitives:** ECDH P-256, SHA-256, HKDF-SHA256 (RFC 5869, built on the platform's HMAC), HMAC-SHA256,
   AES-256-GCM. Platform implementations only.
 - **Encodings:** public keys are 65-byte uncompressed X9.62 points (`04 ‖ X ‖ Y`). An ECDH result is the 32-byte
@@ -515,8 +515,9 @@ still stored, which is why records are deleted as soon as they're handled.
 known, the direction is the peer's, the time is no more than 14 days old and no more than 10 minutes ahead, the
 record id isn't one it has already handled (it keeps handled ids for 14 days), and it decrypts. Drops are silent.
 
-**Plaintext.** A UTF-8 JSON message from the catalog, exactly as in a session record, at most 48 KB. Requests from R
-carry an `id` from a counter R keeps across restarts; B answers through the mailbox, or on a session if one is up.
+**Plaintext.** A UTF-8 JSON message from the catalog, exactly as in a session record, at most 49,152 bytes (both
+kinds; a longer record is dropped before any crypto). The time is an unsigned 64-bit number. Requests from R carry an
+`id` from a counter R keeps across restarts; B answers through the mailbox, or on a session if one is up.
 
 ### Mailboxes in iCloud
 
@@ -578,7 +579,12 @@ that's far away" on the iPhone and accept it only after the person at home allow
 
 1. R creates a 32-byte invitation secret `is` and the three mailbox ids, and shows or shares the invitation:
    `pairline://invite?v=1&k=<pubR>&s=<is>&b=<backend>&e=<env>&t=<token>&m=<R→B id>&a=<alert id>&q=<quiet id>&x=<expiry>`
-   (`k`, `s` base64url; `t` percent-encoded; `x` Unix seconds, 10 minutes ahead).
+   (`k`, `s` base64url; `t` percent-encoded; `x` Unix seconds, 10 minutes ahead). A receiver accepts it only if: the
+   path is empty; each of these parameters appears exactly once (unknown ones are ignored); values are percent-decoded
+   (a raw `+` stays `+`); `v` is `1`; `k` is base64url without padding of a point on P-256 and `s` of 32 bytes; `b` and
+   `e` are exactly one of the values in `remote.config`; `t` is non-empty printable ASCII without spaces (0x21–0x7E);
+   `m`, `a` and `q` are 32 lowercase hex digits and all different; `x` is 1 to 12 decimal digits. Whether it has
+   expired is checked separately, and release builds refuse `b=public` while that backend is debug-only.
 2. Invitation records (kind `0x02`) are sealed with
    `kI = HKDF-SHA256(is, salt = empty, info = "pairline v1 invite", L = 64)` (B→R the first 32 bytes, R→B the last 32),
    the first 12 bytes of the record id as the nonce and the 27-byte header as associated data.
@@ -588,6 +594,8 @@ that's far away" on the iPhone and accept it only after the person at home allow
 4. R accepts only the first `rpair.hello` for an invitation (a second one means someone else has it: R cancels and
    tells the user), creates a 32-byte `nonceR` and sends `{"t":"rpair.nonce","n":<nonceR>}`.
 5. B sends `{"t":"rpair.reveal","n":<nonceB>}`. R checks it against `commit` and cancels on a mismatch.
+   Every `rpair.*` field is checked before use: `k` a 65-byte point on P-256, `id` 8 bytes, `c` and `n` 32 bytes
+   (base64url without padding); anything else cancels the pairing.
 6. Both show `code`: the first 4 bytes of `HMAC-SHA256(is, "pairline v1 code" ‖ pubR ‖ pubB ‖ nonceR ‖ nonceB)` as a
    big-endian number, modulo 1,000,000, as 6 digits. The two people read it to each other; each taps "The codes
    match" or cancels.
