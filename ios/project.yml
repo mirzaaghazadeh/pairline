@@ -122,6 +122,8 @@ targets:
       - path: PairlineTests
       - path: ../protocol/test-vectors/v0.json
         buildPhase: resources
+      - path: ../protocol/test-vectors/v1-remote.json
+        buildPhase: resources
       - path: Pairline/Store/Pairline.storekit
         buildPhase: resources
     dependencies:
