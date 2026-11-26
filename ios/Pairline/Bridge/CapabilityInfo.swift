@@ -27,6 +27,7 @@ struct CapabilityInfo: Identifiable {
         case .dualSIM: return "simcard.2"
         case .callMedia: return "ear"
         case .callMediaTalk: return "mic"
+        case .callMediaLink: return "dot.radiowaves.left.and.right"
         case .netShare: return "network"
         case .wifi: return "wifi"
         case .files: return "doc.on.doc"
@@ -52,6 +53,7 @@ struct CapabilityInfo: Identifiable {
         case .dualSIM: return String(localized: "Dual SIM")
         case .callMedia: return String(localized: "Hear calls on iPhone", table: "CallAudio")
         case .callMediaTalk: return String(localized: "Talk from iPhone", table: "CallAudio")
+        case .callMediaLink: return String(localized: "Call audio over Bluetooth", table: "CallAudio")
         case .netShare: return String(localized: "Internet sharing", table: "NetShare")
         case .wifi: return String(localized: "Wi-Fi link")
         case .files: return String(localized: "Send files")
@@ -74,9 +76,11 @@ struct CapabilityInfo: Identifiable {
         case .callDTMF, .callAudio:
             return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Wireless debugging).", table: "CallAudio")
         case .callMedia:
-            return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later, Wireless debugging (no extra app), and both phones on the same Wi-Fi.", table: "CallAudio")
+            return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone. It needs Android 11 or later and Wireless debugging (no extra app).", table: "CallAudio")
         case .callMediaTalk:
             return String(localized: "This bridge phone can't feed audio into calls. You hear calls on the iPhone and talk on the Android phone.", table: "CallAudio")
+        case .callMediaLink:
+            return String(localized: "Needs Talk on iPhone and the latest Pairline Bridge on your Android phone. Until then call audio goes over Wi-Fi.", table: "CallAudio")
         case .netShare:
             return String(localized: "Turn on Internet sharing in Pairline Bridge › Settings on your Android phone.", table: "NetShare")
         case .contacts:

@@ -324,13 +324,18 @@ extension BluetoothCentral: CBPeripheralDelegate {
 }
 
 /// Frames over the `rx` (write without response) and `tx` (notify) characteristics, with fragmenting and
-/// `canSendWriteWithoutResponse` flow control.
+/// `canSendWriteWithoutResponse` flow control. Call audio (D-072) is pulled at each frame boundary, before frames
+/// still waiting; fragments of two frames never interleave.
 final class BLETransport: FrameTransport {
     let kind: TransportKind = .bluetooth
     let peripheral: CBPeripheral
     private let rx: CBCharacteristic
     private weak var central: BluetoothCentral?
-    private var queue: [Data] = []
+    /// Frames waiting to start, each as its fragments.
+    private var queue: [[Data]] = []
+    /// What's left of the frame being written.
+    private var sending: [Data] = []
+    private var media: (() -> Data?)?
     private var reassembler = BLEReassembler()
     private var closed = false
 
@@ -344,20 +349,40 @@ final class BLETransport: FrameTransport {
     }
 
     func send(_ frame: Data) {
+        guard !closed, let fragments = fragments(of: frame) else { return }
+        queue.append(fragments)
+        pump()
+    }
+
+    func mediaReady(_ source: @escaping () -> Data?) {
         guard !closed else { return }
+        media = source
+        pump()
+    }
+
+    private func fragments(of frame: Data) -> [Data]? {
         let payload = min(peripheral.maximumWriteValueLength(for: .withoutResponse), BLEFragmenter.maximumPayload)
         guard payload >= BLEFragmenter.minimumPayload, frame.count <= WireProtocol.maxFrameLength else {
             log.error("ble", "Can't send a frame of \(frame.count) bytes with payload \(payload)")
             close()
-            return
+            return nil
         }
-        queue.append(contentsOf: BLEFragmenter.fragments(of: frame, attPayload: payload))
-        pump()
+        return BLEFragmenter.fragments(of: frame, attPayload: payload)
     }
 
     func pump() {
-        while !closed, !queue.isEmpty, peripheral.canSendWriteWithoutResponse {
-            peripheral.writeValue(queue.removeFirst(), for: rx, type: .withoutResponse)
+        while !closed, peripheral.canSendWriteWithoutResponse {
+            if sending.isEmpty {
+                // A frame boundary: call audio first, then the frames waiting in order.
+                if let audio = media?(), let fragments = fragments(of: audio) {
+                    sending = fragments
+                } else if !queue.isEmpty {
+                    sending = queue.removeFirst()
+                } else {
+                    return
+                }
+            }
+            peripheral.writeValue(sending.removeFirst(), for: rx, type: .withoutResponse)
         }
     }
 
@@ -387,6 +412,8 @@ final class BLETransport: FrameTransport {
         guard !closed else { return }
         closed = true
         queue.removeAll()
+        sending.removeAll()
+        media = nil
         let callback = onClose
         onClose = nil
         onFrame = nil

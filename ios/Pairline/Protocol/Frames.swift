@@ -21,6 +21,8 @@ enum FrameType: UInt8 {
     case record = 0x20
     /// A record on the bulk channel (M5): Wi-Fi TCP only, after the handshake.
     case bulk = 0x21
+    /// A record on the link media channel (call audio, D-072): Bluetooth and debug TCP only, after the handshake.
+    case media = 0x22
 }
 
 enum ProtocolError: Error, Equatable {

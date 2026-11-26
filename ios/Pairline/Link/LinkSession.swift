@@ -10,6 +10,9 @@ protocol FrameTransport: AnyObject {
     func send(_ frame: Data)
     /// Sends and calls `completion` (on the main queue) once the transport took the frame, for flow control.
     func send(_ frame: Data, completion: (() -> Void)?)
+    /// Call audio is waiting (D-072): `source` returns the next `MEDIA` frame (every packet waiting in it) or nil.
+    /// Bluetooth pulls it at each frame boundary, before frames still waiting; others send what it has at once.
+    func mediaReady(_ source: @escaping () -> Data?)
     func close()
 }
 
@@ -17,6 +20,10 @@ extension FrameTransport {
     func send(_ frame: Data, completion: (() -> Void)?) {
         send(frame)
         if let completion { DispatchQueue.main.async(execute: completion) }
+    }
+
+    func mediaReady(_ source: @escaping () -> Data?) {
+        while let frame = source() { send(frame) }
     }
 }
 
@@ -61,6 +68,8 @@ final class LinkSession {
     private var opener: RecordOpener?
     private var bulkSealer: RecordSealer?
     private var bulkOpener: RecordOpener?
+    private var linkMediaSealer: RecordSealer?
+    private var linkMediaOpener: RecordOpener?
 
     private(set) var phase: Phase = .idle
     private(set) var keys: SessionKeys?
@@ -72,6 +81,8 @@ final class LinkSession {
     var onMessage: ((Data) -> Void)?
     /// Decrypted `BULK` record plaintext (Wi-Fi sessions only).
     var onBulk: ((Data) -> Void)?
+    /// Decrypted `MEDIA` record plaintext: call audio (Bluetooth and debug TCP sessions only, D-072).
+    var onLinkMedia: ((Data) -> Void)?
     var onClose: ((LinkSessionError?) -> Void)?
 
     var transportKind: TransportKind { transport.kind }
@@ -79,6 +90,8 @@ final class LinkSession {
     var frameTransport: FrameTransport { transport }
     /// `BULK` frames exist only on the Wi-Fi link (PROTOCOL.md, "Frames").
     var carriesBulk: Bool { transport.kind == .wifi }
+    /// `MEDIA` frames (call audio, D-072) exist only on Bluetooth and the debug TCP link: Wi-Fi has its UDP channel.
+    var carriesLinkMedia: Bool { transport.kind == .bluetooth || transport.kind == .tcp }
 
     init(transport: FrameTransport, identity: KeyAgreementPrivateKey, pinnedBridgeKey: Data?, pairing: PairingLink?,
          ephemeral: KeyAgreementPrivateKey = P256.KeyAgreement.PrivateKey(),
@@ -118,6 +131,20 @@ final class LinkSession {
         let wire = try bulkSealer.seal(plaintext)
         self.bulkSealer = bulkSealer
         transport.send(Frame(type: .bulk, body: wire).encoded, completion: completion)
+    }
+
+    /// Seals one link media record and returns its `MEDIA` frame for the caller to hand to the transport (D-072).
+    func sealLinkMedia(_ plaintext: Data) throws -> Data {
+        guard phase == .established, carriesLinkMedia, var linkMediaSealer else { throw LinkSessionError.transportClosed }
+        let wire = try linkMediaSealer.seal(plaintext)
+        self.linkMediaSealer = linkMediaSealer
+        return Frame(type: .media, body: wire).encoded
+    }
+
+    /// Call audio is waiting: the transport pulls `MEDIA` frames from `source`, ahead of frames that haven't started.
+    func mediaReady(_ source: @escaping () -> Data?) {
+        guard phase == .established, carriesLinkMedia else { return }
+        transport.mediaReady(source)
     }
 
     func close() {
@@ -166,6 +193,8 @@ final class LinkSession {
             handleRecord(frame.body)
         case (.established, .bulk) where carriesBulk:
             handleBulk(frame.body)
+        case (.established, .media) where carriesLinkMedia:
+            handleLinkMedia(frame.body)
         default:
             finish(.protocolViolation("unexpected frame \(frame.type)"))
         }
@@ -219,6 +248,11 @@ final class LinkSession {
                 bulkSealer = RecordSealer(key: bulk.remoteToBridge, direction: .remoteToBridge, channel: .bulk)
                 bulkOpener = RecordOpener(key: bulk.bridgeToRemote, direction: .bridgeToRemote, channel: .bulk)
             }
+            if carriesLinkMedia, let keys {
+                let media = keys.linkMediaKeys()
+                linkMediaSealer = RecordSealer(key: media.remoteToBridge, direction: .remoteToBridge, channel: .linkMedia)
+                linkMediaOpener = RecordOpener(key: media.bridgeToRemote, direction: .bridgeToRemote, channel: .linkMedia)
+            }
             phase = .established
             onEstablished?()
         } catch {
@@ -251,6 +285,18 @@ final class LinkSession {
         }
     }
 
+    /// Link media records are ordered like control records: a replayed or forged one closes the connection (D-072).
+    private func handleLinkMedia(_ body: Data) {
+        guard var linkMediaOpener else { return finish(.protocolViolation("state")) }
+        do {
+            let (_, plaintext) = try linkMediaOpener.open(body)
+            self.linkMediaOpener = linkMediaOpener
+            onLinkMedia?(plaintext)
+        } catch {
+            finish(.protocolViolation("media"))
+        }
+    }
+
     private func finish(_ error: LinkSessionError?) {
         guard phase != .closed else { return }
         phase = .closed
@@ -261,12 +307,15 @@ final class LinkSession {
         opener = nil
         bulkSealer = nil
         bulkOpener = nil
+        linkMediaSealer = nil
+        linkMediaOpener = nil
         let callback = onClose
         onClose = nil
         onPaired = nil
         onEstablished = nil
         onMessage = nil
         onBulk = nil
+        onLinkMedia = nil
         callback?(error)
     }
 }

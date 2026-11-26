@@ -58,6 +58,13 @@ final class CallCenter: ObservableObject {
     weak var bridge: BridgeController?
     /// The Wi-Fi media channel while one is open (M5); nil without a Wi-Fi link.
     var mediaTransport: (() -> AudioPacketTransport?)?
+    /// The call-audio channel inside the Bluetooth session while it's established (D-072); nil otherwise.
+    var linkTransport: (() -> AudioPacketTransport?)?
+    /// The path and channel of the relay the bridge accepted.
+    private var relayPath: CallAudioPath?
+    private var relayTransport: AudioPacketTransport?
+    /// Calls whose relay already got its one second try (on the other path, after the first stopped).
+    private var relayRetried = Set<UUID>()
     private let useCallKit: Bool
     private var adapter: CallKitAdapter?
     private let controller = CXCallController()
@@ -110,11 +117,27 @@ final class CallCenter: ObservableObject {
     /// Mute and speaker work: locally while the audio is on this iPhone, or on the bridge through `call.audio`.
     var canAudio: Bool { audioOnIPhone || (bridge?.has(.callAudio) ?? false) }
     var audioOnIPhone: Bool { if case .iphone = audioRoute { return true } else { return false } }
-    /// The bridge can relay this call's audio and the Wi-Fi media channel is open.
-    var canRelayAudio: Bool { bridge?.has(.callMedia) == true && (mediaTransport?()?.isOpen ?? false) }
-    /// Talk on iPhone is set up on the bridge, but the phones aren't linked over Wi-Fi, which carries the audio.
+    /// The path a call's audio takes now (D-072): the one chosen in Settings › Call audio when it's up, else the
+    /// other. Bluetooth needs a bridge that lists `call.media.link`; Wi-Fi needs an open media channel.
+    private func availablePath() -> (path: CallAudioPath, transport: AudioPacketTransport)? {
+        let order: [CallAudioPath] = AppSettings.shared.callAudioPath == .wifi ? [.wifi, .link] : [.link, .wifi]
+        for path in order {
+            switch path {
+            case .link:
+                if bridge?.has(.callMediaLink) == true, let channel = linkTransport?(), channel.isOpen { return (path, channel) }
+            case .wifi:
+                if let channel = mediaTransport?(), channel.isOpen { return (path, channel) }
+            }
+        }
+        return nil
+    }
+
+    /// The bridge can relay this call's audio, and a path for it is up (Bluetooth or Wi-Fi).
+    var canRelayAudio: Bool { bridge?.has(.callMedia) == true && availablePath() != nil }
+    /// Talk on iPhone is set up on the bridge, but no path for the audio is up: an older bridge that carries call
+    /// audio only over Wi-Fi, and the phones aren't linked over Wi-Fi.
     var audioNeedsWiFi: Bool {
-        audioRoute == .bridge && bridge?.has(.callMedia) == true && !(mediaTransport?()?.isOpen ?? false)
+        audioRoute == .bridge && bridge?.has(.callMedia) == true && availablePath() == nil
     }
 
     /// The call screen explains why the audio stayed on the Android phone (no Wi-Fi between the phones).
@@ -315,12 +338,21 @@ final class CallCenter: ObservableObject {
         case "failed", "stopped":
             guard audioRoute != .bridge else { return }
             log.info("audio", "Bridge stopped relaying call audio: \(event.reason ?? "-")")
+            let stoppedPath = relayPath
+            stopRelay(callEnded: false, tellBridge: false) // the bridge has stopped already
+            // The path it ran on went away mid-call (Bluetooth or Wi-Fi dropped): try once more on whatever is up.
+            if call.state == .active, call.answeredHere, !relayRetried.contains(call.id),
+               let next = availablePath(), next.path != stoppedPath {
+                relayRetried.insert(call.id)
+                log.info("audio", "Moving the call's audio to \(next.path == .link ? "Bluetooth" : "Wi-Fi")")
+                startRelayIfPossible()
+                return
+            }
             if event.state == "failed" {
                 explainRelayFailure(event.reason)
             } else if call.state == .active {
                 notice = String(localized: "The call's audio went back to your Android phone.", table: "CallAudio")
             }
-            stopRelay(callEnded: false)
         default:
             break
         }
@@ -332,17 +364,20 @@ final class CallCenter: ObservableObject {
             audioRoute = .iphone(talk: bridge.has(.callMediaTalk))
             return
         }
-        guard audioRoute == .bridge, !relayAccepted, canRelayAudio,
-              let bridge, let bridgeID = current?.bridgeID else { return }
+        guard audioRoute == .bridge, !relayAccepted, let bridge, bridge.has(.callMedia),
+              let choice = availablePath(), let bridgeID = current?.bridgeID else { return }
         audioRoute = .connecting
         let talk = bridge.has(.callMediaTalk)
         if !useCallKit || current?.inCallKit == false { activateOwnAudioSession() }
         Task {
             do {
-                _ = try await bridge.link.request(.callMediaStart(bridgeID, talk: talk))
+                _ = try await bridge.link.request(.callMediaStart(bridgeID, talk: talk, via: choice.path))
                 guard self.current?.bridgeID == bridgeID else { return }
+                log.info("audio", "The bridge relays the call's audio over \(choice.path == .link ? "Bluetooth (Opus)" : "Wi-Fi")")
                 self.relayAccepted = true
                 self.relayTalk = talk
+                self.relayPath = choice.path
+                self.relayTransport = choice.transport
                 self.startEngineIfReady()
             } catch {
                 log.warning("audio", "Bridge didn't start call audio: \(error.localizedDescription)")
@@ -361,9 +396,9 @@ final class CallCenter: ObservableObject {
     /// and the session is active.
     private func startEngineIfReady() {
         guard relayAccepted, audioSessionActive, audioEngine == nil,
-              let transport = mediaTransport?(), transport.isOpen else { return }
+              let transport = relayTransport, transport.isOpen, let path = relayPath else { return }
         do {
-            let engine = try startedEngine(transport)
+            let engine = try startedEngine(transport, path: path)
             engine.muted = current?.muted ?? false
             if current?.speaker == true { engine.setSpeaker(true) }
             engine.onConfigurationChange = { [weak self, weak engine] in
@@ -383,9 +418,9 @@ final class CallCenter: ObservableObject {
 
     /// Echo cancellation first; if the engine won't start with it (some routes and devices refuse), a fresh engine
     /// without it, so the call's audio still comes here. Remembered for the rest of the call.
-    private func startedEngine(_ transport: AudioPacketTransport) throws -> CallAudioEngine {
+    private func startedEngine(_ transport: AudioPacketTransport, path: CallAudioPath) throws -> CallAudioEngine {
         if !echoCancellationFailed {
-            let engine = CallAudioEngine(transport: transport, voiceProcessing: true)
+            let engine = try CallAudioEngine(transport: transport, voiceProcessing: true, path: path)
             do {
                 try engine.start()
                 return engine
@@ -394,7 +429,7 @@ final class CallCenter: ObservableObject {
                 echoCancellationFailed = true
             }
         }
-        let engine = CallAudioEngine(transport: transport, voiceProcessing: false)
+        let engine = try CallAudioEngine(transport: transport, voiceProcessing: false, path: path)
         try engine.start()
         return engine
     }
@@ -438,14 +473,17 @@ final class CallCenter: ObservableObject {
         audioEngine = nil
     }
 
-    private func stopRelay(callEnded: Bool) {
+    private func stopRelay(callEnded: Bool, tellBridge: Bool = true) {
         let wasRelaying = audioOnIPhone
         let relayedFor = relayStartedAt.map { Date().timeIntervalSince($0) } ?? 0
         stopEngine()
-        if relayAccepted, !callEnded, let bridgeID = current?.bridgeID, let bridge {
+        if relayAccepted, !callEnded, tellBridge, let bridgeID = current?.bridgeID, let bridge {
             Task { _ = try? await bridge.link.request(.callMediaStop(bridgeID)) }
         }
         relayAccepted = false
+        relayPath = nil
+        relayTransport = nil
+        if callEnded { relayRetried.removeAll() }
         relayStartedAt = nil
         engineStartedAt = nil
         engineRestarts = 0

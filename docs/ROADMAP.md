@@ -130,6 +130,10 @@ Agents: tick checkboxes as work lands, and move the "Current milestone" line whe
       local network; PROTOCOL.md "Call audio", D-047) — wired to the M5 media channel on both sides (bridge relay
       `setTransport`, iPhone `CallCenter.mediaTransport`); a real relayed call is still to be tested
 - [x] Packet-loss concealment (jitter buffer, repeat-and-fade) — echo self-test still open
+- [x] Call audio over Bluetooth, so Talk on iPhone works without Wi-Fi between the phones (D-072): Opus inside the
+      Bluetooth session with each platform's own codec, audio ahead of other traffic, a fast connection during the
+      call; iPhone Settings › Call audio chooses Bluetooth (default) or Wi-Fi first — unit-tested on both sides and
+      on the Simulator against the fake bridge; **real phones pending**
 - [ ] Test call with "Did you hear it?" feedback; automatic choice of the audio method (`call.media.feedback`
       flips capture source and bridge-mic muting — bridge side done, iPhone prompt pending); known-device list
       shipped inside the app (never fetched)

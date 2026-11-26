@@ -447,11 +447,14 @@ struct Outbound {
     var fields: [String: Any]
     /// Whether B answers with the same `id`.
     let isRequest: Bool
+    /// The only session this message may go on, when it matters (call audio inside the Bluetooth session, D-072).
+    var lane: LinkLane?
 
-    init(_ type: String, _ fields: [String: Any] = [:], isRequest: Bool = true) {
+    init(_ type: String, _ fields: [String: Any] = [:], isRequest: Bool = true, lane: LinkLane? = nil) {
         self.type = type
         self.fields = fields
         self.isRequest = isRequest
+        self.lane = lane
     }
 
     var timeout: TimeInterval { type == "ussd.run" ? 60 : 15 }
@@ -542,9 +545,11 @@ struct Outbound {
         return Outbound("call.audio", fields)
     }
 
-    /// Asks the bridge to relay this call's audio over the Wi-Fi media channel (PROTOCOL.md "Call audio").
-    static func callMediaStart(_ call: OpaqueValue, talk: Bool) -> Outbound {
-        Outbound("call.media.start", ["call": call.jsonObject, "talk": talk])
+    /// Asks the bridge to relay this call's audio (PROTOCOL.md "Call audio"): over the Wi-Fi media channel, or inside
+    /// the Bluetooth session it's sent on (`.link`, D-072), which is why that one goes only on the Bluetooth lane.
+    static func callMediaStart(_ call: OpaqueValue, talk: Bool, via: CallAudioPath = .wifi) -> Outbound {
+        Outbound("call.media.start", ["call": call.jsonObject, "talk": talk, "via": via.wire],
+                 lane: via == .link ? .primary : nil)
     }
 
     static func callMediaStop(_ call: OpaqueValue) -> Outbound {
@@ -610,6 +615,8 @@ enum Capability: String, CaseIterable, Identifiable {
     case callMedia = "call.media"
     /// …and can feed this iPhone's microphone into the call.
     case callMediaTalk = "call.media.talk"
+    /// …and the audio can travel inside the Bluetooth session, as Opus (D-072).
+    case callMediaLink = "call.media.link"
     /// The bridge's user allows internet sharing for this iPhone (M8).
     case netShare = "net.share"
     /// The bridge's Wi-Fi link is on (M5).

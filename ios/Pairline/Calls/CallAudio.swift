@@ -2,20 +2,52 @@ import AVFoundation
 import Foundation
 import os
 
-/// The Wi-Fi link's encrypted media channel as call audio needs it (M5): lossy, unordered, never blocks.
+/// An encrypted media channel as call audio needs it: the Wi-Fi link's UDP channel (lossy, unordered) or the one
+/// inside the Bluetooth session (D-072). `send` never blocks.
 protocol AudioPacketTransport: AnyObject {
     var isOpen: Bool { get }
     func send(_ packet: Data)
     var onPacket: ((Data) -> Void)? { get set }
 }
 
-/// Call-audio packets (PROTOCOL.md "Call audio", D-047): `kind ‖ sequence (2 bytes, big-endian) ‖ samples`.
-/// Kind 0x01 is one 20 ms frame of 16-bit little-endian mono PCM at 16 kHz. Unknown kinds and sizes are dropped.
+/// Where a call's audio travels between the phones (`call.media.start` `via`, PROTOCOL.md "Call audio"). The user's
+/// choice in Settings › Call audio is the one tried first (D-072).
+enum CallAudioPath: String, CaseIterable, Identifiable {
+    /// Inside the Bluetooth session, as Opus (needs `call.media.link`).
+    case link
+    /// The Wi-Fi link's UDP media channel, as PCM.
+    case wifi
+
+    var id: String { rawValue }
+    var wire: String { rawValue }
+}
+
+/// Call-audio packets (PROTOCOL.md "Call audio", D-047, D-072): `kind ‖ sequence (2 bytes, big-endian) ‖ audio`.
+/// Kind 0x01 is one 20 ms frame of 16-bit little-endian mono PCM at 16 kHz (Wi-Fi); kind 0x02 one Opus packet of
+/// 20 ms (Bluetooth). Unknown kinds and sizes are dropped.
 enum AudioPackets {
     static let kindPCM16: UInt8 = 0x01
+    static let kindOpus: UInt8 = 0x02
     static let sampleRate: Double = 16_000
     static let frameSamples = 320
     static let headerBytes = 3
+    static let maxOpusBytes = 400
+
+    static func encodeOpus(sequence: UInt16, opus: Data) -> Data {
+        precondition(!opus.isEmpty && opus.count <= maxOpusBytes)
+        var data = Data(capacity: headerBytes + opus.count)
+        data.append(kindOpus)
+        data.append(UInt8(sequence >> 8))
+        data.append(UInt8(sequence & 0xFF))
+        data.append(opus)
+        return data
+    }
+
+    static func decodeOpus(_ packet: Data) -> (sequence: UInt16, opus: Data)? {
+        let bytes = [UInt8](packet)
+        guard bytes.count > headerBytes, bytes.count - headerBytes <= maxOpusBytes, bytes[0] == kindOpus else { return nil }
+        return (UInt16(bytes[1]) << 8 | UInt16(bytes[2]), Data(bytes[headerBytes...]))
+    }
 
     static func encode(sequence: UInt16, frame: [Int16]) -> Data {
         precondition(frame.count == frameSamples)
@@ -141,7 +173,13 @@ final class CallAudioEngine {
     /// Echo cancellation (Apple's voice processing). Some routes and devices refuse to start with it; the call
     /// center then tries a fresh engine without it rather than giving the audio back to the Android phone.
     let voiceProcessing: Bool
-    private let jitter = JitterBuffer()
+    /// Where the audio travels: PCM on Wi-Fi, Opus inside the Bluetooth session (D-072).
+    let path: CallAudioPath
+    private let jitter: JitterBuffer
+    /// Opus for the Bluetooth path: the encoder runs on the microphone tap's thread, the decoder on the channel's
+    /// delivery queue (each used by one thread only).
+    private let encoder: OpusEncoder?
+    private let decoder: OpusDecoder?
     private let state = OSAllocatedUnfairLock(initialState: SendState())
     private var converter: AVAudioConverter?
     private var sourceNode: AVAudioSourceNode?
@@ -163,11 +201,28 @@ final class CallAudioEngine {
         var sequence: UInt16 = 0
         var muted = false
         var sent = 0
+        var decodeFailures = 0
     }
 
-    init(transport: AudioPacketTransport, voiceProcessing: Bool = true) {
+    /// Bluetooth delivers in bursts: hold 80 ms there, 60 ms on Wi-Fi (PROTOCOL.md "Call audio").
+    static func jitterFrames(_ path: CallAudioPath) -> Int { path == .link ? 4 : 3 }
+
+    init(transport: AudioPacketTransport, voiceProcessing: Bool = true, path: CallAudioPath = .wifi) throws {
         self.transport = transport
         self.voiceProcessing = voiceProcessing
+        self.path = path
+        jitter = JitterBuffer(target: Self.jitterFrames(path))
+        if path == .link {
+            do {
+                encoder = try OpusEncoder()
+                decoder = try OpusDecoder()
+            } catch {
+                throw CallAudioError.noCodec
+            }
+        } else {
+            encoder = nil
+            decoder = nil
+        }
     }
 
     var muted: Bool {
@@ -223,14 +278,25 @@ final class CallAudioEngine {
         engine.attach(source)
         engine.connect(source, to: engine.mainMixerNode, format: playFormat)
 
-        transport.onPacket = { [weak self] packet in
-            guard let (sequence, frame) = AudioPackets.decode(packet) else { return }
-            self?.jitter.put(sequence, frame)
-        }
+        transport.onPacket = { [weak self] packet in self?.received(packet) }
         engine.prepare()
         try engine.start()
         isRunning = true
-        log.info("audio", "Call audio on this iPhone: mic \(Int(inputFormat.sampleRate)) Hz, echo cancellation \(voiceProcessing ? "on" : "off")")
+        let codec = encoder.map { "Opus \($0.bitRate / 1000) kbit/s over Bluetooth" } ?? "PCM over Wi-Fi"
+        log.info("audio", "Call audio on this iPhone: \(codec), mic \(Int(inputFormat.sampleRate)) Hz, echo cancellation \(voiceProcessing ? "on" : "off")")
+    }
+
+    /// A packet from the bridge, on the channel's own queue: PCM straight to the jitter buffer, Opus decoded first.
+    private func received(_ packet: Data) {
+        if let (sequence, frame) = AudioPackets.decode(packet) {
+            jitter.put(sequence, frame)
+        } else if let decoder, let (sequence, opus) = AudioPackets.decodeOpus(packet) {
+            if let frame = decoder.decode(opus) {
+                jitter.put(sequence, frame)
+            } else {
+                state.withLock { $0.decodeFailures += 1 }
+            }
+        }
     }
 
     /// After iOS stopped the engine for a configuration change: rebuild the microphone tap and the player for the new
@@ -274,8 +340,9 @@ final class CallAudioEngine {
         if let sourceNode { engine.detach(sourceNode) }
         sourceNode = nil
         if voiceProcessing { try? engine.inputNode.setVoiceProcessingEnabled(false) }
-        let sent = state.withLock { $0.sent }
-        log.info("audio", "Call audio stopped: sent \(sent) frames, quiet frames skipped \(jitter.skipped)")
+        let (sent, failures) = state.withLock { ($0.sent, $0.decodeFailures) }
+        let opus = path == .link ? ", Opus packets the codec dropped \(failures)" : ""
+        log.info("audio", "Call audio stopped: sent \(sent) frames, quiet frames skipped \(jitter.skipped)\(opus)")
     }
 
     /// Routes the call to the loudspeaker or back to the receiver.
@@ -302,20 +369,33 @@ final class CallAudioEngine {
         }
         guard error == nil, let samples = out.int16ChannelData?[0] else { return }
         let converted = Array(UnsafeBufferPointer(start: samples, count: Int(out.frameLength)))
-        var packets: [Data] = []
+        var frames: [[Int16]] = []
         state.withLock { s in
             s.pending.append(contentsOf: converted)
             while s.pending.count >= AudioPackets.frameSamples {
-                let frame = s.muted
+                frames.append(s.muted
                     ? [Int16](repeating: 0, count: AudioPackets.frameSamples)
-                    : Array(s.pending.prefix(AudioPackets.frameSamples))
+                    : Array(s.pending.prefix(AudioPackets.frameSamples)))
                 s.pending.removeFirst(AudioPackets.frameSamples)
-                packets.append(AudioPackets.encode(sequence: s.sequence, frame: frame))
-                s.sequence &+= 1
-                s.sent += 1
             }
         }
-        for packet in packets { transport.send(packet) }
+        for frame in frames {
+            // Opus (Bluetooth) is encoded here on the tap's thread, outside the lock; PCM goes as it is.
+            var opus: Data?
+            if let encoder {
+                guard let encoded = encoder.encode(frame) else { continue } // the codec warming up
+                opus = encoded
+            }
+            let packet: Data = state.withLock { s in
+                defer {
+                    s.sequence &+= 1
+                    s.sent += 1
+                }
+                if let opus { return AudioPackets.encodeOpus(sequence: s.sequence, opus: opus) }
+                return AudioPackets.encode(sequence: s.sequence, frame: frame)
+            }
+            transport.send(packet)
+        }
     }
 
     // Bridge → speaker. Runs on the audio render thread: one jitter-buffer frame per 20 ms of output.
@@ -340,8 +420,15 @@ final class CallAudioEngine {
 
 enum CallAudioError: LocalizedError {
     case noMicrophone
+    /// iOS's Opus codec couldn't be started (Bluetooth call audio, D-072).
+    case noCodec
 
     var errorDescription: String? {
-        String(localized: "The iPhone's microphone isn't available for the call.", table: "CallAudio")
+        switch self {
+        case .noMicrophone:
+            return String(localized: "The iPhone's microphone isn't available for the call.", table: "CallAudio")
+        case .noCodec:
+            return String(localized: "The iPhone couldn't start the audio codec for calls over Bluetooth.", table: "CallAudio")
+        }
     }
 }

@@ -79,6 +79,7 @@ struct SettingsTab: View {
                 // Shown once the bridge has reported its SIMs (D-062).
                 if !bridge.sims.isEmpty { SIMDefaultsSection() }
                 callsSection
+                callAudioSection
                 languageSection
                 helpSection
                 telegramSection
@@ -296,6 +297,20 @@ struct SettingsTab: View {
             Text("Calls")
         } footer: {
             Text("iPhone Recents can sync to iCloud, so this is off by default. Calls are always listed in Pairline.")
+        }
+    }
+
+    /// Talk on iPhone: which way a call's audio tries first (D-072). Bluetooth by default; the other is the fallback.
+    private var callAudioSection: some View {
+        Section {
+            Picker(selection: $settings.callAudioPath) {
+                Text("Bluetooth", tableName: "CallAudio").tag(CallAudioPath.link)
+                Text("Wi-Fi", tableName: "CallAudio").tag(CallAudioPath.wifi)
+            } label: {
+                Label { Text("Call audio", tableName: "CallAudio") } icon: { Image(systemName: "waveform") }
+            }
+        } footer: {
+            Text("With Talk on iPhone, a call's audio goes between your phones the way you choose here; if that one isn't connected, Pairline uses the other. Bluetooth works wherever the phones are near each other; Wi-Fi needs both on the same network or the Android phone's hotspot.", tableName: "CallAudio")
         }
     }
 

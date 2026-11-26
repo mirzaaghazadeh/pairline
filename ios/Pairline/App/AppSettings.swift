@@ -12,6 +12,9 @@ final class AppSettings: ObservableObject {
     @AppStorage("notifications.trialReminder") var trialReminder = true
     /// CallKit calls in iPhone Recents (which can sync to iCloud). Off by default (ARCHITECTURE.md, "Calls").
     @AppStorage("calls.recents") var callsInRecents = false
+    /// Where a call's audio travels first when it's on this iPhone: Bluetooth (default) or Wi-Fi; the other is used
+    /// when the first isn't up (D-072).
+    @AppStorage("calls.audioPath") var callAudioPath: CallAudioPath = .link
     @AppStorage("messages.defaultSim") var defaultSMSSim = -1
     @AppStorage("calls.defaultSim") var defaultCallSim = -1
     @AppStorage("ussd.saved") var savedUSSDCodesRaw = ""

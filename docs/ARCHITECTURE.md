@@ -171,7 +171,7 @@ Everything above `BridgeLink` is shared by the real link and demo mode. The tran
 
 | Channel | Carries | Notes |
 |---------|---------|-------|
-| Bluetooth LE GATT | control, SMS, call signaling, contacts, status | Low bandwidth; wakes the iPhone app in the background. Android is the peripheral (advertiser + GATT server); iPhone is the central. |
+| Bluetooth LE GATT | control, SMS, call signaling, contacts, status; call audio as Opus (`MEDIA` frames, D-072) | Low bandwidth; wakes the iPhone app in the background. Android is the peripheral (advertiser + GATT server); iPhone is the central. Call audio goes ahead of other frames and asks Android for its fastest connection during the call. |
 | Local Wi-Fi (M5) | everything above when Bluetooth is down; call audio (UDP media channel), files and bulk sync (TCP) | Shared network or the bridge's hotspot. A full session of its own, with its own keys; addresses come from DNS-SD, the QR code or `wifi.offer` over Bluetooth. |
 | Internet relay (later, paid, opt-in) | everything, when the phones are far apart | End-to-end encrypted; the relay sees only ciphertext. Must be added to `PRIVACY.md` before it ships. |
 
@@ -194,3 +194,11 @@ Connectivity (`NEAppPushProvider`, a separate entitlement) could close that gap 
 | D. Carrier call forwarding to VoIP | Forward calls to a SIP number reachable on the iPhone | No device hacks | Needs a third-party VoIP provider (privacy impact) and carrier support |
 
 M6 starts with a spike: test B on 3–5 devices (Qualcomm, MediaTek, Samsung Exynos) and record a compatibility matrix in `docs/`.
+
+**Two paths for the audio (D-072).** Under option B the audio travels either inside the Bluetooth session (Opus at
+16 kHz and 32 kbit/s, `MEDIA` frames; Android's `MediaCodec` and iOS's AudioToolbox, no codec library of ours) or on
+the Wi-Fi link's UDP media channel (raw 16 kHz PCM). The iPhone's Settings › Call audio picks which one a call tries
+first (Bluetooth by default) and the other is used when the first isn't up. Android: `LinkMediaChannel` (one per
+Bluetooth or debug TCP session; batches what's waiting, drops audio older than 200 ms), `BleTransport` (pulls audio
+at each frame boundary, before queued frames), `audio/OpusCodec`. iPhone: `LinkMediaChannel`, `BLETransport` (same
+rule), `Calls/OpusCodec`.

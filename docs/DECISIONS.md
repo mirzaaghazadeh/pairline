@@ -1157,3 +1157,34 @@ captured open, in English and Arabic, and checked:
   there is who a store takedown of a copy (a competing use under FSL-1.1) is filed for.
 - **No trademark filing,** the maintainer's decision. This replaces D-001's "do a proper trademark search before
   launch". The name and logo stay outside the license (its Trademarks clause, README), so a copy may not use them.
+
+### D-072 — Call audio over Bluetooth, as Opus inside the Bluetooth session (2026-11-26)
+
+Talk on iPhone needed the Wi-Fi link for its audio (D-047), so away from a shared Wi-Fi (in the street, in a car) the
+call's audio stayed on the Android phone unless the user turned its hotspot on. The maintainer asked for audio over
+Bluetooth, with a setting, and Bluetooth as the default if it works well.
+- **Setting:** iPhone Settings › Call audio: **Bluetooth** (default) or **Wi-Fi**. The choice is what a call tries
+  first; when it isn't up (no Bluetooth session, a bridge without `call.media.link`, no Wi-Fi link) the other is
+  used. Wi-Fi keeps uncompressed PCM (D-047).
+- **Codec:** Opus, 16 kHz mono, 20 ms frames, the VoIP application, 32 kbit/s: wideband speech like an HD-voice
+  call, about 80 bytes a frame, so a frame fits one BLE fragment (raw PCM is 640 bytes and 32 KB/s each way, more than
+  BLE carries reliably). Each platform's own codec: Android's `MediaCodec` (its Opus encoder came with Android 10;
+  Talk on iPhone needs 11+) and iOS's AudioToolbox (`kAudioFormatOpus`). **No new dependency**, nothing that could
+  reach a network. The bridge lists `call.media.link` only when it finds both an encoder and a decoder.
+- **Wire (PROTOCOL.md "Call audio"):** a new `MEDIA` frame (`0x22`) on the Bluetooth (or debug TCP) session, channel
+  3, with keys of its own (`"pairline v0 link media"`), so the two media paths never share a key and nonce. Ordered
+  like the control channel: a replayed or forged record closes the connection. One record holds one or more packets,
+  each with a 2-byte length, so a sender that fell behind catches up in one frame. A new packet kind `0x02` (Opus).
+  `call.media.start` takes `via: "link"`. No version bump: like `BULK`, nothing is sent until the bridge accepted a
+  request an older app never makes. New vectors (`link_media`) on both sides.
+- **Bluetooth behaviour:** at each frame boundary the audio goes before frames still waiting (a 30 KB sync page can't
+  hold up the voice; fragments of two frames still never interleave); audio that waited over 200 ms is dropped
+  rather than played late; during the call the bridge asks Android for high connection priority and the 2M PHY
+  through the LE link it already holds (`BleTransport.holdLeLink`), and returns to balanced after. Jitter buffers hold
+  80 ms on Bluetooth (deliveries come in bursts), 60 ms on Wi-Fi as before.
+- **Expected:** a short gap now and then when Bluetooth stalls, filled by the jitter buffer's concealment. Bluetooth
+  tethering between the same two phones shares the radio and can cause longer stalls; Wi-Fi stays available for that.
+- **Tested:** unit tests and vectors on both sides, the iPhone's Opus encoder and decoder round trip, and the
+  Simulator against `fake_bridge.py` over the debug TCP link, which echoes `MEDIA` frames: with `-PairlineLinkMediaTest`
+  (debug builds) the app sent 50 Opus frames of a tone (32 kbit/s, 71 bytes on average), got all 50 back and decoded
+  them at the tone's level. Android's `MediaCodec` Opus and the Bluetooth path itself need real phones next.

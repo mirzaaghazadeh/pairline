@@ -61,10 +61,11 @@ except ImportError:
 VERSION = 0
 ROLE_R, ROLE_B = 0x52, 0x42  # 'R', 'B'
 DIR_B_TO_R, DIR_R_TO_B = 1, 2
-CONTROL_CHANNEL, MEDIA_CHANNEL, BULK_CHANNEL = 0, 1, 2
+CONTROL_CHANNEL, MEDIA_CHANNEL, BULK_CHANNEL, LINK_MEDIA_CHANNEL = 0, 1, 2, 3
 F_PAIR_HELLO, F_PAIR_OK, F_PAIR_FAIL, F_HELLO, F_RECORD, F_BULK = 0x01, 0x02, 0x03, 0x10, 0x20, 0x21
+F_MEDIA = 0x22  # call audio inside the session (D-072)
 FRAME_NAMES = {F_PAIR_HELLO: "PAIR_HELLO", F_PAIR_OK: "PAIR_OK", F_PAIR_FAIL: "PAIR_FAIL",
-               F_HELLO: "HELLO", F_RECORD: "RECORD", F_BULK: "BULK"}
+               F_HELLO: "HELLO", F_RECORD: "RECORD", F_BULK: "BULK", F_MEDIA: "MEDIA"}
 MEDIA_MAX_PAYLOAD = 1200      # PROTOCOL.md, "Media channel (UDP)"
 REPLAY_WINDOW = 64
 FILE_CHUNK = 49152            # PROTOCOL.md, "File transfer"
@@ -227,7 +228,8 @@ def session_keys(ikm: bytes, hello_r: bytes, hello_b: bytes):
 
 
 def channel_keys(okm: bytes, name: str):
-    """Wi-Fi channel keys ("media" or "bulk") of a Wi-Fi session. Returns (B→R, R→B)."""
+    """Channel keys of a session: "media" or "bulk" (Wi-Fi), "link media" (the debug link standing in for Bluetooth,
+    D-072). Returns (B→R, R→B)."""
     k = hkdf(okm, b"", b"pairline v0 " + name.encode(), 64)
     return k[:32], k[32:]
 
@@ -711,6 +713,9 @@ class Link:
         self.tx, self.rx = 0, -1  # next counter to send; last counter accepted
         self.bulk_tx_key = self.bulk_rx_key = self.media_keys = None
         self.bulk_tx, self.bulk_rx = 0, -1
+        self.link_media_keys = None  # (B→R, R→B): MEDIA frames on the debug link (D-072)
+        self.link_tx, self.link_rx = 0, -1
+        self.link_records = self.link_packets = 0
         self.ready = self.closed = False
         self.tasks = []
         self.ping_id, self.pings = 0, {}
@@ -736,6 +741,8 @@ class Link:
                 self.last_rx = time.monotonic()
                 if ftype == F_BULK and self.kind == "wifi":
                     self.on_bulk(body)
+                elif ftype == F_MEDIA and self.kind != "wifi":
+                    self.on_link_media(body)
                 elif ftype != F_RECORD:
                     raise ProtocolError(f"unexpected {FRAME_NAMES[ftype]} after the handshake")
                 else:
@@ -771,6 +778,8 @@ class Link:
         if self.kind == "wifi":
             self.bulk_tx_key, self.bulk_rx_key = channel_keys(okm, "bulk")
             self.media_keys = channel_keys(okm, "media")
+        else:
+            self.link_media_keys = channel_keys(okm, "link media")
         self.send_record(b"")
         log("→ confirm")
         ftype, body = await self.recv(HANDSHAKE_TIMEOUT)
@@ -817,6 +826,43 @@ class Link:
             raise ProtocolError(f"bulk record {counter} doesn't decrypt") from None
         self.bulk_rx = counter
         self.b.files.on_bulk(self, plaintext)
+
+    def on_link_media(self, body):
+        """A MEDIA frame (call audio inside the session, D-072): ordered like control records; anything wrong closes
+        the connection. The packets in it are echoed back in one MEDIA frame while `media echo` is on."""
+        if len(body) < 8 + 16:
+            raise ProtocolError("media record too short")
+        counter = struct.unpack(">Q", body[:8])[0]
+        if counter <= self.link_rx:
+            raise ProtocolError(f"replayed or reordered media record (counter {counter})")
+        try:
+            _, plaintext = open_record(self.link_media_keys[1], DIR_R_TO_B, LINK_MEDIA_CHANNEL, body)
+        except InvalidTag:
+            raise ProtocolError(f"media record {counter} doesn't decrypt") from None
+        self.link_rx = counter
+        packets, at = [], 0
+        while at < len(plaintext):
+            if len(plaintext) - at < 2:
+                log("media (link): a record that doesn't split into packets, ignored")
+                return
+            n = struct.unpack(">H", plaintext[at:at + 2])[0]
+            if n < 3 or n > len(plaintext) - at - 2:
+                log("media (link): a record that doesn't split into packets, ignored")
+                return
+            packets.append(plaintext[at + 2:at + 2 + n])
+            at += 2 + n
+        self.link_records += 1
+        self.link_packets += len(packets)
+        if self.link_records in (1, 10, 50) or self.link_records % 500 == 0:
+            kinds = sorted({p[0] for p in packets})
+            log(f"media (link): {self.link_records} record(s), {self.link_packets} packet(s) from the iPhone "
+                f"(kinds {kinds}, {len(plaintext)} B last)")
+        if self.b.media.echo:
+            self.send_link_media(plaintext)
+
+    def send_link_media(self, plaintext: bytes):
+        self.send_frame(F_MEDIA, seal(self.link_media_keys[0], DIR_B_TO_R, self.link_tx, LINK_MEDIA_CHANNEL, plaintext))
+        self.link_tx += 1
 
     def send_bulk(self, plaintext: bytes):
         self.send_frame(F_BULK, seal(self.bulk_tx_key, DIR_B_TO_R, self.bulk_tx, BULK_CHANNEL, plaintext))
