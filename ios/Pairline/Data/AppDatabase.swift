@@ -439,6 +439,13 @@ final class AppDatabase: ObservableObject {
         return rows.map(StoredMessage.init(row:))
     }
 
+    /// Received messages with `after < time <= before`, oldest first: for deleting old one-time codes (D-083).
+    func receivedMessages(after: Date, before: Date) -> [StoredMessage] {
+        let rows = (try? db.query("SELECT * FROM messages WHERE box = 'in' AND time > ? AND time <= ? ORDER BY time ASC",
+                                  [.int(after.milliseconds), .int(before.milliseconds)])) ?? []
+        return rows.map(StoredMessage.init(row:))
+    }
+
     func message(key: String) -> StoredMessage? {
         (try? db.query("SELECT * FROM messages WHERE key = ?", [.text(key)]))?.first.map(StoredMessage.init(row:))
     }

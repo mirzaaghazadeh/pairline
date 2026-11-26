@@ -1388,3 +1388,30 @@ two phones"). This is the first: things a phone's own Settings › Phone and sta
   a status every 2 s over Bluetooth.
 - Capability `call.voicemail`. iOS strings in a new `Carrier` table (EN/FA/AR/TR). Unit tests on both sides; needs a
   real phone on a GSM carrier.
+
+### D-083 — The iPhone's inbox: groups, old codes, quick replies, codes in the Dynamic Island, "left behind" (2026-11-26)
+
+The second part of "More from the same two phones". All on the iPhone; no protocol change.
+- **Groups:** chips over the conversation list (All, People, Codes, Transactions, Offers, Services) with each group's
+  unread conversations counted. Sorted on the iPhone each time the list shows, from the sender and the latest
+  message: a sender in the bridge's contacts is always People; otherwise a one-time code (the existing detector), then
+  bank and payment words, then offer words (EN/FA/AR/TR, specific words such as "لغو11", "% off", "kampanya"), then
+  the sender (a full phone number is People, except Iran's bulk-sender ranges 1000…, 2000…, 3000…, 5000…, 20004…;
+  short codes and names are Services). Keyword lists rather than a model: predictable, nothing to download, and wrong
+  guesses only move a conversation between filters. Only the chosen filter is stored.
+- **Delete codes after a day** (Settings › Messages and alerts, off by default): received messages with a one-time
+  code are deleted from the iPhone 24 hours after they arrive, through the normal delete (tombstones, D-043), so a sync
+  doesn't bring them back; they stay on the Android phone, which only its default SMS app can change. The scan
+  remembers how far it got, so each message is checked once; the text check runs off the main thread.
+- **Quick replies:** a speech-bubble button in the composer puts a saved reply into the message field (not sent
+  straight away, so it can be edited). Four defaults in the user's language until they edit the list; kept in user
+  defaults.
+- **Codes in the Dynamic Island** (on by default): a new code shows in the bridge Live Activity's Dynamic Island for
+  two minutes (`code` in its content state, relevance raised so it takes the island), and a tap opens
+  `pairline://code`, which copies it the same way as "Copy code" (this iPhone only, expires after 3 minutes). Never in
+  the Lock Screen view: the Dynamic Island shows only while the iPhone is unlocked. The link carries no code.
+- **Bridge phone left behind** (on by default): when a connected link drops (not when this iPhone's Bluetooth is
+  off, or the app is locked or unpaired), a local notification is scheduled 5 minutes ahead and withdrawn if the link
+  comes back first. iOS holds the timer, so it works while Pairline is suspended. It uses no location.
+- Strings in a new `Inbox` table; the widget extension's two new strings in its own catalog. Unit tests for the
+  grouping; needs real use to tune the word lists.

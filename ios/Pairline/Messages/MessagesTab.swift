@@ -132,6 +132,15 @@ struct ConversationList: View {
     @ObservedObject private var notifier = Notifier.shared
     @Environment(\.editMode) private var editMode
     @State private var rows: [(Conversation, StoredMessage?)] = []
+    /// The inbox filter (D-083), sorted on this iPhone.
+    @AppStorage("messages.filter") private var filterRaw = MessageCategory.all.rawValue
+    @State private var categories: [Int64: MessageCategory] = [:]
+
+    private var filter: MessageCategory { MessageCategory(rawValue: filterRaw) ?? .all }
+
+    private var shown: [(Conversation, StoredMessage?)] {
+        filter == .all ? rows : rows.filter { categories[$0.0.thread] == filter }
+    }
 
     var body: some View {
         // Selection only while editing, so a tap opens the conversation otherwise.
@@ -141,13 +150,24 @@ struct ConversationList: View {
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                if !rows.isEmpty {
+                    filterChips
+                        .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
             }
             if rows.isEmpty {
                 emptyState
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+            } else if shown.isEmpty {
+                EmptyStateView(symbol: filter.symbol, title: Text("Nothing here", tableName: "Inbox"),
+                               message: Text("No conversations in this group right now.", tableName: "Inbox"))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             } else {
-                ForEach(rows, id: \.0.thread) { conversation, match in
+                ForEach(shown, id: \.0.thread) { conversation, match in
                     row(conversation, match: match)
                         .tag(conversation.thread)
                         .swipeActions(edge: .trailing) {
@@ -191,6 +211,52 @@ struct ConversationList: View {
 
     private func reload() {
         rows = db.searchConversations(search)
+        var sorted: [Int64: MessageCategory] = [:]
+        for (conversation, _) in rows {
+            let address = conversation.primaryAddress
+            // A group conversation is always people.
+            sorted[conversation.thread] = conversation.addresses.count > 1 ? .people
+                : MessageCategory.of(address: address, text: conversation.snippet,
+                                     isContact: db.knownName(for: address) != nil)
+        }
+        categories = sorted
+    }
+
+    /// All · People · Codes · Transactions · Offers · Services, each with its unread conversations counted (D-083).
+    private var filterChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(MessageCategory.allCases) { category in
+                    let unread = rows.filter {
+                        $0.0.unread > 0 && (category == .all || categories[$0.0.thread] == category)
+                    }.count
+                    let selected = filter == category
+                    Button {
+                        filterRaw = category.rawValue
+                        Haptics.selection()
+                    } label: {
+                        HStack(spacing: 5) {
+                            Image(systemName: category.symbol).font(.caption)
+                            category.title.font(.subheadline.weight(.medium))
+                            if unread > 0 {
+                                Text(verbatim: "\(unread)")
+                                    .font(.caption2.weight(.bold).monospacedDigit())
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 1)
+                                    .background(Capsule().fill(selected ? Color.white.opacity(0.3) : Color.brandBlue.opacity(0.15)))
+                            }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .foregroundStyle(selected ? Color.white : Color.primary)
+                        .background(Capsule().fill(selected ? Color.brandBlue : Color.secondary.opacity(0.12)))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
+                }
+            }
+            .padding(.horizontal, 16)
+        }
     }
 
     /// Pushes the conversation on a phone. Beside an open conversation, a tap opens it there and the open one is

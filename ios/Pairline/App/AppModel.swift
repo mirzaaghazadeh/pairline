@@ -244,6 +244,16 @@ final class AppModel: ObservableObject {
             tab = .bridge
             return
         }
+        // A tap on the code in the Dynamic Island (D-083): copy the code Pairline shows there. The link carries no
+        // code, so another app's link can only copy what's already on screen.
+        if url.host == "code" {
+            if let code = BridgeLiveActivity.shared.code {
+                Clipboard.copy(code, isCode: true)
+                BridgeLiveActivity.shared.clearCode()
+                toast = String(localized: "Code copied.", table: "Inbox")
+            }
+            return
+        }
         // Runs only the code the user chose as their balance code (D-082); a link can't name a code, so a web page
         // can't make the bridge phone run one.
         if url.host == "balance" {
@@ -326,6 +336,7 @@ final class AppModel: ObservableObject {
             await Notifier.shared.refreshAuthorization()
         }
         if real.phase.isConnected { Task { await real.sync() } }
+        real.deleteOldCodes()
     }
 
     private func applyLaunchArguments() {

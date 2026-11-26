@@ -195,6 +195,33 @@ final class Notifier: NSObject, ObservableObject {
         center.add(UNNotificationRequest(identifier: "battery-low", content: content, trigger: nil))
     }
 
+    // MARK: Bridge phone left behind (D-083)
+
+    static let leftBehindID = "bridge.leftBehind"
+    /// How long the link may stay down before the alert: long enough for a walk to the next room and back.
+    static let leftBehindDelay: TimeInterval = 5 * 60
+
+    /// Scheduled when the link drops; iOS delivers it only if the link isn't back by then, because reconnecting
+    /// removes it ([cancelLeftBehind]). Works while Pairline is suspended, since iOS holds the timer.
+    func scheduleLeftBehind() {
+        guard AppSettings.shared.leftBehindAlert,
+              authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Bridge phone out of reach", table: "Inbox")
+        content.body = String(localized: "Calls and texts to your Android phone's SIM can't reach this iPhone. Did you leave it behind?", table: "Inbox")
+        content.sound = .default
+        content.userInfo = ["status": true]
+        if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
+        center.add(UNNotificationRequest(identifier: Self.leftBehindID, content: content,
+                                         trigger: UNTimeIntervalNotificationTrigger(timeInterval: Self.leftBehindDelay,
+                                                                                    repeats: false)))
+    }
+
+    func cancelLeftBehind() {
+        center.removePendingNotificationRequests(withIdentifiers: [Self.leftBehindID])
+        center.removeDeliveredNotifications(withIdentifiers: [Self.leftBehindID])
+    }
+
     /// The carrier says a voicemail is waiting on a SIM of the bridge phone (D-082). Tapping opens the Bridge tab,
     /// whose SIM card has "Call voicemail".
     func notifyVoicemail(simName: String?) {

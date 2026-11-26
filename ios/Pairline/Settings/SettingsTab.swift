@@ -86,6 +86,7 @@ struct SettingsTab: View {
                 bridgeSection
                 liveActivitySection
                 notificationSection
+                InboxSettingsSection() // D-083
                 // Shown once the bridge has reported its SIMs (D-062).
                 if !bridge.sims.isEmpty { SIMDefaultsSection() }
                 callsSection

@@ -27,6 +27,12 @@ final class AppSettings: ObservableObject {
     @AppStorage("ussd.balanceSim") var balanceUSSDSim = -1
     /// The bridge's signal, network and battery as a Live Activity on the Lock Screen and in the Dynamic Island (D-053).
     @AppStorage("liveActivity.bridge") var bridgeLiveActivity = true
+    /// The newest one-time code in that Live Activity's Dynamic Island for two minutes (D-083); never on the Lock Screen.
+    @AppStorage("liveActivity.codes") var codesInLiveActivity = true
+    /// Received one-time codes older than a day are deleted from this iPhone (D-083). Off until the user turns it on.
+    @AppStorage("messages.deleteOldCodes") var deleteOldCodes = false
+    /// A notification when the bridge phone stays out of reach for a few minutes (D-083).
+    @AppStorage("alerts.leftBehind") var leftBehindAlert = true
 
     var savedUSSDCodes: [String] {
         get { savedUSSDCodesRaw.split(separator: "\n").map(String.init) }

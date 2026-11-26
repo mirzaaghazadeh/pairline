@@ -198,9 +198,10 @@ parties). Each needs a real-phone test.
 - [x] Carrier tools (D-082): call forwarding, call waiting and caller ID screens; hide the number on one call;
       balance code on the Bridge tab and `pairline://balance`; voicemail indicator and "Call voicemail" (touch and
       hold 1); signal in dBm, radio technology and the network's name per SIM
-- [ ] Messages on the iPhone: inbox sorted into codes, banks and carriers, promotions; codes deleted after a day
-      (opt-in); quick replies; the newest code in the Dynamic Island; scheduled SMS sent by the bridge
-- [ ] "Bridge phone left behind" alert when the link stays down
+- [x] Messages on the iPhone (D-083): inbox groups (people, codes, transactions, offers, services); codes deleted
+      after a day (opt-in); quick replies; the newest code in the Dynamic Island
+- [ ] Scheduled SMS, sent by the bridge at the chosen time
+- [x] "Bridge phone left behind" alert when the link stays down for 5 minutes (D-083)
 - [ ] Ring the iPhone from the Android phone (Quick Settings tile)
 - [ ] Mobile data used this month on the bridge phone, with a limit alert
 - [ ] Call screening role on Android: blocked calls never ring, silence unknown callers, blocked prefixes

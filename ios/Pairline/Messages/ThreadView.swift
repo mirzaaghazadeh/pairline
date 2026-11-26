@@ -367,6 +367,10 @@ struct Composer: View {
                     if bridge.isDualSIM {
                         simMenu
                     }
+                    // Saved replies (D-083): one tap puts one in the field, to send as it is or edit first.
+                    QuickReplyMenu { reply in
+                        draft = draft.trimmingCharacters(in: .whitespaces).isEmpty ? reply : draft + " " + reply
+                    }
                     TextField(String(localized: "Text message"), text: $draft, axis: .vertical)
                         .lineLimit(1...6)
                         .focused($focused)

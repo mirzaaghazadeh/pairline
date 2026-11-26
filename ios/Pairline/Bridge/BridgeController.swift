@@ -131,7 +131,9 @@ final class BridgeController: ObservableObject {
     // MARK: - Link events
 
     private func phaseChanged(_ phase: LinkPhase) {
+        let wasConnected = self.phase.isConnected
         self.phase = phase
+        if mode == .real { watchLeftBehind(wasConnected: wasConnected, now: phase) }
         transports = link.activeTransports
         if phase != .connected {
             latencyTimer?.invalidate()
@@ -147,6 +149,7 @@ final class BridgeController: ObservableObject {
                 applyStatus(s)
             }
             await sync()
+            deleteOldCodes()
             await flushOutbox()
             await refreshBlockList()
             await measureLatency()
@@ -183,6 +186,10 @@ final class BridgeController: ObservableObject {
             let inserted = db.upsertMessages([message], countUnread: Notifier.shared.visibleThread != message.thread)
             for stored in inserted where !stored.isOutgoing {
                 notify(stored)
+                // The newest code in the Dynamic Island for two minutes (D-083).
+                if Date().timeIntervalSince(stored.time) < 10 * 60, let code = OTPDetector.code(in: stored.body) {
+                    BridgeLiveActivity.shared.showCode(code, for: self)
+                }
             }
             if !inserted.isEmpty { Haptics.soft() }
             updateBadge()
@@ -222,6 +229,48 @@ final class BridgeController: ObservableObject {
         }
         saveWidget()
         requestMicrophoneIfNeeded(s)
+    }
+
+    // MARK: - Left behind and old codes (D-083)
+
+    /// The link dropped: a notification waits a few minutes and is withdrawn if the link comes back first. Not when
+    /// this iPhone's own Bluetooth is off or unpaired, locked or not allowed: the user knows why then.
+    private func watchLeftBehind(wasConnected: Bool, now: LinkPhase) {
+        switch now {
+        case .connected, .notPaired, .locked, .bluetoothOff, .bluetoothUnauthorized, .bluetoothUnsupported, .pairing:
+            Notifier.shared.cancelLeftBehind()
+        case .searching, .securing, .waiting:
+            if wasConnected, canUseLink { Notifier.shared.scheduleLeftBehind() }
+        }
+    }
+
+    private static let codesScannedKey = "messages.codesScannedUntil"
+
+    /// With "Delete codes after a day" on: received one-time codes older than 24 hours go from this iPhone (they stay
+    /// on the Android phone, like every message deleted here). Each message is looked at once: the scan remembers how
+    /// far it got. The text check runs off the main thread, since the first run may cover the whole history.
+    func deleteOldCodes() {
+        guard AppSettings.shared.deleteOldCodes, mode == .real else { return }
+        let defaults = UserDefaults.standard
+        let from = Date(timeIntervalSince1970: defaults.double(forKey: Self.codesScannedKey))
+        let until = Date().addingTimeInterval(-24 * 3600)
+        guard until > from else { return }
+        let candidates = db.receivedMessages(after: from, before: until).map { ($0.key, $0.body) }
+        Task.detached(priority: .utility) {
+            let keys = candidates.filter { OTPDetector.code(in: $0.1) != nil }.map(\.0)
+            await MainActor.run {
+                if !keys.isEmpty {
+                    self.deleteMessages(keys)
+                    log.info("sms", "Deleted \(keys.count) one-time code(s) older than a day")
+                }
+                defaults.set(until.timeIntervalSince1970, forKey: Self.codesScannedKey)
+            }
+        }
+    }
+
+    /// The setting was turned on: start from the beginning of the history.
+    static func resetCodeScan() {
+        UserDefaults.standard.removeObject(forKey: codesScannedKey)
     }
 
     // MARK: - Voicemail and balance (D-082)

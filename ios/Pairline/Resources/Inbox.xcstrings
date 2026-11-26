@@ -1,0 +1,230 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "A new code shows there for two minutes, with the bridge status on. Tap it to copy. Never on the Lock Screen." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يظهر الرمز الجديد هناك لمدة دقيقتين عندما تكون حالة الهاتف الوسيط مفعّلة. انقر عليه لنسخه. لا يظهر أبدًا على شاشة القفل." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A new code shows there for two minutes, with the bridge status on. Tap it to copy. Never on the Lock Screen." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کد تازه، وقتی وضعیت گوشی پل روشن است، دو دقیقه آنجا نشان داده می‌شود. برای کپی رویش بزنید. هیچ‌وقت روی صفحهٔ قفل نمی‌آید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefon durumu açıkken yeni bir kod orada iki dakika görünür. Kopyalamak için dokunun. Kilit Ekranı’nda asla görünmez." } }
+      }
+    },
+    "A notification when the Android phone has been out of reach for 5 minutes." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إشعار عندما يكون هاتف أندرويد بعيدًا عن المتناول لمدة 5 دقائق." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A notification when the Android phone has been out of reach for 5 minutes." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی گوشی اندرویدی ۵ دقیقه در دسترس نباشد، یک اعلان می‌آید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefona 5 dakika ulaşılamadığında bir bildirim." } }
+      }
+    },
+    "Add" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إضافة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "افزودن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ekle" } }
+      }
+    },
+    "All" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الكل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "همه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tümü" } }
+      }
+    },
+    "Bridge phone left behind" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نسيان الهاتف الوسيط" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bridge phone left behind" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "جا ماندن گوشی پل" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefon geride kaldı" } }
+      }
+    },
+    "Bridge phone out of reach" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الهاتف الوسيط بعيد عن المتناول" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bridge phone out of reach" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل در دسترس نیست" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefona ulaşılamıyor" } }
+      }
+    },
+    "Calls and texts to your Android phone's SIM can't reach this iPhone. Did you leave it behind?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يمكن أن تصل المكالمات والرسائل الواردة إلى شريحة هاتف أندرويد إلى هذا الآيفون. هل نسيته؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls and texts to your Android phone's SIM can't reach this iPhone. Did you leave it behind?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها و پیامک‌های سیم‌کارت گوشی اندرویدی به این آیفون نمی‌رسند. آن را جا گذاشته‌اید؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzun SIM’ine gelen aramalar ve mesajlar bu iPhone’a ulaşamıyor. Telefonu geride mi bıraktınız?" } }
+      }
+    },
+    "Can't talk now. Text me, please." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا أستطيع التحدث الآن. راسلني من فضلك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can't talk now. Text me, please." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "الان نمی‌توانم صحبت کنم. لطفاً پیام بدهید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şu an konuşamıyorum. Lütfen mesaj atın." } }
+      }
+    },
+    "Code copied." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم نسخ الرمز." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Code copied." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کد کپی شد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kod kopyalandı." } }
+      }
+    },
+    "Codes" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرموز" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Codes" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کدها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kodlar" } }
+      }
+    },
+    "Codes in the Dynamic Island" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرموز في Dynamic Island" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Codes in the Dynamic Island" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کدها در Dynamic Island" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Dynamic Island’da kodlar" } }
+      }
+    },
+    "Delete codes after a day" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حذف الرموز بعد يوم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete codes after a day" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاک کردن کدها بعد از یک روز" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kodları bir gün sonra sil" } }
+      }
+    },
+    "Edit quick replies" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعديل الردود السريعة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit quick replies" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ویرایش پاسخ‌های سریع" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hızlı yanıtları düzenle" } }
+      }
+    },
+    "I'll call you back." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سأعاود الاتصال بك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "I'll call you back." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعداً زنگ می‌زنم." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Seni sonra ararım." } }
+      }
+    },
+    "Messages and alerts" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرسائل والتنبيهات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Messages and alerts" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام‌ها و هشدارها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar ve uyarılar" } }
+      }
+    },
+    "New quick reply" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رد سريع جديد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New quick reply" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاسخ سریع جدید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeni hızlı yanıt" } }
+      }
+    },
+    "No conversations in this group right now." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد محادثات في هذه المجموعة الآن." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No conversations in this group right now." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فعلاً گفتگویی در این دسته نیست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şu an bu grupta konuşma yok." } }
+      }
+    },
+    "Nothing here" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا شيء هنا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nothing here" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "چیزی اینجا نیست" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Burada bir şey yok" } }
+      }
+    },
+    "Offers" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "العروض" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Offers" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تبلیغات" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kampanyalar" } }
+      }
+    },
+    "On my way." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أنا في الطريق." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "On my way." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در راهم." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yoldayım." } }
+      }
+    },
+    "One-time codes go from this iPhone 24 hours after they arrive. They stay on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُحذف الرموز لمرة واحدة من هذا الآيفون بعد 24 ساعة من وصولها، وتبقى على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "One-time codes go from this iPhone 24 hours after they arrive. They stay on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کدهای یک‌بارمصرف ۲۴ ساعت بعد از رسیدن از این آیفون پاک می‌شوند و روی گوشی اندرویدی می‌مانند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tek kullanımlık kodlar geldikten 24 saat sonra bu iPhone’dan silinir. Android telefonda kalırlar." } }
+      }
+    },
+    "People" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الأشخاص" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "People" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اشخاص" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kişiler" } }
+      }
+    },
+    "Quick replies" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الردود السريعة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quick replies" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاسخ‌های سریع" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hızlı yanıtlar" } }
+      }
+    },
+    "Reply" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reply" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پاسخ" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yanıt" } }
+      }
+    },
+    "Services" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الخدمات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Services" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خدمات" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hizmetler" } }
+      }
+    },
+    "Tap the speech bubble next to the message field to put one in. They stay on this iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "انقر على فقاعة الكلام بجانب حقل الرسالة لإدراج أحدها. تبقى على هذا الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tap the speech bubble next to the message field to put one in. They stay on this iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای گذاشتن یکی از آن‌ها، حباب گفتگو کنار کادر پیام را بزنید. فقط روی همین آیفون می‌مانند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Birini eklemek için mesaj alanının yanındaki konuşma balonuna dokunun. Bu iPhone’da kalırlar." } }
+      }
+    },
+    "Thanks!" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شكرًا!" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Thanks!" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ممنون!" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Teşekkürler!" } }
+      }
+    },
+    "Transactions" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المعاملات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Transactions" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تراکنش‌ها" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İşlemler" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
