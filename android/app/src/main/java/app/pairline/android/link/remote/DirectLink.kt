@@ -171,11 +171,21 @@ class DirectLink(
     fun check(): HomeCheck.Result {
         if (!checking.compareAndSet(false, true)) throw RequestException(ErrorCode.BUSY, "a check is already running")
         try {
-            return HomeCheck.run(if (networkKnown) wantNetwork else null)
+            val result = HomeCheck.run(if (networkKnown) wantNetwork else null)
+            // The router answers now (the user just turned UPnP or NAT-PMP on): with Cloud mode on, map at once
+            // instead of at the next half-hourly retry.
+            if (result.router != null && wantActive) {
+                retryNow = true
+                wake.trySend(Unit)
+            }
+            return result
         } finally {
             checking.set(false)
         }
     }
+
+    /** Set by [check] when the router answered: the next pass asks it for the mapping again right away. */
+    @Volatile private var retryNow = false
 
     private val checking = AtomicBoolean(false)
 
@@ -237,6 +247,11 @@ class DirectLink(
         }
         mapped = net
         port = p
+        if (retryNow) {
+            retryNow = false
+            if (v4 == null) v4DueAt = 0
+            if (v6 == null && info.globalV6 != null) v6DueAt = 0
+        }
         val mapper = PortMapper(net.io, info, random)
         val now = clock()
         if (now >= v4DueAt) {

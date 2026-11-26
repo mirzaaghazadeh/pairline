@@ -86,6 +86,23 @@ class DirectLinkTest {
         assertEquals(listOf(v4("192.168.1.23")), server.listened.single())
     }
 
+    /**
+     * The user turns NAT-PMP on in the router and taps "Check my home connection": the router answers, so the mapping
+     * is made at once, not at the half-hourly retry.
+     */
+    @Test
+    fun aCheckThatFindsTheRouterAnsweringMapsAtOnce() {
+        router.natPmp = false
+        on()
+        direct.step()
+        assertEquals(listOf("addr null null", "state blocked no_mapping"), taken())
+        router.natPmp = true
+        assertTrue(direct.check().router != null)
+        direct.step()
+        assertEquals(listOf("addr 81.2.69.160:47830 null", "state open null"), taken())
+        assertEquals(1, router.natMappings.size)
+    }
+
     @Test
     fun offWiFiThereIsNothingToForward() {
         direct.setActive(true)
