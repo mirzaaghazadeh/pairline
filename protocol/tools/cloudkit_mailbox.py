@@ -159,25 +159,33 @@ def cmd_zones(ck, args):
     return status == 200
 
 
-def put_record(ck, zone, size):
+def put_record(ck, zone, size, scope="private", mailbox=None):
+    """A Mail record with random bytes. In the public database it goes to the default zone with a mailbox ID."""
     name = secrets.token_hex(16)
-    body = {"zoneID": {"zoneName": zone}, "atomic": False, "operations": [{
-        "operationType": "create",
-        "record": {"recordType": "Mail", "recordName": name,
-                   "fields": {"payload": {"value": base64.b64encode(secrets.token_bytes(size)).decode()}}}}]}
-    status, payload, t = ck.call("records/modify", body)
+    sealed = base64.b64encode(secrets.token_bytes(size)).decode()
+    if mailbox:
+        # Public mailbox: base64 text, because a push can carry a STRING field but not a BYTES one.
+        fields = {"mailbox": {"value": mailbox}, "sealed": {"value": sealed}}
+    else:
+        fields = {"payload": {"value": sealed}}
+    body = {"atomic": False, "operations": [{
+        "operationType": "create", "record": {"recordType": "Mail", "recordName": name, "fields": fields}}]}
+    if scope == "private":
+        body["zoneID"] = {"zoneName": zone}
+    status, payload, t = ck.call("records/modify", body, scope=scope)
     ok = status == 200 and not any("serverErrorCode" in r for r in payload.get("records", []))
     return name, ok, status, payload, t
 
 
-def delete_record(ck, zone, name):
-    body = {"zoneID": {"zoneName": zone}, "operations": [{
-        "operationType": "forceDelete", "record": {"recordName": name}}]}
-    return ck.call("records/modify", body)
+def delete_record(ck, zone, name, scope="private"):
+    body = {"operations": [{"operationType": "forceDelete", "record": {"recordName": name}}]}
+    if scope == "private":
+        body["zoneID"] = {"zoneName": zone}
+    return ck.call("records/modify", body, scope=scope)
 
 
 def cmd_put(ck, args):
-    name, ok, status, payload, t = put_record(ck, args.zone, args.size)
+    name, ok, status, payload, t = put_record(ck, args.zone, args.size, args.scope, args.mailbox)
     print(f"{'ok' if ok else 'FAILED'}: HTTP {status} in {t * 1000:.0f} ms, record {name}, "
           f"token rotated: {payload['_rotated']}")
     if not ok:
@@ -185,8 +193,21 @@ def cmd_put(ck, args):
     return ok
 
 
+def cmd_lookup(ck, args):
+    body = {"records": [{"recordName": args.name}]}
+    if args.scope != "public":
+        body["zoneID"] = {"zoneName": args.zone}
+    status, payload, t = ck.call("records/lookup", body, scope=args.scope)
+    print(f"HTTP {status} in {t * 1000:.0f} ms, token rotated: {payload['_rotated']}")
+    for r in payload.get("records", []):
+        print(f"  {r.get('recordName')}: {r.get('serverErrorCode') or 'found'} {r.get('reason', '')}")
+    if status != 200:
+        print(json.dumps(summarize(payload), indent=2)[:1000])
+    return status == 200
+
+
 def cmd_delete(ck, args):
-    status, payload, t = delete_record(ck, args.zone, args.name)
+    status, payload, t = delete_record(ck, args.zone, args.name, args.scope)
     print(f"HTTP {status} in {t * 1000:.0f} ms: {json.dumps(summarize(payload))[:500]}")
     return status == 200
 
@@ -247,7 +268,7 @@ def cmd_latency(ck, args):
     try:
         for i in range(args.tries):
             t0 = time.monotonic()
-            name, ok, status, payload, t_http = put_record(ck, args.zone, args.size)
+            name, ok, status, payload, t_http = put_record(ck, args.zone, args.size, args.scope, args.mailbox)
             if not ok:
                 print(f"#{i + 1}: write failed HTTP {status}: {json.dumps(summarize(payload))[:400]}")
                 results.append(None)
@@ -260,7 +281,7 @@ def cmd_latency(ck, args):
             if args.verbose and line:
                 print("    " + line[:220])
             if not args.keep:
-                delete_record(ck, args.zone, name)
+                delete_record(ck, args.zone, name, args.scope)
             time.sleep(args.interval)
     finally:
         log.stop()
@@ -278,7 +299,7 @@ def latency_writes_only(ck, args):
     writes = []
     for i in range(args.tries):
         start = time.time()
-        name, ok, status, payload, t_http = put_record(ck, args.zone, args.size)
+        name, ok, status, payload, t_http = put_record(ck, args.zone, args.size, args.scope, args.mailbox)
         end = time.time()
         if not ok:
             print(f"#{i + 1}: write failed HTTP {status}: {json.dumps(summarize(payload))[:400]}")
@@ -287,7 +308,7 @@ def latency_writes_only(ck, args):
         deleted = ""
         if not args.keep:
             time.sleep(args.delete_after)
-            status, _, _ = delete_record(ck, args.zone, name)
+            status, _, _ = delete_record(ck, args.zone, name, args.scope)
             deleted = f", deleted (HTTP {status})"
             writes[-1]["deleted"] = time.time()
         print(f"#{i + 1}: write {t_http * 1000:.0f} ms{deleted}", flush=True)
@@ -404,10 +425,19 @@ def main():
     p = sub.add_parser("import-token"); p.add_argument("file")
     sub.add_parser("whoami")
     p = sub.add_parser("zones"); p.add_argument("--scope", default="private", choices=["private", "public", "shared"])
+    def mailbox_args(p):
+        p.add_argument("--scope", default="private", choices=["private", "public"],
+                       help="public: the app's public database (default zone), records found by --mailbox")
+        p.add_argument("--mailbox", help="the mailbox ID a public-database record carries")
     p = sub.add_parser("put"); p.add_argument("--zone", default="ToPhone"); p.add_argument("--size", type=int, default=200)
+    mailbox_args(p)
     p = sub.add_parser("delete"); p.add_argument("name"); p.add_argument("--zone", default="ToPhone")
+    mailbox_args(p)
+    p = sub.add_parser("lookup"); p.add_argument("name"); p.add_argument("--zone", default="ToPhone")
+    p.add_argument("--scope", default="private", choices=["private", "public", "shared"])
     p = sub.add_parser("changes"); p.add_argument("--zone", default="ToBridge")
     p = sub.add_parser("latency")
+    mailbox_args(p)
     p.add_argument("--device", help="UDID of a USB-connected iPhone whose system log shows the push")
     p.add_argument("--out", default=os.path.join(CONFIG_DIR, "latency-writes.json"),
                    help="without --device: where to note the writes for `match`")
@@ -433,7 +463,7 @@ def main():
         return 0 if cmd_match(args) else 1
     ck = CloudKit(args.chain, keep_token=args.keep_token, show_headers=args.show_headers,
                   environment=args.environment, config=args.config)
-    ok = {"whoami": cmd_whoami, "zones": cmd_zones, "put": cmd_put, "delete": cmd_delete, "changes": cmd_changes,
+    ok = {"whoami": cmd_whoami, "zones": cmd_zones, "put": cmd_put, "delete": cmd_delete, "lookup": cmd_lookup, "changes": cmd_changes,
           "latency": cmd_latency, "tokens": cmd_tokens, "webcourier": cmd_webcourier}[args.cmd](ck, args)
     return 0 if ok else 1
 

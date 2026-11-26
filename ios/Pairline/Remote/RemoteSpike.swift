@@ -15,6 +15,8 @@ import UserNotifications
 /// iPhone's system log can time the pushes. `-PairlineRemoteSpike clear` removes the subscriptions, the zones and the
 /// files. `-PairlineRemoteSpikeAPIToken <token>` mints the tokens with another API token (a build signed for iCloud
 /// Production needs the Production one). Each step is also written to `remote-spike-status.txt`, without secrets.
+/// `-PairlineRemoteSpike public` tries the public database instead (D-072, while Apple looks into the private one):
+/// a random mailbox ID in `remote-spike-mailbox.txt` and a query subscription on it.
 enum RemoteSpike {
     static let subscriptionIDs = ["to-phone-db": "db", "to-phone-zone": "zone", "to-phone-query": "query"]
 
@@ -69,9 +71,13 @@ enum RemoteSpike {
                 .requestAuthorization(options: [.alert, .sound, .badge])
             note("notifications allowed: \(granted)")
             await MainActor.run { UIApplication.shared.registerForRemoteNotifications() }
-            try await RemoteCloud.ensureZones()
-            note("zones ready")
-            try await saveSubscription(step)
+            if step == "public" {
+                try await savePublicSubscription()
+            } else {
+                try await RemoteCloud.ensureZones()
+                note("zones ready")
+                try await saveSubscription(step)
+            }
             note("subscription \(step) saved")
             for file in [tokenFile, spareTokenFile] {
                 let started = Date()
@@ -100,6 +106,7 @@ enum RemoteSpike {
                     row["record"] = query.recordID?.recordName ?? ""
                     row["reason"] = query.queryNotificationReason.rawValue
                     row["payloadInPush"] = query.recordFields?[RemoteCloud.payloadField] != nil
+                        || query.recordFields?[sealedField] != nil
                 }
             } else {
                 row["type"] = -1
@@ -155,11 +162,35 @@ enum RemoteSpike {
         }
     }
 
+    /// The public-database variant: a fresh random mailbox ID (written to `remote-spike-mailbox.txt` for the Mac) and a
+    /// query subscription that fires only for new `Mail` records with that mailbox written by this same iCloud user.
+    private static func savePublicSubscription() async throws {
+        let container = RemoteCloud.container
+        let user = try await container.userRecordID()
+        let mailbox = (0..<16).map { _ in String(format: "%02x", UInt8.random(in: 0...255)) }.joined()
+        let predicate = NSPredicate(format: "mailbox == %@ AND creatorUserRecordID == %@",
+                                    mailbox, CKRecord.Reference(recordID: user, action: .none))
+        let sub = CKQuerySubscription(recordType: RemoteCloud.mailRecordType, predicate: predicate,
+                                      subscriptionID: publicSubscriptionID, options: [.firesOnRecordCreation])
+        // A push can't carry a BYTES field ("unsupported field type in notification"), so the sealed payload rides
+        // along as base64 text in `sealed`.
+        sub.notificationInfo = notificationInfo(desiredKeys: [sealedField])
+        let (saved, _) = try await container.publicCloudDatabase.modifySubscriptions(saving: [sub], deleting: [])
+        for (_, result) in saved { if case .failure(let error) = result { throw error } }
+        try Data(mailbox.utf8).write(to: mailboxFile, options: .atomic)
+    }
+
+    static let publicSubscriptionID = "to-phone-public"
+    static let sealedField = "sealed"
+    static var mailboxFile: URL { cacheFile("remote-spike-mailbox.txt") }
+
     private static func clear() async throws {
         _ = try? await RemoteCloud.database.modifySubscriptions(saving: [], deleting: Array(subscriptionIDs.keys))
+        _ = try? await RemoteCloud.container.publicCloudDatabase.modifySubscriptions(
+            saving: [], deleting: [publicSubscriptionID])
         _ = try? await RemoteCloud.database.modifyRecordZones(
             saving: [], deleting: [RemoteCloud.toPhoneZone, RemoteCloud.toBridgeZone])
-        for file in [tokenFile, spareTokenFile, deliveriesFile, statusFile] {
+        for file in [tokenFile, spareTokenFile, deliveriesFile, statusFile, mailboxFile] {
             try? FileManager.default.removeItem(at: file)
         }
         note("cleared")
