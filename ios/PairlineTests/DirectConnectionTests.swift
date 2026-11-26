@@ -335,9 +335,15 @@ final class DirectLaneTests: XCTestCase {
         XCTAssertNil(manager.linkMediaChannel)
         manager.reconnectNow()
         XCTAssertFalse(manager.isDirect, "no new attempt while in the background")
+        // Coming back to the foreground alone brings it back: nothing else kicks it (2026-11-27).
         manager.appBecameActive()
-        manager.reconnectNow()
         await waitFor("direct again") { manager.isDirect }
+    }
+
+    /// The app's own connectors: the direct lane dials TCP to the bridge's home. Until 2026-11-27 it fell through to
+    /// Bluetooth, which searched forever and never reported a failure, while every test used a fake connector.
+    func testTheAppDialsTheDirectLaneWithTheDirectConnector() {
+        XCTAssertTrue(AppModel.makeConnector(.direct) is DirectConnector)
     }
 
     /// Manual port forwarding (D-095): with no `remote.addr` at all (the router opened nothing), the address the user

@@ -53,13 +53,8 @@ final class AppModel: ObservableObject {
                                 bridgeKey: { [peers] in peers.peer?.publicKey },
                                 registerForPush: { if !Self.isTestHost { UIApplication.shared.registerForRemoteNotifications() } })
         }
-        link = LinkManager(identityStore: identity, peerStore: peers, deviceInfo: deviceInfo, remote: remote) { kind in
-            #if DEBUG
-            if kind == .tcp { return TCPConnector() }
-            #endif
-            if kind == .wifi { return WiFiConnector() }
-            return BluetoothCentral()
-        }
+        link = LinkManager(identityStore: identity, peerStore: peers, deviceInfo: deviceInfo, remote: remote,
+                           makeConnector: Self.makeConnector)
         real = BridgeController(mode: .real, link: link, db: AppDatabase.openDefault())
         pairedPeer = peers.peer
         real.onPaywallRequest = { [weak self] in self?.showPaywall = true }
@@ -146,6 +141,23 @@ final class AppModel: ObservableObject {
 
     /// When the app hosts unit tests, its own link stays idle so it can't touch a real or emulated bridge.
     static let isTestHost = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
+    /// The connector behind each lane. Every kind is spelled out: until 2026-11-27 the direct connection fell through
+    /// to Bluetooth here, so Cloud mode's "direct connection to your home" searched for the bridge over Bluetooth,
+    /// never connected and never failed (D-092).
+    static func makeConnector(_ kind: TransportKind) -> LinkConnector {
+        switch kind {
+        case .bluetooth, .demo: return BluetoothCentral()
+        case .wifi: return WiFiConnector()
+        case .direct: return DirectConnector()
+        case .tcp:
+            #if DEBUG
+            return TCPConnector()
+            #else
+            return BluetoothCentral()
+            #endif
+        }
+    }
 
     // MARK: - Free first sync (D-069)
 

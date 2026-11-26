@@ -31,7 +31,10 @@ final class DirectConnector: LinkConnector {
         let monitor = NWPathMonitor()
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self else { return }
+            // Moving from one Wi-Fi network to another keeps the interface ("en0"), so the gateways tell them apart.
+            // The key stays in memory only; it's never logged.
             let key = path.availableInterfaces.map(\.name).sorted().joined(separator: ",")
+                + "|" + path.gateways.map { "\($0)" }.sorted().joined(separator: ",")
                 + (path.status == .satisfied ? "+" : "-")
             guard key != self.lastPathKey else { return }
             let first = self.lastPathKey == nil

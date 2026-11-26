@@ -270,6 +270,9 @@ final class LinkManager: BridgeLink {
 
     func appBecameActive() {
         inBackground = false
+        // The direct connection closed in the background (or never opened there), and the iPhone may be on another
+        // network now: try it again right away instead of waiting for the next push or address.
+        if direct.session == nil, !direct.connecting { kickDirect(reason: "back in the foreground") }
     }
 
     /// While in the background: closes the direct connection unless a call needs it (call this when a call ends).
