@@ -391,7 +391,14 @@ def cmd_webcourier(ck, args):
     sub = {"operations": [{"operationType": "replace", "subscription": {
         "subscriptionID": "to-bridge-web", "subscriptionType": "zone", "zoneID": {"zoneName": args.zone},
         "notificationInfo": {"shouldSendContentAvailable": True}}}]}
-    status, subs, _ = ck.call("subscriptions/modify", sub)
+    if args.scope == "public":
+        # The public database only has query subscriptions: new Mail records with this mailbox id.
+        sub["operations"][0]["subscription"] = {
+            "subscriptionID": "to-bridge-web", "subscriptionType": "query",
+            "query": {"recordType": "Mail", "filterBy": [{"fieldName": "mailbox", "comparator": "EQUALS",
+                                                          "fieldValue": {"value": args.mailbox}}]},
+            "firesOn": ["create"], "notificationInfo": {"shouldSendContentAvailable": True}}
+    status, subs, _ = ck.call("subscriptions/modify", sub, scope=args.scope)
     print(f"subscriptions/modify: HTTP {status} {json.dumps(summarize(subs))[:400]}")
     deadline = time.monotonic() + args.seconds
     url = created["webcourierURL"]
@@ -455,6 +462,8 @@ def main():
     p = sub.add_parser("tokens"); p.add_argument("--steps", type=int, default=5)
     p = sub.add_parser("webcourier"); p.add_argument("--seconds", type=int, default=120)
     p.add_argument("--zone", default="ToBridge")
+    p.add_argument("--scope", default="private", choices=["private", "public"])
+    p.add_argument("--mailbox", help="public: the mailbox id to subscribe to")
     args = ap.parse_args()
     if args.cmd == "import-token":
         cmd_import_token(args)

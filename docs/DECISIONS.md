@@ -1225,6 +1225,9 @@ service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch
   only when "Access iCloud Data on the Web" was switched off and on, which cancels every web token of the account;
   longer lifetimes are unmeasured. The bridge uses its token every few minutes, and the iPhone sends a fresh one every
   12 hours and whenever the bridge stops reading, so neither limit is reached.
+- **No push for the bridge.** CloudKit Web Services' push for web clients (`tokens/create`, then the webcourier
+  long-poll) answers HTTP 403 "This endpoint is deprecated." So the bridge checks the R→B mailbox on a timer: every
+  5 s for 2 minutes after hearing from the iPhone, every 30 s within 10 minutes, otherwise every 2 minutes.
 - **Blocker: the private database is refused** on the maintainer's account, which has no Advanced Data Protection
   and has "Access iCloud Data on the Web" on. Tokens from the iPhone get HTTP 403 `ACCESS_DENIED`, "private db
   access disabled for this account"; a token from Apple's web sign-in for the same user (a second, Development-only
