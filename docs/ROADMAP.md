@@ -193,6 +193,8 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 - [ ] Protocol: mailbox records, remote session, Opus kind; version bump and shared vectors
 - [ ] Bridge mailbox: CloudKit Web Services client in `link/remote/`
 - [ ] iPhone: subscription and Notification Service Extension (SMS, codes, calls through CallKit)
+- [ ] Remote pairing: one-time invitation from the iPhone, allowed on the Android phone, 6-digit code compared on a
+      call (D-072)
 - [ ] Router mapping, public listener and direct session
 - [ ] Opus call audio on the direct connection
 - [ ] Settings, status line, the before-you-turn-it-on screen and "Check my home connection"

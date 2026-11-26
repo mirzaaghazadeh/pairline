@@ -1196,6 +1196,18 @@ service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch
   iCloud"; the local log records connections, redacted (rule 9).
 - **First, three risky parts are proven** (Phase 0): the home router's port mapping, the CloudKit path from a
   non-Apple client to a suspended iPhone, and the filtering entitlement request. Results are added below.
+- **Remote pairing** (added 2026-11-26 at the maintainer's request, also for testing with a tester's phone in
+  another home): pairing while the phones are apart. The user picks "Pair a phone that's far away" on the iPhone,
+  which makes a one-time invitation (10 minutes, single use) carrying what the Android phone needs to reach the
+  mailbox and to start the pairing. It is sent by any means; the person at home opens it in Pairline on the Android
+  phone and allows it there. The phones meet through the iCloud mailbox (or the direct connection), and both show a
+  6-digit code derived from the pairing handshake, which the two people compare on a phone call and confirm on both
+  phones; a copied invitation produces different codes and the pairing stops. This replaces "seeing the QR code"
+  as the trust anchor for this one flow only, chosen explicitly on both phones; outside it, release builds still
+  pair only from the camera. The Android phone's own setup (installing Pairline, its permissions, Talk on iPhone)
+  still happens on that phone. Known limit: an intercepted invitation's iCloud token reaches only Pairline's records
+  in that user's iCloud, which stay sealed, until Apple expires it. Part of the remote-mode add-on; it comes after
+  the mailbox works, with its own protocol version, PROTOCOL.md text and vectors.
 
 **Phase 0 results (2026-11-26, in progress):**
 
