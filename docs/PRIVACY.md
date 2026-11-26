@@ -11,6 +11,9 @@ Any change that adds or changes a data flow or permission must update this file 
   directly between them, encrypted.
 - **Only two outside companies are involved, and neither gets your data:** Apple, when you buy something in the
   iPhone app, and GitHub, which the Android app asks once a day whether a new version exists (you can turn that off).
+- **Remote mode (off unless you turn it on, D-072)** lets the phones work while apart through your own iCloud: Apple
+  stores records locked with keys only your two phones hold, and can see that your phones exchange them, not what
+  they say. Details below.
 
 ## Data flows
 
@@ -62,6 +65,22 @@ Any change that adds or changes a data flow or permission must update this file 
 | App logs | Only if you tap Share after reading them | Application Support, redacted (no phone numbers, emails, device ids or message text) | Last 7 days |
 | Pairing link (QR code) | No | Read from the camera and used once; the secret is never stored or logged | Until pairing ends |
 
+### Remote mode (opt-in, D-072)
+
+Off until you turn it on (on the iPhone, or by pairing from far away). Until Apple answers D-072's question about the
+private database, it exists in debug builds only and uses the app's public CloudKit database, where each record is
+readable only by the iCloud account that wrote it; the design, and release builds, use your private iCloud database.
+
+| Data | Leaves the device? | Goes to | Stored where | How long |
+|------|--------------------|---------|--------------|----------|
+| Messages, codes, call events, status and the iPhone's requests while the phones are apart | Yes, each one sealed for the other phone (AES-256-GCM with keys only your two phones hold) | Your iCloud (Apple's CloudKit), as a "Mail" record; Apple pushes the iPhone when one arrives | Apple's CloudKit, under your iCloud account | Until the receiving phone handles it (it deletes it then); a phone deletes its own records left over after a day; turning remote mode off deletes them all |
+| What Apple can see of those records | — | Apple | That your iCloud account stores and deletes records of a given size at given times, a random mailbox id, and the network addresses the phones use; never content | Apple's policy |
+| iCloud web access token (lets the Android phone reach Pairline's records in your iCloud and nothing else) | Yes: from the iPhone to the Android phone over the encrypted link or in a pairing invitation | The Android phone; it sends it only to Apple's CloudKit | Android: encrypted with an Android Keystore key, in no-backup app storage | Until remote mode is off or you forget the pairing; Apple also expires it |
+| Remote pairing invitation (a one-time secret, your iPhone's public key, an iCloud web access token and mailbox ids) | Yes: you send the link yourself, by any app you choose | The person you send it to | Not stored by Pairline after pairing | 10 minutes. Whoever gets the link in that time could try to pair; the 6-digit code you compare on a call stops that, and the token reaches only Pairline's locked records |
+| Unsealed messages from remote-mode notifications (iPhone) | No | Pairline's notification extension unseals a pushed record, shows it (sender and, if "Show message text" is on, the text) and leaves it in the app group container for the app | Until the app next runs and takes it (minutes to hours) |
+| Ids of handled records, mailbox ids, remote-mode settings | No | iPhone: app storage and the app group container; Android: app storage | Handled ids 14 days; the rest until remote mode is off |
+| Identity key and pinned bridge key (iPhone) | No | Now in a Keychain group shared with Pairline's own notification extension, so it can unseal records | As before |
+
 ## Network connections
 
 | App | Connects to | Why |
@@ -73,10 +92,13 @@ Any change that adds or changes a data flow or permission must update this file 
 | iPhone app | Apple App Store (StoreKit) | Purchases |
 | Android bridge, only while internet sharing is on (M8) | The sites your iPhone visits | Forwards your iPhone's own traffic; Pairline starts no connections of its own |
 | Android bridge, only with Talk on iPhone | This phone's own Wireless debugging on `127.0.0.1`; its port is found from this phone's own `_adb-tls-*` announcements on the Wi-Fi network | Pairs with it once and starts Pairline's helper (D-054). Never connects to another device's Wireless debugging |
+| Android bridge, only with remote mode on | `api.apple-cloudkit.com` (Apple's CloudKit Web Services) | Writes and reads the sealed remote-mode records in your iCloud, with your iCloud web access token; Apple sees the bridge's IP address. Checks every 30 seconds while the iPhone was heard from in the last 10 minutes, otherwise every 2 minutes, and not at all while a local link is up |
+| iPhone app, only with remote mode on | iCloud (CloudKit) and Apple's push service | Writes and reads the same sealed records, and gets a push when one arrives |
 
-Nothing else. The Android app's network code is confined by CI to four places: the update check (GitHub only),
-the Wi-Fi link (addresses on your local network only), internet sharing (M8, only while you have it on) and Talk on
-iPhone's connection to this phone's own Wireless debugging (`127.0.0.1` only).
+Nothing else. The Android app's network code is confined by CI to five places: the update check (GitHub only),
+the Wi-Fi link (addresses on your local network only), internet sharing (M8, only while you have it on), Talk on
+iPhone's connection to this phone's own Wireless debugging (`127.0.0.1` only) and remote mode (Apple's CloudKit Web
+Services host only).
 **Debug builds only** (never the release APK): the bridge also listens on `127.0.0.1:47800` inside the phone or
 emulator, so developers can connect a test iPhone app through `adb forward` (D-018); it isn't reachable from any
 network. On an emulator (never on a phone), a debug build's Wi-Fi link also listens on the emulator's emulated
@@ -87,7 +109,7 @@ Links you tap in Settings (the source code, Pairline's Telegram news channel and
 handed to your browser or the Telegram app; the bridge doesn't open them itself.
 
 **iPhone app:** it makes no network requests of its own; the only outside party is Apple (StoreKit, App Store
-purchases and restores). Links you tap — the bridge download page `getpairline.com`, the privacy policy, the terms,
+purchases and restores, and iCloud with its push service while remote mode is on). Links you tap — the bridge download page `getpairline.com`, the privacy policy, the terms,
 the source code, Pairline's Telegram news channel and help group (`t.me`, for the app's language), or a link inside a
 message — open in Safari or the Telegram app, only when you tap them. The Telegram help group is public, and the app
 says so next to the link. **Debug builds only** (never
