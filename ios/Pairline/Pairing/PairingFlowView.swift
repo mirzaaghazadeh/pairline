@@ -78,22 +78,24 @@ struct PairingFlowView: View {
 
     // MARK: - Install
 
+    /// Sized to fit an iPhone screen without scrolling, with "I've installed it" pinned to the bottom so it's never
+    /// below the fold; it still scrolls with very large text.
     private var install: some View {
         ScrollView {
-            VStack(spacing: 22) {
+            VStack(spacing: 14) {
                 StepHeader(number: 1, of: 2, title: Text("Install Pairline Bridge on your Android phone"),
                            subtitle: Text("It's free. It runs on the Android phone that holds your SIM card."))
-                VStack(spacing: 14) {
+                VStack(spacing: 10) {
                     QRCodeImage(text: AppInfo.downloadURL.absoluteString)
-                        .frame(width: 170, height: 170)
-                        .padding(14)
-                        .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(.white))
+                        .frame(width: 110, height: 110)
+                        .padding(10)
+                        .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(.white))
                     Text("Scan this with the Android phone's camera, or open:")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                     Text(verbatim: "getpairline.com")
-                        .font(.title3.weight(.semibold).monospaced())
+                        .font(.headline.monospaced())
                         .foregroundStyle(Color.brandBlue)
                         .environment(\.layoutDirection, .leftToRight)
                     HStack(spacing: 10) {
@@ -108,20 +110,29 @@ struct PairingFlowView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .card(padding: 20)
-                VStack(alignment: .leading, spacing: 12) {
+                .card(padding: 14)
+                VStack(alignment: .leading, spacing: 10) {
                     HelpBullet(symbol: "checkmark.shield", text: Text("Allow the permissions it asks for: SMS, phone and Bluetooth."))
                     HelpBullet(symbol: "battery.100", text: Text("Let it run without battery restrictions so the link stays up."))
                     HelpBullet(symbol: "qrcode", text: Text("Tap Pair in the bridge app to show a pairing code."))
                 }
-                .card()
-                Button("I've installed it") {
-                    Haptics.tap()
-                    step = .scan
-                }
-                .buttonStyle(PrimaryButtonStyle())
+                .card(padding: 14)
             }
-            .padding(20)
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .padding(.bottom, 12)
+        }
+        .scrollsOnlyWhenNeeded()
+        .safeAreaInset(edge: .bottom) {
+            Button("I've installed it") {
+                Haptics.tap()
+                step = .scan
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 6)
+            .background(.regularMaterial)
         }
     }
 

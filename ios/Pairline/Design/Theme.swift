@@ -84,6 +84,16 @@ extension View {
     func onValueChange<V: Equatable>(_ value: V, perform: @escaping (V) -> Void) -> some View {
         onChange(of: value, perform: perform)
     }
+
+    /// A scroll view that only moves when its content is taller than the screen (iOS 16.4 and later), so a page that
+    /// fits doesn't look scrollable.
+    @ViewBuilder func scrollsOnlyWhenNeeded() -> some View {
+        if #available(iOS 16.4, *) {
+            scrollBounceBehavior(.basedOnSize)
+        } else {
+            self
+        }
+    }
 }
 
 enum Formatters {
