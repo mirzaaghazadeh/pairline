@@ -205,9 +205,14 @@ final class DemoBridge: BridgeLink {
             let status = statusBody(id: nil)
             DispatchQueue.main.async { [weak self] in self?.emit(status) }
             return ["t": "ok", "id": id]
-        case "sms.read", "call.hold", "contacts.update", "phone.find":
-            // Nothing to do on a made-up phone (D-074).
+        case "sms.read", "call.hold", "contacts.update", "phone.find", "sms.schedule", "sms.unschedule":
+            // Nothing to do on a made-up phone (D-074, D-084): a scheduled demo message just stays scheduled.
             return ["t": "ok", "id": id]
+        case "sms.scheduled":
+            return ["t": "sms.scheduled", "id": id, "items": [], "done": [], "exact": true]
+        case "data.usage":
+            let since = f["since"] as? Int64 ?? Date().milliseconds
+            return ["t": "data.usage", "id": id, "since": since, "until": Date().milliseconds, "bytes": 3_400_000_000]
         case "net.switch":
             // Nothing is switched anywhere: the demo only remembers it and shows it in the next status.
             if let what = f["what"] as? String, what == "dataSim", let slot = f["sim"] as? Int, (0...1).contains(slot) {

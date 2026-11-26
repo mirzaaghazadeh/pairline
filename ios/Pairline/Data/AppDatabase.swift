@@ -278,6 +278,28 @@ final class AppDatabase: ObservableObject {
                              isOutgoing: true, sim: sim, state: .pending, cid: cid, error: nil)
     }
 
+    /// A message the bridge will send at `at` (D-084): shown in the conversation at that time with a clock, while the
+    /// conversation itself moves to the top now.
+    func insertScheduled(thread: Int64?, to address: String, body: String, sim: Int?, cid: String, at: Date) -> StoredMessage {
+        let threadID = thread ?? existingThread(for: address) ?? PhoneNumber.syntheticThreadID(for: address)
+        let key = "local:\(cid)"
+        try? db.transaction {
+            try db.execute("""
+                INSERT INTO messages(key, thread, addr, body, time, box, sim, state, cid) VALUES(?, ?, ?, ?, ?, 'out', ?, 'scheduled', ?)
+                """, [.text(key), .int(threadID), .text(address), .text(body), .int(at.milliseconds), .from(sim), .text(cid)])
+            try touchThread(threadID, addr: address, body: body, time: Date().milliseconds, newMessage: true, unread: false)
+        }
+        changed()
+        return StoredMessage(key: key, thread: threadID, addr: address, body: body, time: at, isOutgoing: true, sim: sim,
+                             state: .scheduled, cid: cid, error: nil)
+    }
+
+    /// Messages waiting at the bridge to be sent (D-084).
+    func scheduledMessages() -> [StoredMessage] {
+        let rows = (try? db.query("SELECT * FROM messages WHERE state = 'scheduled' ORDER BY time ASC")) ?? []
+        return rows.map(StoredMessage.init(row:))
+    }
+
     /// The thread already used for this address, if any.
     func existingThread(for address: String) -> Int64? {
         guard let key = PhoneNumber.matchKey(address) else { return nil }

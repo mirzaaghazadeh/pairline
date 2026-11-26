@@ -33,6 +33,9 @@ final class AppSettings: ObservableObject {
     @AppStorage("messages.deleteOldCodes") var deleteOldCodes = false
     /// A notification when the bridge phone stays out of reach for a few minutes (D-083).
     @AppStorage("alerts.leftBehind") var leftBehindAlert = true
+    /// The data meter's month starts on this day (1–28), and warns at 80% and 100% of this many GB; 0 is no limit (D-084).
+    @AppStorage("data.cycleDay") var dataCycleDay = 1
+    @AppStorage("data.limitGB") var dataLimitGB = 0
 
     var savedUSSDCodes: [String] {
         get { savedUSSDCodesRaw.split(separator: "\n").map(String.init) }

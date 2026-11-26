@@ -232,7 +232,7 @@ struct MessageBubble: View {
                 if let code {
                     CopyChip(label: Text("Copy code \(PhoneNumber.ltr(code))"), value: code, isCode: true)
                 }
-                if isLastInGroup || message.state == .failed || message.state == .pending {
+                if isLastInGroup || message.state == .failed || message.state == .pending || message.state == .scheduled {
                     footer
                 }
             }
@@ -250,6 +250,23 @@ struct MessageBubble: View {
                         bridge.retry(message)
                     } label: { Label("Try again", systemImage: "arrow.clockwise") }
                 }
+                if message.state == .scheduled {
+                    Button(role: .destructive) {
+                        Task {
+                            do {
+                                try await bridge.cancelScheduled(message)
+                            } catch {
+                                AppModel.shared.toast = error.localizedDescription
+                            }
+                        }
+                    } label: {
+                        Label {
+                            Text("Cancel scheduled message", tableName: "Extras")
+                        } icon: {
+                            Image(systemName: "calendar.badge.minus")
+                        }
+                    }
+                }
                 if let onDelete {
                     Button(role: .destructive, action: onDelete) {
                         Label("Delete", systemImage: "trash")
@@ -265,7 +282,11 @@ struct MessageBubble: View {
     }
 
     private var bubbleColor: Color {
-        message.state == .failed ? Color.brandRed.opacity(0.85) : Color.brandFill
+        switch message.state {
+        case .failed: return Color.brandRed.opacity(0.85)
+        case .scheduled: return Color.brandFill.opacity(0.55)
+        default: return Color.brandFill
+        }
     }
 
     private var bubbleShape: some Shape {
@@ -277,9 +298,14 @@ struct MessageBubble: View {
             if let simLabel {
                 SIMBadge(slot: simLabel)
             }
-            Text(message.time, style: .time)
+            if message.state != .scheduled {
+                Text(message.time, style: .time)
+            }
             if message.isOutgoing {
                 switch message.state {
+                case .scheduled:
+                    Image(systemName: "calendar.badge.clock")
+                    Text("Scheduled for \(message.time.formatted(date: .abbreviated, time: .shortened))", tableName: "Extras")
                 case .pending:
                     Image(systemName: "clock")
                     Text(bridge.phase.isConnected ? "Sending…" : "Waiting for bridge")
@@ -332,6 +358,7 @@ struct Composer: View {
     @EnvironmentObject private var bridge: BridgeController
     @State private var draft: String
     @State private var sim: Int?
+    @State private var scheduling = false
     @FocusState private var focused: Bool
 
     init(thread: Int64?, address: String, onSend: @escaping () -> Void = {}) {
@@ -386,6 +413,20 @@ struct Composer: View {
                     }
                     .disabled(!canSend)
                     .accessibilityLabel(Text("Send"))
+                    // Touch and hold: the bridge sends it later, even if this iPhone is away then (D-084).
+                    .contextMenu {
+                        if canSend, bridge.has(.smsSchedule) {
+                            Button {
+                                scheduling = true
+                            } label: {
+                                Label {
+                                    Text("Send later…", tableName: "Extras")
+                                } icon: {
+                                    Image(systemName: "calendar.badge.clock")
+                                }
+                            }
+                        }
+                    }
                 }
                 if segments.parts > 1 || (segments.parts == 1 && segments.remaining < 20) {
                     Text("SMS parts: \(segments.parts) · left: \(segments.remaining)")
@@ -402,6 +443,26 @@ struct Composer: View {
             sim = bridge.effectiveSim(forSMS: true)
         }
         .onValueChange(draft) { ComposerDrafts.set($0, for: thread) }
+        .sheet(isPresented: $scheduling) {
+            ScheduleSheet(exact: bridge.scheduledExact) { date in
+                scheduling = false
+                schedule(at: date)
+            }
+        }
+    }
+
+    private func schedule(at date: Date) {
+        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        Task {
+            do {
+                try await bridge.scheduleSMS(to: address, body: text, sim: sim, thread: thread, at: date)
+                draft = ""
+                onSend()
+            } catch {
+                app.toast = error.localizedDescription
+            }
+        }
     }
 
     private var simMenu: some View {

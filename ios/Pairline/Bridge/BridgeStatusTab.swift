@@ -67,6 +67,7 @@ struct BridgeStatusTab: View {
             batteryCard
             simCards
             BalanceCard()
+            if !bridge.isDemo { DataUsageCard() }
         }
     }
 

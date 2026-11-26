@@ -150,6 +150,7 @@ final class BridgeController: ObservableObject {
             }
             await sync()
             deleteOldCodes()
+            await reconcileScheduled()
             await flushOutbox()
             await refreshBlockList()
             await measureLatency()
@@ -210,6 +211,9 @@ final class BridgeController: ObservableObject {
         case .blockList(let list):
             // Changed in the bridge app itself.
             applyBlockList(list)
+        case .remoteRing(let on):
+            // The bridge's user is looking for this iPhone (D-084).
+            if mode == .real { on ? IPhoneRinger.shared.start() : IPhoneRinger.shared.stop() }
         default:
             break
         }
@@ -229,6 +233,123 @@ final class BridgeController: ObservableObject {
         }
         saveWidget()
         requestMicrophoneIfNeeded(s)
+        if mode == .real { Task { await refreshDataUsage(force: false) } }
+    }
+
+    // MARK: - Scheduled messages (D-084)
+
+    /// Whether the bridge can send at the exact minute (Android's "Alarms & reminders"); from its last list.
+    @Published private(set) var scheduledExact = true
+
+    /// Gives the message to the bridge, which keeps it and sends it at `date` even if this iPhone is away then. The
+    /// conversation shows it with a clock until the bridge reports it sent.
+    @discardableResult
+    func scheduleSMS(to address: String, body: String, sim: Int?, thread: Int64?, at date: Date) async throws -> StoredMessage {
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        guard has(.smsSchedule) else { throw ActionError.missingCapability(.smsSchedule) }
+        guard phase.isConnected else { throw LinkError.notConnected }
+        let cid = "s-" + UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(16).lowercased()
+        _ = try await link.request(.smsSchedule(cid: cid, sim: sim, to: address, body: body, at: date.milliseconds))
+        let message = db.insertScheduled(thread: thread, to: address, body: body, sim: sim, cid: cid, at: date)
+        log.info("sms", "Message scheduled on the bridge")
+        Haptics.success()
+        Task { await reconcileScheduled() }
+        return message
+    }
+
+    /// Takes it back from the bridge, then deletes it here. When it already went, the list says what became of it.
+    func cancelScheduled(_ message: StoredMessage) async throws {
+        guard let cid = message.cid else { return }
+        do {
+            _ = try await link.request(.smsUnschedule(cid: cid))
+            db.deleteMessages(keys: [message.key])
+        } catch {
+            await reconcileScheduled()
+            throw error
+        }
+    }
+
+    /// After a reconnect: messages the bridge sent while this iPhone was away get their real state and key, and a
+    /// scheduled message the bridge no longer knows (its app data was cleared) is marked as not sent.
+    func reconcileScheduled() async {
+        guard mode == .real, has(.smsSchedule), phase.isConnected,
+              let reply = try? await link.request(.smsScheduled), case .smsScheduled(let list) = reply.message else { return }
+        scheduledExact = list.exact
+        for done in list.done {
+            // "pending": handed to the radio, its result not in yet; it isn't waiting here any more either way.
+            let state = done.state == "pending" ? .sent : (MessageState(rawValue: done.state) ?? .sent)
+            db.updateState(cid: done.cid, state: state, key: done.key, error: done.error)
+        }
+        let known = Set(list.items.map(\.cid)).union(list.done.map(\.cid))
+        for message in db.scheduledMessages() {
+            guard let cid = message.cid, !known.contains(cid) else { continue }
+            db.updateState(cid: cid, state: .failed, key: nil,
+                           error: String(localized: "The Android phone no longer has this scheduled message.", table: "Extras"))
+        }
+    }
+
+    // MARK: - Mobile data meter (D-084)
+
+    struct DataUsageInfo: Equatable {
+        var bytes: Int64
+        var since: Date
+        var fetched: Date
+    }
+
+    @Published private(set) var dataUsage: DataUsageInfo?
+    /// Why the meter has no figure: nil, `permission` (Usage access not given) or `unsupported` (an older bridge).
+    @Published private(set) var dataUsageProblem: String?
+    private var lastDataAttempt: Date?
+
+    /// The start of the current data month, from the day in Settings (1–28).
+    nonisolated static func dataCycleStart(day: Int, now: Date = Date(), calendar: Calendar = .current) -> Date {
+        let day = min(max(day, 1), 28)
+        var parts = calendar.dateComponents([.year, .month, .day], from: now)
+        let today = parts.day ?? 1
+        parts.day = day
+        let thisMonth = calendar.date(from: parts) ?? now
+        return today >= day ? thisMonth : (calendar.date(byAdding: .month, value: -1, to: thisMonth) ?? thisMonth)
+    }
+
+    /// Asks the bridge for this month's mobile data: at most every 15 minutes unless forced (the card, pull to refresh).
+    func refreshDataUsage(force: Bool) async {
+        guard mode == .real, canUseLink, phase.isConnected else { return }
+        guard force || has(.dataUsage) else { return }
+        if !force, let last = lastDataAttempt, Date().timeIntervalSince(last) < 15 * 60 { return }
+        lastDataAttempt = Date()
+        let since = Self.dataCycleStart(day: AppSettings.shared.dataCycleDay)
+        do {
+            let reply = try await link.request(.dataUsage(since: since.milliseconds))
+            guard case .dataUsage(let usage) = reply.message else { return }
+            dataUsage = DataUsageInfo(bytes: usage.bytes, since: since, fetched: Date())
+            dataUsageProblem = nil
+            checkDataLimit()
+        } catch LinkError.bridge(let error) {
+            dataUsageProblem = error.code
+        } catch {
+            log.warning("data", "Data usage unavailable: \(error.localizedDescription)")
+        }
+    }
+
+    /// One notification at 80% and one at 100% of the limit, per data month.
+    private func checkDataLimit() {
+        let limitGB = AppSettings.shared.dataLimitGB
+        guard limitGB > 0, let usage = dataUsage else { return }
+        let ratio = Double(usage.bytes) / (Double(limitGB) * 1_000_000_000)
+        let month = Int(usage.since.timeIntervalSince1970)
+        let defaults = UserDefaults.standard
+        for step in [100, 80] where ratio * 100 >= Double(step) {
+            let key = "data.alerted.\(step)"
+            if defaults.integer(forKey: key) != month {
+                defaults.set(month, forKey: key)
+                if step == 100 { defaults.set(month, forKey: "data.alerted.80") }
+                Notifier.shared.notifyDataUsage(percent: step, bytes: usage.bytes)
+            }
+            break
+        }
     }
 
     // MARK: - Left behind and old codes (D-083)

@@ -142,6 +142,10 @@ class LinkManager(
     @Volatile
     var peerAcceptsFiles: Boolean = false
 
+    /** The iPhone listed `ring` in its `device.info` caps, so `remote.ring` reaches it (D-084). */
+    @Volatile
+    var peerCanRing: Boolean = false
+
     private val _state = MutableStateFlow(LinkSnapshot())
     val state: StateFlow<LinkSnapshot> = _state
 
@@ -298,6 +302,7 @@ class LinkManager(
         prefs.clearPeer()
         pairing.resetOutcome()
         peerAcceptsFiles = false
+        peerCanRing = false
     }
 
     /** Runs [block] on the link thread, where messages and bulk data are handled. */
@@ -432,6 +437,7 @@ class LinkManager(
             prefs.clearPeer()
             prefs.pairedAt = clock()
             peerAcceptsFiles = false
+            peerCanRing = false
             // A new iPhone replaces the old one: drop every other connection, including an established one.
             entries.filterKeys { it != connection }.values.toList().forEach { it.session.close("another iPhone paired") }
         }

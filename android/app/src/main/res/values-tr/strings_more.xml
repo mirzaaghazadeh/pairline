@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_channel">iPhone için izinler</string>
+    <string name="schedule_access_title">Zamanlanmış mesajları zamanında gönder</string>
+    <string name="schedule_access_text">iPhone’da zamanladığınız mesajları bu telefon gönderir. Seçtiğiniz dakikada gitmeleri için Alarmlar ve hatırlatıcılar altında Pairline Bridge’i açın. Açmazsanız Android bunları birkaç dakika geç gönderebilir.</string>
+    <string name="usage_access_title">Veri sayacı için kullanım erişimine izin verin</string>
+    <string name="usage_access_text">iPhone, bu telefonun ne kadar mobil veri kullandığını sordu. Kullanım erişimi altında Pairline Bridge’i açın. iPhone’a yalnızca toplam gider, hangi uygulamaların kullandığı asla gitmez.</string>
+    <string name="ring_iphone_tile">iPhone’u çaldır</string>
+    <string name="ring_iphone">iPhone’umu çaldır</string>
+    <string name="ring_iphone_sub">iPhone’da 30 saniye boyunca, sessizdeyken bile ses çalar</string>
+    <string name="ring_iphone_offline">iPhone şu anda bağlı değil.</string>
+    <string name="ring_iphone_update">Buradan çaldırmak için iPhone’daki Pairline’ı güncelleyin.</string>
+    <string name="ring_iphone_sent">iPhone’unuz çalıyor…</string>
+</resources>

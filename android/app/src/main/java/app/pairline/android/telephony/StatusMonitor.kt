@@ -50,6 +50,8 @@ class StatusMonitor(
     private val smsWrite: () -> Boolean = { false },
     /** `status.ringer` (D-074): normal, vibrate or silent. */
     private val ringer: () -> String? = { null },
+    /** Usage access is given for the data meter (D-084). */
+    private val dataUsage: () -> Boolean = { false },
 ) {
     /** Called (on a background thread) whenever something in the status may have changed. */
     var onChange: (() -> Unit)? = null
@@ -178,6 +180,7 @@ class StatusMonitor(
                 smsWrite = smsWrite(),
                 phoneTools = true,
                 notifMirror = app.pairline.android.mirror.NotificationMirror.accessGranted(context),
+                dataUsage = dataUsage(),
             ),
         )
     }

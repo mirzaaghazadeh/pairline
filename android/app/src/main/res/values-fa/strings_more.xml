@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_channel">اجازه‌ها برای آیفون</string>
+    <string name="schedule_access_title">ارسال به‌موقع پیام‌های زمان‌بندی‌شده</string>
+    <string name="schedule_access_text">پیام‌هایی که روی آیفون زمان‌بندی می‌کنید با این گوشی فرستاده می‌شوند. Pairline Bridge را در «هشدارها و یادآوری‌ها» روشن کنید تا دقیقاً در همان دقیقه‌ای که انتخاب کرده‌اید فرستاده شوند. بدون آن، اندروید ممکن است چند دقیقه دیرتر بفرستد.</string>
+    <string name="usage_access_title">اجازهٔ دسترسی به آمار مصرف برای سنجش اینترنت</string>
+    <string name="usage_access_text">آیفون پرسیده این گوشی چقدر اینترنت همراه مصرف کرده است. Pairline Bridge را در «دسترسی به میزان استفاده» روشن کنید. فقط مجموع مصرف به آیفون می‌رود، نه اینکه کدام برنامه‌ها مصرف کرده‌اند.</string>
+    <string name="ring_iphone_tile">زنگ آیفون</string>
+    <string name="ring_iphone">آیفونم را زنگ بزن</string>
+    <string name="ring_iphone_sub">۳۰ ثانیه روی آیفون صدا پخش می‌کند، حتی در حالت بی‌صدا</string>
+    <string name="ring_iphone_offline">آیفون الان وصل نیست.</string>
+    <string name="ring_iphone_update">برای زنگ زدن آیفون از اینجا، Pairline را روی آیفون به‌روز کنید.</string>
+    <string name="ring_iphone_sent">آیفون شما در حال زنگ خوردن است…</string>
+</resources>

@@ -27,7 +27,10 @@ import app.pairline.android.telephony.BlockList
 import app.pairline.android.telephony.BlockRules
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
+import app.pairline.android.telephony.DataUsage
 import app.pairline.android.telephony.PhoneNumbers
+import app.pairline.android.telephony.ScheduledMessage
+import app.pairline.android.telephony.ScheduledSms
 import app.pairline.android.telephony.SmsMapping
 import app.pairline.android.telephony.SmsSender
 import app.pairline.android.telephony.SmsStore
@@ -64,6 +67,8 @@ class MessageRouter(
     private val blockList: BlockList,
     private val netSwitches: NetSwitches,
     private val appContext: Context,
+    private val scheduled: ScheduledSms,
+    private val dataUsage: DataUsage,
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -284,6 +289,30 @@ class MessageRouter(
                 NotificationMirror.dismiss(message.stringOrNull("key") ?: invalid("key missing"))
                 Messages.ok(id)
             }
+            // D-084: messages the bridge sends later, and the mobile-data meter.
+            Msg.SMS_SCHEDULE -> request(message) { id ->
+                val cid = message.stringOrNull("cid") ?: invalid("cid missing")
+                scheduled.add(
+                    ScheduledMessage(
+                        cid = cid,
+                        sim = sim(message),
+                        to = message.stringOrNull("to") ?: invalid("to missing"),
+                        body = message.stringOrNull("body") ?: invalid("body missing"),
+                        at = message.longOrNull("at") ?: invalid("at missing"),
+                    ),
+                )
+                scheduled.askForExactTiming()
+                Messages.ok(id)
+            }
+            Msg.SMS_UNSCHEDULE -> request(message) { id ->
+                val cid = message.stringOrNull("cid") ?: invalid("cid missing")
+                if (!scheduled.remove(cid)) invalid("not scheduled (already sent?)")
+                Messages.ok(id)
+            }
+            Msg.SMS_SCHEDULED -> request(message) { id -> scheduled.toMessage(id) }
+            Msg.DATA_USAGE -> request(message) { id ->
+                dataUsage.toMessage(id, message.longOrNull("since") ?: invalid("since missing"))
+            }
             Msg.CONTACTS_SYNC -> request(message) { id -> contacts.contacts(id, cursor(message)) }
             Msg.CALLLOG_SYNC -> request(message) { id -> contacts.callLog(id, cursor(message)) }
             Msg.CONTACTS_ADD -> request(message) { id -> contactsAdd(id, message) }
@@ -413,6 +442,7 @@ class MessageRouter(
         prefs.peerApp = m.stringOrNull("app")?.take(20)
         val caps = m.optJSONArray("caps")
         link.peerAcceptsFiles = caps != null && (0 until caps.length()).any { caps.opt(it) == Caps.FILES }
+        link.peerCanRing = caps != null && (0 until caps.length()).any { caps.opt(it) == Caps.REMOTE_RING }
         files.onPeerCaps()
         Log.i(TAG, "iPhone app ${prefs.peerApp ?: "?"}, iOS ${prefs.peerOs ?: "?"}, protocol ${m.opt("proto")}")
     }

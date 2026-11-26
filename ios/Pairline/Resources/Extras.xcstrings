@@ -1,0 +1,230 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ of %lld GB" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "%@ من %lld غيغابايت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ of %lld GB" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "%@ از %lld گیگابایت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ / %lld GB" } }
+      }
+    },
+    "Allow Usage access for Pairline Bridge on the Android phone: it shows a notification that leads there." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسمح بـ«الوصول إلى بيانات الاستخدام» لـ Pairline Bridge على هاتف أندرويد؛ يعرض إشعارًا يقودك إليه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Allow Usage access for Pairline Bridge on the Android phone: it shows a notification that leads there." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی «دسترسی به میزان استفاده» را برای Pairline Bridge روشن کنید؛ اعلانی آنجا شما را به آن می‌رساند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonda Pairline Bridge için Kullanım erişimine izin verin; oraya götüren bir bildirim gösterir." } }
+      }
+    },
+    "Allow Usage access for Pairline Bridge on your Android phone: open the data meter here and it shows a notification there that leads to it." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسمح بـ«الوصول إلى بيانات الاستخدام» لـ Pairline Bridge على هاتف أندرويد: افتح عدّاد البيانات هنا فيعرض هناك إشعارًا يقودك إليه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Allow Usage access for Pairline Bridge on your Android phone: open the data meter here and it shows a notification there that leads to it." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی «دسترسی به میزان استفاده» را برای Pairline Bridge روشن کنید: سنجش اینترنت را اینجا باز کنید تا آنجا اعلانی نشان دهد که شما را به آن می‌رساند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda Pairline Bridge için Kullanım erişimine izin verin: veri sayacını burada açın, orada sizi oraya götüren bir bildirim gösterir." } }
+      }
+    },
+    "Android may send it a few minutes late: allow Pairline Bridge under Alarms & reminders on the Android phone for the exact minute." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قد يرسلها أندرويد متأخرة بضع دقائق: اسمح لـ Pairline Bridge ضمن «المنبّهات والتذكيرات» على هاتف أندرويد لتُرسل في الدقيقة نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android may send it a few minutes late: allow Pairline Bridge under Alarms & reminders on the Android phone for the exact minute." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ممکن است اندروید آن را چند دقیقه دیرتر بفرستد: برای ارسال در همان دقیقه، روی گوشی اندرویدی Pairline Bridge را در «هشدارها و یادآوری‌ها» مجاز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android bunu birkaç dakika geç gönderebilir: tam dakikasında gitmesi için Android telefonda Alarmlar ve hatırlatıcılar altında Pairline Bridge’e izin verin." } }
+      }
+    },
+    "Cancel scheduled message" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إلغاء الرسالة المجدولة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel scheduled message" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "لغو پیام زمان‌بندی‌شده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Zamanlanmış mesajı iptal et" } }
+      }
+    },
+    "Data month and limit" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شهر البيانات والحد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Data month and limit" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ماه مصرف و سقف" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Veri ayı ve sınır" } }
+      }
+    },
+    "Found it" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "وجدته" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Found it" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیدایش کردم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Buldum" } }
+      }
+    },
+    "Limit: %lld GB" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الحد: %lld غيغابايت" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Limit: %lld GB" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سقف: %lld گیگابایت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sınır: %lld GB" } }
+      }
+    },
+    "Mobile data" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بيانات الجوال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mobile data" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اینترنت همراه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mobil veri" } }
+      }
+    },
+    "Mobile data almost used up" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بيانات الجوال على وشك النفاد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mobile data almost used up" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اینترنت همراه نزدیک به تمام شدن است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mobil veri bitmek üzere" } }
+      }
+    },
+    "Mobile data limit reached" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم بلوغ حد بيانات الجوال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mobile data limit reached" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به سقف اینترنت همراه رسیدید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mobil veri sınırına ulaşıldı" } }
+      }
+    },
+    "Mobile data meter" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عدّاد بيانات الجوال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mobile data meter" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سنجش اینترنت همراه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mobil veri sayacı" } }
+      }
+    },
+    "Month starts on day" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يبدأ الشهر في اليوم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Month starts on day" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ماه از این روز شروع می‌شود" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ay şu günde başlar" } }
+      }
+    },
+    "No limit" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بلا حد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No limit" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بدون سقف" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sınır yok" } }
+      }
+    },
+    "Open Pairline to stop the sound." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "افتح Pairline لإيقاف الصوت." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Pairline to stop the sound." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای قطع صدا Pairline را باز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sesi durdurmak için Pairline’ı açın." } }
+      }
+    },
+    "Schedule" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جدولة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Schedule" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "زمان‌بندی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Zamanla" } }
+      }
+    },
+    "Scheduled for %@" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مجدولة في %@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scheduled for %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "زمان‌بندی برای %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ için zamanlandı" } }
+      }
+    },
+    "Scheduled messages" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرسائل المجدولة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scheduled messages" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیام‌های زمان‌بندی‌شده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Zamanlanmış mesajlar" } }
+      }
+    },
+    "Send at" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "وقت الإرسال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send at" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "زمان ارسال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gönderme zamanı" } }
+      }
+    },
+    "Send later" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إرسال لاحقًا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send later" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ارسال در زمان دیگر" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sonra gönder" } }
+      }
+    },
+    "Send later…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إرسال لاحقًا…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send later…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ارسال در زمان دیگر…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sonra gönder…" } }
+      }
+    },
+    "Show mobile data" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عرض بيانات الجوال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show mobile data" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نمایش مصرف اینترنت همراه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mobil veriyi göster" } }
+      }
+    },
+    "Since %@, every SIM together." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "منذ %@، لكل الشرائح معًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Since %@, every SIM together." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از %@، همهٔ سیم‌کارت‌ها با هم." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%@ tarihinden beri, tüm SIM’ler birlikte." } }
+      }
+    },
+    "The Android phone has used %@ of mobile data this month (%lld%% of your limit)." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استخدم هاتف أندرويد %@ من بيانات الجوال هذا الشهر (%lld%% من حدّك)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone has used %@ of mobile data this month (%lld%% of your limit)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی این ماه %@ اینترنت همراه مصرف کرده است (%lld%% سقف شما)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon bu ay %@ mobil veri kullandı (sınırınızın %%%lld kadarı)." } }
+      }
+    },
+    "The Android phone no longer has this scheduled message." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم تعد هذه الرسالة المجدولة موجودة على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone no longer has this scheduled message." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این پیام زمان‌بندی‌شده دیگر روی گوشی اندرویدی نیست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu zamanlanmış mesaj artık Android telefonda yok." } }
+      }
+    },
+    "With a limit, Pairline notifies you at 80% and at 100%, once each month." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مع تحديد حدّ، ينبّهك Pairline عند 80% وعند 100%، مرة كل شهر." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "With a limit, Pairline notifies you at 80% and at 100%, once each month." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "با تعیین سقف، Pairline هر ماه یک بار در ۸۰٪ و یک بار در ۱۰۰٪ به شما خبر می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bir sınır koyarsanız Pairline her ay bir kez %80’de ve bir kez %100’de sizi bilgilendirir." } }
+      }
+    },
+    "Your Android phone is looking for this iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتف أندرويد يبحث عن هذا الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your Android phone is looking for this iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی شما دنبال این آیفون می‌گردد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuz bu iPhone’u arıyor" } }
+      }
+    },
+    "Your Android phone keeps the message and sends it at this time, even if this iPhone is off or away. Touch and hold it in the conversation to cancel." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتفظ هاتف أندرويد بالرسالة ويرسلها في هذا الوقت حتى لو كان هذا الآيفون مطفأً أو بعيدًا. المسها مطولًا في المحادثة لإلغائها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your Android phone keeps the message and sends it at this time, even if this iPhone is off or away. Touch and hold it in the conversation to cancel." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی پیام را نگه می‌دارد و در این زمان می‌فرستد، حتی اگر این آیفون خاموش یا دور باشد. برای لغو، آن را در گفتگو نگه دارید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuz mesajı saklar ve bu iPhone kapalı ya da uzakta olsa bile bu saatte gönderir. İptal etmek için konuşmada mesaja dokunup basılı tutun." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

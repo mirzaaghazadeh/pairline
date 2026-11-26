@@ -38,10 +38,11 @@ class TelephonyLogicTest {
         smsWrite: Boolean = false,
         tools: Boolean = false,
         mirror: Boolean = false,
+        usage: Boolean = false,
     ) = CapsCalculator.compute(
         CapsInput(
             granted, messaging, calling, sims, inCall, add, listen, talk, share, wifi, link, switches, smsWrite, tools,
-            mirror,
+            mirror, usage,
         ),
     )
 
@@ -49,8 +50,9 @@ class TelephonyLogicTest {
     fun allPermissionsSingleSim() {
         assertEquals(
             listOf(
-                Caps.SMS_RECEIVE, Caps.SMS_SEND, Caps.SMS_HISTORY, Caps.CALL_OBSERVE, Caps.CALL_CONTROL, Caps.CALL_DIAL,
-                Caps.CALL_VOICEMAIL, Caps.CONTACTS, Caps.CALLLOG, Caps.USSD, Caps.CALLLOG_DELETE, Caps.BLOCK,
+                Caps.SMS_RECEIVE, Caps.SMS_SEND, Caps.SMS_HISTORY, Caps.SMS_SCHEDULE, Caps.CALL_OBSERVE,
+                Caps.CALL_CONTROL, Caps.CALL_DIAL, Caps.CALL_VOICEMAIL, Caps.CONTACTS, Caps.CALLLOG, Caps.USSD,
+                Caps.CALLLOG_DELETE, Caps.BLOCK,
             ),
             caps(),
         )
@@ -62,7 +64,7 @@ class TelephonyLogicTest {
             Caps.ALL,
             caps(
                 sims = 2, inCall = true, add = true, listen = true, talk = true, share = true, wifi = true, link = true,
-                switches = true, smsWrite = true, tools = true, mirror = true,
+                switches = true, smsWrite = true, tools = true, mirror = true, usage = true,
             ),
         )
     }

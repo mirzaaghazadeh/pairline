@@ -36,6 +36,10 @@ struct RootView: View {
         .overlay(alignment: .top) {
             ToastOverlay(text: $app.toast)
         }
+        // The Android phone is ringing this iPhone (D-084).
+        .overlay(alignment: .bottom) {
+            RingingOverlay()
+        }
         .tint(.brandBlue)
     }
 }

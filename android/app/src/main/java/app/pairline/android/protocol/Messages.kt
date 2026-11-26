@@ -54,6 +54,13 @@ object Msg {
     const val CALLLOG_DELETE = "calllog.delete"
     const val BLOCK_LIST = "block.list"
     const val BLOCK_SET = "block.set"
+
+    // D-084: messages sent later by the bridge, the mobile-data meter, and ringing the iPhone.
+    const val SMS_SCHEDULE = "sms.schedule"
+    const val SMS_UNSCHEDULE = "sms.unschedule"
+    const val SMS_SCHEDULED = "sms.scheduled"
+    const val DATA_USAGE = "data.usage"
+    const val REMOTE_RING = "remote.ring"
 }
 
 /** Capabilities in `status.caps` (PROTOCOL.md, "Capabilities"). */
@@ -116,6 +123,12 @@ object Caps {
      */
     const val CALL_VOICEMAIL = "call.voicemail"
 
+    /** Messages can be given to the bridge to send later (`sms.schedule`, D-084). */
+    const val SMS_SCHEDULE = "sms.schedule"
+
+    /** The bridge reports its mobile data use (`data.usage`, Usage access given, D-084). */
+    const val DATA_USAGE = "data.usage"
+
     /** Call-history entries can be deleted on the bridge too (D-043). */
     const val CALLLOG_DELETE = "calllog.delete"
 
@@ -124,11 +137,15 @@ object Caps {
 
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
-        SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF, CALL_AUDIO,
-        CALL_HOLD, CALL_VOICEMAIL, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA, CALL_MEDIA_TALK,
-        CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, NOTIF_MIRROR, WIFI, FILES, CALLLOG_DELETE,
-        BLOCK,
+        SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, SMS_SCHEDULE, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF,
+        CALL_AUDIO, CALL_HOLD, CALL_VOICEMAIL, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA,
+        CALL_MEDIA_TALK,
+        CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, NOTIF_MIRROR, DATA_USAGE, WIFI, FILES,
+        CALLLOG_DELETE, BLOCK,
     )
+
+    /** What the iPhone can receive, in its `device.info` `caps`: `remote.ring` needs this (D-084). */
+    const val REMOTE_RING = "ring"
 }
 
 /** `error.code` values. */

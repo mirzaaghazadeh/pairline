@@ -195,6 +195,39 @@ final class Notifier: NSObject, ObservableObject {
         center.add(UNNotificationRequest(identifier: "battery-low", content: content, trigger: nil))
     }
 
+    // MARK: Data meter and ringing (D-084)
+
+    /// The bridge phone's mobile data reached 80% or 100% of the user's monthly limit.
+    func notifyDataUsage(percent: Int, bytes: Int64) {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        let used = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .decimal)
+        content.title = percent >= 100
+            ? String(localized: "Mobile data limit reached", table: "Extras")
+            : String(localized: "Mobile data almost used up", table: "Extras")
+        content.body = String(localized: "The Android phone has used \(used) of mobile data this month (\(percent)% of your limit).", table: "Extras")
+        content.sound = .default
+        content.userInfo = ["status": true]
+        center.add(UNNotificationRequest(identifier: "data-\(percent)", content: content, trigger: nil))
+    }
+
+    static let ringingID = "iphone.ringing"
+
+    /// Shown while the Android phone rings this iPhone, so the user knows why it's ringing; a tap opens Pairline,
+    /// which stops it.
+    func notifyRinging() {
+        guard authorization == .authorized || authorization == .provisional else { return }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Your Android phone is looking for this iPhone", table: "Extras")
+        content.body = String(localized: "Open Pairline to stop the sound.", table: "Extras")
+        if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
+        center.add(UNNotificationRequest(identifier: Self.ringingID, content: content, trigger: nil))
+    }
+
+    func clearRinging() {
+        center.removeDeliveredNotifications(withIdentifiers: [Self.ringingID])
+    }
+
     // MARK: Bridge phone left behind (D-083)
 
     static let leftBehindID = "bridge.leftBehind"

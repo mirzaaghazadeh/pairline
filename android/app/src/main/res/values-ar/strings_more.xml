@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_channel">أذونات للآيفون</string>
+    <string name="schedule_access_title">إرسال الرسائل المجدولة في موعدها</string>
+    <string name="schedule_access_text">يرسل هذا الهاتف الرسائل التي تجدولها على الآيفون. فعّل Pairline Bridge ضمن «المنبّهات والتذكيرات» لتُرسل في الدقيقة التي اخترتها. من دونه قد يرسلها أندرويد متأخرة بضع دقائق.</string>
+    <string name="usage_access_title">اسمح بالوصول إلى بيانات الاستخدام لعدّاد البيانات</string>
+    <string name="usage_access_text">سأل الآيفون عن مقدار بيانات الجوال التي استخدمها هذا الهاتف. فعّل Pairline Bridge ضمن «الوصول إلى بيانات الاستخدام». يصل المجموع فقط إلى الآيفون، ولا يصل أبدًا أيّ التطبيقات استخدمها.</string>
+    <string name="ring_iphone_tile">رنين الآيفون</string>
+    <string name="ring_iphone">اجعل الآيفون يرنّ</string>
+    <string name="ring_iphone_sub">يشغّل صوتًا على الآيفون لمدة 30 ثانية حتى في الوضع الصامت</string>
+    <string name="ring_iphone_offline">الآيفون غير متصل الآن.</string>
+    <string name="ring_iphone_update">حدّث Pairline على الآيفون لتجعله يرنّ من هنا.</string>
+    <string name="ring_iphone_sent">جارٍ رنين الآيفون…</string>
+</resources>

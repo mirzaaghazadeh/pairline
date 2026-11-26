@@ -155,6 +155,15 @@ fun HomeScreen(navigate: (Route) -> Unit) {
                     onClick = { navigate(Route.Pairing) },
                 )
                 if (paired) {
+                    // Find phone the other way round (D-084); also a Quick Settings tile.
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                    ListRow(
+                        title = stringResource(R.string.ring_iphone),
+                        subtitle = stringResource(R.string.ring_iphone_sub),
+                        icon = PIcons.Notifications,
+                        onClick = { app.pairline.android.tools.RingIphone.ring(context) },
+                    )
                     HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                     ListRow(
                         title = stringResource(R.string.home_unpair),

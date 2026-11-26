@@ -31,6 +31,8 @@ struct CapabilityInfo: Identifiable {
         case .netShare: return "network"
         case .netSwitch: return "personalhotspot"
         case .smsRead: return "envelope.open"
+        case .smsSchedule: return "calendar.badge.clock"
+        case .dataUsage: return "chart.bar"
         case .callHold: return "pause.circle"
         case .callVoicemail: return "recordingtape"
         case .contactsEdit: return "person.crop.circle.badge.checkmark"
@@ -65,6 +67,8 @@ struct CapabilityInfo: Identifiable {
         case .netShare: return String(localized: "Internet sharing", table: "NetShare")
         case .netSwitch: return String(localized: "Hotspot and data switches", table: "NetShare")
         case .smsRead: return String(localized: "Read on both phones", table: "PhoneTools")
+        case .smsSchedule: return String(localized: "Scheduled messages", table: "Extras")
+        case .dataUsage: return String(localized: "Mobile data meter", table: "Extras")
         case .callHold: return String(localized: "Hold calls", table: "PhoneTools")
         case .callVoicemail: return String(localized: "Voicemail", table: "Carrier")
         case .contactsEdit: return String(localized: "Edit contacts from iPhone", table: "PhoneTools")
@@ -107,8 +111,10 @@ struct CapabilityInfo: Identifiable {
             return String(localized: "Turn on Talk on iPhone in Pairline Bridge on your Android phone (needs Android 12 or later and Wireless debugging).", table: "CallAudio")
         case .contactsEdit:
             return String(localized: "Turn on \"Add contacts from iPhone\" in Pairline Bridge on your Android phone.")
-        case .phoneFind, .phoneRinger, .callVoicemail:
+        case .phoneFind, .phoneRinger, .callVoicemail, .smsSchedule:
             return String(localized: "Update Pairline Bridge on your Android phone.", table: "PhoneTools")
+        case .dataUsage:
+            return String(localized: "Allow Usage access for Pairline Bridge on your Android phone: open the data meter here and it shows a notification there that leads to it.", table: "Extras")
         case .notifMirror:
             return String(localized: "In Pairline Bridge › Settings › Notifications from apps on your Android phone, allow notification access and choose the apps.", table: "PhoneTools")
         case .contacts:

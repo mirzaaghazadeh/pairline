@@ -20,6 +20,8 @@ import app.pairline.android.log.Log
 import app.pairline.android.telephony.BlockList
 import app.pairline.android.telephony.CallTracker
 import app.pairline.android.telephony.ContactsSync
+import app.pairline.android.telephony.DataUsage
+import app.pairline.android.telephony.ScheduledSms
 import app.pairline.android.telephony.SimDirectory
 import app.pairline.android.telephony.SmsSender
 import app.pairline.android.telephony.SmsStore
@@ -88,12 +90,19 @@ object AppGraph {
             netSwitch = { netSwitches.canSwitch },
             smsWrite = { privileged.canWriteSms() },
             ringer = { Ringer.mode(app) },
+            dataUsage = { dataUsage.accessGranted() },
         )
     }
+
+    /** Messages the iPhone asked to send later (D-084). */
+    val scheduledSms: ScheduledSms by lazy { ScheduledSms(app, smsSender, link::send) }
+
+    /** Mobile data used, for the iPhone's meter (D-084). */
+    val dataUsage: DataUsage by lazy { DataUsage(app, sims) }
     val router: MessageRouter by lazy {
         MessageRouter(
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
-            netSwitches, app,
+            netSwitches, app, scheduledSms, dataUsage,
         )
     }
 

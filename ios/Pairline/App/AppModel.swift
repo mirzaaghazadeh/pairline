@@ -328,6 +328,8 @@ final class AppModel: ObservableObject {
 
     func didBecomeActive() {
         Notifier.shared.clearCallsPaused()
+        // Opening Pairline while the Android phone rings this iPhone means it was found (D-084).
+        IPhoneRinger.shared.stop()
         link.reconnectNow()
         link.files.collectOutbox()
         if !Self.isTestHost { BridgeLiveActivity.shared.appBecameActive() }

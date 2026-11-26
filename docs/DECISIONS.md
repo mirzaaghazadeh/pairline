@@ -1415,3 +1415,33 @@ The second part of "More from the same two phones". All on the iPhone; no protoc
   comes back first. iOS holds the timer, so it works while Pairline is suspended. It uses no location.
 - Strings in a new `Inbox` table; the widget extension's two new strings in its own catalog. Unit tests for the
   grouping; needs real use to tune the word lists.
+
+### D-084 — Scheduled SMS sent by the bridge, a mobile-data meter, and ringing the iPhone from Android (2026-11-26)
+
+The third part of "More from the same two phones": three things only the two phones together can do.
+- **Scheduled SMS:** touching and holding the send button offers "Send later…" (date and time, up to a year).
+  `sms.schedule` gives the message to the bridge, which keeps it in private storage and sends it at that time
+  through the normal sender with the iPhone's `cid`, so it goes even when the iPhone is off or away, and `sms.state`
+  follows when the iPhone is linked. The iPhone shows it in the conversation at its time with a clock (a new
+  `scheduled` state the outbox never sends), and "Cancel scheduled message" sends `sms.unschedule`. For an iPhone
+  that was away at the time, `sms.scheduled` lists what's waiting and `done` (each sent message's state and the key
+  Android stored it under, kept 7 days) so the iPhone's copy merges with the synced one; a message the bridge no
+  longer knows is marked not sent. One alarm for the earliest message, re-armed when the link service starts (alarms
+  don't survive a restart or update). **Exact timing** needs `SCHEDULE_EXACT_ALARM`: Android 12 grants it, 13 and
+  later ask the user (Alarms & reminders), so the bridge falls back to Doze-friendly inexact alarms, shows a
+  notification leading to the setting, and tells the iPhone (`exact`), which says it may be a few minutes late.
+  `USE_EXACT_ALARM` was not used: it's meant for alarm-clock and calendar apps.
+- **Mobile-data meter:** a Bridge-tab card with the bridge phone's mobile data since the start of the user's data
+  month (day 1–28) and an optional monthly limit, with a notification at 80% and 100% once a month. `data.usage`
+  reads Android's `NetworkStatsManager` total for mobile networks (every SIM; Android 9 needs each SIM's subscriber
+  id, which READ_PHONE_STATE still gives there). Usage access (`PACKAGE_USAGE_STATS`) is a special access only the
+  user can give; without it the bridge answers `permission` and shows a notification leading to the screen. Only the
+  total in bytes leaves the phone, never per-app figures. Refreshed with the status at most every 15 minutes.
+- **Ring my iPhone:** the reverse of Find phone, from the bridge app's home screen or a Quick Settings tile.
+  `remote.ring` goes only to an iPhone that listed `ring` in its `device.info` caps. The iPhone makes a two-tone beep
+  itself (no sound file) through the playback audio category, so it sounds with the ring switch on silent at the
+  media volume (iOS doesn't let an app raise it); its existing `audio` background mode lets it start when the
+  Bluetooth link wakes the app. 30 seconds at most, never during a call; a notification says why, and "Found it" or
+  opening Pairline stops it.
+- Android strings in a new `strings_more.xml` per language, iOS strings in a new `Extras` table. Unit tests on both
+  sides; needs real phones (exact alarms on Android 13+, Usage access, background audio on the iPhone).

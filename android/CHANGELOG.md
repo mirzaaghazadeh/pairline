@@ -15,6 +15,12 @@ the section in the same commit that raises `versionName`.
 - **Voicemail.** The iPhone hears when a voicemail is waiting on a SIM and can call your voicemail on that SIM.
 - **More signal detail on the iPhone:** strength in dBm, the exact network type (such as LTE-CA or 5G NSA) and the
   network you're on when roaming.
+- **Scheduled messages.** Messages you schedule on the iPhone are kept here and sent at the time you chose, even if
+  the iPhone is off. On Android 13 and later, allow Pairline Bridge under Alarms & reminders so they go out on the
+  minute (a notification leads there).
+- **Ring my iPhone.** From the home screen or a new Quick Settings tile, make the iPhone play a sound for 30 seconds.
+- **Mobile data meter.** The iPhone can show how much mobile data this phone used this month, once you give Pairline
+  Bridge Usage access. Only the total goes to the iPhone.
 
 ## 1.7.0 (2026-11-26)
 

@@ -262,6 +262,36 @@ struct BlockedNumber: Codable, Equatable, Hashable {
     var time: Int64?
 }
 
+/// `sms.scheduled` (D-084): messages the bridge will send later, what became of the ones it sent in the last week,
+/// and whether it can send at the exact minute (Android's "Alarms & reminders").
+struct ScheduledList: Equatable {
+    struct Item: Codable, Equatable {
+        var cid: String
+        var sim: Int?
+        var to: String
+        var body: String
+        var at: Int64
+    }
+
+    struct Done: Codable, Equatable {
+        var cid: String
+        var state: String
+        var key: String?
+        var error: String?
+    }
+
+    var items: [Item]
+    var done: [Done]
+    var exact: Bool
+}
+
+/// `data.usage` (D-084): mobile bytes the bridge phone used between `since` and `until` (ms).
+struct DataUsageReply: Codable, Equatable {
+    var since: Int64
+    var until: Int64
+    var bytes: Int64
+}
+
 struct USSDResult: Equatable {
     var ok: Bool
     var text: String?
@@ -361,6 +391,10 @@ enum InboundMessage {
     case fileCancel(FileCancelMessage)
     /// The reply to `block.list` / `block.set`, or (without an `id`) the list after it changed on the bridge.
     case blockList([BlockedNumber])
+    /// D-084: the scheduled messages, the data meter, and the bridge's user ringing this iPhone.
+    case smsScheduled(ScheduledList)
+    case dataUsage(DataUsageReply)
+    case remoteRing(Bool)
     case unknown
 }
 
@@ -420,6 +454,12 @@ struct Inbound {
         var band: String?
     }
     private struct BlockListBody: Decodable { var numbers: LossyList<BlockedNumber>? }
+    private struct ScheduledBody: Decodable {
+        var items: LossyList<ScheduledList.Item>?
+        var done: LossyList<ScheduledList.Done>?
+        var exact: Bool?
+    }
+    private struct OnBody: Decodable { var on: Bool? }
 
     static func decode(_ data: Data) throws -> Inbound {
         let decoder = JSONDecoder()
@@ -481,6 +521,12 @@ struct Inbound {
         case "file.cancel": message = .fileCancel(try body(FileCancelMessage.self))
         case "block.list":
             message = .blockList(try body(BlockListBody.self).numbers?.elements ?? [])
+        case "sms.scheduled":
+            let b = try body(ScheduledBody.self)
+            message = .smsScheduled(ScheduledList(items: b.items?.elements ?? [], done: b.done?.elements ?? [],
+                                                  exact: b.exact ?? true))
+        case "data.usage": message = .dataUsage(try body(DataUsageReply.self))
+        case "remote.ring": message = .remoteRing(try body(OnBody.self).on ?? true)
         default:
             message = .unknown
         }
@@ -517,8 +563,9 @@ struct Outbound {
 
     private static func optional(_ value: Any?) -> Any { value ?? NSNull() }
 
-    /// What this iPhone app can receive (PROTOCOL.md, "Capabilities"): B only offers files when `files` is listed.
-    static let remoteCaps = ["files"]
+    /// What this iPhone app can receive (PROTOCOL.md, "Capabilities"): B only offers files when `files` is listed,
+    /// and rings this iPhone (`remote.ring`) only when `ring` is (D-084).
+    static let remoteCaps = ["files", "ring"]
 
     static func deviceInfo(name: String, os: String, app: String) -> Outbound {
         Outbound("device.info", ["name": name, "platform": "ios", "os": os, "app": app, "proto": Int(WireProtocol.version),
@@ -682,6 +729,18 @@ struct Outbound {
 
     static var blockList: Outbound { Outbound("block.list") }
 
+    /// The bridge sends this message at `at` (ms), keeping it while this iPhone is away (needs `sms.schedule`, D-084).
+    static func smsSchedule(cid: String, sim: Int?, to: String, body: String, at: Int64) -> Outbound {
+        Outbound("sms.schedule", ["cid": cid, "sim": optional(sim), "to": to, "body": body, "at": at])
+    }
+
+    static func smsUnschedule(cid: String) -> Outbound { Outbound("sms.unschedule", ["cid": cid]) }
+
+    static var smsScheduled: Outbound { Outbound("sms.scheduled") }
+
+    /// The bridge phone's mobile data since `since` (ms), every SIM together (needs `data.usage`, D-084).
+    static func dataUsage(since: Int64) -> Outbound { Outbound("data.usage", ["since": since]) }
+
     static func blockSet(add: [String], remove: [String]) -> Outbound {
         Outbound("block.set", ["add": add, "remove": remove])
     }
@@ -721,6 +780,10 @@ enum Capability: String, CaseIterable, Identifiable {
     case netSwitch = "net.switch"
     /// A conversation read here is marked read on the bridge phone too (D-074).
     case smsRead = "sms.read"
+    /// Messages can be scheduled; the bridge sends them at the time (D-084).
+    case smsSchedule = "sms.schedule"
+    /// The bridge reports its mobile data use (Usage access given, D-084).
+    case dataUsage = "data.usage"
     /// A call can be put on hold (D-074).
     case callHold = "call.hold"
     /// Voicemail can be called on a chosen SIM, and SIMs say when one is waiting (D-082).

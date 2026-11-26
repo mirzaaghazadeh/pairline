@@ -200,10 +200,10 @@ parties). Each needs a real-phone test.
       hold 1); signal in dBm, radio technology and the network's name per SIM
 - [x] Messages on the iPhone (D-083): inbox groups (people, codes, transactions, offers, services); codes deleted
       after a day (opt-in); quick replies; the newest code in the Dynamic Island
-- [ ] Scheduled SMS, sent by the bridge at the chosen time
+- [x] Scheduled SMS, sent by the bridge at the chosen time (D-084)
 - [x] "Bridge phone left behind" alert when the link stays down for 5 minutes (D-083)
-- [ ] Ring the iPhone from the Android phone (Quick Settings tile)
-- [ ] Mobile data used this month on the bridge phone, with a limit alert
+- [x] Ring the iPhone from the Android phone: home screen and a Quick Settings tile (D-084)
+- [x] Mobile data used this month on the bridge phone, with a limit alert (D-084)
 - [ ] Call screening role on Android: blocked calls never ring, silence unknown callers, blocked prefixes
 - [ ] Reply to Android app notifications from the iPhone
 - [ ] Browse the Android phone's photos from the iPhone and fetch them over Wi-Fi

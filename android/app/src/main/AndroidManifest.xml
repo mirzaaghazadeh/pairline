@@ -74,6 +74,16 @@
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
+    <!-- Messages scheduled on the iPhone go out at the minute chosen (D-084). Android 12 grants this at install;
+         Android 13+ asks the user (Alarms & reminders), and without it the bridge sends as close to the time as Doze
+         allows. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- The iPhone's mobile-data meter (D-084): Usage access, which only the user can give in Android Settings, lets
+         Pairline read this phone's total mobile data from Android's own statistics. -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
@@ -179,6 +189,23 @@
         <receiver
             android:name=".telephony.SmsResultReceiver"
             android:exported="false" />
+
+        <!-- The alarm for messages scheduled on the iPhone (D-084); reached only through our own PendingIntent. -->
+        <receiver
+            android:name=".telephony.ScheduledSmsReceiver"
+            android:exported="false" />
+
+        <!-- "Ring my iPhone" in Quick Settings (D-084). Only the system binds it (BIND_QUICK_SETTINGS_TILE). -->
+        <service
+            android:name=".tools.RingIphoneTile"
+            android:exported="true"
+            android:icon="@drawable/ic_stat_pairline"
+            android:label="@string/ring_iphone_tile"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
         <!-- "Send to iPhone" in the share sheet (M5): files go to the paired iPhone over the Wi-Fi link. -->
         <activity

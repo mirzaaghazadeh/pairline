@@ -6,6 +6,8 @@ enum MessageState: String {
     case sent
     case delivered
     case failed
+    /// Given to the bridge to send at the message's time (D-084); never flushed from the outbox.
+    case scheduled
 }
 
 struct StoredMessage: Identifiable, Equatable {

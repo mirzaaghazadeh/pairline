@@ -39,6 +39,15 @@ class SmsSender(
 
     private val pending = ConcurrentHashMap<String, Pending>()
 
+    /** Every `sms.state` this sender reports, also handed here: scheduled messages keep their outcome (D-084). */
+    @Volatile
+    var onOutcome: ((cid: String, state: String, key: String?, error: String?) -> Unit)? = null
+
+    private fun report(cid: String, state: String, key: String?, error: String?) {
+        emit(state(cid, state, key, error))
+        runCatching { onOutcome?.invoke(cid, state, key, error) }
+    }
+
     /** Sent and delivered reports are handled one at a time, in the order Android delivers them. */
     val results: java.util.concurrent.ExecutorService =
         java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "pairline-sms-results") }
@@ -119,7 +128,7 @@ class SmsSender(
                 p.failed = true
                 pending.remove(cid)
                 Log.w(TAG, "SMS failed (code $resultCode)")
-                emit(state(cid, "failed", null, sendError(resultCode)))
+                report(cid, "failed", null, sendError(resultCode))
                 return
             }
             p.sent++
@@ -128,7 +137,7 @@ class SmsSender(
         Log.i(TAG, "SMS sent")
         // Android stores the sent message itself; look up its key so the iPhone can match history.
         p.key = lookupKey(p)
-        emit(state(cid, "sent", p.key, null))
+        report(cid, "sent", p.key, null)
     }
 
     internal fun onDelivered(cid: String, intent: Intent) {
@@ -141,7 +150,7 @@ class SmsSender(
                 status >= 0x40 -> {
                     p.failed = true
                     pending.remove(cid)
-                    emit(state(cid, "failed", p.key, "not delivered"))
+                    report(cid, "failed", p.key, "not delivered")
                     return
                 }
                 else -> return // still pending at the carrier; another report follows
@@ -150,7 +159,7 @@ class SmsSender(
             pending.remove(cid)
         }
         Log.i(TAG, "SMS delivered")
-        emit(state(cid, "delivered", p.key ?: lookupKey(p), null))
+        report(cid, "delivered", p.key ?: lookupKey(p), null)
     }
 
     private fun lookupKey(p: Pending): String? =

@@ -91,6 +91,8 @@ class LinkService : Service() {
         graph.status.onCallState = graph.calls::onTelephonyState
         graph.status.start()
         graph.netSwitches.start()
+        // Alarms don't survive a restart or an app update: set the next scheduled message's again (D-084).
+        graph.io.execute { runCatching { graph.scheduledSms.arm() } }
 
         ContextCompat.registerReceiver(
             this,
