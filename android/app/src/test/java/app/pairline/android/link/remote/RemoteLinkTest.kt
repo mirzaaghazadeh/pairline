@@ -100,12 +100,41 @@ class RemoteLinkTest {
         link.send(status(49, 3))
         link.step()
         assertEquals(listOf(50, 49), phoneReads(mb.quiet).map { it.getJSONObject("battery").getInt("level") })
-        // A session carried newer status meanwhile: the next one goes into the mailbox even if unchanged.
+        // A session coming and going changes nothing the iPhone doesn't know: the same status doesn't go again.
         link.onSessionChanged(true)
         link.onSessionChanged(false)
         link.send(status(49, 4))
         link.step()
+        assertTrue(phoneReads(mb.quiet).isEmpty())
+        // A session carried a newer status meanwhile: going back to the old one is a change, so it goes.
+        link.onSessionChanged(true)
+        link.statusDelivered(status(30, 5))
+        link.onSessionChanged(false)
+        link.send(status(49, 6))
+        link.step()
+        assertEquals(listOf(49), phoneReads(mb.quiet).map { it.getJSONObject("battery").getInt("level") })
+    }
+
+    /**
+     * The loop seen on a real bridge: each status record's push woke the iPhone, which came back over Wi-Fi for a few
+     * seconds and was frozen again; the session ending made the next unchanged status (a signal flicker) another
+     * record about 90 s later, and so on. Now a short session that carried the same status costs nothing.
+     */
+    @Test
+    fun shortSessionsFromPushWakeUpsDontMakeMoreRecords() {
+        on()
+        link.send(status(50, 1))
+        link.step()
         assertEquals(1, phoneReads(mb.quiet).size)
+        repeat(5) { i ->
+            link.onSessionChanged(true)
+            link.statusDelivered(status(50, 10L + i))
+            link.onSessionChanged(false)
+            now += 90_000
+            link.send(status(50, 20L + i))
+            link.step()
+            assertTrue("round $i", phoneReads(mb.quiet).isEmpty())
+        }
     }
 
     @Test

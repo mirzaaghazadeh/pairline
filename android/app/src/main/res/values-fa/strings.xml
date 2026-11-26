@@ -52,7 +52,7 @@
 
     <!-- Setup: privacy promise -->
     <string name="privacy_title">اطلاعات شما فقط بین دو گوشی خودتان می‌ماند</string>
-    <string name="privacy_body">در Pairline هیچ سروری وجود ندارد. پیام‌ها، تماس‌ها و مخاطبین شما مستقیم از این گوشی به آیفونتان می‌روند و به هیچ جای دیگری نمی‌روند.</string>
+    <string name="privacy_body">در Pairline هیچ سروری وجود ندارد. پیام‌ها، تماس‌ها و مخاطبین شما مستقیم از این گوشی به آیفونتان می‌روند و به هیچ جای دیگری نمی‌روند. با حالت ابری، که می‌توانید از روی آیفون روشنش کنید، از iCloud خودتان می‌گذرند، قفل‌شده طوری که فقط دو گوشی شما بتوانند بخوانندشان.</string>
     <string name="privacy_point_e2e">همه‌چیز رمزگذاری سرتاسری می‌شود، با کلیدهایی که فقط در گوشی‌های خود شما هستند</string>
     <string name="privacy_point_accounts">بدون حساب کاربری، بدون ثبت‌نام، بدون تأیید شمارهٔ تلفن</string>
     <string name="privacy_point_tracking">بدون تبلیغات، آمارگیری یا هر نوع ردیابی</string>
@@ -129,6 +129,7 @@
     <string name="pair_replaces">اگر آیفون جدیدی را جفت کنید، جایگزین %1$s می‌شود.</string>
     <string name="pair_success_title">جفت شد!</string>
     <string name="pair_success_text">حالا آیفون شما و این گوشی به هم اعتماد دارند. فقط خودشان می‌توانند چیزهایی را که بینشان رد و بدل می‌شود بخوانند.</string>
+    <string name="pair_success_cloud">می‌خواهید وقتی گوشی‌هایتان از هم دورند هم به هم وصل بمانند؟ حالت ابری را در Pairline روی آیفونتان روشن کنید.</string>
     <string name="pair_connecting">در حال اتصال…</string>
     <string name="pair_connected">وصل شد. حالا آیفون شما می‌تواند از سیم‌کارت این گوشی استفاده کند.</string>
     <string name="pair_too_many">کسی چند بار کد اشتباه را امتحان کرد، برای همین این کد لغو شد. وقتی آیفون شما آماده بود، یک کد جدید بسازید.</string>
@@ -166,10 +167,17 @@
     <string name="home_waiting_body">آخرین اتصال: %1$s. وقتی آیفون شما نزدیک باشد و Pairline روی آن باز یا در پس‌زمینه باشد، خودش دوباره وصل می‌شود.</string>
     <string name="home_waiting_never">آیفون شما هنوز وصل نشده است. برنامهٔ Pairline را روی آن، نزدیک این گوشی و با بلوتوث روشن، باز کنید.</string>
     <string name="state_via_icloud">از طریق iCloud</string>
-    <string name="notif_via_icloud_text">تا وقتی آیفون شما دوباره از نزدیک وصل شود، پیامک‌ها، کدها و تماس‌ها از راه iCloud شما به آن می‌رسند.</string>
+    <string name="state_cloud_offline">iCloud در دسترس نیست</string>
+    <string name="notif_via_icloud_text">حالت ابری: تا وقتی گوشی‌هایتان دوباره از نزدیک وصل شوند، پیامک‌ها، کدها و تماس‌ها از راه iCloud شما به آیفونتان می‌رسند.</string>
     <string name="home_via_icloud_title">ارتباط با %1$s از طریق iCloud</string>
-    <string name="home_via_icloud_body">آیفون شما الان از نزدیک وصل نیست، پس پیامک‌ها، کدهای یک‌بارمصرف و تماس‌ها از راه iCloud شما به آن می‌رسند، قفل‌شده با کلیدهایی که فقط دو گوشی شما دارند. برای تماس از راه دور، اتصال مستقیم لازم است.</string>
-    <string name="home_via_icloud_retrying">حالت از راه دور روشن است، اما الان دسترسی به iCloud ممکن نیست. اتصال اینترنت این گوشی را بررسی کنید؛ Pairline دوباره تلاش می‌کند.</string>
+    <string name="home_via_icloud_body">گوشی‌هایتان از نزدیک وصل نیستند، پس حالت ابری پیامک‌ها، کدهای یک‌بارمصرف و تماس‌های ورودی را از راه iCloud شما به آیفونتان می‌رساند، قفل‌شده با کلیدهایی که فقط دو گوشی شما دارند. برای صحبت در تماس از راه دور، اتصال مستقیم لازم است.</string>
+    <string name="home_via_icloud_retrying">حالت ابری روشن است، اما الان دسترسی به iCloud ممکن نیست. اتصال اینترنت این گوشی را بررسی کنید؛ Pairline دوباره تلاش می‌کند.</string>
+    <string name="cloud_on">حالت ابری روشن است: وقتی گوشی‌هایتان از هم دورند، از راه اینترنت به هم وصل می‌مانند.</string>
+    <string name="cloud_off">برای اینکه گوشی‌هایتان وقتی از هم دورند از راه اینترنت به هم وصل بمانند، حالت ابری را در Pairline روی آیفونتان روشن کنید.</string>
+    <string name="cloud_retrying">حالت ابری الان به iCloud دسترسی ندارد. اتصال اینترنت این گوشی را بررسی کنید؛ Pairline دوباره تلاش می‌کند.</string>
+    <string name="cloud_paused_token">حالت ابری متوقف است تا آیفونتان دسترسی این گوشی به iCloud را تازه کند. Pairline را روی آیفونتان باز کنید.</string>
+    <string name="cloud_paused_refused">حالت ابری متوقف است: iCloud فعلاً اجازه نمی‌دهد Pairline از گوشی دیگری به این حساب دسترسی داشته باشد.</string>
+    <string name="bt_cant_advertise">بلوتوث این گوشی نمی‌تواند آن را قابل‌دیدن کند، پس آیفونتان نمی‌تواند از راه بلوتوث وصل شود. وقتی Pairline روی آیفون باز است، گوشی‌ها از راه وای‌فای وصل می‌شوند؛ بقیهٔ وقت‌ها حالت ابری پیامک‌ها و کدها را می‌رساند.</string>
     <string name="home_not_paired_body">آیفونتان را جفت کنید تا از طریق آن، از سیم‌کارت این گوشی استفاده کنید.</string>
     <string name="home_bt_off_body">تا وقتی بلوتوث خاموش است، آیفون شما نمی‌تواند به این گوشی وصل شود.</string>
     <string name="home_bt_perm_title">مجوز «دستگاه‌های اطراف» داده نشده</string>
@@ -358,7 +366,7 @@
     <!-- Starts with U+200F (right-to-left mark) so the URL lines up with the RTL layout. -->
     <string name="settings_source_sub">‏github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">حریم خصوصی</string>
-    <string name="settings_privacy_body">در Pairline خبری از سرور، حساب کاربری، تبلیغات یا آمارگیری نیست. پیام‌ها، تماس‌ها و مخاطبین شما فقط به آیفونِ جفت‌شدهٔ شما می‌روند، آن هم با رمزگذاری سرتاسری. تنها اتصال اینترنتی که این برنامه خودش برقرار می‌کند، بررسی روزانهٔ به‌روزرسانی در GitHub است که می‌توانید در بخش «به‌روزرسانی‌ها» خاموشش کنید. گزارش‌ها روی همین گوشی می‌مانند و فقط اگر خودتان بخواهید، آن هم بعد از اینکه آن‌ها را دیدید، با کسی به اشتراک گذاشته می‌شوند.</string>
+    <string name="settings_privacy_body">در Pairline خبری از سرور، حساب کاربری، تبلیغات یا آمارگیری نیست. پیام‌ها، تماس‌ها و مخاطبین شما فقط به آیفونِ جفت‌شدهٔ شما می‌روند، آن هم با رمزگذاری سرتاسری. این برنامه خودش فقط برای بررسی روزانهٔ به‌روزرسانی در GitHub به اینترنت وصل می‌شود، که می‌توانید در بخش «به‌روزرسانی‌ها» خاموشش کنید، و تا وقتی حالت ابری روشن است، به iCloud شما و روتر خانه‌تان. گزارش‌ها روی همین گوشی می‌مانند و فقط اگر خودتان بخواهید، آن هم بعد از اینکه آن‌ها را دیدید، با کسی به اشتراک گذاشته می‌شوند.</string>
 
     <!-- Updates (D-042) -->
     <string name="settings_updates">به‌روزرسانی‌ها</string>
@@ -481,9 +489,9 @@
     <string name="help_a_unpair">هر دو گوشی کلید یکدیگر را پاک می‌کنند و دیگر نمی‌توانند با هم ارتباط داشته باشند. پیامک‌ها و مخاطبین شما همان‌جا که هستند، روی این گوشی می‌مانند.</string>
 
     <!-- Remote pairing (D-080). -->
-    <string name="remote_pair_title">جفت کردن از راه دور</string>
-    <string name="remote_pair_ask_title">آیفون شما می‌خواهد از راه دور با این گوشی جفت شود</string>
-    <string name="remote_pair_ask_body">اگر اجازه بدهید، آیفون شما هر جا که باشد پیامک‌ها، کدهای یک‌بارمصرف و تماس‌های این گوشی را دریافت می‌کند و می‌تواند با سیم‌کارت این گوشی پیامک بفرستد و تماس بگیرد.</string>
+    <string name="remote_pair_title">جفت کردن از راه اینترنت</string>
+    <string name="remote_pair_ask_title">آیفون شما می‌خواهد از راه اینترنت با این گوشی جفت شود</string>
+    <string name="remote_pair_ask_body">اگر اجازه بدهید، آیفون شما با حالت ابریِ روشن، هر جا که باشد پیامک‌ها، کدهای یک‌بارمصرف و تماس‌های این گوشی را دریافت می‌کند و می‌تواند با سیم‌کارت این گوشی پیامک بفرستد و تماس بگیرد.</string>
     <string name="remote_pair_ask_only_if">فقط وقتی اجازه بدهید که همین حالا این دعوت را روی آیفون خودتان ساخته‌اید. تا روی «اجازه دادن» نزنید، چیزی فرستاده نمی‌شود.</string>
     <string name="remote_pair_replaces">این گوشی الان با %1$s جفت است. اگر اجازه بدهید، این جفت‌سازی جای آن را می‌گیرد.</string>
     <string name="remote_pair_ask_next">بعد هر دو گوشی یک کد ۶ رقمی نشان می‌دهند. مطمئن شوید آیفون شما همین کد را نشان می‌دهد.</string>
@@ -499,7 +507,7 @@
     <string name="remote_pair_confirming">در انتظار تأیید آیفون…</string>
     <string name="remote_pair_confirming_body">روی آیفونتان هم تأیید کنید که کدها یکی است.</string>
     <string name="remote_pair_done_title">جفت شد</string>
-    <string name="remote_pair_done_body">حالا این گوشی و آیفون شما به هم اعتماد دارند. وقتی از هم دورند، از راه iCloud شما به هم می‌رسند و همه‌چیز با کلیدهایی قفل می‌ماند که فقط همین دو گوشی دارند.</string>
+    <string name="remote_pair_done_body">حالا این گوشی و آیفون شما به هم اعتماد دارند و حالت ابری روشن است: وقتی از هم دورند، از راه iCloud شما به هم می‌رسند و همه‌چیز با کلیدهایی قفل می‌ماند که فقط همین دو گوشی دارند.</string>
     <string name="remote_pair_refused_title">از این دعوت نمی‌شود استفاده کرد</string>
     <string name="remote_pair_refused_malformed">پیوند ناقص یا خراب است. روی آیفونتان دعوت تازه‌ای بسازید.</string>
     <string name="remote_pair_refused_expired">مهلت این دعوت تمام شده است. هر دعوت ۱۰ دقیقه اعتبار دارد؛ روی آیفونتان دعوت تازه‌ای بسازید.</string>
@@ -508,10 +516,11 @@
     <string name="remote_pair_failed_expired">آیفون پیش از تمام شدن مهلت دعوت پاسخی نداد. روی آیفونتان دعوت تازه‌ای بسازید و دوباره امتحان کنید.</string>
     <string name="remote_pair_failed_timeout">کدها ظرف ۱۰ دقیقه روی هر دو گوشی تأیید نشدند. با یک دعوت تازه از نو شروع کنید.</string>
     <string name="remote_pair_failed_token">iCloud دیگر این دعوت را نمی‌پذیرد. روی آیفونتان دعوت تازه‌ای بسازید.</string>
-    <string name="remote_pair_failed_icloud">اپل اجازه نمی‌دهد Pairline از گوشی دیگری به این حساب iCloud دسترسی داشته باشد، پس فعلاً جفت کردن از راه دور با این حساب ممکن نیست.</string>
+    <string name="remote_pair_failed_icloud">اپل اجازه نمی‌دهد Pairline از گوشی دیگری به این حساب iCloud دسترسی داشته باشد، پس فعلاً جفت کردن از راه اینترنت با این حساب ممکن نیست.</string>
     <string name="remote_pair_failed_bad_answer">پاسخ آیفون در بررسی‌ها تأیید نشد، پس برای امنیت این گوشی جفت‌سازی متوقف شد. روی آیفونتان دعوت تازه‌ای بسازید.</string>
     <string name="remote_pair_failed_internal">در این گوشی مشکلی پیش آمد. با یک دعوت تازه دوباره امتحان کنید.</string>
-    <string name="remote_pair_paste_intro">آیفونتان جای دیگری است؟ روی آن یک دعوت بسازید و اینجا بازش کنید: کد QR آن را اسکن کنید، عکسی از آن را انتخاب کنید، یا کل لینک را کپی کنید و بچسبانید.</string>
+    <string name="remote_pair_section_title">گوشی‌ها کنار هم نیستند؟</string>
+    <string name="remote_pair_paste_intro">از راه اینترنت جفت کنید: روی آیفونتان «جفت کردن از راه اینترنت» را بزنید تا دعوتی بسازد، بعد آن را اینجا باز کنید. کد QR آن را اسکن کنید، عکسی از آن را انتخاب کنید، یا لینکش را بچسبانید.</string>
     <string name="remote_pair_scan">اسکن کد QR دعوت</string>
     <string name="remote_pair_pick">انتخاب عکسی از آن</string>
     <string name="remote_pair_paste">چسباندن دعوت</string>
@@ -523,8 +532,8 @@
     <string name="remote_pair_scan_denied">Pairline فقط برای خواندن کد QR به دوربین نیاز دارد. برای اسکن اجازه بدهید، یا به‌جایش عکسی از کد QR انتخاب کنید یا لینک را بچسبانید.</string>
     <string name="remote_pair_paste_none">هیچ دعوت Pairline در کلیپ‌بورد نیست. کل لینک را (که با pairline://invite شروع می‌شود) کپی کنید و دوباره امتحان کنید.</string>
 
-    <string name="home_connected_body_direct">از طریق اینترنت، مستقیم از راه روتر خانه. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
-    <string name="notif_connected_text_direct">از طریق اینترنت وصل است. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
+    <string name="home_connected_body_direct">اتصال مستقیم حالت ابری: از طریق اینترنت، مستقیم از راه روتر خانه. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
+    <string name="notif_connected_text_direct">اتصال مستقیم حالت ابری، از طریق اینترنت. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
     <string name="direct_checking">اتصال مستقیم: در حال بررسی…</string>
     <string name="direct_open">اتصال مستقیم: باز است</string>
     <string name="direct_ipv6_unconfirmed">اتصال مستقیم: فقط از طریق IPv6، اگر روتر اجازه دهد</string>

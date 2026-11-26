@@ -59,10 +59,13 @@ import app.pairline.android.link.WifiLinkStatus
 import app.pairline.android.link.remote.Direct
 import app.pairline.android.link.remote.DirectReason
 import app.pairline.android.link.remote.DirectStatus
+import app.pairline.android.link.remote.RemoteStatus
+import app.pairline.android.link.remote.RemoteStore
 import app.pairline.android.protocol.Caps
 import app.pairline.android.telephony.Perms
 import app.pairline.android.telephony.SimSnapshot
 import app.pairline.android.telephony.BatteryInfo
+import app.pairline.android.ui.CloudModeUi
 import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
 import app.pairline.android.ui.PermissionGroup
@@ -233,11 +236,12 @@ private fun LinkCard(
         StoppedCard()
         return
     }
-    // Remote mode (D-080): no session, but texts, codes and calls still reach the iPhone through its iCloud.
+    // Cloud mode (remote mode, D-080): no session, but texts, codes and calls still reach the iPhone through its iCloud.
     val remote by AppGraph.remote.state.collectAsState()
     val viaIcloud = paired && !link.connected && remote.on && remote.problem == null
     val (visual, tone, pill) = when {
         link.connected -> Triple(LinkVisual.CONNECTED, Tone.GOOD, R.string.state_connected)
+        viaIcloud && remote.retrying -> Triple(LinkVisual.SEARCHING, Tone.WARN, R.string.state_cloud_offline)
         viaIcloud -> Triple(LinkVisual.CONNECTED, Tone.GOOD, R.string.state_via_icloud)
         btProblem && !link.debugTcpListening && !wifiReady -> Triple(LinkVisual.PROBLEM, Tone.BAD, R.string.state_problem)
         !paired -> Triple(LinkVisual.NOT_PAIRED, Tone.NEUTRAL, R.string.state_not_paired)
@@ -276,6 +280,13 @@ private fun LinkCard(
             }
             Text(title, style = MaterialTheme.typography.titleLarge)
             Text(body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            // The chip won't advertise (some older phones): the iPhone can't find this one over Bluetooth at all.
+            val btUsable = link.bluetooth != BluetoothStatus.OFF && link.bluetooth != BluetoothStatus.NO_PERMISSION &&
+                link.bluetooth != BluetoothStatus.UNSUPPORTED
+            if (paired && link.cantAdvertise && btUsable && TransportKind.BLUETOOTH !in link.transports) {
+                NoteBox(stringResource(R.string.bt_cant_advertise), Tone.WARN, PIcons.Bluetooth)
+            }
+            if (paired) CloudLine(remote, viaIcloud, prefs.peerProto)
             val direct by AppGraph.direct.status.collectAsState()
             if (paired && direct.active) DirectLine(direct)
             when {
@@ -287,7 +298,38 @@ private fun LinkCard(
     }
 }
 
-/** Remote mode's direct connection through the home router (D-080): open, or why not. */
+/**
+ * Cloud mode in one line (remote mode, D-080): on, paused and why, or off with where to turn it on (the iPhone). Not
+ * shown while the card itself says "Via iCloud", nor for an iPhone that doesn't offer Cloud mode.
+ */
+@Composable
+private fun CloudLine(remote: RemoteStatus, viaIcloud: Boolean, peerProto: Int) {
+    val (text, tone) = when {
+        remote.on && remote.problem == RemoteStore.Problem.TOKEN_REJECTED -> R.string.cloud_paused_token to Tone.WARN
+        remote.on && remote.problem == RemoteStore.Problem.PRIVATE_DATABASE_REFUSED ->
+            R.string.cloud_paused_refused to Tone.WARN
+        viaIcloud -> return
+        remote.on && remote.retrying -> R.string.cloud_retrying to Tone.WARN
+        remote.on -> R.string.cloud_on to Tone.GOOD
+        CloudModeUi.offered(peerProto) -> R.string.cloud_off to Tone.NEUTRAL
+        else -> return
+    }
+    Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(
+            when (tone) {
+                Tone.GOOD -> PIcons.CheckCircle
+                Tone.WARN -> PIcons.Warning
+                else -> PIcons.Info
+            },
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = if (tone == Tone.NEUTRAL) MaterialTheme.colorScheme.onSurfaceVariant else toneColors(tone).content,
+        )
+        Text(stringResource(text), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** Cloud mode's direct connection through the home router (D-080): open, or why not. */
 @Composable
 private fun DirectLine(s: DirectStatus) {
     val open = s.direct == Direct.OPEN

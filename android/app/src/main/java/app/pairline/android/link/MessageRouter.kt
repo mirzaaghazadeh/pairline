@@ -462,6 +462,7 @@ class MessageRouter(
         prefs.peerName = m.stringOrNull("name")?.take(60)
         prefs.peerOs = m.stringOrNull("os")?.take(20)
         prefs.peerApp = m.stringOrNull("app")?.take(20)
+        prefs.peerProto = (m.opt("proto") as? Number)?.toInt()?.coerceIn(0, 99) ?: 0
         val caps = m.optJSONArray("caps")
         link.peerAcceptsFiles = caps != null && (0 until caps.length()).any { caps.opt(it) == Caps.FILES }
         files.onPeerCaps()

@@ -38,6 +38,7 @@ class LinkService : Service() {
     private val graph = AppGraph
     private var transports: List<LinkTransport> = emptyList()
     private var ble: BleTransport? = null
+    private val advertisingTrouble = AdvertisingTrouble()
     private var wifi: WifiTransport? = null
     private var directWatcher: DirectNetworkWatcher? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -70,7 +71,9 @@ class LinkService : Service() {
         }
 
         val bleTransport = BleTransport(this, link, { graph.identity.deviceId }) { bt, advertising ->
-            link.updateState { it.copy(bluetooth = bt, advertising = advertising) }
+            // A failure that keeps coming back stays visible even when another path reports Bluetooth as on.
+            val cantAdvertise = advertisingTrouble.onStatus(bt, advertising)
+            link.updateState { it.copy(bluetooth = bt, advertising = advertising, cantAdvertise = cantAdvertise) }
             BluetoothRecovery.onStatus(bt)
         }
         ble = bleTransport
@@ -231,7 +234,10 @@ class LinkService : Service() {
                 BluetoothAdapter.STATE_TURNING_OFF, BluetoothAdapter.STATE_OFF -> {
                     Log.i(TAG, "Bluetooth turned off")
                     ble?.stop()
-                    graph.link.updateState { it.copy(bluetooth = BluetoothStatus.OFF, advertising = false) }
+                    advertisingTrouble.onStatus(BluetoothStatus.OFF, false)
+                    graph.link.updateState {
+                        it.copy(bluetooth = BluetoothStatus.OFF, advertising = false, cantAdvertise = false)
+                    }
                 }
             }
         }

@@ -122,7 +122,7 @@ private fun ColumnScope.Asking(state: State.Asking, now: Long, onAllow: () -> Un
         val name = AppGraph.prefs.peerName?.let(::ltr) ?: stringResource(R.string.generic_iphone_name)
         NoteBox(stringResource(R.string.remote_pair_replaces, name), Tone.WARN, PIcons.LinkOff)
     }
-    NoteBox(stringResource(R.string.remote_pair_ask_next), Tone.NEUTRAL, PIcons.Phone)
+    NoteBox(stringResource(R.string.remote_pair_ask_next), Tone.NEUTRAL, PIcons.Shield)
     Remaining(R.string.remote_pair_expires, state.expiresAtMs - now)
     PrimaryButton(
         stringResource(R.string.action_allow),

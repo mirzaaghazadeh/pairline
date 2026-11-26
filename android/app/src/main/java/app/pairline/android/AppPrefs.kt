@@ -54,6 +54,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getString(PEER_APP, null)
         set(value) = edit { putString(PEER_APP, value) }
 
+    /** The `proto` in the paired iPhone's `device.info`: 1 or more when it offers Cloud mode (D-080), else 0. */
+    var peerProto: Int
+        get() = prefs.getInt(PEER_PROTO, 0)
+        set(value) = edit { putInt(PEER_PROTO, value) }
+
     var pairedAt: Long
         get() = prefs.getLong(PAIRED_AT, 0)
         set(value) = edit { putLong(PAIRED_AT, value) }
@@ -171,6 +176,7 @@ class AppPrefs(context: Context) {
         remove(PEER_NAME)
         remove(PEER_OS)
         remove(PEER_APP)
+        remove(PEER_PROTO)
         remove(PAIRED_AT)
         remove(LAST_SEEN)
     }
@@ -189,6 +195,7 @@ class AppPrefs(context: Context) {
         const val PEER_NAME = "peer_name"
         const val PEER_OS = "peer_os"
         const val PEER_APP = "peer_app"
+        const val PEER_PROTO = "peer_proto"
         const val PAIRED_AT = "paired_at"
         const val LAST_SEEN = "last_seen"
         const val COMPANION_BOUND = "companion_bound_at"

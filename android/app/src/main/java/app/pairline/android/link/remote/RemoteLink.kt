@@ -108,18 +108,17 @@ class RemoteLink(
     override fun send(message: JSONObject) {
         val slot = slotFor(message) ?: return
         if (message.type == Msg.STATUS && message.requestId == null) {
-            // Only when it changed (PROTOCOL.md, "Remote messages"): at once for what matters (statusKey), and at
-            // most every STATUS_DETAIL_MS for the rest (signal bars, battery percent), so the iPhone's battery and
-            // signal stay roughly current without a record for every flicker.
+            // Only when it changed since the iPhone last got one, by any path (PROTOCOL.md, "Remote messages"): at
+            // once for what matters (statusKey), and at most every STATUS_DETAIL_MS for the rest (signal bars,
+            // battery percent), so the iPhone's battery and signal stay roughly current without a record, and a push
+            // that wakes the iPhone, for every flicker.
             val key = statusKey(message)
-            val detail = JSONObject(message.toString()).apply { remove("time") }.toString()
+            val detail = statusDetail(message)
             val now = clock()
             val matters = key != lastStatusKey
             val detailDue = detail != lastStatusDetail && now - lastStatusSentAt >= STATUS_DETAIL_MS
             if (!matters && !detailDue) return
-            lastStatusKey = key
-            lastStatusDetail = detail
-            lastStatusSentAt = now
+            remember(key, detail, now)
         }
         val plaintext = message.toString().toByteArray(Charsets.UTF_8)
         if (plaintext.size > Mailbox.MAX_PLAINTEXT) {
@@ -141,12 +140,25 @@ class RemoteLink(
     override fun onSessionChanged(up: Boolean) {
         sessionUp = up
         if (!up) {
-            // The iPhone's last status came on the session: the next one goes into the mailbox even if unchanged.
-            lastStatusKey = null
+            // A session ending changes nothing the iPhone doesn't know: the statuses it got on the session were noted
+            // (statusDelivered), so only a status that differs from those goes into the mailbox. (Forgetting them here
+            // made every short session, such as a push waking the iPhone for a few seconds, cost another record and
+            // push a minute later, over and over.)
             // Check once right after a session ends.
             nextCheckAt = 0
             wake.trySend(Unit)
         }
+    }
+
+    override fun statusDelivered(status: JSONObject) {
+        if (status.type != Msg.STATUS) return
+        remember(statusKey(status), statusDetail(status), clock())
+    }
+
+    private fun remember(key: String, detail: String, at: Long) {
+        lastStatusKey = key
+        lastStatusDetail = detail
+        lastStatusSentAt = at
     }
 
     /** `remote.config` with `on: true`. */
@@ -423,6 +435,9 @@ class RemoteLink(
          * battery dropping one percent at a time don't send one; a new network type, roaming, a SIM, charging or each
          * 10 % of battery do.
          */
+        /** Everything in a status but its `time`: a change here is a detail worth sending at most every 10 minutes. */
+        fun statusDetail(status: JSONObject): String = JSONObject(status.toString()).apply { remove("time") }.toString()
+
         fun statusKey(status: JSONObject): String = JSONObject(status.toString()).apply {
             remove("time")
             optJSONObject("battery")?.let { battery ->

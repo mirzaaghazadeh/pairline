@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -68,6 +69,7 @@ import app.pairline.android.link.BluetoothStatus
 import app.pairline.android.link.LinkService
 import app.pairline.android.link.PairingOutcome
 import app.pairline.android.protocol.RemoteInvitation
+import app.pairline.android.ui.CloudModeUi
 import app.pairline.android.ui.PIcons
 import app.pairline.android.ui.PermissionGroup
 import app.pairline.android.ui.SystemActions
@@ -162,6 +164,16 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                // Cloud mode is turned on from the iPhone (D-080); the iPhone's device.info says whether it offers it.
+                val prefsTick by AppGraph.prefs.changes.collectAsState()
+                if (prefsTick >= 0 && CloudModeUi.offered(AppGraph.prefs.peerProto)) {
+                    Text(
+                        stringResource(R.string.pair_success_cloud),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 if (link.connected) {
                     NoteBox(stringResource(R.string.pair_connected), Tone.GOOD, PIcons.CheckCircle)
                 } else {
@@ -235,7 +247,10 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                     NoteBox(stringResource(R.string.pair_replaces, name), Tone.WARN, PIcons.Warning)
                 }
                 NoteBox(stringResource(R.string.pair_keep_open), Tone.NEUTRAL, PIcons.Lock)
-                RemoteInvitationPaste()
+                if (CloudModeUi.pairingOverInternet) {
+                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                    RemoteInvitationPaste()
+                }
             }
         }
     }
@@ -300,12 +315,14 @@ private fun RemoteInvitationPaste() {
         )
     }
 
+    Text(stringResource(R.string.remote_pair_section_title), style = MaterialTheme.typography.titleMedium)
     Text(
         stringResource(R.string.remote_pair_paste_intro),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
     )
+    // Scan first (the iPhone's screen or a second screen), then the link most invitations arrive as, then a picture.
     SecondaryButton(stringResource(R.string.remote_pair_scan), {
         problem = null
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -313,7 +330,14 @@ private fun RemoteInvitationPaste() {
         } else {
             askCamera.launch(Manifest.permission.CAMERA)
         }
-    }, icon = PIcons.Qr)
+    }, Modifier.fillMaxWidth(), icon = PIcons.Qr)
+    SecondaryButton(stringResource(R.string.remote_pair_paste), {
+        problem = null
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val text = clipboard.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)
+            ?.coerceToText(context)?.toString()
+        open(text, R.string.remote_pair_paste_none)
+    }, Modifier.fillMaxWidth(), icon = PIcons.Copy)
     SecondaryButton(stringResource(R.string.remote_pair_pick), {
         problem = null
         try {
@@ -321,13 +345,7 @@ private fun RemoteInvitationPaste() {
         } catch (e: ActivityNotFoundException) {
             problem = R.string.remote_pair_scan_none
         }
-    }, icon = PIcons.Image)
-    SecondaryButton(stringResource(R.string.remote_pair_paste), {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val text = clipboard.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)
-            ?.coerceToText(context)?.toString()
-        open(text, R.string.remote_pair_paste_none)
-    }, icon = PIcons.Copy)
+    }, Modifier.fillMaxWidth(), icon = PIcons.Image)
     if (reading) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)

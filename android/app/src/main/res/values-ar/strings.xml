@@ -53,7 +53,7 @@
 
     <!-- Setup: privacy promise -->
     <string name="privacy_title">تبقى بياناتك بين هاتفيك</string>
-    <string name="privacy_body">لا يملك Pairline أي خوادم. تنتقل رسائلك ومكالماتك وجهات اتصالك مباشرةً من هذا الهاتف إلى آيفونك، ولا تذهب إلى أي مكان آخر.</string>
+    <string name="privacy_body">لا يملك Pairline أي خوادم. تنتقل رسائلك ومكالماتك وجهات اتصالك مباشرةً من هذا الهاتف إلى آيفونك، ولا تذهب إلى أي مكان آخر. ومع الوضع السحابي، الذي يمكنك تفعيله من الآيفون، تمر عبر حساب iCloud الخاص بك، مقفلةً بحيث لا يقرؤها إلا هاتفاك.</string>
     <string name="privacy_point_e2e">كل شيء مشفّر تشفيرًا تامًا بين الطرفين بمفاتيح لا يملكها سوى هاتفيك</string>
     <string name="privacy_point_accounts">لا حساب ولا تسجيل ولا تحقق من رقم الهاتف</string>
     <string name="privacy_point_tracking">لا إعلانات ولا تحليلات ولا تتبّع من أي نوع</string>
@@ -130,6 +130,7 @@
     <string name="pair_replaces">عند إقران آيفون جديد، سيحلّ محلّ %1$s.</string>
     <string name="pair_success_title">تم الإقران!</string>
     <string name="pair_success_text">أصبح آيفونك وهذا الهاتف يثق كلٌّ منهما بالآخر، ولا يمكن لأحد غيرهما قراءة ما يتبادلانه.</string>
+    <string name="pair_success_cloud">هل تريد أن يبقى هاتفاك متصلين حين يكونان بعيدين؟ فعّل الوضع السحابي في Pairline على آيفونك.</string>
     <string name="pair_connecting">جارٍ الاتصال…</string>
     <string name="pair_connected">تم الاتصال. يمكن لآيفونك الآن استخدام شريحة هذا الهاتف.</string>
     <string name="pair_too_many">حاول أحدهم إدخال رموز خاطئة عدة مرات، لذا أُلغي هذا الرمز. أنشئ رمزًا جديدًا عندما يصبح آيفونك جاهزًا.</string>
@@ -167,10 +168,17 @@
     <string name="home_waiting_body">آخر اتصال %1$s. يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا وتطبيق Pairline مفتوحًا عليه أو يعمل في الخلفية.</string>
     <string name="home_waiting_never">لم يتصل آيفونك بعد. افتح Pairline عليه وهو بالقرب من هذا الهاتف، مع تشغيل البلوتوث.</string>
     <string name="state_via_icloud">عبر iCloud</string>
-    <string name="notif_via_icloud_text">تصل الرسائل والرموز والمكالمات إلى آيفونك عبر حساب iCloud الخاص بك إلى أن يتصل عن قرب من جديد.</string>
+    <string name="state_cloud_offline">تعذّر الوصول إلى iCloud</string>
+    <string name="notif_via_icloud_text">الوضع السحابي: تصل الرسائل والرموز والمكالمات إلى آيفونك عبر حساب iCloud الخاص بك إلى أن يتصل هاتفاك عن قرب من جديد.</string>
     <string name="home_via_icloud_title">الوصول إلى %1$s عبر iCloud</string>
-    <string name="home_via_icloud_body">آيفونك غير متصل عن قرب الآن، لذا تصل إليه الرسائل ورموز التحقق والمكالمات عبر حساب iCloud الخاص بك، مقفلةً بمفاتيح لا يملكها إلا هاتفاك. وتحتاج المكالمات من بعيد إلى الاتصال المباشر.</string>
-    <string name="home_via_icloud_retrying">الوضع عن بُعد مفعّل، لكن تعذّر الوصول إلى iCloud الآن. تحقّق من اتصال هذا الهاتف بالإنترنت؛ سيواصل Pairline المحاولة.</string>
+    <string name="home_via_icloud_body">هاتفاك غير متصلين عن قرب، لذا يوصل الوضع السحابي الرسائل ورموز التحقق والمكالمات الواردة إلى آيفونك عبر حساب iCloud الخاص بك، مقفلةً بمفاتيح لا يملكها إلا هاتفاك. أما التحدث في مكالمة من بعيد فيحتاج إلى الاتصال المباشر.</string>
+    <string name="home_via_icloud_retrying">الوضع السحابي مفعّل، لكن تعذّر الوصول إلى iCloud الآن. تحقّق من اتصال هذا الهاتف بالإنترنت؛ سيواصل Pairline المحاولة.</string>
+    <string name="cloud_on">الوضع السحابي مفعّل: حين يكون هاتفاك بعيدين، يبقيان متصلين عبر الإنترنت.</string>
+    <string name="cloud_off">فعّل الوضع السحابي في Pairline على آيفونك ليبقى هاتفاك متصلين عبر الإنترنت حين يكونان بعيدين.</string>
+    <string name="cloud_retrying">تعذّر على الوضع السحابي الوصول إلى iCloud الآن. تحقّق من اتصال هذا الهاتف بالإنترنت؛ سيواصل Pairline المحاولة.</string>
+    <string name="cloud_paused_token">الوضع السحابي متوقف إلى أن يجدّد آيفونك وصول هذا الهاتف إلى iCloud. افتح Pairline على آيفونك.</string>
+    <string name="cloud_paused_refused">الوضع السحابي متوقف: لا يسمح iCloud حاليًا لتطبيق Pairline بالوصول إلى هذا الحساب من هاتف آخر.</string>
+    <string name="bt_cant_advertise">لا يستطيع البلوتوث في هذا الهاتف جعله مرئيًا، لذا لا يمكن لآيفونك الاتصال عبر البلوتوث. يتصل هاتفاك عبر الواي فاي ما دام Pairline مفتوحًا على الآيفون، ويوصل الوضع السحابي الرسائل والرموز في بقية الأوقات.</string>
     <string name="home_not_paired_body">قم بإقران آيفونك لتبدأ استخدام شريحة هذا الهاتف منه.</string>
     <string name="home_bt_off_body">لا يمكن لآيفونك الوصول إلى هذا الهاتف ما دام البلوتوث متوقفًا.</string>
     <string name="home_bt_perm_title">لم يُسمح بإذن «الأجهزة المجاورة»</string>
@@ -359,7 +367,7 @@
     <string name="settings_source">الشيفرة المصدرية</string>
     <string name="settings_source_sub">&#x200F;github.com/mirzaaghazadeh/pairline</string>
     <string name="settings_privacy">الخصوصية</string>
-    <string name="settings_privacy_body">لا يملك Pairline خوادم أو حسابات أو إعلانات أو تحليلات. تذهب رسائلك ومكالماتك وجهات اتصالك إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. الاتصال الوحيد بالإنترنت الذي يجريه تطبيق الجسر من تلقاء نفسه هو التحقق اليومي من التحديثات على GitHub، ويمكنك إيقافه من قسم «التحديثات». تبقى السجلات على هذا الهاتف، ولا تُشارَك إلا إذا اخترت ذلك، بعد أن تطّلع عليها.</string>
+    <string name="settings_privacy_body">لا يملك Pairline خوادم أو حسابات أو إعلانات أو تحليلات. تذهب رسائلك ومكالماتك وجهات اتصالك إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. لا يتصل تطبيق الجسر بالإنترنت من تلقاء نفسه إلا للتحقق اليومي من التحديثات على GitHub، ويمكنك إيقافه من قسم «التحديثات»، وما دام الوضع السحابي مفعّلًا، بحساب iCloud الخاص بك وراوتر منزلك. تبقى السجلات على هذا الهاتف، ولا تُشارَك إلا إذا اخترت ذلك، بعد أن تطّلع عليها.</string>
 
     <!-- Updates (D-042) -->
     <string name="settings_updates">التحديثات</string>
@@ -482,9 +490,9 @@
     <string name="help_a_unpair">يحذف كل هاتف مفتاح الآخر، فلا يعود بإمكانهما التواصل. وتبقى رسائلك وجهات اتصالك في مكانها على هذا الهاتف.</string>
 
     <!-- Remote pairing (D-080). -->
-    <string name="remote_pair_title">الإقران عن بُعد</string>
-    <string name="remote_pair_ask_title">آيفونك يريد الإقران بهذا الهاتف عن بُعد</string>
-    <string name="remote_pair_ask_body">إذا سمحت بذلك، فسيستلم آيفونك رسائل هذا الهاتف النصية ورموز التحقق ومكالماته أينما كان، وسيتمكن من إرسال الرسائل وإجراء المكالمات بشريحة هذا الهاتف.</string>
+    <string name="remote_pair_title">الإقران عبر الإنترنت</string>
+    <string name="remote_pair_ask_title">آيفونك يريد الإقران بهذا الهاتف عبر الإنترنت</string>
+    <string name="remote_pair_ask_body">إذا سمحت بذلك، فسيستلم آيفونك رسائل هذا الهاتف النصية ورموز التحقق ومكالماته أينما كان، مع تفعيل الوضع السحابي، وسيتمكن من إرسال الرسائل وإجراء المكالمات بشريحة هذا الهاتف.</string>
     <string name="remote_pair_ask_only_if">لا تسمح بذلك إلا إذا كنت قد أنشأت هذه الدعوة على آيفونك للتو. لا يُرسَل أي شيء قبل أن تضغط «السماح».</string>
     <string name="remote_pair_replaces">هذا الهاتف مقترن الآن بـ %1$s. وإذا سمحت بهذه الدعوة فستحلّ محلّ ذلك الإقران.</string>
     <string name="remote_pair_ask_next">بعد ذلك يعرض الهاتفان رمزًا من ٦ أرقام. تأكّد من أن آيفونك يعرض الرمز نفسه.</string>
@@ -500,7 +508,7 @@
     <string name="remote_pair_confirming">في انتظار تأكيد الآيفون…</string>
     <string name="remote_pair_confirming_body">أكّد على آيفونك أيضًا أن الرمزين متطابقان.</string>
     <string name="remote_pair_done_title">تم الإقران</string>
-    <string name="remote_pair_done_body">أصبح هذا الهاتف وآيفونك يثق كلٌّ منهما بالآخر. وحين يكونان بعيدين، يتواصلان عبر حساب iCloud الخاص بك، ويبقى كل شيء مقفلًا بمفاتيح لا يملكها إلا هذان الهاتفان.</string>
+    <string name="remote_pair_done_body">أصبح هذا الهاتف وآيفونك يثق كلٌّ منهما بالآخر، والوضع السحابي مفعّل: حين يكونان بعيدين، يتواصلان عبر حساب iCloud الخاص بك، ويبقى كل شيء مقفلًا بمفاتيح لا يملكها إلا هذان الهاتفان.</string>
     <string name="remote_pair_refused_title">لا يمكن استخدام هذه الدعوة</string>
     <string name="remote_pair_refused_malformed">الرابط ناقص أو تالف. أنشئ دعوة جديدة على آيفونك.</string>
     <string name="remote_pair_refused_expired">انتهت صلاحية هذه الدعوة. تعمل كل دعوة لمدة ١٠ دقائق؛ أنشئ دعوة جديدة على آيفونك.</string>
@@ -509,10 +517,11 @@
     <string name="remote_pair_failed_expired">لم يردّ الآيفون قبل انتهاء صلاحية الدعوة. أنشئ دعوة جديدة على آيفونك وحاول مرة أخرى.</string>
     <string name="remote_pair_failed_timeout">لم يُؤكَّد الرمزان على الهاتفين خلال ١٠ دقائق. ابدأ من جديد بدعوة جديدة.</string>
     <string name="remote_pair_failed_token">لم يعد iCloud يقبل هذه الدعوة. أنشئ دعوة جديدة على آيفونك.</string>
-    <string name="remote_pair_failed_icloud">لا تسمح Apple لتطبيق Pairline بالوصول إلى حساب iCloud هذا من هاتف آخر، لذا لا يمكن الإقران عن بُعد مع هذا الحساب حاليًا.</string>
+    <string name="remote_pair_failed_icloud">لا تسمح Apple لتطبيق Pairline بالوصول إلى حساب iCloud هذا من هاتف آخر، لذا لا يمكن الإقران عبر الإنترنت مع هذا الحساب حاليًا.</string>
     <string name="remote_pair_failed_bad_answer">لم يجتز ردّ الآيفون عمليات التحقق، لذا توقّف الإقران حفاظًا على أمان هذا الهاتف. أنشئ دعوة جديدة على آيفونك.</string>
     <string name="remote_pair_failed_internal">حدث خطأ ما على هذا الهاتف. حاول مجددًا بدعوة جديدة.</string>
-    <string name="remote_pair_paste_intro">هل آيفونك في مكان آخر؟ أنشئ عليه دعوة ثم افتحها هنا: امسح رمز QR الخاص بها، أو اختر صورة له، أو انسخ الرابط كاملًا والصقه.</string>
+    <string name="remote_pair_section_title">هاتفاك ليسا معًا؟</string>
+    <string name="remote_pair_paste_intro">أقرِنهما عبر الإنترنت: على آيفونك، اختر «الإقران عبر الإنترنت» لإنشاء دعوة، ثم افتحها هنا. امسح رمز QR الخاص بها، أو اختر صورة له، أو الصق رابطها.</string>
     <string name="remote_pair_scan">مسح رمز QR للدعوة</string>
     <string name="remote_pair_pick">اختيار صورة له</string>
     <string name="remote_pair_paste">لصق دعوة</string>
@@ -524,8 +533,8 @@
     <string name="remote_pair_scan_denied">يحتاج Pairline إلى الكاميرا فقط لقراءة رمز QR. اسمح بها للمسح، أو اختر صورة لرمز QR أو الصق الرابط بدلًا من ذلك.</string>
     <string name="remote_pair_paste_none">لا توجد دعوة من Pairline في الحافظة. انسخ الرابط كاملًا (يبدأ بـ pairline://invite) ثم حاول مرة أخرى.</string>
 
-    <string name="home_connected_body_direct">عبر الإنترنت، مباشرةً من خلال راوتر المنزل. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
-    <string name="notif_connected_text_direct">متصل عبر الإنترنت. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="home_connected_body_direct">الاتصال المباشر للوضع السحابي: عبر الإنترنت، مباشرةً من خلال راوتر المنزل. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="notif_connected_text_direct">الاتصال المباشر للوضع السحابي، عبر الإنترنت. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
     <string name="direct_checking">الاتصال المباشر: جارٍ التحقق…</string>
     <string name="direct_open">الاتصال المباشر: مفتوح</string>
     <string name="direct_ipv6_unconfirmed">الاتصال المباشر: عبر IPv6 فقط، إن سمح الراوتر بذلك</string>

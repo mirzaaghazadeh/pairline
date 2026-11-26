@@ -4,6 +4,7 @@ import app.pairline.android.AppPrefs
 import app.pairline.android.log.Log
 import app.pairline.android.protocol.BridgeSession
 import app.pairline.android.protocol.Messages
+import app.pairline.android.protocol.Msg
 import app.pairline.android.protocol.SessionCallbacks
 import app.pairline.android.protocol.StaticKey
 import app.pairline.android.protocol.WifiHint
@@ -41,6 +42,11 @@ data class LinkSnapshot(
     val running: Boolean = false,
     val bluetooth: BluetoothStatus = BluetoothStatus.UNKNOWN,
     val advertising: Boolean = false,
+    /**
+     * Android keeps refusing to advertise over Bluetooth (several failures in a row, none since the last success):
+     * some older phones' chips can't, so the iPhone can't find this one over Bluetooth at all.
+     */
+    val cantAdvertise: Boolean = false,
     val connected: Boolean = false,
     /** The transport that carries events: Bluetooth (or debug TCP) when it's up, otherwise Wi-Fi. */
     val transport: TransportKind? = null,
@@ -95,6 +101,12 @@ interface MailboxRoute {
 
     /** A session is now up ([up]) or the last one ended. Called on the link thread. */
     fun onSessionChanged(up: Boolean)
+
+    /**
+     * A `status` just went to the iPhone on a session, so the mailbox needn't carry it again: only a status that
+     * differs from it is worth an iCloud record (and a push that wakes the iPhone). Called on the link thread.
+     */
+    fun statusDelivered(status: JSONObject) {}
 
     /** The pairing is forgotten: remote mode ends, its state and records are deleted. [farewell] still goes out first. */
     fun forget(farewell: JSONObject?)
@@ -304,6 +316,7 @@ class LinkManager(
             return@post
         }
         entry.session.send(message)
+        noteStatus(message)
     }
 
     /** Sends one `BULK` record on the Wi-Fi session [token]. [onSent] gets false if it couldn't be queued. */
@@ -376,9 +389,15 @@ class LinkManager(
         val session = primary?.session
         if (session != null) {
             session.send(message)
+            noteStatus(message)
         } else {
             remote?.takeIf { it.isActive }?.send(message)
         }
+    }
+
+    /** A status that went out on a session: the mailbox remembers it, so it doesn't send the same one again. */
+    private fun noteStatus(message: JSONObject) {
+        if (message.optString("t") == Msg.STATUS) remote?.statusDelivered(message)
     }
 
     private fun forgetPeer(farewell: JSONObject?) {
