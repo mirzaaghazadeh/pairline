@@ -1,0 +1,78 @@
+name: Android rebuild
+
+# A second, independent build of a commit's unsigned release APK on its own fresh runner, for the reproducible-build
+# check (D-100). android-release.yml runs it next to the release build; android-release-checks.yml runs it for a
+# release that already exists; it can also run by hand for any commit or tag. It signs and publishes nothing: it
+# reads the repo and keeps the APK as the artifact "rebuilt-unsigned-apk".
+#
+# Same steps as android-release.yml's build, except that the NDK and CMake versions come from the commit being built
+# (android/app/build.gradle.kts), so older tags build with what they asked for. Keep the two in step.
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit or tag to build
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit or tag to build, e.g. android-v1.8.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    name: Rebuild the unsigned release APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      BUILD_TOOLS: 37.0.0
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          # Nothing cached by earlier runs goes into the build, as for a release.
+          cache-disabled: true
+
+      - name: Install build-tools, and the NDK and CMake the commit asks for
+        run: |
+          ndk="$(sed -n 's/^ *ndkVersion = "\(.*\)"/\1/p' app/build.gradle.kts)"
+          cmake="$(sed -n 's/^ *version = "\(3\.[0-9.]*\)"/\1/p' app/build.gradle.kts | head -1)"
+          echo "build-tools $BUILD_TOOLS, NDK ${ndk:-none}, CMake ${cmake:-none}"
+          sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -d "$ANDROID_HOME/build-tools/$BUILD_TOOLS" ] || yes | "$sdk" "build-tools;$BUILD_TOOLS" > /dev/null
+          if [ -n "$ndk" ]; then [ -d "$ANDROID_HOME/ndk/$ndk" ] || yes | "$sdk" "ndk;$ndk" > /dev/null; fi
+          if [ -n "$cmake" ]; then [ -d "$ANDROID_HOME/cmake/$cmake" ] || yes | "$sdk" "cmake;$cmake" > /dev/null; fi
+
+      - name: Build the unsigned release APK
+        run: ./gradlew --no-daemon --no-build-cache assembleRelease
+
+      # The release workflow aligns the APK before signing it; do the same, so only the signature can differ.
+      - name: Align it like the release
+        run: |
+          "$ANDROID_HOME/build-tools/$BUILD_TOOLS/zipalign" -P 16 -f 4 \
+            app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/rebuilt-unsigned.apk"
+          sha256sum "$RUNNER_TEMP/rebuilt-unsigned.apk" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rebuilt-unsigned-apk
+          path: ${{ runner.temp }}/rebuilt-unsigned.apk
+          retention-days: 30

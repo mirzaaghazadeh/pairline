@@ -16,7 +16,9 @@ end-to-end encrypted link between your own two phones.
 | **Pairline** for iPhone, iPad and Mac | **[Get it on the App Store](https://getpairline.com/download)** | iOS 16 or later |
 
 Both links always point to the newest release. Each release's notes list the APK's SHA-256, its signing
-certificate and its [VirusTotal](https://www.virustotal.com) report; see [Verifying releases](#verifying-releases).
+certificate, its signed build provenance, its [VirusTotal](https://www.virustotal.com) report, whether a second,
+independent build came out identical, and its [εxodus](https://reports.exodus-privacy.eu.org) tracker check; see
+[Verifying releases](#verifying-releases).
 Progress: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## What it does
@@ -118,8 +120,10 @@ Thanks to Sayyad Abbasi and Amirreza Azadmehr for testing on real phones and hel
 ## Verifying releases
 
 Android APKs are built and signed only by GitHub Actions from a tagged commit. Each release's notes link the
-build run and list the APK's SHA-256, the signing-certificate fingerprint and the APK's VirusTotal report.
-How to check them: [SECURITY.md](SECURITY.md#verifying-a-release).
+build run and list the APK's SHA-256, the signing-certificate fingerprint, a Sigstore-signed build provenance you
+can check with `gh attestation verify`, the APK's VirusTotal report, whether a second build of the same commit on
+another machine came out byte for byte identical, and whether any tracker εxodus Privacy knows is in it. You can
+also rebuild the APK yourself and compare. How to check all of it: [SECURITY.md](SECURITY.md#verifying-a-release).
 
 ## Documentation
 

@@ -47,20 +47,30 @@ reinstall. Keep at least two offline backups (for example, a password manager an
    ```
 
 3. The workflow checks that the tag matches `versionName` and that `CHANGELOG.md` has its section, builds, runs the
-   policy checks (`.github/scripts/android-policy-check.sh`), signs, scans the signed APK on VirusTotal
-   (`.github/scripts/virustotal-scan.sh`), and creates a **draft** GitHub Release with what's new, the contributors,
-   the APK, its SHA-256, the signing-certificate digest and the VirusTotal report link
-   (`.github/scripts/release-notes.sh`, D-080). What's new covers every version since the last *published* release,
-   so publishing 1.7.0 after leaving 1.4.0 to 1.6.0 as drafts still tells people everything they get. Contributors
-   are the GitHub accounts behind the commits in that range that touch `android/` or `protocol/`. Versions starting
-   with `0.` are marked as pre-releases.
-4. Review the draft and publish it. If the VirusTotal row shows detections or "not scanned", open the report (or the
-   run's warnings) first. One or two engines flagging a new APK is usually a false positive; check which engines and
-   what they call it before publishing.
+   policy checks (`.github/scripts/android-policy-check.sh`), signs, attests the build provenance (Sigstore, D-100),
+   scans the signed APK on VirusTotal (`.github/scripts/virustotal-scan.sh`), and creates a **draft** GitHub Release
+   with what's new, the contributors, the APK and its attestation bundle, its SHA-256, the signing-certificate
+   digest, the provenance and the VirusTotal report link (`.github/scripts/release-notes.sh`, D-080). What's new
+   covers every version since the last *published* release, so publishing 1.7.0 after leaving 1.4.0 to 1.6.0 as
+   drafts still tells people everything they get. Contributors are the GitHub accounts behind the commits in that
+   range that touch `android/` or `protocol/`. Versions starting with `0.` are marked as pre-releases.
+
+   Meanwhile a second runner builds the same commit again (`android-rebuild.yml`). When both are done, the run
+   compares the release APK with that build (`.github/scripts/reproducible-check.sh`, with apksigcopier) and checks it
+   against εxodus's tracker signatures (`.github/scripts/trackers-scan.py`), then fills in the draft's "Reproducible
+   build" and "Trackers" rows, which say "pending" until then (D-100).
+4. Review the draft and publish it once the run has finished. If the VirusTotal row shows detections or "not
+   scanned", open the report (or the run's warnings) first. One or two engines flagging a new APK is usually a false
+   positive; check which engines and what they call it before publishing. Don't publish a release whose
+   "Reproducible build" row says it differs, or whose "Trackers" row found one, until you know why: the run's
+   warning names the files that differ or the trackers and the classes that matched.
 
 To scan a release that already exists (made before the scan was added, or when the scan didn't finish), run the
 **VirusTotal scan of a release** workflow from the Actions tab with the release tag
 (`gh workflow run virustotal.yml -f tag=android-v1.0.1`). It adds or replaces the VirusTotal row in that release's notes.
+Likewise **Checks of a release** (`gh workflow run android-release-checks.yml -f tag=android-v1.8.0`) rebuilds the tag,
+compares and looks for trackers, and sets the "Reproducible build" and "Trackers" rows. Releases up to 1.8.0 have no
+provenance: it can only be made by the run that built the APK.
 
 To redo an existing release's what's new and contributors (after fixing its changelog section, or after publishing an
 earlier draft changes what counts as "since the last published release"), run
@@ -72,6 +82,19 @@ of the notes above "## Pairline Bridge …" with its output (`gh release edit an
 
 Gradle builds an unsigned APK, and the workflow signs it with `apksigner`. Anyone can build the same unsigned APK
 from the tagged commit without our key, which is the basis for the reproducible-build check in `SECURITY.md`.
+
+What keeps the build reproducible: no build paths or build IDs in the native library and no `.comment` section
+(`android/app/src/main/cpp/CMakeLists.txt`), no dependency report in the APK, an empty version-control record (the
+Gradle project is in `android/`, where the Android Gradle plugin finds no git root), and a fixed toolchain. If the "Reproducible build" row ever says the APK differs, `.github/scripts/reproducible-check.sh` names
+the files; compare them from both builds (`unzip`, then `cmp`, `llvm-readelf -S` or `dexdump`) to find what leaked in.
+
+### CI's own security
+
+`zizmor.yml` audits the workflows on every change to `.github/` and weekly, and fails on any finding (D-101). Run it
+before pushing a workflow change: `pipx run zizmor .github/` (needs `GH_TOKEN` for the online checks).
+Dependabot (`.github/dependabot.yml`) opens weekly pull requests for the pinned actions and the Android libraries,
+and monthly ones for CI's Python tools, each a week after the version came out. They only raise versions; a new
+dependency still needs its `docs/DECISIONS.md` entry.
 
 ## iOS (remote app)
 

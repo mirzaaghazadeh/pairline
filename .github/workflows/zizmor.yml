@@ -1,0 +1,44 @@
+name: Workflow audit
+
+# zizmor audits the GitHub Actions workflows and dependabot.yml for security problems (D-101): template injection,
+# credentials left in checkouts, permissions broader than needed, unpinned, impostor or known-vulnerable actions.
+# The release workflow holds the signing key, so a mistake there matters. Runs on every change to .github/, and
+# weekly for new advisories about the actions we use. Fails on any finding.
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/**']
+  pull_request:
+    paths: ['.github/**']
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zizmor-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install zizmor
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --require-hashes --no-deps -r .github/requirements/zizmor.txt
+
+      # The token lets zizmor ask GitHub about the pinned actions (impostor commits, advisories); read-only.
+      - name: Audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: '"$RUNNER_TEMP/venv/bin/zizmor" --format=github .github/'

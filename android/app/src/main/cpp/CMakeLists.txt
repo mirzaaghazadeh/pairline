@@ -13,3 +13,12 @@ find_package(boringssl REQUIRED CONFIG)
 
 add_library(pairline_adb SHARED spake2_jni.cpp adb_tls_jni.cpp)
 target_link_libraries(pairline_adb boringssl::ssl_static boringssl::crypto_static)
+
+# The .comment section only names the compilers, and the NDK's crtbegin_so.o names a different clang build in the
+# macOS NDK than in the Linux one, so with it a Mac can't reproduce the release (D-100). The code is the same.
+if(NOT CMAKE_OBJCOPY)
+  message(FATAL_ERROR "llvm-objcopy not found; it removes the .comment section for reproducible builds")
+endif()
+add_custom_command(TARGET pairline_adb POST_BUILD
+  COMMAND "${CMAKE_OBJCOPY}" --remove-section=.comment "$<TARGET_FILE:pairline_adb>"
+  VERBATIM)

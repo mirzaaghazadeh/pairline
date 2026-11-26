@@ -12,6 +12,7 @@ on:
       - '.github/workflows/android.yml'
       - '.github/scripts/android-policy-check.sh'
       - '.github/scripts/network-code-check.sh'
+      - '.github/scripts/trackers-scan.py'
   pull_request:
     paths:
       - 'android/**'
@@ -19,6 +20,7 @@ on:
       - '.github/workflows/android.yml'
       - '.github/scripts/android-policy-check.sh'
       - '.github/scripts/network-code-check.sh'
+      - '.github/scripts/trackers-scan.py'
   workflow_dispatch:
 
 permissions:
@@ -66,6 +68,12 @@ jobs:
 
       - name: Policy checks (release APK)
         run: ../.github/scripts/android-policy-check.sh app/build/outputs/apk/release/app-release-unsigned.apk release
+
+      # εxodus's tracker signatures on every build, so a tracker is caught in its pull request, not at release (D-100).
+      - name: No trackers (εxodus signatures)
+        run: >
+          python3 -I ../.github/scripts/trackers-scan.py --fail-on-trackers
+          app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/trackers.md"
 
       - name: Network code stays in update/, link/wifi/ and netshare/ (D-041)
         run: ../.github/scripts/network-code-check.sh
