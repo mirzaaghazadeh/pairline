@@ -1,0 +1,51 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Buy remote mode · %@" : {
+      "comment" : "Remote-mode add-on (D-081): the buy button, shown only after Pairline Full Access is bought. %@ is the price, e.g. $9.99.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شراء الوضع عن بُعد · %@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Buy remote mode · %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خرید حالت از راه دور · %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak modu satın al · %@" } }
+      }
+    },
+    "Pairing a phone that's far away is part of remote mode, a one-time %@ add-on to Pairline Full Access." : {
+      "comment" : "Remote-mode add-on (D-081): shown instead of remote pairing when Full Access is bought but the add-on isn't. %@ is the price.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إقران هاتف بعيد جزء من الوضع عن بُعد، وهو إضافة تُشترى مرة واحدة بسعر %@ إلى الوصول الكامل إلى Pairline." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairing a phone that's far away is part of remote mode, a one-time %@ add-on to Pairline Full Access." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "جفت کردن با گوشی‌ای که دور است بخشی از حالت از راه دور است؛ افزونه‌ای یک‌باره به قیمت %@ برای دسترسی کامل Pairline." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktaki bir telefonla eşleştirme, Pairline Tam Erişim'e %@ tutarında tek seferlik bir eklenti olan uzak modun parçasıdır." } }
+      }
+    },
+    "Remote mode is a one-time add-on to Pairline Full Access. Everything nearby keeps working without it." : {
+      "comment" : "Remote-mode add-on (D-081): Settings footer when Full Access is bought but the add-on isn't.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع عن بُعد إضافة تُشترى مرة واحدة إلى الوصول الكامل إلى Pairline. كل ما يعمل والهاتفان قريبان يظل يعمل من دونها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Remote mode is a one-time add-on to Pairline Full Access. Everything nearby keeps working without it." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور افزونه‌ای یک‌باره برای دسترسی کامل Pairline است. هر چه وقتی گوشی‌ها کنار هم‌اند کار می‌کند، بدون آن هم کار می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod, Pairline Tam Erişim'e tek seferlik bir eklentidir. Telefonlar yakındayken her şey onsuz da çalışmaya devam eder." } }
+      }
+    },
+    "Remote mode is part of your free trial. After you buy Pairline, it's a one-time %@ add-on." : {
+      "comment" : "Remote-mode add-on (D-081): Settings footer during the free trial. %@ is the add-on's price.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع عن بُعد جزء من فترتك التجريبية المجانية. بعد شراء Pairline يصبح إضافة تُشترى مرة واحدة بسعر %@." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Remote mode is part of your free trial. After you buy Pairline, it's a one-time %@ add-on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور بخشی از دوره آزمایشی رایگان شماست. بعد از خرید Pairline، افزونه‌ای یک‌باره به قیمت %@ است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod ücretsiz denemenize dahildir. Pairline'ı satın aldıktan sonra %@ tutarında tek seferlik bir eklentidir." } }
+      }
+    },
+    "Remote mode needs the free trial or Pairline Full Access." : {
+      "comment" : "Remote-mode add-on (D-081): Settings footer when there's no trial running and no Full Access.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج الوضع عن بُعد إلى الفترة التجريبية المجانية أو الوصول الكامل إلى Pairline." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Remote mode needs the free trial or Pairline Full Access." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت از راه دور به دوره آزمایشی رایگان یا دسترسی کامل Pairline نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzak mod için ücretsiz deneme veya Pairline Tam Erişim gerekir." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

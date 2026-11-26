@@ -68,6 +68,10 @@ final class AppModel: ObservableObject {
             .removeDuplicates()
             .sink { [weak self] access in self?.accessChanged(access) }
             .store(in: &cancellables)
+        purchases.$remoteAccess
+            .removeDuplicates()
+            .sink { [weak self] access in self?.remoteAccessChanged(access) }
+            .store(in: &cancellables)
 
         let notifier = Notifier.shared
         notifier.configure()
@@ -220,7 +224,18 @@ final class AppModel: ObservableObject {
         for _ in 0..<20 where purchases.access == .loading {
             try? await Task.sleep(nanoseconds: 250_000_000)
         }
+        // Not covered any more (the trial ended without the add-on, D-081): remote mode is being turned off.
+        guard purchases.remoteAccess.allowsRemote else { return false }
         return await link.remoteCatchUp()
+    }
+
+    /// Remote mode is part of the trial, then an add-on (D-081). When the purchase state no longer covers it, it turns
+    /// off the usual way, which tells the bridge to stop and clears this iPhone's part in iCloud; Settings then shows
+    /// why and, after Full Access, the add-on.
+    private func remoteAccessChanged(_ access: RemoteAccess) {
+        guard access.endsRemote, let remote = link.remote, remote.isOn else { return }
+        log.info("store", "Remote mode isn't covered by the purchase state (\(access)); turning it off")
+        Task { await link.turnOffRemote() }
     }
 
     /// A remote pairing ("Pair a phone that's far away") wired to this app's keys, link and iCloud.
@@ -342,6 +357,7 @@ final class AppModel: ObservableObject {
 
     func didBecomeActive() {
         Notifier.shared.clearCallsPaused()
+        link.appBecameActive()
         link.reconnectNow()
         link.files.collectOutbox()
         if !Self.isTestHost { BridgeLiveActivity.shared.appBecameActive() }
@@ -351,6 +367,11 @@ final class AppModel: ObservableObject {
         }
         if real.phase.isConnected { Task { await real.sync() } }
         Task { await remoteCatchUp() }
+    }
+
+    /// Remote mode's direct connection can't wake a suspended app, so it closes unless a call is on (D-080).
+    func didEnterBackground() {
+        link.appMovedToBackground()
     }
 
     private func applyLaunchArguments() {

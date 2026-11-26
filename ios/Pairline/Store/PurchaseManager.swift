@@ -2,17 +2,24 @@ import Foundation
 import StoreKit
 import UIKit
 
-/// StoreKit 2 purchases (D-017, D-036). Two non-consumables: a free "7-day Trial" and "Pairline Full Access".
-/// Entitlements are verified on the device from Apple-signed transactions; there's no receipt server.
+/// StoreKit 2 purchases (D-017, D-036, D-081). Three non-consumables: a free "7-day Trial", "Pairline Full Access",
+/// and the remote-mode add-on. Entitlements are verified on the device from Apple-signed transactions; there's no
+/// receipt server.
 @MainActor
 final class PurchaseManager: ObservableObject {
     static let trialID = "app.pairline.ios.trial7day"
     static let fullID = "app.pairline.ios.full"
+    /// Remote mode after the trial (D-081): bought only once Full Access is.
+    static let remoteID = "app.pairline.ios.remote"
     static let fallbackPrice = "$9.99"
+    static let remoteFallbackPrice = "$9.99"
 
     @Published private(set) var access: AccessState = .loading
+    /// Whether remote mode may run (D-081): during the trial, or with Full Access and the add-on.
+    @Published private(set) var remoteAccess: RemoteAccess = .loading
     @Published private(set) var fullProduct: Product?
     @Published private(set) var trialProduct: Product?
+    @Published private(set) var remoteProduct: Product?
     @Published private(set) var busy = false
     @Published var message: String?
     @Published private(set) var trustedNow = Date()
@@ -23,6 +30,7 @@ final class PurchaseManager: ObservableObject {
     private var tick: Timer?
     private var trialStart: Date?
     private var purchased = false
+    private var remotePurchased = false
     private var signedDates: [Date] = []
 
     init(timeStore: TrustedTimeStore = KeychainTimeStore(), clock: @escaping () -> Date = Date.init) {
@@ -66,12 +74,18 @@ final class PurchaseManager: ObservableObject {
         return fullProduct?.displayPrice ?? Self.fallbackPrice
     }
 
+    /// The remote-mode add-on's price in the user's storefront (D-081).
+    var remotePriceText: String {
+        remoteProduct?.displayPrice ?? Self.remoteFallbackPrice
+    }
+
     func loadProducts() async {
         do {
-            let products = try await Product.products(for: [Self.trialID, Self.fullID])
+            let products = try await Product.products(for: [Self.trialID, Self.fullID, Self.remoteID])
             for product in products {
                 if product.id == Self.fullID { fullProduct = product }
                 if product.id == Self.trialID { trialProduct = product }
+                if product.id == Self.remoteID { remoteProduct = product }
             }
         } catch {
             log.warning("store", "Couldn't load products: \(error.localizedDescription)")
@@ -82,6 +96,7 @@ final class PurchaseManager: ObservableObject {
     func refresh() async {
         var start: Date?
         var bought = false
+        var boughtRemote = false
         var signed: [Date] = []
         for await result in Transaction.currentEntitlements {
             guard case .verified(let transaction) = result, transaction.revocationDate == nil else { continue }
@@ -91,12 +106,15 @@ final class PurchaseManager: ObservableObject {
                 bought = true
             case Self.trialID:
                 start = min(start ?? transaction.originalPurchaseDate, transaction.originalPurchaseDate)
+            case Self.remoteID:
+                boughtRemote = true
             default:
                 break
             }
         }
         trialStart = start
         purchased = bought
+        remotePurchased = boughtRemote
         signedDates = signed
         evaluate()
     }
@@ -107,12 +125,20 @@ final class PurchaseManager: ObservableObject {
         timeStore.save(now)
         trustedNow = now
         var new = TrialPolicy.state(purchased: purchased, trialStart: trialStart, now: now)
+        var remoteBought = remotePurchased
         #if DEBUG
-        new = Self.debugAccessOverride(now: now) ?? new
+        let override = Self.debugAccessOverride(now: now)
+        new = override ?? new
+        remoteBought = Self.debugRemoteOverride(accessOverridden: override != nil) ?? remoteBought
         #endif
         if new != access {
             log.info("store", "Access: \(new)")
             access = new
+        }
+        let remote = RemoteAddOnPolicy.access(new, remotePurchased: remoteBought)
+        if remote != remoteAccess {
+            log.info("store", "Remote mode access: \(remote)")
+            remoteAccess = remote
         }
     }
 
@@ -143,6 +169,30 @@ final class PurchaseManager: ObservableObject {
         }
     }
 
+    /// Debug builds only: `-PairlineRemoteAccess purchased|none` fakes the remote-mode add-on (D-081), remembered like
+    /// `-PairlineAccess` until `-PairlineRemoteAccess reset`. Without it, a faked access state of "purchased" counts as
+    /// everything bought (so a test iPhone set up with `-PairlineAccess purchased` keeps remote mode); use
+    /// `-PairlineRemoteAccess none` to see the add-on for sale. Unit tests ignore the remembered value.
+    private static func debugRemoteOverride(accessOverridden: Bool) -> Bool? {
+        let key = "debug.remoteAccessOverride"
+        let defaults = UserDefaults.standard
+        let args = ProcessInfo.processInfo.arguments
+        let value: String?
+        if let index = args.firstIndex(of: "-PairlineRemoteAccess"), index + 1 < args.count {
+            value = args[index + 1] == "reset" ? nil : args[index + 1]
+            defaults.set(value, forKey: key)
+        } else if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            value = defaults.string(forKey: key)
+        } else {
+            value = nil
+        }
+        switch value {
+        case "purchased": return true
+        case "none": return false
+        default: return accessOverridden ? true : nil
+        }
+    }
+
     /// A debug build made for a remote tester's iPhone, where nobody can pass `-PairlineAccess` at launch, is built with
     /// `PAIRLINE_TESTER_UNLOCKED` among `SWIFT_ACTIVE_COMPILATION_CONDITIONS` and starts as purchased.
     private static var testerAccess: String? {
@@ -168,6 +218,17 @@ final class PurchaseManager: ObservableObject {
     func buyFull() async -> Bool {
         if fullProduct == nil { await loadProducts() }
         guard let product = fullProduct else {
+            message = String(localized: "The App Store isn't available right now. Check your connection and try again.")
+            return false
+        }
+        return await purchase(product)
+    }
+
+    /// Buys the remote-mode add-on (D-081). Offered only once Full Access is bought (`RemoteAccess.offersPurchase`).
+    @discardableResult
+    func buyRemote() async -> Bool {
+        if remoteProduct == nil { await loadProducts() }
+        guard let product = remoteProduct else {
             message = String(localized: "The App Store isn't available right now. Check your connection and try again.")
             return false
         }

@@ -316,16 +316,46 @@ struct PairingFlowView: View {
         }
     }
 
-    /// Needs a trial or the purchase: through iCloud there's no free first sync (D-069) to lead to.
+    /// Needs a trial or the purchase: through iCloud there's no free first sync (D-069) to lead to. After the trial it
+    /// is part of the remote-mode add-on (D-081).
     @ViewBuilder private var remote: some View {
-        if purchases.access.allowsLink {
+        if purchases.remoteAccess.allowsRemote {
             RemotePairingView { step = .done }
+        } else if purchases.remoteAccess.offersPurchase {
+            ScrollView {
+                remoteAddOnOffer
+                    .padding(20)
+            }
         } else {
             ScrollView {
                 trialChoices
                     .padding(20)
             }
         }
+    }
+
+    /// Full Access is bought but not the remote-mode add-on, which pairing from far away is part of (D-081).
+    private var remoteAddOnOffer: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "icloud.and.arrow.up").font(.largeTitle).foregroundStyle(Color.brandBlue)
+            Text("Pairing a phone that's far away is part of remote mode, a one-time \(purchases.remotePriceText) add-on to Pairline Full Access.",
+                 tableName: "RemoteAddOn")
+                .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            Button {
+                Haptics.tap()
+                Task {
+                    if await purchases.buyRemote() { Haptics.success() }
+                }
+            } label: {
+                Text("Buy remote mode · \(purchases.remotePriceText)", tableName: "RemoteAddOn")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .disabled(purchases.busy)
+            if let message = purchases.message {
+                Text(message).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            }
+        }
+        .card(padding: 20)
     }
 
     // MARK: - Connecting / done
@@ -359,7 +389,7 @@ struct PairingFlowView: View {
             }
             Text("You're paired!").font(.largeTitle.weight(.bold))
             (app.real.phase == .remote
-                ? Text("Texts and codes from your Android phone's SIM now come to this iPhone through iCloud. Calls still need the phones together for now.")
+                ? Text("Texts and codes from your Android phone's SIM now come to this iPhone through iCloud. Calls work once the direct connection to its home is up.")
                 : Text("Messages and calls from your Android phone's SIM now come to this iPhone."))
                 .font(.body)
                 .foregroundStyle(.secondary)

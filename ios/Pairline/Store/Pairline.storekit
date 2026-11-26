@@ -43,6 +43,21 @@
       "productID" : "app.pairline.ios.full",
       "referenceName" : "Pairline Full Access",
       "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "6739000003",
+      "localizations" : [
+        {
+          "description" : "Texts, codes and calls while phones are apart",
+          "displayName" : "Remote Mode",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "app.pairline.ios.remote",
+      "referenceName" : "Remote Mode",
+      "type" : "NonConsumable"
     }
   ],
   "settings" : {

@@ -1353,7 +1353,10 @@ third-party service (no STUN/TURN, Firebase or Tailscale).
   else within 10 s, and rate-limits. Turning remote mode off, or forgetting the pairing, closes the router mapping,
   stops the listener and deletes the CloudKit records.
 - **Audio:** D-072's Opus, as `MEDIA` frames inside the session, carried over the direct connection (no UDP port, no
-  second mapping); local links keep their own paths.
+  second mapping); local links keep their own paths. A call moves between the direct connection and Bluetooth as the
+  user leaves or comes home.
+- **In the background** the iPhone closes the direct session unless a call is in progress: iOS suspends an app with
+  only a socket open, so events sent into it would wait unread, while the mailbox's pushes wake the iPhone.
 - **Android code** lives in `link/remote/`; `network-code-check.sh` lets it reach only CloudKit's web services host
   and, by address, the local router and the paired iPhone.
 - **What users are told** (a screen before turning it on, PRIVACY.md, README): no Pairline server; content locked
@@ -1418,3 +1421,26 @@ third-party service (no STUN/TURN, Firebase or Tailscale).
   pairing through iCloud (both showed the same code), SMS with a one-time code shown on the locked iPhone by the
   extension (the Secure Enclave key opened in the extension), texts sent from the iPhone through the mailbox, and the
   bridge's name, battery and signal shown "Via iCloud" in the app, the Live Activity and the widget.
+
+### D-081 — Remote mode is a $9.99 one-time add-on after Full Access, included in the free trial (2026-11-26)
+
+The maintainer's pricing for remote mode (D-080). Extends D-017 and D-036; the Android app stays free.
+
+- **Product:** `app.pairline.ios.remote`, a non-consumable In-App Purchase, $9.99 once, no subscription. Like Full
+  Access it's verified on the iPhone from Apple-signed transactions (StoreKit 2, `Transaction.currentEntitlements`
+  and `Transaction.updates`); there's no receipt server, and Restore Purchases brings it back.
+- **The rule** (`RemoteAddOnPolicy`, unit-tested): remote mode, and pairing a phone that's far away, work while the
+  7-day trial runs, and afterwards only with Full Access **and** the add-on. The trial shows a line that remote mode
+  is part of it and becomes a $9.99 add-on after Full Access. No trial and no Full Access: the app's own paywall comes
+  first, and the add-on isn't offered.
+- **Sold only after Full Access:** the "Buy remote mode" button appears only once Full Access is bought, and only in
+  a build where remote mode is available (`RemoteFeature`), so a build without remote mode (App Review before it
+  ships) never shows a purchase button for it.
+- **When it stops being covered** (the trial ended without the add-on, or a refund) while remote mode is on, the iPhone
+  turns it off the usual way: `remote.config` off to the bridge (over a session, or one last mailbox record), then its
+  records and subscriptions in iCloud go. Nothing is turned off while the purchase state is still loading.
+- **Debug builds** fake it with `-PairlineRemoteAccess purchased|none|reset` (remembered like `-PairlineAccess`); a
+  faked "purchased" access state counts as the add-on bought too, so a test iPhone keeps remote mode.
+- **Not done yet:** the product doesn't exist in App Store Connect. Creating it there (price tier, localized name and
+  description in English, Arabic and Turkish, review screenshot) waits for the maintainer's OK; until then it exists
+  only in `ios/Pairline/Store/Pairline.storekit` for Xcode and the unit tests.
