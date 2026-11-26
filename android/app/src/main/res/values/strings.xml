@@ -488,4 +488,19 @@
     <string name="remote_pair_paste_intro">Is the iPhone far away? If you got an invitation link from it, copy the whole link and paste it here.</string>
     <string name="remote_pair_paste">Paste an invitation</string>
     <string name="remote_pair_paste_none">There\'s no Pairline invitation on the clipboard. Copy the whole link (it starts with pairline://invite) and try again.</string>
+
+    <!-- Remote mode's direct connection through the home router (D-072): the link card's line while remote mode is on. -->
+    <string name="home_connected_body_direct">Over the internet, straight through your home router. Calls and messages are being relayed to your iPhone.</string>
+    <string name="notif_connected_text_direct">Connected over the internet. Calls and messages are being relayed to your iPhone.</string>
+    <string name="direct_checking">Direct connection: checking…</string>
+    <string name="direct_open">Direct connection: open</string>
+    <string name="direct_ipv6_unconfirmed">Direct connection: over IPv6 only, if the router lets it through</string>
+    <!-- %1$s is one of the direct_reason_* texts below. -->
+    <string name="direct_not_possible">Direct connection: not possible (%1$s)</string>
+    <string name="direct_reason_wifi">this phone isn\'t on Wi-Fi</string>
+    <string name="direct_reason_carrier_nat">the internet provider doesn\'t give this home its own address</string>
+    <string name="direct_reason_double_nat">another router sits in front of this one</string>
+    <string name="direct_reason_no_address">the router has no internet address</string>
+    <string name="direct_reason_no_mapping">the router doesn\'t open ports for apps</string>
+    <string name="direct_reason_listen">couldn\'t open a port on this phone</string>
 </resources>

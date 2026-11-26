@@ -13,6 +13,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import app.pairline.android.AppGraph
 import app.pairline.android.audio.CallAudioRelay
+import app.pairline.android.link.remote.DirectNetworkWatcher
 import app.pairline.android.link.wifi.HotspotState
 import app.pairline.android.link.wifi.WifiTransport
 import app.pairline.android.log.Log
@@ -38,6 +39,7 @@ class LinkService : Service() {
     private var transports: List<LinkTransport> = emptyList()
     private var ble: BleTransport? = null
     private var wifi: WifiTransport? = null
+    private var directWatcher: DirectNetworkWatcher? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun attachBaseContext(newBase: Context) {
@@ -59,6 +61,13 @@ class LinkService : Service() {
         link.start()
         // Remote mode (D-072): checks the mailbox in iCloud while no session is up, if the iPhone turned it on.
         graph.remote.start()
+        // Its direct connection: while remote mode is on and the phone is on Wi-Fi, a public listener and a port
+        // opened on the home router; closed and deleted when remote mode ends.
+        graph.direct.start()
+        directWatcher = DirectNetworkWatcher(this) { graph.direct.setNetwork(it) }.also { it.start() }
+        scope.launch {
+            graph.remote.state.map { it.on }.distinctUntilChanged().collect { graph.direct.setActive(it) }
+        }
 
         val bleTransport = BleTransport(this, link, { graph.identity.deviceId }) { bt, advertising ->
             link.updateState { it.copy(bluetooth = bt, advertising = advertising) }
@@ -174,6 +183,9 @@ class LinkService : Service() {
         transports = emptyList()
         wifi?.stop()
         wifi = null
+        directWatcher?.stop()
+        directWatcher = null
+        graph.direct.stop()
         graph.remote.stop()
         graph.link.stop()
         scope.cancel()

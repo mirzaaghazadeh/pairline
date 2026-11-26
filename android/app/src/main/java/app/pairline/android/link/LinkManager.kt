@@ -110,10 +110,12 @@ interface WifiSessionListener {
 
 /**
  * Owns every connection's [BridgeSession] on one thread ("link thread"). At most one established session per lane:
- * Bluetooth (or the debug TCP link) and Wi-Fi (PROTOCOL.md, "Two sessions at once"). Events go to the Bluetooth
- * session when there is one, otherwise to Wi-Fi, otherwise (remote mode, D-072) to the mailbox in iCloud; replies go
- * back on the session the request came from. Requests read from the mailbox carry [MAILBOX_TOKEN]. Runs keep-alive
- * and handshake timeouts, and opens the media channel for each Wi-Fi session.
+ * Bluetooth (or the debug TCP link), Wi-Fi (PROTOCOL.md, "Two sessions at once") and remote mode's direct connection
+ * (D-072). Events go to the Bluetooth session when there is one, otherwise to Wi-Fi, otherwise to the direct session,
+ * otherwise (remote mode) to the mailbox in iCloud; replies go back on the session the request came from. Requests
+ * read from the mailbox carry [MAILBOX_TOKEN]. Runs keep-alive and handshake timeouts, and opens the media channel for
+ * each Wi-Fi session. The direct session is a Wi-Fi session without media, bulk data or pairing: none of the Wi-Fi
+ * lane's extras (files, call audio, internet sharing's peer address) ever reach a connection from the internet.
  */
 class LinkManager(
     private val identity: () -> StaticKey,
@@ -135,6 +137,9 @@ class LinkManager(
         var token: Long = 0
         var media: MediaEndpoint? = null
         val wifi: Boolean get() = connection.kind.isWifi
+
+        /** A connection from the internet that hasn't authenticated: counted by the listener, not logged here. */
+        val quiet: Boolean get() = connection.kind == TransportKind.DIRECT && token == 0L
     }
 
     private val entries = HashMap<LinkConnection, Entry>()
@@ -145,7 +150,9 @@ class LinkManager(
     @Volatile
     private var wifi: Entry? = null
 
-    /** The session events go to: [radio] when up, else [wifi]. */
+    private var direct: Entry? = null
+
+    /** The session events go to: [radio] when up, else [wifi], else [direct]. */
     private var primary: Entry? = null
     private var tokens = 0L
     private val pingIds = AtomicInteger(1)
@@ -196,6 +203,7 @@ class LinkManager(
             entries.clear()
             radio = null
             wifi = null
+            direct = null
             refreshPrimary()
             setMedia(null)
             wifiListener?.onWifiSession(null)
@@ -204,18 +212,26 @@ class LinkManager(
     }
 
     override fun onOpened(connection: LinkConnection) = post {
-        Log.i(TAG, "${connection.label}: connected")
-        if (connection.kind.isWifi) {
-            // At most a few Wi-Fi connections may sit in the handshake at once; drop the oldest.
+        val kind = connection.kind
+        if (kind != TransportKind.DIRECT) Log.i(TAG, "${connection.label}: connected")
+        if (kind.isWifi || kind == TransportKind.DIRECT) {
+            // At most a few Wi-Fi (or direct) connections may sit in the handshake at once; drop the oldest.
             val unfinished = entries.values
-                .filter { it.wifi && it.session.state != BridgeSession.State.ESTABLISHED }
+                .filter { it.connection.kind == kind && it.session.state != BridgeSession.State.ESTABLISHED }
                 .sortedBy { it.openedAt }
-            if (unfinished.size >= MAX_UNFINISHED_WIFI) unfinished.first().session.close("too many Wi-Fi connections")
+            if (unfinished.size >= MAX_UNFINISHED_WIFI) unfinished.first().session.close("too many connections")
         }
         val callbacks = Callbacks(connection)
         val entry = Entry(
             connection,
-            BridgeSession(identity(), pairing, callbacks, wifiChannels = connection.kind.isWifi),
+            BridgeSession(
+                identity(),
+                pairing,
+                callbacks,
+                wifiChannels = kind.isWifi,
+                // Pairing needs the QR code or an invitation, never a connection from the internet (D-072).
+                allowPairing = kind != TransportKind.DIRECT,
+            ),
             clock(),
         )
         callbacks.entry = entry
@@ -235,7 +251,7 @@ class LinkManager(
     override fun onClosed(connection: LinkConnection, reason: String) = post {
         val entry = entries.remove(connection) ?: return@post
         entry.session.close(reason)
-        Log.i(TAG, "${connection.label}: disconnected ($reason)")
+        if (!entry.quiet) Log.i(TAG, "${connection.label}: disconnected ($reason)")
         laneLost(entry)
     }
 
@@ -290,7 +306,7 @@ class LinkManager(
 
     /** The user unpaired on this phone: tell the iPhone on every session (or through the mailbox), then forget it. */
     fun unpairLocally() = post {
-        val sessions = listOfNotNull(radio, wifi)
+        val sessions = listOfNotNull(radio, wifi, direct)
         sessions.forEach { e ->
             e.session.send(Messages.unpair())
             e.session.close("unpaired on this phone")
@@ -301,7 +317,7 @@ class LinkManager(
 
     /** The iPhone sent `unpair`. */
     fun onRemoteUnpair() = post {
-        listOfNotNull(radio, wifi).forEach { it.session.close("unpaired by the iPhone") }
+        listOfNotNull(radio, wifi, direct).forEach { it.session.close("unpaired by the iPhone") }
         forgetPeer(farewell = null)
         Log.i(TAG, "the iPhone unpaired")
     }
@@ -361,11 +377,12 @@ class LinkManager(
         }
     }
 
-    private fun established(token: Long): Entry? = listOfNotNull(radio, wifi).firstOrNull { it.token == token }
+    private fun established(token: Long): Entry? = listOfNotNull(radio, wifi, direct).firstOrNull { it.token == token }
 
     /** A connection's session ended: take it off its lane and move events elsewhere if needed. */
     private fun laneLost(entry: Entry) {
         if (radio === entry) radio = null
+        if (direct === entry) direct = null
         if (wifi === entry) {
             wifi = null
             wifiToken = null
@@ -391,12 +408,12 @@ class LinkManager(
 
     /** Recomputes [primary] and the snapshot. Returns true if the event session changed. */
     private fun refreshPrimary(): Boolean {
-        val now = radio ?: wifi
+        val now = radio ?: wifi ?: direct
         val changed = now !== primary
         val wasUp = primary != null
         primary = now
         if (wasUp != (now != null)) remote?.onSessionChanged(now != null)
-        val kinds = listOfNotNull(radio, wifi).map { it.connection.kind }.toSet()
+        val kinds = listOfNotNull(radio, wifi, direct).map { it.connection.kind }.toSet()
         updateState {
             it.copy(
                 connected = now != null,
@@ -424,12 +441,14 @@ class LinkManager(
         for (e in entries.values.toList()) {
             val established = e.session.state == BridgeSession.State.ESTABLISHED
             if (!established) {
-                if (now - e.openedAt > HANDSHAKE_TIMEOUT_MS) e.session.close("handshake timed out")
+                val limit = if (e.connection.kind == TransportKind.DIRECT) DIRECT_HANDSHAKE_TIMEOUT_MS else HANDSHAKE_TIMEOUT_MS
+                if (now - e.openedAt > limit) e.session.close("handshake timed out")
                 continue
             }
             val idle = now - e.lastReceived
-            val pingAfter = if (e.wifi) WIFI_PING_AFTER_MS else PING_AFTER_MS
-            val idleLimit = if (e.wifi) WIFI_IDLE_TIMEOUT_MS else IDLE_TIMEOUT_MS
+            val fast = e.connection.kind.fastKeepAlive
+            val pingAfter = if (fast) WIFI_PING_AFTER_MS else PING_AFTER_MS
+            val idleLimit = if (fast) WIFI_IDLE_TIMEOUT_MS else IDLE_TIMEOUT_MS
             when {
                 idle > idleLimit -> e.session.close("nothing received for ${idle / 1000} s")
                 idle > pingAfter && now - e.lastPingSent > pingAfter -> {
@@ -465,7 +484,7 @@ class LinkManager(
         override fun sendFrame(frame: ByteArray) = connection.send(frame)
 
         override fun close(reason: String) {
-            Log.i(TAG, "${connection.label}: closing ($reason)")
+            if (!entry.quiet) Log.i(TAG, "${connection.label}: closing ($reason)")
             connection.close()
             laneLost(entry)
         }
@@ -485,14 +504,24 @@ class LinkManager(
         override fun onEstablished() {
             val e = entry
             e.token = ++tokens
+            connection.onAuthenticated()
             // Newest session wins on its lane: an iPhone that reconnects may leave a stale connection behind.
             // Put the new one in place first, so closing the old one doesn't look like a disconnect.
-            val old = if (e.wifi) wifi else radio
-            if (e.wifi) {
-                wifi = e
-                wifiToken = e.token
-            } else {
-                radio = e
+            val old: Entry?
+            when {
+                e.wifi -> {
+                    old = wifi
+                    wifi = e
+                    wifiToken = e.token
+                }
+                connection.kind == TransportKind.DIRECT -> {
+                    old = direct
+                    direct = e
+                }
+                else -> {
+                    old = radio
+                    radio = e
+                }
             }
             val carriesEvents = refreshPrimary() && primary === e
             old?.takeIf { it !== e }?.session?.close("replaced by a new connection")
@@ -529,6 +558,9 @@ class LinkManager(
         private const val TAG = "link"
         private const val WATCHDOG_INTERVAL_MS = 5_000L
         private const val HANDSHAKE_TIMEOUT_MS = 30_000L
+
+        /** The direct connection faces the internet: 10 s (PROTOCOL.md, "Direct connection"); its listener enforces it too. */
+        private const val DIRECT_HANDSHAKE_TIMEOUT_MS = 10_000L
         private const val PING_AFTER_MS = 60_000L
         private const val IDLE_TIMEOUT_MS = 180_000L
 

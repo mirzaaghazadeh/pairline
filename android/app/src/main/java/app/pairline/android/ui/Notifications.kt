@@ -103,7 +103,13 @@ object Notifications {
         val wifiReady = s.wifi == WifiLinkStatus.LISTENING
         return when {
             s.connected -> r.getString(R.string.notif_connected_title, peerName ?: r.getString(R.string.generic_iphone)) to
-                r.getString(if (wifiOnly) R.string.notif_connected_text_wifi else R.string.notif_connected_text)
+                r.getString(
+                    when {
+                        s.transport == TransportKind.DIRECT -> R.string.notif_connected_text_direct
+                        wifiOnly -> R.string.notif_connected_text_wifi
+                        else -> R.string.notif_connected_text
+                    },
+                )
             s.bluetooth == BluetoothStatus.NO_PERMISSION && !wifiReady -> r.getString(R.string.notif_permission_title) to
                 r.getString(R.string.notif_permission_text)
             s.bluetooth == BluetoothStatus.OFF && !wifiReady -> r.getString(R.string.notif_bt_off_title) to

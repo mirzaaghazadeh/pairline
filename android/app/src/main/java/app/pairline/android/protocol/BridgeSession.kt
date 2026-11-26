@@ -38,7 +38,8 @@ interface SessionCallbacks {
  * The bridge (B) side of one connection: pairing, the session handshake and records
  * (docs/PROTOCOL.md). Transport-independent and single-threaded; BLE and TCP feed it whole frames.
  *
- * A Wi-Fi session ([wifiChannels]) also derives the media and bulk keys and accepts `BULK` frames (M5).
+ * A Wi-Fi session ([wifiChannels]) also derives the media and bulk keys and accepts `BULK` frames (M5). Remote
+ * mode's direct connection ([allowPairing] false) closes on `PAIR_HELLO` without answering (D-072).
  */
 class BridgeSession(
     private val identity: StaticKey,
@@ -47,6 +48,7 @@ class BridgeSession(
     private val random: SecureRandom = SecureRandom(),
     private val newEphemeral: () -> StaticKey = { SoftwareKey.generate(random) },
     private val wifiChannels: Boolean = false,
+    private val allowPairing: Boolean = true,
 ) {
     enum class State { AWAIT_FIRST, AWAIT_HELLO, AWAIT_CONFIRM, ESTABLISHED, CLOSED }
 
@@ -132,6 +134,7 @@ class BridgeSession(
     }
 
     private fun onPairHello(body: ByteArray) {
+        if (!allowPairing) throw ProtocolException("pairing isn't possible on this connection")
         if (state != State.AWAIT_FIRST) throw ProtocolException("pair_hello in the wrong state")
         // Malformed pair_hello (bad JSON, version, lengths or a point off the curve) gets bad_mac
         // (PROTOCOL.md clarifications), without touching the code on screen.

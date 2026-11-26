@@ -5,10 +5,19 @@ enum class TransportKind {
     DEBUG_TCP,
 
     /** The local Wi-Fi link (M5): a full session, plus the media and bulk channels. */
-    WIFI;
+    WIFI,
+
+    /**
+     * Remote mode's direct connection through the home router (D-072): the Wi-Fi session's framing, handshake and
+     * messages from anywhere on the internet, without media or bulk channels, on a lane of its own.
+     */
+    DIRECT;
 
     /** BLE and the debug TCP link share the "radio" lane; Wi-Fi has its own (PROTOCOL.md, "Two sessions at once"). */
     val isWifi: Boolean get() = this == WIFI
+
+    /** Wi-Fi and the direct connection notice a dead peer within 45 s (PROTOCOL.md, "Wi-Fi" keep-alive). */
+    val fastKeepAlive: Boolean get() = this == WIFI || this == DIRECT
 }
 
 /** One connection from an iPhone, over any transport. Methods are thread-safe. */
@@ -41,6 +50,12 @@ interface LinkConnection {
      * it to stop reading while too many frames wait (file data arrives faster than BLE ever could).
      */
     fun frameProcessed() {}
+
+    /**
+     * The session handshake on this connection authenticated the pinned iPhone. Called on the link thread. The direct
+     * connection reads nothing after the hello and the confirm until this.
+     */
+    fun onAuthenticated() {}
 }
 
 /** A Wi-Fi connection can open the UDP media channel for its session. */

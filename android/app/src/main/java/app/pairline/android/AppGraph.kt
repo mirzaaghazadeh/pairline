@@ -12,6 +12,9 @@ import app.pairline.android.link.LinkManager
 import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
 import app.pairline.android.link.PrefsPeerKeyStore
+import app.pairline.android.link.remote.DirectLink
+import app.pairline.android.link.remote.DirectListener
+import app.pairline.android.link.remote.PrefsKeyValueStore
 import app.pairline.android.link.remote.RemoteConfig
 import app.pairline.android.link.remote.RemoteLink
 import app.pairline.android.link.remote.RemotePairingFlow
@@ -68,6 +71,14 @@ object AppGraph {
         )
     }
 
+    /**
+     * Remote mode's direct connection through the home router (D-072): a public listener whose sessions join
+     * [link] on their own lane, and the router's port mapping. Its `remote.addr` / `remote.state` go out like events.
+     */
+    val direct: DirectLink by lazy {
+        DirectLink(DirectListener(link), link::send, PrefsKeyValueStore(app, "pairline.direct"))
+    }
+
     /** Pairing from far away through an invitation (D-072). */
     val remotePairing: RemotePairingFlow by lazy {
         RemotePairingFlow(
@@ -115,7 +126,12 @@ object AppGraph {
     val router: MessageRouter by lazy {
         MessageRouter(
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList, remote,
-        ).also { router -> remote.onConfigured = router::remoteStarted }
+        ).also { router ->
+            remote.onConfigured = {
+                router.remoteStarted()
+                direct.announce()
+            }
+        }
     }
 
     /** Internet sharing for the paired iPhone (M8, D-048). */

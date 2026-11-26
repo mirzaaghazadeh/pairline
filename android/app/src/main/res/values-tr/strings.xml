@@ -485,4 +485,17 @@
     <string name="remote_pair_paste_intro">iPhone uzakta mı? Ondan bir davet bağlantısı aldıysanız bağlantının tamamını kopyalayıp buraya yapıştırın.</string>
     <string name="remote_pair_paste">Daveti yapıştır</string>
     <string name="remote_pair_paste_none">Panoda Pairline daveti yok. Bağlantının tamamını (pairline://invite ile başlar) kopyalayıp tekrar deneyin.</string>
+
+    <string name="home_connected_body_direct">İnternet üzerinden, doğrudan ev modeminiz aracılığıyla. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
+    <string name="notif_connected_text_direct">İnternet üzerinden bağlı. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
+    <string name="direct_checking">Doğrudan bağlantı: kontrol ediliyor…</string>
+    <string name="direct_open">Doğrudan bağlantı: açık</string>
+    <string name="direct_ipv6_unconfirmed">Doğrudan bağlantı: yalnızca IPv6 ile, modem izin verirse</string>
+    <string name="direct_not_possible">Doğrudan bağlantı: mümkün değil (%1$s)</string>
+    <string name="direct_reason_wifi">bu telefon Wi-Fi\'ye bağlı değil</string>
+    <string name="direct_reason_carrier_nat">internet sağlayıcısı bu eve kendi adresini vermiyor</string>
+    <string name="direct_reason_double_nat">bu modemin önünde başka bir modem var</string>
+    <string name="direct_reason_no_address">modemin internet adresi yok</string>
+    <string name="direct_reason_no_mapping">modem uygulamalar için port açmıyor</string>
+    <string name="direct_reason_listen">bu telefonda port açılamadı</string>
 </resources>

@@ -49,6 +49,8 @@ object Msg {
     // Remote mode (v1, D-072).
     const val REMOTE_CONFIG = "remote.config"
     const val REMOTE_TOKEN = "remote.token"
+    const val REMOTE_ADDR = "remote.addr"
+    const val REMOTE_STATE = "remote.state"
     const val RPAIR_HELLO = "rpair.hello"
     const val RPAIR_NONCE = "rpair.nonce"
     const val RPAIR_REVEAL = "rpair.reveal"
@@ -163,6 +165,24 @@ object Messages {
     fun fileCancel(fid: Long, reason: String? = null): JSONObject = JSONObject()
         .put("t", Msg.FILE_CANCEL)
         .put("fid", fid)
+        .putNullable("reason", reason)
+
+    /**
+     * Where remote mode's direct connection listens (D-072): `v4` `"203.0.113.5:47830"`, `v6` `"[2001:db8::5]:47830"`,
+     * either null.
+     */
+    fun remoteAddr(v4: String?, v6: String?): JSONObject = JSONObject()
+        .put("t", Msg.REMOTE_ADDR)
+        .putNullable("v4", v4)
+        .putNullable("v6", v6)
+
+    /**
+     * `direct`: `open` / `none` / `blocked`; [reason] a fixed code (`cgnat`, `no_public_address`, `no_mapping`,
+     * `not_wifi`, `listener_failed`), null when open.
+     */
+    fun remoteState(direct: String, reason: String?): JSONObject = JSONObject()
+        .put("t", Msg.REMOTE_STATE)
+        .put("direct", direct)
         .putNullable("reason", reason)
 }
 

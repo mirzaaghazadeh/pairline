@@ -144,6 +144,27 @@ class BridgeSessionTest {
     }
 
     @Test
+    fun directConnectionRefusesPairingSilently() {
+        // Remote mode's direct connection (D-072): a valid PAIR_HELLO with the code on screen still gets nothing.
+        val gate = Gate(hex("pairing.pairing_secret"))
+        val rec = Recorder(pinned = null)
+        BridgeSession(TestVectors.key("sB"), gate, rec, allowPairing = false).onFrame(frame(FrameType.PAIR_HELLO, pairHello))
+        assertNotNull(rec.closedReason)
+        assertTrue(rec.frames.isEmpty())
+        assertNull(gate.pinned)
+        assertEquals(0, gate.badMacs)
+
+        // The handshake with the pinned iPhone works as on Wi-Fi.
+        val ok = Recorder(pinned = TestVectors.publicKey("sR"))
+        val s = BridgeSession(
+            TestVectors.key("sB"), Gate(null), ok, FixedRandom(hex("session.rand_b")), { TestVectors.key("eB") }, allowPairing = false,
+        )
+        s.onFrame(hex("session.hello_r_frame"))
+        s.onFrame(frame(FrameType.RECORD, hex("session.confirm_r_to_b")))
+        assertTrue(ok.established)
+    }
+
+    @Test
     fun helloWithoutPairingCloses() {
         val rec = Recorder(pinned = null)
         session(Gate(null), rec).onFrame(hex("session.hello_r_frame"))

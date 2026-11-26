@@ -485,4 +485,17 @@
     <string name="remote_pair_paste_intro">آیفون دور است؟ اگر از آن لینک دعوت گرفته‌اید، کل لینک را کپی کنید و اینجا بچسبانید.</string>
     <string name="remote_pair_paste">چسباندن دعوت</string>
     <string name="remote_pair_paste_none">هیچ دعوت Pairline در کلیپ‌بورد نیست. کل لینک را (که با pairline://invite شروع می‌شود) کپی کنید و دوباره امتحان کنید.</string>
+
+    <string name="home_connected_body_direct">از طریق اینترنت، مستقیم از راه روتر خانه. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
+    <string name="notif_connected_text_direct">از طریق اینترنت وصل است. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
+    <string name="direct_checking">اتصال مستقیم: در حال بررسی…</string>
+    <string name="direct_open">اتصال مستقیم: باز است</string>
+    <string name="direct_ipv6_unconfirmed">اتصال مستقیم: فقط از طریق IPv6، اگر روتر اجازه دهد</string>
+    <string name="direct_not_possible">اتصال مستقیم: ممکن نیست (%1$s)</string>
+    <string name="direct_reason_wifi">این گوشی به وای‌فای وصل نیست</string>
+    <string name="direct_reason_carrier_nat">اینترنت‌دهنده به این خانه آدرس اینترنتی اختصاصی نمی‌دهد</string>
+    <string name="direct_reason_double_nat">روتر دیگری جلوی این روتر قرار دارد</string>
+    <string name="direct_reason_no_address">روتر آدرس اینترنتی ندارد</string>
+    <string name="direct_reason_no_mapping">روتر برای برنامه‌ها پورت باز نمی‌کند</string>
+    <string name="direct_reason_listen">باز کردن پورت روی این گوشی ممکن نشد</string>
 </resources>

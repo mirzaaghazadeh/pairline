@@ -486,4 +486,17 @@
     <string name="remote_pair_paste_intro">هل الآيفون بعيد؟ إذا وصلك منه رابط دعوة، فانسخ الرابط كاملًا والصقه هنا.</string>
     <string name="remote_pair_paste">لصق دعوة</string>
     <string name="remote_pair_paste_none">لا توجد دعوة من Pairline في الحافظة. انسخ الرابط كاملًا (يبدأ بـ pairline://invite) ثم حاول مرة أخرى.</string>
+
+    <string name="home_connected_body_direct">عبر الإنترنت، مباشرةً من خلال راوتر المنزل. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="notif_connected_text_direct">متصل عبر الإنترنت. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="direct_checking">الاتصال المباشر: جارٍ التحقق…</string>
+    <string name="direct_open">الاتصال المباشر: مفتوح</string>
+    <string name="direct_ipv6_unconfirmed">الاتصال المباشر: عبر IPv6 فقط، إن سمح الراوتر بذلك</string>
+    <string name="direct_not_possible">الاتصال المباشر: غير ممكن (%1$s)</string>
+    <string name="direct_reason_wifi">هذا الهاتف غير متصل بالواي فاي</string>
+    <string name="direct_reason_carrier_nat">مزوّد الإنترنت لا يمنح هذا المنزل عنوانًا خاصًا به</string>
+    <string name="direct_reason_double_nat">يوجد راوتر آخر أمام هذا الراوتر</string>
+    <string name="direct_reason_no_address">ليس للراوتر عنوان على الإنترنت</string>
+    <string name="direct_reason_no_mapping">الراوتر لا يفتح المنافذ للتطبيقات</string>
+    <string name="direct_reason_listen">تعذّر فتح منفذ على هذا الهاتف</string>
 </resources>

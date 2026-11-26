@@ -56,6 +56,9 @@ import app.pairline.android.link.LinkService
 import app.pairline.android.link.LinkSnapshot
 import app.pairline.android.link.TransportKind
 import app.pairline.android.link.WifiLinkStatus
+import app.pairline.android.link.remote.Direct
+import app.pairline.android.link.remote.DirectReason
+import app.pairline.android.link.remote.DirectStatus
 import app.pairline.android.protocol.Caps
 import app.pairline.android.telephony.Perms
 import app.pairline.android.telephony.SimSnapshot
@@ -247,9 +250,11 @@ private fun LinkCard(
             val (title, body) = when {
                 link.connected -> stringResource(R.string.home_connected_title, peer) to stringResource(
                     when {
+                        link.transport == TransportKind.DIRECT -> R.string.home_connected_body_direct
                         link.transport == TransportKind.DEBUG_TCP && !ScreenshotMode.enabled && TransportKind.WIFI !in link.transports ->
                             R.string.home_connected_body_tcp
-                        TransportKind.WIFI in link.transports && link.transports.size > 1 -> R.string.home_connected_body_both
+                        TransportKind.WIFI in link.transports &&
+                            link.transports.any { it != TransportKind.WIFI && it != TransportKind.DIRECT } -> R.string.home_connected_body_both
                         TransportKind.WIFI in link.transports -> R.string.home_connected_body_wifi
                         else -> R.string.home_connected_body
                     },
@@ -264,6 +269,8 @@ private fun LinkCard(
             }
             Text(title, style = MaterialTheme.typography.titleLarge)
             Text(body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            val direct by AppGraph.direct.status.collectAsState()
+            if (paired && direct.active) DirectLine(direct)
             when {
                 link.bluetooth == BluetoothStatus.OFF -> PrimaryButton(stringResource(R.string.action_turn_on_bt), { SystemActions.requestBluetoothOn(context) }, icon = PIcons.Bluetooth)
                 link.bluetooth == BluetoothStatus.NO_PERMISSION -> PrimaryButton(stringResource(R.string.action_allow), onAllowBluetooth, icon = PIcons.Bluetooth)
@@ -271,6 +278,37 @@ private fun LinkCard(
             }
         }
     }
+}
+
+/** Remote mode's direct connection through the home router (D-072): open, or why not. */
+@Composable
+private fun DirectLine(s: DirectStatus) {
+    val open = s.direct == Direct.OPEN
+    val text = when {
+        s.direct == null -> stringResource(R.string.direct_checking)
+        open -> stringResource(R.string.direct_open)
+        s.ipv6Unconfirmed -> stringResource(R.string.direct_ipv6_unconfirmed)
+        else -> stringResource(R.string.direct_not_possible, stringResource(directReasonText(s.reason)))
+    }
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(
+            if (open) PIcons.CheckCircle else PIcons.Info,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = if (open) toneColors(Tone.GOOD).content else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@StringRes
+private fun directReasonText(reason: DirectReason?): Int = when (reason) {
+    DirectReason.NOT_ON_WIFI -> R.string.direct_reason_wifi
+    DirectReason.CARRIER_NAT -> R.string.direct_reason_carrier_nat
+    DirectReason.DOUBLE_NAT -> R.string.direct_reason_double_nat
+    DirectReason.NO_PUBLIC_ADDRESS -> R.string.direct_reason_no_address
+    DirectReason.NO_MAPPING, null -> R.string.direct_reason_no_mapping
+    DirectReason.LISTEN_FAILED -> R.string.direct_reason_listen
 }
 
 @Composable
