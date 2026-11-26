@@ -78,6 +78,8 @@ class RemoteLink(
     @Volatile private var sessionUp = false
     @Volatile private var lastReceived = 0L
     @Volatile private var lastStatusKey: String? = null
+    @Volatile private var lastStatusDetail: String? = null
+    @Volatile private var lastStatusSentAt = 0L
     @Volatile private var nextCheckAt = 0L
     @Volatile private var retryAt = 0L
     @Volatile private var failures = 0
@@ -106,10 +108,18 @@ class RemoteLink(
     override fun send(message: JSONObject) {
         val slot = slotFor(message) ?: return
         if (message.type == Msg.STATUS && message.requestId == null) {
-            // Only when it changed, never on a timer (PROTOCOL.md, "Remote messages").
+            // Only when it changed (PROTOCOL.md, "Remote messages"): at once for what matters (statusKey), and at
+            // most every STATUS_DETAIL_MS for the rest (signal bars, battery percent), so the iPhone's battery and
+            // signal stay roughly current without a record for every flicker.
             val key = statusKey(message)
-            if (key == lastStatusKey) return
+            val detail = JSONObject(message.toString()).apply { remove("time") }.toString()
+            val now = clock()
+            val matters = key != lastStatusKey
+            val detailDue = detail != lastStatusDetail && now - lastStatusSentAt >= STATUS_DETAIL_MS
+            if (!matters && !detailDue) return
             lastStatusKey = key
+            lastStatusDetail = detail
+            lastStatusSentAt = now
         }
         val plaintext = message.toString().toByteArray(Charsets.UTF_8)
         if (plaintext.size > Mailbox.MAX_PLAINTEXT) {
@@ -147,7 +157,11 @@ class RemoteLink(
         publish()
         Log.i(TAG, "remote mode on (${config.backend.wire}, ${config.environment.wire})")
         wake.trySend(Unit)
+        onConfigured?.invoke()
     }
+
+    /** Remote mode was just turned on (by `remote.config` or a remote pairing): introduce this phone to the iPhone. */
+    var onConfigured: (() -> Unit)? = null
 
     /** `remote.token`: a fresh web auth token; checking resumes if it had stopped. */
     fun updateToken(token: String) {
@@ -366,6 +380,9 @@ class RemoteLink(
          * [BURST_CHECK_MS] for [BURST_MS] after a record from the iPhone, so a conversation feels live; every
          * [FAST_CHECK_MS] while the iPhone was heard from in the last [RECENT_MS]; otherwise every [SLOW_CHECK_MS].
          */
+        /** A status that changed only in signal bars or battery percent goes at most this often. */
+        const val STATUS_DETAIL_MS = 10 * 60_000L
+
         const val BURST_MS = 2 * 60_000L
         const val BURST_CHECK_MS = 5_000L
         const val RECENT_MS = 10 * 60_000L

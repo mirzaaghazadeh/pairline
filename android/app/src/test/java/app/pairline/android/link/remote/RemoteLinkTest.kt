@@ -223,6 +223,27 @@ class RemoteLinkTest {
     }
 
     @Test
+    fun smallStatusChangesGoAtMostEveryTenMinutes() {
+        on()
+        link.send(status(83, now))
+        link.step()
+        assertEquals(1, phoneReads(mb.quiet).size)
+        // Only the battery percent changed: held back for now…
+        link.send(status(81, now + 1000))
+        link.step()
+        assertTrue(phoneReads(mb.quiet).isEmpty())
+        // …and sent once ten minutes have passed since the last one.
+        now += RemoteLink.STATUS_DETAIL_MS
+        link.send(status(81, now))
+        link.step()
+        assertEquals(1, phoneReads(mb.quiet).size)
+        // A change that matters goes at once.
+        link.send(status(69, now + 1000))
+        link.step()
+        assertEquals(1, phoneReads(mb.quiet).size)
+    }
+
+    @Test
     fun statusKeyIgnoresSignalBarsAndSmallBatteryChanges() {
         fun status(level: Int, signal: Int, net: String, charging: Boolean = false) = JSONObject(
             """{"t":"status","time":${now + level},"battery":{"level":$level,"charging":$charging},

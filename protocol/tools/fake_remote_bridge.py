@@ -179,10 +179,28 @@ def cmd_call(args):
     print(f"sent {msg['t']} to the alert mailbox")
 
 
+def fake_status(request_id=None) -> dict:
+    """A plausible bridge status (made-up values), as the real bridge would send it."""
+    status = {"t": "status", "battery": {"level": 76, "charging": False}, "app": "1.0-fake",
+              "caps": ["sms.receive", "sms.send", "sms.history", "call.observe"], "time": now_ms(),
+              "sims": [{"slot": 0, "carrier": "Test Carrier", "label": "SIM 1", "number": None, "signal": 3,
+                        "net": "LTE", "roaming": False, "defaultSms": True, "defaultVoice": True}]}
+    if request_id is not None:
+        status["id"] = request_id
+    return status
+
+
 def cmd_serve(args):
-    """Answers the iPhone's requests from the R→B mailbox: `ok` for most, a fake sms.state for sms.send."""
+    """Answers the iPhone's requests from the R→B mailbox: `ok` for most, a status for status.get, a fake sms.state
+    for sms.send. Starts by introducing itself (device.info and status), as the real bridge does when remote mode
+    starts."""
     state = load_state()
     ck, key, pub_r = client(state), identity(state), from_b64u(state["iphone_key"])
+    info = {"t": "device.info", "name": "Test bridge (fake)", "platform": "android", "os": "16", "app": "1.0-fake",
+            "proto": 1}
+    put(ck, state["mb"]["q"], seal_to_iphone(state, info))
+    put(ck, state["mb"]["q"], seal_to_iphone(state, fake_status()))
+    print("sent device.info and status to the quiet mailbox", flush=True)
     deadline = time.time() + args.seconds
     while time.time() < deadline:
         for name, sealed in fetch(ck, state["mb"]["b"]):
@@ -197,7 +215,9 @@ def cmd_serve(args):
             print(f"got {kind} (id {msg.get('id')}, cid {msg.get('cid')}) at {time.strftime('%H:%M:%S')}", flush=True)
             if kind == "remote.token" and msg.get("token"):
                 ckm.write_secret(ck.chain_path, ckm.normalize_token(msg["token"]))
-            if msg.get("id") is not None:
+            if kind == "status.get":
+                put(ck, state["mb"]["q"], seal_to_iphone(state, fake_status(msg.get("id"))))
+            elif msg.get("id") is not None:
                 put(ck, state["mb"]["q"], seal_to_iphone(state, {"t": "ok", "id": msg["id"]}))
             if kind == "sms.send":
                 put(ck, state["mb"]["q"], seal_to_iphone(state, {"t": "sms.state", "cid": msg.get("cid"),

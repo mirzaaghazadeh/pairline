@@ -147,6 +147,17 @@ class MessageRouter(
         audio.stop(null, "link closed")
     }
 
+    /**
+     * Remote mode just started (D-072). A phone paired from far away may never have had a session, so the iPhone
+     * learns this phone's name, model and status through the mailbox (or the session, if one is up).
+     */
+    fun remoteStarted() {
+        scope.launch {
+            link.send(Messages.deviceInfo(deviceName(), Build.VERSION.RELEASE ?: "", BuildConfig.VERSION_NAME))
+            sendStatus(force = true)
+        }
+    }
+
     /** Something in the status may have changed; sends it if it really did (at most every 2 s). */
     fun statusChanged() {
         if (!link.canSendEvents) return

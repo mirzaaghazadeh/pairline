@@ -115,7 +115,7 @@ object AppGraph {
     val router: MessageRouter by lazy {
         MessageRouter(
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList, remote,
-        )
+        ).also { router -> remote.onConfigured = router::remoteStarted }
     }
 
     /** Internet sharing for the paired iPhone (M8, D-048). */
