@@ -533,7 +533,7 @@ class MessageRouter(
      * which is for testing only.
      */
     private fun remoteConfig(id: Long, m: JSONObject, token: Long): JSONObject? =
-        when (val request = RemoteConfigRequest.parse(m, allowPublic = BuildConfig.DEBUG)) {
+        when (val request = RemoteConfigRequest.parse(m, debugBuild = BuildConfig.DEBUG)) {
             is RemoteConfigRequest.On -> {
                 remote.configure(request.config, request.token)
                 Messages.ok(id)

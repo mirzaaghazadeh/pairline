@@ -340,14 +340,14 @@ class RemoteLinkTest {
     fun remoteConfigIsChecked() {
         val good = JSONObject().put("t", Msg.REMOTE_CONFIG).put("id", 1).put("on", true).put("backend", "private")
             .put("env", "development").put("token", "abc").put("mb", JSONObject().put("b", mb.toBridge).put("a", mb.alert).put("q", mb.quiet))
-        val on = RemoteConfigRequest.parse(good, allowPublic = false) as RemoteConfigRequest.On
+        val on = RemoteConfigRequest.parse(good, debugBuild = false) as RemoteConfigRequest.On
         assertEquals(RemoteBackend.PRIVATE, on.config.backend)
         assertEquals(mb, on.config.mailboxes)
         assertEquals("abc", on.token)
-        assertEquals(RemoteConfigRequest.Off, RemoteConfigRequest.parse(JSONObject().put("on", false), allowPublic = false))
+        assertEquals(RemoteConfigRequest.Off, RemoteConfigRequest.parse(JSONObject().put("on", false), debugBuild = false))
 
         val bad = listOf(
-            JSONObject(good.toString()).put("backend", "public"), // release builds
+            JSONObject(good.toString()).put("backend", "public"), // release builds: public only in Production
             JSONObject(good.toString()).put("env", "staging"),
             JSONObject(good.toString()).put("token", "has space"),
             JSONObject(good.toString()).put("mb", JSONObject().put("b", mb.toBridge).put("a", mb.toBridge).put("q", mb.quiet)),
@@ -355,12 +355,43 @@ class RemoteLinkTest {
         )
         for (message in bad) {
             try {
-                RemoteConfigRequest.parse(message, allowPublic = false)
+                RemoteConfigRequest.parse(message, debugBuild = false)
                 fail("accepted $message")
             } catch (e: RequestException) {
                 assertEquals(ErrorCode.INVALID, e.code)
             }
         }
-        assertTrue(RemoteConfigRequest.parse(JSONObject(good.toString()).put("backend", "public"), allowPublic = true) is RemoteConfigRequest.On)
+        assertTrue(RemoteConfigRequest.parse(JSONObject(good.toString()).put("backend", "public"), debugBuild = true) is RemoteConfigRequest.On)
+    }
+
+    /**
+     * What a TestFlight iPhone sends (D-092): the public database in CloudKit Production. A release bridge takes it;
+     * the public database in Development stays for debug builds, and malformed requests are still refused.
+     */
+    @Test
+    fun releaseBuildsTakeTheTestFlightSetup() {
+        val testFlight = JSONObject().put("t", Msg.REMOTE_CONFIG).put("id", 1).put("on", true).put("backend", "public")
+            .put("env", "production").put("token", "abc").put("mb", JSONObject().put("b", mb.toBridge).put("a", mb.alert).put("q", mb.quiet))
+        val on = RemoteConfigRequest.parse(testFlight, debugBuild = false) as RemoteConfigRequest.On
+        assertEquals(RemoteBackend.PUBLIC, on.config.backend)
+        assertEquals(RemoteEnvironment.PRODUCTION, on.config.environment)
+
+        assertTrue(RemoteConfig.accepts(RemoteBackend.PUBLIC, RemoteEnvironment.PRODUCTION, debugBuild = false))
+        assertTrue(RemoteConfig.accepts(RemoteBackend.PRIVATE, RemoteEnvironment.PRODUCTION, debugBuild = false))
+        assertFalse(RemoteConfig.accepts(RemoteBackend.PUBLIC, RemoteEnvironment.DEVELOPMENT, debugBuild = false))
+        assertTrue(RemoteConfig.accepts(RemoteBackend.PUBLIC, RemoteEnvironment.DEVELOPMENT, debugBuild = true))
+
+        for (message in listOf(
+            JSONObject(testFlight.toString()).put("token", ""),
+            JSONObject(testFlight.toString()).put("env", "staging"),
+            JSONObject(testFlight.toString()).apply { remove("mb") },
+        )) {
+            try {
+                RemoteConfigRequest.parse(message, debugBuild = false)
+                fail("accepted $message")
+            } catch (e: RequestException) {
+                assertEquals(ErrorCode.INVALID, e.code)
+            }
+        }
     }
 }

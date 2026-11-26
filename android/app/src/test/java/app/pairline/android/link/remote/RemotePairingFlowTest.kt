@@ -52,10 +52,10 @@ class RemotePairingFlowTest {
     }
 
     private val host = TestHost(bridge, deviceId)
-    private var flow = flow(allowPublic = true)
+    private var flow = flow(debugBuild = true)
 
-    private fun flow(allowPublic: Boolean) =
-        RemotePairingFlow(host, cloud, allowPublic, { clock.get() }, random, pollMs = 5, dispatcher = Dispatchers.IO)
+    private fun flow(debugBuild: Boolean) =
+        RemotePairingFlow(host, cloud, debugBuild, { clock.get() }, random, pollMs = 5, dispatcher = Dispatchers.IO)
 
     @After
     fun tearDown() = flow.cancel()
@@ -64,7 +64,8 @@ class RemotePairingFlowTest {
         backend: String = "public",
         expiresAt: Long = clock.get() / 1000 + 600,
         key: ByteArray = phone.publicKey,
-    ) = "pairline://invite?v=1&k=${B64u.encode(key)}&s=${B64u.encode(secret)}&b=$backend&e=development" +
+        environment: String = "development",
+    ) = "pairline://invite?v=1&k=${B64u.encode(key)}&s=${B64u.encode(secret)}&b=$backend&e=$environment" +
         "&t=tok%2Bx&m=$toBridge&a=$alert&q=$quiet&x=$expiresAt"
 
     private fun <T> eventually(probe: () -> T?): T {
@@ -157,10 +158,15 @@ class RemotePairingFlowTest {
         assertEquals(State.Refused(Refusal.MALFORMED), flow.state.value)
         flow.open(link(expiresAt = clock.get() / 1000))
         assertEquals(State.Refused(Refusal.EXPIRED), flow.state.value)
-        flow = flow(allowPublic = false)
+        // A release build: the public database only in Production, which is what a TestFlight iPhone invites with.
+        flow = flow(debugBuild = false)
         flow.open(link(backend = "public"))
         assertEquals(State.Refused(Refusal.UNSUPPORTED), flow.state.value)
         flow.open(link(backend = "private"))
+        assertTrue(flow.state.value is State.Asking)
+        flow.cancel()
+        flow = flow(debugBuild = false)
+        flow.open(link(backend = "public", environment = "production"))
         assertTrue(flow.state.value is State.Asking)
     }
 

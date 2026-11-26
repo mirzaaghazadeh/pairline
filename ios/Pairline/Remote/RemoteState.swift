@@ -1,18 +1,48 @@
 import Foundation
 
-/// Remote mode (D-092) is in debug builds only for now: it uses the public CloudKit backend in the Development
-/// environment while Apple looks into the private database. Release builds show and do nothing of it.
+/// Remote mode ("Cloud mode", D-092) runs in test builds only for now, on the public CloudKit backend, while Apple
+/// looks into the private database: debug builds in CloudKit's Development environment, and TestFlight builds in
+/// Production. The App Store build shows and does nothing of it.
+///
+/// A TestFlight build is one archived with the `PAIRLINE_CLOUD_TESTFLIGHT` compilation condition (docs/RELEASING.md)
+/// and running from TestFlight (a sandbox receipt). The condition keeps Cloud mode out of every other Release build:
+/// App Review also runs with a sandbox receipt, so a build made for TestFlight must never be submitted for review.
 enum RemoteFeature {
-    static var isAvailable: Bool {
-        #if DEBUG
-        return true
-        #else
-        return false
-        #endif
+    enum Build: Equatable {
+        case debug
+        case testFlight
+        case appStore
     }
 
+    /// What kind of build this is, worked out once.
+    static let build: Build = {
+        #if DEBUG
+        return kind(debug: true, testFlightBuild: false, receiptName: nil)
+        #elseif PAIRLINE_CLOUD_TESTFLIGHT
+        return kind(debug: false, testFlightBuild: true, receiptName: Bundle.main.appStoreReceiptURL?.lastPathComponent)
+        #else
+        return kind(debug: false, testFlightBuild: false, receiptName: nil)
+        #endif
+    }()
+
+    /// The rule behind `build`, apart for tests: a TestFlight build counts as one only where its receipt is a sandbox
+    /// receipt; installed from the App Store (a real receipt) it behaves as the App Store build.
+    static func kind(debug: Bool, testFlightBuild: Bool, receiptName: String?) -> Build {
+        if debug { return .debug }
+        return testFlightBuild && receiptName == "sandboxReceipt" ? .testFlight : .appStore
+    }
+
+    static var isAvailable: Bool { build != .appStore }
+
     static let backend: RemoteInvitation.Backend = .public
-    static let environment: RemoteInvitation.Environment = .development
+
+    /// CloudKit's environment follows the signing: a development-signed (debug) build reaches Development, a
+    /// distribution-signed (TestFlight) build Production. The web auth token and the API token must match it.
+    static var environment: RemoteInvitation.Environment { environment(for: build) }
+
+    static func environment(for build: Build) -> RemoteInvitation.Environment {
+        build == .testFlight ? .production : .development
+    }
 
     /// `proto` in this iPhone's `device.info`: 1 when it speaks remote mode (PROTOCOL.md, "Version 1").
     static var protocolVersion: Int { isAvailable ? 1 : Int(WireProtocol.version) }

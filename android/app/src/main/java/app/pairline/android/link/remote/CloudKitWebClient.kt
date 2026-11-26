@@ -149,10 +149,12 @@ class CloudKitWebClient(
 
         /**
          * CloudKit API tokens are made for web pages (CloudKit Console › Tokens & Keys); one alone reads nothing, a
-         * signed-in user's web auth token is needed too. Production gets its token when the add-on ships (D-092).
+         * signed-in user's web auth token is needed too. Development serves debug iPhones; Production serves TestFlight
+         * iPhones now and App Store iPhones once Cloud mode ships there (D-092).
          */
         private val API_TOKENS = mapOf(
             RemoteEnvironment.DEVELOPMENT to "88f1d920f369a9d3976a70aa7d7ddb5ac7faca8b1545f01fc9c2aef5ce435a1b",
+            RemoteEnvironment.PRODUCTION to "77a377504d64d4de8978f7d16bdae9b7758a00ee1c0bdc513e62cf0a087edb0a",
         )
 
         /** A `sealed` text field of at most this many characters fits in the push; larger records use `payload`. */

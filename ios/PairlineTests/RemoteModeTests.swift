@@ -89,6 +89,33 @@ private func waitFor(_ condition: () -> Bool, timeout: TimeInterval = 3) async {
     }
 }
 
+// MARK: - Which builds have Cloud mode (D-092)
+
+final class RemoteFeatureTests: XCTestCase {
+    /// Debug builds always; a build made for TestFlight only while it runs from TestFlight (a sandbox receipt); every
+    /// other build, and a TestFlight-made build installed from the App Store, never.
+    func testBuildKinds() {
+        XCTAssertEqual(RemoteFeature.kind(debug: true, testFlightBuild: false, receiptName: nil), .debug)
+        XCTAssertEqual(RemoteFeature.kind(debug: false, testFlightBuild: true, receiptName: "sandboxReceipt"), .testFlight)
+        XCTAssertEqual(RemoteFeature.kind(debug: false, testFlightBuild: true, receiptName: "receipt"), .appStore)
+        XCTAssertEqual(RemoteFeature.kind(debug: false, testFlightBuild: true, receiptName: nil), .appStore)
+        XCTAssertEqual(RemoteFeature.kind(debug: false, testFlightBuild: false, receiptName: "sandboxReceipt"), .appStore)
+    }
+
+    /// TestFlight reaches CloudKit Production with its own API token; debug builds Development.
+    func testEnvironmentAndTokenFollowTheBuild() {
+        XCTAssertEqual(RemoteFeature.environment(for: .debug), .development)
+        XCTAssertEqual(RemoteFeature.environment(for: .testFlight), .production)
+        XCTAssertEqual(RemoteCloud.apiToken(for: .development), RemoteCloud.developmentAPIToken)
+        XCTAssertEqual(RemoteCloud.apiToken(for: .production), RemoteCloud.productionAPIToken)
+        XCTAssertNotEqual(RemoteCloud.productionAPIToken, RemoteCloud.developmentAPIToken)
+        // The test host is a debug build.
+        XCTAssertEqual(RemoteFeature.build, .debug)
+        XCTAssertTrue(RemoteFeature.isAvailable)
+        XCTAssertEqual(RemoteFeature.environment, .development)
+    }
+}
+
 // MARK: - State
 
 final class RemoteStoreTests: XCTestCase {

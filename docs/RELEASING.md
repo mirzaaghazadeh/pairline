@@ -94,3 +94,21 @@ release note names the git tag and commit (`ios-v<version>`).
    "exportArchive Copy failed".
 3. Uploading doesn't submit anything. Attach the build to the version in App Store Connect and submit it for review
    when it's time; `Info.plist` already answers the export-compliance question (D-035).
+
+### A TestFlight build with Cloud mode (D-092)
+
+Until Apple's private database works for Cloud mode, only test builds have it. A build for TestFlight testers gets it
+by archiving with one extra compilation condition:
+
+```sh
+xcodebuild -scheme Pairline -configuration Release -destination 'generic/platform=iOS' \
+  -archivePath build/Pairline-testflight.xcarchive archive "${AUTH[@]}" \
+  SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) PAIRLINE_CLOUD_TESTFLIGHT'
+```
+
+Exported for App Store Connect as above, it reaches CloudKit's **Production** environment (distribution signing; the
+export sets `aps-environment` to production) and uses the public database there, with the Production API token in
+`RemoteCloud`. It turns Cloud mode on only where it runs from TestFlight (a sandbox receipt); installed from the App
+Store it behaves like any other build. **Never submit a build made this way for App Review:** review runs with a
+sandbox receipt too, so the reviewer would see Cloud mode and its purchases, which App Store users don't get. Builds
+for review are archived without the condition.

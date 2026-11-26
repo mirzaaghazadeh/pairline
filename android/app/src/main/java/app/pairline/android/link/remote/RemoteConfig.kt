@@ -39,6 +39,14 @@ data class RemoteConfig(
         /** A web auth token: non-empty printable ASCII without spaces, as in the invitation. */
         fun isToken(text: String): Boolean = text.length in 1..MAX_TOKEN && text.all { it in '!'..'~' }
 
+        /**
+         * Whether this build takes the setup an iPhone chose (D-092): debug builds any; release builds the public
+         * database only in CloudKit Production, which is what TestFlight iPhones use (the public database in
+         * Development is debug iPhones' test backend), and the private database.
+         */
+        fun accepts(backend: RemoteBackend, environment: RemoteEnvironment, debugBuild: Boolean): Boolean =
+            debugBuild || backend != RemoteBackend.PUBLIC || environment == RemoteEnvironment.PRODUCTION
+
         private const val MAX_TOKEN = 8192
     }
 }
@@ -64,14 +72,15 @@ sealed interface RemoteConfigRequest {
     companion object {
         /**
          * Reads `on`, `backend`, `env`, `token` and `mb {b, a, q}`. Throws [RequestException] (`invalid`) for anything
-         * missing or malformed, and for the public backend unless [allowPublic] (debug builds, D-092).
+         * missing or malformed, and for a setup this build doesn't take ([RemoteConfig.accepts]: a release build takes
+         * the public backend only in Production, D-092).
          */
-        fun parse(message: JSONObject, allowPublic: Boolean): RemoteConfigRequest {
+        fun parse(message: JSONObject, debugBuild: Boolean): RemoteConfigRequest {
             val on = message.boolOrNull("on") ?: invalid("on missing")
             if (!on) return Off
             val backend = message.stringOrNull("backend")?.let(RemoteBackend::of) ?: invalid("bad backend")
-            if (backend == RemoteBackend.PUBLIC && !allowPublic) invalid("backend not available in this build")
             val env = message.stringOrNull("env")?.let(RemoteEnvironment::of) ?: invalid("bad env")
+            if (!RemoteConfig.accepts(backend, env, debugBuild)) invalid("backend not available in this build")
             val token = message.stringOrNull("token")?.takeIf(RemoteConfig::isToken) ?: invalid("bad token")
             val mb = message.optJSONObject("mb") ?: invalid("mb missing")
             val mailboxes = RemoteMailboxes(

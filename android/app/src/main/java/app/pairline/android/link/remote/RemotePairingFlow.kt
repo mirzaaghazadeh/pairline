@@ -10,7 +10,6 @@ import app.pairline.android.protocol.MailboxHeader
 import app.pairline.android.protocol.MailboxKind
 import app.pairline.android.protocol.Msg
 import app.pairline.android.protocol.ProtocolException
-import app.pairline.android.protocol.RemoteBackend
 import app.pairline.android.protocol.RemoteInvitation
 import app.pairline.android.protocol.RemotePairing
 import app.pairline.android.protocol.StaticKey
@@ -157,7 +156,8 @@ internal class RemotePairingSteps(
 class RemotePairingFlow(
     private val host: Host,
     private val http: CloudKitWebClient.Http = CloudKitWebClient.HttpsTransport,
-    private val allowPublic: Boolean = BuildConfig.DEBUG,
+    /** Debug builds take invitations for any backend and environment; release builds as [RemoteConfig.accepts] says. */
+    private val debugBuild: Boolean = BuildConfig.DEBUG,
     private val clock: () -> Long = System::currentTimeMillis,
     private val random: SecureRandom = SecureRandom(),
     private val pollMs: Long = POLL_MS,
@@ -256,7 +256,8 @@ class RemotePairingFlow(
             val next = when {
                 invitation == null -> State.Refused(Refusal.MALFORMED)
                 invitation.expiresAt * 1000 <= clock() -> State.Refused(Refusal.EXPIRED)
-                invitation.backend == RemoteBackend.PUBLIC && !allowPublic -> State.Refused(Refusal.UNSUPPORTED)
+                !RemoteConfig.accepts(invitation.backend, invitation.environment, debugBuild) ->
+                    State.Refused(Refusal.UNSUPPORTED)
                 else -> State.Asking(invitation)
             }
             _state.value = next

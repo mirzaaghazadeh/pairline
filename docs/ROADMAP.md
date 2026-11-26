@@ -235,6 +235,8 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
       non-Apple client wakes a suspended iPhone; delay measured (public database, median 1.6 s; the private
       database is refused on the maintainer's account, asked Apple, D-092)
 - [x] Phase 0: notification-filtering entitlement requested (2026-11-26, Apple request ID Q7U98356ZR)
+- [x] Production schema deployed (2026-11-26); Cloud mode in TestFlight builds on the public database in Production,
+      release Android bridges accept it (D-092)
 - [x] Protocol: mailbox records, remote messages, remote pairing; v1 with shared vectors (`v1-remote.json`); the Opus
       kind comes with the Opus step
 - [x] Bridge mailbox: CloudKit Web Services client and RemoteLink in `link/remote/`
