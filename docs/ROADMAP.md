@@ -187,8 +187,9 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 
 - [ ] Phase 0: home router port mapping checked (NAT-PMP, PCP, UPnP), read-only
       (`protocol/tools/router_check.py`)
-- [ ] Phase 0: CloudKit container, API and management tokens; a record written through CloudKit Web Services from a
-      non-Apple client wakes a suspended iPhone; delay measured
+- [x] Phase 0: CloudKit container, API and management tokens; a record written through CloudKit Web Services from a
+      non-Apple client wakes a suspended iPhone; delay measured (public database, median 1.6 s; the private
+      database is refused on the maintainer's account, asked Apple, D-072)
 - [x] Phase 0: notification-filtering entitlement requested (2026-11-26, Apple request ID Q7U98356ZR)
 - [ ] Protocol: mailbox records, remote session, Opus kind; version bump and shared vectors
 - [ ] Bridge mailbox: CloudKit Web Services client in `link/remote/`

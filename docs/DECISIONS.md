@@ -1229,6 +1229,16 @@ service (no STUN/TURN, Firebase or Tailscale). Built on the `remote-mode` branch
   Both read the user record through the public database, both are Development tokens, and GET and POST requests
   fail alike. Other projects tie the 403 to Advanced Data Protection, which doesn't apply here; nothing published
   explains it for a plain account. Whether it affects every account or only some is untested (it needs a second
-  Apple ID). The push delay isn't measured yet.
+  Apple ID). Turning "Access iCloud Data on the Web" off and on only invalidated the existing tokens. iCloud.com
+  shows the account's Notes, and the CloudKit Console ("Act As iCloud Account", which uses Apple's own developer
+  API) lists the container's private zones for the same user, so only third-party web access is refused. A focused
+  sample app reproduces it from the iPhone alone; it went to Apple Developer Technical Support on 2026-11-26.
+- **Until Apple answers, tests use the public database** (the maintainer's decision; debug builds only; the
+  shipping design stays the private database). `Mail` gets a queryable `mailbox` ID and a `sealed` text field
+  (a push can't carry a BYTES field: "unsupported field type in notification"), and is readable only by the
+  iCloud user who wrote it. The iPhone subscribes to new records with its random mailbox ID written by its own
+  iCloud user. Result: **20 of 20 records written through CloudKit Web Services woke the locked iPhone**, a median
+  1.61 s from the start of the write (1.14 to 2.44 s; the write itself takes about 1 s). The pushes allow
+  modification, so the notification service extension can unlock them before they're shown.
 - **Filtering entitlement** requested on 2026-11-26 (Apple request ID Q7U98356ZR), for the extension
   `app.pairline.ios.notifications`, use case end-to-end encrypted messaging.
