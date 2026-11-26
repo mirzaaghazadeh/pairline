@@ -28,6 +28,7 @@ Commands:
 
 import argparse
 import base64
+import hashlib
 import json
 import os
 import re
@@ -46,9 +47,9 @@ HOST = "https://api.apple-cloudkit.com"
 TOKEN_HEADERS = ("X-Apple-CloudKit-Web-Auth-Token", "X-Apple-CloudKit-Session")
 
 
-def load_env():
+def load_env(name="development"):
     env = {}
-    path = os.path.join(CONFIG_DIR, "cloudkit-development.env")
+    path = os.path.join(CONFIG_DIR, f"cloudkit-{name}.env")
     with open(path) as f:
         for line in f:
             if "=" in line and not line.lstrip().startswith("#"):
@@ -72,8 +73,8 @@ def write_secret(path, text):
 
 
 class CloudKit:
-    def __init__(self, chain="main", keep_token=False, show_headers=False, environment=None):
-        self.env = load_env()
+    def __init__(self, chain="main", keep_token=False, show_headers=False, environment=None, config="development"):
+        self.env = load_env(config)
         if environment:
             self.env["CK_ENVIRONMENT"] = environment
         self.chain_path = os.path.join(CONFIG_DIR, f"ck-webauth-{chain}.token")
@@ -143,8 +144,10 @@ def cmd_import_token(args):
 
 def cmd_whoami(ck, args):
     status, payload, t = ck.call("users/current", scope="public")
-    print(f"HTTP {status} in {t * 1000:.0f} ms, token rotated: {payload['_rotated']}, "
-          f"user record {'present' if payload.get('userRecordName') else 'absent'} "
+    user = payload.get("userRecordName")
+    # A short hash tells two tokens' users apart without printing the user's record name.
+    shown = f"user {hashlib.sha256(user.encode()).hexdigest()[:8]}" if user else "no user record"
+    print(f"HTTP {status} in {t * 1000:.0f} ms, token rotated: {payload['_rotated']}, {shown} "
           f"{payload.get('serverErrorCode', '')} {payload.get('reason', '')}")
     return status == 200
 
@@ -389,6 +392,8 @@ def cmd_webcourier(ck, args):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--chain", default="main", help="which stored token chain to use")
+    ap.add_argument("--config", default="development",
+                    help="read ~/.config/pairline/cloudkit-<CONFIG>.env (another API token)")
     ap.add_argument("--environment", choices=["development", "production"],
                     help="override CK_ENVIRONMENT (diagnosis: which environment a token belongs to)")
     ap.add_argument("--keep-token", action="store_true",
@@ -427,7 +432,7 @@ def main():
     if args.cmd == "match":
         return 0 if cmd_match(args) else 1
     ck = CloudKit(args.chain, keep_token=args.keep_token, show_headers=args.show_headers,
-                  environment=args.environment)
+                  environment=args.environment, config=args.config)
     ok = {"whoami": cmd_whoami, "zones": cmd_zones, "put": cmd_put, "delete": cmd_delete, "changes": cmd_changes,
           "latency": cmd_latency, "tokens": cmd_tokens, "webcourier": cmd_webcourier}[args.cmd](ck, args)
     return 0 if ok else 1
