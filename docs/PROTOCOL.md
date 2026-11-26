@@ -619,7 +619,10 @@ link media keys, exactly as on Bluetooth (`call.media.start` `via: "link"` sent 
 No UDP port is opened on the router. R tries IPv6 first, then IPv4, only while no Bluetooth or Wi-Fi session is up
 (a local session replaces the direct one), and retries after 5, 15 and 30 s, then every 2 minutes, and at once when its
 network changes or a new `remote.addr` arrives. An address whose handshake fails on the keys is skipped until the next
-`remote.addr`. On the public listener B:
+`remote.addr`. B listens whenever remote mode is on and it's on Wi-Fi, mapped or not, so a user whose router has no
+NAT-PMP, PCP or UPnP can forward the port by hand (D-083): R then also tries the address or DNS name the user entered,
+with the same handshake (the pinned key decides; a wrong host just fails, and the entry stays). No wire change. On the
+public listener B:
 
 - accepts no pairing frames: anything but `HELLO` first closes the connection;
 - parses only the frame length and the hello before the handshake has authenticated the peer;

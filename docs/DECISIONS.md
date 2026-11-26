@@ -1467,3 +1467,22 @@ while the feature is simply how the phones stay connected over the internet when
   access); its home screen says whether it's on and where to turn it on.
 - **Automatic, no mode switching:** with Cloud mode on, the phones use Bluetooth or Wi-Fi when they're near each other
   and the internet (iCloud, and the direct connection) whenever they aren't, without the user doing anything.
+
+### D-083 — Manual port forwarding when the router can't open the port by itself (2026-11-26)
+
+The maintainer's decision: "if [UPnP or NAT-PMP] can be enabled, enable it; if not, the user does it manually."
+
+- **First choice stays automatic:** the apps tell users to turn on UPnP or NAT-PMP (or PCP) when their router has it;
+  Pairline then opens and closes the port itself (D-080).
+- **Otherwise, by hand:** the user forwards TCP 47830 in the router to the Android phone (Pairline Bridge shows its
+  home-network address and port), gives that phone a fixed address there (DHCP reservation; "Use device MAC" for that
+  Wi-Fi on Android 10+), and enters the home's internet address, or a DDNS name from the router's own DDNS feature for
+  a changing address, on the iPhone: Settings › Cloud mode › Port forwarding. Help › "Allow calls from far away"
+  explains both ways for any router brand.
+- **Why the user types the address:** without NAT-PMP, PCP or UPnP the router doesn't tell the Android phone the
+  home's internet address, and Pairline never asks outside "what's my IP" services (AGENTS.md rule 2).
+- **New outside party, by the user's choice:** a DDNS name the user entered is looked up through the iPhone's normal
+  DNS, so their DNS resolver and the name's provider see the lookup (PRIVACY.md). Nothing else changes: the bridge
+  already listens while Cloud mode is on, the handshake pins the bridge's key, and nothing changes on the wire.
+- The entry lives in the iPhone's Keychain (this device only), is never logged (rule 9), and goes when Cloud mode is
+  turned off or the pairing is forgotten. Carrier-grade NAT still can't be helped by any router setting.
