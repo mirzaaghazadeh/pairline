@@ -514,8 +514,11 @@
     <string name="remote_pair_pick">Choose a picture of it</string>
     <string name="remote_pair_paste">Paste an invitation</string>
     <string name="remote_pair_scan_reading">Reading the QR code…</string>
-    <string name="remote_pair_scan_none">There\'s no Pairline invitation in that picture. Take it again with the whole QR code in view, or paste the link instead.</string>
-    <string name="remote_pair_scan_no_camera">This phone has no camera app for that. Choose a picture of the QR code, or paste the link instead.</string>
+    <string name="remote_pair_scan_none">There\'s no Pairline invitation in that picture. Choose one that shows the whole QR code, or paste the link instead.</string>
+    <string name="remote_pair_scan_no_camera">The camera isn\'t available right now. Choose a picture of the QR code, or paste the link instead.</string>
+    <string name="remote_pair_scan_hint">Point the camera at the invitation\'s QR code on your iPhone.</string>
+    <string name="remote_pair_scan_other_code">That isn\'t a Pairline invitation. Point the camera at the QR code your iPhone shows.</string>
+    <string name="remote_pair_scan_denied">Pairline needs the camera only to read the QR code. Allow it to scan, or choose a picture of the QR code or paste the link instead.</string>
     <string name="remote_pair_paste_none">There\'s no Pairline invitation on the clipboard. Copy the whole link (it starts with pairline://invite) and try again.</string>
 
     <!-- Remote mode's direct connection through the home router (D-080): the link card's line while remote mode is on. -->

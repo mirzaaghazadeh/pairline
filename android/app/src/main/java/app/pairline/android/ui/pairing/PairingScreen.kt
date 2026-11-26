@@ -1,9 +1,11 @@
 package app.pairline.android.ui.pairing
 
+import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.view.WindowManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -58,6 +60,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
 import app.pairline.android.R
@@ -239,9 +242,9 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 /**
- * Remote pairing (D-080) for an invitation that didn't arrive as a link that opens Pairline: scan its QR code (the
- * phone's own camera app takes one photo, read here and deleted at once; no camera permission), choose a picture of
- * the QR code (a screenshot sent in a messenger), or paste the whole link. The clipboard is read only on a tap.
+ * Remote pairing (D-080) for an invitation that didn't arrive as a link that opens Pairline: scan its QR code live
+ * (the camera permission is asked on that tap and used only there), choose a picture of the QR code (a screenshot), or
+ * paste the whole link. The clipboard is read only on a tap.
  */
 @Composable
 private fun RemoteInvitationPaste() {
@@ -249,7 +252,7 @@ private fun RemoteInvitationPaste() {
     val scope = rememberCoroutineScope()
     var problem by remember { mutableStateOf<Int?>(null) }
     var reading by remember { mutableStateOf(false) }
-    var photo by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var scanning by remember { mutableStateOf(false) }
 
     fun open(text: String?, notFound: Int) {
         val invitation = text?.trim()
@@ -261,7 +264,7 @@ private fun RemoteInvitationPaste() {
         AppGraph.remotePairing.open(invitation)
     }
 
-    fun read(uri: Uri, temporary: Boolean) {
+    fun read(uri: Uri) {
         reading = true
         scope.launch {
             val text = withContext(Dispatchers.Default) {
@@ -270,8 +273,6 @@ private fun RemoteInvitationPaste() {
                 } catch (e: Exception) {
                     Log.w("pairing", "couldn't read the picture: ${e.javaClass.simpleName}")
                     null
-                } finally {
-                    if (temporary) InvitationPhoto.delete(context)
                 }
             }
             reading = false
@@ -279,13 +280,24 @@ private fun RemoteInvitationPaste() {
         }
     }
 
-    val takePicture = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
-        val uri = photo
-        photo = null
-        if (taken && uri != null) read(uri, temporary = true) else InvitationPhoto.delete(context)
+    val askCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) scanning = true else problem = R.string.remote_pair_scan_denied
     }
     val pickPicture = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) read(uri, temporary = false)
+        if (uri != null) read(uri)
+    }
+    if (scanning) {
+        InvitationScanner(
+            onFound = { text ->
+                scanning = false
+                open(text, R.string.remote_pair_scan_none)
+            },
+            onUnavailable = {
+                scanning = false
+                problem = R.string.remote_pair_scan_no_camera
+            },
+            onDismiss = { scanning = false },
+        )
     }
 
     Text(
@@ -296,14 +308,10 @@ private fun RemoteInvitationPaste() {
     )
     SecondaryButton(stringResource(R.string.remote_pair_scan), {
         problem = null
-        val uri = InvitationPhoto.create(context)
-        photo = uri
-        try {
-            takePicture.launch(uri)
-        } catch (e: ActivityNotFoundException) {
-            photo = null
-            InvitationPhoto.delete(context)
-            problem = R.string.remote_pair_scan_no_camera
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            scanning = true
+        } else {
+            askCamera.launch(Manifest.permission.CAMERA)
         }
     }, icon = PIcons.Qr)
     SecondaryButton(stringResource(R.string.remote_pair_pick), {

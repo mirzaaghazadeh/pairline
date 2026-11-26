@@ -512,8 +512,11 @@
     <string name="remote_pair_pick">اختيار صورة له</string>
     <string name="remote_pair_paste">لصق دعوة</string>
     <string name="remote_pair_scan_reading">جارٍ قراءة رمز QR…</string>
-    <string name="remote_pair_scan_none">لا توجد دعوة من Pairline في هذه الصورة. التقطها مرة أخرى بحيث يظهر رمز QR كاملًا، أو الصق الرابط بدلًا من ذلك.</string>
-    <string name="remote_pair_scan_no_camera">لا يوجد على هذا الهاتف تطبيق كاميرا لذلك. اختر صورة لرمز QR، أو الصق الرابط بدلًا من ذلك.</string>
+    <string name="remote_pair_scan_none">لا توجد دعوة من Pairline في هذه الصورة. اختر صورة يظهر فيها رمز QR كاملًا، أو الصق الرابط بدلًا من ذلك.</string>
+    <string name="remote_pair_scan_no_camera">الكاميرا غير متاحة الآن. اختر صورة لرمز QR، أو الصق الرابط بدلًا من ذلك.</string>
+    <string name="remote_pair_scan_hint">وجّه الكاميرا إلى رمز QR الخاص بالدعوة على آيفونك.</string>
+    <string name="remote_pair_scan_other_code">هذه ليست دعوة من Pairline. وجّه الكاميرا إلى رمز QR الذي يعرضه آيفونك.</string>
+    <string name="remote_pair_scan_denied">يحتاج Pairline إلى الكاميرا فقط لقراءة رمز QR. اسمح بها للمسح، أو اختر صورة لرمز QR أو الصق الرابط بدلًا من ذلك.</string>
     <string name="remote_pair_paste_none">لا توجد دعوة من Pairline في الحافظة. انسخ الرابط كاملًا (يبدأ بـ pairline://invite) ثم حاول مرة أخرى.</string>
 
     <string name="home_connected_body_direct">عبر الإنترنت، مباشرةً من خلال راوتر المنزل. يتم نقل المكالمات والرسائل إلى آيفونك.</string>

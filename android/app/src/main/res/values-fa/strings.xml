@@ -511,8 +511,11 @@
     <string name="remote_pair_pick">انتخاب عکسی از آن</string>
     <string name="remote_pair_paste">چسباندن دعوت</string>
     <string name="remote_pair_scan_reading">در حال خواندن کد QR…</string>
-    <string name="remote_pair_scan_none">در این عکس دعوت Pairline پیدا نشد. دوباره عکس بگیرید و کل کد QR را در کادر بیاورید، یا به‌جایش لینک را بچسبانید.</string>
-    <string name="remote_pair_scan_no_camera">این گوشی برنامهٔ دوربینی برای این کار ندارد. عکسی از کد QR انتخاب کنید، یا به‌جایش لینک را بچسبانید.</string>
+    <string name="remote_pair_scan_none">در این عکس دعوت Pairline پیدا نشد. عکسی انتخاب کنید که کل کد QR در آن پیداست، یا به‌جایش لینک را بچسبانید.</string>
+    <string name="remote_pair_scan_no_camera">دوربین الان در دسترس نیست. عکسی از کد QR انتخاب کنید، یا به‌جایش لینک را بچسبانید.</string>
+    <string name="remote_pair_scan_hint">دوربین را رو به کد QR دعوت روی آیفونتان بگیرید.</string>
+    <string name="remote_pair_scan_other_code">این دعوت Pairline نیست. دوربین را رو به کد QR‌ای بگیرید که آیفونتان نشان می‌دهد.</string>
+    <string name="remote_pair_scan_denied">Pairline فقط برای خواندن کد QR به دوربین نیاز دارد. برای اسکن اجازه بدهید، یا به‌جایش عکسی از کد QR انتخاب کنید یا لینک را بچسبانید.</string>
     <string name="remote_pair_paste_none">هیچ دعوت Pairline در کلیپ‌بورد نیست. کل لینک را (که با pairline://invite شروع می‌شود) کپی کنید و دوباره امتحان کنید.</string>
 
     <string name="home_connected_body_direct">از طریق اینترنت، مستقیم از راه روتر خانه. تماس‌ها و پیامک‌ها به آیفون شما منتقل می‌شوند.</string>
