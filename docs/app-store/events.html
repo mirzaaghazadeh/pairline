@@ -1,0 +1,105 @@
+<!doctype html>
+<!--
+  In-app event images, rendered by render.sh into out/<locale>/events/<event>/:
+    events.html#event=talk-on-iphone&lang=en&kind=card     3840 x 2160 (16:9)  EVENT_CARD_ASSET
+    events.html#event=talk-on-iphone&lang=en&kind=details  2160 x 3840 (9:16)  EVENT_DETAILS_PAGE_ASSET
+  No text: the App Store lays the badge, the event name and the short description over the lower part of both, so
+  the phone sits high and the bottom fades to dark. Apple's rules: no price, URL, copyright mark, awards or other
+  platforms' logos; no alpha.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pairline in-app event</title>
+<style>
+  html, body { margin: 0; overflow: hidden; }
+  body {
+    position: relative;
+    background:
+      radial-gradient(55% 45% at 50% 38%, rgba(111, 156, 240, 0.42), transparent 70%),
+      radial-gradient(40% 30% at 50% -5%, rgba(18, 184, 134, 0.22), transparent 70%),
+      linear-gradient(170deg, #0a1a38 0%, #12346f 55%, #1f5fbf 100%);
+  }
+  body.card { width: 3840px; height: 2160px; }
+  body.details { width: 2160px; height: 3840px; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+          background: linear-gradient(to bottom, rgba(10, 26, 56, 0), #0a1a38 85%); }
+
+  /* Same phone as slides.html and assets.html (961 x 2028 at scale 1), scaled per placement. */
+  .device {
+    position: absolute; width: 961px; height: 2028px; box-sizing: border-box; padding: 26px;
+    border-radius: 152px; background: #05070c; transform-origin: top left; z-index: 3;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16), 0 70px 140px rgba(2, 8, 24, 0.55);
+  }
+  .screen { position: relative; width: 909px; height: 1976px; border-radius: 126px; overflow: hidden; background: #000; }
+  .screen img { display: block; width: 100%; height: 100%; }
+  .island { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); width: 282px; height: 84px;
+            border-radius: 42px; background: #000; }
+  svg { position: absolute; left: 0; top: 0; z-index: 2; }
+</style>
+</head>
+<body>
+<script>
+// One entry per event folder in events/: the app screen to show and whether sound waves come off the phone.
+const EVENTS = {
+  "talk-on-iphone": { screen: "06-incoming-call", waves: true },
+};
+const params = new URLSearchParams(location.hash.slice(1));
+const lang = params.get("lang") || "en";
+const kind = params.get("kind") || "card";
+const ev = EVENTS[params.get("event") || "talk-on-iphone"];
+document.documentElement.lang = lang;
+document.body.className = kind;
+
+const [W, H] = kind === "card" ? [3840, 2160] : [2160, 3840];
+// Phone placement: scale, top edge, and the height of the dark fade at the bottom (where Apple puts the text).
+// (Not named `top`: that's window.top, and redeclaring it stops the whole script.)
+const { scale, phoneTop, fade } = kind === "card"
+  ? { scale: 0.7, phoneTop: 150, fade: 820 }
+  : { scale: 0.86, phoneTop: 330, fade: 1700 };
+const pw = 961 * scale, ph = 2028 * scale;
+const px = (W - pw) / 2;
+
+const d = document.createElement("div");
+d.className = "device";
+d.style.left = px + "px"; d.style.top = phoneTop + "px"; d.style.transform = `scale(${scale})`;
+d.innerHTML = `<div class="screen"><img src="../screenshots/ios/${lang}/${ev.screen}.png" alt=""><div class="island"></div></div>`;
+document.body.appendChild(d);
+
+if (ev.waves) {
+  // Three arcs on each side of the phone, like sound leaving a speaker; the inner one in Pairline's green.
+  const cx = W / 2, cy = phoneTop + ph * 0.36;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+  // The details page fills a taller iPhone screen, which crops about 190 px off each side: keep the arcs closer there.
+  const gaps = kind === "card" ? [170, 380, 590] : [120, 260, 400];
+  const arcs = [
+    { r: pw / 2 + gaps[0], color: "#12b886", opacity: 0.95 },
+    { r: pw / 2 + gaps[1], color: "#ffffff", opacity: 0.5 },
+    { r: pw / 2 + gaps[2], color: "#ffffff", opacity: 0.24 },
+  ];
+  const span = 30 * Math.PI / 180;
+  for (const side of [0, Math.PI]) {
+    for (const a of arcs) {
+      const p = (t) => [cx + a.r * Math.cos(side + t), cy + a.r * Math.sin(side + t)];
+      const [x1, y1] = p(-span), [x2, y2] = p(span);
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", `M ${x1} ${y1} A ${a.r} ${a.r} 0 0 1 ${x2} ${y2}`);
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", a.color);
+      path.setAttribute("stroke-opacity", a.opacity);
+      path.setAttribute("stroke-width", kind === "card" ? 30 : 34);
+      path.setAttribute("stroke-linecap", "round");
+      svg.appendChild(path);
+    }
+  }
+  document.body.appendChild(svg);
+}
+
+const f = document.createElement("div");
+f.className = "fade";
+f.style.height = fade + "px";
+document.body.appendChild(f);
+</script>
+</body>
+</html>
