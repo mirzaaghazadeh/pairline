@@ -46,6 +46,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.text.BidiFormatter
+import androidx.core.text.TextDirectionHeuristicsCompat
 import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
 import app.pairline.android.R
@@ -349,21 +351,43 @@ private fun DirectLine(s: DirectStatus) {
         Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
     // What fixes it, when the home's router, modem or provider is the reason (D-082): texts and codes work anyway.
-    val hint = when {
+    // UPnP or NAT-PMP first (Pairline then does it all); otherwise the user's own port forwarding, which needs this
+    // phone's home address and port, shown left to right in every language.
+    val bidi = BidiFormatter.getInstance()
+    val address = s.localV4?.let { bidi.unicodeWrap(it, TextDirectionHeuristicsCompat.LTR) }
+    val port = s.port?.let { bidi.unicodeWrap(it.toString(), TextDirectionHeuristicsCompat.LTR) }
+    val forwardable = address != null && port != null
+    val routerReason = s.reason == DirectReason.NO_MAPPING || s.reason == null
+    val modemReason = s.reason == DirectReason.DOUBLE_NAT || s.reason == DirectReason.NO_PUBLIC_ADDRESS
+    val hint: String? = when {
         s.direct == null || open || s.ipv6Unconfirmed -> null
-        s.reason == DirectReason.NO_MAPPING || s.reason == null -> R.string.direct_hint_router
-        s.reason == DirectReason.DOUBLE_NAT || s.reason == DirectReason.NO_PUBLIC_ADDRESS -> R.string.direct_hint_modem
-        s.reason == DirectReason.CARRIER_NAT -> R.string.direct_hint_provider
+        routerReason && forwardable -> stringResource(R.string.direct_hint_router_manual, port!!, address!!)
+        routerReason -> stringResource(R.string.direct_hint_router)
+        modemReason && forwardable -> stringResource(R.string.direct_hint_modem_manual, port!!, address!!)
+        modemReason -> stringResource(R.string.direct_hint_modem)
+        s.reason == DirectReason.CARRIER_NAT -> stringResource(R.string.direct_hint_provider)
         else -> null
     }
     if (hint != null) {
-        Text(
-            stringResource(hint),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 26.dp),
-        )
+        HintText(hint)
+        // Android 10+ gives each Wi-Fi network a random hardware address, which can break the router's reservation.
+        if ((routerReason || modemReason) && forwardable && Build.VERSION.SDK_INT >= 29) {
+            HintText(stringResource(R.string.direct_hint_device_mac))
+        }
+    } else if (forwardable && !s.mappedV4) {
+        // Not opened by the router itself: the user may have forwarded the port by hand; here is what to forward.
+        HintText(stringResource(R.string.direct_forward_info, port!!, address!!))
     }
+}
+
+@Composable
+private fun HintText(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 26.dp),
+    )
 }
 
 @StringRes

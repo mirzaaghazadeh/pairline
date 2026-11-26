@@ -62,7 +62,39 @@ class DirectLinkTest {
         assertEquals(listOf("addr 81.2.69.160:47830 null", "state open null"), taken())
         assertEquals(listOf(v4("192.168.1.23")), server.listened.single())
         assertEquals(DirectLink.CHECK_MS, wait)
-        assertEquals(DirectStatus(true, Direct.OPEN, null, false), direct.status.value)
+        assertEquals(
+            DirectStatus(true, Direct.OPEN, null, false, localV4 = "192.168.1.23", port = 47830, mappedV4 = true),
+            direct.status.value,
+        )
+    }
+
+    /**
+     * Manual port forwarding (D-083): a router with no NAT-PMP, PCP or UPnP still gets a listener, and the screen shows
+     * the address and port to forward by hand. Neither goes into a message.
+     */
+    @Test
+    fun withoutARouterProtocolTheStatusSaysWhatToForwardByHand() {
+        router.natPmp = false
+        on()
+        direct.step()
+        assertEquals(listOf("addr null null", "state blocked no_mapping"), taken())
+        val status = direct.status.value
+        assertEquals(DirectReason.NO_MAPPING, status.reason)
+        assertEquals("192.168.1.23", status.localV4)
+        assertEquals(47830, status.port)
+        assertFalse(status.mappedV4)
+        assertEquals(listOf(v4("192.168.1.23")), server.listened.single())
+    }
+
+    @Test
+    fun offWiFiThereIsNothingToForward() {
+        direct.setActive(true)
+        direct.setNetwork(null)
+        direct.step()
+        val status = direct.status.value
+        assertEquals(DirectReason.NOT_ON_WIFI, status.reason)
+        assertNull(status.localV4)
+        assertNull(status.port)
     }
 
     @Test

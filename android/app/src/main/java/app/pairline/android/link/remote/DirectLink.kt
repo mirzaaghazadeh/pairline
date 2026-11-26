@@ -69,6 +69,14 @@ data class DirectStatus(
     val reason: DirectReason? = null,
     /** An IPv6 address is offered although the router didn't confirm it lets connections in. */
     val ipv6Unconfirmed: Boolean = false,
+    /**
+     * This phone's address on the home network while it listens, and the listening port: what the user forwards in the
+     * router by hand when it has no UPnP, NAT-PMP or PCP. For the screen only; never logged or sent.
+     */
+    val localV4: String? = null,
+    val port: Int? = null,
+    /** The router opened IPv4 for us (NAT-PMP, PCP or UPnP), so no forwarding by hand is needed. */
+    val mappedV4: Boolean = false,
 )
 
 /**
@@ -318,7 +326,15 @@ class DirectLink(
         lastAddr = addr
         lastState = state
         reannounce = false
-        _status.value = DirectStatus(true, direct, reason, unconfirmedV6)
+        _status.value = DirectStatus(
+            active = true,
+            direct = direct,
+            reason = reason,
+            ipv6Unconfirmed = unconfirmedV6,
+            localV4 = info?.localV4?.takeIf { listening }?.hostAddress,
+            port = port?.takeIf { listening },
+            mappedV4 = v4Text != null,
+        )
     }
 
     /** For the log: never an address, only how the connection is open or why not. */
