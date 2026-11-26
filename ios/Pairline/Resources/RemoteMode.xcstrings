@@ -102,18 +102,293 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sağlayıcınızın modemi kendi yönlendiricinizin önündeyse modemde de UPnP'yi açın ya da yönlendiriciniz internet adresini alsın diye modemi köprü (bridge) moduna alın." } }
       }
     },
-    "What turning on UPnP means" : {
+    "What opening a port means" : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ماذا يعني تفعيل UPnP" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن کردن UPnP یعنی چه" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "UPnP'yi açmak ne anlama gelir" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ماذا يعني فتح منفذ" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "باز کردن پورت یعنی چه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port açmak ne anlama gelir" } }
       }
     },
-    "Apps on your home network can ask the router to open ports. Pairline opens one, closes it when you turn Cloud mode off, and only your paired iPhone can use it." : {
+    "Pairline opens one port, only to the Android phone, and only your paired iPhone can use it: anything else is turned away. With UPnP on, apps on your home network can also ask the router to open ports; Pairline closes its own when you turn Cloud mode off." : {
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يصبح بإمكان التطبيقات على شبكة منزلك أن تطلب من الموجّه فتح منافذ. يفتح Pairline منفذًا واحدًا، ويغلقه حين توقف الوضع السحابي، ولا يستطيع استخدامه إلا آيفونك المقترن." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برنامه‌های روی شبکهٔ خانه می‌توانند از مودم بخواهند پورت باز کند. Pairline یک پورت باز می‌کند، وقتی حالت ابری را خاموش کنید آن را می‌بندد، و فقط آیفون جفت‌شدهٔ شما می‌تواند از آن استفاده کند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ev ağınızdaki uygulamalar yönlendiriciden port açmasını isteyebilir. Pairline bir port açar, Bulut modunu kapattığınızda kapatır ve onu yalnızca eşleştirilmiş iPhone'unuz kullanabilir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يفتح Pairline منفذًا واحدًا، إلى هاتف أندرويد فقط، ولا يستطيع استخدامه إلا آيفونك المقترن: يُرفض أي شيء آخر. ومع تفعيل UPnP، يصبح بإمكان التطبيقات على شبكة منزلك أيضًا أن تطلب من الموجّه فتح منافذ؛ ويغلق Pairline منفذه حين توقف الوضع السحابي." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline فقط یک پورت باز می‌کند، فقط به‌سوی گوشی اندرویدی، و فقط آیفون جفت‌شدهٔ شما می‌تواند از آن استفاده کند: هر چیز دیگری رد می‌شود. با روشن بودن UPnP، برنامه‌های روی شبکهٔ خانه هم می‌توانند از مودم بخواهند پورت باز کند؛ Pairline پورت خودش را وقتی حالت ابری را خاموش کنید می‌بندد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline yalnızca Android telefona giden tek bir port açar ve onu yalnızca eşleştirilmiş iPhone'unuz kullanabilir: geri kalan her şey reddedilir. UPnP açıkken ev ağınızdaki uygulamalar da yönlendiriciden port açmasını isteyebilir; Pairline kendi portunu Bulut modunu kapattığınızda kapatır." } }
+      }
+    },
+    "If your router has UPnP or NAT-PMP, turn it on" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا كان موجّهك يدعم UPnP أو NAT-PMP، ففعّله" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر مودمتان UPnP یا NAT-PMP دارد، روشنش کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiricinizde UPnP veya NAT-PMP varsa açın" } }
+      }
+    },
+    "If it doesn't: set up port forwarding yourself" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "وإن لم يكن: اضبط إعادة توجيه المنفذ بنفسك" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر ندارد: هدایت پورت را خودتان تنظیم کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yoksa: port yönlendirmeyi kendiniz ayarlayın" } }
+      }
+    },
+    "If it doesn't: set it up yourself" : {
+      "comment" : "Port forwarding screen: the section with the manual steps, for a router without UPnP or NAT-PMP.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "وإن لم يكن: اضبطه بنفسك" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر ندارد: خودتان تنظیمش کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yoksa: kendiniz ayarlayın" } }
+      }
+    },
+    "If neither works" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا لم ينجح أيٌّ منهما" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر هیچ‌کدام کار نکرد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İkisi de işe yaramazsa" } }
+      }
+    },
+    "Forward the port" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أعد توجيه المنفذ" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پورت را هدایت کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Portu yönlendirin" } }
+      }
+    },
+    "In your router, forward TCP port 47830 to the Android phone. Pairline Bridge shows the phone's address on your home network." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في موجّهك، أعد توجيه منفذ TCP رقم 47830 إلى هاتف أندرويد. يعرض Pairline Bridge عنوان الهاتف على شبكة منزلك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در مودم، پورت TCP شمارهٔ 47830 را به گوشی اندرویدی هدایت کنید (Port forwarding). Pairline Bridge نشانی گوشی را در شبکهٔ خانه نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiricinizde TCP 47830 numaralı portu Android telefona yönlendirin. Pairline Bridge telefonun ev ağınızdaki adresini gösterir." } }
+      }
+    },
+    "Keep the Android phone's address" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ثبّت عنوان هاتف أندرويد" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نشانی گوشی اندرویدی را ثابت کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonun adresini sabitleyin" } }
+      }
+    },
+    "The router's forwarding rule points at one address on your home network. If the Android phone gets a different one (after a restart or a while away), calls from far away stop working until you fix the rule." : {
+      "comment" : "Manual port forwarding (D-083): why the Android phone needs a fixed address on the home network.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تشير قاعدة إعادة التوجيه في الموجّه إلى عنوان واحد على شبكة منزلك. إذا حصل هاتف أندرويد على عنوان آخر (بعد إعادة التشغيل أو غياب لبعض الوقت)، تتوقف المكالمات من بعيد إلى أن تصلح القاعدة." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "قانون هدایت پورت در مودم به یک نشانی در شبکهٔ خانه اشاره می‌کند. اگر گوشی اندرویدی نشانی دیگری بگیرد (بعد از راه‌اندازی دوباره یا مدتی دوری)، تماس از راه دور کار نمی‌کند تا وقتی قانون را درست کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiricideki yönlendirme kuralı ev ağınızdaki tek bir adresi gösterir. Android telefon farklı bir adres alırsa (yeniden başlatmadan ya da bir süre uzakta kaldıktan sonra), siz kuralı düzeltene kadar uzaktan aramalar çalışmaz." } }
+      }
+    },
+    "Best: in the router, reserve the phone's current address for it (\"DHCP reservation\", \"static lease\", \"address reservation\" or \"always use this IP address\"; Pairline Bridge shows the address). On Android 10 and later, first set that Wi-Fi network's privacy to \"Use device MAC\", or the router won't recognize the phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الأفضل: في الموجّه، احجز للهاتف عنوانه الحالي (يُسمّى «حجز DHCP» أو «تأجير ثابت» أو «حجز العنوان» أو «استخدام عنوان IP هذا دائمًا»؛ ويعرض Pairline Bridge العنوان). وفي أندرويد 10 وما بعده، اضبط أولًا خصوصية شبكة الواي فاي هذه على «استخدام عنوان MAC للجهاز»، وإلا فلن يتعرّف الموجّه على الهاتف." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بهترین راه: در مودم، نشانی فعلی گوشی را برای خودش رزرو کنید (با نام‌هایی مثل «DHCP reservation»، «Static lease»، «Address reservation» یا «همیشه از این IP استفاده شود»؛ Pairline Bridge این نشانی را نشان می‌دهد). در اندروید ۱۰ و بعد از آن، اول حریم خصوصی همان شبکهٔ وای‌فای را روی «استفاده از MAC دستگاه» بگذارید، وگرنه مودم گوشی را نمی‌شناسد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "En iyisi: yönlendiricide telefonun şu anki adresini ona ayırın (\"DHCP rezervasyonu\", \"statik kiralama\", \"adres rezervasyonu\" ya da \"her zaman bu IP adresini kullan\"; adresi Pairline Bridge gösterir). Android 10 ve sonrasında önce o Wi-Fi ağının gizlilik ayarını \"Cihaz MAC'ini kullan\" yapın; yoksa yönlendirici telefonu tanımaz." } }
+      }
+    },
+    "Or on the Android phone: Wi-Fi › that network › IP settings › Static, with an address outside the router's automatic range. Only if you know the range: a clash breaks the connection." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أو على هاتف أندرويد: الواي فاي › تلك الشبكة › إعدادات IP › ثابت، مع عنوان خارج النطاق التلقائي للموجّه. افعل ذلك فقط إن كنت تعرف النطاق: التعارض يقطع الاتصال." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یا روی خود گوشی اندرویدی: وای‌فای › همان شبکه › تنظیمات IP › ثابت (Static)، با نشانی‌ای بیرون از محدودهٔ خودکار مودم. فقط اگر محدوده را می‌دانید: نشانی تکراری اتصال را قطع می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ya da Android telefonda: Wi-Fi › o ağ › IP ayarları › Statik, yönlendiricinin otomatik aralığı dışında bir adresle. Yalnızca aralığı biliyorsanız: bir çakışma bağlantıyı koparır." } }
+      }
+    },
+    "Not needed with UPnP or NAT-PMP: Pairline then updates the router itself whenever the phone's address changes." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا حاجة إلى ذلك مع UPnP أو NAT-PMP: عندها يحدّث Pairline الموجّه بنفسه كلما تغيّر عنوان الهاتف." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "با UPnP یا NAT-PMP لازم نیست: آن‌وقت Pairline هر بار که نشانی گوشی عوض شود، خودش مودم را به‌روز می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "UPnP veya NAT-PMP ile gerekmez: Pairline o zaman telefonun adresi her değiştiğinde yönlendiriciyi kendisi günceller." } }
+      }
+    },
+    "A fixed name for your home" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسم ثابت لمنزلك" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک نام ثابت برای خانه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Eviniz için sabit bir ad" } }
+      }
+    },
+    "If your home's internet address changes, turn on your router's DDNS feature to get a fixed name." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا كان عنوان الإنترنت لمنزلك يتغيّر، ففعّل ميزة DDNS في موجّهك لتحصل على اسم ثابت." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر نشانی اینترنتی خانه‌تان عوض می‌شود، قابلیت DDNS مودم را روشن کنید تا یک نام ثابت بگیرید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evinizin internet adresi değişiyorsa sabit bir ad almak için yönlendiricinizin DDNS özelliğini açın." } }
+      }
+    },
+    "Enter it in Pairline" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أدخله في Pairline" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آن را در Pairline وارد کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline'a girin" } }
+      }
+    },
+    "Open Settings › Cloud mode › Port forwarding on this iPhone and enter that name, or your home's internet address." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "افتح الإعدادات › الوضع السحابي › إعادة توجيه المنفذ على هذا الآيفون، وأدخل ذلك الاسم أو عنوان الإنترنت لمنزلك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در این آیفون تنظیمات › حالت ابری › هدایت پورت را باز کنید و آن نام، یا نشانی اینترنتی خانه‌تان را وارد کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone'da Ayarlar › Bulut modu › Port yönlendirme'yi açın ve o adı ya da evinizin internet adresini girin." } }
+      }
+    },
+    "Set up port forwarding" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اضبط إعادة توجيه المنفذ" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تنظیم هدایت پورت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port yönlendirmeyi ayarla" } }
+      }
+    },
+    "Port forwarding" : {
+      "comment" : "Settings › Cloud mode row and screen title (D-083): the user forwards the bridge's port in the router by hand, for a router without UPnP, NAT-PMP or PCP.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعادة توجيه المنفذ" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هدایت پورت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port yönlendirme" } }
+      }
+    },
+    "Set up by you" : {
+      "comment" : "Settings › Cloud mode › Port forwarding row value: the user entered their home's address.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مضبوطة من قِبلك" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تنظیم‌شده توسط شما" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sizin ayarladığınız" } }
+      }
+    },
+    "Not set up" : {
+      "comment" : "Settings › Cloud mode › Port forwarding row value.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "غير مضبوطة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تنظیم نشده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ayarlanmadı" } }
+      }
+    },
+    "Port forwarding: working" : {
+      "comment" : "Settings › Cloud mode › Direct connection row: the router opened nothing, but the user's port forwarding reached the Android phone.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعادة توجيه المنفذ: تعمل" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هدایت پورت: کار می‌کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port yönlendirme: çalışıyor" } }
+      }
+    },
+    "Port forwarding: not reached" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعادة توجيه المنفذ: تعذّر الوصول" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هدایت پورت: دسترسی نشد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port yönlendirme: ulaşılamadı" } }
+      }
+    },
+    "Port forwarding: set up by you" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعادة توجيه المنفذ: مضبوطة من قِبلك" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هدایت پورت: تنظیم‌شده توسط شما" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port yönlendirme: sizin ayarladığınız" } }
+      }
+    },
+    "If your router has UPnP or NAT-PMP, turn it on instead: Pairline then sets everything up by itself." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا كان موجّهك يدعم UPnP أو NAT-PMP، ففعّله بدلًا من ذلك: عندها يضبط Pairline كل شيء بنفسه." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر مودمتان UPnP یا NAT-PMP دارد، به‌جای این کار آن را روشن کنید: آن‌وقت Pairline همه‌چیز را خودش تنظیم می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiricinizde UPnP veya NAT-PMP varsa bunun yerine onu açın: Pairline o zaman her şeyi kendisi ayarlar." } }
+      }
+    },
+    "Enter that name, or your home's internet address, below." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أدخل ذلك الاسم، أو عنوان الإنترنت لمنزلك، أدناه." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آن نام، یا نشانی اینترنتی خانه‌تان را پایین وارد کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "O adı ya da evinizin internet adresini aşağıya girin." } }
+      }
+    },
+    "Your home's internet address or DDNS name" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عنوان الإنترنت لمنزلك أو اسم DDNS" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نشانی اینترنتی خانه یا نام DDNS" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evinizin internet adresi veya DDNS adı" } }
+      }
+    },
+    "Port" : {
+      "comment" : "The TCP port the user forwarded in the router (default 47830).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المنفذ" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پورت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port" } }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حفظ" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ذخیره" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kaydet" } }
+      }
+    },
+    "Remove port forwarding" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إزالة إعادة توجيه المنفذ" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حذف هدایت پورت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port yönlendirmeyi kaldır" } }
+      }
+    },
+    "Turn Cloud mode on first. Port forwarding is kept while it's on." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل الوضع السحابي أولًا. تُحفظ إعادة توجيه المنفذ ما دام مفعّلًا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اول حالت ابری را روشن کنید. هدایت پورت تا وقتی روشن است نگه داشته می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Önce Bulut modunu açın. Port yönlendirme, açık kaldığı sürece saklanır." } }
+      }
+    },
+    "Your internet provider shares one internet address among many homes, so port forwarding can't help there." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يشارك مزوّد الإنترنت عنوان إنترنت واحدًا بين منازل كثيرة، لذا لا تفيد إعادة توجيه المنفذ هناك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "شرکت اینترنت شما یک نشانی اینترنتی را بین خانه‌های زیادی تقسیم می‌کند، پس هدایت پورت آنجا کمکی نمی‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İnternet sağlayıcınız tek bir internet adresini birçok ev arasında paylaştırıyor; bu yüzden port yönlendirme orada işe yaramaz." } }
+      }
+    },
+    "Your Android phone answered at this address (%@)." : {
+      "comment" : "Port forwarding status; %@ is when, like \"2 minutes ago\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ردّ هاتف أندرويد على هذا العنوان (%@)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی روی این نشانی پاسخ داد (%@)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuz bu adreste yanıt verdi (%@)." } }
+      }
+    },
+    "Couldn't reach your Android phone at the address you entered. Last tried %@." : {
+      "comment" : "Port forwarding status; %@ is when, like \"2 minutes ago\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر الوصول إلى هاتف أندرويد على العنوان الذي أدخلته. آخر محاولة: %@." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی نشانی‌ای که وارد کردید به گوشی اندرویدی دسترسی نشد. آخرین تلاش: %@." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Girdiğiniz adreste Android telefonunuza ulaşılamadı. Son deneme: %@." } }
+      }
+    },
+    "Saved. Pairline uses it whenever your phones aren't near each other." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم الحفظ. يستخدمه Pairline كلما لم يكن هاتفاك قريبين من بعضهما." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ذخیره شد. Pairline هر وقت گوشی‌ها نزدیک هم نباشند از آن استفاده می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kaydedildi. Pairline telefonlarınız birbirinden uzaktayken bunu kullanır." } }
+      }
+    },
+    "Enter your home's internet address or a DDNS name." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أدخل عنوان الإنترنت لمنزلك أو اسم DDNS." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نشانی اینترنتی خانه یا یک نام DDNS وارد کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evinizin internet adresini veya bir DDNS adı girin." } }
+      }
+    },
+    "That isn't an internet address or a DNS name. Enter something like myhome.ddns.net." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هذا ليس عنوان إنترنت ولا اسم DNS. أدخل شيئًا مثل myhome.ddns.net." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این نه نشانی اینترنتی است نه نام DNS. چیزی مثل myhome.ddns.net وارد کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu bir internet adresi ya da DNS adı değil. myhome.ddns.net gibi bir şey girin." } }
+      }
+    },
+    "That's an address inside a home network; enter your home's internet address or a DDNS name." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هذا عنوان داخل شبكة منزلية؛ أدخل عنوان الإنترنت لمنزلك أو اسم DDNS." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این نشانیِ داخل شبکهٔ خانه است؛ نشانی اینترنتی خانه یا یک نام DDNS وارد کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu bir ev ağının içindeki adres; evinizin internet adresini veya bir DDNS adı girin." } }
+      }
+    },
+    "The port is a number from 1 to 65535." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المنفذ رقم من 1 إلى 65535." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پورت عددی از 1 تا 65535 است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port, 1 ile 65535 arasında bir sayıdır." } }
+      }
+    },
+    "You set up port forwarding yourself; Pairline uses it while you're away." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ضبطت إعادة توجيه المنفذ بنفسك؛ يستخدمها Pairline حين تكون بعيدًا." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هدایت پورت را خودتان تنظیم کرده‌اید؛ Pairline وقتی دور هستید از آن استفاده می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port yönlendirmeyi kendiniz ayarladınız; Pairline uzaktayken bunu kullanır." } }
       }
     },
     "Talking on the iPhone" : {

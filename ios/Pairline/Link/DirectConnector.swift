@@ -4,8 +4,10 @@ import Network
 /// Opens remote mode's direct connection (D-080; PROTOCOL.md, "Direct connection"): TCP out to the bridge's public
 /// address, carrying exactly the Wi-Fi session (`WiFiTransport`). It's the one connector that dials beyond the local
 /// network, so it dials only `ConnectTarget.direct` — which `LinkManager` fills from the paired bridge's authenticated
-/// `remote.addr` alone — and only IP literals `DirectAddress` accepts. It never resolves a name or browses. Candidates
-/// are tried in order (IPv6 first), each with its own time limit. Runs on the main queue.
+/// `remote.addr` alone — as IP literals `DirectAddress` accepts, and `ConnectTarget.directManual`, the port forwarding
+/// the user typed in (D-083), the one name it lets the system resolve. It never browses. Candidates are tried in order
+/// (IPv6 first; the user's entry first while the bridge's router opened nothing), each with its own time limit. Runs
+/// on the main queue.
 final class DirectConnector: LinkConnector {
     /// How long one candidate may take to connect over the internet.
     static let candidateTimeout: TimeInterval = 10
@@ -18,6 +20,8 @@ final class DirectConnector: LinkConnector {
 
     private var completion: ((Result<(FrameTransport, UUID?), Error>) -> Void)?
     private var queue: [(endpoint: WiFiEndpoint, target: NWEndpoint)] = []
+    /// The user's port forwarding in this attempt, for the log (which never holds the address itself).
+    private var manual: WiFiEndpoint?
     private var pending: NWConnection?
     private var timer: Timer?
     private var pathMonitor: NWPathMonitor?
@@ -45,7 +49,18 @@ final class DirectConnector: LinkConnector {
     func connect(_ target: ConnectTarget, completion: @escaping (Result<(FrameTransport, UUID?), Error>) -> Void) {
         cancel()
         self.completion = completion
-        queue = target.direct.compactMap { endpoint in DirectAddress.dialable(endpoint).map { (endpoint, $0) } }
+        var bridge: [(endpoint: WiFiEndpoint, target: NWEndpoint)] = target.direct.compactMap { endpoint in
+            DirectAddress.dialable(endpoint).map { (endpoint, $0) }
+        }
+        manual = nil
+        if let endpoint = target.directManual,
+           let forward = try? ManualForward.make(host: endpoint.host, port: String(endpoint.port)).get(),
+           forward.endpoint == endpoint, let dialable = forward.dialable {
+            manual = endpoint
+            bridge.removeAll { $0.endpoint == endpoint }
+            if target.directManualFirst { bridge.insert((endpoint, dialable), at: 0) } else { bridge.append((endpoint, dialable)) }
+        }
+        queue = bridge
         next()
     }
 
@@ -118,7 +133,8 @@ final class DirectConnector: LinkConnector {
             if case .failed = state { transport?.close() }
         }
         transport.startReceiving()
-        log.info("direct", "Reached the bridge's \(DirectAddress.family(endpoint)) address")
+        log.info("direct", endpoint == manual ? "Reached the address you entered (port forwarding)"
+                                             : "Reached the bridge's \(DirectAddress.family(endpoint)) address")
         queue = []
         let callback = completion
         completion = nil

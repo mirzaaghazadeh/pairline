@@ -184,9 +184,99 @@ extension DirectStatus.Reason {
     }
 }
 
-/// What the bridge last said about its direct connection (`remote.addr`, `remote.state`), kept until remote mode
-/// goes off.
+/// What the bridge last said about its direct connection (`remote.addr`, `remote.state`), and the port forwarding the
+/// user set up by hand, kept until remote mode goes off.
 struct RemoteDirect: Codable, Equatable {
     var endpoints = DirectEndpoints()
     var status: DirectStatus?
+    /// Manual port forwarding (D-083): where the user says the bridge's home can be reached, for a router without
+    /// UPnP, NAT-PMP or PCP.
+    var manual: ManualForward?
+}
+
+/// Manual port forwarding (D-083): the home's internet address or DDNS name and the port the user forwarded to the
+/// bridge, typed on this iPhone. Without UPnP, NAT-PMP or PCP the bridge can't learn the home's public address, and
+/// Pairline never asks an outside "what's my IP" service, so the user enters it. This is the one place a host name is
+/// dialed (the system resolves it); the handshake still pins the bridge's key, so a wrong host only fails.
+struct ManualForward: Codable, Equatable {
+    var host: String
+    var port: UInt16
+
+    static let defaultPort: UInt16 = 47830
+
+    enum Problem: Error, Equatable {
+        /// Nothing typed.
+        case empty
+        /// Neither a DNS name nor an IP address.
+        case notAnAddress
+        /// An address inside a home network (private, loopback, link-local, carrier-grade NAT) or a `.local` name.
+        case insideHome
+        /// Not 1–65535.
+        case badPort
+    }
+
+    var endpoint: WiFiEndpoint { WiFiEndpoint(host: host, port: port) }
+
+    /// Checks what the user typed: a DNS name (letters, digits and hyphens per label, at least two labels, up to 253
+    /// characters) or a public IPv4 or global IPv6 address, and a port 1–65535. The name is kept lowercased, without a
+    /// trailing dot; an IPv6 address without brackets.
+    static func make(host rawHost: String, port rawPort: String) -> Result<ManualForward, Problem> {
+        var host = rawHost.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if host.hasPrefix("["), host.hasSuffix("]") { host = String(host.dropFirst().dropLast()) }
+        if host.hasSuffix(".") { host = String(host.dropLast()) }
+        guard !host.isEmpty else { return .failure(.empty) }
+        // Any script's decimal digits (a Persian or Arabic keypad types ۴۷۸۳۰ or ٤٧٨٣٠).
+        let digits = rawPort.trimmingCharacters(in: .whitespacesAndNewlines).map { ch -> Int? in
+            guard let value = ch.wholeNumberValue, (0...9).contains(value), ch.isNumber else { return nil }
+            return value
+        }
+        guard !digits.isEmpty, digits.count <= 5, !digits.contains(nil) else { return .failure(.badPort) }
+        let portValue = digits.reduce(0) { $0 * 10 + ($1 ?? 0) }
+        guard (1...65535).contains(portValue) else { return .failure(.badPort) }
+        let port = UInt16(portValue)
+        if host.contains(":") {
+            guard host.allSatisfy({ $0.isASCII && ($0.isHexDigit || $0 == ":" || $0 == ".") }),
+                  let address = IPv6Address(host) else { return .failure(.notAnAddress) }
+            guard DirectAddress.isGlobal(address) else { return .failure(.insideHome) }
+            return .success(ManualForward(host: "\(address)", port: port))
+        }
+        let labels = host.split(separator: ".", omittingEmptySubsequences: false)
+        if labels.count == 4, labels.allSatisfy({ !$0.isEmpty && $0.count <= 3 && $0.allSatisfy(\.isNumber) }) {
+            guard let address = IPv4Address(host) else { return .failure(.notAnAddress) }
+            guard DirectAddress.isPublic(address) else { return .failure(.insideHome) }
+            return .success(ManualForward(host: "\(address)", port: port))
+        }
+        guard host.count <= 253, labels.count >= 2,
+              labels.allSatisfy({ label in
+                  (1...63).contains(label.count) && !label.hasPrefix("-") && !label.hasSuffix("-")
+                      && label.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-") }
+              }),
+              let last = labels.last, !last.allSatisfy(\.isNumber) else { return .failure(.notAnAddress) }
+        if last == "local" || last == "localhost" || last == "lan" || last == "home" || last == "internal" {
+            return .failure(.insideHome)
+        }
+        return .success(ManualForward(host: host, port: port))
+    }
+
+    /// Read back from storage: checked again, nil when no longer valid.
+    var checked: ManualForward? {
+        try? Self.make(host: host, port: String(port)).get()
+    }
+
+    /// How Network.framework dials it: an IP literal as such, a name for the system to resolve.
+    var dialable: NWEndpoint? {
+        guard let port = NWEndpoint.Port(rawValue: port) else { return nil }
+        if let address = IPv6Address(host), host.contains(":") { return .hostPort(host: .ipv6(address), port: port) }
+        if let address = IPv4Address(host), host.split(separator: ".").count == 4 {
+            return .hostPort(host: .ipv4(address), port: port)
+        }
+        return .hostPort(host: .name(host, nil), port: port)
+    }
+}
+
+/// The last time the direct connection tried the user's port forwarding (in memory only): when, and whether the
+/// bridge answered there.
+struct ManualAttempt: Equatable {
+    var at: Date
+    var worked: Bool
 }

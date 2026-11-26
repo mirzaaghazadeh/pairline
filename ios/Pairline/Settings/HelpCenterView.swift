@@ -43,7 +43,7 @@ struct HelpCenterView: View {
                                 subtitle: Text("Leave the Android phone at home, on charge and on Wi-Fi.", tableName: "RemoteMode"))
                     }
                     NavigationLink {
-                        RouterHelpView()
+                        RouterHelpView(remote: AppModel.shared.link.remote)
                     } label: {
                         ToolRow(symbol: "wifi.router", tint: .brandBlue, title: Text("Allow calls from far away", tableName: "RemoteMode"),
                                 subtitle: Text("Let your home router make the direct connection", tableName: "RemoteMode"))

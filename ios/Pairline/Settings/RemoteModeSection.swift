@@ -53,6 +53,24 @@ struct RemoteModeSection: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
+            // Manual port forwarding (D-083), for a router without UPnP, NAT-PMP or PCP.
+            if remote.isOn {
+                NavigationLink {
+                    PortForwardingView(remote: remote)
+                } label: {
+                    HStack(spacing: 12) {
+                        Label {
+                            Text("Port forwarding", tableName: "RemoteMode")
+                        } icon: {
+                            Image(systemName: "arrow.left.arrow.right.square")
+                        }
+                        Spacer(minLength: 12)
+                        (remote.direct.manual != nil ? Text("Set up by you", tableName: "RemoteMode")
+                                                     : Text("Not set up", tableName: "RemoteMode"))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
             // Texts and codes reach a locked iPhone through iCloud only as notifications: a way to allow them here.
             if remote.isOn, notifier.authorization == .notDetermined {
                 Button {
@@ -68,7 +86,7 @@ struct RemoteModeSection: View {
                 }
             }
             // Free, with remote mode on or off: the bridge asks its router, read-only (`remote.check`).
-            HomeConnectionCheckRow(bridge: bridge)
+            HomeConnectionCheckRow(bridge: bridge, remote: remote, manualSet: remote.direct.manual != nil)
             Button {
                 intro = .info
             } label: {
@@ -113,6 +131,16 @@ struct RemoteModeSection: View {
                 if remote.isOn, !busy, let problem = remote.problem {
                     Text(problem.nextStep).foregroundStyle(Color.brandAmber)
                 }
+                if remote.isOn, remote.direct.manual != nil, let attempt = remote.manualAttempt, !attempt.worked,
+                   !bridge.isDirect {
+                    let when = attempt.at.formatted(.relative(presentation: .named))
+                    Text("Couldn't reach your Android phone at the address you entered. Last tried \(when).", tableName: "RemoteMode")
+                        .foregroundStyle(Color.brandAmber)
+                }
+                if remote.isOn, remote.direct.manual != nil, remote.direct.status?.reason == .carrierNAT {
+                    Text("Your internet provider shares one internet address among many homes, so port forwarding can't help there.", tableName: "RemoteMode")
+                        .foregroundStyle(Color.brandAmber)
+                }
                 if !remote.isOn, let blocker {
                     blocker
                 }
@@ -137,6 +165,15 @@ struct RemoteModeSection: View {
     /// What the bridge said about its direct connection (`remote.state`), or that it's in use; nil before it said.
     private var directText: Text? {
         if bridge.isDirect { return Text("Connected") }
+        // The router opened nothing, but the user forwarded the port by hand (D-083): say that instead of the reason.
+        if remote.direct.manual != nil, remote.direct.status?.availability != .open,
+           remote.direct.status?.reason != .carrierNAT, remote.direct.status?.reason != .notOnWiFi {
+            switch remote.manualAttempt?.worked {
+            case true?: return Text("Port forwarding: working", tableName: "RemoteMode")
+            case false?: return Text("Port forwarding: not reached", tableName: "RemoteMode")
+            case nil: return Text("Port forwarding: set up by you", tableName: "RemoteMode")
+            }
+        }
         guard let status = remote.direct.status else { return nil }
         switch status.availability {
         case .open:

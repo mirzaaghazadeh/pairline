@@ -249,7 +249,7 @@ final class LinkManager: BridgeLink {
     /// The direct lane runs in remote mode, once the bridge has sent addresses, while no nearby session is up, and
     /// while the app is in the foreground or a call needs it.
     private var directWanted: Bool {
-        guard let remote, remote.isOn, !remote.directCandidates.isEmpty else { return false }
+        guard let remote, remote.isOn, remote.hasDirectTargets else { return false }
         if inBackground, keepsDirectInBackground?() != true { return false }
         return !primary.isEstablished && !wifi.isEstablished
     }
@@ -432,8 +432,14 @@ final class LinkManager: BridgeLink {
         lane.token += 1
         let token = lane.token
         var target = ConnectTarget(deviceID: peer.deviceID, knownPeripheral: peer.peripheralID)
-        // The only non-local addresses the iPhone dials: from the paired bridge's authenticated `remote.addr`.
-        if lane.id == .direct { target.direct = remote?.directCandidates ?? [] }
+        // The only non-local addresses the iPhone dials: from the paired bridge's authenticated `remote.addr`, and the
+        // port forwarding the user typed in (D-083).
+        if lane.id == .direct, let remote {
+            target.direct = remote.directCandidates
+            target.directManual = remote.manualEndpoint
+            target.directManualFirst = remote.manualFirst
+        }
+        let triedManual = target.directManual != nil
         updatePhase()
         connector.connect(target) { [weak self, weak lane] result in
             guard let self, let lane, token == lane.token else {
@@ -454,6 +460,7 @@ final class LinkManager: BridgeLink {
                 if case ConnectError.cancelled = error { return self.updatePhase() }
                 // Remote mode's log line for a failed attempt: never the addresses tried (rule 9).
                 if lane.id == .direct { log.info("direct", "Couldn't reach the bridge's home; trying again later") }
+                if lane.id == .direct, triedManual { self.remote?.noteManualAttempt(worked: false) }
                 self.scheduleRetry(lane)
             }
         }
@@ -833,6 +840,10 @@ final class LinkManager: BridgeLink {
             }
         }
         sendRaw(deviceInfo, id: nil, on: lane)
+        // The user's port forwarding (D-083) worked: Settings says so.
+        if lane.id == .direct, let dialed = lane.session?.frameTransport.dialed, dialed == remote?.manualEndpoint {
+            remote?.noteManualAttempt(worked: true)
+        }
         // Call audio rides inside the Bluetooth session, or inside the direct connection while no Bluetooth one is up.
         if lane.id == .primary || (lane.id == .direct && linkMediaLane != .primary),
            let session = lane.session, session.carriesLinkMedia {
@@ -1155,7 +1166,8 @@ final class LinkManager: BridgeLink {
         guard let remote, remote.isOn else { return "off" }
         let state = direct.isEstablished ? "connected" : direct.session != nil ? "handshake"
             : direct.connecting ? "connecting" : direct.retryAt != nil ? "waiting" : "idle"
-        let families = remote.directCandidates.map(DirectAddress.family)
+        var families = remote.directCandidates.map(DirectAddress.family)
+        if remote.manualEndpoint != nil { families.append("port forwarding") }
         return "\(state); addresses: \(families.isEmpty ? "none" : families.joined(separator: " + "))"
     }
 

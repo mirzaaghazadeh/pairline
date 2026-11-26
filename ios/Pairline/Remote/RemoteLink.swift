@@ -205,6 +205,45 @@ final class RemoteLink: ObservableObject {
         return direct.endpoints.candidates.filter { !droppedEndpoints.contains($0) }
     }
 
+    /// The user's manual port forwarding (D-083), while remote mode is on.
+    var manualEndpoint: WiFiEndpoint? {
+        guard isOn else { return nil }
+        return direct.manual?.endpoint
+    }
+
+    /// Something for the direct connection to dial: the bridge's addresses or the user's port forwarding.
+    var hasDirectTargets: Bool { !directCandidates.isEmpty || manualEndpoint != nil }
+
+    /// Try the user's port forwarding first while the bridge says its router didn't open a port; after the bridge's
+    /// own addresses when it did.
+    var manualFirst: Bool { direct.status?.availability != .open }
+
+    /// The last attempt at the user's port forwarding, this run of the app.
+    @Published private(set) var manualAttempt: ManualAttempt?
+
+    /// Saves (or, with nil, removes) the user's port forwarding. Only while remote mode is on: it goes with it.
+    func setManualForward(_ forward: ManualForward?) {
+        guard isOn || forward == nil else { return }
+        var direct = self.direct
+        guard direct.manual != forward else { return }
+        direct.manual = forward
+        store.saveDirect(direct)
+        self.direct = direct
+        manualAttempt = nil
+        log.info("remote", forward == nil ? "Port forwarding removed" : "Port forwarding set up by the user")
+        onChange?()
+    }
+
+    /// The direct connection reached the bridge at the address the user entered, or didn't. Never logs the address.
+    func noteManualAttempt(worked: Bool) {
+        guard direct.manual != nil else { return }
+        if manualAttempt?.worked != worked {
+            log.info("remote", worked ? "Reached the bridge at the address you entered"
+                                      : "Couldn't reach the bridge at the address you entered")
+        }
+        manualAttempt = ManualAttempt(at: now(), worked: worked)
+    }
+
     func nextRequestID() -> Int { store.nextRequestID() }
 
     private func mailbox(for settings: RemoteSettings) -> RemoteMailboxing {
@@ -430,6 +469,7 @@ final class RemoteLink: ObservableObject {
         problem = nil
         direct = store.direct
         droppedEndpoints = []
+        manualAttempt = nil
         let mailbox = mailbox(for: old)
         let task = Task {
             for box in RemoteMailbox.Box.allCases {
@@ -478,8 +518,10 @@ final class RemoteLink: ObservableObject {
         return true
     }
 
-    /// The direct connection's handshake failed at this address: skip it until the next `remote.addr`.
+    /// The direct connection's handshake failed at this address: skip it until the next `remote.addr`. The user's own
+    /// port forwarding is never skipped or removed for that; the attempt is noted as failed instead.
     func dropDirect(_ endpoint: WiFiEndpoint) {
+        if endpoint == direct.manual?.endpoint { return noteManualAttempt(worked: false) }
         guard direct.endpoints.candidates.contains(endpoint), droppedEndpoints.insert(endpoint).inserted else { return }
         log.warning("remote", "Skipping the bridge's \(DirectAddress.family(endpoint)) address until it sends new ones")
     }

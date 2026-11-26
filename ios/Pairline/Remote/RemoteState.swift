@@ -66,6 +66,7 @@ final class RemoteStore {
         let stored = Keychain.get(account: directAccount)
         var direct = stored.flatMap { try? JSONDecoder().decode(RemoteDirect.self, from: $0) } ?? RemoteDirect()
         direct.endpoints = direct.endpoints.checked
+        direct.manual = direct.manual?.checked
         self.direct = direct
     }
 

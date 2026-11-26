@@ -80,6 +80,9 @@ extension HomeCheckReply {
 struct HomeConnectionCheckRow: View {
     @EnvironmentObject private var app: AppModel
     @ObservedObject var bridge: BridgeController
+    /// For the Port forwarding screen (D-083), and whether the user set it up; the parent observes it.
+    var remote: RemoteLink?
+    var manualSet = false
     @State private var running = false
     @State private var result: HomeCheckReply?
     @State private var failure: String?
@@ -130,12 +133,33 @@ struct HomeConnectionCheckRow: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
+                // Manual port forwarding (D-083): covers a router that opens nothing, not a shared provider address.
+                if manualSet, result.reason == .router || result.reason == .noPublicAddress {
+                    Text("You set up port forwarding yourself; Pairline uses it while you're away.", tableName: "RemoteMode")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } else if manualSet, result.reason == .carrierNAT {
+                    Text("Your internet provider shares one internet address among many homes, so port forwarding can't help there.", tableName: "RemoteMode")
+                        .font(.footnote)
+                        .foregroundStyle(Color.brandAmber)
+                }
             }
             .fixedSize(horizontal: false, vertical: true)
             .padding(.vertical, 2)
+            if let remote, !manualSet, result.reason == .router || result.reason == .noPublicAddress {
+                NavigationLink {
+                    PortForwardingView(remote: remote)
+                } label: {
+                    Label {
+                        Text("Set up port forwarding", tableName: "RemoteMode")
+                    } icon: {
+                        Image(systemName: "arrow.left.arrow.right.square")
+                    }
+                }
+            }
             if result.hasRouterHelp {
                 NavigationLink {
-                    RouterHelpView()
+                    RouterHelpView(remote: remote)
                 } label: {
                     Label {
                         Text("How to allow calls from far away", tableName: "RemoteMode")

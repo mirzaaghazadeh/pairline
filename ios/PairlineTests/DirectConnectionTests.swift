@@ -200,7 +200,8 @@ final class DirectLaneTests: XCTestCase {
         UserDefaults.standard.removeObject(forKey: DebugSettings.transportKey)
     }
 
-    /// Each connection reaches a fresh bridge endpoint; a direct one "dialed" the first address it was given.
+    /// Each connection reaches a fresh bridge endpoint; a direct one "dialed" the first address it was given (the
+    /// user's port forwarding first when the target says so).
     private func makeBridge(_ kind: TransportKind) -> LoopbackTransport {
         let (r, b) = LoopbackTransport.pair(kind: kind)
         let bridge = TestBridge(transport: b, identity: kind == .direct ? directAnswersWith ?? bridgeKey : bridgeKey)
@@ -210,7 +211,10 @@ final class DirectLaneTests: XCTestCase {
             self.onMessage?(bridge, object)
         }
         if kind == .direct {
-            r.dialed = directConnector.targets.last?.direct.first
+            if let target = directConnector.targets.last {
+                r.dialed = target.directManualFirst ? (target.directManual ?? target.direct.first)
+                                                    : (target.direct.first ?? target.directManual)
+            }
             directBridge = bridge
         } else {
             primaryBridge = bridge
@@ -334,6 +338,35 @@ final class DirectLaneTests: XCTestCase {
         manager.appBecameActive()
         manager.reconnectNow()
         await waitFor("direct again") { manager.isDirect }
+    }
+
+    /// Manual port forwarding (D-083): with no `remote.addr` at all (the router opened nothing), the address the user
+    /// entered brings the direct session up, and it's kept with the rest of the direct connection.
+    func testManualPortForwardingAloneBringsUpTheDirectSession() async throws {
+        await mail(["t": "remote.state", "direct": "none", "reason": "no_mapping"])
+        XCTAssertTrue(directConnector.targets.isEmpty)
+        let forward = try ManualForward.make(host: "myhome.example.net", port: "47830").get()
+        remote.setManualForward(forward)
+        await waitFor("direct through the user's entry") { manager.isDirect }
+        let target = try XCTUnwrap(directConnector.targets.last)
+        XCTAssertEqual(target.directManual, forward.endpoint)
+        XCTAssertTrue(target.directManualFirst)
+        XCTAssertTrue(target.direct.isEmpty)
+        await waitFor("noted as working") { remote.manualAttempt?.worked == true }
+        XCTAssertEqual(RemoteStore(defaults: defaults, prefix: prefix).direct.manual, forward)
+        XCTAssertTrue(manager.directSummary.contains("port forwarding"), manager.directSummary)
+    }
+
+    /// Another phone (or nothing of ours) answers at the user's address: the attempt fails, the entry stays.
+    func testAWrongPhoneAtTheUsersAddressKeepsTheEntry() async throws {
+        directAnswersWith = P256.KeyAgreement.PrivateKey()
+        let forward = try ManualForward.make(host: "myhome.example.net", port: "47830").get()
+        remote.setManualForward(forward)
+        await waitFor("noted as not reached") { remote.manualAttempt?.worked == false }
+        XCTAssertFalse(manager.isDirect)
+        XCTAssertEqual(remote.direct.manual, forward)
+        XCTAssertEqual(remote.manualEndpoint, forward.endpoint)
+        XCTAssertEqual(RemoteStore(defaults: defaults, prefix: prefix).direct.manual, forward)
     }
 
     func testNoDirectAttemptWhileANearbyLinkIsUp() async {
