@@ -77,6 +77,11 @@ final class BridgeController: ObservableObject {
                   let lane = manager.linkMediaLane else { return nil }
             return (channel, lane)
         }
+        // In the background the direct connection stays only for a call (D-080); when the call ends, it goes.
+        if let manager = link as? LinkManager {
+            manager.keepsDirectInBackground = { [weak calls] in calls?.current != nil }
+            calls.onCallPresenceChange = { [weak manager] active in if !active { manager?.backgroundCheck() } }
+        }
         link.onPhaseChange = { [weak self] phase in self?.phaseChanged(phase) }
         link.onTransportsChange = { [weak self] in
             guard let self else { return }

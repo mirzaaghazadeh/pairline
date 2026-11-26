@@ -80,6 +80,11 @@ final class CallAudioTests: XCTestCase {
         XCTAssertEqual(start?["t"] as? String, "call.media.start")
         XCTAssertEqual(start?["call"] as? String, "c1")
         XCTAssertEqual(start?["talk"] as? Bool, false)
+        // Over Wi-Fi it may go on any session; inside the link only on the session that carries the audio: Bluetooth,
+        // or remote mode's direct connection (D-080).
+        XCTAssertNil(Outbound.callMediaStart(.string("c1"), talk: true).lane)
+        XCTAssertEqual(Outbound.callMediaStart(.string("c1"), talk: true, via: .link).lane, .primary)
+        XCTAssertEqual(Outbound.callMediaStart(.string("c1"), talk: true, via: .link, linkLane: .direct).lane, .direct)
         let event = try Inbound.decode(Data(#"{"t":"call.media.state","call":"c1","state":"active","listen":true,"talk":true}"#.utf8))
         guard case .callMediaState(let state) = event.message else { return XCTFail("not decoded") }
         XCTAssertEqual(state.state, "active")

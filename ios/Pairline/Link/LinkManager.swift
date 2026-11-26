@@ -246,10 +246,36 @@ final class LinkManager: BridgeLink {
         return peerStore.peer?.wifi != nil || bridgeCaps.contains(Capability.wifi.rawValue)
     }
 
-    /// The direct lane runs in remote mode, once the bridge has sent addresses, while no nearby session is up.
+    /// The direct lane runs in remote mode, once the bridge has sent addresses, while no nearby session is up, and
+    /// while the app is in the foreground or a call needs it.
     private var directWanted: Bool {
         guard let remote, remote.isOn, !remote.directCandidates.isEmpty else { return false }
+        if inBackground, keepsDirectInBackground?() != true { return false }
         return !primary.isEstablished && !wifi.isEstablished
+    }
+
+    /// The app is in the background. A direct session can't wake a suspended app the way Bluetooth and iCloud's pushes
+    /// do, so the bridge would send events into a socket nobody reads: it closes, and events go through iCloud.
+    private var inBackground = false
+    /// A call is in progress, whose audio may ride the direct connection: it stays in the background then.
+    var keepsDirectInBackground: (() -> Bool)?
+
+    func appMovedToBackground() {
+        inBackground = true
+        backgroundCheck()
+    }
+
+    func appBecameActive() {
+        inBackground = false
+    }
+
+    /// While in the background: closes the direct connection unless a call needs it (call this when a call ends).
+    func backgroundCheck() {
+        guard inBackground, keepsDirectInBackground?() != true else { return }
+        guard direct.session != nil || direct.connecting || direct.retryTimer != nil else { return }
+        log.info("direct", "In the background: the direct connection closes and iCloud carries events")
+        cancelDirectAttempt()
+        closeDirectSession()
     }
 
     init(identityStore: IdentityStore, peerStore: PeerStore, deviceInfo: Outbound, remote: RemoteLink? = nil,
@@ -426,6 +452,8 @@ final class LinkManager: BridgeLink {
                 self.startSession(transport, lane: lane, pairing: nil)
             case .failure(let error):
                 if case ConnectError.cancelled = error { return self.updatePhase() }
+                // Remote mode's log line for a failed attempt: never the addresses tried (rule 9).
+                if lane.id == .direct { log.info("direct", "Couldn't reach the bridge's home; trying again later") }
                 self.scheduleRetry(lane)
             }
         }
@@ -519,6 +547,8 @@ final class LinkManager: BridgeLink {
         guard let session = direct.session else { return }
         direct.session = nil
         direct.connectedSince = nil
+        // Its close callback no longer matches the lane, so the call-audio channel inside it closes here.
+        if linkMediaLane == .direct { closeLinkMedia() }
         session.close()
         reroutePending(from: direct)
         if !lanes.contains(where: \.isEstablished) { latency = nil }
@@ -930,7 +960,9 @@ final class LinkManager: BridgeLink {
         }
         inbound.viaMailbox = lane == nil
         inbound.alreadyShown = alreadyShown
-        if inbound.type.hasPrefix("remote.") || inbound.type.hasPrefix("rpair.") {
+        // Remote mode's own events stay here; a reply to a request (`remote.check`) goes to whoever asked.
+        let answersRequest = inbound.id.map { pending[$0] != nil } ?? false
+        if !answersRequest, inbound.type.hasPrefix("remote.") || inbound.type.hasPrefix("rpair.") {
             return handleRemote(inbound, plaintext: plaintext)
         }
         switch inbound.message {
@@ -1156,6 +1188,7 @@ final class LinkManager: BridgeLink {
     private func requestThroughMailbox(_ message: Outbound, remote: RemoteLink) async throws -> Inbound {
         let id = remote.nextRequestID()
         let record = try remote.seal(message.json(id: id))
+        log.info("link", "Sending \(message.type) through iCloud")
         return try await withCheckedThrowingContinuation { continuation in
             let timer = Timer.scheduledTimer(withTimeInterval: max(message.timeout, Self.mailboxTimeout),
                                              repeats: false) { [weak self] _ in
@@ -1240,6 +1273,7 @@ final class LinkManager: BridgeLink {
             return
         }
         guard phase == .remote, let remote, let record = try? remote.seal(message.json(id: nil)) else { return }
+        log.info("link", "Sending \(message.type) through iCloud")
         Task { try? await remote.write(record) }
     }
 

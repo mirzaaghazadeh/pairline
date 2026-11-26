@@ -12076,13 +12076,6 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajların ve kodların iCloud üzerinden size ulaşması için Pairline bildirimlerine izin verin." } }
       }
     },
-    "Keeps texts and codes coming when your phones are apart. There's no Pairline server: messages are locked with keys only your two phones hold, and Apple stores only locked records in your iCloud until they're read. Apple and internet providers can see that your phones talk, not what they say. Calls still need the phones together for now." : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يُبقي الرسائل والرموز تصلك حين يكون هاتفاك بعيدين عن بعضهما. لا يوجد خادم لـ Pairline: تُقفَل الرسائل بمفاتيح لا يملكها إلا هاتفاك، ولا تخزّن Apple في iCloud الخاص بك سوى هذه السجلات المقفلة إلى أن تُقرأ. يمكن لـ Apple ومزوّدي الإنترنت أن يعرفوا أن هاتفيك يتواصلان، لا ما يقولانه. أما المكالمات فما زالت تحتاج حاليًا إلى أن يكون الهاتفان معًا." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی دو گوشی از هم دورند، پیامک‌ها و کدها همچنان به شما می‌رسند. هیچ سرور Pairline در کار نیست: پیام‌ها با کلیدهایی قفل می‌شوند که فقط دو گوشی شما دارند، و Apple فقط همین رکوردهای قفل‌شده را تا وقتی خوانده شوند در iCloud شما نگه می‌دارد. Apple و ارائه‌دهندگان اینترنت می‌توانند ببینند که گوشی‌های شما با هم در ارتباط‌اند، اما نه اینکه چه می‌گویند. تماس‌ها فعلاً هنوز نیاز دارند که دو گوشی کنار هم باشند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirinden uzaktayken de mesajlar ve kodlar gelmeye devam eder. Pairline sunucusu yoktur: mesajlar yalnızca iki telefonunuzdaki anahtarlarla kilitlenir ve Apple, iCloud'unuzda yalnızca bu kilitli kayıtları okunana kadar saklar. Apple ve internet sağlayıcıları telefonlarınızın birbiriyle konuştuğunu görebilir, ne konuştuklarını göremez. Aramalar için şimdilik telefonların bir arada olması gerekiyor." } }
-      }
-    },
     "Pair a phone that's far away" : {
       "localizations" : {
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "إقران هاتف بعيد" } },
@@ -12258,11 +12251,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon zamanında onaylamadı. Yeni bir davetle tekrar deneyin." } }
       }
     },
-    "Texts and codes from your Android phone's SIM now come to this iPhone through iCloud. Calls still need the phones together for now." : {
+    "Texts and codes from your Android phone's SIM now come to this iPhone through iCloud. Calls work once the direct connection to its home is up." : {
+      "comment" : "Remote pairing (D-080) finished while the phones are apart. Call audio needs the direct connection through the home router.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصل الآن الرسائل والرموز من شريحة هاتف أندرويد إلى هذا الآيفون عبر iCloud. أما المكالمات فما زالت تحتاج حاليًا إلى أن يكون الهاتفان معًا." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از این پس، پیامک‌ها و کدهای سیم‌کارت گوشی اندرویدی شما از طریق iCloud به این آیفون می‌آیند. تماس‌ها فعلاً هنوز نیاز دارند که دو گوشی کنار هم باشند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzun SIM'ine gelen mesajlar ve kodlar artık iCloud üzerinden bu iPhone'a geliyor. Aramalar için şimdilik telefonların bir arada olması gerekiyor." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصل الآن الرسائل والرموز من شريحة هاتف أندرويد إلى هذا الآيفون عبر iCloud. وتعمل المكالمات حين يُتاح الاتصال المباشر بمنزله." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از این پس، پیامک‌ها و کدهای سیم‌کارت گوشی اندرویدی شما از طریق iCloud به این آیفون می‌آیند. تماس‌ها وقتی کار می‌کنند که اتصال مستقیم به خانهٔ آن گوشی برقرار باشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzun SIM'ine gelen mesajlar ve kodlar artık iCloud üzerinden bu iPhone'a geliyor. Aramalar, telefonun bulunduğu eve doğrudan bağlantı kurulduğunda çalışır." } }
       }
     },
     "remote.push.title" : {

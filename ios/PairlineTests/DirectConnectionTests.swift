@@ -315,6 +315,27 @@ final class DirectLaneTests: XCTestCase {
         XCTAssertNotNil(manager.linkMediaChannel)
     }
 
+    /// In the background the direct session closes, since it can't wake the app and iCloud's pushes can, unless a
+    /// call needs it; back in the foreground it comes back.
+    func testTheDirectSessionClosesInTheBackgroundUnlessACallNeedsIt() async {
+        await mail(addr)
+        await waitFor("direct") { manager.isDirect }
+        var inCall = true
+        manager.keepsDirectInBackground = { inCall }
+        manager.appMovedToBackground()
+        XCTAssertTrue(manager.isDirect, "a call keeps it")
+        inCall = false
+        manager.backgroundCheck()
+        XCTAssertFalse(manager.isDirect)
+        XCTAssertEqual(manager.phase, .remote)
+        XCTAssertNil(manager.linkMediaChannel)
+        manager.reconnectNow()
+        XCTAssertFalse(manager.isDirect, "no new attempt while in the background")
+        manager.appBecameActive()
+        manager.reconnectNow()
+        await waitFor("direct again") { manager.isDirect }
+    }
+
     func testNoDirectAttemptWhileANearbyLinkIsUp() async {
         primaryConnector.enable()
         await waitFor("nearby") { manager.activeTransports == [.tcp] }

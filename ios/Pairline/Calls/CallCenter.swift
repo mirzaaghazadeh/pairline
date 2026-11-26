@@ -45,7 +45,11 @@ final class CallCenter: ObservableObject {
         case iphone(talk: Bool)
     }
 
-    @Published private(set) var current: ActiveCall?
+    @Published private(set) var current: ActiveCall? {
+        didSet { if (oldValue == nil) != (current == nil) { onCallPresenceChange?(current != nil) } }
+    }
+    /// Called when a call starts (true) or the last one ends (false).
+    var onCallPresenceChange: ((Bool) -> Void)?
     /// A second call during a call (call waiting, D-074): ringing, or on hold after the user switched calls.
     @Published private(set) var other: ActiveCall?
     @Published private(set) var audioRoute: AudioRoute = .bridge
@@ -65,6 +69,8 @@ final class CallCenter: ObservableObject {
     var linkTransport: (() -> (channel: AudioPacketTransport, lane: LinkLane)?)?
     /// The path and channel of the relay the bridge accepted.
     private var relayPath: CallAudioPath?
+    /// For `.link`: the session lane the relay runs in (Bluetooth or remote mode's direct connection).
+    private var relayLane: LinkLane?
     private var relayTransport: AudioPacketTransport?
     /// Calls whose relay already got its one second try (on the other path, after the first stopped).
     private var relayRetried = Set<UUID>()
@@ -465,13 +471,21 @@ final class CallCenter: ObservableObject {
         case "failed", "stopped":
             guard audioRoute != .bridge else { return }
             log.info("audio", "Bridge stopped relaying call audio: \(event.reason ?? "-")")
-            let stoppedPath = relayPath
+            let stoppedPath = relayPath, stoppedLane = relayLane
             stopRelay(callEnded: false, tellBridge: false) // the bridge has stopped already
+            // The session it ran in changed mid-call (walking home from remote mode's direct connection to Bluetooth,
+            // or leaving again, D-080): move the audio to the session that's up now, as often as that happens.
+            if call.state == .active, call.answeredHere, let next = availablePath(), next.path == .link,
+               stoppedPath == .link, next.lane != stoppedLane {
+                log.info("audio", "Moving the call's audio to \(Self.pathName(next.path, lane: next.lane))")
+                startRelayIfPossible()
+                return
+            }
             // The path it ran on went away mid-call (Bluetooth or Wi-Fi dropped): try once more on whatever is up.
             if call.state == .active, call.answeredHere, !relayRetried.contains(call.id),
                let next = availablePath(), next.path != stoppedPath {
                 relayRetried.insert(call.id)
-                log.info("audio", "Moving the call's audio to \(next.path == .link ? "Bluetooth" : "Wi-Fi")")
+                log.info("audio", "Moving the call's audio to \(Self.pathName(next.path, lane: next.lane))")
                 startRelayIfPossible()
                 return
             }
@@ -506,6 +520,7 @@ final class CallCenter: ObservableObject {
                 self.relayAccepted = true
                 self.relayTalk = talk
                 self.relayPath = choice.path
+                self.relayLane = choice.lane
                 self.relayTransport = choice.transport
                 self.startEngineIfReady()
             } catch {
@@ -618,6 +633,7 @@ final class CallCenter: ObservableObject {
         }
         relayAccepted = false
         relayPath = nil
+        relayLane = nil
         relayTransport = nil
         if callEnded { relayRetried.removeAll() }
         relayStartedAt = nil

@@ -22,6 +22,7 @@ struct PairlineApp: App {
                 .onContinueUserActivity("INStartAudioCallIntent") { model.handleCallActivity($0) }
                 .onValueChange(scenePhase) { phase in
                     if phase == .active { model.didBecomeActive() }
+                    if phase == .background { model.didEnterBackground() }
                 }
         }
     }

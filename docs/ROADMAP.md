@@ -214,12 +214,28 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
 - [x] Remote pairing: one-time invitation from the iPhone, allowed on the Android phone (tap or paste the link), 6-digit
       code compared on a call (D-080); tested iPhone ↔ stand-in bridge through iCloud on 2026-11-26
 - [ ] Street test with a real Android bridge in another home (a tester's phone)
-- [ ] Router mapping, public listener and direct session
-- [ ] Opus call audio on the direct connection
-- [ ] Settings, status line, the before-you-turn-it-on screen and "Check my home connection"
-- [ ] The remote-mode add-on purchase
-- [ ] PRIVACY.md, ARCHITECTURE.md, PROTOCOL.md, README and decision entries
-- [ ] Street tests on real phones
+- [x] Router mapping, public listener and direct session (unit-tested against a fake router; no real router yet)
+- [x] Opus call audio on the direct connection: D-072's `MEDIA` frames inside the direct session, no UDP port; in the
+      background the iPhone keeps the direct session only during a call, so events go through iCloud's pushes
+- [x] Settings, status line, the before-you-turn-it-on screen, "Check my home connection" (`remote.check`, free,
+      read-only on the router) and the connection log (IP addresses redacted on both phones)
+- [x] The remote-mode add-on purchase (D-081): code and the local StoreKit file; the App Store Connect product waits
+      for the maintainer
+- [x] PRIVACY.md, ARCHITECTURE.md, PROTOCOL.md, README and decision entries (D-080, D-081)
+- [ ] Street tests on real phones, with the bridge at home on charge and Wi-Fi and the iPhone on mobile data:
+  - [ ] Turn remote mode on; the status line says "Via iCloud", then "Direct connection" where the router allows it
+  - [ ] "Check my home connection" matches what the router really does (open, carrier-grade NAT, no UPnP/NAT-PMP/PCP)
+  - [ ] SMS and a one-time code arrive with the iPhone locked, through the notification extension, within seconds
+  - [ ] A text sent from the iPhone goes out from the Android phone (direct, and via iCloud with the direct
+        connection off)
+  - [ ] An incoming call: the notification on the locked iPhone, answering on the iPhone, two-way audio over the
+        direct connection, mute, speaker, hang up from both sides
+  - [ ] An outgoing call from the iPhone over the direct connection, then the same with the app in the background
+  - [ ] Battery, signal and the bridge's name in the Bridge tab, widget and Live Activity while via iCloud
+  - [ ] Walk home: Bluetooth takes over (a call in progress keeps going); leave again: back to remote mode
+  - [ ] Turn remote mode off: the router mapping is gone (router page), the bridge stops checking iCloud
+  - [ ] Remote pairing with a tester's phone in another home, codes compared on a call
+  - [ ] Both phones' logs show the paths taken and no addresses, numbers or tokens
 
 ## Later
 
