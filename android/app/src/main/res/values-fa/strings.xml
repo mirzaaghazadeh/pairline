@@ -327,6 +327,9 @@
     <string name="settings_general">عمومی</string>
     <string name="settings_language">زبان</string>
     <string name="settings_language_system">پیش‌فرض سیستم</string>
+    <string name="language_step_title">زبان خود را انتخاب کنید</string>
+    <string name="language_step_body">بعداً هم می‌توانید آن را در تنظیمات عوض کنید.</string>
+    <string name="language_step_body_guessed">این زبان را از روی سیم‌کارت یا منطقهٔ زمانی گوشی انتخاب کردیم. همین حالا یا بعداً در تنظیمات می‌توانید عوضش کنید.</string>
     <string name="settings_iphone">آیفون شما</string>
     <string name="settings_ios_version">نسخهٔ iOS: %1$s</string>
     <string name="settings_app_version">نسخهٔ Pairline: %1$s</string>

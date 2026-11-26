@@ -354,10 +354,7 @@ struct SettingsTab: View {
         }
     }
 
-    private var currentLanguageName: String {
-        let code = Bundle.main.preferredLocalizations.first ?? "en"
-        return Locale(identifier: code).localizedString(forLanguageCode: code)?.capitalized ?? code
-    }
+    private var currentLanguageName: String { AppLanguage.shownName }
 
     private var helpSection: some View {
         Section {

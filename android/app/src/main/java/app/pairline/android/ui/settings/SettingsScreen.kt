@@ -674,13 +674,8 @@ private fun localDate(ms: Long, locale: java.util.Locale): String {
 
 /** Language names are shown in their own language, so anyone can find theirs. */
 @Composable
-private fun languageName(tag: String): String = when (tag) {
-    "en" -> "English"
-    "fa" -> "فارسی"
-    "ar" -> "العربية"
-    "tr" -> "Türkçe"
-    else -> stringResource(R.string.settings_language_system)
-}
+private fun languageName(tag: String): String =
+    LocaleHelper.NAMES[tag] ?: stringResource(R.string.settings_language_system)
 
 @Composable
 private fun LanguageDialog(current: String, onDismiss: () -> Unit, onPick: (String) -> Unit) {

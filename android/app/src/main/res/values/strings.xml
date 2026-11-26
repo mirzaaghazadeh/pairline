@@ -328,6 +328,9 @@
     <string name="settings_general">General</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_system">System default</string>
+    <string name="language_step_title">Choose your language</string>
+    <string name="language_step_body">You can change it later in Settings.</string>
+    <string name="language_step_body_guessed">We picked this from your SIM card or time zone. You can change it now, or later in Settings.</string>
     <string name="settings_iphone">Your iPhone</string>
     <string name="settings_ios_version">iOS %1$s</string>
     <string name="settings_app_version">Pairline %1$s</string>

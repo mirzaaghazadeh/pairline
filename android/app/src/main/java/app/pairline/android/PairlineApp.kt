@@ -4,6 +4,7 @@ import android.app.Application
 import app.pairline.android.files.FileNotifications
 import app.pairline.android.link.LinkService
 import app.pairline.android.log.Log
+import app.pairline.android.ui.FirstLanguage
 import app.pairline.android.ui.Notifications
 
 class PairlineApp : Application() {
@@ -17,6 +18,8 @@ class PairlineApp : Application() {
             previous?.uncaughtException(thread, error)
         }
         AppGraph.init(this)
+        // A fresh install starts in the language of the phone's country (D-081); setup's first step shows the choice.
+        FirstLanguage.applyIfNeeded(this)
         Notifications.createChannels(this)
         FileNotifications(this).createChannel()
         Log.i("app", "Pairline ${BuildConfig.VERSION_NAME} started on Android ${android.os.Build.VERSION.SDK_INT}")

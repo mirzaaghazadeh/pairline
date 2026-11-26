@@ -328,6 +328,9 @@
     <string name="settings_general">عام</string>
     <string name="settings_language">اللغة</string>
     <string name="settings_language_system">لغة النظام الافتراضية</string>
+    <string name="language_step_title">اختر لغتك</string>
+    <string name="language_step_body">يمكنك تغييرها لاحقاً من الإعدادات.</string>
+    <string name="language_step_body_guessed">اخترنا هذه اللغة حسب شريحة SIM أو المنطقة الزمنية لهاتفك. يمكنك تغييرها الآن أو لاحقاً من الإعدادات.</string>
     <string name="settings_iphone">آيفونك</string>
     <string name="settings_ios_version">نظام iOS %1$s</string>
     <string name="settings_app_version">تطبيق Pairline %1$s</string>

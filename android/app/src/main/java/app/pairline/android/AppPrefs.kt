@@ -41,6 +41,14 @@ class AppPrefs(context: Context) {
         get() = prefs.getString(LANGUAGE, "") ?: ""
         set(value) = edit { putString(LANGUAGE, value) }
 
+    /**
+     * The language picked on first open from the phone's country (D-081): null before that check ran, "" when it
+     * picked nothing, else the tag it set. The setup's language step says so when it picked one.
+     */
+    var languageGuess: String?
+        get() = prefs.getString(LANGUAGE_GUESS, null)
+        set(value) = edit { putString(LANGUAGE_GUESS, value) }
+
     /** The paired iPhone's model name from its `device.info` (never a user-chosen name). */
     var peerName: String?
         get() = prefs.getString(PEER_NAME, null)
@@ -186,6 +194,7 @@ class AppPrefs(context: Context) {
         const val WIFI_LINK = "wifi_link"
         const val HOTSPOT_BAND = "hotspot_band"
         const val LANGUAGE = "language"
+        const val LANGUAGE_GUESS = "language_guess"
         const val PEER_NAME = "peer_name"
         const val PEER_OS = "peer_os"
         const val PEER_APP = "peer_app"

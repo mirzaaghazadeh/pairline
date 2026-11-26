@@ -5,6 +5,12 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.8.0 (not released yet)
+
+- **Starts in your language.** On a new install, Pairline picks Persian, Arabic or Turkish from your SIM card's
+  country (or the network's, or the time zone) when the phone itself is in English. Setup now opens with a Language
+  step, so you can see the choice and change it.
+
 ## 1.7.0 (2026-11-26)
 
 - **Notifications from your Android apps on the iPhone.** Choose apps in Settings › Notifications from apps and their

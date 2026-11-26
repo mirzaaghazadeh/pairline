@@ -192,6 +192,23 @@ private struct WelcomePage: View {
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 12)
             Spacer()
+            // The language the app runs in, picked from the iPhone on first open (D-081); iPhone Settings changes it.
+            // Only the current language is named here (D-033).
+            Button {
+                AppLanguage.openSettings()
+            } label: {
+                Label(AppLanguage.shownName, systemImage: "globe")
+                    .font(.subheadline.weight(.medium))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(Capsule().fill(Color.secondary.opacity(0.12)))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .accessibilityLabel(Text("Language"))
+            .accessibilityValue(Text(verbatim: AppLanguage.shownName))
+            .accessibilityHint(Text("Change the language in iPhone Settings › Pairline › Language."))
+            .opacity(appeared ? 1 : 0)
             Spacer()
         }
         .padding(.horizontal, 24)

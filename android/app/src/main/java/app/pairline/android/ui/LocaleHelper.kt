@@ -17,6 +17,13 @@ object LocaleHelper {
     /** Language tags offered in Settings; "" follows the system. */
     val SUPPORTED = listOf("", "en", "fa", "ar", "tr")
 
+    /** Each language in its own name, so anyone can find theirs. */
+    val NAMES = mapOf("en" to "English", "fa" to "فارسی", "ar" to "العربية", "tr" to "Türkçe")
+
+    /** The language the app shows now: the chosen one, else the phone's if Pairline has it, else English. */
+    fun shown(context: Context): String =
+        current(context).ifEmpty { context.resources.configuration.locales[0].language }.takeIf { it in NAMES } ?: "en"
+
     fun current(context: Context): String {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val locales = context.getSystemService(LocaleManager::class.java)?.applicationLocales

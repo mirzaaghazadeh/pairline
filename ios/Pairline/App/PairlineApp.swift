@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-@main
+/// Started by `PairlineMain` (AppLanguage.swift), which picks the first-open language first.
 struct PairlineApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var model = AppModel.shared

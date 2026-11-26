@@ -1336,3 +1336,25 @@ written by hand into the published notes; the others had only the build table.
   touch `android/` or `protocol/`, most commits first, bots left out. Mentions make GitHub show the avatars.
 - `.github/scripts/release-notes.sh` builds both parts with git and `gh` (no new dependency); the workflow checks out
   the full history for it. Every existing release, 1.0.0 to 1.7.0, got the same notes from it.
+
+### D-081 — The first language comes from the phone's country (2026-11-26)
+
+The maintainer asked both apps to open in the right language the first time, from the carrier or time zone, and to
+show the language on first open. Only fresh installs: anyone who already set Pairline up keeps their language.
+- **Android:** before setup starts, Pairline reads the SIM card's country, else the mobile network's, else the time
+  zone's region (ICU), else the region setting; the first one known decides (a US SIM keeps English even in Tehran's
+  time zone). Iran and Afghanistan give Persian, Turkey Turkish, the Arab League countries Arabic, and it applies only
+  when the phone itself is in English or a language Pairline doesn't have. It sets the app's own language (Android
+  13+'s per-app language, the stored choice before). No permission is needed and nothing leaves the phone. Setup gets
+  a first step, **Language**, listing the four languages in their own names with the current one selected; when it was
+  picked from the country, the text says so ("from your SIM card or time zone").
+- **iPhone:** the iPhone usually has no SIM of the bridge's country, and a time zone alone would put everyone with an
+  English iPhone in Istanbul or Dubai into Turkish or Arabic. So the keyboards decide: with one Persian, Arabic or
+  Turkish keyboard added, that language; with several, the time zone, then the region picks among them; with none,
+  the iPhone's language stays. (`UITextInputMode.activeInputModes`; only when iOS gives no keyboard list do the time
+  zone and region decide alone.) It's written as the app's own `AppleLanguages`, the same setting as iPhone Settings ›
+  Pairline › Language, before SwiftUI starts (`PairlineMain`), so the first screen is already in that language; checked
+  on the Simulator: a fresh install with a Persian keyboard opened in Persian, right to left in Estedad.
+- **Shown on first open, D-033 kept:** the iPhone's welcome page has a globe button with the current language's own
+  name that opens iPhone Settings › Pairline, where iOS lists the languages. The app still doesn't list them itself.
+- The unit tests' host app skips the check, so tests keep the Simulator's language.
