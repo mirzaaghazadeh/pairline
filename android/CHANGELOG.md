@@ -5,7 +5,7 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
-## Unreleased
+## 1.9.0 (2026-11-27)
 
 - **Nearby or Cloud mode, explained.** Setup has a new "Two ways to connect" step: Nearby works by itself with the
   phones near each other; Cloud mode, turned on in Pairline on your iPhone, is for leaving this phone at home. The home
@@ -16,6 +16,8 @@ the section in the same commit that raises `versionName`.
   the home screen.
 - Help starts with "Nearby or Cloud mode". Buttons before Android's own permission windows say "Continue" instead of
   "Allow", and Diagnostics moved to Settings › Help.
+- Calls in Cloud mode while you're away from home were fixed in Pairline for iPhone (TestFlight build 23 and later);
+  nothing to change on this phone.
 
 ## 1.8.0 (2026-11-26)
 
