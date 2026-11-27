@@ -158,6 +158,8 @@ final class RemoteLink: ObservableObject {
     @Published private(set) var settings: RemoteSettings?
     @Published private(set) var problem: RemoteProblem? {
         didSet {
+            // Anything but a network hiccup (a success, too) starts the hiccup grace over.
+            if problem != .offline, problem != .busy { networkTroubleSince = nil }
             // The log notes when the mailbox recovers, and when the bridge stops reading it (errors log themselves).
             guard problem != oldValue else { return }
             if problem == nil, let oldValue {
@@ -553,8 +555,22 @@ final class RemoteLink: ObservableObject {
         self.direct = direct
     }
 
+    /// How long a network hiccup (no network, or iCloud asking to wait) lasts before Settings shows it. An iPhone often
+    /// fails its first iCloud request after waking (CloudKit error 4) and succeeds seconds later; flashing "Can't reach
+    /// iCloud" for that only worried testers (2026-11-27).
+    static let networkGrace: TimeInterval = 20
+    /// When the current run of network hiccups began, while it isn't shown yet.
+    private var networkTroubleSince: Date?
+
     private func note(_ error: Error) {
-        problem = RemoteProblem(error)
+        let found = RemoteProblem(error)
+        if found == .offline || found == .busy, problem != found {
+            let since = networkTroubleSince ?? now()
+            networkTroubleSince = since
+            if now().timeIntervalSince(since) >= Self.networkGrace { problem = found }
+        } else {
+            problem = found
+        }
         let detail = (error as? CKError).map { "CloudKit error \($0.code.rawValue)" } ?? "\(type(of: error))"
         log.warning("remote", "Mailbox: \(detail)")
     }

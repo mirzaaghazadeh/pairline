@@ -191,6 +191,22 @@ class DirectLinkTest {
         assertEquals(DirectReason.CARRIER_NAT, direct.status.value.reason)
     }
 
+    /**
+     * A check whose quick probe gets no answer keeps what this phone's own mapping learned on the same network, so the
+     * iPhone hears "carrier-grade NAT", not "turn on UPnP" (a TP-Link with UPnP on, 2026-11-27).
+     */
+    @Test
+    fun aCheckTheRouterDoesntAnswerKeepsWhatTheMappingLearned() {
+        router.external = "100.72.1.2"
+        on()
+        direct.step()
+        assertEquals(DirectReason.CARRIER_NAT, direct.status.value.reason)
+        router.natPmp = false
+        val result = direct.check()
+        assertFalse(result.likely)
+        assertEquals(DirectReason.CARRIER_NAT, result.reason)
+    }
+
     @Test
     fun doubleNatAndNoMapping() {
         router.external = "192.168.0.2"

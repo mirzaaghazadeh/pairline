@@ -171,7 +171,7 @@ class DirectLink(
     fun check(): HomeCheck.Result {
         if (!checking.compareAndSet(false, true)) throw RequestException(ErrorCode.BUSY, "a check is already running")
         try {
-            val result = HomeCheck.run(if (networkKnown) wantNetwork else null)
+            val result = reconcile(HomeCheck.run(if (networkKnown) wantNetwork else null))
             // The router answers now (the user just turned UPnP or NAT-PMP on): with Cloud mode on, map at once
             // instead of at the next half-hourly retry.
             if (result.router != null && wantActive) {
@@ -182,6 +182,26 @@ class DirectLink(
         } finally {
             checking.set(false)
         }
+    }
+
+    /**
+     * The check's quick, read-only probe can miss a slow router (no UPnP answer in its time) while this phone's own
+     * mapping on the same network already learned more: carrier-grade NAT, double NAT, or a port that's open. That
+     * stands then, so the iPhone isn't told to turn on UPnP that's already on (seen 2026-11-27: a TP-Link TD-W9960 with
+     * UPnP on, behind the provider's carrier-grade NAT, got "the router doesn't open ports").
+     */
+    private fun reconcile(probed: HomeCheck.Result): HomeCheck.Result {
+        if (probed.router != null || probed.reason == DirectReason.NOT_ON_WIFI) return probed
+        val known = _status.value
+        val sameNetwork = synchronized(work) { mapped != null && mapped === wantNetwork }
+        if (!known.active || !sameNetwork) return probed
+        val result = when {
+            known.direct == Direct.OPEN && known.mappedV4 -> HomeCheck.Result(true, null, null, probed.ipv6)
+            known.reason in ADDRESS_REASONS -> HomeCheck.Result(false, known.reason, null, probed.ipv6)
+            else -> return probed
+        }
+        Log.i(TAG, "the router didn't answer the check in time; " + HomeCheck.describe(result) + " (from this phone's mapping)")
+        return result
     }
 
     /** Set by [check] when the router answered: the next pass asks it for the mapping again right away. */
@@ -449,6 +469,10 @@ class DirectLink(
 
     companion object {
         private const val TAG = "direct"
+
+        /** What this phone's mapping learned about the router's internet address, which a check's quick probe keeps. */
+        private val ADDRESS_REASONS =
+            setOf(DirectReason.CARRIER_NAT, DirectReason.DOUBLE_NAT, DirectReason.NO_PUBLIC_ADDRESS)
 
         /** Check the mapping and the router's internet address at least this often (a new address is noticed then). */
         const val CHECK_MS = 15 * 60_000L

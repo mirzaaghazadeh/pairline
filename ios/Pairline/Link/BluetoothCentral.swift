@@ -213,6 +213,16 @@ extension BluetoothCentral: CBCentralManagerDelegate {
             candidates.removeAll()
             candidateTimers.values.forEach { $0.invalidate() }
             candidateTimers.removeAll()
+            // iOS drops every connection when Bluetooth turns off without calling didDisconnectPeripheral, so the
+            // session would stay "up" on a dead radio and every request would wait for its timeout. Close it here, so
+            // requests move at once to Wi-Fi, the direct connection or iCloud (seen 2026-11-27: syncs, a call and a
+            // ping all timed out for 40 s after Bluetooth went off).
+            if let transport {
+                self.transport = nil
+                chosen = nil
+                log.info("ble", "Bluetooth turned off; the Bluetooth link is closed")
+                transport.didDisconnect(nil)
+            }
         }
         onAvailabilityChange?(new)
     }

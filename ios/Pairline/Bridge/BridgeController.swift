@@ -503,6 +503,8 @@ final class BridgeController: ObservableObject {
     }
 
     @Published private(set) var balance: BalanceReply?
+    /// The microphone was asked for in this launch (see `requestMicrophoneIfNeeded`).
+    private var microphoneAsked = false
 
     /// Runs the code the user chose as their balance code, on the SIM it was chosen for.
     @discardableResult
@@ -519,10 +521,13 @@ final class BridgeController: ObservableObject {
     /// The bridge just offered "Talk on iPhone": ask for the microphone now, while the app is open, rather than in
     /// the middle of the first call. iOS asks only once; the answer is kept in Settings › Pairline.
     private func requestMicrophoneIfNeeded(_ s: BridgeStatus) {
-        guard mode == .real, s.caps?.contains(Capability.callMediaTalk.rawValue) == true,
+        guard mode == .real, !microphoneAsked, s.caps?.contains(Capability.callMediaTalk.rawValue) == true,
               UIApplication.shared.applicationState == .active else { return }
         let session = AVAudioSession.sharedInstance()
         guard session.recordPermission == .undetermined else { return }
+        // Once: every status that arrives while iOS's prompt is open would otherwise ask again, and each answer was
+        // logged (15 "Microphone allowed" lines in a tester's log, 2026-11-27).
+        microphoneAsked = true
         session.requestRecordPermission { granted in
             log.info("audio", "Microphone \(granted ? "allowed" : "denied") for calls")
         }
