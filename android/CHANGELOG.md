@@ -5,6 +5,13 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.2 (2026-11-27)
+
+- **Diagnostics show Cloud mode.** The report you can share from Settings › Help › Diagnostics now says whether Cloud
+  mode is on, when this phone last checked iCloud and last got a message from your iPhone through it, any iCloud
+  problem, and whether calls from far away can work (and why not). Its log says which kinds of message came through
+  iCloud and why any were set aside (for example, a clock that's off). Still no numbers, addresses or message text.
+
 ## 1.9.1 (2026-11-27)
 
 - **"Check my home connection" tells carrier-grade NAT apart.** When the router is slow to answer the check, it now

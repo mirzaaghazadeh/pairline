@@ -5,6 +5,8 @@ import android.os.Build
 import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
 import app.pairline.android.link.LinkSnapshot
+import app.pairline.android.link.remote.DirectStatus
+import app.pairline.android.link.remote.RemoteStatus
 import app.pairline.android.log.Log
 import app.pairline.android.log.Redactor
 import app.pairline.android.telephony.Perms
@@ -37,6 +39,9 @@ data class DiagnosticsFacts(
     val caps: List<String>,
     val simCount: Int,
     val companionBound: Boolean,
+    /** Cloud mode (D-092): the mailbox and the direct connection. Neither holds an address, a token or a key. */
+    val remote: RemoteStatus = RemoteStatus(),
+    val direct: DirectStatus = DirectStatus(),
     val logLines: List<String>,
 )
 
@@ -69,6 +74,8 @@ object DiagnosticsReport {
             caps = AppGraph.status.caps(),
             simCount = AppGraph.sims.activeCount(),
             companionBound = prefs.companionBoundAt != 0L,
+            remote = AppGraph.remote.state.value,
+            direct = AppGraph.direct.status.value,
             logLines = Log.storedLines(400),
         )
     }
@@ -100,6 +107,23 @@ object DiagnosticsReport {
             )
             if (f.buildType == "debug") appendLine("Debug TCP transport listening: ${yes(l.debugTcpListening)}")
             appendLine("Background running allowed: ${yes(f.batteryExempt)}")
+            val r = f.remote
+            appendLine(
+                "Cloud mode: ${if (r.on) "on" else "off"}" +
+                    (if (r.on) {
+                        ", iCloud problem: ${r.problem?.name?.lowercase() ?: "none"}, retrying: ${yes(r.retrying)}, " +
+                            "last iCloud check: ${t(r.lastCheck)}, last message from the iPhone through iCloud: ${t(r.lastReceived)}"
+                    } else {
+                        ""
+                    }),
+            )
+            if (r.on) {
+                val d = f.direct
+                appendLine(
+                    "Calls from far away (direct connection): ${d.direct?.wire ?: "checking"}" +
+                        (d.reason?.let { " (${it.wire})" } ?: "") + ", router mapping: ${yes(d.mappedV4)}",
+                )
+            }
             appendLine()
             appendLine("Permissions: " + f.permissions.entries.joinToString(", ") { "${it.key} ${if (it.value) "yes" else "no"}" })
             appendLine("Capabilities: ${f.caps.joinToString(", ").ifEmpty { "none" }}")

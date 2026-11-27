@@ -38,6 +38,8 @@ data class RemoteStatus(
     /** The last request failed for a network or server reason; retrying with backoff. */
     val retrying: Boolean = false,
     val lastCheck: Long = 0,
+    /** When a message from the iPhone last came through the mailbox (for the diagnostics report). */
+    val lastReceived: Long = 0,
 )
 
 /**
@@ -324,8 +326,9 @@ class RemoteLink(
         val now = clock()
         val handled = ArrayList<String>()
         val messages = ArrayList<JSONObject>()
+        val dropped = LinkedHashMap<String, Int>()
         for (record in records) {
-            val opened = open(ready, record, now) ?: continue
+            val opened = open(ready, record, now, dropped) ?: continue
             handled += record.name
             runCatching { JSONObject(String(opened.plaintext, Charsets.UTF_8)) }.getOrNull()?.let(messages::add)
         }
@@ -334,23 +337,45 @@ class RemoteLink(
         if (messages.isNotEmpty()) lastReceived = now
         messages.forEach(deliver)
         ready.client.delete(box, records.map { it.name })
-        Log.i(TAG, "mailbox: ${messages.size} message(s) from the iPhone, ${records.size - messages.size} dropped")
+        // Which kinds of message came (never their contents), and why any record was dropped.
+        val kinds = messages.joinToString(", ") { it.optString("t", "?") }
+        val why = if (dropped.isEmpty()) "" else " (" + dropped.entries.joinToString(", ") { "${it.key}: ${it.value}" } + ")"
+        Log.i(TAG, "mailbox: ${messages.size} message(s) from the iPhone${if (kinds.isEmpty()) "" else " [$kinds]"}, " +
+            "${records.size - messages.size} dropped$why")
         return records.size >= FETCH_LIMIT
     }
 
-    /** The record if it's timely, new, from the paired iPhone and authentic; otherwise null (dropped silently). */
-    private fun open(ready: Ready, record: CloudKitWebClient.MailRecord, now: Long): MailboxRecord? {
+    /**
+     * The record if it's timely, new, from the paired iPhone and authentic; otherwise null, with the reason counted in
+     * [dropped] for the log (a tester's text that never went out needs to say why).
+     */
+    private fun open(
+        ready: Ready,
+        record: CloudKitWebClient.MailRecord,
+        now: Long,
+        dropped: MutableMap<String, Int>,
+    ): MailboxRecord? {
+        fun drop(why: String): MailboxRecord? {
+            dropped[why] = (dropped[why] ?: 0) + 1
+            return null
+        }
         val header = try {
             MailboxHeader.parse(record.sealed)
         } catch (_: ProtocolException) {
-            return null
+            return drop("unreadable")
         }
-        if (header.kind != MailboxKind.SEALED || header.direction != MailboxDirection.REMOTE_TO_BRIDGE) return null
-        if (!header.isTimely(now) || header.recordName != record.name || store.isHandled(record.name)) return null
+        if (header.kind != MailboxKind.SEALED || header.direction != MailboxDirection.REMOTE_TO_BRIDGE) {
+            return drop("not for this phone")
+        }
+        if (!header.isTimely(now)) {
+            return drop(if (header.timeMs > now) "dated ahead of this phone's clock" else "older than 14 days")
+        }
+        if (header.recordName != record.name) return drop("renamed")
+        if (store.isHandled(record.name)) return drop("already handled")
         return try {
             Mailbox.open(identity(), ready.peer, MailboxDirection.REMOTE_TO_BRIDGE, record.sealed)
         } catch (_: ProtocolException) {
-            null
+            drop("not from the paired iPhone")
         }
     }
 
@@ -379,7 +404,7 @@ class RemoteLink(
     }
 
     private fun publish(retrying: Boolean = false) {
-        _state.value = RemoteStatus(store.isOn, store.problem, retrying, lastCheck)
+        _state.value = RemoteStatus(store.isOn, store.problem, retrying, lastCheck, lastReceived)
     }
 
     companion object {

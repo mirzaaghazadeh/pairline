@@ -4,6 +4,10 @@ import app.pairline.android.link.BluetoothStatus
 import app.pairline.android.link.LinkSnapshot
 import app.pairline.android.link.TransportKind
 import app.pairline.android.link.WifiLinkStatus
+import app.pairline.android.link.remote.Direct
+import app.pairline.android.link.remote.DirectReason
+import app.pairline.android.link.remote.DirectStatus
+import app.pairline.android.link.remote.RemoteStatus
 import app.pairline.android.protocol.WifiHint
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -84,5 +88,23 @@ class DiagnosticsReportTest {
         assertFalse(report.contains("192.168"))
         assertFalse(report.contains("AndroidShare"))
         assertFalse(report.contains("secret pass"))
+        assertTrue(report.contains("Cloud mode: off"))
+    }
+
+    /** Cloud mode says how the mailbox and the direct connection are doing, never the addresses behind them. */
+    @Test
+    fun cloudModeIsReported() {
+        val report = DiagnosticsReport.build(
+            facts(emptyList()).copy(
+                remote = RemoteStatus(on = true, lastCheck = 1_764_000_150_000, lastReceived = 1_764_000_120_000),
+                direct = DirectStatus(active = true, direct = Direct.BLOCKED, reason = DirectReason.CARRIER_NAT,
+                                      localV4 = "192.168.1.23", port = 47830),
+            ),
+            now = 1_764_000_200_000,
+        )
+        assertTrue(report, report.contains("Cloud mode: on, iCloud problem: none, retrying: no"))
+        assertTrue(report, report.contains("last message from the iPhone through iCloud: 2025-"))
+        assertTrue(report, report.contains("Calls from far away (direct connection): blocked (cgnat), router mapping: no"))
+        assertFalse(report.contains("192.168"))
     }
 }
