@@ -184,9 +184,21 @@ class CloudKitWebClient(
     object HttpsTransport : Http {
         private const val MAX_REPLY = 2L * 1024 * 1024
 
+        /**
+         * A whole request gives up after this long. The connect and read timeouts only bound each step, so on a slow or
+         * filtered network one request hung for 10 minutes and nothing else was read meanwhile (a tester's log,
+         * 2026-11-27); closing the connection from here makes the blocked call fail at once.
+         */
+        private const val TOTAL_MS = 20_000L
+
+        private val watchdog = java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r ->
+            Thread(r, "pairline-cloudkit-watchdog").apply { isDaemon = true }
+        }
+
         override fun post(url: String, body: String): Response {
             require(URL(url).let { it.protocol == "https" && it.host == HOST }) { "not CloudKit" }
             val connection = URL(url).openConnection() as HttpsURLConnection
+            val deadline = watchdog.schedule({ connection.disconnect() }, TOTAL_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
             try {
                 connection.instanceFollowRedirects = false
                 connection.useCaches = false
@@ -205,6 +217,7 @@ class CloudKitWebClient(
                     .associate { it.key to it.value.first() }
                 return Response(status, headers, text)
             } finally {
+                deadline.cancel(false)
                 connection.disconnect()
             }
         }

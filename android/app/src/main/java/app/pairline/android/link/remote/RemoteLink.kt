@@ -442,8 +442,12 @@ class RemoteLink(
         const val BURST_MS = 2 * 60_000L
         const val BURST_CHECK_MS = 5_000L
         const val BATTERY_CHECK_MS = 10_000L
-        const val RETRY_FIRST_MS = 30_000L
-        const val RETRY_MAX_MS = 10 * 60_000L
+        /*
+         * After a failed request (often a network that's slow to reach Apple): 3 s, then doubling, at most a minute, so
+         * texts keep going out within seconds once it's back (it was 30 s doubling to 10 minutes).
+         */
+        const val RETRY_FIRST_MS = 3_000L
+        const val RETRY_MAX_MS = 60_000L
 
         /** Events that only make sense on a session (Wi-Fi, files, call audio); replies always go. */
         private val SESSION_ONLY = setOf(
@@ -493,7 +497,7 @@ class RemoteLink(
             else -> BATTERY_CHECK_MS
         }
 
-        /** 30 s, 1, 2, 4, 8 minutes, then 10 minutes. */
+        /** 3, 6, 12, 24, 48 s, then every minute. */
         fun backoff(failures: Int): Long =
             (RETRY_FIRST_MS shl (failures - 1).coerceIn(0, 10)).coerceAtMost(RETRY_MAX_MS)
 

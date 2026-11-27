@@ -5,6 +5,13 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.6 (2026-11-27)
+
+- **Cloud mode keeps up on a slow network.** When the connection to Apple's iCloud stalls, a request now gives up
+  after 20 seconds instead of hanging (one hung for 10 minutes on a tester's network, and nothing from the iPhone was
+  read meanwhile), and the next try comes after 3 seconds, at most a minute later (it was 30 seconds, growing to 10
+  minutes). Texts and syncing from your iPhone go on as soon as the network does.
+
 ## 1.9.5 (2026-11-27)
 
 - **Scanning an invitation works.** "Pair over the internet" › Scan now asks for the camera; in 1.9.4 it couldn't, and

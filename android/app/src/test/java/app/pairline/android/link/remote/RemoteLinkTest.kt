@@ -211,16 +211,16 @@ class RemoteLinkTest {
     fun serverAndNetworkErrorsBackOff() {
         on()
         cloud.failures += listOf(503, 503)
-        assertEquals(30_000L, link.step())
+        assertEquals(3_000L, link.step())
         assertTrue(link.state.value.retrying)
         val requests = cloud.requestCount()
-        now += 10_000
-        assertEquals(20_000L, link.step()) // still waiting: no request
+        now += 1_000
+        assertEquals(2_000L, link.step()) // still waiting: no request
         assertEquals(requests, cloud.requestCount())
-        now += 20_000
-        assertEquals(60_000L, link.step())
-        now += 60_000
-        // 90 s after remote.config: still within the burst after hearing from the iPhone.
+        now += 2_000
+        assertEquals(6_000L, link.step())
+        now += 6_000
+        // 9 s after remote.config: still within the burst after hearing from the iPhone.
         assertEquals(RemoteLink.BURST_CHECK_MS, link.step())
         assertFalse(link.state.value.retrying)
     }
@@ -342,7 +342,7 @@ class RemoteLinkTest {
         assertNull(RemoteLink.slotFor(Messages.wifiMedia(4000)))
         assertNull(RemoteLink.slotFor(JSONObject()))
         assertEquals(RemoteLink.statusKey(status(10, 1)), RemoteLink.statusKey(status(10, 2)))
-        assertEquals(listOf(30_000L, 60_000L, 120_000L, 240_000L, 480_000L, 600_000L, 600_000L), (1..7).map(RemoteLink::backoff))
+        assertEquals(listOf(3_000L, 6_000L, 12_000L, 24_000L, 48_000L, 60_000L, 60_000L), (1..7).map(RemoteLink::backoff))
     }
 
     @Test
