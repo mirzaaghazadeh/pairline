@@ -26,6 +26,8 @@ struct PortForwardingView: View {
                         Image(systemName: "wifi.router")
                     }
                 }
+                // D-106: for a router (or provider) that can't let anything in at all.
+                OwnServerLink(remote: remote)
             }
             Section {
                 step(1, PortForwardText.values)

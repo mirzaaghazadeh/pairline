@@ -97,6 +97,8 @@ object CapsCalculator {
         if (has(Manifest.permission.READ_CALL_LOG) && has(Manifest.permission.WRITE_CALL_LOG)) caps += Caps.CALLLOG_DELETE
         // The block list needs no permission: it filters what the bridge relays (D-043).
         caps += Caps.BLOCK
+        // This bridge takes `remote.relay` and can wait at the user's own server (D-106); the iPhone offers it only then.
+        caps += Caps.RELAY
         if (input.callScreen && input.hasCalling) caps += Caps.CALL_SCREEN
         // Photos travel with the file transfer, so only with the Wi-Fi link on.
         if (input.photos && input.wifiLink) caps += Caps.MEDIA_PHOTOS

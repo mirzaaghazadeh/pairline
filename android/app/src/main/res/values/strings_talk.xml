@@ -14,6 +14,20 @@
     <string name="talk_summary_starting">Starting…</string>
     <string name="talk_summary_failed">Didn’t start</string>
     <string name="talk_summary_unsupported">Needs Android 11 or later</string>
+    <!-- D-107: why it isn't running, in plain words -->
+    <string name="talk_summary_waiting_wifi">Waiting for Wi-Fi: starts by itself once this phone is on Wi-Fi</string>
+    <string name="talk_summary_pair_again">Pair again: Android forgot Pairline’s pairing</string>
+    <string name="talk_summary_failed_root">Root didn’t start it: allow Pairline Bridge in your root app</string>
+
+    <!-- Home screen card while it isn't set up (D-107) -->
+    <string name="talk_card_title">Hear calls on your iPhone</string>
+    <string name="talk_card_body">Calls can ring on your iPhone and play there, with its own microphone and speaker. It takes a one-time setup on this phone.</string>
+    <string name="talk_card_set_up">Set up (about 2 minutes)</string>
+    <string name="talk_card_later">Not now</string>
+
+    <!-- The iPhone asked for it (talk.setup, D-107) -->
+    <string name="talk_setup_n_title">Set up Talk on iPhone</string>
+    <string name="talk_setup_n_text">Your iPhone asked to hear calls there. Tap to set it up on this phone: once, about 2 minutes.</string>
     <string name="talk_android_too_old">This phone runs Android %1$s. Call audio on the iPhone needs Android 11 or later: before that, Android lets no app (not even with a computer or Shizuku) capture a call’s audio. Calls still ring on the iPhone, and you talk on this phone.</string>
     <string name="talk_steps">Set up</string>
 

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -53,6 +54,7 @@ import app.pairline.android.privileged.HelperCommand
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.privileged.PrivilegedManager.Pairing
 import app.pairline.android.privileged.PrivilegedManager.State
+import app.pairline.android.privileged.TalkStatus
 import app.pairline.android.ui.ClearSetupGuideOnResume
 import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
@@ -93,23 +95,33 @@ fun TalkScreen(back: () -> Unit) {
     }
 }
 
-/** Short label for the Settings and home rows: on, off, or what's missing. */
+/** What `status.talk` says now (D-107), re-read when the helper, the settings or the screen change. */
 @Composable
-fun talkSummary(): String {
+fun rememberTalkStatus(): TalkStatus {
     val state by AppGraph.privileged.state.collectAsState()
     val prefsTick by AppGraph.prefs.changes.collectAsState()
-    val on = remember(prefsTick) { AppGraph.prefs.talkOnIphone }
-    return stringResource(
-        when (state) {
-            State.UNSUPPORTED -> R.string.talk_summary_unsupported
-            State.READY, State.IDLE -> if (on) R.string.talk_summary_on else R.string.talk_summary_off
-            State.STARTING -> R.string.talk_summary_starting
-            State.FAILED -> R.string.talk_summary_failed
-            State.NEEDS_WIRELESS_DEBUGGING ->
-                if (AppGraph.privileged.paired) R.string.talk_summary_needs_wireless else R.string.talk_summary_not_set_up
-            State.NEEDS_DEVELOPER_OPTIONS, State.NEEDS_PAIRING -> R.string.talk_summary_not_set_up
-        },
-    )
+    val tick = refreshTick()
+    return remember(state, prefsTick, tick) { AppGraph.privileged.talkStatus() }
+}
+
+/** Short label for the Settings and home rows: on, off, or what's missing and why (D-107). */
+@Composable
+fun talkSummary(): String = stringResource(talkSummaryRes(rememberTalkStatus()))
+
+@StringRes
+fun talkSummaryRes(talk: TalkStatus): Int = when (talk.state) {
+    TalkStatus.UNSUPPORTED -> R.string.talk_summary_unsupported
+    TalkStatus.READY -> R.string.talk_summary_on
+    TalkStatus.OFF -> R.string.talk_summary_off
+    TalkStatus.SETUP -> R.string.talk_summary_not_set_up
+    TalkStatus.STARTING -> R.string.talk_summary_starting
+    else -> when (talk.reason) {
+        TalkStatus.REASON_WIFI -> R.string.talk_summary_waiting_wifi
+        TalkStatus.REASON_DEBUGGING -> R.string.talk_summary_needs_wireless
+        TalkStatus.REASON_PAIRING -> R.string.talk_summary_pair_again
+        TalkStatus.REASON_ROOT -> R.string.talk_summary_failed_root
+        else -> R.string.talk_summary_failed
+    }
 }
 
 /**
@@ -126,8 +138,11 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
     val tick = refreshTick()
     LaunchedEffect(tick) { manager.refresh() }
     // While this screen is open the helper may run for its checks, even with Talk on iPhone off.
+    val context = LocalContext.current
     DisposableEffect(Unit) {
         manager.setupOpen = true
+        // The iPhone's "Set up on Android phone" notification led here, or isn't needed now (D-107).
+        TalkPrompt.cancel(context)
         onDispose { manager.setupOpen = false }
     }
     val on = remember(prefsTick) { AppGraph.prefs.talkOnIphone }
@@ -157,7 +172,6 @@ fun ColumnScope.TalkSetupContent(showReset: Boolean) {
         }
     }
     if (state == State.READY || state == State.IDLE) {
-        val context = LocalContext.current
         SectionCard {
             ListRow(
                 title = stringResource(R.string.talk_switch),

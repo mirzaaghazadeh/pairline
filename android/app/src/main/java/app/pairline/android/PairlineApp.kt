@@ -23,6 +23,8 @@ class PairlineApp : Application() {
         Notifications.createChannels(this)
         FileNotifications(this).createChannel()
         Log.i("app", "Pairline ${BuildConfig.VERSION_NAME} started on Android ${android.os.Build.VERSION.SDK_INT}")
+        // Talk on iPhone is on by default from D-107; a phone already set up with the switch left off keeps it off.
+        AppGraph.prefs.migrateTalkDefault(paired = AppGraph.privileged.paired, rootMode = AppGraph.prefs.rootMode)
         // Watches Developer options and Wireless debugging, and starts Pairline's helper only if the user set up Talk
         // on iPhone and Wireless debugging is on (D-054). Changes no settings.
         AppGraph.privileged.start()

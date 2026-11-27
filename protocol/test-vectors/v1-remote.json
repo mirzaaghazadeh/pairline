@@ -78,5 +78,288 @@
     "confirm_record_id": "d4710a1d955994762c832a115ff44435",
     "confirm_time_ms": 1795700009000,
     "confirm_sealed": "010142d4710a1d955994762c832a115ff44435000001a2180fa82804c66ac79061a05dac5b0a1bce0ae082e9f9e9dd33e6752e494bcb9e571e2c371a7325b0da009e59c0f3be73189873a3d775348be572b5ec66c27055877d89a5ea7688c10cdd9c8b9de3aa3c6b9b6b727e2aca2d851430073d3a9e10817c9035e00efa4a0e8e"
+  },
+  "relay": {
+    "fingerprint": "a395924b4c2c9c6adb2b9e3c70a831bf1983206cdd036ccc32c2c73ec2af11fb",
+    "access_key": "e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a8",
+    "rendezvous_id": "93e586c1c9ea37ee683ffb33c2d4f0fa",
+    "links": [
+      {
+        "why": "a DNS name",
+        "uri": "pairline-relay://relay.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+        "host": "relay.example.net",
+        "port": 443,
+        "fp": "a395924b4c2c9c6adb2b9e3c70a831bf1983206cdd036ccc32c2c73ec2af11fb",
+        "k": "e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a8"
+      },
+      {
+        "why": "a public IPv4 address",
+        "uri": "pairline-relay://5.6.7.8:47840?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+        "host": "5.6.7.8",
+        "port": 47840,
+        "fp": "a395924b4c2c9c6adb2b9e3c70a831bf1983206cdd036ccc32c2c73ec2af11fb",
+        "k": "e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a8"
+      },
+      {
+        "why": "a global IPv6 address in brackets, given back without them",
+        "uri": "pairline-relay://[2a01:4f8:c17:1234::1]:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+        "host": "2a01:4f8:c17:1234::1",
+        "port": 443,
+        "fp": "a395924b4c2c9c6adb2b9e3c70a831bf1983206cdd036ccc32c2c73ec2af11fb",
+        "k": "e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a8"
+      },
+      {
+        "why": "parameters in any order; an unknown one is ignored",
+        "uri": "pairline-relay://relay.example.net:443?k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg&extra=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&v=1",
+        "host": "relay.example.net",
+        "port": 443,
+        "fp": "a395924b4c2c9c6adb2b9e3c70a831bf1983206cdd036ccc32c2c73ec2af11fb",
+        "k": "e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a8"
+      },
+      {
+        "why": "an empty path written as /",
+        "uri": "pairline-relay://relay.example.net:443/?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+        "host": "relay.example.net",
+        "port": 443,
+        "fp": "a395924b4c2c9c6adb2b9e3c70a831bf1983206cdd036ccc32c2c73ec2af11fb",
+        "k": "e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a8"
+      },
+      {
+        "why": "a name is kept lowercased, without a trailing dot",
+        "uri": "pairline-relay://Relay.Example.NET.:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+        "host": "relay.example.net",
+        "port": 443,
+        "fp": "a395924b4c2c9c6adb2b9e3c70a831bf1983206cdd036ccc32c2c73ec2af11fb",
+        "k": "e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a8"
+      }
+    ],
+    "links_must_fail": [
+      {
+        "why": "another scheme",
+        "uri": "https://relay.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "no port",
+        "uri": "pairline-relay://relay.example.net?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "port 0",
+        "uri": "pairline-relay://relay.example.net:0?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "port above 65535",
+        "uri": "pairline-relay://relay.example.net:65536?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a port with a leading zero",
+        "uri": "pairline-relay://relay.example.net:0443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "version 2",
+        "uri": "pairline-relay://relay.example.net:443?v=2&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "no version",
+        "uri": "pairline-relay://relay.example.net:443?fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "no fingerprint",
+        "uri": "pairline-relay://relay.example.net:443?v=1&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a 31-byte fingerprint",
+        "uri": "pairline-relay://relay.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEQ&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "padding on the key",
+        "uri": "pairline-relay://relay.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg="
+      },
+      {
+        "why": "the key twice",
+        "uri": "pairline-relay://relay.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "two fingerprints",
+        "uri": "pairline-relay://relay.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&fp=jgg9Wdiw8DbOxtKZyUfrYOCWB6wjaHDsbmCguLfbtmE&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "user info",
+        "uri": "pairline-relay://user@relay.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a path",
+        "uri": "pairline-relay://relay.example.net:443/path?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a fragment",
+        "uri": "pairline-relay://relay.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg#x"
+      },
+      {
+        "why": "a single-label name",
+        "uri": "pairline-relay://relay:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a .local name",
+        "uri": "pairline-relay://relay.local:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a .home name",
+        "uri": "pairline-relay://relay.home:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "localhost",
+        "uri": "pairline-relay://localhost:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "an underscore in a name",
+        "uri": "pairline-relay://relay_1.example.net:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a private IPv4 address (release builds)",
+        "uri": "pairline-relay://192.168.1.10:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "carrier-grade NAT (release builds)",
+        "uri": "pairline-relay://100.64.0.1:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "loopback (release builds)",
+        "uri": "pairline-relay://127.0.0.1:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a documentation address",
+        "uri": "pairline-relay://203.0.113.5:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a unique-local IPv6 address (release builds)",
+        "uri": "pairline-relay://[fd00::1]:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "documentation IPv6",
+        "uri": "pairline-relay://[2001:db8::1]:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      },
+      {
+        "why": "a shortened IPv4 address",
+        "uri": "pairline-relay://1.2.3:443?v=1&fp=o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs&k=40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+      }
+    ],
+    "remote_relay": {
+      "host": "relay.example.net",
+      "port": 443,
+      "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+      "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+      "rv": "93e586c1c9ea37ee683ffb33c2d4f0fa"
+    },
+    "remote_relay_must_fail": [
+      {
+        "why": "rendezvous id of 15 bytes",
+        "relay": {
+          "host": "relay.example.net",
+          "port": 443,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+          "rv": "93e586c1c9ea37ee683ffb33c2d4f0"
+        }
+      },
+      {
+        "why": "rendezvous id in uppercase",
+        "relay": {
+          "host": "relay.example.net",
+          "port": 443,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+          "rv": "93E586C1C9EA37EE683FFB33C2D4F0FA"
+        }
+      },
+      {
+        "why": "fingerprint of 31 bytes",
+        "relay": {
+          "host": "relay.example.net",
+          "port": 443,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEQ",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+          "rv": "93e586c1c9ea37ee683ffb33c2d4f0fa"
+        }
+      },
+      {
+        "why": "key in standard base64 with padding",
+        "relay": {
+          "host": "relay.example.net",
+          "port": 443,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg=",
+          "rv": "93e586c1c9ea37ee683ffb33c2d4f0fa"
+        }
+      },
+      {
+        "why": "port 0",
+        "relay": {
+          "host": "relay.example.net",
+          "port": 0,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+          "rv": "93e586c1c9ea37ee683ffb33c2d4f0fa"
+        }
+      },
+      {
+        "why": "port as a string",
+        "relay": {
+          "host": "relay.example.net",
+          "port": "443",
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+          "rv": "93e586c1c9ea37ee683ffb33c2d4f0fa"
+        }
+      },
+      {
+        "why": "a host with a space",
+        "relay": {
+          "host": "relay example.net",
+          "port": 443,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+          "rv": "93e586c1c9ea37ee683ffb33c2d4f0fa"
+        }
+      },
+      {
+        "why": "an IPv6 host in brackets (the message carries it without)",
+        "relay": {
+          "host": "[2a01:4f8::1]",
+          "port": 443,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+          "rv": "93e586c1c9ea37ee683ffb33c2d4f0fa"
+        }
+      },
+      {
+        "why": "a private address (release builds)",
+        "relay": {
+          "host": "192.168.1.10",
+          "port": 443,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg",
+          "rv": "93e586c1c9ea37ee683ffb33c2d4f0fa"
+        }
+      },
+      {
+        "why": "no rendezvous id",
+        "relay": {
+          "host": "relay.example.net",
+          "port": 443,
+          "fp": "o5WSS0wsnGrbK548cKgxvxmDIGzdA2zMMsLHPsKvEfs",
+          "k": "40hogcOdV9J0lYRjVnIzlEF0AuhfD4W-2HmTlZ9Y1Kg"
+        }
+      }
+    ],
+    "preamble_bridge": "504c52590142e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a893e586c1c9ea37ee683ffb33c2d4f0fa",
+    "preamble_remote": "504c52590152e3486881c39d57d27495846356723394417402e85f0f85bed87993959f58d4a893e586c1c9ea37ee683ffb33c2d4f0fa",
+    "status": {
+      "keepalive": 0,
+      "joined": 1,
+      "no_bridge": 2,
+      "wrong_key": 3,
+      "bad_version": 4,
+      "full": 5
+    }
   }
 }

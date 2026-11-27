@@ -29,6 +29,13 @@ object UiEvents {
     fun bump() {
         refresh.value++
     }
+
+    /** A screen to open: from a notification's tap, or the iPhone asking while Pairline is on screen (D-107). */
+    val open = MutableStateFlow<Route?>(null)
+
+    /** Pairline's activity is on screen (between onResume and onPause). */
+    @Volatile
+    var resumed = false
 }
 
 /** Re-reads on every resume or permission result. */

@@ -42,6 +42,8 @@ final class WiFiTransport: FrameTransport {
     /// What was dialed (an address from a hint, or a DNS-SD service resolved to `remoteHost`).
     let label: String
     let dialed: WiFiEndpoint?
+    /// A direct connection that runs through the user's own server (D-106); `dialed` is then the server.
+    var viaRelay = false
     private let connection: NWConnection
     private var deframer = TCPDeframer()
     private var closed = false

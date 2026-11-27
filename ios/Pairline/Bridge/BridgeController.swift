@@ -100,6 +100,35 @@ final class BridgeController: ObservableObject {
 
     func has(_ capability: Capability) -> Bool { caps.contains(capability.rawValue) }
 
+    /// Talk on iPhone's state on the bridge (D-107); nil from a bridge that doesn't report it. When it says `ready`
+    /// but `call.media` isn't listed (a moment between two statuses), the capability wins.
+    var talk: TalkState? { status?.talk }
+
+    enum TalkSetupError: LocalizedError {
+        /// Android 10 or older: the bridge can't send call audio to the iPhone.
+        case unsupported
+
+        var errorDescription: String? {
+            String(localized: "This Android phone can't send call audio to the iPhone (needs Android 11).", table: "CallAudio")
+        }
+    }
+
+    /// "Set up on Android phone" (D-107): the bridge turns Talk on iPhone on and shows its setup screen (a notification
+    /// that opens it). Over a session, or through the mailbox in Cloud mode. Nothing to do in demo mode.
+    func requestTalkSetup() async throws {
+        guard !isDemo else { return }
+        guard canUseLink else {
+            requestPaywall()
+            throw ActionError.locked
+        }
+        do {
+            _ = try await link.request(.talkSetup)
+            log.info("audio", "Asked the bridge to set up Talk on iPhone")
+        } catch LinkError.bridge(let reply) where reply.code == "unsupported" {
+            throw TalkSetupError.unsupported
+        }
+    }
+
     var sims: [SIMInfo] { (status?.sims ?? []).sorted { $0.slot < $1.slot } }
     var isDualSIM: Bool { sims.count > 1 }
 

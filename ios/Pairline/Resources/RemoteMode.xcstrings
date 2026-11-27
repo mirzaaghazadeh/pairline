@@ -840,6 +840,530 @@
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "یا حالت ابری را در تنظیمات روشن کنید: آن‌وقت وقتی Pairline بسته است هم پیامک‌ها و کدها از طریق iCloud خودتان می‌رسند." } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ya da Ayarlar’da Bulut modunu açın: o zaman Pairline kapalıyken de mesajlar ve kodlar kendi iCloud’unuz üzerinden gelir." } }
       }
+    },
+    "Your own server" : {
+      "comment" : "D-106: Settings › Connection › Advanced row and screen title. A small relay server the user runs themselves (a VPS), for calls from far away when the home router lets nothing in.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "خادمك الخاص" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your own server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرور خودتان" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kendi sunucunuz" } }
+      }
+    },
+    "Set up your own server" : {
+      "comment" : "D-106: title of the guide to running the relay server, and links to it from Help and Settings.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعداد خادمك الخاص" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Set up your own server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "راه‌اندازی سرور خودتان" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kendi sunucunuzu kurun" } }
+      }
+    },
+    "Use your own server" : {
+      "comment" : "D-106: link (and help card title) where the router can't let calls in: opens Your own server.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استخدم خادمك الخاص" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use your own server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "استفاده از سرور خودتان" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kendi sunucunuzu kullanın" } }
+      }
+    },
+    "If your home router lets nothing in, calls from far away can go through a small server you run yourself. Both phones connect out to it, and it only passes along data locked with keys only your two phones hold. Texts and codes still come through your own iCloud, which also wakes this iPhone." : {
+      "comment" : "D-106: the first lines of Your own server.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا كان موجّه منزلك لا يسمح بدخول أي اتصال، يمكن للمكالمات من بعيد أن تمر عبر خادم صغير تشغّله بنفسك. يتصل به الهاتفان كلاهما، ولا يمرّر إلا بيانات مقفلة بمفاتيح لا يملكها سوى هاتفيك. وتظل الرسائل والرموز تصل عبر iCloud الخاص بك، الذي يوقظ هذا الآيفون أيضًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "If your home router lets nothing in, calls from far away can go through a small server you run yourself. Both phones connect out to it, and it only passes along data locked with keys only your two phones hold. Texts and codes still come through your own iCloud, which also wakes this iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر مودم خانه هیچ اتصالی را راه نمی‌دهد، تماس‌های از راه دور می‌توانند از یک سرور کوچک که خودتان راه می‌اندازید بگذرند. هر دو گوشی به آن وصل می‌شوند و سرور فقط داده‌هایی را جابه‌جا می‌کند که با کلیدهایی قفل شده‌اند که فقط دو گوشی شما دارند. پیامک‌ها و کدها همچنان از iCloud خودتان می‌رسند، که این آیفون را هم بیدار می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ev yönlendiriciniz hiçbir bağlantıyı içeri almıyorsa, uzaktan aramalar kendi çalıştırdığınız küçük bir sunucu üzerinden geçebilir. İki telefon da ona bağlanır ve sunucu yalnızca, anahtarları sadece iki telefonunuzda olan kilitli verileri iletir. Mesajlar ve kodlar yine kendi iCloud’unuz üzerinden gelir; bu iPhone’u uyandıran da odur." } }
+      }
+    },
+    "Server" : {
+      "comment" : "D-106: Your own server › the server's address (a host name or IP address follows).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الخادم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرور" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucu" } }
+      }
+    },
+    "Android phone" : {
+      "comment" : "D-106: Your own server › how the Android (bridge) phone stands with the server (a short status follows).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon" } }
+      }
+    },
+    "Remove this server" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إزالة هذا الخادم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Remove this server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حذف این سرور" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu sunucuyu kaldır" } }
+      }
+    },
+    "Your server" : {
+      "comment" : "D-106: section header for the server the user set up.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "خادمك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرور شما" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz" } }
+      }
+    },
+    "Scan the server's QR code" : {
+      "comment" : "D-106: button and scanner title. The relay server prints a QR code when it starts.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "امسح رمز QR الخاص بالخادم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scan the server's QR code" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اسکن کد QR سرور" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunun QR kodunu tarayın" } }
+      }
+    },
+    "Sending it to the Android phone…" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ إرساله إلى هاتف أندرويد…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sending it to the Android phone…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال فرستادن به گوشی اندرویدی…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefona gönderiliyor…" } }
+      }
+    },
+    "Add your server" : {
+      "comment" : "D-106: section header above Scan and Paste, while no server is set up.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أضف خادمك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add your server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "افزودن سرور" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuzu ekleyin" } }
+      }
+    },
+    "Use another server" : {
+      "comment" : "D-106: section header above Scan and Paste, when a server is already set up.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استخدم خادمًا آخر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use another server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "استفاده از سرور دیگر" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Başka bir sunucu kullanın" } }
+      }
+    },
+    "Turn Cloud mode on first. Your own server is part of it." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فعّل الوضع السحابي أولًا. خادمك الخاص جزء منه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn Cloud mode on first. Your own server is part of it." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اول حالت ابری را روشن کنید. سرور خودتان بخشی از آن است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Önce Bulut modunu açın. Kendi sunucunuz onun bir parçasıdır." } }
+      }
+    },
+    "Your own server needs a newer Pairline Bridge on the Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج خادمك الخاص إلى إصدار أحدث من Pairline Bridge على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your own server needs a newer Pairline Bridge on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرور خودتان به نسخهٔ جدیدتر Pairline Bridge روی گوشی اندرویدی نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kendi sunucunuz için Android telefonda Pairline Bridge’in daha yeni bir sürümü gerekir." } }
+      }
+    },
+    "When it starts, your server shows a QR code and a link that starts with pairline-relay://. Scan the code, or copy the link and tap Paste." : {
+      "comment" : "D-106: footer under Scan and Paste. Paste is the system's Paste button; pairline-relay:// stays as is.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عند تشغيله، يعرض خادمك رمز QR ورابطًا يبدأ بـ ⁦pairline-relay://⁩. امسح الرمز، أو انسخ الرابط واضغط «لصق»." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "When it starts, your server shows a QR code and a link that starts with pairline-relay://. Scan the code, or copy the link and tap Paste." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان وقتی راه می‌افتد یک کد QR و پیوندی را نشان می‌دهد که با ⁦pairline-relay://⁩ شروع می‌شود. کد را اسکن کنید، یا پیوند را کپی کنید و «جای‌گذاری» را بزنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz başlarken bir QR kodu ve pairline-relay:// ile başlayan bir bağlantı gösterir. Kodu tarayın ya da bağlantıyı kopyalayıp Yapıştır’a dokunun." } }
+      }
+    },
+    "Waiting to hear from it" : {
+      "comment" : "D-106: the Android phone hasn't said yet whether it reached the user's server.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بانتظار رده" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Waiting to hear from it" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هنوز خبری نداده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Henüz haber gelmedi" } }
+      }
+    },
+    "Connected to your server" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "متصل بخادمك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connected to your server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به سرورتان وصل است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuza bağlı" } }
+      }
+    },
+    "Can't reach your server" : {
+      "comment" : "D-106: the Android phone can't reach the user's server.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يمكنه الوصول إلى خادمك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can't reach your server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "به سرورتان دسترسی ندارد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuza ulaşamıyor" } }
+      }
+    },
+    "Your server's keys changed" : {
+      "comment" : "D-106: the server's certificate doesn't match its link (it made new keys): scan its code again.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تغيّرت مفاتيح خادمك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server's keys changed" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کلیدهای سرورتان عوض شده" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuzun anahtarları değişti" } }
+      }
+    },
+    "Your server refused the link" : {
+      "comment" : "D-106: the server refused the access key in its link (a new link was made on the server).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رفض خادمك الرابط" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server refused the link" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان پیوند را نپذیرفت" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz bağlantıyı reddetti" } }
+      }
+    },
+    "Your server needs an update" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج خادمك إلى تحديث" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server needs an update" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان به‌روزرسانی لازم دارد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuzun güncellenmesi gerekiyor" } }
+      }
+    },
+    "Your server is full" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "خادمك ممتلئ" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server is full" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان پر است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz dolu" } }
+      }
+    },
+    "Connecting to your server…" : {
+      "comment" : "D-106: the Android phone is still trying to reach the user's server (its first attempt hasn't finished).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ الاتصال بخادمك…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connecting to your server…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال وصل شدن به سرورتان…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuza bağlanıyor…" } }
+      }
+    },
+    "Pairline uses your server whenever your phones aren't near each other." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يستخدم Pairline خادمك كلما لم يكن هاتفاك قريبين من بعضهما." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairline uses your server whenever your phones aren't near each other." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline هر وقت گوشی‌هایتان نزدیک هم نباشند از سرورتان استفاده می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline, telefonlarınız birbirine yakın olmadığında sunucunuzu kullanır." } }
+      }
+    },
+    "This iPhone reached your Android phone through it (%@)." : {
+      "comment" : "D-106: %@ is when, like \"2 minutes ago\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "وصل هذا الآيفون إلى هاتف أندرويد عبره (%@)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This iPhone reached your Android phone through it (%@)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این آیفون از طریق آن به گوشی اندرویدی‌تان رسید (%@)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone, Android telefonunuza onun üzerinden ulaştı (%@)." } }
+      }
+    },
+    "Your server answered, but the Android phone wasn't there (%@). Check that it's on and online." : {
+      "comment" : "D-106: %@ is when, like \"2 minutes ago\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ردّ خادمك، لكن هاتف أندرويد لم يكن متصلًا به (%@). تأكد من أنه يعمل ومتصل بالإنترنت." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server answered, but the Android phone wasn't there (%@). Check that it's on and online." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان پاسخ داد، اما گوشی اندرویدی آنجا نبود (%@). ببینید روشن و آنلاین باشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz yanıt verdi ama Android telefon orada değildi (%@). Açık ve çevrimiçi olduğundan emin olun." } }
+      }
+    },
+    "Your server didn't accept this link (%@). Scan its code again." : {
+      "comment" : "D-106: %@ is when, like \"2 minutes ago\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يقبل خادمك هذا الرابط (%@). امسح رمزه مرة أخرى." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server didn't accept this link (%@). Scan its code again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان این پیوند را نپذیرفت (%@). کدش را دوباره اسکن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz bu bağlantıyı kabul etmedi (%@). Kodunu yeniden tarayın." } }
+      }
+    },
+    "Your server needs an update (%@)." : {
+      "comment" : "D-106: %@ is when, like \"2 minutes ago\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج خادمك إلى تحديث (%@)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server needs an update (%@)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان به‌روزرسانی لازم دارد (%@)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuzun güncellenmesi gerekiyor (%@)." } }
+      }
+    },
+    "Your server is full (%@)." : {
+      "comment" : "D-106: %@ is when, like \"2 minutes ago\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "خادمك ممتلئ (%@)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server is full (%@)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان پر است (%@)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz dolu (%@)." } }
+      }
+    },
+    "This iPhone couldn't reach your server (%@). Check that it's running and its port is open." : {
+      "comment" : "D-106: %@ is when, like \"2 minutes ago\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعذّر على هذا الآيفون الوصول إلى خادمك (%@). تأكد من أنه يعمل وأن منفذه مفتوح." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This iPhone couldn't reach your server (%@). Check that it's running and its port is open." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این آیفون به سرورتان نرسید (%@). ببینید سرور روشن باشد و پورتش باز باشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone sunucunuza ulaşamadı (%@). Çalıştığından ve portunun açık olduğundan emin olun." } }
+      }
+    },
+    "Something other than your Android phone answered through your server (%@)." : {
+      "comment" : "D-106: %@ is when, like \"2 minutes ago\". The handshake through the server failed.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أجاب عبر خادمك شيء غير هاتف أندرويد الخاص بك (%@)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Something other than your Android phone answered through your server (%@)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "چیزی جز گوشی اندرویدی‌تان از طریق سرورتان پاسخ داد (%@)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz üzerinden Android telefonunuzdan başka bir şey yanıt verdi (%@)." } }
+      }
+    },
+    "Saved. The Android phone connects to your server now." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم الحفظ. سيتصل هاتف أندرويد بخادمك الآن." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Saved. The Android phone connects to your server now." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ذخیره شد. گوشی اندرویدی حالا به سرورتان وصل می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kaydedildi. Android telefon şimdi sunucunuza bağlanıyor." } }
+      }
+    },
+    "Saved on this iPhone. It goes to the Android phone the next time they're linked." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم الحفظ على هذا الآيفون. سيصل إلى هاتف أندرويد في المرة القادمة التي يرتبط فيها الهاتفان." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Saved on this iPhone. It goes to the Android phone the next time they're linked." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی این آیفون ذخیره شد. دفعهٔ بعد که گوشی‌ها به هم وصل شوند به گوشی اندرویدی می‌رسد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone’a kaydedildi. Telefonlar bir dahaki bağlanışında Android telefona gider." } }
+      }
+    },
+    "That isn't a Pairline server link. It starts with pairline-relay:// and your server shows it when it starts." : {
+      "comment" : "D-106: the scanned or pasted text isn't the relay server's link. pairline-relay:// stays as is.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هذا ليس رابط خادم Pairline. يبدأ الرابط بـ ⁦pairline-relay://⁩ ويعرضه خادمك عند تشغيله." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "That isn't a Pairline server link. It starts with pairline-relay:// and your server shows it when it starts." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این پیوند سرور Pairline نیست. پیوند درست با ⁦pairline-relay://⁩ شروع می‌شود و سرورتان وقتی راه می‌افتد نشانش می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu bir Pairline sunucu bağlantısı değil. Bağlantı pairline-relay:// ile başlar ve sunucunuz başlarken onu gösterir." } }
+      }
+    },
+    "That link is from a newer Pairline server. Update Pairline on this iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هذا الرابط من إصدار أحدث من خادم Pairline. حدّث Pairline على هذا الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "That link is from a newer Pairline server. Update Pairline on this iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این پیوند از نسخهٔ جدیدتری از سرور Pairline است. Pairline را روی این آیفون به‌روز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu bağlantı daha yeni bir Pairline sunucusundan. Bu iPhone’da Pairline’ı güncelleyin." } }
+      }
+    },
+    "That server's address is inside a home network, which this iPhone can't reach from far away. Use the server's internet address or name." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عنوان هذا الخادم داخل شبكة منزلية لا يستطيع هذا الآيفون الوصول إليها من بعيد. استخدم عنوان الخادم على الإنترنت أو اسمه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "That server's address is inside a home network, which this iPhone can't reach from far away. Use the server's internet address or name." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نشانی این سرور داخل یک شبکهٔ خانگی است که این آیفون از راه دور به آن نمی‌رسد. نشانی اینترنتی یا نام سرور را به کار ببرید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu sunucunun adresi bir ev ağının içinde; bu iPhone oraya uzaktan ulaşamaz. Sunucunun internet adresini ya da adını kullanın." } }
+      }
+    },
+    "On · through your own server" : {
+      "comment" : "D-106: Cloud mode's status when the live connection runs through the user's own server.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مفعّل · عبر خادمك الخاص" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "On · through your own server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن · از طریق سرور خودتان" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Açık · kendi sunucunuz üzerinden" } }
+      }
+    },
+    "If nothing at home can let calls in, run Pairline's small server on a server of your own, such as a cheap VPS near home. Both phones connect out to it, so no router setting is needed, and it only passes along locked data." : {
+      "comment" : "D-106: help card in Allow calls from far away › If neither works.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا لم يكن في المنزل ما يسمح بدخول المكالمات، فشغّل خادم Pairline الصغير على خادم خاص بك، مثل VPS رخيص قريب من المنزل. يتصل به الهاتفان كلاهما، فلا حاجة إلى أي إعداد في الموجّه، ولا يمرّر إلا بيانات مقفلة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "If nothing at home can let calls in, run Pairline's small server on a server of your own, such as a cheap VPS near home. Both phones connect out to it, so no router setting is needed, and it only passes along locked data." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر هیچ چیز در خانه نمی‌تواند تماس‌ها را راه بدهد، سرور کوچک Pairline را روی سروری از خودتان اجرا کنید، مثلاً یک VPS ارزان نزدیک خانه. هر دو گوشی به آن وصل می‌شوند، پس به هیچ تنظیم مودمی نیازی نیست، و سرور فقط دادهٔ قفل‌شده را جابه‌جا می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evde aramaları içeri alabilecek hiçbir şey yoksa, Pairline’ın küçük sunucusunu kendinize ait bir sunucuda, örneğin eve yakın ucuz bir VPS’te çalıştırın. İki telefon da ona bağlanır, böylece yönlendirici ayarı gerekmez; sunucu yalnızca kilitli veriyi iletir." } }
+      }
+    },
+    "Calls from far away when your router lets nothing in" : {
+      "comment" : "D-106: Help list subtitle under Set up your own server.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مكالمات من بعيد عندما لا يسمح موجّهك بدخول أي اتصال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls from far away when your router lets nothing in" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس از راه دور وقتی مودم هیچ اتصالی را راه نمی‌دهد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiriciniz hiçbir şeyi içeri almadığında uzaktan aramalar" } }
+      }
+    },
+    "Can I use my own server?" : {
+      "comment" : "D-106: Help question.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل يمكنني استخدام خادمي الخاص؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can I use my own server?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "می‌توانم از سرور خودم استفاده کنم؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kendi sunucumu kullanabilir miyim?" } }
+      }
+    },
+    "Yes, for calls from far away: if your home router lets nothing in, run Pairline's small server on a server of your own and add it in Settings › Connection › Advanced › Your own server. It only passes along locked data between your two phones. Texts and codes keep coming through your own iCloud. Step by step: Help › Set up your own server." : {
+      "comment" : "D-106: Help answer. The paths name this app's screens.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، للمكالمات من بعيد: إذا كان موجّه منزلك لا يسمح بدخول أي اتصال، فشغّل خادم Pairline الصغير على خادم خاص بك وأضفه في الإعدادات › الاتصال › متقدم › خادمك الخاص. لا يمرّر إلا بيانات مقفلة بين هاتفيك. وتظل الرسائل والرموز تصل عبر iCloud الخاص بك. خطوة بخطوة: المساعدة › إعداد خادمك الخاص." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, for calls from far away: if your home router lets nothing in, run Pairline's small server on a server of your own and add it in Settings › Connection › Advanced › Your own server. It only passes along locked data between your two phones. Texts and codes keep coming through your own iCloud. Step by step: Help › Set up your own server." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، برای تماس از راه دور: اگر مودم خانه هیچ اتصالی را راه نمی‌دهد، سرور کوچک Pairline را روی سروری از خودتان اجرا کنید و آن را در تنظیمات › اتصال › پیشرفته › سرور خودتان اضافه کنید. سرور فقط دادهٔ قفل‌شده را بین دو گوشی‌تان جابه‌جا می‌کند. پیامک‌ها و کدها همچنان از iCloud خودتان می‌رسند. قدم‌به‌قدم: راهنما › راه‌اندازی سرور خودتان." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, uzaktan aramalar için: Ev yönlendiriciniz hiçbir bağlantıyı içeri almıyorsa Pairline’ın küçük sunucusunu kendinize ait bir sunucuda çalıştırın ve Ayarlar › Bağlantı › Gelişmiş › Kendi sunucunuz’da ekleyin. Yalnızca iki telefonunuz arasındaki kilitli veriyi iletir. Mesajlar ve kodlar kendi iCloud’unuz üzerinden gelmeye devam eder. Adım adım: Yardım › Kendi sunucunuzu kurun." } }
+      }
+    },
+    "For calls from far away when your home router lets nothing in. It takes about 15 minutes, once." : {
+      "comment" : "D-106: the first line of the guide Set up your own server.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "للمكالمات من بعيد عندما لا يسمح موجّه منزلك بدخول أي اتصال. يستغرق نحو 15 دقيقة، ومرة واحدة فقط." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "For calls from far away when your home router lets nothing in. It takes about 15 minutes, once." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای تماس از راه دور، وقتی مودم خانه هیچ اتصالی را راه نمی‌دهد. حدود ۱۵ دقیقه طول می‌کشد، فقط یک بار." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ev yönlendiriciniz hiçbir bağlantıyı içeri almadığında uzaktan aramalar için. Yaklaşık 15 dakika sürer, yalnızca bir kez." } }
+      }
+    },
+    "A small server" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "خادم صغير" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A small server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک سرور کوچک" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Küçük bir sunucu" } }
+      }
+    },
+    "Rent a small Linux server (a VPS) from any hosting company, or use a computer you already have that's reachable from the internet. Pick one near your home, ideally in the same country: every word of a call goes through it, and a far-away server adds delay. The smallest plan is plenty." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استأجر خادم لينكس صغيرًا (VPS) من أي شركة استضافة، أو استخدم حاسوبًا لديك يمكن الوصول إليه من الإنترنت. اختر خادمًا قريبًا من منزلك، ويُفضَّل في البلد نفسه: فكل كلمة في المكالمة تمر عبره، والخادم البعيد يضيف تأخيرًا. أصغر باقة تكفي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rent a small Linux server (a VPS) from any hosting company, or use a computer you already have that's reachable from the internet. Pick one near your home, ideally in the same country: every word of a call goes through it, and a far-away server adds delay. The smallest plan is plenty." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک سرور کوچک لینوکسی (VPS) از هر شرکت میزبانی اجاره کنید، یا از کامپیوتری که دارید و از اینترنت در دسترس است استفاده کنید. سروری نزدیک خانه‌تان انتخاب کنید، بهتر است در همان کشور: همهٔ صدای تماس از آن می‌گذرد و سرور دور تأخیر می‌آورد. کوچک‌ترین طرح کافی است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Herhangi bir barındırma şirketinden küçük bir Linux sunucusu (VPS) kiralayın ya da internetten erişilebilen bir bilgisayarınızı kullanın. Evinize yakın, tercihen aynı ülkede bir sunucu seçin: Aramadaki her söz onun üzerinden geçer ve uzaktaki bir sunucu gecikme ekler. En küçük paket yeterlidir." } }
+      }
+    },
+    "Install Docker" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ثبّت Docker" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Install Docker" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نصب Docker" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Docker’ı kurun" } }
+      }
+    },
+    "On the server, install Docker. Many hosting companies offer it ready to use; otherwise docs.docker.com has the steps for each Linux." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ثبّت Docker على الخادم. كثير من شركات الاستضافة تقدّمه جاهزًا للاستخدام، وإلا فموقع ⁦docs.docker.com⁩ يشرح الخطوات لكل توزيعة لينكس." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "On the server, install Docker. Many hosting companies offer it ready to use; otherwise docs.docker.com has the steps for each Linux." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی سرور Docker را نصب کنید. خیلی از شرکت‌های میزبانی آن را آماده ارائه می‌کنند؛ وگرنه سایت ⁦docs.docker.com⁩ مراحلش را برای هر نسخهٔ لینوکس دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucuya Docker’ı kurun. Birçok barındırma şirketi onu kullanıma hazır sunar; yoksa docs.docker.com her Linux için adımları anlatır." } }
+      }
+    },
+    "Start Pairline's server" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شغّل خادم Pairline" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start Pairline's server" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "راه‌اندازی سرور Pairline" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline sunucusunu başlatın" } }
+      }
+    },
+    "Run this on the server, with your server's internet address or name in place of YOUR.SERVER.IP:" : {
+      "comment" : "D-106: a shell command follows. YOUR.SERVER.IP stays as is (it appears in the command).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شغّل هذا الأمر على الخادم، مع وضع عنوان خادمك على الإنترنت أو اسمه مكان ⁦YOUR.SERVER.IP⁩:" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Run this on the server, with your server's internet address or name in place of YOUR.SERVER.IP:" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این را روی سرور اجرا کنید و به‌جای ⁦YOUR.SERVER.IP⁩ نشانی اینترنتی یا نام سرورتان را بگذارید:" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bunu sunucuda çalıştırın; YOUR.SERVER.IP yerine sunucunuzun internet adresini ya da adını yazın:" } }
+      }
+    },
+    "Show its QR code" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اعرض رمز QR الخاص به" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show its QR code" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نمایش کد QR آن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "QR kodunu gösterin" } }
+      }
+    },
+    "Then run this. It shows a QR code and a link that starts with pairline-relay://." : {
+      "comment" : "D-106: a shell command follows. pairline-relay:// stays as is.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ثم شغّل هذا الأمر. سيعرض رمز QR ورابطًا يبدأ بـ ⁦pairline-relay://⁩." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Then run this. It shows a QR code and a link that starts with pairline-relay://." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعد این را اجرا کنید. یک کد QR و پیوندی نشان می‌دهد که با ⁦pairline-relay://⁩ شروع می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ardından bunu çalıştırın. Bir QR kodu ve pairline-relay:// ile başlayan bir bağlantı gösterir." } }
+      }
+    },
+    "Scan it on this iPhone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "امسحه على هذا الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scan it on this iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اسکن آن روی این آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone’da tarayın" } }
+      }
+    },
+    "Open Settings › Connection › Advanced › Your own server and scan the code, or copy the link and paste it there. The iPhone passes it to the Android phone by itself." : {
+      "comment" : "D-106: the path names this app's screens.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "افتح الإعدادات › الاتصال › متقدم › خادمك الخاص وامسح الرمز، أو انسخ الرابط والصقه هناك. يمرّره الآيفون إلى هاتف أندرويد من تلقاء نفسه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Settings › Connection › Advanced › Your own server and scan the code, or copy the link and paste it there. The iPhone passes it to the Android phone by itself." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تنظیمات › اتصال › پیشرفته › سرور خودتان را باز کنید و کد را اسکن کنید، یا پیوند را کپی و آنجا جای‌گذاری کنید. آیفون خودش آن را به گوشی اندرویدی می‌رساند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ayarlar › Bağlantı › Gelişmiş › Kendi sunucunuz’u açıp kodu tarayın ya da bağlantıyı kopyalayıp oraya yapıştırın. iPhone onu Android telefona kendisi iletir." } }
+      }
+    },
+    "Port 443" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المنفذ 443" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Port 443" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پورت 443" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Port 443" } }
+      }
+    },
+    "Your server listens on port 443, like a website, so it also works on networks that block other ports. Allow TCP port 443 in the server's firewall. If something else on the server uses 443, use another port in both places, for example -p 8443:443 and PAIRLINE_RELAY_PUBLIC=YOUR.SERVER.IP:8443." : {
+      "comment" : "D-106: -p 8443:443 and PAIRLINE_RELAY_PUBLIC=YOUR.SERVER.IP:8443 are parts of the command and stay as they are.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يستمع خادمك على المنفذ 443 مثل أي موقع ويب، فيعمل أيضًا على الشبكات التي تحجب المنافذ الأخرى. اسمح بمنفذ TCP 443 في جدار الحماية على الخادم. وإذا كان شيء آخر على الخادم يستخدم 443، فاستخدم منفذًا آخر في الموضعين، مثلًا ⁦-p 8443:443⁩ و⁦PAIRLINE_RELAY_PUBLIC=YOUR.SERVER.IP:8443⁩." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your server listens on port 443, like a website, so it also works on networks that block other ports. Allow TCP port 443 in the server's firewall. If something else on the server uses 443, use another port in both places, for example -p 8443:443 and PAIRLINE_RELAY_PUBLIC=YOUR.SERVER.IP:8443." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان مثل یک وب‌سایت روی پورت 443 گوش می‌دهد، پس در شبکه‌هایی که پورت‌های دیگر را می‌بندند هم کار می‌کند. پورت TCP 443 را در فایروال سرور باز کنید. اگر برنامهٔ دیگری روی سرور از 443 استفاده می‌کند، در هر دو جا پورت دیگری بگذارید، مثلاً ⁦-p 8443:443⁩ و ⁦PAIRLINE_RELAY_PUBLIC=YOUR.SERVER.IP:8443⁩." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz bir web sitesi gibi 443 numaralı portu dinler; böylece başka portları engelleyen ağlarda da çalışır. Sunucunun güvenlik duvarında TCP 443 portuna izin verin. Sunucuda 443’ü başka bir şey kullanıyorsa iki yerde de başka bir port kullanın; örneğin -p 8443:443 ve PAIRLINE_RELAY_PUBLIC=YOUR.SERVER.IP:8443." } }
+      }
+    },
+    "What your server sees" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ما الذي يراه خادمك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "What your server sees" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سرورتان چه می‌بیند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sunucunuz ne görür" } }
+      }
+    },
+    "Only locked data: it passes bytes between your two phones and can't read or change them. It does see both phones' internet addresses and when and how much they talk, so use a server you trust. It keeps nothing but its own keys." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بيانات مقفلة فقط: يمرّر البايتات بين هاتفيك ولا يستطيع قراءتها أو تغييرها. لكنه يرى عنواني الهاتفين على الإنترنت ومتى يتواصلان وبأي قدر، فاستخدم خادمًا تثق به. ولا يحتفظ بشيء سوى مفاتيحه." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Only locked data: it passes bytes between your two phones and can't read or change them. It does see both phones' internet addresses and when and how much they talk, so use a server you trust. It keeps nothing but its own keys." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فقط دادهٔ قفل‌شده: بایت‌ها را بین دو گوشی‌تان جابه‌جا می‌کند و نمی‌تواند آن‌ها را بخواند یا تغییر دهد. ولی نشانی اینترنتی هر دو گوشی و زمان و حجم ارتباطشان را می‌بیند، پس از سروری استفاده کنید که به آن اعتماد دارید. جز کلیدهای خودش چیزی نگه نمی‌دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yalnızca kilitli veri: İki telefonunuz arasında baytları iletir; onları okuyamaz ya da değiştiremez. Ama iki telefonun internet adreslerini, ne zaman ve ne kadar konuştuklarını görür; bu yüzden güvendiğiniz bir sunucu kullanın. Kendi anahtarlarından başka bir şey saklamaz." } }
+      }
+    },
+    "Keep the link to yourself" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "احتفظ بالرابط لنفسك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep the link to yourself" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیوند را پیش خودتان نگه دارید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bağlantıyı kendinize saklayın" } }
+      }
+    },
+    "Anyone with the link can use your server to pass data along, though never to reach your phones. The full guide explains how to make a new link, update the server and build it yourself: relay/README.md in Pairline's source code." : {
+      "comment" : "D-106: relay/README.md is a file name and stays as is.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يستطيع أي شخص لديه الرابط استخدام خادمك لتمرير البيانات، لكن دون أن يصل إلى هاتفيك أبدًا. يشرح الدليل الكامل كيف تنشئ رابطًا جديدًا، وتحدّث الخادم، وتبنيه بنفسك: ⁦relay/README.md⁩ في الشيفرة المصدرية لـ Pairline." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Anyone with the link can use your server to pass data along, though never to reach your phones. The full guide explains how to make a new link, update the server and build it yourself: relay/README.md in Pairline's source code." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هر کس پیوند را داشته باشد می‌تواند از سرورتان برای جابه‌جا کردن داده استفاده کند، ولی هرگز نمی‌تواند به گوشی‌هایتان برسد. راهنمای کامل توضیح می‌دهد چطور پیوند تازه بسازید، سرور را به‌روز کنید و خودتان آن را بسازید: ⁦relay/README.md⁩ در کد منبع Pairline." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bağlantıya sahip olan herkes sunucunuzu veri iletmek için kullanabilir, ama telefonlarınıza asla ulaşamaz. Tam kılavuz yeni bir bağlantının nasıl oluşturulacağını, sunucunun nasıl güncelleneceğini ve kendiniz nasıl derleyeceğinizi anlatır: Pairline’ın kaynak kodundaki relay/README.md." } }
+      }
+    },
+    "iCloud still does its part" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يظل iCloud يؤدي دوره" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "iCloud still does its part" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "iCloud همچنان کار خودش را می‌کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud yine kendi işini yapar" } }
+      }
+    },
+    "Texts and codes keep coming through your own iCloud, which is also what wakes this iPhone. Your server carries calls and the live connection while you're away." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تظل الرسائل والرموز تصل عبر iCloud الخاص بك، وهو ما يوقظ هذا الآيفون أيضًا. أما خادمك فيحمل المكالمات والاتصال المباشر وأنت بعيد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts and codes keep coming through your own iCloud, which is also what wakes this iPhone. Your server carries calls and the live connection while you're away." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها و کدها همچنان از iCloud خودتان می‌رسند، که این آیفون را هم بیدار می‌کند. وقتی دور هستید، سرورتان تماس‌ها و اتصال زنده را می‌برد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar ve kodlar kendi iCloud’unuz üzerinden gelmeye devam eder; bu iPhone’u uyandıran da odur. Siz uzaktayken aramaları ve canlı bağlantıyı sunucunuz taşır." } }
+      }
+    },
+    "Copies the command" : {
+      "comment" : "D-106: VoiceOver hint of the Copy button under a shell command.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ينسخ الأمر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Copies the command" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دستور را کپی می‌کند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Komutu kopyalar" } }
+      }
     }
   },
   "version" : "1.0"

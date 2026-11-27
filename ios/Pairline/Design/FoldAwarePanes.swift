@@ -93,11 +93,15 @@ struct PaneSplit: Equatable {
 
     init?(proxy: GeometryProxy, axes: Axis.Set) {
         var fold: CGRect?
+        // Xcode 27's SDK (Swift 6.4) has reservedRegions; GitHub's Mac runners stop at Xcode 26.6, whose SDK doesn't,
+        // so CI builds without it (the panes then meet in the middle). Release builds come from Xcode 27.2 (AGENTS.md).
+        #if compiler(>=6.4)
         if #available(iOS 27.1, *) {
             // Inactive too, so the layout is already clear of the fold while the device lies flat. The frame includes
             // the clearance the system keeps for controls, and is mirrored like the stacks in right-to-left languages.
             fold = proxy.reservedRegions(kind: .division, options: .includeInactive).first?.frame
         }
+        #endif
         self.init(size: proxy.size, fold: fold, axes: axes)
     }
 

@@ -1,0 +1,46 @@
+# systemd unit for running pairline-relay without Docker (relay/README.md, "Without Docker").
+#
+#   sudo install -m 755 pairline-relay /usr/local/bin/
+#   sudo install -m 644 pairline-relay.service /etc/systemd/system/
+#   sudo systemctl edit pairline-relay      # set PAIRLINE_RELAY_PUBLIC (see below)
+#   sudo systemctl enable --now pairline-relay
+#   journalctl -u pairline-relay            # the link and QR code
+[Unit]
+Description=Pairline relay (Your own server)
+Documentation=https://github.com/mirzaaghazadeh/pairline/blob/main/relay/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Your server's internet address or DNS name, as your phones reach it. Override with `systemctl edit`.
+Environment=PAIRLINE_RELAY_PUBLIC=
+Environment=PAIRLINE_RELAY_LISTEN=:443
+Environment=PAIRLINE_RELAY_DATA=/var/lib/pairline-relay
+ExecStart=/usr/local/bin/pairline-relay
+Restart=always
+RestartSec=5
+
+# Its own throwaway user; the key lives in /var/lib/pairline-relay.
+DynamicUser=yes
+StateDirectory=pairline-relay
+StateDirectoryMode=0700
+# Port 443 without root.
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+LimitNOFILE=8192
+
+[Install]
+WantedBy=multi-user.target

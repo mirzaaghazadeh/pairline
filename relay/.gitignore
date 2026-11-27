@@ -1,0 +1,6 @@
+# Built binaries and a local run's key material: never committed.
+/relay
+/pairline-relay
+/pairline-relay-*
+!/pairline-relay.service
+/pairline-relay-data/

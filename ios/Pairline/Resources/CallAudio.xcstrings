@@ -464,6 +464,255 @@
         "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی پل شما برای «مکالمه با آیفون» آماده است، اما دو گوشی الان به یک وای‌فای وصل نیستند." } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Köprü telefonunuz iPhone’dan konuşma için hazır, ancak telefonlar şu anda aynı Wi-Fi ağında değil." } }
       }
+    },
+    "Calls play on this iPhone" : {
+      "comment" : "Bridge tab (D-107): Talk on iPhone is ready on the Android phone.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُشغَّل المكالمات على هذا الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls play on this iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها روی این آیفون پخش می‌شوند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar bu iPhone’da duyulur" } }
+      }
+    },
+    "When you answer here, you hear and talk on this iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عندما ترد هنا، تسمع وتتحدث على هذا الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "When you answer here, you hear and talk on this iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی اینجا جواب بدهید، روی همین آیفون می‌شنوید و صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Burada yanıtladığınızda bu iPhone’dan duyar ve konuşursunuz." } }
+      }
+    },
+    "Getting ready on your Android phone…" : {
+      "comment" : "Bridge tab (D-107): Talk on iPhone's helper is starting on the Android phone.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ التجهيز على هاتف أندرويد…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Getting ready on your Android phone…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال آماده شدن روی گوشی اندرویدی شما…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda hazırlanıyor…" } }
+      }
+    },
+    "Talk on iPhone is starting there. Calls play on this iPhone in a moment." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يبدأ «التحدث عبر الآيفون» هناك. ستُشغَّل المكالمات على هذا الآيفون بعد قليل." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Talk on iPhone is starting there. Calls play on this iPhone in a moment." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» آنجا در حال راه‌اندازی است. تا لحظاتی دیگر تماس‌ها روی این آیفون پخش می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan konuşma orada başlatılıyor. Aramalar birazdan bu iPhone’da duyulur." } }
+      }
+    },
+    "Calls play on your Android phone" : {
+      "comment" : "Bridge tab (D-107): calls can't play on the iPhone; the detail says why.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُشغَّل المكالمات على هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls play on your Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها روی گوشی اندرویدی شما پخش می‌شوند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar Android telefonunuzda duyulur" } }
+      }
+    },
+    "Set up Talk on iPhone there once (about 2 minutes) to hear and talk here." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اضبط «التحدث عبر الآيفون» هناك مرة واحدة (نحو دقيقتين) لتسمع وتتحدث هنا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Set up Talk on iPhone there once (about 2 minutes) to hear and talk here." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک بار «مکالمه با آیفون» را آنجا راه‌اندازی کنید (حدود ۲ دقیقه) تا اینجا بشنوید و صحبت کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Burada duymak ve konuşmak için iPhone’dan konuşma’yı orada bir kez kurun (yaklaşık 2 dakika)." } }
+      }
+    },
+    "Talk on iPhone is off on your Android phone" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "«التحدث عبر الآيفون» متوقف على هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Talk on iPhone is off on your Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» روی گوشی اندرویدی شما خاموش است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda iPhone’dan konuşma kapalı" } }
+      }
+    },
+    "Calls play on your Android phone until you turn it on." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُشغَّل المكالمات على هاتف أندرويد إلى أن تشغّله." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls play on your Android phone until you turn it on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تا وقتی آن را روشن نکنید، تماس‌ها روی گوشی اندرویدی شما پخش می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Açana kadar aramalar Android telefonunuzda duyulur." } }
+      }
+    },
+    "Calls play on your Android phone for now" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُشغَّل المكالمات على هاتف أندرويد حاليًا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls play on your Android phone for now" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فعلاً تماس‌ها روی گوشی اندرویدی شما پخش می‌شوند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şimdilik aramalar Android telefonunuzda duyulur" } }
+      }
+    },
+    "Starts when your Android phone is on Wi-Fi." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يبدأ عندما يتصل هاتف أندرويد بالواي فاي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Starts when your Android phone is on Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی گوشی اندرویدی شما به وای‌فای وصل شود، شروع می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuz Wi-Fi’a bağlanınca başlar." } }
+      }
+    },
+    "Wireless debugging is off on your Android phone; Pairline turns it back on when it can. If this doesn't change, open Pairline Bridge there." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "«تصحيح الأخطاء اللاسلكي» متوقف على هاتف أندرويد؛ يعيد Pairline تشغيله عندما يستطيع. إن لم يتغير ذلك، افتح Pairline Bridge هناك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wireless debugging is off on your Android phone; Pairline turns it back on when it can. If this doesn't change, open Pairline Bridge there." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«اشکال‌زدایی بی‌سیم» روی گوشی اندرویدی شما خاموش است؛ Pairline هر وقت بتواند دوباره روشنش می‌کند. اگر تغییری نکرد، Pairline Bridge را آنجا باز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda Kablosuz hata ayıklama kapalı; Pairline mümkün olunca yeniden açar. Bu değişmezse orada Pairline Bridge’i açın." } }
+      }
+    },
+    "Pair again on your Android phone: Pairline Bridge › Talk on iPhone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أعد الإقران على هاتف أندرويد: Pairline Bridge › التحدث عبر الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pair again on your Android phone: Pairline Bridge › Talk on iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روی گوشی اندرویدی دوباره جفت کنید: Pairline Bridge › مکالمه با آیفون." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda yeniden eşleştirin: Pairline Bridge › iPhone’dan konuşma." } }
+      }
+    },
+    "Root access was refused on your Android phone." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رُفض الوصول إلى صلاحيات الروت على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Root access was refused on your Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دسترسی روت روی گوشی اندرویدی شما رد شد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzda root erişimi reddedildi." } }
+      }
+    },
+    "Talk on iPhone didn't start on your Android phone. Open Pairline Bridge there to see why." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يبدأ «التحدث عبر الآيفون» على هاتف أندرويد. افتح Pairline Bridge هناك لمعرفة السبب." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Talk on iPhone didn't start on your Android phone. Open Pairline Bridge there to see why." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» روی گوشی اندرویدی شما شروع نشد. برای دیدن علت، Pairline Bridge را آنجا باز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan konuşma Android telefonunuzda başlamadı. Nedenini görmek için orada Pairline Bridge’i açın." } }
+      }
+    },
+    "This Android phone can't send call audio to the iPhone (needs Android 11)." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يستطيع هاتف أندرويد هذا إرسال صوت المكالمات إلى الآيفون (يحتاج إلى أندرويد 11)." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This Android phone can't send call audio to the iPhone (needs Android 11)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "این گوشی اندرویدی نمی‌تواند صدای تماس را به آیفون بفرستد (اندروید ۱۱ لازم است)." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu Android telefon arama sesini iPhone’a gönderemez (Android 11 gerekir)." } }
+      }
+    },
+    "Talk on iPhone is starting on your Android phone." : {
+      "comment" : "Call screen (D-107): why the call's voice is still on the Android phone.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يبدأ «التحدث عبر الآيفون» على هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Talk on iPhone is starting on your Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "«مکالمه با آیفون» روی گوشی اندرویدی شما در حال راه‌اندازی است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan konuşma Android telefonunuzda başlatılıyor." } }
+      }
+    },
+    "The voice is on your Android phone: Talk on iPhone isn't set up there yet." : {
+      "comment" : "Call screen (D-107).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد: لم يُضبط «التحدث عبر الآيفون» هناك بعد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The voice is on your Android phone: Talk on iPhone isn't set up there yet." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی شماست: «مکالمه با آیفون» هنوز آنجا راه‌اندازی نشده است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonunuzda: iPhone’dan konuşma orada henüz kurulmadı." } }
+      }
+    },
+    "The voice is on your Android phone: Talk on iPhone is off there." : {
+      "comment" : "Call screen (D-107).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد: «التحدث عبر الآيفون» متوقف هناك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The voice is on your Android phone: Talk on iPhone is off there." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی شماست: «مکالمه با آیفون» آنجا خاموش است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonunuzda: iPhone’dan konuşma orada kapalı." } }
+      }
+    },
+    "The voice is on your Android phone until it's on Wi-Fi." : {
+      "comment" : "Call screen (D-107).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد إلى أن يتصل بالواي فاي." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The voice is on your Android phone until it's on Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تا وقتی گوشی اندرویدی به وای‌فای وصل نشود، صدا روی آن است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuz Wi-Fi’a bağlanana kadar ses onda." } }
+      }
+    },
+    "The voice is on your Android phone: Wireless debugging is off there." : {
+      "comment" : "Call screen (D-107).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد: «تصحيح الأخطاء اللاسلكي» متوقف هناك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The voice is on your Android phone: Wireless debugging is off there." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی شماست: «اشکال‌زدایی بی‌سیم» آنجا خاموش است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonunuzda: Kablosuz hata ayıklama orada kapalı." } }
+      }
+    },
+    "The voice is on your Android phone: pair Talk on iPhone again there." : {
+      "comment" : "Call screen (D-107).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد: أعد إقران «التحدث عبر الآيفون» هناك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The voice is on your Android phone: pair Talk on iPhone again there." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی شماست: «مکالمه با آیفون» را آنجا دوباره جفت کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonunuzda: iPhone’dan konuşma’yı orada yeniden eşleştirin." } }
+      }
+    },
+    "The voice is on your Android phone: root access was refused there." : {
+      "comment" : "Call screen (D-107).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد: رُفض الوصول إلى صلاحيات الروت هناك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The voice is on your Android phone: root access was refused there." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی شماست: دسترسی روت آنجا رد شد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonunuzda: root erişimi orada reddedildi." } }
+      }
+    },
+    "The voice is on your Android phone: Talk on iPhone didn't start there." : {
+      "comment" : "Call screen (D-107).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد: لم يبدأ «التحدث عبر الآيفون» هناك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The voice is on your Android phone: Talk on iPhone didn't start there." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی شماست: «مکالمه با آیفون» آنجا شروع نشد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonunuzda: iPhone’dan konuşma orada başlamadı." } }
+      }
+    },
+    "The voice is on your Android phone: it can't send call audio to the iPhone." : {
+      "comment" : "Call screen (D-107): Android 10 or older.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت على هاتف أندرويد: لا يستطيع إرسال صوت المكالمات إلى الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The voice is on your Android phone: it can't send call audio to the iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدا روی گوشی اندرویدی شماست: نمی‌تواند صدای تماس را به آیفون بفرستد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ses Android telefonunuzda: arama sesini iPhone’a gönderemiyor." } }
+      }
+    },
+    "Set up on Android phone" : {
+      "comment" : "Button (D-107): asks the Android phone to open Talk on iPhone's setup.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإعداد على هاتف أندرويد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Set up on Android phone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "راه‌اندازی روی گوشی اندرویدی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonda kur" } }
+      }
+    },
+    "Turn on" : {
+      "comment" : "Button (D-107): asks the Android phone to turn Talk on iPhone back on.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تشغيل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن کردن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aç" } }
+      }
+    },
+    "Pairline Bridge on your Android phone shows what to do." : {
+      "comment" : "After talk.setup went through (D-107).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يعرض Pairline Bridge على هاتف أندرويد ما عليك فعله." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge on your Android phone shows what to do." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "Pairline Bridge روی گوشی اندرویدی شما مراحل را نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuzdaki Pairline Bridge ne yapacağınızı gösteriyor." } }
+      }
+    },
+    "Hear calls on this iPhone?" : {
+      "comment" : "One-time prompt (D-107) when the bridge reports Talk on iPhone isn't set up.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تريد سماع المكالمات على هذا الآيفون؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hear calls on this iPhone?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها را روی این آیفون بشنوید؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramaları bu iPhone’da duymak ister misiniz?" } }
+      }
+    },
+    "Calls play on your Android phone for now. Set up Talk on iPhone there once (about 2 minutes), and you hear and talk on this iPhone." : {
+      "comment" : "One-time prompt (D-107), the message.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تُشغَّل المكالمات على هاتف أندرويد حاليًا. اضبط «التحدث عبر الآيفون» هناك مرة واحدة (نحو دقيقتين)، فتسمع وتتحدث على هذا الآيفون." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls play on your Android phone for now. Set up Talk on iPhone there once (about 2 minutes), and you hear and talk on this iPhone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فعلاً تماس‌ها روی گوشی اندرویدی شما پخش می‌شوند. یک بار «مکالمه با آیفون» را آنجا راه‌اندازی کنید (حدود ۲ دقیقه) تا روی این آیفون بشنوید و صحبت کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şimdilik aramalar Android telefonunuzda duyulur. iPhone’dan konuşma’yı orada bir kez kurun (yaklaşık 2 dakika); sonra bu iPhone’dan duyar ve konuşursunuz." } }
+      }
     }
   },
   "version" : "1.0"

@@ -212,8 +212,14 @@ final class DirectLaneTests: XCTestCase {
         }
         if kind == .direct {
             if let target = directConnector.targets.last {
-                r.dialed = target.directManualFirst ? (target.directManual ?? target.direct.first)
-                                                    : (target.direct.first ?? target.directManual)
+                if let relay = target.relay, target.relayFirst || (target.direct.isEmpty && target.directManual == nil) {
+                    // Through the user's own server (D-106).
+                    r.dialed = relay.endpoint
+                    r.viaRelay = true
+                } else {
+                    r.dialed = target.directManualFirst ? (target.directManual ?? target.direct.first)
+                                                        : (target.direct.first ?? target.directManual)
+                }
             }
             directBridge = bridge
         } else {
@@ -457,5 +463,129 @@ final class DirectLaneTests: XCTestCase {
         XCTAssertTrue(remote.direct.endpoints.isEmpty)
         XCTAssertTrue(RemoteStore(defaults: defaults, prefix: prefix).direct.endpoints.isEmpty)
         XCTAssertEqual(directConnector.targets.count, attempts)
+    }
+
+    // MARK: Your own server (D-106)
+
+    private var relay: RelayServer {
+        try! RelayServer.parse("pairline-relay://relay.example.net:443?v=1&fp=\(Data(repeating: 1, count: 32).base64URL)"
+                               + "&k=\(Data(repeating: 2, count: 32).base64URL)", allowLocal: false).get()
+    }
+
+    /// The router let nothing in: the user's own server alone brings the direct session up, through it, first.
+    func testTheUsersOwnServerAloneBringsUpTheDirectSession() async throws {
+        await mail(["t": "remote.state", "direct": "blocked", "reason": "cgnat"])
+        XCTAssertTrue(directConnector.targets.isEmpty)
+        let server = relay
+        remote.setRelay(server)
+        await waitFor("direct through the user's server") { manager.isDirect }
+        let target = try XCTUnwrap(directConnector.targets.last)
+        XCTAssertEqual(target.relay, server)
+        XCTAssertTrue(target.relayFirst)
+        XCTAssertTrue(manager.directViaRelay)
+        await waitFor("noted as connected") { remote.relayAttempt?.outcome == .connected }
+        XCTAssertTrue(manager.directSummary.contains("own server"), manager.directSummary)
+        // Kept in the Keychain with the rest of the direct connection, rendezvous id included.
+        XCTAssertEqual(RemoteStore(defaults: defaults, prefix: prefix).direct.relay, server)
+    }
+
+    /// With the router open, the bridge's own addresses come first and the server last.
+    func testTheServerComesLastWhileTheRouterIsOpen() async throws {
+        directConnector.enabled = false
+        await mail(["t": "remote.state", "direct": "open"])
+        remote.setRelay(relay)
+        await mail(addr)
+        directConnector.enable()
+        await waitFor("direct") { manager.isDirect }
+        let target = try XCTUnwrap(directConnector.targets.last)
+        XCTAssertEqual(target.direct, [v6, v4])
+        XCTAssertNotNil(target.relay)
+        XCTAssertFalse(target.relayFirst)
+        XCTAssertFalse(manager.directViaRelay)
+    }
+
+    /// Setting a server sends `remote.relay` to the bridge, here through iCloud (no session), with the link's values and
+    /// the rendezvous id; removing it sends null.
+    func testSettingTheServerTellsTheBridge() async throws {
+        directConnector.enabled = false
+        let server = relay
+        let task = Task { try await manager.setRelay(server) }
+        await waitFor("written to the mailbox") { !mailbox.sent.isEmpty }
+        let sealed = try XCTUnwrap(mailbox.sent.last).sealed
+        let opened = try MailboxCrypto.open(sealed, identity: bridgeKey, sender: phoneKey, direction: .remoteToBridge)
+        let sent = try XCTUnwrap(JSONSerialization.jsonObject(with: opened.plaintext) as? [String: Any])
+        XCTAssertEqual(sent["t"] as? String, "remote.relay")
+        let body = try XCTUnwrap(sent["relay"] as? [String: Any])
+        XCTAssertEqual(body["host"] as? String, "relay.example.net")
+        XCTAssertEqual(body["port"] as? Int, 443)
+        XCTAssertEqual(body["fp"] as? String, server.fingerprint.base64URL)
+        XCTAssertEqual(body["k"] as? String, server.key.base64URL)
+        XCTAssertEqual(body["rv"] as? String, server.rendezvous.hex)
+        XCTAssertEqual(server.rendezvous.count, 16)
+        let id = try XCTUnwrap(sent["id"] as? Int)
+        await mail(["t": "ok", "id": id])
+        try await task.value
+        XCTAssertEqual(remote.direct.relay, server)
+
+        let removing = Task { try await manager.setRelay(nil) }
+        await waitFor("removal written") { mailbox.sent.count == 2 }
+        let removal = try MailboxCrypto.open(try XCTUnwrap(mailbox.sent.last).sealed, identity: bridgeKey,
+                                             sender: phoneKey, direction: .remoteToBridge)
+        let removed = try XCTUnwrap(JSONSerialization.jsonObject(with: removal.plaintext) as? [String: Any])
+        XCTAssertTrue(removed["relay"] is NSNull)
+        await mail(["t": "ok", "id": try XCTUnwrap(removed["id"] as? Int)])
+        try await removing.value
+        XCTAssertNil(remote.direct.relay)
+        XCTAssertNil(RemoteStore(defaults: defaults, prefix: prefix).direct.relay)
+    }
+
+    /// A bridge that can take it (`relay` in its caps) but says it has no server gets `remote.relay` again on a session,
+    /// once, until its `remote.state` says it has one.
+    func testTheServerGoesAgainOnASessionWhileTheBridgeDoesntHaveIt() async throws {
+        directConnector.enabled = false
+        remote.setRelay(relay)
+        var relays: [[String: Any]] = []
+        onMessage = { bridge, object in
+            guard object["t"] as? String == "remote.relay", let id = object["id"] as? Int else { return }
+            relays.append(object)
+            bridge.send(["t": "ok", "id": id])
+        }
+        primaryConnector.enable()
+        await waitFor("nearby") { manager.activeTransports == [.tcp] }
+        let bridge = try XCTUnwrap(primaryBridge)
+        // An older bridge (no `relay` in its caps) never gets it.
+        bridge.send(["t": "status", "caps": ["sms.send"]])
+        try await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertTrue(relays.isEmpty)
+        bridge.send(["t": "status", "caps": ["sms.send", "relay"]])
+        await waitFor("sent on the session") { relays.count == 1 }
+        bridge.send(["t": "status", "caps": ["sms.send", "relay"]])
+        try await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertEqual(relays.count, 1, "not again within a minute")
+        bridge.send(["t": "remote.state", "direct": "blocked", "reason": "cgnat", "relay": "up"])
+        await waitFor("the bridge's word kept") { remote.direct.status?.relay == .up }
+        XCTAssertFalse(remote.relayNeedsSending)
+    }
+
+    /// A failed handshake through the server is noted for Settings; the server isn't dropped like a bridge address.
+    func testAWrongPhoneThroughTheServerKeepsTheServer() async {
+        directAnswersWith = P256.KeyAgreement.PrivateKey()
+        await mail(["t": "remote.state", "direct": "blocked", "reason": "cgnat"])
+        remote.setRelay(relay)
+        await waitFor("noted") { remote.relayAttempt?.outcome == .handshakeFailed }
+        XCTAssertFalse(manager.isDirect)
+        XCTAssertNotNil(remote.relayServer)
+    }
+
+    /// Turning Cloud mode off forgets the server with the rest of the direct connection.
+    func testTurningRemoteModeOffForgetsTheServer() async {
+        directConnector.enabled = false
+        remote.setRelay(relay)
+        await manager.turnOffRemote()
+        XCTAssertNil(remote.direct.relay)
+        XCTAssertNil(remote.relayServer)
+        XCTAssertNil(RemoteStore(defaults: defaults, prefix: prefix).direct.relay)
+        remote.setRelay(relay)
+        XCTAssertNil(remote.direct.relay, "only while Cloud mode is on")
     }
 }

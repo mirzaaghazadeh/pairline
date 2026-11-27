@@ -212,6 +212,9 @@ struct CallScreen: View {
             }
             .buttonStyle(.plain)
             .padding(.top, 18)
+            // Why the voice stays on the Android phone, with a way to set Talk on iPhone up there (D-107).
+            TalkCallLine()
+                .padding(.top, 12)
         }
         if let other = calls.other { otherCall(other) }
     }

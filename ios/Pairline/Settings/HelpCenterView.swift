@@ -53,6 +53,13 @@ struct HelpCenterView: View {
                         ToolRow(symbol: "wifi.router", tint: .brandBlue, title: Text("Allow calls from far away", tableName: "RemoteMode"),
                                 subtitle: Text("Let your home router make the direct connection", tableName: "RemoteMode"))
                     }
+                    // D-106: the relay the user runs, for a home whose router lets nothing in.
+                    NavigationLink {
+                        OwnServerGuideView()
+                    } label: {
+                        ToolRow(symbol: "server.rack", tint: .brandBlue, title: Text("Set up your own server", tableName: "RemoteMode"),
+                                subtitle: Text("Calls from far away when your router lets nothing in", tableName: "RemoteMode"))
+                    }
                 }
             } header: {
                 Text("Guides")
@@ -288,6 +295,9 @@ struct FAQ: Identifiable {
             items.insert(FAQ(id: 13, question: "Texts work, but calls from far away don't",
                              answer: "Calls from far away need a direct connection to the Android phone at home, through your home router. If Settings › Connection › Advanced says it's blocked by carrier-grade NAT, your internet provider shares one address among many homes and no router setting helps: ask the provider for a public IPv4 address, or turn on IPv6 if they offer it. Otherwise turn on UPnP or NAT-PMP in the router, or forward TCP port 47830 to the Android phone. Step by step: Help › Allow calls from far away.",
                              table: "Connection"), at: 3)
+            items.insert(FAQ(id: 14, question: "Can I use my own server?",
+                             answer: "Yes, for calls from far away: if your home router lets nothing in, run Pairline's small server on a server of your own and add it in Settings › Connection › Advanced › Your own server. It only passes along locked data between your two phones. Texts and codes keep coming through your own iCloud. Step by step: Help › Set up your own server.",
+                             table: "RemoteMode"), at: 4)
         }
         return items
     }

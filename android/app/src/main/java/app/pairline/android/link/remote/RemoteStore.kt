@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.content.edit
 import app.pairline.android.link.KeyWrapper
 import app.pairline.android.link.KeystoreAesWrapper
+import app.pairline.android.link.remote.relay.RelayConfig
 import app.pairline.android.log.Log
 import app.pairline.android.protocol.B64u
 import app.pairline.android.protocol.Mailbox
@@ -74,7 +75,10 @@ class RemoteStore(
         return config
     }
 
-    /** Turns remote mode on with [config] and a fresh [token]; clears a recorded problem. */
+    /**
+     * Turns remote mode on with [config] and a fresh [token]; clears a recorded problem. A relay set before is
+     * forgotten: a new Cloud mode setup on the iPhone starts without one (D-106), and the iPhone sends its own again.
+     */
     @Synchronized
     fun turnOn(config: RemoteConfig, token: String) {
         kv.put(
@@ -87,12 +91,51 @@ class RemoteStore(
                 MB_QUIET to config.mailboxes.quiet,
                 TOKEN to wrapToken(token),
                 PROBLEM to null,
+                RELAY to null,
             ),
         )
         this.config = config
         this.token = token
         configLoaded = true
         tokenLoaded = true
+        relay = null
+        relayLoaded = true
+    }
+
+    private var relay: RelayConfig? = null
+    private var relayLoaded = false
+
+    /**
+     * The user's own server (D-106), while remote mode is on: kept encrypted like the token, since its access key is a
+     * secret. Checked again when read back ([debugBuild] as for `remote.relay`).
+     */
+    @Synchronized
+    fun relay(debugBuild: Boolean): RelayConfig? {
+        if (!isOn) return null
+        if (!relayLoaded) {
+            relay = kv.get(RELAY)?.let { blob ->
+                try {
+                    B64u.decodeOrNull(blob)?.let { String(wrapper.unwrap(it, RELAY_AAD), Charsets.UTF_8) }
+                        ?.let { RelayConfig.fromStored(JSONObject(it), debugBuild) }
+                } catch (e: Exception) {
+                    Log.w(TAG, "the stored relay can't be read", e)
+                    null
+                }
+            }
+            relayLoaded = true
+        }
+        return relay
+    }
+
+    /** Sets (or with null removes) the user's own server. Only while remote mode is on; returns whether it was kept. */
+    @Synchronized
+    fun setRelay(config: RelayConfig?): Boolean {
+        if (!isOn) return false
+        val blob = config?.let { B64u.encode(wrapper.wrap(it.toJson().toString().toByteArray(Charsets.UTF_8), RELAY_AAD)) }
+        kv.put(mapOf(RELAY to blob))
+        relay = config
+        relayLoaded = true
+        return true
     }
 
     /** The web auth token, decrypted once and then kept in memory. */
@@ -172,6 +215,8 @@ class RemoteStore(
         token = null
         configLoaded = true
         tokenLoaded = true
+        relay = null
+        relayLoaded = true
         handled.reset()
         sent.values.forEach { it.reset() }
     }
@@ -231,8 +276,10 @@ class RemoteStore(
         private const val HANDLED = "handled"
         private const val SENT_ALERT = "sent.a"
         private const val SENT_QUIET = "sent.q"
+        private const val RELAY = "relay"
         private const val MAX_SENT = 1000
         private val TOKEN_AAD = "pairline remote token v1".toByteArray(Charsets.US_ASCII)
+        private val RELAY_AAD = "pairline remote relay v1".toByteArray(Charsets.US_ASCII)
 
         fun create(context: Context): RemoteStore =
             RemoteStore(PrefsKeyValueStore(context, "pairline.remote"), KeystoreAesWrapper("pairline.remote.wrap.v1"))

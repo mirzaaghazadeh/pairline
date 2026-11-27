@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -101,6 +102,14 @@ private fun MainNavigation() {
     val stack = rememberSaveable(saver = RouteStackSaver) { mutableStateListOf<Route>(Route.Home) }
     val navigate: (Route) -> Unit = { if (stack.last() != it) stack.add(it) }
     val back: () -> Unit = { if (stack.size > 1) stack.removeAt(stack.lastIndex) }
+    // A screen asked for from outside: a notification's tap, or the iPhone's "Set up on Android phone" (D-107).
+    val requested by UiEvents.open.collectAsState()
+    LaunchedEffect(requested) {
+        requested?.let { route ->
+            navigate(route)
+            UiEvents.open.value = null
+        }
+    }
     BackHandler(enabled = stack.size > 1) { back() }
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 

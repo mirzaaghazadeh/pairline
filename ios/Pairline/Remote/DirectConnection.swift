@@ -147,14 +147,23 @@ struct DirectStatus: Codable, Equatable {
 
     var availability: Availability
     var reason: Reason?
+    /// The user's own server (D-106): nil when the bridge has none set (or is older), `up` while it waits there.
+    var relay: RelayBridgeState? = nil
+    /// Why not, when `relay` is `down`; nil for a reason this app doesn't know.
+    var relayReason: RelayBridgeReason? = nil
 }
 
 extension DirectStatus {
-    /// `remote.state`'s body; nil unless `direct` is one of the three values.
+    /// `remote.state`'s body; nil unless `direct` is one of the three values. An unknown `relay` counts as `down`.
     init?(message object: [String: Any]) {
         guard let raw = object["direct"] as? String, let availability = Availability(rawValue: raw) else { return nil }
         self.availability = availability
         reason = availability == .open ? nil : (object["reason"] as? String).flatMap(Reason.init(text:))
+        if let relay = object["relay"] as? String {
+            let state = RelayBridgeState(rawValue: relay) ?? .down
+            self.relay = state
+            relayReason = state == .down ? (object["relayReason"] as? String).flatMap(RelayBridgeReason.init(rawValue:)) : nil
+        }
     }
 }
 
@@ -184,14 +193,16 @@ extension DirectStatus.Reason {
     }
 }
 
-/// What the bridge last said about its direct connection (`remote.addr`, `remote.state`), and the port forwarding the
-/// user set up by hand, kept until remote mode goes off.
+/// What the bridge last said about its direct connection (`remote.addr`, `remote.state`), the port forwarding the
+/// user set up by hand and the user's own server, kept until remote mode goes off.
 struct RemoteDirect: Codable, Equatable {
     var endpoints = DirectEndpoints()
     var status: DirectStatus?
     /// Manual port forwarding (D-095): where the user says the bridge's home can be reached, for a router without
     /// UPnP, NAT-PMP or PCP.
     var manual: ManualForward?
+    /// The user's own relay server (D-106), with this pairing's rendezvous id.
+    var relay: RelayServer?
 }
 
 /// Manual port forwarding (D-095): the home's internet address or DDNS name and the port the user forwarded to the

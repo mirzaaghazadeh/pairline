@@ -9,6 +9,7 @@ import app.pairline.android.link.remote.HomeCheck
 import app.pairline.android.link.remote.RemoteConfig
 import app.pairline.android.link.remote.RemoteConfigRequest
 import app.pairline.android.link.remote.RemoteLink
+import app.pairline.android.link.remote.relay.RelayConfig
 import app.pairline.android.log.Log
 import app.pairline.android.mirror.NotificationMirror
 import app.pairline.android.netshare.NetShare
@@ -79,6 +80,16 @@ class MessageRouter(
     private val remote: RemoteLink,
     /** "Check my home connection" (`remote.check`): asks the router read-only; blocks for seconds. */
     private val checkHome: () -> HomeCheck.Result,
+    /**
+     * `remote.relay` (D-106): keeps the user's own server (null removes it) and makes the relay client look again.
+     * False while remote mode is off.
+     */
+    private val setRelay: (RelayConfig?) -> Boolean = { false },
+    /**
+     * `talk.setup` (D-107): turns Talk on iPhone on and shows its setup screen (or a notification that opens it).
+     * False on Android 10 or older, where it can't work.
+     */
+    private val talkSetup: () -> Boolean = { false },
 ) : MessageHandler {
 
     /** `net.share` reply or event: the proxy's address and this session's credentials (PROTOCOL.md, M8). */
@@ -408,6 +419,12 @@ class MessageRouter(
                 null // the reply is the ussd.result with the same id, sent when the network answers
             }
             Msg.REMOTE_CONFIG -> request(message) { id -> remoteConfig(id, message, token) }
+            Msg.REMOTE_RELAY -> request(message) { id -> remoteRelay(id, message) }
+            Msg.TALK_SETUP -> request(message) { id ->
+                if (!talkSetup()) throw RequestException(ErrorCode.UNSUPPORTED, "Talk on iPhone needs Android 11 or later")
+                Log.i(TAG, "the iPhone asked to set up Talk on iPhone")
+                Messages.ok(id)
+            }
             // Free, with remote mode on or off: asks the router read-only, never opens a port (D-092).
             Msg.REMOTE_CHECK -> request(message) { id -> HomeCheck.reply(id, checkHome()) }
             // An event in PROTOCOL.md; answered with `ok` only if R gave it an id anyway.
@@ -550,6 +567,17 @@ class MessageRouter(
                 Messages.ok(id).takeIf { token != LinkManager.MAILBOX_TOKEN }
             }
         }
+
+    /**
+     * `remote.relay` (D-106): the user's own server, or null to remove it, kept while remote mode is on. Every field is
+     * checked (`invalid` otherwise); release builds take only public addresses or DNS names. Never logs the server.
+     */
+    private fun remoteRelay(id: Long, m: JSONObject): JSONObject {
+        val config = RelayConfig.parse(if (m.has("relay")) m.opt("relay") else null, debugBuild = BuildConfig.DEBUG)
+        if (!setRelay(config)) throw RequestException(ErrorCode.FAILED, "remote mode is off")
+        Log.i(TAG, if (config == null) "own server removed by the iPhone" else "own server set by the iPhone")
+        return Messages.ok(id)
+    }
 
     /** `remote.token`: a fresh web auth token from the iPhone. */
     private fun remoteToken(m: JSONObject) {

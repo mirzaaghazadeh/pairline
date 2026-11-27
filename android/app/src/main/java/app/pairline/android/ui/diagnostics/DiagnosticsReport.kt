@@ -6,6 +6,7 @@ import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
 import app.pairline.android.link.LinkSnapshot
 import app.pairline.android.link.remote.DirectStatus
+import app.pairline.android.link.remote.relay.RelayStatus
 import app.pairline.android.link.remote.RemoteStatus
 import app.pairline.android.log.Log
 import app.pairline.android.log.Redactor
@@ -42,6 +43,8 @@ data class DiagnosticsFacts(
     /** Cloud mode (D-092): the mailbox and the direct connection. Neither holds an address, a token or a key. */
     val remote: RemoteStatus = RemoteStatus(),
     val direct: DirectStatus = DirectStatus(),
+    /** The user's own server (D-106): its state only, never its name, address or keys. */
+    val relay: RelayStatus = RelayStatus(),
     val logLines: List<String>,
 )
 
@@ -76,6 +79,7 @@ object DiagnosticsReport {
             companionBound = prefs.companionBoundAt != 0L,
             remote = AppGraph.remote.state.value,
             direct = AppGraph.direct.status.value,
+            relay = AppGraph.relay.status.value,
             logLines = Log.storedLines(400),
         )
     }
@@ -122,6 +126,11 @@ object DiagnosticsReport {
                 appendLine(
                     "Calls from far away (direct connection): ${d.direct?.wire ?: "checking"}" +
                         (d.reason?.let { " (${it.wire})" } ?: "") + ", router mapping: ${yes(d.mappedV4)}",
+                )
+                val s = f.relay
+                appendLine(
+                    "Own server: " + (s.wire ?: "not set") +
+                        (s.reasonWire?.let { " ($it)" } ?: "") + (if (s.set && !s.up && s.reason == null) " (connecting)" else ""),
                 )
             }
             appendLine()

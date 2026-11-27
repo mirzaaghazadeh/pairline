@@ -179,6 +179,22 @@ struct CloudModeAdvancedSection: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                // The user's own relay server (D-106), for a home whose router lets nothing in.
+                NavigationLink {
+                    OwnServerView(remote: remote, bridge: bridge)
+                } label: {
+                    HStack(spacing: 12) {
+                        Label {
+                            Text("Your own server", tableName: "RemoteMode")
+                        } icon: {
+                            Image(systemName: "server.rack")
+                        }
+                        Spacer(minLength: 12)
+                        (remote.direct.relay != nil ? Text("Set up by you", tableName: "RemoteMode")
+                                                    : Text("Not set up", tableName: "RemoteMode"))
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
             // Free, with remote mode on or off: the bridge asks its router, read-only (`remote.check`).
             HomeConnectionCheckRow(bridge: bridge, remote: remote, manualSet: remote.direct.manual != nil)
@@ -235,6 +251,9 @@ struct CloudModeAdvancedSection: View {
     private var status: Text {
         guard remote.isOn else { return Text("Off") }
         if let problem = remote.problem { return Text(problem.text) }
+        if bridge.isDirect, app.link.directViaRelay {
+            return Text("On · through your own server", tableName: "RemoteMode")
+        }
         if bridge.isDirect { return Text("On · direct connection") }
         return bridge.phase.isConnected ? Text("On · using the nearby link") : Text("On")
     }

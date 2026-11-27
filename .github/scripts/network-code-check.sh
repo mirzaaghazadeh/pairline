@@ -9,8 +9,10 @@
 # - app/pairline/android/netshare/   opt-in internet sharing (M8): forwards only the iPhone's own traffic
 # - app/pairline/android/privileged/adb/  this phone's own Wireless debugging, on 127.0.0.1 only (D-054)
 # - app/pairline/android/link/remote/  opt-in remote mode (D-092): CloudKit Web Services (hosts checked below), the
-#                                       home router's port mapping (router/: NAT-PMP, PCP, UPnP on the LAN) and the
-#                                       direct connection from the paired iPhone (DirectListener)
+#                                       home router's port mapping (router/: NAT-PMP, PCP, UPnP on the LAN), the
+#                                       direct connection from the paired iPhone (DirectListener) and, if the user set
+#                                       one up, their own relay server (relay/, D-106; its host comes from the user's
+#                                       link, never from a literal here)
 # Debug-only code (src/debug) is exempt: it never ships (D-018).
 set -euo pipefail
 cd "$(dirname "$0")/../../android/app/src/main/java"

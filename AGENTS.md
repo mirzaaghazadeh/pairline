@@ -28,9 +28,11 @@ one, stop and ask the maintainer instead of working around it.
 2. **No accounts and no Pairline backend in v1.** The apps make no requests to our servers. The only
    outside parties are Apple (App Store / StoreKit) on the iPhone and, on Android, GitHub for the daily
    update check, which the user can turn off (D-041; it sends nothing about the user). The opt-in
-   internet-sharing feature (M8, `netshare`) forwards the iPhone's own traffic. Android network code lives
-   only in `update/`, `link/wifi/`, `netshare/` and `privileged/adb/` (this phone's own Wireless debugging,
-   127.0.0.1 only, D-054) (`.github/scripts/network-code-check.sh`).
+   internet-sharing feature (M8, `netshare`) forwards the iPhone's own traffic. Opt-in Cloud mode adds the user's own
+   iCloud (D-092) and, only if the user sets one up, the user's own relay server (D-106, `relay/`), which passes along
+   the phones' end-to-end encrypted session without being able to read it; neither is ours. Android network code lives
+   only in `update/`, `link/wifi/`, `link/remote/`, `netshare/` and `privileged/adb/` (this phone's own Wireless
+   debugging, 127.0.0.1 only, D-054) (`.github/scripts/network-code-check.sh`).
 3. **No analytics, ads, crash-reporting, attribution or IP-geolocation code.** No Firebase, Sentry,
    AppsFlyer, ipinfo-style lookups, etc.
 4. **`docs/PRIVACY.md` lists every data flow and permission.** A change that adds or changes a data
@@ -103,6 +105,7 @@ confirmation that it makes no network calls of its own.
 android/        Android bridge app (Gradle project) — created in M0
 ios/            iOS remote app (XcodeGen project) — created in M0
 protocol/       shared test vectors for the link protocol — created in M0
+relay/          the relay users run on their own server for Cloud mode (Go, standard library only; D-106)
 docs/
   ARCHITECTURE.md   components, transports, background behavior
   PROTOCOL.md       pairing, crypto and message format (draft v0)
@@ -164,6 +167,10 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
   `xcrun simctl launch booted app.pairline.ios -PairlineAccess purchased -PairlineTCPPort 47810 -PairlinePairLink "<printed link>"`,
   and inject events with `echo otp | nc 127.0.0.1 47811` (`help` lists commands). Use port 47800 (the default) to
   reach the Android emulator through `adb forward` instead.
+- Your own server on the Simulator (D-106): run the relay on the Mac (Relay commands below), relaunch the paired app
+  with `-PairlineFakeCloudMode -PairlineRelayLink "<relay link>"` (Cloud mode's settings without iCloud, and the server;
+  debug builds only), then `echo "nearby off" | nc 127.0.0.1 47811`: the fake bridge waits at the relay and the app
+  reaches it there. Details in `fake_bridge.py`'s docstring
 - Translations: `xcodebuild -exportLocalizations -project Pairline.xcodeproj -localizationPath <dir> -exportLanguage fa -exportLanguage ar`,
   translate the XLIFF files, then `xcodebuild -importLocalizations -project Pairline.xcodeproj -localizationPath <file>.xliff` (D-028).
 - App icon: `swift tools/make_icon.swift Pairline/Resources/Assets.xcassets`
@@ -173,8 +180,20 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
   the App Store's Larger Text and Sufficient Contrast labels. A new screen gets a line in
   `PairlineAccessibilityTests/AccessibilityAudit.swift`. Needs ImageMagick
 
+**Relay** (run in `relay/`; Go 1.24 or later, standard library only, no `require` lines, D-106):
+
+- Tests: `go vet ./... && go test -race ./...` (the shared vectors in `protocol/test-vectors/v1-remote.json` included)
+- Run it on the Mac for the emulator and Simulator:
+  `PAIRLINE_RELAY_LISTEN=:47840 PAIRLINE_RELAY_DATA=<scratch dir> PAIRLINE_RELAY_PUBLIC=127.0.0.1:47840 go run .`
+  prints the link (debug builds of both apps accept local addresses; the emulator reaches the Mac at 10.0.2.2)
+- QR codes, after changing `qr.go`: `QR_PNG_DIR=<dir> go test -run TestQRDecodes .` then
+  `swift tools/qr-check.swift <dir>` (Apple's own detector must read every sample), and update `qrGolden`
+- The image: `docker build -t pairline-relay .`. Releases come from a `relay-v*` tag (`relay-release.yml`).
+  User guide: `relay/README.md`
+
 **CI:** `.github/workflows/android.yml` runs on every push and pull request that touches `android/` or `protocol/`.
 `.github/workflows/ios.yml` runs on pull requests that touch `ios/` or `protocol/`, and manually (D-022).
+`.github/workflows/relay.yml` runs on every push and pull request that touches `relay/` or the test vectors.
 
 ## Development machine
 

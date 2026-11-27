@@ -126,7 +126,10 @@ class DirectLink(
     private var v6: Mapping? = null
     private var v6DueAt = 0L
     private var lastAddr: Pair<String?, String?>? = null
-    private var lastState: Pair<Direct, String?>? = null
+    private var lastState: List<String?>? = null
+
+    /** The user's own server (D-106): `remote.state`'s `relay` and `relayReason`, from [relayChanged]. */
+    @Volatile private var relay: Pair<String?, String?> = null to null
 
     private val _status = MutableStateFlow(DirectStatus())
     val status: StateFlow<DirectStatus> = _status
@@ -208,6 +211,17 @@ class DirectLink(
     @Volatile private var retryNow = false
 
     private val checking = AtomicBoolean(false)
+
+    /**
+     * The user's own server changed state (D-106): [wire] is `remote.state`'s `relay` (null, `up`, `down`) and
+     * [reason] its `relayReason`. `remote.state` goes out again with it, since it can work where the router can't.
+     */
+    fun relayChanged(wire: String?, reason: String?) {
+        val next = wire to reason
+        if (next == relay) return
+        relay = next
+        wake.trySend(Unit)
+    }
 
     /** Remote mode was just (re)configured: send `remote.addr` and `remote.state` again even if unchanged. */
     fun announce() {
@@ -355,9 +369,10 @@ class DirectLink(
         val reasonText = reason?.wire
         val addr = v4Text to v6Text
         if (addr != lastAddr || reannounce) send(Messages.remoteAddr(v4Text, v6Text))
-        val state = direct to reasonText
-        if (state != lastState || reannounce) send(Messages.remoteState(direct.wire, reasonText))
-        if (state != lastState) Log.i(TAG, describe(direct, reasonText))
+        val (relayWire, relayReason) = relay
+        val state = listOf(direct.wire, reasonText, relayWire, relayReason)
+        if (state != lastState || reannounce) send(Messages.remoteState(direct.wire, reasonText, relayWire, relayReason))
+        if (state.take(2) != lastState?.take(2)) Log.i(TAG, describe(direct, reasonText))
         lastAddr = addr
         lastState = state
         reannounce = false

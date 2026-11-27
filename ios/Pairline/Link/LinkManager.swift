@@ -187,6 +187,8 @@ final class LinkManager: BridgeLink {
     var activeTransports: [TransportKind] { lanes.filter(\.isEstablished).compactMap { $0.session?.transportKind } }
     /// The live session is remote mode's direct connection (the UI says "Direct connection").
     var isDirect: Bool { activeTransports == [.direct] }
+    /// The direct connection runs through the user's own server (D-106).
+    var directViaRelay: Bool { direct.isEstablished && direct.session?.frameTransport.viaRelay == true }
 
     var onPhaseChange: ((LinkPhase) -> Void)?
     var onTransportsChange: (() -> Void)?
@@ -352,6 +354,7 @@ final class LinkManager: BridgeLink {
         }
         if let directConnector = new as? DirectConnector {
             directConnector.onNetworkChange = { [weak self] in self?.kickDirect(reason: "network changed") }
+            directConnector.onRelayResult = { [weak self] outcome in self?.remote?.noteRelayAttempt(outcome) }
         }
         connectors[kind] = new
         return new
@@ -444,6 +447,9 @@ final class LinkManager: BridgeLink {
             target.direct = remote.directCandidates
             target.directManual = remote.manualEndpoint
             target.directManualFirst = remote.manualFirst
+            // The user's own server (D-106), the other place the user chose.
+            target.relay = remote.relayServer
+            target.relayFirst = remote.relayFirst
         }
         let triedManual = target.directManual != nil
         updatePhase()
@@ -569,8 +575,13 @@ final class LinkManager: BridgeLink {
         updatePhase()
     }
 
-    /// The direct handshake failed or timed out at this session's address: skip it until the next `remote.addr`.
+    /// The direct handshake failed or timed out at this session's address: skip it until the next `remote.addr`. Through
+    /// the user's own server it's noted for Settings instead; the server stays.
     private func dropDirectAddress(of session: LinkSession) {
+        if session.frameTransport.viaRelay {
+            remote?.noteRelayAttempt(.handshakeFailed)
+            return
+        }
         if let endpoint = session.frameTransport.dialed { remote?.dropDirect(endpoint) }
     }
 
@@ -847,7 +858,10 @@ final class LinkManager: BridgeLink {
         }
         sendRaw(deviceInfo, id: nil, on: lane)
         // The user's port forwarding (D-095) worked: Settings says so.
-        if lane.id == .direct, let dialed = lane.session?.frameTransport.dialed, dialed == remote?.manualEndpoint {
+        if lane.id == .direct, lane.session?.frameTransport.viaRelay == true {
+            // Through the user's own server (D-106).
+            remote?.noteRelayAttempt(.connected)
+        } else if lane.id == .direct, let dialed = lane.session?.frameTransport.dialed, dialed == remote?.manualEndpoint {
             remote?.noteManualAttempt(worked: true)
         }
         // Call audio rides inside the Bluetooth session, or inside the direct connection while no Bluetooth one is up.
@@ -1007,6 +1021,11 @@ final class LinkManager: BridgeLink {
                 bridgeCaps = caps
                 updateFiles()
                 if wifi.session == nil, !wifi.connecting { connectIfNeeded(wifi) }
+            }
+            // The user's own server (D-106): on a session, tell a bridge that doesn't know about it yet (or still
+            // waits at one that was removed). The mailbox isn't used for this repeat.
+            if lane != nil, caps.contains(RelayServer.capability), remote?.relayNeedsSending == true {
+                Task { try? await self.sendRelay() }
             }
         default:
             break
@@ -1175,6 +1194,7 @@ final class LinkManager: BridgeLink {
             : direct.connecting ? "connecting" : direct.retryAt != nil ? "waiting" : "idle"
         var families = remote.directCandidates.map(DirectAddress.family)
         if remote.manualEndpoint != nil { families.append("port forwarding") }
+        if remote.relayServer != nil { families.append("own server") }
         return "\(state); addresses: \(families.isEmpty ? "none" : families.joined(separator: " + "))"
     }
 
@@ -1334,6 +1354,24 @@ final class LinkManager: BridgeLink {
         guard let remote, !remote.isOn else { return }
         guard lanes.contains(where: \.isEstablished) else { throw RemoteError.needsNearbyLink }
         try await remote.turnOn { message in try await self.request(message) }
+    }
+
+    /// The user set up (or, with nil, removed) their own server (D-106): kept with Cloud mode's direct-connection
+    /// settings, and sent to the bridge as `remote.relay`, over a session or through iCloud. Throws when the bridge
+    /// didn't take it; the server stays saved here, and goes to the bridge again on the next session.
+    func setRelay(_ server: RelayServer?) async throws {
+        guard let remote, remote.isOn else { throw RemoteError.needsNearbyLink }
+        remote.setRelay(server)
+        if server != nil { kickDirect(reason: "your own server was set up") }
+        try await sendRelay()
+    }
+
+    private func sendRelay() async throws {
+        guard let remote, remote.isOn else { return }
+        remote.noteRelaySent()
+        let reply = try await request(.remoteRelay(remote.relayServer))
+        guard case .ok = reply.message else { throw RemoteError.failed }
+        log.info("remote", "The bridge took your own server's settings")
     }
 
     /// Turns remote mode off: `remote.config` off to the bridge (over a session, or through the mailbox one last

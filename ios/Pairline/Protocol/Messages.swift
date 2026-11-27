@@ -180,6 +180,83 @@ struct BridgeStatus: Codable, Equatable {
     var net: BridgeNetState?
     /// The bridge phone's ringer (D-074): `normal`, `vibrate` or `silent`.
     var ringer: String?
+    /// Talk on iPhone's state on the bridge (D-107); nil from a bridge that doesn't report it.
+    var talk: TalkState?
+}
+
+/// `status.talk` (D-107; PROTOCOL.md "Talk on iPhone's state"): whether a call's audio can move to this iPhone, and if
+/// not, what's missing on the Android phone. Fixed codes only.
+struct TalkState: Codable, Equatable {
+    enum State: String, Codable, CaseIterable {
+        /// The helper runs; `call.media` is listed.
+        case ready
+        /// The helper is starting (after a restart, or Wi-Fi came back).
+        case starting
+        /// Never set up on that phone: its one-time steps are still to do.
+        case setup
+        /// Set up once, then turned off on the bridge.
+        case off
+        /// Set up and on, but the helper can't start right now (`reason`).
+        case waiting
+        /// The helper didn't start (`reason`).
+        case failed
+        /// Android 10 or older.
+        case unsupported
+    }
+
+    enum Reason: String, Codable, CaseIterable {
+        /// Wireless debugging works only on Wi-Fi.
+        case wifi
+        /// Developer options or Wireless debugging is off and the bridge couldn't turn it back on.
+        case debugging
+        /// Android no longer knows Pairline's pairing.
+        case pairing
+        /// Root mode, and `su` is missing or refused.
+        case root
+        case other
+    }
+
+    var state: State
+    /// Only with `waiting` or `failed`.
+    var reason: Reason?
+
+    init(state: State, reason: Reason? = nil) {
+        self.state = state
+        self.reason = state == .waiting || state == .failed ? reason : nil
+    }
+
+    /// From the wire: an unknown state counts as `failed` with no reason, an unknown reason as none.
+    init(wireState: String, wireReason: String?) {
+        guard let state = State(rawValue: wireState) else {
+            self.init(state: .failed)
+            return
+        }
+        self.init(state: state, reason: wireReason.flatMap(Reason.init(rawValue:)))
+    }
+
+    private enum CodingKeys: String, CodingKey { case state, reason }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let state = try c.decode(String.self, forKey: .state)
+        let reason = (try? c.decodeIfPresent(String.self, forKey: .reason)) ?? nil
+        self.init(wireState: state, wireReason: reason)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(state.rawValue, forKey: .state)
+        try c.encodeIfPresent(reason?.rawValue, forKey: .reason)
+    }
+}
+
+/// `status.talk` as received: a value that doesn't parse is dropped, never the whole status.
+struct LossyTalkState: Decodable {
+    let value: TalkState?
+
+    init(from decoder: Decoder) throws {
+        value = try? TalkState(from: decoder)
+    }
 }
 
 struct SMSMessage: Codable, Equatable {
@@ -481,6 +558,7 @@ struct Inbound {
         var time: Int64?
         var net: BridgeNetState?
         var ringer: String?
+        var talk: LossyTalkState?
     }
 
     private struct MsgBody: Decodable { var msg: SMSMessage }
@@ -532,7 +610,8 @@ struct Inbound {
         case "status":
             let s = try body(StatusBody.self)
             message = .status(BridgeStatus(battery: s.battery, sims: s.sims?.elements, app: s.app,
-                                           caps: s.caps?.elements, time: s.time, net: s.net, ringer: s.ringer))
+                                           caps: s.caps?.elements, time: s.time, net: s.net, ringer: s.ringer,
+                                           talk: s.talk?.value))
         case "ping": message = .ping
         case "pong": message = .pong
         case "unpair": message = .unpair
@@ -659,6 +738,11 @@ struct Outbound {
     /// work. Free, and answered with remote mode on or off.
     static var remoteCheck: Outbound { Outbound("remote.check") }
 
+    /// The user's own server (D-106): where the bridge waits for this iPhone, or null to stop.
+    static func remoteRelay(_ server: RelayServer?) -> Outbound {
+        Outbound("remote.relay", ["relay": server.map { $0.message as Any } ?? NSNull()])
+    }
+
     /// Requests whose replies can be large: sent on the Wi-Fi session when one is up (PROTOCOL.md, "Two sessions").
     static let bulkTypes: Set<String> = ["sms.threads", "sms.history", "contacts.sync", "calllog.sync"]
 
@@ -783,6 +867,9 @@ struct Outbound {
 
     /// The bridge phone's ringer: `normal`, `vibrate` or `silent` (needs `phone.ringer`, D-074).
     static func phoneRinger(_ mode: String) -> Outbound { Outbound("phone.ringer", ["mode": mode]) }
+
+    /// The user asked to hear calls on this iPhone (D-107): the bridge turns Talk on iPhone on and shows its setup.
+    static var talkSetup: Outbound { Outbound("talk.setup") }
 
     /// The user dismissed a mirrored notification here: clear it on the bridge phone too (D-077).
     static func notifDismiss(key: String) -> Outbound { Outbound("notif.dismiss", ["key": key]) }

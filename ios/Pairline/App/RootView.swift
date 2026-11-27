@@ -89,6 +89,8 @@ struct MainView: View {
                 .environmentObject(bridge.db)
         }
         .modifier(CallAudioFeedbackModifier(calls: calls))
+        // Once per pairing: offer to set Talk on iPhone up on the Android phone (D-107).
+        .modifier(TalkSetupPromptModifier(bridge: bridge))
         .onValueChange(calls.showCallScreen) { show in
             guard show, !retriedCallScreen else { return }
             // SwiftUI silently drops a fullScreenCover requested during another presentation or a transition.

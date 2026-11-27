@@ -108,6 +108,8 @@ final class DemoBridge: BridgeLink {
             // Everything a fully set-up bridge can do, so the demo shows Talk on iPhone and internet sharing as
             // ready. Demo calls show their audio on this iPhone without playing any (CallCenter).
             "caps": Capability.allCases.map(\.rawValue),
+            // Talk on iPhone set up and running (D-107), as on a fully set-up bridge.
+            "talk": ["state": "ready", "reason": NSNull()],
             "time": Date().milliseconds,
         ]
         if let id { body["id"] = id }
@@ -205,7 +207,7 @@ final class DemoBridge: BridgeLink {
             let status = statusBody(id: nil)
             DispatchQueue.main.async { [weak self] in self?.emit(status) }
             return ["t": "ok", "id": id]
-        case "sms.read", "call.hold", "contacts.update", "phone.find", "sms.schedule", "sms.unschedule":
+        case "sms.read", "call.hold", "contacts.update", "phone.find", "sms.schedule", "sms.unschedule", "talk.setup":
             // Nothing to do on a made-up phone (D-074, D-084): a scheduled demo message just stays scheduled.
             return ["t": "ok", "id": id]
         case "sms.scheduled":

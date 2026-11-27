@@ -97,6 +97,7 @@ final class RemoteStore {
         var direct = stored.flatMap { try? JSONDecoder().decode(RemoteDirect.self, from: $0) } ?? RemoteDirect()
         direct.endpoints = direct.endpoints.checked
         direct.manual = direct.manual?.checked
+        direct.relay = direct.relay?.checked
         self.direct = direct
     }
 

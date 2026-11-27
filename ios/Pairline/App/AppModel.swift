@@ -528,6 +528,31 @@ final class AppModel: ObservableObject {
                 if clearCalls { _ = await self.active.clearCallHistory() }
             }
         }
+        // Cloud mode on without iCloud (the Simulator has no iCloud account): settings with random mailboxes, adopted
+        // as a remote pairing would. iCloud requests then fail and say so; the direct connection and the user's own
+        // server (D-106) work. Nothing goes to the bridge: start the fake bridge's relay with `-PairlineRelayLink`.
+        if args.contains("-PairlineFakeCloudMode"), let remote = link.remote, !remote.isOn, isPaired {
+            remote.adopt(RemoteSettings(on: true, backend: RemoteFeature.backend, environment: RemoteFeature.environment,
+                                        mailboxes: .random(), tokenSentAt: Date()))
+        }
+        // Sets the user's own server (D-106) from its link once Cloud mode is on, and sends it to the bridge.
+        if let text = value("-PairlineRelayLink") {
+            Task { @MainActor in
+                for _ in 0..<30 where self.link.remote?.isOn != true || !self.real.phase.isConnected {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                }
+                switch RelayServer.parse(text) {
+                case .success(let server):
+                    do {
+                        try await self.link.setRelay(server)
+                    } catch {
+                        log.warning("remote", "-PairlineRelayLink: the bridge didn't take it (\(error))")
+                    }
+                case .failure(let problem):
+                    log.warning("remote", "-PairlineRelayLink: not a relay link (\(problem))")
+                }
+            }
+        }
         // Places one call through the link once connected.
         if let index = args.firstIndex(of: "-PairlineDial"), index + 1 < args.count {
             let number = args[index + 1]

@@ -271,6 +271,30 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
   - [ ] Pair over the internet with a phone in another home, codes checked on both phones
   - [ ] Both phones' logs show the paths taken and no addresses, numbers or tokens
 
+### Your own server (D-106)
+
+For homes whose router lets nothing in (carrier-grade NAT, no UPnP): a relay the user runs on their own server. Built
+on the `own-server` branch.
+
+- [x] Protocol: the relay's link, preamble and status bytes, `remote.relay`, `remote.state`'s `relay`, `status.caps`
+      `relay`; shared vectors (`v1-remote.json` `relay`)
+- [x] The relay (`relay/`, Go, standard library only): pinned self-signed TLS, access key, rendezvous, keep-alives,
+      limits, link and QR code in its log; tests, and its QR codes checked with Core Image
+- [x] Dockerfile, systemd unit and the setup guide (`relay/README.md`); CI and tagged releases (`relay.yml`)
+- [x] Bridge: `remote.relay`, the waiting connection on any network, joined connections through the public
+      listener's gate, status on screen, Help; four languages (tested against the Go relay; not yet on an emulator)
+- [x] iPhone: Settings › Connection › Advanced › Your own server (scan or paste, status, remove), the relay as a
+      direct-lane candidate with the pin, the setup guide, Help; four languages (tested on the Simulator through the Go
+      relay with `fake_bridge.py`)
+- [ ] Street tests on real phones with a relay on a VPS:
+  - [x] Paste the relay's link (or scan its QR code); the bridge says it's connected to your server
+  - [ ] With the bridge behind carrier-grade NAT (a 4G/5G router or mobile data): "Direct connection" through the
+        server, a text both ways, an incoming and an outgoing call with two-way audio
+  - [ ] Stop the relay: the bridge says it can't reach the server; start it: it reconnects by itself
+  - [ ] `pairline-relay new-key`: the bridge reports the refused key; scanning the new link fixes it
+  - [ ] Remove the server on the iPhone, and turn Cloud mode off: the bridge stops connecting to it
+  - [ ] Both phones' logs and the relay's log hold no addresses, keys or ids
+
 ## Later
 
 - ~~Notification mirroring from chosen Android apps~~ — done (D-077), real-phone test pending

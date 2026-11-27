@@ -30,6 +30,16 @@ Options: --state PATH (default ~/.pairline/fake_bridge.json: B's identity key, d
 pinned iPhone key, so the app reconnects without pairing again), --reset (forget all of that),
 --single-sim, --app-version X.Y.Z, --host/--port (127.0.0.1:47800), --control-port (47801; 0 turns
 it off), --no-stdin, --self-test (check the crypto helpers against protocol/test-vectors/v0.json).
+
+Your own server (D-106): the fake lists `relay` in its caps and takes `remote.relay` from the app, then waits at that
+relay as the bridge (TLS pinned to the link's fingerprint, the role-'B' preamble, keep-alives) and serves the session
+that comes through it like a direct connection. Test it on the Simulator against a local relay (relay/README.md):
+
+    cd relay && PAIRLINE_RELAY_LISTEN=127.0.0.1:47840 PAIRLINE_RELAY_DATA=/tmp/relay-data \\
+        PAIRLINE_RELAY_PUBLIC=127.0.0.1:47840 go run .          # prints the pairline-relay:// link
+    xcrun simctl launch booted app.pairline.ios -PairlineAccess purchased -PairlineTCPPort 47810 \\
+        -PairlineFakeCloudMode -PairlineRelayLink "<relay link>"
+    echo "nearby off" | nc 127.0.0.1 47811                     # the app then reaches the fake through the relay
 """
 import argparse
 import asyncio
@@ -40,6 +50,7 @@ import json
 import os
 import re
 import secrets
+import ssl
 import struct
 import sys
 import threading
@@ -88,7 +99,10 @@ CALLLOG_PAGE = 20        # 30 sample entries: 2 pages
 ALL_CAPS = ["sms.receive", "sms.send", "sms.history", "call.observe", "call.control", "call.dial",
             "call.dtmf", "call.audio", "contacts", "calllog", "contacts.add", "ussd", "dualsim",
             "calllog.delete", "block", "net.switch", "sms.read", "call.hold", "contacts.edit", "phone.find",
-            "phone.ringer"]
+            "phone.ringer", "relay"]
+# Your own server (D-106; PROTOCOL.md, "Your own server (relay, D-106)").
+RELAY_STATUS = {0: "keepalive", 1: "joined", 2: "no_bridge", 3: "key", 4: "version", 5: "full"}
+RELAY_WAIT_LIMIT = 90    # a waiting connection that hears nothing this long is replaced
 CAP_FOR = {"net.switch": "net.switch", "sms.read": "sms.read", "call.hold": "call.hold",
            "contacts.update": "contacts.edit", "phone.find": "phone.find", "phone.ringer": "phone.ringer","sms.threads": "sms.history", "sms.history": "sms.history", "sms.send": "sms.send",
            "call.dial": "call.dial", "call.answer": "call.control", "call.reject": "call.control",
@@ -727,6 +741,8 @@ class Link:
         why = "ended"
         try:
             ftype, body = await self.recv(HANDSHAKE_TIMEOUT)
+            if ftype == F_PAIR_HELLO and self.kind == "direct":
+                raise ProtocolError("no pairing over a direct connection (D-092)")
             if ftype == F_PAIR_HELLO:
                 log(f"← PAIR_HELLO ({self.kind})")
                 ok, reply, detail = self.b.pair(body)
@@ -801,7 +817,8 @@ class Link:
         # Periodic status goes on the event session only; the Wi-Fi session has its own faster keep-alive.
         self.tasks = [asyncio.create_task(self.every(STATUS_EVERY,
                                                      lambda: self.b.link is self and self.send(self.b.status())))]
-        if self.kind == "wifi":
+        if self.kind in ("wifi", "direct"):
+            # The direct connection keeps alive like the Wi-Fi session it is (PROTOCOL.md, "Direct connection").
             self.tasks.append(asyncio.create_task(self.every(5, self.wifi_keepalive)))
         else:
             self.tasks.append(asyncio.create_task(self.every(PING_EVERY, self.ping)))
@@ -1183,7 +1200,11 @@ HELP = """commands (console or control socket):
   blocks                       show the block list
   calls                        the last 10 call-log entries (to see what calllog.delete removed)
   unpair                       send unpair, close and forget the iPhone
-  disconnect [tcp|wifi]        close the connections (or just one)
+  disconnect [tcp|wifi|direct] close the connections (or just one)
+  nearby on|off                accept or refuse the tcp and wifi links (off: the app has to use the relay)
+  relay                        the relay from remote.relay (D-106) and where the fake stands with it
+  talk [<state> [<reason>]]    Talk on iPhone's state in status.talk (D-107): ready|starting|setup|off|waiting|failed|
+                               unsupported, reason wifi|debugging|pairing|root|other -> status; talk.setup makes it ready
   offer                        send wifi.offer again (Wi-Fi mode)
   sendfile <path>              offer a file to the iPhone over Wi-Fi (file.offer, then BULK records)
   cancelfile                   cancel the file being sent
@@ -1207,10 +1228,19 @@ class Bridge:
         # status.net (D-073): the bridge phone's own hotspot, Bluetooth tethering and mobile data, as net.switch sets.
         self.net = {"hotspot": False, "bluetooth": False, "data": True}
         self.ringer = "normal"  # status.ringer (D-074)
+        # status.talk (D-107): Talk on iPhone's state; a fresh bridge hasn't set it up.
+        self.talk = {"state": "setup", "reason": None}
         self.app_version = args.app_version
         self.pairing = None
-        # Debug TCP stands in for Bluetooth; "wifi" is the M5 Wi-Fi link. One established session per transport.
-        self.links = {"tcp": None, "wifi": None}
+        # Debug TCP stands in for Bluetooth; "wifi" is the M5 Wi-Fi link; "direct" a session through the user's own
+        # server (D-106). One established session per transport.
+        self.links = {"tcp": None, "wifi": None, "direct": None}
+        # Your own server (D-106): the relay from `remote.relay`, the task waiting there, and what remote.state says.
+        self.relay = None
+        self.relay_task = None
+        self.relay_state = (None, None)
+        # `nearby off`: refuse the debug TCP and Wi-Fi links, so the app has to come through the relay.
+        self.refuse_nearby = False
         if args.wifi_offer_ip == "auto":
             self.wifi_ips = [ip for ip in [lan_address()] if ip]
         else:
@@ -1234,7 +1264,8 @@ class Bridge:
             "block.set": self.req_block_set, "net.switch": self.req_net_switch,
             "sms.read": self.req_sms_read, "call.hold": self.req_call_hold, "contacts.update": self.req_contacts_update,
             "phone.find": self.req_phone_find, "phone.ringer": self.req_phone_ringer,
-            "remote.check": self.req_remote_check,
+            "remote.check": self.req_remote_check, "remote.relay": self.req_remote_relay,
+            "talk.setup": self.req_talk_setup,
         }
 
     # State file
@@ -1276,12 +1307,14 @@ class Bridge:
     @property
     def link(self):
         """The event session (PROTOCOL.md, "Two sessions at once"): debug TCP (for Bluetooth) when up, else Wi-Fi."""
-        tcp, wifi = self.links["tcp"], self.links["wifi"]
+        tcp, wifi, direct = self.links["tcp"], self.links["wifi"], self.links["direct"]
         if tcp and tcp.ready:
             return tcp
         if wifi and wifi.ready:
             return wifi
-        return tcp or wifi
+        if direct and direct.ready:
+            return direct
+        return tcp or wifi or direct
 
     # Pairing
     def new_pairing(self) -> str:
@@ -1337,6 +1370,10 @@ class Bridge:
 
     # Connections
     async def on_connect(self, reader, writer, kind="tcp"):
+        if self.refuse_nearby and kind in ("tcp", "wifi"):
+            log(f"refused a {kind} connection (`nearby off`)")
+            writer.close()
+            return
         link = Link(self, reader, writer, kind)
         if kind == "wifi" and not plain_ip(link.peer_ip).startswith(("127.", "10.", "192.168.", "169.254.", "fe80", "fd", "fc")) \
                 and not re.match(r"172\.(1[6-9]|2\d|3[01])\.", plain_ip(link.peer_ip)) and link.peer_ip != "::1":
@@ -1376,7 +1413,7 @@ class Bridge:
     def status(self) -> dict:
         return {"t": "status", "battery": dict(self.battery), "sims": [dict(s) for s in self.sims],
                 "app": self.app_version, "caps": list(self.caps), "net": dict(self.net), "ringer": self.ringer,
-                "time": now_ms()}
+                "talk": dict(self.talk), "time": now_ms()}
 
     def push_status(self):
         if self.link and self.link.ready:
@@ -1593,6 +1630,134 @@ class Bridge:
     def req_remote_check(self, link, msg):
         """"Check my home connection" (D-092): a canned answer; this fake never asks a router anything."""
         return {"t": "remote.check", "direct": "likely", "reason": None, "router": "nat-pmp", "ipv6": False}
+
+    # --- Talk on iPhone's state (D-107) -------------------------------------------------------------
+
+    TALK_STATES = ("ready", "starting", "setup", "off", "waiting", "failed", "unsupported")
+    TALK_REASONS = ("wifi", "debugging", "pairing", "root", "other")
+
+    def set_talk(self, state, reason=None):
+        self.talk = {"state": state, "reason": reason if state in ("waiting", "failed") else None}
+        self.push_status()
+
+    def req_talk_setup(self, link, msg):
+        """`talk.setup`: a real bridge turns the switch on and shows its setup screen; this fake pretends the user went
+        through it: starting at once, ready 3 s later."""
+        if self.talk["state"] == "unsupported":
+            raise Reject("unsupported", "Android 10 or older")
+        log("talk.setup: the user would see the setup screen now; starting, ready in 3 s")
+        self.set_talk("starting")
+        self.later(3, self.set_talk, "ready")
+        return {"t": "ok"}
+
+    # --- Your own server (D-106) ------------------------------------------------------------------
+
+    def req_remote_relay(self, link, msg):
+        """`remote.relay`: wait at the user's own server (or stop, with null). Fields checked as PROTOCOL.md says,
+        except that this dev tool takes local addresses."""
+        r = msg.get("relay", "missing")
+        if r == "missing":
+            raise Reject("invalid", "relay missing")
+        if r is None:
+            self.set_relay(None)
+            return {"t": "ok"}
+        if not isinstance(r, dict):
+            raise Reject("invalid", "relay must be an object or null")
+        host, port, rv = r.get("host"), r.get("port"), r.get("rv")
+        if not isinstance(host, str) or not host or len(host) > 253 or any(c.isspace() or c in "[]/@" for c in host):
+            raise Reject("invalid", "bad host")
+        if not is_int(port) or not 1 <= port <= 65535:
+            raise Reject("invalid", "bad port")
+        try:
+            fp, key = unb64u(r.get("fp")), unb64u(r.get("k"))
+        except (ValueError, TypeError):
+            raise Reject("invalid", "fp and k must be base64url") from None
+        if len(fp) != 32 or len(key) != 32:
+            raise Reject("invalid", "fp and k must be 32 bytes")
+        if not isinstance(rv, str) or not re.fullmatch(r"[0-9a-f]{32}", rv):
+            raise Reject("invalid", "rv must be 32 lowercase hex digits")
+        self.set_relay({"host": host, "port": port, "fp": fp, "k": key, "rv": bytes.fromhex(rv)})
+        return {"t": "ok"}
+
+    def set_relay(self, relay):
+        if self.relay_task:
+            self.relay_task.cancel()
+            self.relay_task = None
+        self.relay = relay
+        if relay is None:
+            log("relay: none (the app removed it)")
+            self.relay_changed(None, None)
+            return
+        log(f"relay: waiting at {relay['host']}:{relay['port']} as the bridge")
+        self.relay_task = asyncio.get_running_loop().create_task(self.relay_loop(relay))
+
+    def relay_changed(self, state, reason):
+        """`remote.state` with the relay fields, whenever they change (PROTOCOL.md)."""
+        if (state, reason) == self.relay_state:
+            return
+        self.relay_state = (state, reason)
+        log(f"relay state: {state}{' (' + reason + ')' if reason else ''}")
+        self.emit({"t": "remote.state", "direct": "blocked", "reason": "cgnat", "relay": state, "relayReason": reason})
+
+    async def relay_loop(self, relay):
+        """One waiting connection at a time: TLS pinned to the link, the role-'B' preamble, keep-alives; on `joined`
+        the connection becomes a direct session and the next waiting connection opens at once."""
+        backoff = 2
+        while self.relay is relay and not self.stopped.is_set():
+            writer = None
+            try:
+                ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+                ctx.minimum_version = ssl.TLSVersion.TLSv1_2
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE  # the pin below is the trust
+                reader, writer = await asyncio.wait_for(
+                    asyncio.open_connection(relay["host"], relay["port"], ssl=ctx), 15)
+                der = writer.get_extra_info("ssl_object").getpeercert(binary_form=True)
+                if hashlib.sha256(der).digest() != relay["fp"]:
+                    writer.close()
+                    self.relay_changed("down", "pin")
+                    log("relay: the certificate doesn't match the link; stopped until the app sets it again")
+                    return
+                writer.write(b"PLRY" + bytes([1, ROLE_B]) + relay["k"] + relay["rv"])
+                await writer.drain()
+                self.relay_changed("up", None)
+                while True:
+                    status = (await asyncio.wait_for(reader.readexactly(1), RELAY_WAIT_LIMIT))[0]
+                    if status != 0:
+                        break
+                if status == 1:
+                    log("relay: the iPhone joined through the relay")
+                    asyncio.get_running_loop().create_task(self.serve_relay_link(reader, writer))
+                    backoff = 2
+                    continue
+                writer.close()
+                reason = RELAY_STATUS.get(status, "unreachable")
+                if status == 2:
+                    reason = "unreachable"
+                self.relay_changed("down", reason)
+                if status in (3, 4):
+                    log(f"relay: refused ({reason}); stopped until the app sets it again")
+                    return
+            except (OSError, asyncio.TimeoutError, asyncio.IncompleteReadError, ssl.SSLError) as e:
+                if writer:
+                    writer.close()
+                self.relay_changed("down", "unreachable")
+                log(f"relay: {type(e).__name__}; trying again in {backoff} s")
+            await asyncio.sleep(backoff)
+            backoff = min(backoff * 2, 60)
+
+    async def serve_relay_link(self, reader, writer):
+        link = Link(self, reader, writer, "direct")
+        link.name = "direct through the relay"
+        old = self.links["direct"]
+        if old:
+            old.close("replaced by a new connection")
+        self.links["direct"] = link
+        try:
+            await link.run()
+        finally:
+            if self.links["direct"] is link:
+                self.links["direct"] = None
 
     def req_net_switch(self, link, msg):
         """D-073: switches nothing real; remembers it and shows it in the status that follows."""
@@ -1875,8 +2040,38 @@ class Bridge:
         self.forget_peer("unpair command")
         return "unpaired; run `pair` for a new pairing link"
 
+    def cmd_nearby(self, rest, source):
+        if rest not in ("on", "off"):
+            raise CommandError("nearby on|off")
+        self.refuse_nearby = rest == "off"
+        if self.refuse_nearby:
+            for kind in ("tcp", "wifi"):
+                if self.links[kind]:
+                    self.links[kind].close("nearby off")
+            return "refusing the tcp and wifi links; the app has to come through the relay"
+        return "accepting the tcp and wifi links again"
+
+    def cmd_relay(self, rest, source):
+        if not self.relay:
+            return "no relay (the app hasn't sent remote.relay, or removed it)"
+        state, reason = self.relay_state
+        direct = self.links["direct"]
+        return (f"relay {self.relay['host']}:{self.relay['port']}, rendezvous {self.relay['rv'].hex()[:8]}…; "
+                f"state {state}{' (' + reason + ')' if reason else ''}; "
+                f"session through it: {'ready' if direct and direct.ready else 'none'}")
+
+    def cmd_talk(self, rest, source):
+        parts = rest.split()
+        if not parts:
+            reason = self.talk["reason"]
+            return f"talk {self.talk['state']}{' (' + reason + ')' if reason else ''}"
+        if parts[0] not in self.TALK_STATES or len(parts) > 2 or (len(parts) == 2 and parts[1] not in self.TALK_REASONS):
+            raise CommandError(f"usage: talk [{'|'.join(self.TALK_STATES)} [{'|'.join(self.TALK_REASONS)}]]")
+        self.set_talk(parts[0], parts[1] if len(parts) == 2 else None)
+        return self.cmd_talk("", source)
+
     def cmd_disconnect(self, rest, source):
-        kinds = [rest] if rest in ("tcp", "wifi") else ["tcp", "wifi"]
+        kinds = [rest] if rest in ("tcp", "wifi", "direct") else ["tcp", "wifi", "direct"]
         closed = []
         for kind in kinds:
             if self.links[kind]:

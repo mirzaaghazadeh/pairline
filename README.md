@@ -80,8 +80,11 @@ Hearing calls on the iPhone, the internet switches and read status on Android ne
   and codes keep reaching your iPhone anywhere, and you call and text back. There is still no Pairline server:
   messages travel as locked records through your own iCloud, which only your two phones can open, and calls go
   straight to your home through one port your router opens for your paired iPhone alone. Most routers open it by
-  themselves; for the rest the app shows how to do it by hand. [docs/PRIVACY.md](docs/PRIVACY.md) lists exactly what
-  Apple and your router see.
+  themselves; for the rest the app shows how to do it by hand. If your internet provider shares one address among
+  many homes (carrier-grade NAT, common on 4G/5G home routers), no router setting can help: you can then run
+  Pairline's small relay on a server of your own ([relay/README.md](relay/README.md)), and calls go through it,
+  still locked so that only your two phones can open them. [docs/PRIVACY.md](docs/PRIVACY.md) lists exactly what
+  Apple, your router and your server see.
 
 Both can be on: near each other the phones use Bluetooth and Wi-Fi, and Cloud mode takes over when you leave.
 Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/PROTOCOL.md](docs/PROTOCOL.md).

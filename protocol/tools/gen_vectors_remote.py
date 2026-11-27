@@ -104,6 +104,100 @@ def invite_uri(pub_r: bytes, invite_secret: bytes, backend: str, env: str, token
     return "pairline://invite?" + urllib.parse.urlencode(q, quote_via=urllib.parse.quote, safe="")
 
 
+RELAY_MAGIC = b"PLRY"
+RELAY_VERSION = 0x01
+
+
+def relay_link(host: str, port: int, fp: bytes, key: bytes) -> str:
+    """The relay's link (PROTOCOL.md, "Your own server (relay, D-106)"); an IPv6 host goes in brackets."""
+    shown = f"[{host}]" if ":" in host else host
+    return f"pairline-relay://{shown}:{port}?v=1&fp={b64u(fp)}&k={b64u(key)}"
+
+
+def relay_preamble(role: int, key: bytes, rendezvous: bytes) -> bytes:
+    assert len(key) == 32 and len(rendezvous) == 16 and role in (DIR_B, DIR_R)
+    return RELAY_MAGIC + bytes([RELAY_VERSION, role]) + key + rendezvous
+
+
+def relay_vectors() -> dict:
+    fp = label("relay certificate fingerprint")[:32]
+    key = label("relay access key")[:32]
+    rv = label("relay rendezvous id")[:16]
+    other_fp = label("another relay")[:32]
+    f, k = b64u(fp), b64u(key)
+
+    def valid(uri: str, host: str, port: int, why: str) -> dict:
+        return {"why": why, "uri": uri, "host": host, "port": port, "fp": hx(fp), "k": hx(key)}
+
+    links = [
+        valid(relay_link("relay.example.net", 443, fp, key), "relay.example.net", 443, "a DNS name"),
+        valid(relay_link("5.6.7.8", 47840, fp, key), "5.6.7.8", 47840, "a public IPv4 address"),
+        valid(relay_link("2a01:4f8:c17:1234::1", 443, fp, key), "2a01:4f8:c17:1234::1", 443,
+              "a global IPv6 address in brackets, given back without them"),
+        valid(f"pairline-relay://relay.example.net:443?k={k}&extra=1&fp={f}&v=1", "relay.example.net", 443,
+              "parameters in any order; an unknown one is ignored"),
+        valid(f"pairline-relay://relay.example.net:443/?v=1&fp={f}&k={k}", "relay.example.net", 443,
+              "an empty path written as /"),
+        valid(f"pairline-relay://Relay.Example.NET.:443?v=1&fp={f}&k={k}", "relay.example.net", 443,
+              "a name is kept lowercased, without a trailing dot"),
+    ]
+
+    def bad(uri: str, why: str) -> dict:
+        return {"why": why, "uri": uri}
+
+    must_fail = [
+        bad(f"https://relay.example.net:443?v=1&fp={f}&k={k}", "another scheme"),
+        bad(f"pairline-relay://relay.example.net?v=1&fp={f}&k={k}", "no port"),
+        bad(f"pairline-relay://relay.example.net:0?v=1&fp={f}&k={k}", "port 0"),
+        bad(f"pairline-relay://relay.example.net:65536?v=1&fp={f}&k={k}", "port above 65535"),
+        bad(f"pairline-relay://relay.example.net:0443?v=1&fp={f}&k={k}", "a port with a leading zero"),
+        bad(f"pairline-relay://relay.example.net:443?v=2&fp={f}&k={k}", "version 2"),
+        bad(f"pairline-relay://relay.example.net:443?fp={f}&k={k}", "no version"),
+        bad(f"pairline-relay://relay.example.net:443?v=1&k={k}", "no fingerprint"),
+        bad(f"pairline-relay://relay.example.net:443?v=1&fp={b64u(fp[:31])}&k={k}", "a 31-byte fingerprint"),
+        bad(f"pairline-relay://relay.example.net:443?v=1&fp={f}&k={k}=", "padding on the key"),
+        bad(f"pairline-relay://relay.example.net:443?v=1&fp={f}&k={k}&k={k}", "the key twice"),
+        bad(f"pairline-relay://relay.example.net:443?v=1&fp={f}&fp={b64u(other_fp)}&k={k}", "two fingerprints"),
+        bad(f"pairline-relay://user@relay.example.net:443?v=1&fp={f}&k={k}", "user info"),
+        bad(f"pairline-relay://relay.example.net:443/path?v=1&fp={f}&k={k}", "a path"),
+        bad(f"pairline-relay://relay.example.net:443?v=1&fp={f}&k={k}#x", "a fragment"),
+        bad(f"pairline-relay://relay:443?v=1&fp={f}&k={k}", "a single-label name"),
+        bad(f"pairline-relay://relay.local:443?v=1&fp={f}&k={k}", "a .local name"),
+        bad(f"pairline-relay://relay.home:443?v=1&fp={f}&k={k}", "a .home name"),
+        bad(f"pairline-relay://localhost:443?v=1&fp={f}&k={k}", "localhost"),
+        bad(f"pairline-relay://relay_1.example.net:443?v=1&fp={f}&k={k}", "an underscore in a name"),
+        bad(f"pairline-relay://192.168.1.10:443?v=1&fp={f}&k={k}", "a private IPv4 address (release builds)"),
+        bad(f"pairline-relay://100.64.0.1:443?v=1&fp={f}&k={k}", "carrier-grade NAT (release builds)"),
+        bad(f"pairline-relay://127.0.0.1:443?v=1&fp={f}&k={k}", "loopback (release builds)"),
+        bad(f"pairline-relay://203.0.113.5:443?v=1&fp={f}&k={k}", "a documentation address"),
+        bad(f"pairline-relay://[fd00::1]:443?v=1&fp={f}&k={k}", "a unique-local IPv6 address (release builds)"),
+        bad(f"pairline-relay://[2001:db8::1]:443?v=1&fp={f}&k={k}", "documentation IPv6"),
+        bad(f"pairline-relay://1.2.3:443?v=1&fp={f}&k={k}", "a shortened IPv4 address"),
+    ]
+
+    message = {"host": "relay.example.net", "port": 443, "fp": f, "k": k, "rv": rv.hex()}
+    message_must_fail = [
+        {"why": "rendezvous id of 15 bytes", "relay": {**message, "rv": rv.hex()[:30]}},
+        {"why": "rendezvous id in uppercase", "relay": {**message, "rv": rv.hex().upper()}},
+        {"why": "fingerprint of 31 bytes", "relay": {**message, "fp": b64u(fp[:31])}},
+        {"why": "key in standard base64 with padding", "relay": {**message, "k": b64u(key) + "="}},
+        {"why": "port 0", "relay": {**message, "port": 0}},
+        {"why": "port as a string", "relay": {**message, "port": "443"}},
+        {"why": "a host with a space", "relay": {**message, "host": "relay example.net"}},
+        {"why": "an IPv6 host in brackets (the message carries it without)", "relay": {**message, "host": "[2a01:4f8::1]"}},
+        {"why": "a private address (release builds)", "relay": {**message, "host": "192.168.1.10"}},
+        {"why": "no rendezvous id", "relay": {k2: v for k2, v in message.items() if k2 != "rv"}},
+    ]
+    return {
+        "fingerprint": hx(fp), "access_key": hx(key), "rendezvous_id": rv.hex(),
+        "links": links, "links_must_fail": must_fail,
+        "remote_relay": message, "remote_relay_must_fail": message_must_fail,
+        "preamble_bridge": hx(relay_preamble(DIR_B, key, rv)),
+        "preamble_remote": hx(relay_preamble(DIR_R, key, rv)),
+        "status": {"keepalive": 0, "joined": 1, "no_bridge": 2, "wrong_key": 3, "bad_version": 4, "full": 5},
+    }
+
+
 def main():
     sB, sR = private_key("sB"), private_key("sR")
     pub_b, pub_r = pub(sB), pub(sR)
@@ -201,6 +295,7 @@ def main():
             "confirm_ephemeral_public": hx(pub(e3)), "confirm_json": '{"t":"rpair.confirm"}',
             "confirm_record_id": hx(rid_c), "confirm_time_ms": time_ms + 9000, "confirm_sealed": hx(confirm),
         },
+        "relay": relay_vectors(),
     }
     print(json.dumps(vectors, indent=2, ensure_ascii=False))
 

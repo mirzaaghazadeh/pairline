@@ -65,6 +65,8 @@ struct BridgeStatusTab: View {
             if wifiOnly { wifiOnlyNotice }
             if proxy == .leftOn || proxy == .outdated { proxyNotice }
             batteryCard
+            // Where calls play, and why not on this iPhone (D-107); a bridge that doesn't report it shows nothing here.
+            if let talk = bridge.talk { TalkCard(talk: talk) }
             simCards
             BalanceCard()
             if !bridge.isDemo { DataUsageCard() }

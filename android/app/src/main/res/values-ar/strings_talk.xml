@@ -14,6 +14,17 @@
     <string name="talk_summary_starting">جارٍ التشغيل…</string>
     <string name="talk_summary_failed">لم يبدأ</string>
     <string name="talk_summary_unsupported">يحتاج إلى أندرويد 11 أو أحدث</string>
+    <string name="talk_summary_waiting_wifi">بانتظار الواي فاي: يعمل تلقائيًا بمجرد اتصال هذا الهاتف بالواي فاي</string>
+    <string name="talk_summary_pair_again">أعد الإقران: نسي أندرويد إقران Pairline</string>
+    <string name="talk_summary_failed_root">لم يشغّله الروت: اسمح لـ Pairline Bridge في تطبيق الروت</string>
+
+    <string name="talk_card_title">اسمع المكالمات على الآيفون</string>
+    <string name="talk_card_body">يمكن أن ترنّ المكالمات على الآيفون وتُسمع هناك بميكروفونه ومكبّر صوته. يحتاج ذلك إلى إعداد واحد فقط على هذا الهاتف.</string>
+    <string name="talk_card_set_up">إعداد (نحو دقيقتين)</string>
+    <string name="talk_card_later">ليس الآن</string>
+
+    <string name="talk_setup_n_title">إعداد «التحدث عبر الآيفون»</string>
+    <string name="talk_setup_n_text">طلب الآيفون سماع المكالمات عليه. اضغط لإعداد ذلك على هذا الهاتف: مرة واحدة، نحو دقيقتين.</string>
     <string name="talk_android_too_old">يعمل هذا الهاتف بأندرويد %1$s. صوت المكالمات على الآيفون يحتاج إلى أندرويد 11 أو أحدث: فقبله لا يسمح أندرويد لأي تطبيق (ولا حتى عبر كمبيوتر أو Shizuku) بالتقاط صوت المكالمة. ستظل المكالمات ترنّ على الآيفون، وتتحدث من هذا الهاتف.</string>
     <string name="talk_steps">الإعداد</string>
 

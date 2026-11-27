@@ -14,6 +14,17 @@
     <string name="talk_summary_starting">در حال اجرا…</string>
     <string name="talk_summary_failed">اجرا نشد</string>
     <string name="talk_summary_unsupported">به اندروید ۱۱ یا جدیدتر نیاز دارد</string>
+    <string name="talk_summary_waiting_wifi">منتظر وای‌فای: به‌محض وصل‌شدن این گوشی به وای‌فای خودش اجرا می‌شود</string>
+    <string name="talk_summary_pair_again">دوباره مرتبط کنید: اندروید ارتباط Pairline را فراموش کرده است</string>
+    <string name="talk_summary_failed_root">روت آن را اجرا نکرد: در برنامهٔ روت به Pairline Bridge اجازه بدهید</string>
+
+    <string name="talk_card_title">تماس‌ها را روی آیفون بشنوید</string>
+    <string name="talk_card_body">تماس‌ها می‌توانند روی آیفون زنگ بخورند و همان‌جا با میکروفون و بلندگوی خودش پخش شوند. فقط یک بار باید روی این گوشی راه‌اندازی شود.</string>
+    <string name="talk_card_set_up">راه‌اندازی (حدود ۲ دقیقه)</string>
+    <string name="talk_card_later">الان نه</string>
+
+    <string name="talk_setup_n_title">راه‌اندازی «مکالمه با آیفون»</string>
+    <string name="talk_setup_n_text">آیفون شما خواسته تماس‌ها را آنجا بشنود. بزنید تا روی این گوشی راه‌اندازی شود: فقط یک بار، حدود ۲ دقیقه.</string>
     <string name="talk_android_too_old">این گوشی اندروید %1$s دارد. صدای تماس روی آیفون به اندروید ۱۱ یا جدیدتر نیاز دارد: پیش از آن، اندروید به هیچ برنامه‌ای (حتی با کامپیوتر یا Shizuku) اجازهٔ گرفتن صدای تماس را نمی‌دهد. تماس‌ها همچنان روی آیفون زنگ می‌خورند و شما با همین گوشی صحبت می‌کنید.</string>
     <string name="talk_steps">راه‌اندازی</string>
 

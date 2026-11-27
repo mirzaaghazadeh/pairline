@@ -618,4 +618,20 @@
     <string name="help_a_double_nat">O zaman yönlendiricinizin kendi internet (WAN) adresi özel bir adrestir (192.168.x.x, 10.x.x.x veya 172.16–31.x.x) ve Ayarlar › Bulut modu bunun önünde başka bir yönlendirici olduğunu söyler. Yönlendiriciniz internet adresini alsın diye modemi köprü (bridge) moduna alın ya da hem modemde hem yönlendiricide UPnP\'yi açın (veya portu yönlendirin).</string>
     <string name="help_q_port_forward">Port yönlendirme için yönlendiriciye ne girmeliyim?</string>
     <string name="help_a_port_forward">Yalnızca yönlendiricinizde UPnP veya NAT-PMP yoksa gerekir. Bir port yönlendirme kuralı ekleyin (bazı yönlendiriciler buna Virtual Server der): protokol TCP, dış (WAN) port 47830, iç (LAN) IP bu telefonun ev Wi-Fi\'ındaki adresi, iç (LAN) port 47830. Buradaki Ayarlar › Bulut modu bu telefonun adresini ve kullanılan portu gösterir. Bu adresi, orada gösterilen cihaz MAC\'ını kullanarak yönlendiricinin DHCP ayarlarında bu telefona ayırın. Sonra iPhone\'unuzdaki Pairline\'da Ayarlar › Bağlantı › Gelişmiş › Port yönlendirme\'yi açın ve evinizin internet adresini veya bir DDNS adını girin. Yalnızca 47830\'u yönlendirin: 47820 yakın Wi-Fi bağlantısıdır ve evin içinde kalır. Yalnızca eşleştirilmiş iPhone\'unuz bağlanabilir.</string>
+    <!-- Your own server (D-106) -->
+    <string name="relay_up">Kendi sunucunuz: bağlı. Uzaktan aramalar onun üzerinden geçer.</string>
+    <string name="relay_connecting">Kendi sunucunuz: bağlanıyor…</string>
+    <string name="relay_unreachable">Kendi sunucunuz: ulaşılamıyor</string>
+    <string name="relay_pin">Kendi sunucunuz: sertifikası eşleşmiyor</string>
+    <string name="relay_key">Kendi sunucunuz: erişim anahtarını reddetti</string>
+    <string name="relay_version">Kendi sunucunuz: güncellenmesi gerekiyor</string>
+    <string name="relay_full">Kendi sunucunuz: şu an dolu</string>
+    <string name="relay_hint_unreachable">Sunucunun çalıştığından ve portunun güvenlik duvarında açık olduğundan emin olun. Pairline Wi-Fi veya mobil veri üzerinden denemeye devam eder.</string>
+    <string name="relay_hint_pin">Bu, kodunu taradığınız sunucu değil ya da anahtarı yeniden oluşturuldu. Sunucunun şimdi gösterdiği kodu iPhone\'unuzdaki Pairline\'da tarayın: Ayarlar › Bağlantı › Gelişmiş › Kendi sunucunuz.</string>
+    <string name="relay_hint_key">Sunucunun erişim anahtarı değişti. Şimdi gösterdiği kodu iPhone\'unuzdaki Pairline\'da tarayın: Ayarlar › Bağlantı › Gelişmiş › Kendi sunucunuz.</string>
+    <string name="relay_hint_version">Sunucunuzdaki Pairline aktarıcısını en son sürüme güncelleyin. Pairline denemeye devam eder.</string>
+    <string name="relay_hint_full">Sunucunun şu an çok fazla bağlantısı var. Pairline denemeye devam eder.</string>
+    <string name="relay_suggest">Yönlendirici aramaları içeri alamıyorsa, aramalar bunun yerine kendi sunucunuz üzerinden gidebilir: iki telefon da ona bağlanır, böylece evde hiçbir şeyi değiştirmeniz gerekmez. iPhone\'unuzdaki Pairline\'da kurun: Ayarlar › Bağlantı › Gelişmiş › Kendi sunucunuz. Ayrıntılar Yardım\'da.</string>
+    <string name="help_q_own_server">Aramalar kendi sunucum üzerinden geçebilir mi?</string>
+    <string name="help_a_own_server">Evet, yönlendiriciniz aramaları içeri alamıyorsa (örneğin internet sağlayıcınız bir adresi birçok ev arasında paylaştırıyorsa). Pairline\'ın küçük aktarıcısını kiraladığınız veya sahip olduğunuz bir sunucuda Docker ile ya da tek bir program olarak çalıştırın; rehberi Pairline\'ın kodunda, relay/ klasöründedir. Sonra iPhone\'unuzdaki Pairline\'da Ayarlar › Bağlantı › Gelişmiş › Kendi sunucunuz bölümüne gidin ve sunucunun gösterdiği kodu tarayın. İki telefon da sunucunuza bağlanır, böylece evde hiçbir şey değişmez. Aramalarınız ve mesajlarınız yalnızca iki telefonunuzun sahip olduğu anahtarlarla kilitli kalır: sunucu onları iletir ama okuyamaz. Sunucu iki telefonun internet adreslerini ve ne zaman konuştuklarını görür. Mesajlar ve kodlar iCloud üzerinden gelmeye devam eder.</string>
 </resources>

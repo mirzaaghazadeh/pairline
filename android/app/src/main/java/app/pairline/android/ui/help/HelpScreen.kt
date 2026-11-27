@@ -60,6 +60,8 @@ private val sections = listOf(
             Faq(R.string.help_q_upnp_empty, R.string.help_a_upnp_empty),
             Faq(R.string.help_q_double_nat, R.string.help_a_double_nat),
             Faq(R.string.help_q_port_forward, R.string.help_a_port_forward),
+            // Where no router setting helps: a relay on a server of the user's own (D-106).
+            Faq(R.string.help_q_own_server, R.string.help_a_own_server),
             Faq(R.string.help_q_cloud_private, R.string.help_a_cloud_private),
         ),
     ),

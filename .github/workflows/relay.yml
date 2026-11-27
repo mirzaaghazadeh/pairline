@@ -1,0 +1,84 @@
+name: Relay
+
+# Pairline's relay for "Your own server" (D-106): format, vet, tests with the race detector, the standard-library-only
+# rule, a reproducible build for both architectures, and the Docker image, on every change to relay/ or the shared
+# vectors it's tested against. Releases: relay-release.yml.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'relay/**'
+      - 'protocol/test-vectors/**'
+      - '.github/workflows/relay.yml'
+  pull_request:
+    paths:
+      - 'relay/**'
+      - 'protocol/test-vectors/**'
+      - '.github/workflows/relay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: relay-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Keep in step with relay/Dockerfile and relay-release.yml.
+  GO_VERSION: '1.27.1'
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+
+      - name: Standard library only (D-106)
+        working-directory: relay
+        run: |
+          if grep -qE '^\s*require' go.mod || [ -e go.sum ]; then
+            echo "::error file=relay/go.mod::The relay uses Go's standard library only; a dependency needs a DECISIONS.md entry first"
+            exit 1
+          fi
+
+      - name: Format, vet and tests
+        working-directory: relay
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then echo "::error::gofmt: $unformatted"; exit 1; fi
+          go vet ./...
+          go test -race -count=1 ./...
+
+      - name: Reproducible build (each architecture twice, with separate caches)
+        working-directory: relay
+        run: |
+          for arch in amd64 arm64; do
+            for n in 1 2; do
+              GOCACHE="$(mktemp -d)" CGO_ENABLED=0 GOOS=linux GOARCH="$arch" \
+                go build -trimpath -buildvcs=false -ldflags "-s -w -buildid=" -o "$RUNNER_TEMP/relay-$n-$arch" .
+            done
+            cmp "$RUNNER_TEMP/relay-1-$arch" "$RUNNER_TEMP/relay-2-$arch"
+            sha256sum "$RUNNER_TEMP/relay-1-$arch"
+          done
+
+      - name: The image builds, starts with docker-compose.yml (as on Coolify) and turns healthy
+        working-directory: relay
+        env:
+          RELAY_ADDRESS: relay.example.net
+          RELAY_IMAGE: pairline-relay-ci
+        run: |
+          docker build -t pairline-relay-ci .
+          docker compose up -d --wait --wait-timeout 60
+          docker compose logs pairline-relay | tee "$RUNNER_TEMP/relay.log"
+          grep -q 'pairline-relay://relay.example.net:47840?v=1&fp=' "$RUNNER_TEMP/relay.log"
+          docker compose exec -T pairline-relay /pairline-relay healthcheck
+          docker compose down -v

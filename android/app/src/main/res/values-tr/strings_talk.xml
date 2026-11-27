@@ -14,6 +14,17 @@
     <string name="talk_summary_starting">Başlatılıyor…</string>
     <string name="talk_summary_failed">Başlamadı</string>
     <string name="talk_summary_unsupported">Android 11 veya üstü gerekli</string>
+    <string name="talk_summary_waiting_wifi">Wi-Fi bekleniyor: bu telefon Wi-Fi’ye bağlanınca kendiliğinden başlar</string>
+    <string name="talk_summary_pair_again">Yeniden eşleyin: Android, Pairline’ın eşlemesini unuttu</string>
+    <string name="talk_summary_failed_root">Root başlatmadı: root uygulamanızda Pairline Bridge’e izin verin</string>
+
+    <string name="talk_card_title">Aramaları iPhone’unuzda duyun</string>
+    <string name="talk_card_body">Aramalar iPhone’unuzda çalabilir ve orada kendi mikrofonu ve hoparlörüyle duyulabilir. Bu telefonda yalnızca bir kez kurulum gerekir.</string>
+    <string name="talk_card_set_up">Kur (yaklaşık 2 dakika)</string>
+    <string name="talk_card_later">Şimdi değil</string>
+
+    <string name="talk_setup_n_title">iPhone’dan konuşmayı kurun</string>
+    <string name="talk_setup_n_text">iPhone’unuz aramaları orada duymak istedi. Bu telefonda kurmak için dokunun: bir kez, yaklaşık 2 dakika.</string>
     <string name="talk_android_too_old">Bu telefonda Android %1$s var. iPhone’da arama sesi için Android 11 veya üstü gerekir: daha önceki sürümlerde Android hiçbir uygulamanın (bilgisayarla veya Shizuku ile bile) arama sesini almasına izin vermez. Aramalar yine iPhone’da çalar, konuşmayı bu telefondan yaparsınız.</string>
     <string name="talk_steps">Kurulum</string>
 

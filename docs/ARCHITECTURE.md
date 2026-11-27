@@ -177,12 +177,13 @@ Everything above `BridgeLink` is shared by the real link and demo mode. The tran
 | Local Wi-Fi (M5) | everything above when Bluetooth is down; call audio (UDP media channel), files and bulk sync (TCP) | Shared network or the bridge's hotspot. A full session of its own, with its own keys; addresses come from DNS-SD, the QR code or `wifi.offer` over Bluetooth. |
 | Remote mode: mailbox in the user's iCloud (M10, opt-in, D-092) | control, SMS, codes, call signaling and status while no session is up | CloudKit records sealed one by one with the pairing keys (Noise K); Apple stores only ciphertext. The bridge writes and polls through CloudKit Web Services with a web auth token from the iPhone; the iPhone gets a push per record, and its notification service extension unseals and shows SMS, codes and calls. No Pairline server. |
 | Remote mode: direct connection (M10, opt-in, D-092) | everything a session carries, call audio as Opus (`MEDIA` frames) | One TCP port the bridge asks its home router for (NAT-PMP, PCP, UPnP IGD); its public addresses reach the iPhone only sealed, in the mailbox. The iPhone connects out; the listener accepts only the paired iPhone's handshake. Only while no Bluetooth or Wi-Fi session is up, and in the background only during a call. |
+| Remote mode: through the user's own server (opt-in, D-106) | the same direct-connection session | Both phones connect out over TLS (certificate pinned) to Pairline's relay (`relay/`) on a server the user runs; the bridge waits there under a random rendezvous id and the relay joins the iPhone to it, copying bytes it can't read. For homes whose router lets nothing in. |
 
 The Android app declares `INTERNET` since D-041. CI (`network-code-check.sh`) confines socket code to `link/wifi/`
 (local addresses only, checked at run time on every bind and accept), `update/` (GitHub only), the opt-in
 `netshare` package (M8), which forwards only the iPhone's own traffic, `privileged/adb/` (this phone's own Wireless
-debugging, 127.0.0.1 only) and the opt-in `link/remote/` (remote mode: CloudKit Web Services and the home router
-only).
+debugging, 127.0.0.1 only) and the opt-in `link/remote/` (remote mode: CloudKit Web Services, the home router and,
+if the user set one up, their own server).
 
 **Remote mode (M10, D-092; "Cloud mode" in the apps, D-094).** The bridge stays at home; the iPhone keeps texts, codes and calls from anywhere, with only
 Apple and the two phones involved. While no nearby session is up, `LinkManager` on both sides adds two paths:
@@ -198,6 +199,12 @@ Apple and the two phones involved. While no nearby session is up, `LinkManager` 
   without its UDP media and bulk channels; call audio rides inside it as Opus `MEDIA` frames, as on Bluetooth.
   A nearby link always wins; in the background the iPhone closes the direct session unless a call is on, so events
   fall back to the mailbox, whose pushes wake the app.
+- **Your own server (D-106).** When the router lets nothing in (carrier-grade NAT, no UPnP), the user can run
+  Pairline's relay (`relay/`, Go, standard library only) on a server of their own and scan its QR code on the iPhone,
+  which hands the link to the bridge (`remote.relay`). The bridge's `RelayClient` keeps a TLS connection waiting there
+  (on any network, since it connects out), and the iPhone's direct lane tries the relay as one more candidate. Each
+  joined connection is handed to the same pre-handshake gate as the public listener's, so the session is exactly the
+  direct connection's. iCloud still wakes the iPhone; the relay replaces only the router.
 
 "Pair over the internet" (remote pairing) replaces the QR code with a one-time invitation the user sends to their own
 Android phone (a link, or its QR code scanned there) and a 6-digit code checked on both phones. Cloud mode is off by

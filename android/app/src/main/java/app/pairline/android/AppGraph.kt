@@ -17,6 +17,7 @@ import app.pairline.android.netshare.NetSwitches
 import app.pairline.android.tools.Ringer
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.privileged.TalkReminder
+import app.pairline.android.ui.talk.TalkPrompt
 import app.pairline.android.link.LinkManager
 import app.pairline.android.link.MessageRouter
 import app.pairline.android.link.PairingManager
@@ -28,6 +29,7 @@ import app.pairline.android.link.remote.RemoteConfig
 import app.pairline.android.link.remote.RemoteLink
 import app.pairline.android.link.remote.RemotePairingFlow
 import app.pairline.android.link.remote.RemoteStore
+import app.pairline.android.link.remote.relay.RelayClient
 import app.pairline.android.link.wifi.BridgeHotspot
 import app.pairline.android.log.Log
 import app.pairline.android.telephony.BlockList
@@ -73,10 +75,13 @@ object AppGraph {
         LinkManager({ identity.identity() }, pairing, peers, prefs).also { it.remote = remote }
     }
 
+    /** Remote mode's state on this phone: the mailboxes, the token and the user's own server (D-092, D-106). */
+    private val remoteStore: RemoteStore by lazy { RemoteStore.create(app) }
+
     /** Remote mode (D-092): the mailbox in the user's own iCloud, the path next to the sessions. */
     val remote: RemoteLink by lazy {
         RemoteLink(
-            RemoteStore.create(app),
+            remoteStore,
             identity = { identity.identity() },
             peerKey = peers::pinned,
             lastSeen = { prefs.lastSeen },
@@ -123,6 +128,16 @@ object AppGraph {
      */
     val direct: DirectLink by lazy {
         DirectLink(DirectListener(link), link::send, PrefsKeyValueStore(app, "pairline.direct"))
+    }
+
+    /**
+     * The user's own server (D-106): while remote mode is on and the iPhone set one, a connection out to it waits for
+     * the iPhone, and the sessions it joins are direct ones on [link]. Its state goes out with `remote.state`.
+     */
+    val relay: RelayClient by lazy {
+        RelayClient(link, config = { remoteStore.relay(BuildConfig.DEBUG) }).also { client ->
+            client.onChange = { s -> direct.relayChanged(s.wire, s.reasonWire) }
+        }
     }
 
     /** Pairing from far away through an invitation (D-092). */
@@ -177,6 +192,7 @@ object AppGraph {
             ringer = { Ringer.mode(app) },
             dataUsage = { dataUsage.accessGranted() },
             photos = { photos.available() },
+            talk = { privileged.talkStatus().toJson() },
         )
     }
 
@@ -193,6 +209,8 @@ object AppGraph {
             link, prefs, status, smsStore, smsSender, calls, contacts, ussd, audioRelay, netShare, files, blockList,
             netSwitches, app, scheduledSms, dataUsage, photos, mmsStore, mmsSender, remote,
             checkHome = { direct.check() },
+            setRelay = { config -> remoteStore.setRelay(config).also { kept -> if (kept) relay.reconfigure() } },
+            talkSetup = { TalkPrompt.request(app) },
         ).also { router ->
             remote.onConfigured = {
                 router.remoteStarted()
@@ -218,11 +236,14 @@ object AppGraph {
     /** Pairline's helper with shell rights ("Talk on iPhone", D-046, D-054). Started by [PairlineApp]. */
     val privileged: PrivilegedManager by lazy {
         PrivilegedManager(app, prefs).also { manager ->
+            // What the iPhone hears about Talk on iPhone (status.talk, D-107) changed: resend the status if it differs.
+            manager.onTalkChange = { router.statusChanged() }
             manager.onChange = {
                 router.statusChanged()
                 when (manager.state.value) {
                     PrivilegedManager.State.READY -> {
                         TalkReminder.cancel(app)
+                        TalkPrompt.cancel(app)
                         // The user turned on Talk on iPhone: also let Android bind the companion call service, which
                         // gives the iPhone the keypad, mute and speaker (Android 12+).
                         // It also lets Pairline turn Wireless debugging back on by itself after a restart (D-059).

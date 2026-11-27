@@ -9,6 +9,8 @@ protocol FrameTransport: AnyObject {
     var kind: TransportKind { get }
     /// The address this transport dialed (Wi-Fi and the direct connection); nil for Bluetooth.
     var dialed: WiFiEndpoint? { get }
+    /// A direct connection that runs through the user's own server (D-106); `dialed` is then the server.
+    var viaRelay: Bool { get }
     func send(_ frame: Data)
     /// Sends and calls `completion` (on the main queue) once the transport took the frame, for flow control.
     func send(_ frame: Data, completion: (() -> Void)?)
@@ -20,6 +22,7 @@ protocol FrameTransport: AnyObject {
 
 extension FrameTransport {
     var dialed: WiFiEndpoint? { nil }
+    var viaRelay: Bool { false }
 
     func send(_ frame: Data, completion: (() -> Void)?) {
         send(frame)

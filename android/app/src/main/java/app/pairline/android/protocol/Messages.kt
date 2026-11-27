@@ -78,6 +78,12 @@ object Msg {
     const val REMOTE_ADDR = "remote.addr"
     const val REMOTE_STATE = "remote.state"
     const val REMOTE_CHECK = "remote.check"
+
+    /** The user's own server (D-106). */
+    const val REMOTE_RELAY = "remote.relay"
+
+    /** R→B (D-107): the iPhone's user wants calls on the iPhone; B shows how to set up Talk on iPhone. */
+    const val TALK_SETUP = "talk.setup"
     const val RPAIR_HELLO = "rpair.hello"
     const val RPAIR_NONCE = "rpair.nonce"
     const val RPAIR_REVEAL = "rpair.reveal"
@@ -171,13 +177,16 @@ object Caps {
      */
     const val MMS = "mms"
 
+    /** The bridge takes `remote.relay` and can wait at the user's own server (D-106). */
+    const val RELAY = "relay"
+
     /** In the order the spec lists them; status messages keep this order. */
     val ALL: List<String> = listOf(
         SMS_RECEIVE, SMS_SEND, SMS_HISTORY, SMS_READ, SMS_SCHEDULE, MMS, CALL_OBSERVE, CALL_CONTROL, CALL_DIAL, CALL_DTMF,
         CALL_AUDIO, CALL_HOLD, CALL_VOICEMAIL, CONTACTS, CALLLOG, CONTACTS_ADD, CONTACTS_EDIT, USSD, DUALSIM, CALL_MEDIA,
         CALL_MEDIA_TALK,
         CALL_MEDIA_LINK, NET_SHARE, NET_SWITCH, PHONE_FIND, PHONE_RINGER, NOTIF_MIRROR, DATA_USAGE, WIFI, FILES,
-        CALLLOG_DELETE, BLOCK, CALL_SCREEN, MEDIA_PHOTOS,
+        CALLLOG_DELETE, BLOCK, RELAY, CALL_SCREEN, MEDIA_PHOTOS,
     )
 
     /** What the iPhone can receive, in its `device.info` `caps`: `remote.ring` needs this (D-084). */
@@ -264,12 +273,16 @@ object Messages {
 
     /**
      * `direct`: `open` / `none` / `blocked`; [reason] a fixed code (`cgnat`, `no_public_address`, `no_mapping`,
-     * `not_wifi`, `listener_failed`), null when open.
+     * `not_wifi`, `listener_failed`), null when open. [relay] (D-106): null when no own server is set, `up` or `down`;
+     * [relayReason] only when down: `unreachable`, `pin`, `key`, `version` or `full`.
      */
-    fun remoteState(direct: String, reason: String?): JSONObject = JSONObject()
-        .put("t", Msg.REMOTE_STATE)
-        .put("direct", direct)
-        .putNullable("reason", reason)
+    fun remoteState(direct: String, reason: String?, relay: String? = null, relayReason: String? = null): JSONObject =
+        JSONObject()
+            .put("t", Msg.REMOTE_STATE)
+            .put("direct", direct)
+            .putNullable("reason", reason)
+            .putNullable("relay", relay)
+            .putNullable("relayReason", relayReason)
 
     /**
      * The reply to `remote.check` ("Check my home connection"): [direct] `likely` / `unlikely`; [reason] one of

@@ -297,7 +297,8 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | Type | Direction | Milestone | Body |
 |------|-----------|-----------|------|
 | `device.info` | either | M1 | `name`, `platform` (`android`/`ios`), `os`, `app` (version), `proto` (0), `caps` (R only, M5: what R can receive, see below) |
-| `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `net` (D-073: the bridge phone's hotspot, Bluetooth tethering and mobile data; older bridges omit it), `ringer` (D-074: `normal` / `vibrate` / `silent`), `time`. Sent after the handshake, on every change, and at least every 60 s |
+| `status` | B→R | M1 | `battery` `{level, charging}`, `sims` [SIM], `app`, `caps` [capability], `net` (D-073: the bridge phone's hotspot, Bluetooth tethering and mobile data; older bridges omit it), `ringer` (D-074: `normal` / `vibrate` / `silent`), `talk` (D-107: Talk on iPhone, below; older bridges omit it), `time`. Sent after the handshake, on every change, and at least every 60 s |
+| `talk.setup` | R→B | D-107 | `id` → `ok`, or `error` `unsupported` (Android 10 or older). The iPhone's user asked to hear calls on the iPhone: B turns its Talk on iPhone switch on and shows a notification that opens its Talk on iPhone setup screen (at once if its app is in the foreground). It never changes a system setting itself (AGENTS.md rule 5): the user does the one-time steps there |
 | `status.get` | R→B | M1 | `id` → `status` with the same `id` |
 | `ping` / `pong` | either | M1 | `id`. Keep-alive; also used to measure latency |
 | `unpair` | either | M1 | — The receiver deletes the pinned key and closes the link |
@@ -355,6 +356,30 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `net.share` | R→B, B→R | M8 | request: `id`, `on` / reply (same `id`) or event (no `id`, when the bridge's user stops it): `on`, and while on `host`, `port` (one port for SOCKS5 and HTTP), `user`, `pass` (new for every start), `pac` (`http://host:port/proxy.pac`), `vpn` (the bridge's traffic goes through a VPN), `direct` [domain suffix]. `error` `permission` while the bridge's user hasn't allowed sharing. Needs `net.share` |
 | `net.switch` | R→B | M8 | `id`, `what` (`"hotspot"`: the bridge phone's own Wi-Fi hotspot; `"bluetooth"`: Bluetooth tethering; `"data"`: mobile data on the data SIM) and `on`, or `what: "dataSim"` and `sim` (slot) → `ok` once Android applied it (turning a hotspot off is answered first, then done), then `status` shows it. `error`: `unsupported` (the helper isn't running), `permission` (the carrier's entitlement check or Android refused), `invalid`, `failed` (`msg` has Android's reason, in English). Sent only when the user flips the switch on R. Needs `net.switch` (D-073) |
 
+### Talk on iPhone's state (`status.talk`, D-107)
+
+`talk` says whether call audio can move to the iPhone, and if not, what's missing, so R can tell its user before and
+during a call instead of leaving the voice on B without a word. `{"state": <state>, "reason": <reason or null>}`:
+
+| `state` | Meaning | R shows |
+|---------|---------|---------|
+| `ready` | The helper runs; `call.media` is listed | that calls play on the iPhone |
+| `starting` | The helper is starting (after a restart, or Wi-Fi came back) | that it's on its way |
+| `setup` | Never set up on this phone: its one-time steps (Developer options, Wireless debugging, pairing code, or root mode) are still to do | a way to start them: `talk.setup` |
+| `off` | Set up once, then turned off by B's user | that it's off on the Android phone, and `talk.setup` to turn it on |
+| `waiting` | Set up and on, but the helper can't start right now; `reason` says why | the reason; it starts by itself once that's resolved |
+| `failed` | The helper didn't start; `reason` says why | the reason and what to do |
+| `unsupported` | Android 10 or older (D-056) | that this Android phone can't, without offering setup |
+
+`reason` (only with `waiting` or `failed`): `wifi` (Wireless debugging works only on Wi-Fi; B starts the helper as soon
+as it's on one), `debugging` (Developer options or Wireless debugging is off and B couldn't turn it back on, for
+example after its user declined Android's prompt, or the helper couldn't find Wireless debugging; B keeps retrying,
+D-059), `pairing` (Android no longer knows Pairline's pairing: pair again on B), `root` (root mode, and `su` is
+missing or refused, D-075), `other`. A phone that was never set up reads `setup` whether its switch is on or off;
+`off` means it was set up once. B sends a fresh `status` whenever `talk` changes (the switch, the helper's state, Wi-Fi
+coming or going while it waits). R treats an unknown `state` like `failed` with no reason, and an unknown `reason` as
+none. `call.media` in `caps` stays the authority on whether audio can move now: R shows `ready` without it as starting.
+
 ### Capabilities (`status.caps`)
 
 The bridge lists only what this phone can do right now: the permission is granted and the hardware or Android
@@ -377,7 +402,8 @@ history, `mms.part`, `mms.attach`, `mms.send`, D-089), `contacts.edit`
 (with `contacts.add`, D-074), `phone.find` and `phone.ringer` (D-074), `notif.mirror` (notification access given:
 chosen apps' notifications are sent as `notif.posted`, D-077), `wifi` (M5: the bridge's Wi-Fi link is switched on), `files` (M5:
 it can send and receive files over a Wi-Fi session), `calllog.delete` (delete call-log entries on the bridge, M4),
-`block` (the bridge keeps a block list, M4)
+`block` (the bridge keeps a block list, M4), `relay` (the bridge takes `remote.relay` and can wait at the user's own
+server, D-106)
 
 R lists what it can receive in its own `device.info` as `caps` (M5): `["files"]` when it accepts `file.offer`. B
 offers files only to an R that listed `files`; R offers only to a B whose `status.caps` has `files`. `ring` (D-084):
@@ -636,6 +662,7 @@ older than one day.
 | `remote.addr` | B→R | `v4` (`"203.0.113.5:47830"`) and `v6` (`"[2001:db8::5]:47830"`), either null: where the direct connection listens. Sent (quiet) whenever it changes; each one replaces the previous. Only public addresses: IPv4 not private, carrier-grade NAT, loopback, link-local, multicast, reserved or documentation ranges (so the examples here are refused); IPv6 in 2000::/3, not 2001:db8::/32, 2002::/16 or 2001::/23. R ignores anything else, and connects only to addresses from this message |
 | `remote.state` | B→R | `direct` (`open` / `none` / `blocked`), `reason` (null when open): `cgnat` (the router's external IPv4 is carrier-grade NAT), `no_public_address` (it's private or otherwise not public), `no_mapping` (no NAT-PMP, PCP or UPnP mapping could be made), `not_wifi` (the bridge isn't on Wi-Fi or Ethernet), `listener_failed` (its listener couldn't start). Receivers show unknown codes as no reason |
 | `remote.check` | R→B | `id` → `remote.check` with the same `id`: `direct` (`likely` / `unlikely`), `reason` (null when likely; otherwise `cgnat`, `no_public_address`, `no_mapping` (the router answers none of NAT-PMP, PCP and UPnP IGD) or `not_wifi`, as in `remote.state`), `router` (`nat-pmp` / `pcp` / `upnp`, the one a mapping would use, or null) and `ipv6` (B has a global IPv6 address). "Check my home connection": answered with remote mode on or off, over any session or the mailbox. **Read-only on the router:** B sends only NAT-PMP's external-address request (opcode 0), PCP's ANNOUNCE (opcode 0, lifetime 0) and UPnP IGD's discovery and `GetExternalIPAddress`, and never creates, renews or deletes a mapping. `likely` when one answered and the address it reported (if any; ANNOUNCE carries none) is public. The reply never holds an address. B answers `busy` while a check runs and `unsupported` if it's older; it may take up to about 15 s when the router is silent |
+| `remote.relay` | R→B | `id`, `relay` (`{host, port, fp, k, rv}` or null) → `ok`: the user's own server, below ("Your own server") |
 | `rpair.hello`, `rpair.nonce`, `rpair.reveal`, `rpair.confirm` | see below | remote pairing |
 
 B→R events go on a session when one is up, otherwise in the mailbox: `sms.new`, `call.incoming` and missed calls in
@@ -663,6 +690,90 @@ public listener B:
 - closes a connection that hasn't completed the handshake within 10 s, keeps at most 4 such connections, and accepts
   at most 10 new connections per minute from one address;
 - closes the mapping and the listener when remote mode is turned off or the pairing is forgotten.
+
+### Your own server (relay, D-106)
+
+For a home whose router can't let a connection in (carrier-grade NAT, no NAT-PMP, PCP or UPnP, no port forwarding),
+the user may run a small relay on a server of their own (`relay/` in this repository; "Your own server" in the apps).
+Both phones connect **out** to it, and it joins the two connections byte for byte. What runs inside is exactly the
+direct connection's session (framing, handshake, messages, `MEDIA` call audio), end to end between the pinned identity
+keys, so the relay sees TLS-wrapped ciphertext, the phones' IP addresses and timing: it can drop a connection, never
+read or change one. Waking the iPhone stays with iCloud's pushes (iOS suspends an app that only holds a socket), and
+there is still no Pairline server. Nothing changes between the phones on the wire, so this stays version 1: R uses a
+relay only with a B that lists `relay` in `status.caps`.
+
+**The server's link.** On its first start the relay creates, in its data directory, a P-256 key with a self-signed
+TLS certificate and a 32-byte random access key, and prints its link as text and as a QR code:
+
+`pairline-relay://<host>:<port>?v=1&fp=<fingerprint>&k=<access key>`
+
+`fp` is the SHA-256 of the server's leaf certificate (its DER bytes) and `k` the access key, both base64url without
+padding. A receiver accepts a link only if: the scheme is `pairline-relay`; it has a host and a port (1–65535, plain
+decimal), and no user info, no path (an empty one or `/` only) and no fragment; `v` is `1`, and `fp` and `k` decode to
+exactly 32 bytes, each of the three appearing exactly once (unknown parameters are ignored); the host is a DNS name
+(letters, digits and hyphens per label, at least two labels, at most 253 characters, the last label not all digits and
+not `local`, `localhost`, `lan`, `home` or `internal`), a public IPv4 address, or a global IPv6 address in brackets
+(the same checks as the user's port forwarding, D-095). Debug builds also accept loopback and private addresses, so the
+emulator and the Simulator can reach a relay on the development Mac. The link is a secret: anyone holding it can use
+the relay (never the phones' sessions, which the pinned keys protect). It is never logged.
+
+**`remote.relay`** (R→B request, over a session or through the R→B mailbox): `id`, `relay`: either null (no relay) or
+`{"host", "port", "fp", "k", "rv"}` → `ok`. `host` and `port` as in the link (an IPv6 address without brackets), `fp`
+and `k` as in the link, `rv` the **rendezvous id**: 16 random bytes as 32 lowercase hex digits that R chooses each
+time the user sets a server. B checks every field as above (`invalid` otherwise; `failed` while remote mode is off),
+keeps the relay in its own storage while remote mode is on, never logs it, and forgets it with `remote.config`
+`on: false`, when remote mode is set up again, or when the pairing is forgotten. R keeps it in its Keychain with the
+direct connection's other settings. R sends it again on a session, at most once a minute, when B lists `relay` in
+`status.caps` and B's last `remote.state` disagrees with R: `relay: null` while R has a server, or a `relay` value
+after the user removed it (then `relay: null` goes).
+
+**Connecting.** Each phone opens TCP to `host:port`, then TLS (1.2 or 1.3; no SNI or ALPN requirement), and goes on
+only if the SHA-256 of the server's leaf certificate equals `fp`. Nothing else about the certificate is checked: the
+pin is the trust, so no domain or certificate authority is needed. Inside TLS it sends the 54-byte preamble:
+
+| Offset | Size | Field |
+|--------|------|-------|
+| 0 | 4 | `PLRY` (ASCII) |
+| 4 | 1 | version: `0x01` |
+| 5 | 1 | role: `'B'` (`0x42`) waits for the iPhone, `'R'` (`0x52`) joins the waiting bridge |
+| 6 | 32 | the access key `k` |
+| 38 | 16 | the rendezvous id `rv` |
+
+The relay answers with single status bytes:
+
+| Byte | Meaning |
+|------|---------|
+| `0x00` | keep-alive, sent only to a waiting B: once as soon as it starts waiting (its key was taken), then every 30 s |
+| `0x01` | joined: every byte after it comes from (and goes to) the other phone, in both directions |
+| `0x02` | to R: no bridge is waiting with this rendezvous id (the relay held R up to 10 s for one first) |
+| `0x03` | wrong access key |
+| `0x04` | unsupported version or malformed preamble |
+| `0x05` | the relay is full |
+
+After any byte but `0x00` and `0x01` the relay closes the connection.
+
+- **B** keeps one waiting connection while remote mode is on and a relay is set, on any network (Wi-Fi, Ethernet or
+  mobile data: it connects out, so it needs no router). It writes nothing after its preamble until it has read `0x01`.
+  From then on the connection is a direct connection from the internet, handled exactly like one accepted on the
+  public listener: only `HELLO` and the confirm before the handshake authenticates the pinned iPhone, closed if that
+  takes more than 10 s, a `TransportKind.DIRECT` session afterwards. B opens the next waiting connection at once. A
+  waiting connection that hears nothing for 90 s is replaced. After a failure B waits 2 s, doubling to 60 s, and tries
+  at once when its network changes; a certificate that doesn't match `fp`, or `0x03`, stops it until the relay is set
+  again (or the network changes), since retrying can't help.
+- **R** treats the relay as one more direct-connection candidate: first while B's last `remote.state` isn't `open`
+  (its router let nothing in), otherwise after B's own addresses and the user's port forwarding. It sends the preamble
+  with role `'R'`, waits up to 15 s for `0x01`, then runs the direct session, sending its `HELLO` first. On `0x02` the
+  bridge isn't at the relay right now; the direct connection's usual retries apply.
+- **The relay** reads the preamble within 10 s of the TCP connection, compares the key in constant time, keeps one
+  waiting B per rendezvous id (a newer one replaces the older, since a bridge that lost its network reconnects), joins
+  an R to it, and then copies bytes both ways until either side closes or nothing has passed for 5 minutes (a session
+  pings every 15 s when idle). It never parses what it copies, stores nothing but its key, certificate and access key,
+  and logs counts, never addresses, keys or rendezvous ids.
+
+**`remote.state`** gains two fields: `relay`, null when no relay is set, `up` while B waits at the relay or a session
+runs through it, `down` otherwise; and `relayReason`, null unless `down`: `unreachable` (no TCP or TLS connection),
+`pin` (the certificate doesn't match `fp`), `key` (`0x03`), `version` (`0x04`) or `full` (`0x05`). B sends
+`remote.state` whenever either changes. Receivers show an unknown `relay` as `down` and an unknown reason as none.
 
 ### Remote pairing
 
@@ -703,8 +814,9 @@ The invitation expires after 10 minutes (steps 3–5), and both sides give up 10
 ## Test vectors
 
 `protocol/test-vectors/v1-remote.json` covers remote mode: kind 1 and kind 2 mailbox records, the invitation link,
-the commitment and the comparison code. It is generated by `protocol/tools/gen_vectors_remote.py` with the same fixed
-keys as v0.
+the commitment and the comparison code, and the relay's link and preambles (`relay`, D-106: links that must parse,
+links that must fail, and the preamble bytes for both roles). It is generated by `protocol/tools/gen_vectors_remote.py`
+with the same fixed keys as v0.
 
 `protocol/test-vectors/v0.json` holds fixed keys and inputs with the expected ECDH results, HKDF outputs, pairing
 MACs, hello bodies, session keys, confirm records, encrypted records (control, media and bulk), records that must

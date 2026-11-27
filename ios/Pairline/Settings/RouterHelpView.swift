@@ -63,6 +63,13 @@ struct RouterHelpView: View {
                          text: Text("A home router with a SIM card almost always gets a shared address from the mobile operator. There a public address usually comes with a business or static-IP plan, and IPv6, if the operator supports it, is turned on in the router's APN settings (IPv4/IPv6).", tableName: "RemoteMode"))
                 HelpCard(symbol: "server.rack", title: Text("Two boxes at home", tableName: "RemoteMode"),
                          text: Text("If your router's own internet (WAN) address is a private one (192.168.x.x, 10.x.x.x or 172.16–31.x.x), it sits behind your provider's modem. Put the modem in bridge mode so your router gets the internet address, or turn on UPnP (or forward the port) on both the modem and the router.", tableName: "RemoteMode"))
+                // D-106: when nothing at home can let calls in, a server of the user's own can.
+                HelpCard(symbol: "server.rack", title: Text("Use your own server", tableName: "RemoteMode"),
+                         text: Text("If nothing at home can let calls in, run Pairline's small server on a server of your own, such as a cheap VPS near home. Both phones connect out to it, so no router setting is needed, and it only passes along locked data.", tableName: "RemoteMode"))
+                OwnServerLink(remote: remote ?? AppModel.shared.link.remote)
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .card()
                 HelpCard(symbol: "lock.shield", title: Text("What opening a port means", tableName: "RemoteMode"),
                          text: Text("Pairline opens one port, only to the Android phone, and only your paired iPhone can use it: anything else is turned away. With UPnP on, apps on your home network can also ask the router to open ports; Pairline closes its own when you turn Cloud mode off.", tableName: "RemoteMode"))
                 HelpCard(symbol: "phone.fill", title: Text("Talking on the iPhone", tableName: "RemoteMode"),

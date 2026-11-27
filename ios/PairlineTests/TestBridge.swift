@@ -7,6 +7,8 @@ final class LoopbackTransport: FrameTransport {
     var kind: TransportKind = .tcp
     /// The address a real Wi-Fi or direct transport would have dialed.
     var dialed: WiFiEndpoint?
+    /// A direct transport that went through the user's own server (D-106).
+    var viaRelay = false
     weak var peer: LoopbackTransport?
     var onFrame: ((Data) -> Void)?
     var onClose: ((Error?) -> Void)?

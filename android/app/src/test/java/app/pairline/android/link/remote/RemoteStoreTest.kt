@@ -1,5 +1,7 @@
 package app.pairline.android.link.remote
 
+import app.pairline.android.link.remote.relay.RelayConfig
+import app.pairline.android.protocol.B64u
 import app.pairline.android.protocol.Mailbox
 import app.pairline.android.protocol.RemoteBackend
 import app.pairline.android.protocol.RemoteEnvironment
@@ -100,7 +102,44 @@ class RemoteStoreTest {
         store.markHandled(listOf("aa"), 1)
         store.recordSent(MailboxSlot.QUIET, "q1", 1)
         store.problem = RemoteStore.Problem.TOKEN_REJECTED
+        assertFalse(store.setRelay(relay))
         assertTrue(kv.map.isEmpty())
         assertNull(store.load())
+        assertNull(store.relay(debugBuild = false))
+    }
+
+    private val relay = RelayConfig("relay.example.net", 443, ByteArray(32) { 1 }, ByteArray(32) { 2 }, ByteArray(16) { 3 })
+
+    /** The user's own server (D-106): encrypted at rest like the token, and gone with remote mode or a new setup. */
+    @Test
+    fun theRelayIsEncryptedAtRestAndGoesWithRemoteMode() {
+        val store = RemoteStore(kv, wrapper)
+        store.turnOn(config, "t")
+        assertNull(store.relay(debugBuild = false))
+        assertTrue(store.setRelay(relay))
+        assertTrue(kv.map.values.none { it.contains("relay.example.net") || it.contains(B64u.encode(relay.key)) })
+        assertEquals(relay, RemoteStore(kv, wrapper).relay(debugBuild = false))
+        // Removed by the iPhone.
+        assertTrue(store.setRelay(null))
+        assertNull(RemoteStore(kv, wrapper).relay(debugBuild = false))
+        // A new Cloud mode setup starts without one.
+        store.setRelay(relay)
+        store.turnOn(config, "t2")
+        assertNull(RemoteStore(kv, wrapper).relay(debugBuild = false))
+        // Remote mode off (or the pairing forgotten).
+        store.setRelay(relay)
+        store.clear()
+        assertNull(store.relay(debugBuild = false))
+        assertTrue(kv.map.isEmpty())
+    }
+
+    /** A debug build's local relay isn't taken back by a release build. */
+    @Test
+    fun aStoredRelayIsCheckedAgain() {
+        val store = RemoteStore(kv, wrapper)
+        store.turnOn(config, "t")
+        store.setRelay(RelayConfig("10.0.2.2", 47840, ByteArray(32), ByteArray(32), ByteArray(16)))
+        assertNull(RemoteStore(kv, wrapper).relay(debugBuild = false))
+        assertEquals("10.0.2.2", RemoteStore(kv, wrapper).relay(debugBuild = true)?.host)
     }
 }

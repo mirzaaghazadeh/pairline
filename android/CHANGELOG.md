@@ -5,6 +5,15 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.10.0 (2026-11-27)
+
+- **Calls away from home through your own server.** If your home router can't let calls in (common with 4G/5G home
+  routers and providers that share one internet address among many homes), you can run Pairline's small relay on a
+  server of your own and set it up on your iPhone: Settings › Connection › Advanced › Your own server. This phone then
+  keeps a connection to that server, on Wi-Fi or mobile data, and your iPhone reaches it there. Everything stays
+  locked with keys only your two phones hold; the server only passes it along. The Cloud mode screen shows whether
+  this phone is connected to your server. The guide: relay/README.md in Pairline's source.
+
 ## 1.9.9 (2026-11-27)
 
 - **Calls in Cloud mode show who's calling.** When Android tells this app the caller's number only after the phone

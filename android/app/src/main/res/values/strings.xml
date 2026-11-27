@@ -646,4 +646,20 @@
     <string name="help_a_double_nat">Then your router\'s own internet (WAN) address is a private one (192.168.x.x, 10.x.x.x or 172.16–31.x.x), and Settings › Cloud mode says another router sits in front of this one. Put the modem in bridge mode so your router gets the internet address, or turn on UPnP (or forward the port) on both the modem and the router.</string>
     <string name="help_q_port_forward">What do I enter in the router for port forwarding?</string>
     <string name="help_a_port_forward">Only needed if your router has no UPnP or NAT-PMP. Add a port forwarding rule (some routers call it a virtual server): protocol TCP, external (WAN) port 47830, internal (LAN) IP this phone\'s address on your home Wi-Fi, internal (LAN) port 47830. Settings › Cloud mode here shows this phone\'s address and the port in use. Reserve that address for this phone in the router\'s DHCP settings, using the device MAC shown there. Then, in Pairline on your iPhone, open Settings › Connection › Advanced › Port forwarding and enter your home\'s internet address or a DDNS name. Forward only 47830: 47820 is the nearby Wi-Fi link and stays inside your home. Only your paired iPhone can connect.</string>
+    <!-- Your own server (D-106): set up on the iPhone; this phone waits there for it. -->
+    <string name="relay_up">Your own server: connected. Calls from far away go through it.</string>
+    <string name="relay_connecting">Your own server: connecting…</string>
+    <string name="relay_unreachable">Your own server: can\'t reach it</string>
+    <string name="relay_pin">Your own server: its certificate doesn\'t match</string>
+    <string name="relay_key">Your own server: it refused the access key</string>
+    <string name="relay_version">Your own server: needs an update</string>
+    <string name="relay_full">Your own server: full right now</string>
+    <string name="relay_hint_unreachable">Check that the server is running and that its port is open in its firewall. Pairline keeps trying, on Wi-Fi or mobile data.</string>
+    <string name="relay_hint_pin">This isn\'t the server whose code you scanned, or its key was made again. Scan the code it shows now in Pairline on your iPhone: Settings › Connection › Advanced › Your own server.</string>
+    <string name="relay_hint_key">The server\'s access key changed. Scan the code it shows now in Pairline on your iPhone: Settings › Connection › Advanced › Your own server.</string>
+    <string name="relay_hint_version">Update the Pairline relay on your server to the latest version. Pairline keeps trying.</string>
+    <string name="relay_hint_full">The server has too many connections right now. Pairline keeps trying.</string>
+    <string name="relay_suggest">If the router can\'t let calls in, they can go through a server of your own instead: both phones connect out to it, so nothing at home needs changing. Set it up in Pairline on your iPhone: Settings › Connection › Advanced › Your own server. More in Help.</string>
+    <string name="help_q_own_server">Can calls go through a server of my own?</string>
+    <string name="help_a_own_server">Yes, if your router can\'t let calls in (for example when your internet provider shares one address among many homes). Run Pairline\'s small relay on a server you rent or own, with Docker or as one program; the guide is in Pairline\'s code, in the relay/ folder. Then, in Pairline on your iPhone, go to Settings › Connection › Advanced › Your own server and scan the code the server shows. Both phones connect out to your server, so nothing at home changes. Your calls and messages stay locked with keys only your two phones hold: the server passes them on but can\'t read them. It does see both phones\' internet addresses and when they talk. Texts and codes keep coming through iCloud.</string>
 </resources>

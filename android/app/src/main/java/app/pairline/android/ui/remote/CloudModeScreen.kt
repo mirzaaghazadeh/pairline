@@ -40,6 +40,8 @@ import app.pairline.android.link.remote.DirectReason
 import app.pairline.android.link.remote.DirectStatus
 import app.pairline.android.link.remote.RemoteStatus
 import app.pairline.android.link.remote.RemoteStore
+import app.pairline.android.link.remote.relay.RelayReason
+import app.pairline.android.link.remote.relay.RelayStatus
 import app.pairline.android.ui.ConnectionWay
 import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
@@ -68,6 +70,7 @@ fun CloudModeScreen(navigate: (Route) -> Unit, back: () -> Unit) {
     val context = LocalContext.current
     val remote by AppGraph.remote.state.collectAsState()
     val direct by AppGraph.direct.status.collectAsState()
+    val relay by AppGraph.relay.status.collectAsState()
     val link by AppGraph.link.state.collectAsState()
     val paired by AppGraph.peers.paired.collectAsState()
     val tick = refreshTick()
@@ -161,10 +164,18 @@ fun CloudModeScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                 SectionCard(title = stringResource(R.string.cloud_calls_title)) {
                     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         DirectStatusLine(direct)
-                        directHint(direct, detailed = true)?.let { HintText(it, indent = false) }
+                        // The user's own server (D-106) carries calls where the router lets nothing in.
+                        if (relay.set) RelayStatusLine(relay)
+                        if (!relay.up) {
+                            directHint(direct, detailed = true)?.let { HintText(it, indent = false) }
+                            relayHint(relay)?.let { HintText(it, indent = false) }
+                            if (!relay.set && direct.direct != null && direct.direct != Direct.OPEN) {
+                                HintText(stringResource(R.string.relay_suggest), indent = false)
+                            }
+                        }
                     }
                 }
-                RouterDetails(direct)
+                if (!relay.up) RouterDetails(direct)
             }
             Spacer(Modifier.height(8.dp))
         }
@@ -232,6 +243,50 @@ fun DirectStatusLine(s: DirectStatus) {
             tint = if (open) toneColors(Tone.GOOD).content else MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/**
+ * The user's own server (D-106), once the iPhone set one: connected (calls from far away go through it), connecting, or
+ * why not, in plain words.
+ */
+@Composable
+fun RelayStatusLine(s: RelayStatus) {
+    val text = stringResource(
+        when {
+            s.up -> R.string.relay_up
+            else -> when (s.reason) {
+                null -> R.string.relay_connecting
+                RelayReason.UNREACHABLE -> R.string.relay_unreachable
+                RelayReason.PIN -> R.string.relay_pin
+                RelayReason.KEY -> R.string.relay_key
+                RelayReason.VERSION -> R.string.relay_version
+                RelayReason.FULL -> R.string.relay_full
+            }
+        },
+    )
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(
+            if (s.up) PIcons.CheckCircle else PIcons.Info,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = if (s.up) toneColors(Tone.GOOD).content else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** What to do about the user's own server while it isn't connected; null while connecting or when none is set. */
+@Composable
+fun relayHint(s: RelayStatus): String? {
+    if (!s.set || s.up) return null
+    return when (s.reason) {
+        null -> null
+        RelayReason.UNREACHABLE -> stringResource(R.string.relay_hint_unreachable)
+        RelayReason.PIN -> stringResource(R.string.relay_hint_pin)
+        RelayReason.KEY -> stringResource(R.string.relay_hint_key)
+        RelayReason.VERSION -> stringResource(R.string.relay_hint_version)
+        RelayReason.FULL -> stringResource(R.string.relay_hint_full)
     }
 }
 

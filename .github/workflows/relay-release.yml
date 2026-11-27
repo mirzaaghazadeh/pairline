@@ -1,0 +1,132 @@
+name: Relay release
+
+# A relay-v* tag (for example relay-v1.0.0) publishes Pairline's relay (D-106): Linux binaries for amd64 and arm64
+# with their SHA-256 sums and signed build provenance on a GitHub release, and a multi-architecture image on GitHub's
+# container registry (ghcr.io/<owner>/pairline-relay:<version> and :latest) with provenance pushed next to it.
+# Both are built reproducibly (no cgo, no paths, no build id), so anyone with the same Go version gets the same bytes.
+
+on:
+  push:
+    tags: ['relay-v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: relay-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GO_VERSION: '1.27.1'
+
+jobs:
+  binaries:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write # the GitHub release
+      id-token: write # sign the provenance attestation (Sigstore)
+      attestations: write # store the attestation
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+
+      - name: Version from the tag
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="${TAG#relay-v}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo "::error::Tag $TAG isn't relay-vX.Y.Z"; exit 1; fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Tests
+        working-directory: relay
+        run: go test -race -count=1 ./...
+
+      - name: Build, twice with separate caches, and compare
+        working-directory: relay
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/dist"
+          for arch in amd64 arm64; do
+            out="$RUNNER_TEMP/dist/pairline-relay-linux-$arch"
+            for target in "$out" "$RUNNER_TEMP/check-$arch"; do
+              GOCACHE="$(mktemp -d)" CGO_ENABLED=0 GOOS=linux GOARCH="$arch" go build -trimpath -buildvcs=false \
+                -ldflags "-s -w -buildid= -X main.version=$VERSION" -o "$target" .
+            done
+            cmp "$out" "$RUNNER_TEMP/check-$arch"
+          done
+          cp pairline-relay.service "$RUNNER_TEMP/dist/"
+          (cd "$RUNNER_TEMP/dist" && sha256sum pairline-relay-linux-* > SHA256SUMS && cat SHA256SUMS)
+
+      - name: Attest build provenance
+        id: attest
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ runner.temp }}/dist/pairline-relay-linux-*
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          REPO: ${{ github.repository }}
+        run: |
+          cp "$BUNDLE" "$RUNNER_TEMP/dist/pairline-relay-$VERSION.intoto.jsonl"
+          cat > "$RUNNER_TEMP/notes.md" <<EOF
+          Pairline relay $VERSION for "Your own server" (D-106). Setup: relay/README.md.
+
+          - Docker: \`ghcr.io/${REPO%%/*}/pairline-relay:$VERSION\` (amd64 and arm64)
+          - Binaries: \`pairline-relay-linux-amd64\`, \`pairline-relay-linux-arm64\`, with \`SHA256SUMS\`
+          - Check one: \`gh attestation verify pairline-relay-linux-amd64 --repo $REPO\`
+          - Rebuild it yourself with Go $GO_VERSION: \`CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.version=$VERSION" .\` in relay/, then compare the SHA-256
+          EOF
+          gh release create "$TAG" --repo "$REPO" --title "Pairline relay $VERSION" --notes-file "$RUNNER_TEMP/notes.md" \
+            "$RUNNER_TEMP"/dist/*
+
+  image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write # push to ghcr.io
+      id-token: write # sign the provenance attestation (Sigstore)
+      attestations: write # store the attestation
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build and push (amd64 and arm64, cross-compiled without emulation)
+        id: push
+        env:
+          TAG: ${{ github.ref_name }}
+          OWNER: ${{ github.repository_owner }}
+          ACTOR: ${{ github.actor }}
+          TOKEN: ${{ github.token }}
+        run: |
+          version="${TAG#relay-v}"
+          image="ghcr.io/${OWNER,,}/pairline-relay"
+          echo "$TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+          docker buildx create --use --driver docker-container
+          docker buildx build relay/ --platform linux/amd64,linux/arm64 --build-arg VERSION="$version" \
+            --provenance=false --sbom=false \
+            --tag "$image:$version" --tag "$image:latest" --push --metadata-file "$RUNNER_TEMP/meta.json"
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          echo "digest=$(jq -r '."containerimage.digest"' "$RUNNER_TEMP/meta.json")" >> "$GITHUB_OUTPUT"
+          # Still logged in: the next step pushes the provenance next to the image. The runner is thrown away after.
+
+      - name: Attest the image's provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-name: ${{ steps.push.outputs.image }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

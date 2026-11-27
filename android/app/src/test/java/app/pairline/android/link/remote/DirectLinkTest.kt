@@ -125,10 +125,37 @@ class DirectLinkTest {
         assertEquals("81.2.69.160:47830", addr.getString("v4"))
         assertTrue(addr.isNull("v6") && addr.has("v6"))
         val state = sent[1]
-        assertEquals(setOf("t", "direct", "reason"), state.keys().asSequence().toSet())
+        assertEquals(setOf("t", "direct", "reason", "relay", "relayReason"), state.keys().asSequence().toSet())
         assertEquals("remote.state", state.getString("t"))
         assertEquals("open", state.getString("direct"))
         assertTrue(state.isNull("reason") && state.has("reason"))
+        // No own server set (D-106).
+        assertTrue(state.isNull("relay") && state.isNull("relayReason"))
+    }
+
+    /** The user's own server (D-106) changing state sends `remote.state` again, even though the router's is the same. */
+    @Test
+    fun theOwnServersStateGoesOutWithRemoteState() {
+        router.natPmp = false
+        on()
+        direct.step()
+        taken()
+        direct.relayChanged("down", null)
+        direct.step()
+        direct.relayChanged("up", null)
+        direct.step()
+        direct.relayChanged("up", null) // unchanged: nothing more
+        direct.step()
+        direct.relayChanged("down", "key")
+        direct.step()
+        val states = sent.filter { it.type == Msg.REMOTE_STATE }.map {
+            "${it.getString("direct")} ${it.opt("reason")} ${it.opt("relay")} ${it.opt("relayReason")}"
+        }
+        assertEquals(
+            listOf("blocked no_mapping down null", "blocked no_mapping up null", "blocked no_mapping down key"),
+            states,
+        )
+        assertTrue(sent.none { it.type == Msg.REMOTE_ADDR })
     }
 
     @Test

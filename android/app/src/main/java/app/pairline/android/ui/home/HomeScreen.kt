@@ -62,6 +62,7 @@ import app.pairline.android.link.WifiLinkStatus
 import app.pairline.android.link.remote.DirectStatus
 import app.pairline.android.link.remote.RemoteStatus
 import app.pairline.android.link.remote.RemoteStore
+import app.pairline.android.link.remote.relay.RelayStatus
 import app.pairline.android.protocol.Caps
 import app.pairline.android.telephony.Perms
 import app.pairline.android.telephony.SimSnapshot
@@ -89,6 +90,7 @@ import app.pairline.android.ui.components.toneColors
 import app.pairline.android.ui.refreshTick
 import app.pairline.android.ui.remote.DirectStatusLine
 import app.pairline.android.ui.remote.HintText
+import app.pairline.android.ui.remote.RelayStatusLine
 import app.pairline.android.ui.remote.directHint
 import app.pairline.android.ui.rememberPermissionRequester
 import app.pairline.android.ui.update.UpdateBanner
@@ -142,6 +144,9 @@ fun HomeScreen(navigate: (Route) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             LinkCard(link, paired, prefsTick, now, navigate, onAllowBluetooth = { requestPermission(PermissionGroup.BLUETOOTH) })
+
+            // Calls can play on the iPhone once Talk on iPhone is set up here (D-107).
+            if (paired) TalkSetupCard(onSetUp = { navigate(Route.Talk) })
 
             UpdateBanner()
 
@@ -298,7 +303,8 @@ private fun LinkCard(
                 CloudLine(remote, viaIcloud, prefs.peerProto, onOpen = { navigate(Route.CloudMode) })
             }
             val direct by AppGraph.direct.status.collectAsState()
-            if (paired && direct.active) DirectLine(direct, onDetails = { navigate(Route.CloudMode) })
+            val relay by AppGraph.relay.status.collectAsState()
+            if (paired && direct.active) DirectLine(direct, relay, onDetails = { navigate(Route.CloudMode) })
             when {
                 link.bluetooth == BluetoothStatus.OFF ->
                     PrimaryButton(stringResource(R.string.action_turn_on_bt), { SystemActions.requestBluetoothOn(context) }, icon = PIcons.Bluetooth)
@@ -362,12 +368,51 @@ private fun CloudLine(remote: RemoteStatus, viaIcloud: Boolean, peerProto: Int, 
  * next step. The router details wait on the Cloud mode screen (D-099).
  */
 @Composable
-private fun DirectLine(s: DirectStatus, onDetails: () -> Unit) {
+private fun DirectLine(s: DirectStatus, relay: RelayStatus, onDetails: () -> Unit) {
+    // Through the user's own server (D-106) calls work whatever the router does.
+    if (relay.up) return RelayStatusLine(relay)
     DirectStatusLine(s)
+    if (relay.set) RelayStatusLine(relay)
     val hint = directHint(s, detailed = false) ?: return
     HintText(hint)
     TextButton(onClick = onDetails, modifier = Modifier.padding(start = 14.dp)) {
         Text(stringResource(R.string.action_details))
+    }
+}
+
+/**
+ * "Hear calls on your iPhone" (D-107): while Talk on iPhone isn't set up on this Android 11+ phone and its switch is on
+ * (it is by default), at the top of the home screen. "Not now" turns the switch off, which hides the card; the iPhone
+ * can still ask again.
+ */
+@Composable
+private fun TalkSetupCard(onSetUp: () -> Unit) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+    val talk = app.pairline.android.ui.talk.rememberTalkStatus()
+    val prefsTick by AppGraph.prefs.changes.collectAsState()
+    val on = remember(prefsTick) { AppGraph.prefs.talkOnIphone }
+    if (talk.state != app.pairline.android.privileged.TalkStatus.SETUP || !on) return
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = toneColors(Tone.GOOD).container.copy(alpha = 0.55f)),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(stringResource(R.string.talk_card_title), style = MaterialTheme.typography.titleLarge)
+            Text(
+                stringResource(R.string.talk_card_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            PrimaryButton(stringResource(R.string.talk_card_set_up), onSetUp, icon = PIcons.Phone)
+            TextButton(
+                onClick = {
+                    AppGraph.prefs.talkOnIphone = false
+                    AppGraph.privileged.refresh()
+                },
+                modifier = Modifier.align(Alignment.End),
+            ) { Text(stringResource(R.string.talk_card_later)) }
+        }
     }
 }
 
@@ -600,6 +645,7 @@ private fun CapabilitiesCard(caps: List<String>, onFix: (Fix) -> Unit) {
     val prefsTick by AppGraph.prefs.changes.collectAsState()
     val talkOn = remember(prefsTick) { AppGraph.prefs.talkOnIphone }
     val helper by AppGraph.privileged.state.collectAsState()
+    val talk = app.pairline.android.ui.talk.rememberTalkStatus()
     SectionCard(title = stringResource(R.string.home_supports), contentPadding = PaddingValues(vertical = 4.dp)) {
         features.forEachIndexed { i, f ->
             if (i > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp))
@@ -614,8 +660,10 @@ private fun CapabilitiesCard(caps: List<String>, onFix: (Fix) -> Unit) {
                 subtitle = when {
                     ok -> null
                     nextCall -> stringResource(R.string.cap_dtmf_next_call)
-                    // Turned on but not working, e.g. the helper stopped after a restart: say what's missing.
-                    f.cap == Caps.CALL_MEDIA && talkSupported && talkOn -> app.pairline.android.ui.talk.talkSummary()
+                    // Set up but not working, e.g. the helper stopped after a restart: say what's missing and why
+                    // (D-107). Not set up yet: the description and "Set up".
+                    f.cap == Caps.CALL_MEDIA && talkSupported && talk.state != app.pairline.android.privileged.TalkStatus.SETUP ->
+                        stringResource(app.pairline.android.ui.talk.talkSummaryRes(talk))
                     else -> stringResource(f.missing)
                 },
                 icon = if (ok) PIcons.CheckCircle else if (needsFix) PIcons.Warning else PIcons.Info,

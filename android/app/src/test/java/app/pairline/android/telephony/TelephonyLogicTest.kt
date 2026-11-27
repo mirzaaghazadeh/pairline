@@ -54,7 +54,7 @@ class TelephonyLogicTest {
             listOf(
                 Caps.SMS_RECEIVE, Caps.SMS_SEND, Caps.SMS_HISTORY, Caps.SMS_SCHEDULE, Caps.MMS, Caps.CALL_OBSERVE,
                 Caps.CALL_CONTROL, Caps.CALL_DIAL, Caps.CALL_VOICEMAIL, Caps.CONTACTS, Caps.CALLLOG, Caps.USSD,
-                Caps.CALLLOG_DELETE, Caps.BLOCK,
+                Caps.CALLLOG_DELETE, Caps.BLOCK, Caps.RELAY,
             ),
             caps(),
         )
@@ -80,13 +80,13 @@ class TelephonyLogicTest {
         assertEquals(false, Caps.SMS_READ in caps(granted = everything - Manifest.permission.READ_SMS, smsWrite = true))
         assertEquals(listOf(false, true), listOf(Caps.CALL_HOLD in caps(), Caps.CALL_HOLD in caps(inCall = true)))
         assertEquals(listOf(false, true), listOf(Caps.CONTACTS_EDIT in caps(), Caps.CONTACTS_EDIT in caps(add = true)))
-        assertEquals(listOf(Caps.PHONE_FIND, Caps.PHONE_RINGER, Caps.BLOCK), caps(granted = emptySet(), tools = true))
+        assertEquals(listOf(Caps.PHONE_FIND, Caps.PHONE_RINGER, Caps.BLOCK, Caps.RELAY), caps(granted = emptySet(), tools = true))
     }
 
     @Test
     fun netSwitchFollowsTheHelperOnly() {
         // No permission or SIM needed: the helper does the switching (D-073).
-        assertEquals(listOf(Caps.NET_SWITCH, Caps.BLOCK), caps(granted = emptySet(), switches = true))
+        assertEquals(listOf(Caps.NET_SWITCH, Caps.BLOCK, Caps.RELAY), caps(granted = emptySet(), switches = true))
         assertEquals(false, Caps.NET_SWITCH in caps())
     }
 
@@ -101,8 +101,8 @@ class TelephonyLogicTest {
 
     @Test
     fun nothingGranted() {
-        // The block list needs no permission.
-        assertEquals(listOf(Caps.BLOCK), caps(granted = emptySet()))
+        // The block list needs no permission, and the own-server support (D-106) is always there.
+        assertEquals(listOf(Caps.BLOCK, Caps.RELAY), caps(granted = emptySet()))
     }
 
     @Test
@@ -122,7 +122,7 @@ class TelephonyLogicTest {
     @Test
     fun noTelephonyHardware() {
         assertEquals(
-            listOf(Caps.CONTACTS, Caps.CALLLOG, Caps.CALLLOG_DELETE, Caps.BLOCK),
+            listOf(Caps.CONTACTS, Caps.CALLLOG, Caps.CALLLOG_DELETE, Caps.BLOCK, Caps.RELAY),
             caps(messaging = false, calling = false),
         )
     }
@@ -130,7 +130,7 @@ class TelephonyLogicTest {
     @Test
     fun callControlNeedsPhoneStateToo() {
         val c = caps(granted = setOf(Manifest.permission.ANSWER_PHONE_CALLS))
-        assertEquals(listOf(Caps.BLOCK), c)
+        assertEquals(listOf(Caps.BLOCK, Caps.RELAY), c)
     }
 
     // ---- Block list (D-043) ----

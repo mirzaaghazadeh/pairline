@@ -2,6 +2,8 @@ package app.pairline.android
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
+import app.pairline.android.privileged.TalkDefault
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -85,10 +87,37 @@ class AppPrefs(context: Context) {
         get() = prefs.getLong(COMPANION_BOUND, 0)
         set(value) = edit { putLong(COMPANION_BOUND, value) }
 
-    /** "Talk on iPhone" is turned on: relay call audio through Pairline's helper when the iPhone asks (D-047, D-054). */
+    /**
+     * "Talk on iPhone" is turned on: relay call audio through Pairline's helper when the iPhone asks (D-047, D-054).
+     * On by default on Android 11+ (D-107); nothing happens until the user does the one-time setup, and
+     * [migrateTalkDefault] keeps it off for a phone that was set up with the switch left off.
+     */
     var talkOnIphone: Boolean
-        get() = prefs.getBoolean(TALK_ON_IPHONE, false)
+        get() = prefs.getBoolean(TALK_ON_IPHONE, TalkDefault.on(Build.VERSION.SDK_INT))
         set(value) = edit { putBoolean(TALK_ON_IPHONE, value) }
+
+    /**
+     * Talk on iPhone was set up once on this phone (paired with Wireless debugging, or its helper ran), so a lost
+     * pairing reads as "pair again" on the iPhone (D-107). Cleared by "Forget pairing".
+     */
+    var talkSetUpOnce: Boolean
+        get() = prefs.getBoolean(TALK_SET_UP_ONCE, false)
+        set(value) = edit { putBoolean(TALK_SET_UP_ONCE, value) }
+
+    /**
+     * Once, at the first start of a version with D-107: a phone already paired (or in root mode) whose switch was
+     * never touched keeps Talk on iPhone off, as it was before the default changed.
+     */
+    fun migrateTalkDefault(paired: Boolean, rootMode: Boolean) {
+        if (prefs.getBoolean(TALK_DEFAULT_MIGRATED, false)) return
+        val stored = if (prefs.contains(TALK_ON_IPHONE)) prefs.getBoolean(TALK_ON_IPHONE, false) else null
+        val keep = TalkDefault.migrate(stored, paired, rootMode)
+        edit {
+            if (keep != null) putBoolean(TALK_ON_IPHONE, keep)
+            if (paired) putBoolean(TALK_SET_UP_ONCE, true)
+            putBoolean(TALK_DEFAULT_MIGRATED, true)
+        }
+    }
 
     /** Settings › Advanced › Root mode (D-075): start the helper through `su` instead of Wireless debugging. */
     var rootMode: Boolean
@@ -214,6 +243,8 @@ class AppPrefs(context: Context) {
         const val LAST_SEEN = "last_seen"
         const val COMPANION_BOUND = "companion_bound_at"
         const val TALK_ON_IPHONE = "talk_on_iphone"
+        const val TALK_SET_UP_ONCE = "talk_set_up_once"
+        const val TALK_DEFAULT_MIGRATED = "talk_default_migrated"
         const val ROOT_MODE = "root_mode"
         const val MIRROR_APPS = "mirror_apps"
         const val BLUETOOTH_RESTART = "bluetooth_restart"

@@ -59,6 +59,28 @@ Wi-Fi link (M5; connect to the bridge's Wi-Fi port 47820 instead of the debug po
       adb shell content query --uri 'content://app.pairline.android.debug.devtools/send-test-file?size=5000000'
       fake_remote.py --port 47820 session receive-file --save-dir /tmp --expect file.received
 
+Cloud mode and the user's own server (D-106; a debug bridge, which takes the public backend in Development):
+  remote-on                       remote.config on, with a fake web auth token (iCloud checks then fail on the
+                                  bridge, which is fine for testing the relay)
+  remote-off                      remote.config off (the bridge forgets its relay too)
+  relay-set --relay LINK [--rendezvous HEX] [--relay-bridge-host HOST]
+                                  remote.relay with the relay's link; a random rendezvous id is made and printed
+                                  if none is given. --relay-bridge-host replaces the link's host for the bridge
+                                  (the emulator reaches the Mac at 10.0.2.2)
+  relay-clear                     remote.relay null
+
+  --via-relay --relay LINK --rendezvous HEX   (session only) reach the bridge through the relay instead of
+                                  --host/--port: TLS pinned to the link's certificate, the 54-byte preamble as
+                                  role R, then the direct connection's session (the bridge must be waiting there)
+
+      fake_remote.py session remote-on relay-set --relay 'pairline-relay://127.0.0.1:47840?v=1&fp=…&k=…' \\
+          --relay-bridge-host 10.0.2.2 listen --seconds 5 --expect remote.state
+      fake_remote.py session --via-relay --relay '…' --rendezvous <printed id> status --expect status
+
+Talk on iPhone (D-107; `status` also prints status.talk):
+  talk-setup                      talk.setup: the bridge turns Talk on iPhone on and shows its setup screen
+                                  (or a notification that opens it); `unsupported` on Android 10 or older
+
 The bridge's pings are always answered with pong. --expect TYPE (repeatable) fails the run if no
 message of that type arrived from the bridge. The last line is always PASS or FAIL.
 
@@ -91,7 +113,9 @@ import hmac
 import json
 import os
 import re
+import secrets
 import socket
+import ssl
 import struct
 import sys
 import time
@@ -650,10 +674,104 @@ class State:
 
 
 # ---------------------------------------------------------------------------------------------
+# The user's own server (relay, D-106; docs/PROTOCOL.md "Your own server")
+
+RELAY_MAGIC = b"PLRY"
+RELAY_VERSION = 0x01
+RELAY_STATUS = {0x00: "keep-alive", 0x01: "joined", 0x02: "no bridge is waiting there with this rendezvous id",
+                0x03: "wrong access key", 0x04: "unsupported version or malformed preamble",
+                0x05: "the relay is full"}
+RELAY_JOIN_TIMEOUT = 15.0
+
+
+class RelayLink(NamedTuple):
+    host: str
+    port: int
+    fp: bytes
+    key: bytes
+
+
+def parse_relay_link(link: str) -> RelayLink:
+    """pairline-relay://host:port?v=1&fp=…&k=… (checked loosely: a dev tool, not the apps' parser)."""
+    u = urllib.parse.urlsplit(link.strip())
+    if u.scheme != "pairline-relay":
+        raise ValueError("not a pairline-relay:// link")
+    if u.username or u.password or u.fragment or u.path not in ("", "/"):
+        raise ValueError("the link has user info, a path or a fragment")
+    try:
+        port = u.port
+    except ValueError:
+        raise ValueError("bad port") from None
+    if not u.hostname or not port:
+        raise ValueError("the link needs a host and a port")
+    q = urllib.parse.parse_qs(u.query, keep_blank_values=True)
+
+    def one(name: str) -> str:
+        values = q.get(name, [])
+        if len(values) != 1:
+            raise ValueError(f"{name} must appear exactly once")
+        return values[0]
+
+    if one("v") != "1":
+        raise ValueError("only v=1 links")
+    fp, key = b64u_decode(one("fp")), b64u_decode(one("k"))
+    if len(fp) != 32 or len(key) != 32:
+        raise ValueError("fp and k must be 32 bytes each")
+    return RelayLink(u.hostname.rstrip("."), port, fp, key)
+
+
+def relay_preamble(role: int, key: bytes, rendezvous: bytes) -> bytes:
+    return RELAY_MAGIC + bytes([RELAY_VERSION, role]) + key + rendezvous
+
+
+def relay_connect(relay: RelayLink, rendezvous: bytes, timeout: float) -> socket.socket:
+    """TCP and TLS to the relay, pinned to the link's certificate, then the preamble as R; returns once joined."""
+    try:
+        raw = socket.create_connection((relay.host, relay.port), timeout=timeout)
+    except OSError as e:
+        raise LinkError(f"cannot reach the relay at {relay.host}:{relay.port}: {e.strerror or e}") from None
+    raw.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    ctx.minimum_version = ssl.TLSVersion.TLSv1_2
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE  # the pin below is the whole trust (the relay's certificate is self-signed)
+    try:
+        tls = ctx.wrap_socket(raw)
+    except (OSError, ssl.SSLError) as e:
+        raw.close()
+        raise LinkError(f"TLS to the relay failed: {e}") from None
+    der = tls.getpeercert(binary_form=True)
+    if not der or not hmac.compare_digest(hashlib.sha256(der).digest(), relay.fp):
+        tls.close()
+        raise LinkError("the relay's certificate doesn't match the link (fp)")
+    tls.sendall(relay_preamble(ROLE_R, relay.key, rendezvous))
+    tls.settimeout(RELAY_JOIN_TIMEOUT)
+    try:
+        status = tls.recv(1)
+    except socket.timeout:
+        tls.close()
+        raise LinkError(f"the relay didn't join us to the bridge within {RELAY_JOIN_TIMEOUT:g}s") from None
+    if not status:
+        tls.close()
+        raise LinkError("the relay closed the connection")
+    if status[0] != 0x01:
+        tls.close()
+        raise LinkError(f"relay: {RELAY_STATUS.get(status[0], f'status 0x{status[0]:02x}')}")
+    return tls
+
+
+# ---------------------------------------------------------------------------------------------
 # Link: TCP frames
 
 class Link:
-    def __init__(self, host: str, port: int, timeout: float) -> None:
+    def __init__(self, host: str, port: int, timeout: float, relay: RelayLink | None = None,
+                 rendezvous: bytes | None = None) -> None:
+        if relay is not None and rendezvous is not None:
+            # Through the user's own server: the direct connection's framing inside the relay's TLS.
+            self.sock = relay_connect(relay, rendezvous, timeout)
+            self.sock.settimeout(timeout)
+            self.buf = bytearray()
+            return
         try:
             self.sock = socket.create_connection((host, port), timeout=timeout)
         except OSError as e:
@@ -977,6 +1095,9 @@ def describe_status(m: Msg) -> str:
                          + (" roaming" if sim.get("roaming") else ""))
     if isinstance(m.get("caps"), list):
         parts.append("caps: " + (", ".join(map(str, m["caps"])) or "none"))
+    talk = m.get("talk")
+    if isinstance(talk, dict):  # D-107: Talk on iPhone's state
+        parts.append(f"talk: {talk.get('state')}" + (f" ({talk['reason']})" if talk.get("reason") else ""))
     return "status: " + ("; ".join(parts) or "(no fields)")
 
 
@@ -1206,6 +1327,41 @@ def act_unpair(s: Session, a: argparse.Namespace) -> None:
     s.out.note(f"unpaired; removed the pinned bridge from {s.state.path}")
 
 
+def act_remote_on(s: Session, a: argparse.Namespace) -> None:
+    """remote.config on with random mailboxes and a fake token: a debug bridge takes it (iCloud then refuses)."""
+    mb = {"b": secrets.token_hex(16), "a": secrets.token_hex(16), "q": secrets.token_hex(16)}
+    reply = s.call("remote.config", on=True, backend="public", env="development", token="fake-web-auth-token", mb=mb)
+    if check_reply(s, reply, "ok"):
+        s.out.note("Cloud mode is on on the bridge (with a token iCloud will refuse)")
+
+
+def act_remote_off(s: Session, a: argparse.Namespace) -> None:
+    check_reply(s, s.call("remote.config", on=False), "ok")
+
+
+def act_relay_set(s: Session, a: argparse.Namespace) -> None:
+    """remote.relay with the relay's link (D-106); prints the rendezvous id to pass as --rendezvous later."""
+    relay = parse_relay_link(a.relay)
+    rendezvous = a.rendezvous or secrets.token_hex(16)
+    if not a.rendezvous:
+        s.out.note(f"rendezvous id (pass it as --rendezvous): {rendezvous}")
+    host = a.relay_bridge_host or relay.host
+    reply = s.call("remote.relay", relay={"host": host, "port": relay.port, "fp": b64u(relay.fp),
+                                          "k": b64u(relay.key), "rv": rendezvous})
+    if check_reply(s, reply, "ok"):
+        s.out.note("the bridge waits at the relay now (its remote.state says relay: up once it's there)")
+
+
+def act_relay_clear(s: Session, a: argparse.Namespace) -> None:
+    check_reply(s, s.call("remote.relay", relay=None), "ok")
+
+
+def act_talk_setup(s: Session, a: argparse.Namespace) -> None:
+    """talk.setup (D-107): the bridge turns Talk on iPhone on and shows its setup screen or a notification."""
+    if check_reply(s, s.call("talk.setup"), "ok"):
+        s.out.note("the bridge shows Talk on iPhone's setup (on screen, or as a notification)")
+
+
 class ReplayWindow:
     """The media channel's 64-record sliding replay window (PROTOCOL.md, "Records")."""
 
@@ -1412,10 +1568,13 @@ ACTIONS: dict[str, Callable[[Session, argparse.Namespace], None]] = {
     "calllog-delete": act_calllog_delete, "blocks": act_blocks, "block": act_block, "unblock": act_unblock,
     "ussd": act_ussd, "listen": act_listen, "unpair": act_unpair, "all": act_all,
     "media": act_media, "send-file": act_send_file, "receive-file": act_receive_file,
+    "remote-on": act_remote_on, "remote-off": act_remote_off, "relay-set": act_relay_set,
+    "relay-clear": act_relay_clear, "talk-setup": act_talk_setup,
 }
 REQUIRED = {"send-sms": ("to", "body"), "dial": ("number",), "answer": ("call",), "reject": ("call",),
             "end": ("call",), "dtmf": ("call", "digit"), "audio": ("call",), "contacts-add": ("name", "number"),
-            "ussd": ("code",), "send-file": ("file",), "block": ("number",), "unblock": ("number",)}
+            "ussd": ("code",), "send-file": ("file",), "block": ("number",), "unblock": ("number",),
+            "relay-set": ("relay",)}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1457,6 +1616,12 @@ def build_parser() -> argparse.ArgumentParser:
                         "bridge says \"iPhone\" as in the store screenshots")
     g.add_argument("--no-files", action="store_true",
                    help="leave `files` out of device.info's caps (the bridge then shows no Files card)")
+    g.add_argument("--relay", metavar="LINK", help="the user's own server: its pairline-relay://… link (D-106)")
+    g.add_argument("--rendezvous", metavar="HEX", help="the rendezvous id at the relay (32 lowercase hex digits)")
+    g.add_argument("--relay-bridge-host", metavar="HOST",
+                   help="relay-set: the relay's host as the bridge reaches it (10.0.2.2 from the emulator)")
+    g.add_argument("--via-relay", action="store_true",
+                   help="session: reach the bridge through the relay (--relay, --rendezvous) instead of --host")
     g = p.add_argument_group("output and checks")
     g.add_argument("--pretty", action="store_true", help="pretty-print JSON messages")
     g.add_argument("--full", action="store_true", help="don't shorten long lists in the transcript")
@@ -1525,6 +1690,18 @@ def validate(a: argparse.Namespace) -> tuple[str, list[str], PairUri | None]:
             raise UsageError(f"bad pairing link: {e}") from None
     elif a.pair_uri:
         raise UsageError("--pair-uri is only for pair")
+    if a.relay:
+        try:
+            parse_relay_link(a.relay)
+        except ValueError as e:
+            raise UsageError(f"bad relay link: {e}") from None
+    if a.rendezvous is not None and not re.fullmatch(r"[0-9a-f]{32}", a.rendezvous):
+        raise UsageError("--rendezvous is 32 lowercase hex digits")
+    if a.via_relay:
+        if mode != "session":
+            raise UsageError("--via-relay is for session only: a bridge never pairs over the internet this way")
+        if not a.relay or not a.rendezvous:
+            raise UsageError("--via-relay needs --relay and --rendezvous")
     return mode, actions, uri
 
 
@@ -1539,8 +1716,13 @@ def run(a: argparse.Namespace, mode: str, actions: list[str], uri: PairUri | Non
         raise UsageError(not_paired)
     session: Session | None = None
     try:
-        out.note(f"connecting to {a.host}:{a.port}")
-        link = Link(a.host, a.port, a.timeout)
+        if a.via_relay:
+            relay = parse_relay_link(a.relay)
+            out.note(f"connecting through the relay at {relay.host}:{relay.port}")
+            link = Link(a.host, a.port, a.timeout, relay=relay, rendezvous=bytes.fromhex(a.rendezvous))
+        else:
+            out.note(f"connecting to {a.host}:{a.port}")
+            link = Link(a.host, a.port, a.timeout)
         try:
             out.note("connected")
             if uri is not None:

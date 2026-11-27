@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import app.pairline.android.AppGraph
 import app.pairline.android.audio.MediaChannelTransport
 import app.pairline.android.link.remote.DirectNetworkWatcher
+import app.pairline.android.link.remote.relay.RelayNetworkWatcher
 import app.pairline.android.link.wifi.HotspotState
 import app.pairline.android.link.wifi.WifiTransport
 import app.pairline.android.log.Log
@@ -41,6 +42,7 @@ class LinkService : Service() {
     private val advertisingTrouble = AdvertisingTrouble()
     private var wifi: WifiTransport? = null
     private var directWatcher: DirectNetworkWatcher? = null
+    private var relayWatcher: RelayNetworkWatcher? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun attachBaseContext(newBase: Context) {
@@ -66,8 +68,15 @@ class LinkService : Service() {
         // opened on the home router; closed and deleted when remote mode ends.
         graph.direct.start()
         directWatcher = DirectNetworkWatcher(this) { graph.direct.setNetwork(it) }.also { it.start() }
+        // The user's own server (D-106): while remote mode is on and one is set, a connection out to it waits for the
+        // iPhone, on any network; it moves to a new network at once.
+        graph.relay.start()
+        relayWatcher = RelayNetworkWatcher(this) { graph.relay.networkChanged() }.also { it.start() }
         scope.launch {
-            graph.remote.state.map { it.on }.distinctUntilChanged().collect { graph.direct.setActive(it) }
+            graph.remote.state.map { it.on }.distinctUntilChanged().collect {
+                graph.direct.setActive(it)
+                graph.relay.reconfigure()
+            }
         }
 
         val bleTransport = BleTransport(this, link, { graph.identity.deviceId }) { bt, advertising ->
@@ -202,6 +211,9 @@ class LinkService : Service() {
         wifi = null
         directWatcher?.stop()
         directWatcher = null
+        relayWatcher?.stop()
+        relayWatcher = null
+        graph.relay.stop()
         graph.direct.stop()
         graph.remote.stop()
         graph.link.stop()

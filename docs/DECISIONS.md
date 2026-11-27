@@ -1978,3 +1978,88 @@ what "NR NSA" means, and the lock screen and the Bridge tab disagreed about one 
 - All three now show one label, the one Android's status bar uses: "5G" for NR and NR NSA, "5G+" for NR+, "LTE+" for
   LTE-CA and LTE-A Pro, otherwise the generation from `net` (`SIMInfo.networkLabel`). The signal in dBm stays.
 - Nothing changes on the wire: the bridge still sends `rat`, and older iPhone builds keep showing it.
+
+### D-106 — Your own server: an optional relay the user runs, for calls from homes whose router lets nothing in (2026-11-27)
+
+The maintainer's idea: "users can use their own server … an alternative; users install our script on their server or
+run it with Docker." Cloud mode's direct connection (D-092) needs the home router to let a connection in, and nothing
+helps behind carrier-grade NAT (D-095), which most 4G/5G home routers and many fixed providers use; without the
+direct connection Cloud mode has texts and codes but no calls away from home.
+
+- **What it is:** a small relay (`relay/`, Go, standard library only, no third-party modules) that the user runs on a
+  server they rent or own, with Docker or as one binary. Both phones connect **out** to it and it joins the two
+  connections byte for byte (PROTOCOL.md, "Your own server (relay, D-106)"). The session inside is the direct
+  connection's, end to end between the pinned keys, so the relay sees only TLS-wrapped ciphertext, IP addresses and
+  timing. No port forwarding, UPnP, public address or DDNS at home.
+- **What it isn't:** a replacement for iCloud. Only Apple can wake a locked iPhone, and Apple's pushes need Pairline's
+  own push key, which can't be handed to users. So iCloud stays Cloud mode's doorbell and mailbox, and the relay
+  replaces only the router part (the direct connection). A Pairline-run push relay would be a Pairline backend
+  (AGENTS.md rule 2) and isn't planned. "Your own server" is a choice inside Cloud mode and comes with it (the Cloud
+  mode add-on, D-093); it adds no purchase.
+- **Why Go:** a static binary for amd64 and arm64 (a VPS, a Raspberry Pi, a NAS) and a Docker image of a few MB built
+  `FROM scratch`; TCP, TLS and concurrency are in the standard library, so the whole server stays auditable with zero
+  dependencies; `CGO_ENABLED=0 go build -trimpath` builds reproducibly. Rust would need tokio and rustls with dozens of
+  crates for the same job, and the relay does no work where its speed would show.
+- **Trust without a domain:** the relay makes its own P-256 key and self-signed certificate on first start, and its
+  link carries the certificate's SHA-256, which both phones pin; a 32-byte access key in the link keeps strangers from
+  using it. The user scans the QR code the relay prints (or pastes its link) on the iPhone, which hands it to the
+  bridge (`remote.relay`) over the encrypted link or the mailbox. By default it listens on 443, so it looks like
+  HTTPS to networks that block other ports.
+- **Rendezvous:** the iPhone picks a random 16-byte rendezvous id each time a server is set, so one server can serve
+  several pairs of phones. The bridge keeps one waiting connection there, on any network; the relay keeps it alive
+  every 30 s and joins the iPhone to it. The iPhone tries the relay first when the bridge's router let nothing in.
+- **Privacy:** a new outside party chosen by the user, like D-095's DDNS name: the user's server, and its provider,
+  see both phones' IP addresses and when and how much they talk, never what. PRIVACY.md lists it. The relay logs
+  counts only, never addresses, keys or ids, and keeps nothing on disk but its own key, certificate and access key.
+  The phones never log the link.
+- **The apps:** Settings › Connection › Advanced › Your own server on the iPhone, under its Cloud mode heading (D-099):
+  scan or paste, status, remove, and a setup guide, also linked from the router guide, Port forwarding and the home
+  check when the answer is carrier-grade NAT; the bridge shows whether it's connected there. All four languages.
+  `relay/README.md` is the full guide.
+- **Releases:** `.github/workflows/relay.yml` tests and builds on every change under `relay/`, and a `relay-v*` tag
+  publishes the binaries and a multi-architecture image on GitHub's container registry with signed build provenance,
+  as for the APKs (D-100). The image is public (the maintainer's choice, 2026-11-27), so a server, or Coolify, needs
+  only `relay/docker-compose.yml`, which pulls it; it publishes port 47840 straight to the server, because a hosting
+  panel's own proxy (Coolify's Traefik on 80 and 443) would show the phones another certificate. The image checks
+  its own health (`pairline-relay healthcheck`), since it has no shell. A domain is a plain DNS record pointing at the
+  server (Cloudflare: DNS only) used as `RELAY_ADDRESS`, with Coolify's Domains field left empty: tested on Coolify
+  (the relay's own certificate on 47840, a wrong key answered `0x03`). A second file that had Coolify's Traefik pass
+  TLS through by SNI on 443 was dropped: Coolify didn't route it, and
+  a domain in Coolify's Domains field turns Traefik into a web proxy with its own certificate, which can't carry the
+  relay. `PAIRLINE_RELAY_BEHIND_PROXY` stays for a TCP proxy that passes TLS through (limits per address off). Working
+  with a domain in a hosting panel's Domains field, or behind Cloudflare's proxy, would need the relay over
+  WebSocket with the certificate checked the usual way; not built.
+
+### D-107 — Talk on iPhone is on by default, its state reaches the iPhone, and both apps say what's missing (2026-11-27)
+
+The maintainer, after a test call stayed on the Android phone with Talk on iPhone not set up there, and neither app
+said so: "when it's eligible for calls on the iPhone, turn it on automatically, and if it needs something or failed,
+show the user." Until now
+Talk on iPhone was off until the user found it on the bridge, and the iPhone only listed "Hear calls on iPhone" as a
+missing capability.
+
+- **What can't be automatic:** the one-time setup. Android lets no app turn on Developer options or Wireless debugging
+  or pair with it by itself (before the helper runs, Pairline has no way to), and AGENTS.md rule 5 keeps Pairline to
+  opening those screens. Root mode (D-075) stays the user's choice in Settings › Advanced. Everything after the setup
+  already runs by itself (D-059).
+- **On by default:** the Talk on iPhone switch starts on, on Android 11 and later. A phone that already paired
+  Pairline with Wireless debugging and left the switch off keeps it off (stored as off when the app first runs this
+  version), so D-059's turning debugging back on still happens only after the user set it up with the switch on.
+  Turning it off stays the user's choice and is never undone, except by `talk.setup` from the iPhone, which is the
+  user asking.
+- **The state goes to the iPhone:** `status.talk` (PROTOCOL.md "Talk on iPhone's state"): ready, starting, setup, off,
+  waiting (with why: Wi-Fi, debugging off, pairing lost, root refused) or failed, or unsupported (Android 10). Nothing
+  personal; fixed codes.
+- **The iPhone tells its user:** the Bridge tab says where calls play and, when they can't play on the iPhone, why and
+  what to do, with "Set up on Android phone" (`talk.setup`) where a step is missing; a call whose voice stays on the
+  Android phone says why on the call screen, with the same button. A one-time prompt after pairing offers it while the
+  state is `setup`.
+- **The bridge tells its user:** a card at the top of its home screen while the state is `setup` and an iPhone is
+  paired, with "Set up (about 2 minutes)" and "Not now" (which turns the switch off and hides the card until the
+  iPhone asks again), and the notification that `talk.setup` shows on the existing Talk on iPhone channel, which opens
+  the setup screen (at once when the app is open). Its failures already show there and in the call (D-056); the
+  capability row and Settings now name the reason too. "Set up once" is remembered (`talkSetUpOnce`) from pairing or
+  the first time the helper runs, until Forget pairing, so a lost pairing reads `failed` / `pairing`, not `setup`.
+- **The iPhone's prompt** is an alert once per paired bridge (remembered in its preferences by the bridge's device
+  id, only after the user answers), never in demo mode, during pairing or during a call.
+- All four languages; PROTOCOL.md (`status.talk`, `talk.setup`); no new permission, data flow or dependency.

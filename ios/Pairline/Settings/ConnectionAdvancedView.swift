@@ -62,6 +62,15 @@ struct ConnectionAdvancedView: View {
                                 Image(systemName: "wrench.and.screwdriver")
                             }
                         }
+                        NavigationLink {
+                            OwnServerGuideView()
+                        } label: {
+                            Label {
+                                Text("Set up your own server", tableName: "RemoteMode")
+                            } icon: {
+                                Image(systemName: "server.rack")
+                            }
+                        }
                     } header: {
                         Text("Cloud mode", tableName: "RemoteMode")
                     } footer: {

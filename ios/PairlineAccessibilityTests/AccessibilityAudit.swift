@@ -66,6 +66,14 @@ final class AccessibilityAudit: XCTestCase {
                path: ["Advanced", "Allow calls from far away"]),
         Screen(name: "help-ways", args: ["-PairlineDemo", "-PairlineTab", "settings"],
                path: ["Help center", "Nearby or Cloud mode?"]),
+        // Your own server (D-106): the guide from Help and from Advanced; the live screen needs a paired Android phone,
+        // so in demo mode it skips like the other live Cloud mode rows.
+        Screen(name: "own-server-guide", args: ["-PairlineDemo", "-PairlineTab", "settings"],
+               path: ["Help center", "Set up your own server"]),
+        Screen(name: "advanced-own-server-guide", args: ["-PairlineDemo", "-PairlineTab", "settings"],
+               path: ["Advanced", "Set up your own server"]),
+        Screen(name: "cloud-own-server", args: ["-PairlineDemo", "-PairlineTab", "settings"],
+               path: ["Advanced", "Your own server"]),
     ]
 
     func testAudit() throws {

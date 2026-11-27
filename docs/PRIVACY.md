@@ -15,6 +15,9 @@ Any change that adds or changes a data flow or permission must update this file 
   internet while apart, through your own iCloud: Apple
   stores records locked with keys only your two phones hold, and can see that your phones exchange them, not what
   they say. Details below.
+- **Your own server (optional, inside Cloud mode, D-106):** if you run Pairline's relay on a server of your own, your
+  phones also connect through it, so calls work away from home when your router lets nothing in. It only passes
+  along what your phones lock for each other; it sees their IP addresses and timing, never content.
 
 ## Data flows
 
@@ -104,6 +107,8 @@ Store builds once it ships there, use your private iCloud database.
 | Identity key and pinned bridge key (iPhone) | No | Now in a Keychain group shared with Pairline's own notification extension, so it can unseal records | As before |
 | The bridge's home internet addresses and port, for the direct connection | Yes, sealed for your iPhone (`remote.addr`, in the mailbox or over a session) | Your iPhone only | iPhone: a Keychain item on this device only; Android: a note of a permanent router mapping it made (so it can delete it after a crash) | Until remote mode is off or you forget the pairing |
 | That your bridge phone accepts connections on one TCP port of your home's internet address | Yes, visible to anyone who connects to that port | Your router opens the port when the bridge asks (NAT-PMP, PCP or UPnP, on your local network only). Whoever connects without your iPhone's key is disconnected within 10 seconds and learns nothing beyond the handshake's first message; at most 10 attempts a minute per address | Not stored | While remote mode is on and the bridge is on Wi-Fi; the mapping is removed when remote mode goes off or you forget the pairing |
+| Your own server's link (its address, port, certificate fingerprint and access key), only if you set one up (D-106) | Yes: you scan or paste it on the iPhone, which sends it to the bridge over the encrypted link or sealed in the mailbox, with a random rendezvous id | Your two phones only | iPhone: the Keychain, this device only; Android: app storage excluded from backups, encrypted with an Android Keystore key like the iCloud token | Until you remove the server, turn Cloud mode off (or set it up again) or forget the pairing. Never logged; diagnostics show only whether it's connected |
+| Your calls, messages and requests passing through your own server (D-106) | Yes, end to end between your two phones (the same encrypted session as the direct connection), inside TLS to the server | Your server joins the two phones' connections and passes the bytes along | Your server can't read or change them; it sees both phones' IP addresses and when and how much they talk. Pairline's relay keeps nothing on disk but its own key, certificate and access key, and logs counts only (never addresses or ids). Your hosting provider can see the same as your server | While a session runs |
 
 ## Network connections
 
@@ -122,11 +127,14 @@ Store builds once it ships there, use your private iCloud database.
 | Android bridge, only when you tap "Check my home connection" on the iPhone (remote mode on or off) | Your home router, on your local network (NAT-PMP's address request and PCP's ANNOUNCE on UDP 5351, UPnP: an SSDP search, the router's description and `GetExternalIPAddress`) | Asks, read-only, whether the router could open a port and what kind of internet address it has; opens nothing. The iPhone gets only the verdict (likely or not, why, which protocol answered, whether there's IPv6), never an address |
 | Android bridge, only with remote mode on and on Wi-Fi | Listens on that one TCP port on your home network, reachable from the internet through your router when the router opened it (UPnP, NAT-PMP, PCP) or you forwarded it yourself | Your iPhone connects to it from anywhere (the direct connection: the same encrypted session as Wi-Fi, used for messages and call audio). Anyone else, on your home network or the internet, is disconnected at the handshake |
 | iPhone app, only with remote mode on and no nearby link | Your bridge phone's home internet address (from a sealed `remote.addr`), on that port; or, if you set up port forwarding yourself (D-095), the address or DDNS name you entered | The direct connection. It never connects to any other address on the internet. A name you entered is looked up through the iPhone's normal DNS, so your DNS resolver and the name's provider see that lookup |
+| Android bridge, only with remote mode on and your own server set up (D-106) | Your own server, at the address or name in its link (TLS, accepted only with the certificate pinned in the link) | Keeps one connection waiting there, on any network (Wi-Fi or mobile data), so your iPhone can reach it through the server when your router lets nothing in. While waiting, the server sends one byte every 30 seconds (with TLS and TCP, about 0.4 MB a day). A name is looked up through the phone's normal DNS |
+| iPhone app, only with remote mode on, your own server set up and no nearby link | Your own server, as above | The direct connection through your server, for messages and call audio. A name is looked up through the iPhone's normal DNS |
 
 Nothing else. The Android app's network code is confined by CI to five places: the update check (GitHub only),
 the Wi-Fi link (addresses on your local network only), internet sharing (M8, only while you have it on), Talk on
 iPhone's connection to this phone's own Wireless debugging (`127.0.0.1` only) and remote mode (Apple's CloudKit Web
-Services host, your router on the local network, and the one listening port for your iPhone).
+Services host, your router on the local network, the one listening port for your iPhone, and your own server if you
+set one up).
 **Debug builds only** (never the release APK): the bridge also listens on `127.0.0.1:47800` inside the phone or
 emulator, so developers can connect a test iPhone app through `adb forward` (D-018); it isn't reachable from any
 network. On an emulator (never on a phone), a debug build's Wi-Fi link also listens on the emulator's emulated

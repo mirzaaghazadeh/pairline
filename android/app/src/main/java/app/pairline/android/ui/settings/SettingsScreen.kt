@@ -663,7 +663,9 @@ private fun PhoneHotspotRow(info: PhoneHotspot.Info) {
     val context = LocalContext.current
     val helper by AppGraph.privileged.state.collectAsState()
     // Talk on iPhone's helper starts through Wireless debugging, which Android runs only on a Wi-Fi network (D-054).
-    val helperNote = info.on && !info.onWifi && AppGraph.prefs.talkOnIphone && helper !in setOf(
+    // Only once it's set up with Wireless debugging: the switch is on by default from D-107, set up or not.
+    val helperNote = info.on && !info.onWifi && AppGraph.prefs.talkOnIphone && AppGraph.privileged.paired &&
+        !AppGraph.prefs.rootMode && helper !in setOf(
         PrivilegedManager.State.READY,
         PrivilegedManager.State.STARTING,
         PrivilegedManager.State.UNSUPPORTED,

@@ -108,6 +108,33 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
     /** Called on every state change, so the bridge can resend its capabilities. */
     var onChange: (() -> Unit)? = null
 
+    /**
+     * Called when what `status.talk` says changed (D-107), also when [state] didn't: the switch, Wi-Fi, or a lost
+     * pairing. The bridge resends its status (only if it differs).
+     */
+    var onTalkChange: (() -> Unit)? = null
+
+    @Volatile private var lastTalk: TalkStatus? = null
+
+    /** `status.talk` now (D-107). Any thread. */
+    fun talkStatus(): TalkStatus = TalkStatus.of(
+        sdk = Build.VERSION.SDK_INT,
+        state = _state.value,
+        failure = failure,
+        switchOn = prefs.talkOnIphone,
+        paired = paired,
+        rootMode = rootMode,
+        setUpBefore = prefs.talkSetUpOnce,
+        onWifi = onWifi(),
+    )
+
+    private fun noteTalk() {
+        val now = talkStatus()
+        if (now == lastTalk) return
+        lastTalk = now
+        onTalkChange?.invoke()
+    }
+
     /** The Talk on iPhone setup screen is open: run the helper for its checks even while Talk is off. */
     var setupOpen: Boolean = false
         set(value) {
@@ -141,6 +168,11 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
                     override fun onAvailable(network: Network) {
                         main.post { refresh() }
                     }
+
+                    // Off Wi-Fi the iPhone hears "waiting for Wi-Fi" instead of "debugging off" (D-107).
+                    override fun onLost(network: Network) {
+                        main.post { refresh() }
+                    }
                 },
             )
         }
@@ -149,6 +181,14 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
 
     /** Re-reads the settings and starts or stops the helper as needed. Main thread. */
     fun refresh() {
+        try {
+            refreshState()
+        } finally {
+            noteTalk()
+        }
+    }
+
+    private fun refreshState() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return set(State.UNSUPPORTED)
         val s = service
         if (s != null && s.asBinder().pingBinder()) {
@@ -401,7 +441,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         }.onFailure { Log.w(TAG, "couldn't keep the debugging authorization", it) }
     }
 
-    private fun onWifi(): Boolean {
+    fun onWifi(): Boolean {
         val cm = context.getSystemService(ConnectivityManager::class.java) ?: return false
         return runCatching {
             cm.allNetworks.any { cm.getNetworkCapabilities(it)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true }
@@ -506,6 +546,7 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         try {
             AdbPairingClient(port, code, AdbKey.loadOrCreate(context)).pair()
             prefs.adbPaired = true
+            prefs.talkSetUpOnce = true
             // The user set this up to hear calls on the iPhone: turn it on (the switch is on the same screen).
             prefs.talkOnIphone = true
             Log.i(TAG, "paired with Wireless debugging")
@@ -541,6 +582,8 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         cancelPairing()
         stopHelper(revokeSettings = true)
         prefs.adbPaired = false
+        // Forgotten on purpose: the iPhone offers the first setup again, not "pair again" (D-107).
+        prefs.talkSetUpOnce = false
         worker.execute { AdbKey.delete(context) }
         refresh()
     }
@@ -559,7 +602,9 @@ class PrivilegedManager(private val context: Context, private val prefs: AppPref
         val changed = _state.value != s
         if (changed && (s == State.READY || _state.value == State.READY)) Log.i(TAG, "helper: $s")
         _state.value = s
+        if (s == State.READY && !prefs.talkSetUpOnce) prefs.talkSetUpOnce = true
         if (changed) onChange?.invoke()
+        noteTalk()
     }
 
     private class StartException(val failure: Failure) : Exception(failure.name)

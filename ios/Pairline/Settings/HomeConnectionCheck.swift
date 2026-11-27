@@ -157,6 +157,10 @@ struct HomeConnectionCheckRow: View {
                     }
                 }
             }
+            // D-106: nothing at home can let calls in, but a server of the user's own can.
+            if result.reason == .carrierNAT || result.reason == .noPublicAddress {
+                OwnServerLink(remote: remote)
+            }
             if result.hasRouterHelp {
                 NavigationLink {
                     RouterHelpView(remote: remote)

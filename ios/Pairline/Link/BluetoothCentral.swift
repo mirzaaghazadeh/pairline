@@ -38,6 +38,10 @@ struct ConnectTarget {
     var directManual: WiFiEndpoint?
     /// Try `directManual` before `direct` (the bridge's router didn't open a port).
     var directManualFirst = false
+    /// The direct connection: the user's own relay server (D-106), reached over TLS pinned to its certificate.
+    var relay: RelayServer?
+    /// Try `relay` before everything else (the bridge's router let nothing in); otherwise after.
+    var relayFirst = false
 }
 
 /// Finds the bridge and opens a frame transport to it.

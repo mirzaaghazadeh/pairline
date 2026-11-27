@@ -226,8 +226,67 @@ final class RemoteLink: ObservableObject {
         return direct.manual?.endpoint
     }
 
-    /// Something for the direct connection to dial: the bridge's addresses or the user's port forwarding.
-    var hasDirectTargets: Bool { !directCandidates.isEmpty || manualEndpoint != nil }
+    /// Something for the direct connection to dial: the bridge's addresses, the user's port forwarding or their own
+    /// server.
+    var hasDirectTargets: Bool { !directCandidates.isEmpty || manualEndpoint != nil || relayServer != nil }
+
+    // MARK: - Your own server (D-106)
+
+    /// The user's own relay server, while remote mode is on.
+    var relayServer: RelayServer? {
+        guard isOn else { return nil }
+        return direct.relay
+    }
+
+    /// Try the user's own server first while the bridge says its router let nothing in; last when it did.
+    var relayFirst: Bool { direct.status?.availability != .open }
+
+    /// The last attempt through the user's own server, this run of the app.
+    @Published private(set) var relayAttempt: RelayAttempt?
+    /// When `remote.relay` last went to the bridge (memory only), so a session doesn't send it again and again.
+    private var relaySentAt: Date?
+    /// `remote.relay` is sent again at most this often while the bridge's `remote.state` doesn't match.
+    static let relayResendInterval: TimeInterval = 60
+
+    /// Saves (or, with nil, removes) the user's own server. Only while remote mode is on: it goes with it. A new server
+    /// comes with a new rendezvous id (`RelayServer.parse`). The caller sends `remote.relay` to the bridge.
+    func setRelay(_ server: RelayServer?) {
+        guard isOn || server == nil else { return }
+        var direct = self.direct
+        guard direct.relay != server else { return }
+        direct.relay = server
+        store.saveDirect(direct)
+        self.direct = direct
+        relayAttempt = nil
+        relaySentAt = nil
+        log.info("remote", server == nil ? "Your own server removed" : "Your own server set up by the user")
+        onChange?()
+    }
+
+    /// The bridge's last `remote.state` disagrees with this iPhone about the user's own server (one is set here and the
+    /// bridge says none, or the other way round), and `remote.relay` wasn't sent in the last minute.
+    var relayNeedsSending: Bool {
+        guard isOn else { return false }
+        let set = direct.relay != nil
+        let bridgeHasOne = direct.status?.relay != nil
+        guard set != bridgeHasOne else { return false }
+        if let sent = relaySentAt, now().timeIntervalSince(sent) < Self.relayResendInterval { return false }
+        return true
+    }
+
+    /// `remote.relay` is on its way to the bridge.
+    func noteRelaySent() {
+        relaySentAt = now()
+    }
+
+    /// An attempt through the user's own server ended. Never logs the host.
+    func noteRelayAttempt(_ outcome: RelayAttempt.Outcome) {
+        guard direct.relay != nil else { return }
+        if relayAttempt?.outcome != outcome {
+            log.info("remote", "Your own server: \(outcome.logText)")
+        }
+        relayAttempt = RelayAttempt(at: now(), outcome: outcome)
+    }
 
     /// Try the user's port forwarding first while the bridge says its router didn't open a port; after the bridge's
     /// own addresses when it did.
@@ -485,6 +544,8 @@ final class RemoteLink: ObservableObject {
         direct = store.direct
         droppedEndpoints = []
         manualAttempt = nil
+        relayAttempt = nil
+        relaySentAt = nil
         let mailbox = mailbox(for: old)
         let task = Task {
             for box in RemoteMailbox.Box.allCases {
@@ -545,9 +606,14 @@ final class RemoteLink: ObservableObject {
     func bridgeState(_ plaintext: Data) {
         guard isOn || configuring, let object = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any],
               let status = DirectStatus(message: object) else { return }
-        if direct.status != status {
+        let previous = self.direct.status
+        if previous?.availability != status.availability || previous?.reason != status.reason {
             log.info("remote", "The bridge's direct connection: \(status.availability.rawValue)"
                      + (status.reason.map { " (\($0.rawValue))" } ?? ""))
+        }
+        if previous?.relay != status.relay || previous?.relayReason != status.relayReason {
+            log.info("remote", "The bridge at your own server: \(status.relay?.rawValue ?? "none")"
+                     + (status.relayReason.map { " (\($0.rawValue))" } ?? ""))
         }
         var direct = self.direct
         direct.status = status
@@ -580,5 +646,6 @@ final class RemoteLink: ObservableObject {
         guard let settings, settings.on else { return "off" }
         return "on (\(settings.backend.rawValue), \(settings.environment.rawValue)); problem: "
             + "\(problem.map { "\($0)" } ?? "none"); direct: \(direct.status?.availability.rawValue ?? "?")"
+            + "; own server: \(direct.relay == nil ? "none" : "set, bridge \(direct.status?.relay?.rawValue ?? "?")")"
     }
 }

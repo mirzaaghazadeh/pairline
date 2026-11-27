@@ -54,6 +54,8 @@ class StatusMonitor(
     private val dataUsage: () -> Boolean = { false },
     /** The iPhone may browse this phone's photos (D-088). */
     private val photos: () -> Boolean = { false },
+    /** `status.talk` (D-107): Talk on iPhone's state, so the iPhone can say what's missing. */
+    private val talk: () -> JSONObject? = { null },
 ) {
     /** Called (on a background thread) whenever something in the status may have changed. */
     var onChange: (() -> Unit)? = null
@@ -201,6 +203,7 @@ class StatusMonitor(
             .put("caps", JSONArray(caps()))
             .apply { runCatching { net() }.getOrNull()?.let { put("net", it) } }
             .apply { runCatching { ringer() }.getOrNull()?.let { put("ringer", it) } }
+            .apply { runCatching { talk() }.getOrNull()?.let { put("talk", it) } }
             .put("time", System.currentTimeMillis())
     }
 

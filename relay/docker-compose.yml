@@ -1,0 +1,37 @@
+# Pairline relay, "Your own server" (D-106), with Docker Compose or Coolify. Guide: README.md next to this file.
+# Self-contained: it pulls the published image, so this one file is all a server needs.
+#
+#   RELAY_ADDRESS=203.0.113.5 docker compose up -d
+#   docker compose logs pairline-relay          # the link and QR code
+#
+# Coolify: + New › Docker Compose Empty, paste this file, set RELAY_ADDRESS (your domain, such as relay.example.com,
+# or the server's IP) under Environment Variables, leave the Domains field EMPTY, deploy. The relay gets a port of its
+# own (47840 by default), published straight to the server: Coolify's proxy, or Cloudflare's orange cloud, would show
+# the phones another certificate. The domain is a plain DNS record (Cloudflare: DNS only). Open the port (TCP) in the
+# server's firewall.
+services:
+  pairline-relay:
+    # The published image (amd64 and arm64). To run your own build: docker build -t pairline-relay . and set
+    # RELAY_IMAGE=pairline-relay.
+    image: "${RELAY_IMAGE:-ghcr.io/mirzaaghazadeh/pairline-relay:latest}"
+    restart: unless-stopped
+    ports:
+      # The relay listens on 443 inside the container; this is the port the phones use.
+      - "${RELAY_PORT:-47840}:443"
+    environment:
+      # Your domain (or this server's IP), as the phones reach it (an IPv6 address in brackets).
+      PAIRLINE_RELAY_PUBLIC: "${RELAY_ADDRESS:?}:${RELAY_PORT:-47840}"
+      # How the QR code is drawn in the log: dark (Coolify's log view, most terminals), light, ansi (any terminal), off.
+      PAIRLINE_RELAY_QR: "${RELAY_QR:-dark}"
+    volumes:
+      # The key, certificate and access key. Keep it: a new one means scanning a new code on the iPhone.
+      - pairline-relay-data:/data
+    healthcheck:
+      test: ["CMD", "/pairline-relay", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  pairline-relay-data:
