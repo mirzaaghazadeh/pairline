@@ -149,8 +149,10 @@ Release APKs are built only by GitHub Actions from an `android-v*` tag: `docs/RE
   (`xcodebuild -scheme Pairline -configuration Release -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`),
   then `../.github/scripts/ios-policy-check.sh <path>/Release-iphonesimulator/Pairline.app`
   (fails on third-party SDKs or debug-only code in the Release binary). CI builds the tests ad-hoc signed
-  (`CODE_SIGN_IDENTITY=-`) because the Keychain needs an entitlement. `StoreKitTests` skip on CI when the runner's
-  StoreKit test session serves no products, so **run them locally before every release**
+  (`CODE_SIGN_IDENTITY=-`) because the Keychain needs an entitlement. CI skips `StoreKitTests`: GitHub's runners (and a
+  freshly created simulator) serve the StoreKit test products but never finish a purchase, so the tests hang. **Run
+  them locally before every release**, on a simulator that has run the app before. GitHub's runners stop at Xcode
+  26.6, so CI builds with it; code that needs Xcode 27's SDK goes inside `#if compiler(>=6.4)`
 - Running from Xcode uses `Pairline/Store/Pairline.storekit`, so the trial and purchase work without Apple's servers.
 - On a real iPhone (team 7Y68TERDUC in `project.yml`):
   `xcodebuild -scheme Pairline -destination 'id=<udid>' -allowProvisioningUpdates build`, then

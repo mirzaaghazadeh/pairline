@@ -58,14 +58,18 @@ jobs:
 
       # Ad-hoc signing ("Sign to Run Locally", no certificate or team): the tests use the Keychain, which fails
       # with errSecMissingEntitlement in an unsigned simulator app.
+      # StoreKitTests don't run here: on GitHub's runners (and on a freshly made simulator) the local StoreKit session
+      # serves the products and then never finishes a purchase, so the first purchase test hung until the job's time
+      # limit (2026-11-27). They run locally before every release (AGENTS.md).
       - name: Build and test (Debug)
         env:
-          # Passed to the tests as CI: StoreKitTests skip when the runner can't serve StoreKit test products.
+          # Passed to the tests as CI: StoreKitTests would also skip when the runner can't serve StoreKit products.
           TEST_RUNNER_CI: 'true'
           SIMULATOR: ${{ steps.sim.outputs.udid }}
         run: >
           xcodebuild -scheme Pairline -destination "id=$SIMULATOR"
           -derivedDataPath build -resultBundlePath build/Tests.xcresult
+          -skip-testing:PairlineTests/StoreKitTests
           CODE_SIGN_IDENTITY=- test
 
       - name: Build Release
