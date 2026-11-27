@@ -116,6 +116,22 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bazı internet sağlayıcıları tek bir internet adresini birçok ev arasında paylaştırır (CGNAT). Anlamak için: yönlendiricinizin durum sayfasında kendi internet (WAN) IPv4 adresi 100.64 ile 100.127 arasındaki bir sayıyla başlar ve aynı Wi-Fi'da \"what's my IP\" gibi bir site farklı bir adres gösterir. Pairline böyle bir siteye hiçbir zaman kendisi sormaz; bu yüzden elle kontrol edin. Bu durumda hiçbir yönlendirici ayarı aramaları dışarıdan içeri getiremez ve yönlendiricinin UPnP listesi boş kalır. Mesajlar ve kodlar iCloud üzerinden çalışmaya devam eder." } }
       }
     },
+    "4G and 5G home routers" : {
+      "comment" : "Router guide: a heading for home routers that take a SIM card (mobile internet), which mobile operators put behind carrier-grade NAT.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "موجّهات 4G و5G المنزلية" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم‌های خانگی 4G و 5G" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "4G ve 5G ev modemleri" } }
+      }
+    },
+    "A home router with a SIM card almost always gets a shared address from the mobile operator. There a public address usually comes with a business or static-IP plan, and IPv6, if the operator supports it, is turned on in the router's APN settings (IPv4/IPv6)." : {
+      "comment" : "Router guide, \"4G and 5G home routers\": mobile operators share addresses (carrier-grade NAT); what to ask for, and where IPv6 is switched on.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحصل الموجّه المنزلي الذي يعمل بشريحة SIM دائمًا تقريبًا على عنوان مشترك من مشغّل الجوال. وهناك يأتي العنوان العام عادةً مع باقة أعمال أو باقة «IP ثابت»، ويُفعَّل IPv6، إن كان المشغّل يدعمه، من إعدادات APN في الموجّه (IPv4/IPv6)." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم خانگیِ سیم‌کارت‌خور تقریباً همیشه از اپراتور موبایل نشانی مشترک می‌گیرد. آنجا نشانی عمومی معمولاً با طرح سازمانی یا «آی‌پی ثابت» داده می‌شود، و اگر اپراتور پشتیبانی کند، IPv6 در تنظیمات APN مودم (IPv4/IPv6) روشن می‌شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "SIM kartlı bir ev modemi paylaşılan bir adresi neredeyse her zaman mobil operatörden alır. Orada genel adres genellikle kurumsal ya da statik IP tarifesiyle gelir; IPv6 ise operatör destekliyorsa modemin APN ayarlarından (IPv4/IPv6) açılır." } }
+      }
+    },
     "What to ask your provider" : {
       "comment" : "Router guide: the card after carrier-grade NAT, what to ask the internet provider for.",
       "localizations" : {

@@ -313,7 +313,7 @@ private fun LinkCard(
 
 /**
  * Cloud mode in one line (remote mode, D-092): on, paused and why, or off with where to turn it on (the iPhone). Not
- * shown while the card itself says "Via iCloud", nor for an iPhone that doesn't offer Cloud mode. Tapping it opens
+ * shown while the card itself says "Via Cloud mode", nor for an iPhone that doesn't offer Cloud mode. Tapping it opens
  * the Cloud mode screen: what it is, what this phone needs, and its router details (D-099).
  */
 @Composable

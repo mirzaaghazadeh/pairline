@@ -257,7 +257,7 @@ Apple (the user's own iCloud) and the two phones take part. Built on the `remote
       for pairing your own two phones
 - [x] "Cloud mode" in the apps, offered right after a normal pairing, and a full UX pass of its screens (D-094)
 - [ ] Street tests on real phones, with the bridge at home on charge and Wi-Fi and the iPhone on mobile data:
-  - [ ] Turn Cloud mode on; the status line says "Via iCloud", then "Direct connection" where the router allows it
+  - [ ] Turn Cloud mode on; the status line says "Via Cloud mode", then "Direct connection" where the router allows it
   - [ ] "Check my home connection" matches what the router really does (open, carrier-grade NAT, no UPnP/NAT-PMP/PCP)
   - [ ] SMS and a one-time code arrive with the iPhone locked, through the notification extension, within seconds
   - [ ] A text sent from the iPhone goes out from the Android phone (direct, and via iCloud with the direct

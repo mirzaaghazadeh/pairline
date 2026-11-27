@@ -155,7 +155,7 @@ struct HelpArticleView: View {
             HelpCard(symbol: "checklist", title: Text("What Cloud mode needs", tableName: "Connection"),
                      text: Text("The Android phone on its charger and home Wi-Fi, and this iPhone signed in to iCloud. For calls, your home router lets this iPhone in: most do it by themselves, and Settings › Connection › Advanced shows how otherwise.", tableName: "Connection"))
             HelpCard(symbol: "message.badge", title: Text("Texts while you're away", tableName: "Connection"),
-                     text: Text("Via iCloud, texts and one-time codes go both ways. A text from this iPhone goes out within a few seconds while the Android phone is on its charger, and within about 10 seconds on battery: it checks iCloud that often while Cloud mode is on. Calls from far away need the direct connection to your home.", tableName: "Connection"))
+                     text: Text("In Cloud mode, texts and one-time codes go both ways, through your own iCloud. A text from this iPhone goes out within a few seconds while the Android phone is on its charger, and within about 10 seconds on battery: it checks iCloud that often while Cloud mode is on. Calls from far away need the direct connection to your home.", tableName: "Connection"))
             NavigationLink {
                 RouterHelpView(remote: AppModel.shared.link.remote)
             } label: {
