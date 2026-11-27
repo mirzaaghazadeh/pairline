@@ -80,6 +80,20 @@ class RemoteLinkTest {
         .put("state", state).put("dir", "in").apply { if (reason != null) put("reason", reason) }
 
     @Test
+    fun startingWithRemoteModeOnIntroducesThisPhoneAgain() {
+        var introduced = 0
+        link.onStarted = { introduced++ }
+        link.start()
+        assertEquals("remote mode off: nobody to introduce this phone to", 0, introduced)
+        link.configure(config, "first-token")
+        link.stop()
+        link.start()
+        assertEquals(1, introduced)
+        link.start()
+        assertEquals("already running", 1, introduced)
+    }
+
+    @Test
     fun eventsGoSealedToTheAlertOrQuietMailbox() {
         on()
         link.send(JSONObject().put("t", Msg.SMS_NEW).put("msg", JSONObject().put("body", "Your code is 4821")))

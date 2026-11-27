@@ -566,6 +566,16 @@ final class AppDatabase: ObservableObject {
 
     private var historyComplete: Bool { value("history.complete") == "1" }
 
+    /// The bridge's last `device.info` (its name and model), kept so they show after a restart: in Cloud mode the
+    /// bridge sends them only now and then (2026-11-27). Unpairing clears it with everything else.
+    var bridgeDeviceInfo: DeviceInfo? {
+        get { value("bridge.device_info").flatMap { try? JSONDecoder().decode(DeviceInfo.self, from: Data($0.utf8)) } }
+        set {
+            setValue(newValue.flatMap { try? JSONEncoder().encode($0) }.map { String(decoding: $0, as: UTF8.self) },
+                     for: "bridge.device_info")
+        }
+    }
+
     /// Whether the conversation list and the newest history came from the bridge once; until then a sync loads them,
     /// whatever messages already arrived on their own. Unpairing clears it with everything else.
     var historyLoaded: Bool {

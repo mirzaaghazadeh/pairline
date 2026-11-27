@@ -640,7 +640,9 @@ older than one day.
 
 B→R events go on a session when one is up, otherwise in the mailbox: `sms.new`, `call.incoming` and missed calls in
 the alert mailbox, everything else in the quiet one. `status` goes to the mailbox only when it changes, never on a
-timer.
+timer. B sends its `device.info` (quiet) when remote mode is turned on and each time it starts with remote mode on
+(after an update, a restart or a reboot), so an R without a session still learns B's name and model; R keeps the last
+one until unpairing.
 
 ### Direct connection
 

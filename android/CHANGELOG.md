@@ -5,6 +5,12 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.8 (2026-11-27)
+
+- **Your iPhone shows this phone's name in Cloud mode.** When the app starts with Cloud mode on (after an update, a
+  restart or the phone booting), it tells your iPhone its name and model again, through iCloud. The iPhone's lock
+  screen and widgets said "Bridge phone" when it had never been near this phone since its app restarted.
+
 ## 1.9.7 (2026-11-27)
 
 - **No more duplicate contacts on the iPhone.** The bridge now sends the contacts your phone's Contacts app shows,

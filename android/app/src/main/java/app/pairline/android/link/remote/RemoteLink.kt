@@ -106,7 +106,15 @@ class RemoteLink(
         running = true
         nextCheckAt = 0
         job = scope.launch { loop() }
+        if (store.isOn) onStarted?.invoke()
     }
+
+    /**
+     * The link service started with remote mode already on (after an update, a restart or the phone booting): introduce
+     * this phone again. An iPhone in Cloud mode otherwise learned its name only when remote mode was turned on, and one
+     * that lost it showed "Bridge phone" (2026-11-27).
+     */
+    var onStarted: (() -> Unit)? = null
 
     fun stop() {
         running = false

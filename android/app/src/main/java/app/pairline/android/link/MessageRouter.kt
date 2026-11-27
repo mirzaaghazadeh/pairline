@@ -177,6 +177,13 @@ class MessageRouter(
         }
     }
 
+    /** The link service started with remote mode on: this phone's name and model again, without a status. */
+    fun introduce() {
+        scope.launch {
+            link.send(Messages.deviceInfo(deviceName(), Build.VERSION.RELEASE ?: "", BuildConfig.VERSION_NAME))
+        }
+    }
+
     /** Something in the status may have changed; sends it if it really did (at most every 2 s). */
     fun statusChanged() {
         if (!link.canSendEvents) return

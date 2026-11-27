@@ -67,6 +67,7 @@ final class BridgeController: ObservableObject {
         self.phase = link.phase
         self.calls = CallCenter(useCallKit: mode == .real)
         self.blockedNumbers = db.blockedNumbers
+        self.deviceInfo = db.bridgeDeviceInfo
         calls.bridge = self
         // Call audio (M6) rides on the Wi-Fi session's media channel (M5); nil while there's no open channel.
         calls.mediaTransport = { [weak link] in (link as? LinkManager)?.mediaChannel as? AudioPacketTransport }
@@ -222,6 +223,7 @@ final class BridgeController: ObservableObject {
         switch inbound.message {
         case .deviceInfo(let info):
             deviceInfo = info
+            if db.bridgeDeviceInfo != info { db.bridgeDeviceInfo = info }
             if let proto = info.proto, !RemoteFeature.compatibleVersions.contains(proto) {
                 log.warning("link", "Bridge speaks protocol \(proto)")
             }

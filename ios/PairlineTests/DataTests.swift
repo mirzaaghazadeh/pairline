@@ -100,6 +100,18 @@ final class AppDatabaseTests: XCTestCase {
         XCTAssertEqual(db.displayName(for: "+442079460001"), "+442079460001")
     }
 
+    /// The bridge's name and model outlive a restart (Cloud mode sends them only now and then) but not unpairing.
+    func testTheBridgesNameIsKeptUntilUnpairing() {
+        XCTAssertNil(db.bridgeDeviceInfo)
+        let info = DeviceInfo(name: "Pixel 9", platform: "android", os: "16", app: "1.9.8", proto: 1)
+        db.bridgeDeviceInfo = info
+        XCTAssertEqual(db.bridgeDeviceInfo, info)
+        let controller = BridgeController(mode: .demo, link: DemoBridge(content: .english), db: db)
+        XCTAssertEqual(controller.deviceInfo?.name, "Pixel 9")
+        db.wipe()
+        XCTAssertNil(db.bridgeDeviceInfo)
+    }
+
     /// Copies of one person that Android keeps apart show once; same-named people with other numbers stay apart.
     func testCopiesOfAContactShowOnce() {
         func record(_ key: String, _ name: String, _ numbers: [String], emails: [String] = []) -> ContactRecord {

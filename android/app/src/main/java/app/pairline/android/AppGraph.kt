@@ -198,6 +198,7 @@ object AppGraph {
                 router.remoteStarted()
                 direct.announce()
             }
+            remote.onStarted = router::introduce
         }
     }
 
