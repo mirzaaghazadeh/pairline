@@ -47,10 +47,13 @@ tagged commit. Each release note links the build run. Process: [docs/RELEASING.m
    apksigcopier compare --unsigned pairline-bridge-<version>.apk app/build/outputs/apk/release/app-release-unsigned.apk
    ```
    `apksigcopier` copies our signature onto your build and checks that it verifies; the signature covers every
-   byte of the APK, so it only verifies if your build is identical. Linux and macOS give the same build for
-   releases after 1.8.0. For 1.8.0 and earlier, build on Linux: the macOS NDK labels one of its own files with a
-   different compiler build, which ended up in the native library's `.comment` section (D-100). The release
-   workflow does this check too, on a second machine, and its result is the notes' "Reproducible build" row.
+   byte of the APK, so it only verifies if your build is identical. This works for releases after 1.8.0, on Linux
+   and macOS alike. 1.8.0 and earlier can't pass it even though every file in them matches a rebuild: they were
+   signed without `--alignment-preserved`, so `apksigner` padded the files in its own way, and they reproduce on
+   Linux only (the macOS NDK labels one of its own files with a different compiler build, which ended up in the
+   native library's `.comment` section). For those, compare the files themselves (`unzip` both, then `diff -r`),
+   or see their notes' "Reproducible build" row (D-100). The release workflow does this check too, on a second
+   machine, and its result is that row.
 
 Each release note also links the APK's VirusTotal report. The workflow uploads the signed APK there before the
 release is published; the report's SHA-256 is the same as the release file's. Its "Trackers" row is the result of

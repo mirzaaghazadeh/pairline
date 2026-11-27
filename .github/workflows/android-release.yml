@@ -110,15 +110,19 @@ jobs:
           trap 'rm -f "$ks"' EXIT
           printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$ks"
           "$bt/zipalign" -P 16 -f 4 app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/aligned.apk"
+          # --alignment-preserved keeps zipalign's layout. Without it apksigner pads every stored entry again in its
+          # own way, which no rebuild plus a copied signature can reproduce byte for byte (D-100).
           "$bt/apksigner" sign \
             --ks "$ks" --ks-type PKCS12 --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass env:KEYSTORE_PASSWORD \
+            --ks-pass env:KEYSTORE_PASSWORD --alignment-preserved \
             --out "$RUNNER_TEMP/pairline-bridge-$VERSION.apk" "$RUNNER_TEMP/aligned.apk"
 
-      - name: Verify the signature
+      - name: Verify the signature and alignment
         run: |
           bt="$ANDROID_HOME/build-tools/$BUILD_TOOLS"
           apk="$RUNNER_TEMP/pairline-bridge-$VERSION.apk"
+          # 4-byte alignment for stored files, 16 KB for native libraries (16 KB page-size phones).
+          "$bt/zipalign" -c -P 16 4 "$apk"
           "$bt/apksigner" verify --verbose --print-certs "$apk" | tee "$RUNNER_TEMP/certs.txt"
           # e.g. "V3.0 Signer: certificate SHA-256 digest: 52d7..." (format varies by build-tools version)
           cert="$(sed -n 's/^.*Signer.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/certs.txt" | head -1)"
