@@ -135,6 +135,7 @@ targets:
       - path: Pairline/Identity/Keychain.swift
       - path: Pairline/Messages/OTPDetector.swift
       - path: Pairline/Data/PhoneNumber.swift
+      - path: Pairline/Data/ContactNames.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.pairline.ios.notifications

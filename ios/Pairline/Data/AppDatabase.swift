@@ -11,6 +11,9 @@ final class AppDatabase: ObservableObject {
 
     private let db: SQLiteDatabase
     private(set) var contactIndex: [String: String] = [:]
+    /// The real database only: its contact index is copied for the notification extension (ContactNames). Never the
+    /// demo's, whose sample names must not show on real notifications.
+    private var sharesContactNames = false
 
     init(url: URL?) throws {
         db = try SQLiteDatabase(url: url)
@@ -21,6 +24,8 @@ final class AppDatabase: ObservableObject {
     /// Opens the on-device database, falling back to memory if the file can't be opened.
     static func openDefault() -> AppDatabase {
         if let url = AppPaths.databaseURL, let database = try? AppDatabase(url: url) {
+            database.sharesContactNames = true
+            ContactNames.save(database.contactIndex)
             return database
         }
         log.error("db", "Couldn't open the database file; using memory")
@@ -704,7 +709,9 @@ final class AppDatabase: ObservableObject {
                 if let key = PhoneNumber.matchKey(number.n) { index[key] = contact.name }
             }
         }
+        let changed = index != contactIndex
         contactIndex = index
+        if sharesContactNames, changed { ContactNames.save(index) }
     }
 
     /// The contact name for an address, or the address itself.
@@ -810,6 +817,7 @@ final class AppDatabase: ObservableObject {
             }
         }
         contactIndex = [:]
+        if sharesContactNames { ContactNames.clear() }
         changed()
     }
 

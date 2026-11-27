@@ -308,7 +308,7 @@ Each record's plaintext is a UTF-8 JSON object: `{"t": "<type>", …}`.
 | `sms.state` | B→R | M2 | `cid`, `state` (`sent` / `delivered` / `failed`), `key` (once stored), `error` |
 | `sms.threads` | R→B, B→R | M2 | request: `id`, `limit`, `before` / reply: `id`, `threads` [`{thread, addrs, snippet, time, count}`], `more` |
 | `sms.history` | R→B, B→R | M2 | request: `id`, `thread` or null, `before` or `after`, `limit` (≤ 100) / reply: `id`, `msgs` [Message], `more` |
-| `call.incoming` | B→R | M3 | `call` (id), `sim`, `from`, `name` (if the contact is known) |
+| `call.incoming` | B→R | M3 | `call` (id), `sim`, `from`, `name` (if the contact is known). Sent without `from` when Android hasn't passed the number on yet; then B sends it once more, with the same `call`, when it learns the caller while it still rings (D-104). R already showing that call ignores the repeat |
 | `call.state` | B→R | M3 | `call`, `state` (`dialing` / `ringing` / `active` / `held` / `ended`), `dir` (`in`/`out`), `number`, `name`, `since`, `reason` (`local` / `remote` / `busy` / `missed` / `rejected` / `failed`, only when ended) |
 | `call.answer`, `call.reject`, `call.end` | R→B | M3 | `id`, `call` → `ok` / `error` |
 | `call.dial` | R→B | M3 | `id`, `sim`, `number` → `ok`, then `call.state` events. Or `voicemail: true` without `number` (needs `call.voicemail`, D-082): B calls the SIM's voicemail, whose number Android looks up. A `number` starting `#31#` hides the caller ID on that call (GSM) |

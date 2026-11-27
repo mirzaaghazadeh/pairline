@@ -54,6 +54,9 @@ class CallTracker(
         var telecom: Call? = null
         var callback: Call.Callback? = null
         var incomingSent = false
+
+        /** `call.incoming` went out before the number was known; it goes again once it is (callerLearned). */
+        var incomingWithoutCaller = false
         var wasRinging = state == CallMapping.RINGING
         var weRejected = false
         var weEnded = false
@@ -195,7 +198,10 @@ class CallTracker(
             TelephonyManager.CALL_STATE_RINGING -> {
                 val ringing = mine.firstOrNull { it.state == CallMapping.RINGING }
                 if (ringing != null) {
-                    if (ringing.number == null && number != null) ringing.number = number
+                    if (ringing.number == null && number != null) {
+                        ringing.number = number
+                        if (ringing.incomingSent) callerLearned(ringing)
+                    }
                     return@execute
                 }
                 if (mine.any { it.state != CallMapping.ENDED }) return@execute // call waiting: not tracked here
@@ -242,7 +248,8 @@ class CallTracker(
         calls.values.firstOrNull { it.telecom == null && it.state == CallMapping.RINGING && it.number == null }
             ?.let { t ->
                 t.number = number
-                if (!t.incomingSent) announce(t)
+                // Announced already (after its 700 ms wait) as "Unknown": pass the caller on now.
+                if (!t.incomingSent) announce(t) else callerLearned(t)
             }
     }
 
@@ -270,6 +277,11 @@ class CallTracker(
         Log.i(TAG, "incoming call (${t.id})")
         // Only calls that reach the iPhone: a blocked number still rings here.
         onIncomingRinging?.invoke()
+        emitIncoming(t)
+    }
+
+    private fun emitIncoming(t: Tracked) {
+        t.incomingWithoutCaller = t.number == null
         emit(
             JSONObject()
                 .put("t", Msg.CALL_INCOMING)
@@ -327,6 +339,12 @@ class CallTracker(
     private fun callerLearned(t: Tracked) {
         if (!calls.containsKey(t.id) || t.state == CallMapping.ENDED) return
         if (t.name == null) t.name = lookupName(t.number)
+        // Through iCloud only `call.incoming` alerts the iPhone, and the first one said "Unknown caller": send it again
+        // with the caller, once. A session's iPhone already shows the call and ignores it (2026-11-27).
+        if (t.incoming && t.incomingSent && t.incomingWithoutCaller && t.state == CallMapping.RINGING && !suppressed(t)) {
+            Log.i(TAG, "incoming call (${t.id}): caller known now")
+            emitIncoming(t)
+        }
         sendState(t, null)
     }
 
@@ -355,6 +373,9 @@ class CallTracker(
         if (calls.remove(t.id) == null) return
         t.state = CallMapping.ENDED
         t.since = System.currentTimeMillis()
+        // A number found only at the end (in the call log) gets its contact's name too: a missed call showed the
+        // number alone for a saved contact (2026-11-27).
+        if (t.name == null && t.number != null) t.name = lookupName(t.number)
         sendState(t, reason)
         onCallEnded?.invoke(t.id)
     }

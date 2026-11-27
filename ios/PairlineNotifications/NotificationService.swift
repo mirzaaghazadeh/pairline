@@ -15,7 +15,7 @@ final class NotificationService: UNNotificationServiceExtension {
                              withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
         self.contentHandler = contentHandler
         placeholder = request.content
-        contentHandler(RemoteNotification.content(for: request.content) ?? request.content)
+        contentHandler(RemoteNotification.content(for: request.content, identifier: request.identifier) ?? request.content)
         self.contentHandler = nil
     }
 
@@ -27,7 +27,7 @@ final class NotificationService: UNNotificationServiceExtension {
 
 enum RemoteNotification {
     /// The notification for a pushed record, or nil to keep the placeholder.
-    static func content(for original: UNNotificationContent) -> UNNotificationContent? {
+    static func content(for original: UNNotificationContent, identifier: String) -> UNNotificationContent? {
         guard let notification = CKNotification(fromRemoteNotificationDictionary: original.userInfo) as? CKQueryNotification,
               let name = notification.recordID?.recordName,
               let text = notification.recordFields?["sealed"] as? String,
@@ -47,8 +47,8 @@ enum RemoteNotification {
         RemoteInbox.markHandled(name)
         switch message["t"] as? String {
         case "sms.new": return sms(message["msg"] as? [String: Any], name: name, from: original)
-        case "call.incoming": return incomingCall(message, from: original)
-        case "call.state": return missedCall(message, from: original)
+        case "call.incoming": return incomingCall(message, identifier: identifier, from: original)
+        case "call.state": return missedCall(message, identifier: identifier, from: original)
         default: return nil
         }
     }
@@ -82,7 +82,8 @@ enum RemoteNotification {
         let thread = (msg["thread"] as? NSNumber)?.int64Value ?? 0
         let code = OTPDetector.code(in: body)
         let content = base(from: original)
-        content.title = addr
+        // The contact's name, as the app shows it (Notifier.notifyMessage); the number for anyone else.
+        content.title = ContactNames.name(for: addr) ?? addr
         if showPreviews {
             content.body = body
         } else {
@@ -100,8 +101,13 @@ enum RemoteNotification {
 
     /// Until the filtering entitlement lets the extension ring the call through CallKit (D-092), an incoming call
     /// is a time-sensitive notification.
-    private static func incomingCall(_ message: [String: Any], from original: UNNotificationContent) -> UNNotificationContent {
-        let caller = (message["name"] as? String) ?? (message["from"] as? String) ?? String(localized: "Unknown caller")
+    /// "Name (number)" for a saved contact, the number for anyone else (2026-11-27). The bridge sends `call.incoming`
+    /// again once it learns a caller it didn't know at the first ring; that one replaces the first.
+    private static func incomingCall(_ message: [String: Any], identifier: String,
+                                     from original: UNNotificationContent) -> UNNotificationContent {
+        let caller = ContactNames.caller(name: message["name"] as? String, number: message["from"] as? String)
+            ?? String(localized: "Unknown caller")
+        CallNotifications.show(call: callID(message), as: identifier)
         let content = base(from: original)
         content.title = String(localized: "Incoming call")
         content.body = String(localized: "\(caller) is calling your Android number.")
@@ -110,10 +116,47 @@ enum RemoteNotification {
         return content
     }
 
-    private static func missedCall(_ message: [String: Any], from original: UNNotificationContent) -> UNNotificationContent? {
+    /// Replaces the call's "Incoming call".
+    private static func missedCall(_ message: [String: Any], identifier: String,
+                                   from original: UNNotificationContent) -> UNNotificationContent? {
         guard message["state"] as? String == "ended", message["dir"] as? String == "in" else { return nil }
-        let caller = (message["name"] as? String) ?? (message["number"] as? String) ?? String(localized: "Unknown caller")
+        let caller = ContactNames.caller(name: message["name"] as? String, number: message["number"] as? String)
+            ?? String(localized: "Unknown caller")
+        CallNotifications.show(call: callID(message), as: identifier)
         return simple(title: String(localized: "Missed call"), body: caller, from: original)
+    }
+
+    /// `call` ids are opaque: a string, but accept a number too.
+    private static func callID(_ message: [String: Any]) -> String? {
+        (message["call"] as? String) ?? (message["call"] as? NSNumber)?.stringValue
+    }
+}
+
+/// One notification per call: the newest one shown for a call (a second "Incoming call" that knows the caller, then
+/// "Missed call") removes the one before it. Only call ids and notification ids, in the app group, kept for a day.
+enum CallNotifications {
+    private struct Shown: Codable {
+        var id: String
+        var time: TimeInterval
+    }
+
+    private static var file: URL? {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedOutbox.appGroup)?
+            .appendingPathComponent("call-notifications.json")
+    }
+
+    static func show(call: String?, as identifier: String) {
+        guard let call, let file else { return }
+        let now = Date().timeIntervalSince1970
+        var shown = (try? Data(contentsOf: file)).flatMap { try? JSONDecoder().decode([String: Shown].self, from: $0) } ?? [:]
+        if let previous = shown[call]?.id, previous != identifier {
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [previous])
+        }
+        shown[call] = Shown(id: identifier, time: now)
+        shown = shown.filter { now - $0.value.time < 24 * 3600 }
+        if let data = try? JSONEncoder().encode(shown) {
+            try? data.write(to: file, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        }
     }
 }
 

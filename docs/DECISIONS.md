@@ -1951,3 +1951,20 @@ which release bridges accept (`RemoteConfig.accepts`), so a tester on 1.9.2 foun
   ask for it, and Android didn't list Camera in the app's permissions. It's asked only on the Scan tap, frames are read
   on the phone and never kept (PRIVACY.md); a phone without a camera, or a user who says no, chooses a picture or
   pastes the link.
+
+### D-104 — The link state says "Via Cloud mode"; Cloud mode's call and text notifications name saved contacts (2026-11-27)
+
+The maintainer asked for "Via Cloud mode" instead of "Via iCloud", the link state D-092 named after the way messages
+travel. This supersedes that one name in D-092's list; the feature stays **Cloud mode** and its route stays iCloud.
+
+- **The link state** in the iPhone's status pill, banner, widget and Live Activity, and on the bridge, is "Via Cloud
+  mode" (fa «از طریق حالت ابری», ar «عبر الوضع السحابي», tr «Bulut modu üzerinden»). Settings › Cloud mode, already
+  under that name, says "On". Where Pairline says where the data goes, it still names iCloud: "Cloud mode uses your
+  own iCloud, not ours" (D-099), Help, and the bridge's "Reaching iPhone through iCloud".
+- **Notifications through iCloud** (the extension shows them before the app runs) said "Unknown caller" for a call
+  whose number Android passed on only after the first ring, gave a missed call's number without its contact's name,
+  and titled texts with the number. The bridge (1.9.9) sends `call.incoming` again, once, when it learns the caller
+  during the ring, and looks up the name of a number found only in the call log. The extension shows "Name (number)"
+  for a saved contact and the number for anyone else, takes names from a copy of the app's contact index (match keys
+  and names only) that the app keeps in the app group container, and keeps one notification per call: the newer
+  "Incoming call" and the missed call replace the one before. PRIVACY.md lists both files.

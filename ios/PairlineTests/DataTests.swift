@@ -100,6 +100,23 @@ final class AppDatabaseTests: XCTestCase {
         XCTAssertEqual(db.displayName(for: "+442079460001"), "+442079460001")
     }
 
+    /// Cloud mode's call and text notifications (made by the extension): a saved contact's name with the number, the
+    /// number alone for anyone else; the names come from this iPhone's copy when the bridge sent none.
+    func testNotificationCallerText() {
+        let ltr = { (number: String) in "\u{2066}\(number)\u{2069}" }
+        XCTAssertEqual(ContactNames.caller(name: "Ada", number: "+44 20 7946 0001"), "Ada (\(ltr("+44 20 7946 0001")))")
+        XCTAssertEqual(ContactNames.caller(name: "Ada", number: nil), "Ada")
+        XCTAssertEqual(ContactNames.caller(name: "", number: "  "), nil)
+        XCTAssertEqual(ContactNames.caller(name: nil, number: "00442079460009"), ltr("+442079460009"))
+
+        ContactNames.save([PhoneNumber.matchKey("+44 20 7946 0002")!: "Grace"])
+        defer { ContactNames.clear() }
+        XCTAssertEqual(ContactNames.name(for: "00442079460002"), "Grace")
+        XCTAssertEqual(ContactNames.caller(name: nil, number: "+442079460002"), "Grace (\(ltr("+442079460002")))")
+        ContactNames.clear()
+        XCTAssertNil(ContactNames.name(for: "+442079460002"))
+    }
+
     /// The bridge's name and model outlive a restart (Cloud mode sends them only now and then) but not unpairing.
     func testTheBridgesNameIsKeptUntilUnpairing() {
         XCTAssertNil(db.bridgeDeviceInfo)

@@ -5,6 +5,13 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.9 (2026-11-27)
+
+- **Calls in Cloud mode show who's calling.** When Android tells this app the caller's number only after the phone
+  starts ringing, the app now passes it to your iPhone as soon as it knows it, so the iPhone shows the name and number
+  instead of "Unknown caller". A missed call from a saved contact comes with the contact's name too.
+- The status says "Via Cloud mode" instead of "Via iCloud". Your texts still travel through your own iCloud.
+
 ## 1.9.8 (2026-11-27)
 
 - **Your iPhone shows this phone's name in Cloud mode.** When the app starts with Cloud mode on (after an update, a
