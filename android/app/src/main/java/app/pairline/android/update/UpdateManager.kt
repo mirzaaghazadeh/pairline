@@ -79,6 +79,15 @@ class UpdateManager(private val context: Context) {
     private val installedVersion: String
         get() = debugVersionOverride?.takeIf { BuildConfig.DEBUG } ?: BuildConfig.VERSION_NAME
 
+    /**
+     * A debug build (`app.pairline.android.debug`) can't install a release from GitHub: to Android it's another app,
+     * signed with another key, so the download always ended in "isn't a newer version of this app". It offers one only
+     * while devtools set a version to test the update flow with ([debugVersionOverride]); new debug builds come from
+     * the developer's computer.
+     */
+    private val offersGitHubReleases: Boolean
+        get() = !BuildConfig.DEBUG || debugVersionOverride != null
+
     var enabled: Boolean
         get() = prefs.getBoolean(ENABLED, true)
         set(value) {
@@ -113,7 +122,9 @@ class UpdateManager(private val context: Context) {
                         remove(LAST_ERROR)
                         if (latest != null) putString(LATEST, latest.toJson().toString()) else remove(LATEST)
                     }
-                    if (ReleasePicker.isNewer(latest, installedVersion)) {
+                    if (!offersGitHubReleases) {
+                        Log.i(TAG, "update check ($reason): a debug build; GitHub's ${latest?.version ?: "-"} is the release app, which it can't install")
+                    } else if (ReleasePicker.isNewer(latest, installedVersion)) {
                         Log.i(TAG, "update check ($reason): $installedVersion → ${latest!!.version} available")
                         notifyOnce(latest)
                     } else {
@@ -301,7 +312,7 @@ class UpdateManager(private val context: Context) {
             lastChecked = prefs.getLong(LAST_CHECKED, 0),
             checking = checking,
             lastError = prefs.getString(LAST_ERROR, null)?.let { runCatching { UpdateFailure.valueOf(it) }.getOrNull() },
-            available = latest?.takeIf { ReleasePicker.isNewer(it, version) },
+            available = latest?.takeIf { offersGitHubReleases && ReleasePicker.isNewer(it, version) },
             installedVersion = version,
         )
     }
