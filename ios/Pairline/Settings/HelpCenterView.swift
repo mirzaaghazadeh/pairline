@@ -154,6 +154,16 @@ struct HelpArticleView: View {
                      text: ConnectionWords.bothCanBeOn)
             HelpCard(symbol: "checklist", title: Text("What Cloud mode needs", tableName: "Connection"),
                      text: Text("The Android phone on its charger and home Wi-Fi, and this iPhone signed in to iCloud. For calls, your home router lets this iPhone in: most do it by themselves, and Settings › Connection › Advanced shows how otherwise.", tableName: "Connection"))
+            HelpCard(symbol: "message.badge", title: Text("Texts while you're away", tableName: "Connection"),
+                     text: Text("Via iCloud, texts and one-time codes go both ways. The first text after a quiet spell can take up to 2 minutes to go out: the Android phone checks iCloud every 2 minutes when it's idle, and every 5 seconds right after hearing from this iPhone, so the next ones are quick. Calls from far away need the direct connection to your home.", tableName: "Connection"))
+            NavigationLink {
+                RouterHelpView(remote: AppModel.shared.link.remote)
+            } label: {
+                ToolRow(symbol: "wifi.router", tint: .brandBlue, title: Text("Allow calls from far away", tableName: "RemoteMode"),
+                        subtitle: Text("Your router, port forwarding, and when the provider is the reason", tableName: "Connection"))
+                    .card()
+            }
+            .buttonStyle(.plain)
             HelpCard(symbol: "lock.fill", title: Text("Private either way", tableName: "Connection"),
                      text: Text("Nearby, everything goes straight between your phones. With Cloud mode it passes through your own iCloud, locked so only your two phones can open it. There's no Pairline server.", tableName: "Connection"))
         }
@@ -269,10 +279,21 @@ struct FAQ: Identifiable {
     /// String table; nil is the shared Localizable catalog. Call audio and internet sharing have their own tables.
     var table: String?
 
-    /// Where Cloud mode exists (D-092, D-099), the answers about servers and distance say what it changes.
+    /// Where Cloud mode exists (D-092, D-099), the answers about servers and distance say what it changes, and one more
+    /// answers why texts work but calls from far away don't.
     static var all: [FAQ] {
         let cloud = RemoteFeature.isAvailable
-        return [
+        var items = base(cloud: cloud)
+        if cloud {
+            items.insert(FAQ(id: 13, question: "Texts work, but calls from far away don't",
+                             answer: "Calls from far away need a direct connection to the Android phone at home, through your home router. If Settings › Connection › Advanced says it's blocked by carrier-grade NAT, your internet provider shares one address among many homes and no router setting helps: ask the provider for a public IPv4 address, or turn on IPv6 if they offer it. Otherwise turn on UPnP or NAT-PMP in the router, or forward TCP port 47830 to the Android phone. Step by step: Help › Allow calls from far away.",
+                             table: "Connection"), at: 3)
+        }
+        return items
+    }
+
+    private static func base(cloud: Bool) -> [FAQ] {
+        [
         FAQ(id: 1, question: "What is Pairline?",
             answer: "Pairline lets this iPhone use the SIM card in your Android phone: messages, calls, contacts, call history and USSD codes, over an encrypted link between your two phones."),
         cloud

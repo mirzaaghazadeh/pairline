@@ -28,7 +28,7 @@ struct PortForwardingView: View {
                 }
             }
             Section {
-                step(1, Text("In your router, forward TCP port 47830 to the Android phone. Pairline Bridge shows the phone's address on your home network.", tableName: "RemoteMode"))
+                step(1, PortForwardText.values)
                 step(2, Text("Keep the Android phone's address", tableName: "RemoteMode").fontWeight(.semibold)
                      + Text(verbatim: "\n") + FixedAddressText.why + Text(verbatim: "\n\n") + FixedAddressText.best
                      + Text(verbatim: "\n\n") + FixedAddressText.alternative)

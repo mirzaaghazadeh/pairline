@@ -52,7 +52,14 @@ private val sections = listOf(
         listOf(
             Faq(R.string.help_q_ways, R.string.help_a_ways),
             Faq(R.string.help_q_cloud_on, R.string.help_a_cloud_on),
+            Faq(R.string.help_q_icloud_texts, R.string.help_a_icloud_texts),
             Faq(R.string.help_q_cloud_calls, R.string.help_a_cloud_calls),
+            // What the router, the modem or the provider can be behind (carrier-grade NAT, double NAT, UPnP), and the
+            // values of a hand-made port forwarding rule.
+            Faq(R.string.help_q_cgnat, R.string.help_a_cgnat),
+            Faq(R.string.help_q_upnp_empty, R.string.help_a_upnp_empty),
+            Faq(R.string.help_q_double_nat, R.string.help_a_double_nat),
+            Faq(R.string.help_q_port_forward, R.string.help_a_port_forward),
             Faq(R.string.help_q_cloud_private, R.string.help_a_cloud_private),
         ),
     ),

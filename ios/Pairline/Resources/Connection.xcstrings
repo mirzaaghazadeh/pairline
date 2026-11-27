@@ -1,6 +1,51 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Texts while you're away" : {
+      "comment" : "Help › Nearby or Cloud mode?: the card about texts going through iCloud while the phones are apart.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرسائل وأنت بعيد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts while you're away" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها وقتی دورید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktayken mesajlar" } }
+      }
+    },
+    "Via iCloud, texts and one-time codes go both ways. The first text after a quiet spell can take up to 2 minutes to go out: the Android phone checks iCloud every 2 minutes when it's idle, and every 5 seconds right after hearing from this iPhone, so the next ones are quick. Calls from far away need the direct connection to your home." : {
+      "comment" : "Help › Nearby or Cloud mode?: how fast texts go through iCloud (Cloud mode with the phones apart). The Android phone polls iCloud: every 2 minutes when idle, every 5 seconds for a while after the iPhone writes.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud، تنتقل الرسائل ورموز التحقق في الاتجاهين. قد تستغرق أول رسالة بعد فترة هدوء حتى دقيقتين لتُرسَل: يتحقق هاتف أندرويد من iCloud كل دقيقتين حين يكون خاملًا، وكل ٥ ثوانٍ فور أن يسمع من هذا الآيفون، فتُرسَل الرسائل التالية بسرعة. أما المكالمات من بعيد فتحتاج إلى الاتصال المباشر بمنزلك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Via iCloud, texts and one-time codes go both ways. The first text after a quiet spell can take up to 2 minutes to go out: the Android phone checks iCloud every 2 minutes when it's idle, and every 5 seconds right after hearing from this iPhone, so the next ones are quick. Calls from far away need the direct connection to your home." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از راه iCloud، پیامک‌ها و کدهای یک‌بارمصرف در هر دو جهت می‌روند. اولین پیامک بعد از مدتی سکوت ممکن است تا ۲ دقیقه طول بکشد تا فرستاده شود: گوشی اندرویدی وقتی بیکار است هر ۲ دقیقه، و درست بعد از شنیدن از این آیفون هر ۵ ثانیه، iCloud را بررسی می‌کند؛ پس پیامک‌های بعدی سریع می‌روند. تماس از راه دور به اتصال مستقیم به خانه نیاز دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden mesajlar ve tek kullanımlık kodlar iki yönde de gider. Sessiz bir aradan sonraki ilk mesajın gitmesi 2 dakikayı bulabilir: Android telefon boştayken iCloud'u 2 dakikada bir, bu iPhone'dan haber aldıktan hemen sonra ise 5 saniyede bir kontrol eder; sonraki mesajlar hızlı gider. Uzaktan aramalar evinize doğrudan bağlantı gerektirir." } }
+      }
+    },
+    "Your router, port forwarding, and when the provider is the reason" : {
+      "comment" : "Help › Nearby or Cloud mode?: the subtitle of the link to the router guide \"Allow calls from far away\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الموجّه، وإعادة توجيه المنفذ، وحين يكون السبب من المزوّد" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your router, port forwarding, and when the provider is the reason" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم، هدایت پورت، و وقتی مشکل از شرکت اینترنت است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendirici, port yönlendirme ve sorun sağlayıcıdan kaynaklandığında" } }
+      }
+    },
+    "Texts work, but calls from far away don't" : {
+      "comment" : "Help › Questions (Cloud mode only).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرسائل تعمل لكن المكالمات من بعيد لا تعمل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts work, but calls from far away don't" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها کار می‌کنند، اما تماس از راه دور نه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar çalışıyor ama uzaktan aramalar çalışmıyor" } }
+      }
+    },
+    "Calls from far away need a direct connection to the Android phone at home, through your home router. If Settings › Connection › Advanced says it's blocked by carrier-grade NAT, your internet provider shares one address among many homes and no router setting helps: ask the provider for a public IPv4 address, or turn on IPv6 if they offer it. Otherwise turn on UPnP or NAT-PMP in the router, or forward TCP port 47830 to the Android phone. Step by step: Help › Allow calls from far away." : {
+      "comment" : "Help › Questions: the answer to \"Texts work, but calls from far away don't\". Settings › Connection › Advanced and Help › Allow calls from far away are this app's screens, in this app's words.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحتاج المكالمات من بعيد إلى اتصال مباشر بهاتف أندرويد في المنزل عبر موجّه منزلك. إذا ذكرت الإعدادات › الاتصال › متقدم أنه محجوب بسبب CGNAT، فمزوّد الإنترنت يشارك عنوانًا واحدًا بين منازل كثيرة ولا يفيد أي إعداد في الموجّه: اطلب من المزوّد عنوان IPv4 عامًا، أو فعّل IPv6 إن كان يوفّره. وإلا ففعّل UPnP أو NAT-PMP في الموجّه، أو أعد توجيه منفذ TCP رقم 47830 إلى هاتف أندرويد. خطوة بخطوة: المساعدة › السماح بالمكالمات من بعيد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls from far away need a direct connection to the Android phone at home, through your home router. If Settings › Connection › Advanced says it's blocked by carrier-grade NAT, your internet provider shares one address among many homes and no router setting helps: ask the provider for a public IPv4 address, or turn on IPv6 if they offer it. Otherwise turn on UPnP or NAT-PMP in the router, or forward TCP port 47830 to the Android phone. Step by step: Help › Allow calls from far away." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس از راه دور به اتصال مستقیم با گوشی اندرویدی در خانه، از راه مودم خانه، نیاز دارد. اگر تنظیمات › اتصال › پیشرفته می‌گوید به خاطر CGNAT مسدود است، شرکت اینترنت یک نشانی را بین خانه‌های زیادی تقسیم می‌کند و هیچ تنظیمی در مودم کمکی نمی‌کند: از شرکت اینترنت یک نشانی IPv4 عمومی (آی‌پی استاتیک یا عمومی) بخواهید، یا اگر IPv6 می‌دهد آن را روشن کنید. در غیر این صورت UPnP یا NAT-PMP را در مودم روشن کنید، یا پورت TCP شمارهٔ 47830 را به گوشی اندرویدی هدایت کنید. قدم‌به‌قدم: راهنما › ممکن کردن تماس از راه دور." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzaktan aramalar, ev yönlendiriciniz üzerinden evdeki Android telefona doğrudan bir bağlantı gerektirir. Ayarlar › Bağlantı › Gelişmiş, CGNAT nedeniyle engellendiğini söylüyorsa internet sağlayıcınız tek bir adresi birçok ev arasında paylaştırıyordur ve hiçbir yönlendirici ayarı işe yaramaz: sağlayıcınızdan genel bir IPv4 adresi (CGNAT'tan çıkarılma ya da statik IP) isteyin veya sunuyorsa IPv6'yı açın. Aksi halde yönlendiricide UPnP'yi veya NAT-PMP'yi açın ya da TCP 47830 portunu Android telefona yönlendirin. Adım adım: Yardım › Uzaktan aramalara izin verin." } }
+      }
+    },
     "Nearby" : {
       "comment" : "D-099: the first way to connect, the phones near each other over Bluetooth and Wi-Fi. A card title and a heading; Persian and Arabic say \"nearby connection\".",
       "localizations" : {

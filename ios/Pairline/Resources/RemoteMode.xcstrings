@@ -108,11 +108,28 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sağlayıcınız tek bir adresi paylaştırıyorsa" } }
       }
     },
-    "Some internet providers share one internet address among many homes (carrier-grade NAT). Then no router setting helps. Ask your provider for a public IPv4 address or for IPv6; some give one on request." : {
+    "Some internet providers share one internet address among many homes (carrier-grade NAT). To tell: on your router's status page, its own internet (WAN) IPv4 address starts with 100.64 to 100.127, and a \"what's my IP\" website on the same Wi-Fi shows a different address. Pairline never asks such a website itself, so check by hand. Then no router setting can bring calls in from outside, and the router's UPnP list stays empty. Texts and codes keep working through iCloud." : {
+      "comment" : "Router guide (Allow calls from far away), \"If your provider shares one address\": what carrier-grade NAT is and how to recognize it. Keep 100.64, 100.127 and \"what's my IP\" as they are.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يشارك بعض مزوّدي الإنترنت عنوان إنترنت واحدًا بين منازل كثيرة (CGNAT). عندها لا يفيد أي إعداد في الموجّه. اطلب من مزوّدك عنوان IPv4 عامًا أو IPv6؛ بعضهم يمنحه عند الطلب." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعضی شرکت‌های اینترنت یک نشانی اینترنتی را بین خانه‌های زیادی تقسیم می‌کنند (CGNAT). در این حالت هیچ تنظیمی در مودم کمکی نمی‌کند. از شرکت اینترنت یک نشانی IPv4 عمومی یا IPv6 بخواهید؛ بعضی‌ها با درخواست می‌دهند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bazı internet sağlayıcıları tek bir internet adresini birçok ev arasında paylaştırır (CGNAT). Bu durumda hiçbir yönlendirici ayarı işe yaramaz. Sağlayıcınızdan genel bir IPv4 adresi veya IPv6 isteyin; bazıları istek üzerine verir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يشارك بعض مزوّدي الإنترنت عنوان إنترنت واحدًا بين منازل كثيرة (CGNAT). لتعرف ذلك: في صفحة حالة الموجّه، يبدأ عنوان IPv4 الخاص به على الإنترنت (WAN) بقيمة من 100.64 إلى 100.127، ويُظهر موقع مثل «what's my IP» على شبكة Wi-Fi نفسها عنوانًا مختلفًا. لا يسأل Pairline مثل هذا الموقع بنفسه أبدًا، فتحقّق من ذلك يدويًا. عندها لا يستطيع أي إعداد في الموجّه إيصال المكالمات من الخارج، وتبقى قائمة UPnP في الموجّه فارغة. وتظل الرسائل والرموز تعمل عبر iCloud." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بعضی شرکت‌های اینترنت یک نشانی اینترنتی را بین خانه‌های زیادی تقسیم می‌کنند (CGNAT). برای فهمیدنش: در صفحهٔ وضعیت مودم، نشانی IPv4 اینترنت خودِ مودم (WAN) با عددی از 100.64 تا 100.127 شروع می‌شود، و سایتی مثل «what's my IP» روی همان وای‌فای نشانی دیگری نشان می‌دهد. Pairline خودش هیچ‌وقت از چنین سایتی نمی‌پرسد، پس خودتان بررسی کنید. در این حالت هیچ تنظیمی در مودم نمی‌تواند تماس‌ها را از بیرون به خانه برساند، و فهرست UPnP مودم خالی می‌ماند. پیامک‌ها و کدها از راه iCloud کار می‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bazı internet sağlayıcıları tek bir internet adresini birçok ev arasında paylaştırır (CGNAT). Anlamak için: yönlendiricinizin durum sayfasında kendi internet (WAN) IPv4 adresi 100.64 ile 100.127 arasındaki bir sayıyla başlar ve aynı Wi-Fi'da \"what's my IP\" gibi bir site farklı bir adres gösterir. Pairline böyle bir siteye hiçbir zaman kendisi sormaz; bu yüzden elle kontrol edin. Bu durumda hiçbir yönlendirici ayarı aramaları dışarıdan içeri getiremez ve yönlendiricinin UPnP listesi boş kalır. Mesajlar ve kodlar iCloud üzerinden çalışmaya devam eder." } }
+      }
+    },
+    "What to ask your provider" : {
+      "comment" : "Router guide: the card after carrier-grade NAT, what to ask the internet provider for.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ما الذي تطلبه من مزوّدك" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از شرکت اینترنت چه بخواهید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sağlayıcınızdan ne istemeli" } }
+      }
+    },
+    "Ask for a public IPv4 address (some call it a static or public IP). Or, if your provider offers IPv6, turn it on in the router (on a TP-Link: Advanced › Network › IPv6): Pairline uses IPv6 by itself." : {
+      "comment" : "Router guide: the fix for carrier-grade NAT. Use the words people in your language use with their provider (fa: آی‌پی استاتیک یا عمومی; tr: CGNAT'tan çıkarılma or statik IP). Keep the TP-Link menu path in English, as the router shows it.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اطلب عنوان IPv4 عامًا (يسميه بعضهم IP ثابتًا أو عامًا). أو إذا كان مزوّدك يوفّر IPv6، ففعّله في الموجّه (في ⁦TP-Link: Advanced › Network › IPv6⁩): يستخدم Pairline بروتوكول IPv6 من تلقاء نفسه." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "یک نشانی IPv4 عمومی بخواهید (معمولاً به آن «آی‌پی استاتیک یا عمومی» می‌گویند). یا اگر شرکت اینترنت IPv6 می‌دهد، آن را در مودم روشن کنید (در ⁦TP-Link: Advanced › Network › IPv6⁩): Pairline خودش از IPv6 استفاده می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Genel bir IPv4 adresi isteyin (CGNAT'tan çıkarılma ya da \"statik IP\" de denir). Ya da sağlayıcınız IPv6 sunuyorsa yönlendiricide açın (TP-Link'te: Advanced › Network › IPv6): Pairline IPv6'yı kendiliğinden kullanır." } }
       }
     },
     "Two boxes at home" : {
@@ -122,11 +139,12 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evde iki cihaz" } }
       }
     },
-    "If your provider's modem sits in front of your own router, turn on UPnP on the modem too, or put the modem in bridge mode so your router gets the internet address." : {
+    "If your router's own internet (WAN) address is a private one (192.168.x.x, 10.x.x.x or 172.16–31.x.x), it sits behind your provider's modem. Put the modem in bridge mode so your router gets the internet address, or turn on UPnP (or forward the port) on both the modem and the router." : {
+      "comment" : "Router guide, \"Two boxes at home\": double NAT, how to recognize it and the fix. Keep the address examples as they are.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا كان مودم مزوّدك قبل موجّهك الخاص، ففعّل UPnP على المودم أيضًا، أو اضبط المودم على وضع الجسر (Bridge) ليحصل موجّهك على عنوان الإنترنت." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر مودم شرکت اینترنت پیش از روتر خودتان قرار دارد، UPnP را روی مودم هم روشن کنید، یا مودم را در حالت Bridge بگذارید تا روتر شما نشانی اینترنت را بگیرد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sağlayıcınızın modemi kendi yönlendiricinizin önündeyse modemde de UPnP'yi açın ya da yönlendiriciniz internet adresini alsın diye modemi köprü (bridge) moduna alın." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذا كان عنوان الإنترنت الخاص بموجّهك (WAN) عنوانًا خاصًا (⁦192.168.x.x⁩ أو ⁦10.x.x.x⁩ أو ⁦172.16–31.x.x⁩)، فهو خلف مودم مزوّدك. اضبط المودم على وضع الجسر (Bridge) ليحصل موجّهك على عنوان الإنترنت، أو فعّل UPnP (أو أعد توجيه المنفذ) على المودم والموجّه كليهما." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اگر نشانی اینترنت خودِ روترتان (WAN) یک نشانی خصوصی است (⁦192.168.x.x⁩، ⁦10.x.x.x⁩ یا ⁦172.16–31.x.x⁩)، روتر پشت مودم شرکت اینترنت قرار دارد. مودم را در حالت Bridge بگذارید تا روتر شما نشانی اینترنت را بگیرد، یا UPnP را (یا هدایت پورت را) هم روی مودم و هم روی روتر روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiricinizin kendi internet (WAN) adresi özel bir adresse (192.168.x.x, 10.x.x.x veya 172.16–31.x.x), sağlayıcınızın modeminin arkasındadır. Yönlendiriciniz internet adresini alsın diye modemi köprü (bridge) moduna alın ya da hem modemde hem yönlendiricide UPnP'yi açın (veya portu yönlendirin)." } }
       }
     },
     "What opening a port means" : {
@@ -172,18 +190,36 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "İkisi de işe yaramazsa" } }
       }
     },
-    "Forward the port" : {
+    "What to enter in the router" : {
+      "comment" : "Router guide: the card with a manual port forwarding rule's values.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أعد توجيه المنفذ" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پورت را هدایت کنید" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Portu yönlendirin" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ما الذي تُدخله في الموجّه" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در مودم چه وارد کنید" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiriciye ne girilmeli" } }
       }
     },
-    "In your router, forward TCP port 47830 to the Android phone. Pairline Bridge shows the phone's address on your home network." : {
+    "Add a port forwarding rule (some routers call it a virtual server) with these values:\n• Protocol: TCP\n• External (WAN) port: 47830\n• Internal (LAN) IP: the Android phone's address on your home Wi-Fi\n• Internal (LAN) port: 47830\nPairline Bridge shows the phone's address and port in its Settings › Cloud mode. Forward only 47830: 47820 is the nearby Wi-Fi link and stays inside your home. Only your paired iPhone can connect." : {
+      "comment" : "Router guide and Port forwarding screen: a manual port forwarding rule as a list, one value per line (keep the line breaks and bullets). Keep the router's own English field names in brackets where your language's routers show them in English. \"Settings › Cloud mode\" is the Android app's screen, in the Android app's own words.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في موجّهك، أعد توجيه منفذ TCP رقم 47830 إلى هاتف أندرويد. يعرض Pairline Bridge عنوان الهاتف على شبكة منزلك." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در مودم، پورت TCP شمارهٔ 47830 را به گوشی اندرویدی هدایت کنید (Port forwarding). Pairline Bridge نشانی گوشی را در شبکهٔ خانه نشان می‌دهد." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiricinizde TCP 47830 numaralı portu Android telefona yönlendirin. Pairline Bridge telefonun ev ağınızdaki adresini gösterir." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أضف في الموجّه قاعدة لإعادة توجيه المنفذ (تسميها بعض الموجّهات Virtual Server) بهذه القيم:\n• البروتوكول (Protocol): TCP\n• المنفذ الخارجي (External / WAN): 47830\n• العنوان الداخلي (Internal / LAN IP): عنوان هاتف أندرويد على شبكة Wi-Fi المنزلية\n• المنفذ الداخلي (Internal / LAN): 47830\nيعرض Pairline Bridge عنوان الهاتف والمنفذ في الإعدادات › الوضع السحابي. أعد توجيه 47830 فقط: المنفذ 47820 خاص بالاتصال القريب عبر Wi-Fi ويبقى داخل المنزل. لا يستطيع الاتصال إلا آيفونك المقترن." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در مودم یک قانون هدایت پورت (Port forwarding؛ در بعضی مودم‌ها Virtual Server) با این مقدارها بسازید:\n• پروتکل (Protocol): TCP\n• پورت بیرونی (External / WAN): 47830\n• نشانی داخلی (Internal / LAN IP): نشانی گوشی اندرویدی روی وای‌فای خانه\n• پورت داخلی (Internal / LAN): 47830\nPairline Bridge نشانی گوشی و پورت را در تنظیمات › حالت ابری نشان می‌دهد. فقط 47830 را هدایت کنید: 47820 اتصال نزدیک از راه وای‌فای است و داخل خانه می‌ماند. فقط آیفون جفت‌شدهٔ شما می‌تواند وصل شود." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yönlendiricide şu değerlerle bir port yönlendirme kuralı ekleyin (bazı yönlendiriciler buna Virtual Server der):\n• Protokol: TCP\n• Dış (WAN) port: 47830\n• İç (LAN) IP: Android telefonun ev Wi-Fi'ındaki adresi\n• İç (LAN) port: 47830\nPairline Bridge telefonun adresini ve portu Ayarlar › Bulut modu'nda gösterir. Yalnızca 47830'u yönlendirin: 47820 yakın Wi-Fi bağlantısıdır ve evin içinde kalır. Yalnızca eşleştirilmiş iPhone'unuz bağlanabilir." } }
+      }
+    },
+    "UPnP is on, but the router's list is empty" : {
+      "comment" : "Router guide: a card after the UPnP steps.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "UPnP مفعّل، لكن قائمة الموجّه فارغة" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "UPnP روشن است، اما فهرست مودم خالی است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "UPnP açık ama yönlendiricinin listesi boş" } }
+      }
+    },
+    "Once Cloud mode is on and the Android phone is on your home Wi-Fi, a Pairline entry for port 47830 shows in the router's UPnP list. If the list stays empty (for example \"Total Clients: 0\"), your router's own internet address usually isn't a public one: see \"If neither works\" below. Pairline then opens no port on purpose, since nothing from outside could reach it." : {
+      "comment" : "Router guide: why the router's UPnP list can stay empty. \"If neither works\" is this guide's own section title below, in your language; keep \"Total Clients: 0\" as routers show it.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حين يكون الوضع السحابي مفعّلًا وهاتف أندرويد متصلًا بشبكة Wi-Fi المنزلية، يظهر بند لـ Pairline للمنفذ 47830 في قائمة UPnP في الموجّه. وإذا بقيت القائمة فارغة (مثل «⁦Total Clients: 0⁩»)، فعنوان الإنترنت الخاص بالموجّه ليس عامًا في الغالب: انظر «إذا لم ينجح أيٌّ منهما» أدناه. عندها لا يفتح Pairline أي منفذ عمدًا، لأن لا شيء من الخارج يمكنه الوصول إليه." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی حالت ابری روشن است و گوشی اندرویدی به وای‌فای خانه وصل است، یک ردیف Pairline برای پورت 47830 در فهرست UPnP مودم دیده می‌شود. اگر فهرست خالی می‌ماند (مثلاً «⁦Total Clients: 0⁩»)، معمولاً نشانی اینترنت خودِ مودم عمومی نیست: بخش «اگر هیچ‌کدام کار نکرد» را در پایین ببینید. در این حالت Pairline عمداً پورتی باز نمی‌کند، چون از بیرون چیزی به آن نمی‌رسد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu açıkken ve Android telefon ev Wi-Fi'ına bağlıyken yönlendiricinin UPnP listesinde 47830 portu için bir Pairline satırı görünür. Liste boş kalıyorsa (örneğin \"Total Clients: 0\"), yönlendiricinizin kendi internet adresi genellikle genel bir adres değildir: aşağıdaki \"İkisi de işe yaramazsa\" bölümüne bakın. Pairline o zaman bilerek port açmaz, çünkü dışarıdan hiçbir şey ona ulaşamaz." } }
       }
     },
     "Keep the Android phone's address" : {

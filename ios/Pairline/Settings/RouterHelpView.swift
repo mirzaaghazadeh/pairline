@@ -25,11 +25,13 @@ struct RouterHelpView: View {
                          text: Text("Look for UPnP, NAT-PMP or PCP, often under Advanced, NAT, Network or Firewall. Turn it on and save. Can't find it? Search the web for your router's model and \"UPnP\".", tableName: "RemoteMode"))
                 HelpCard(symbol: "3.circle.fill", title: Text("Check again", tableName: "RemoteMode"),
                          text: Text("In Pairline, open Settings › Connection › Advanced › Check my home connection. When it says a direct connection should work, calls from far away work too.", tableName: "Connection"))
+                HelpCard(symbol: "list.bullet.rectangle", title: Text("UPnP is on, but the router's list is empty", tableName: "RemoteMode"),
+                         text: Text("Once Cloud mode is on and the Android phone is on your home Wi-Fi, a Pairline entry for port 47830 shows in the router's UPnP list. If the list stays empty (for example \"Total Clients: 0\"), your router's own internet address usually isn't a public one: see \"If neither works\" below. Pairline then opens no port on purpose, since nothing from outside could reach it.", tableName: "RemoteMode"))
 
                 Text("If it doesn't: set up port forwarding yourself", tableName: "RemoteMode")
                     .font(.title3.weight(.semibold))
-                HelpCard(symbol: "arrow.left.arrow.right", title: Text("Forward the port", tableName: "RemoteMode"),
-                         text: Text("In your router, forward TCP port 47830 to the Android phone. Pairline Bridge shows the phone's address on your home network.", tableName: "RemoteMode"))
+                HelpCard(symbol: "arrow.left.arrow.right", title: Text("What to enter in the router", tableName: "RemoteMode"),
+                         text: PortForwardText.values)
                 HelpCard(symbol: "pin", title: Text("Keep the Android phone's address", tableName: "RemoteMode"),
                          text: FixedAddressText.full)
                 HelpCard(symbol: "globe", title: Text("A fixed name for your home", tableName: "RemoteMode"),
@@ -54,9 +56,11 @@ struct RouterHelpView: View {
                 Text("If neither works", tableName: "RemoteMode")
                     .font(.title3.weight(.semibold))
                 HelpCard(symbol: "building.2", title: Text("If your provider shares one address", tableName: "RemoteMode"),
-                         text: Text("Some internet providers share one internet address among many homes (carrier-grade NAT). Then no router setting helps. Ask your provider for a public IPv4 address or for IPv6; some give one on request.", tableName: "RemoteMode"))
+                         text: Text("Some internet providers share one internet address among many homes (carrier-grade NAT). To tell: on your router's status page, its own internet (WAN) IPv4 address starts with 100.64 to 100.127, and a \"what's my IP\" website on the same Wi-Fi shows a different address. Pairline never asks such a website itself, so check by hand. Then no router setting can bring calls in from outside, and the router's UPnP list stays empty. Texts and codes keep working through iCloud.", tableName: "RemoteMode"))
+                HelpCard(symbol: "questionmark.bubble", title: Text("What to ask your provider", tableName: "RemoteMode"),
+                         text: Text("Ask for a public IPv4 address (some call it a static or public IP). Or, if your provider offers IPv6, turn it on in the router (on a TP-Link: Advanced › Network › IPv6): Pairline uses IPv6 by itself.", tableName: "RemoteMode"))
                 HelpCard(symbol: "server.rack", title: Text("Two boxes at home", tableName: "RemoteMode"),
-                         text: Text("If your provider's modem sits in front of your own router, turn on UPnP on the modem too, or put the modem in bridge mode so your router gets the internet address.", tableName: "RemoteMode"))
+                         text: Text("If your router's own internet (WAN) address is a private one (192.168.x.x, 10.x.x.x or 172.16–31.x.x), it sits behind your provider's modem. Put the modem in bridge mode so your router gets the internet address, or turn on UPnP (or forward the port) on both the modem and the router.", tableName: "RemoteMode"))
                 HelpCard(symbol: "lock.shield", title: Text("What opening a port means", tableName: "RemoteMode"),
                          text: Text("Pairline opens one port, only to the Android phone, and only your paired iPhone can use it: anything else is turned away. With UPnP on, apps on your home network can also ask the router to open ports; Pairline closes its own when you turn Cloud mode off.", tableName: "RemoteMode"))
                 HelpCard(symbol: "phone.fill", title: Text("Talking on the iPhone", tableName: "RemoteMode"),
@@ -67,6 +71,12 @@ struct RouterHelpView: View {
         .background(Color(.systemGroupedBackground))
         .navigationBarTitleDisplayMode(.inline)
     }
+}
+
+/// The values of a manual port forwarding rule (D-095), as a list. Shared by the Help article and the Port forwarding
+/// screen.
+enum PortForwardText {
+    static let values = Text("Add a port forwarding rule (some routers call it a virtual server) with these values:\n• Protocol: TCP\n• External (WAN) port: 47830\n• Internal (LAN) IP: the Android phone's address on your home Wi-Fi\n• Internal (LAN) port: 47830\nPairline Bridge shows the phone's address and port in its Settings › Cloud mode. Forward only 47830: 47820 is the nearby Wi-Fi link and stays inside your home. Only your paired iPhone can connect.", tableName: "RemoteMode")
 }
 
 /// Why manual port forwarding needs the Android phone at a fixed address on the home network, and how to give it one
