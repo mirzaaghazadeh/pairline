@@ -178,7 +178,18 @@ final class BridgeController: ObservableObject {
         if let last = lastICloudSync, Date().timeIntervalSince(last) < 5 * 60 { return }
         lastICloudSync = Date()
         log.info("sync", "Syncing through iCloud")
+        // The bridge's status says what it can do; a live link asks for it first, and a phone paired over the internet
+        // never had one, so without it nothing was asked for (2026-11-27).
+        if let reply = try? await link.request(.statusGet), case .status(let s) = reply.message {
+            applyStatus(s)
+        }
+        guard !caps.isEmpty else {
+            log.warning("sync", "The bridge's status didn't come through iCloud; trying again later")
+            lastICloudSync = nil
+            return
+        }
         await sync()
+        log.info("sync", "Sync through iCloud done")
     }
 
     private func established() {
