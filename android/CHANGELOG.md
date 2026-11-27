@@ -5,6 +5,12 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.5 (2026-11-27)
+
+- **Scanning an invitation works.** "Pair over the internet" › Scan now asks for the camera; in 1.9.4 it couldn't, and
+  Camera didn't show in the app's permissions. The camera is used only while the scanner is open, and nothing it sees
+  is kept. Choosing a picture of the code or pasting its link still work without it.
+
 ## 1.9.4 (2026-11-27)
 
 - **Pairing fits on one screen.** A smaller QR code, the timer and "New code" side by side, and the "keep this screen

@@ -1936,3 +1936,18 @@ through those timers, so the first text after a quiet spell waited 2 minutes or 
   rate-limit answers. Watch it as users grow; the private database (issue #4) would move these requests to each user's
   own iCloud.
 - **Help** in both apps and the website now says "within a few seconds on the charger, about 10 seconds on battery".
+
+### D-103 — Release bridges offer pairing over the internet, with the camera for its scanner (2026-11-27)
+
+The bridge hid "pair over the internet" in release builds (`CloudModeUi.pairingOverInternet` was debug-only) and
+declared `CAMERA` only in the debug manifest, because release bridges once accepted only private-database invitations,
+which no iPhone made. Since D-092's TestFlight builds, iPhones make public-database invitations in CloudKit Production,
+which release bridges accept (`RemoteConfig.accepts`), so a tester on 1.9.2 found no way to scan one.
+
+- 1.9.4 shows the option in every build: on the pairing screen, "Phones not together? Pair over the internet" opens
+  scan, choose a picture, and paste the link. The screen now fits on one phone screen (a 240 dp QR code, the timer and
+  "New code" on one row).
+- 1.9.5 moves `CAMERA` (with `android.hardware.camera` not required) to the main manifest: 1.9.4's Scan button couldn't
+  ask for it, and Android didn't list Camera in the app's permissions. It's asked only on the Scan tap, frames are read
+  on the phone and never kept (PRIVACY.md); a phone without a camera, or a user who says no, chooses a picture or
+  pastes the link.

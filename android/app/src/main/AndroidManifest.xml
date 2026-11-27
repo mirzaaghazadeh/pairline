@@ -92,6 +92,12 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
+    <!-- Pair over the internet (D-092, D-103): the live scanner for the invitation QR code from the user's iPhone.
+         Asked on the "Scan" tap only; frames are read on the phone and never kept. Phones without a camera can still
+         choose a picture of the code or paste its link. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
