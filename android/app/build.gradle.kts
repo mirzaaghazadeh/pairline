@@ -9,9 +9,11 @@ val remoteProtocolVectors: File = file("../../protocol/test-vectors/v1-remote.js
 
 android {
     namespace = "app.pairline.android"
-    // AndroidX now needs compileSdk 37. This only sets the APIs we compile against;
+    // AndroidX needs compileSdk 37.1 (Compose BOM 2026.11). This only sets the APIs we compile against;
     // targetSdk (runtime behavior) and minSdk (supported phones) are separate.
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 1 }
+    }
 
     defaultConfig {
         // Final since 1.0.0 (D-037). Changing it would break updates.
