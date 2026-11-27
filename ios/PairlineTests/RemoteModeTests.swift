@@ -1,3 +1,4 @@
+import CloudKit
 import CryptoKit
 import XCTest
 @testable import Pairline
@@ -744,5 +745,22 @@ final class RemotePairingTests: XCTestCase {
         await waitFor { restored }
         XCTAssertEqual(mailbox.tornDown, 1)
         XCTAssertFalse(rolledBack)
+    }
+}
+
+/// What Settings says when iCloud fails: only a missing network sends the user to check this iPhone's internet; iCloud
+/// asking to wait (busy, unavailable for a moment, too many requests) says so and that Pairline retries (2026-11-27).
+final class RemoteProblemTests: XCTestCase {
+    func testICloudAskingToWaitIsntBlamedOnTheInternet() {
+        XCTAssertEqual(RemoteProblem(CKError(.networkUnavailable)), .offline)
+        XCTAssertEqual(RemoteProblem(CKError(.networkFailure)), .offline)
+        XCTAssertEqual(RemoteProblem(CKError(.requestRateLimited)), .busy)
+        XCTAssertEqual(RemoteProblem(CKError(.serviceUnavailable)), .busy)
+        XCTAssertEqual(RemoteProblem(CKError(.zoneBusy)), .busy)
+        XCTAssertEqual(RemoteProblem(CKError(.notAuthenticated)), .iCloudUnavailable)
+        XCTAssertEqual(RemoteProblem(CKError(.internalError)), .failed)
+        XCTAssertEqual(RemoteError(CKError(.requestRateLimited)), .busy)
+        XCTAssertEqual(RemotePairing.Failure(CKError(.zoneBusy)), .busy)
+        XCTAssertFalse(RemoteProblem.busy.nextStep.contains("internet"))
     }
 }

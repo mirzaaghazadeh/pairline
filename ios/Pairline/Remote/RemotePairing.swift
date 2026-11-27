@@ -23,6 +23,8 @@ final class RemotePairing: ObservableObject {
     enum Failure: Equatable {
         case iCloudUnavailable
         case offline
+        /// iCloud asked to wait (busy, or too many requests).
+        case busy
         case failed
         case expired
         /// A second, different `rpair.hello`: someone else has the invitation.
@@ -36,6 +38,7 @@ final class RemotePairing: ObservableObject {
             switch RemoteProblem(error) {
             case .iCloudUnavailable: self = .iCloudUnavailable
             case .offline: self = .offline
+            case .busy: self = .busy
             default: self = .failed
             }
         }

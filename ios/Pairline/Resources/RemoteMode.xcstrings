@@ -1,6 +1,33 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "iCloud is busy right now" : {
+      "comment" : "Cloud mode's status in Settings when iCloud answered but asked to wait (busy, unavailable for a moment, or too many requests). Not the iPhone's internet.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "iCloud مشغول الآن" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "iCloud is busy right now" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "iCloud الان شلوغ است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud şu anda meşgul" } }
+      }
+    },
+    "Apple's iCloud asked Pairline to wait a moment. Pairline tries again by itself; there's nothing to do." : {
+      "comment" : "Settings footer under \"iCloud is busy right now\": the next step is to do nothing, since Pairline retries.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "طلب iCloud من Pairline الانتظار قليلًا. سيحاول Pairline مجددًا من تلقاء نفسه، ولا حاجة إلى فعل أي شيء." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Apple's iCloud asked Pairline to wait a moment. Pairline tries again by itself; there's nothing to do." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "iCloud اپل از Pairline خواست کمی صبر کند. Pairline خودش دوباره امتحان می‌کند؛ لازم نیست کاری بکنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Apple'ın iCloud'u Pairline'dan biraz beklemesini istedi. Pairline kendisi yeniden dener; bir şey yapmanıza gerek yok." } }
+      }
+    },
+    "iCloud is busy right now. Try again in a minute." : {
+      "comment" : "Turning Cloud mode on, or pairing over the internet, failed because iCloud asked to wait (busy or too many requests).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "iCloud مشغول الآن. حاول مرة أخرى بعد دقيقة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "iCloud is busy right now. Try again in a minute." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "iCloud الان شلوغ است. یک دقیقهٔ دیگر دوباره امتحان کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud şu anda meşgul. Bir dakika sonra yeniden deneyin." } }
+      }
+    },
     "Allow calls from far away" : {
       "comment" : "Help article title (Cloud mode's direct connection): how to let the home router make the direct connection that calls from far away need. Fits any router brand.",
       "localizations" : {

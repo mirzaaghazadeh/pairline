@@ -5,7 +5,11 @@ import Foundation
 /// Why remote mode ("Cloud mode" on screen) isn't working right now (the status in Settings).
 enum RemoteProblem: Equatable {
     case iCloudUnavailable
+    /// No network on the way to iCloud.
     case offline
+    /// iCloud answered but asked to wait (busy, unavailable for a moment, or too many requests): not the iPhone's
+    /// internet, so the user isn't sent to check it.
+    case busy
     /// Records this iPhone wrote for the bridge stayed unread for 10 minutes.
     case bridgeNotReading
     case failed
@@ -14,8 +18,10 @@ enum RemoteProblem: Equatable {
         switch (error as? CKError)?.code {
         case .notAuthenticated?, .accountTemporarilyUnavailable?, .permissionFailure?:
             self = .iCloudUnavailable
-        case .networkUnavailable?, .networkFailure?, .serviceUnavailable?, .requestRateLimited?, .zoneBusy?:
+        case .networkUnavailable?, .networkFailure?:
             self = .offline
+        case .serviceUnavailable?, .requestRateLimited?, .zoneBusy?:
+            self = .busy
         default:
             self = .failed
         }
@@ -25,6 +31,7 @@ enum RemoteProblem: Equatable {
         switch self {
         case .iCloudUnavailable: return String(localized: "Sign in to iCloud on this iPhone")
         case .offline: return String(localized: "Can't reach iCloud right now")
+        case .busy: return String(localized: "iCloud is busy right now", table: "RemoteMode")
         case .bridgeNotReading: return String(localized: "The bridge phone hasn't checked in for 10 minutes")
         case .failed: return String(localized: "iCloud isn't working right now")
         }
@@ -35,6 +42,8 @@ enum RemoteProblem: Equatable {
         switch self {
         case .iCloudUnavailable:
             return String(localized: "Sign in to iCloud in this iPhone's Settings. Cloud mode uses your own iCloud.", table: "RemoteMode")
+        case .busy:
+            return String(localized: "Apple's iCloud asked Pairline to wait a moment. Pairline tries again by itself; there's nothing to do.", table: "RemoteMode")
         case .offline:
             return String(localized: "Check this iPhone's internet connection. Pairline keeps trying.", table: "RemoteMode")
         case .bridgeNotReading:
@@ -52,6 +61,7 @@ enum RemoteError: LocalizedError, Equatable {
     case bridgeCantReachICloud
     case iCloudUnavailable
     case offline
+    case busy
     case failed
 
     init(_ error: Error) {
@@ -67,6 +77,7 @@ enum RemoteError: LocalizedError, Equatable {
             switch RemoteProblem(error) {
             case .iCloudUnavailable: self = .iCloudUnavailable
             case .offline: self = .offline
+            case .busy: self = .busy
             default: self = .failed
             }
         }
@@ -84,6 +95,8 @@ enum RemoteError: LocalizedError, Equatable {
             return String(localized: "Sign in to iCloud on this iPhone, then try again.")
         case .offline:
             return String(localized: "Couldn't reach iCloud. Check this iPhone's internet connection and try again.")
+        case .busy:
+            return String(localized: "iCloud is busy right now. Try again in a minute.", table: "RemoteMode")
         case .failed:
             return String(localized: "That didn't work. Try again.")
         }

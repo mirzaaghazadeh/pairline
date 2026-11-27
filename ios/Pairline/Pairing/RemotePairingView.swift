@@ -225,6 +225,8 @@ private struct RemotePairingSteps: View {
             return String(localized: "Sign in to iCloud on this iPhone to pair over the internet.", table: "RemoteMode")
         case .offline:
             return RemoteError.offline.errorDescription ?? ""
+        case .busy:
+            return RemoteError.busy.errorDescription ?? ""
         case .failed:
             return RemoteError.failed.errorDescription ?? ""
         case .expired:
