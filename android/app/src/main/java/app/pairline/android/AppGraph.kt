@@ -1,6 +1,11 @@
 package app.pairline.android
 
 import android.app.Application
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
+import android.os.PowerManager
 import app.pairline.android.audio.CallAudioRelay
 import app.pairline.android.audio.MediaChannelTransport
 import app.pairline.android.files.FileNotifications
@@ -76,8 +81,41 @@ object AppGraph {
             peerKey = peers::pinned,
             lastSeen = { prefs.lastSeen },
             deliver = { link.deliverFromMailbox(it) },
+            charging = ::pluggedIn,
+            keepAwake = ::keepAwakeForCloudMode,
         )
     }
+
+    /**
+     * On a charger, whether or not it's charging right now (a phone that protects its battery stops at 85 % and says
+     * "not charging" while plugged in).
+     */
+    private fun pluggedIn(): Boolean =
+        (app.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+            ?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
+
+    /**
+     * Cloud mode checks iCloud every few seconds (D-102); with the screen off Android would let the CPU sleep through
+     * those checks, so a partial wake lock is held while they run and let go while a nearby session carries everything.
+     * Renewed on every pass, so it lapses by itself if the checks ever stop.
+     */
+    private val cloudModeWake: PowerManager.WakeLock by lazy {
+        (app.getSystemService(Context.POWER_SERVICE) as PowerManager)
+            .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "pairline:cloud-mode")
+            .apply { setReferenceCounted(false) }
+    }
+
+    @Volatile private var cloudModeAwake = false
+
+    private fun keepAwakeForCloudMode(on: Boolean) {
+        if (on) cloudModeWake.acquire(CLOUD_MODE_WAKE_MS) else if (cloudModeWake.isHeld) cloudModeWake.release()
+        if (on != cloudModeAwake) {
+            cloudModeAwake = on
+            Log.i("remote", if (on) "checking iCloud every few seconds; keeping the CPU awake for it" else "iCloud checks paused")
+        }
+    }
+
+    private const val CLOUD_MODE_WAKE_MS = 2 * 60_000L
 
     /**
      * Remote mode's direct connection through the home router (D-092): a public listener whose sessions join

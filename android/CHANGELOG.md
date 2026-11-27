@@ -5,6 +5,13 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.3 (2026-11-27)
+
+- **Texts from your iPhone go out within seconds in Cloud mode.** This phone now checks iCloud every 3 seconds while
+  it's on its charger, and every 5 to 10 seconds on battery, and stays awake enough to do it with the screen off.
+  Before, the first text after a quiet spell could wait two minutes or more. Keep this phone on its charger for the
+  fastest texts and the least battery worry.
+
 ## 1.9.2 (2026-11-27)
 
 - **Diagnostics show Cloud mode.** The report you can share from Settings › Help › Diagnostics now says whether Cloud

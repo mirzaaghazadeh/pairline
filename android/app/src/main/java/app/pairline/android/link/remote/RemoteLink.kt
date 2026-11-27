@@ -45,8 +45,9 @@ data class RemoteStatus(
 /**
  * Remote mode's mailbox (D-092, PROTOCOL.md "Remote mode"): the third path next to the Bluetooth and Wi-Fi sessions.
  * While no session is up, events and replies are sealed to the pinned iPhone (kind 1) and put into its alert or quiet
- * mailbox, and the R→B mailbox is checked every 30 s while the iPhone was heard from in the last 10 minutes,
- * otherwise every 2 minutes. What's found there goes to the sessions' handler with `LinkManager.MAILBOX_TOKEN`.
+ * mailbox, and the R→B mailbox is checked every few seconds ([checkInterval], D-102: 3 s on the charger, 5–10 s on
+ * battery), with the CPU kept awake for it. What's found there goes to the sessions' handler with
+ * `LinkManager.MAILBOX_TOKEN`.
  *
  * Every request runs on one coroutine on [Dispatchers.IO], one at a time; the link thread only queues and wakes it.
  */
@@ -62,6 +63,14 @@ class RemoteLink(
     private val clock: () -> Long = System::currentTimeMillis,
     private val random: SecureRandom = SecureRandom(),
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    /** The phone is on its charger: the mailbox is checked every [CHARGING_CHECK_MS] (D-102). */
+    private val charging: () -> Boolean = { false },
+    /**
+     * True while the mailbox is checked on a timer, false while this waits to be woken (a session is up, or remote
+     * mode is off). With the screen off Android lets the CPU sleep and the timer would fire minutes late, so the
+     * caller holds a partial wake lock while this is true (D-102).
+     */
+    private val keepAwake: (Boolean) -> Unit = {},
 ) : MailboxRoute {
 
     private class Outgoing(val slot: MailboxSlot, val plaintext: ByteArray, val time: Long, val recordId: ByteArray)
@@ -239,6 +248,7 @@ class RemoteLink(
         publish()
         while (currentCoroutineContext().isActive) {
             val wait = step()
+            keepAwake(wait != null)
             when {
                 wait == null -> wake.receive()
                 wait > 0 -> withTimeoutOrNull(wait) { wake.receive() }
@@ -259,7 +269,11 @@ class RemoteLink(
             if (!sessionUp && now >= nextCheckAt) {
                 val full = check(ready)
                 lastCheck = clock()
-                nextCheckAt = if (full) lastCheck else lastCheck + checkInterval(lastCheck, maxOf(lastSeen(), lastReceived))
+                nextCheckAt = if (full) {
+                    lastCheck
+                } else {
+                    lastCheck + checkInterval(lastCheck, maxOf(lastSeen(), lastReceived), charging())
+                }
             }
             if (now >= nextSweepAt) {
                 sweep(ready)
@@ -415,19 +429,19 @@ class RemoteLink(
         private const val SWEEP_EVERY_MS = 3_600_000L
         private const val SENT_KEEP_MS = 24 * 3_600_000L
 
-        /**
-         * How often to check the R→B mailbox (Apple pushes only to Apple devices, so the bridge has to look): every
-         * [BURST_CHECK_MS] for [BURST_MS] after a record from the iPhone, so a conversation feels live; every
-         * [FAST_CHECK_MS] while the iPhone was heard from in the last [RECENT_MS]; otherwise every [SLOW_CHECK_MS].
-         */
         /** A status that changed only in signal bars or battery percent goes at most this often. */
         const val STATUS_DETAIL_MS = 10 * 60_000L
 
+        /*
+         * How often to check the R→B mailbox (Apple pushes only to Apple devices, so the bridge has to look), D-102:
+         * on the charger every [CHARGING_CHECK_MS], so a text from the iPhone goes out within seconds; on battery every
+         * [BURST_CHECK_MS] for [BURST_MS] after a record from the iPhone, otherwise every [BATTERY_CHECK_MS].
+         * (D-092's 30 s and 2 minutes made the first text after a quiet spell wait minutes.)
+         */
+        const val CHARGING_CHECK_MS = 3_000L
         const val BURST_MS = 2 * 60_000L
         const val BURST_CHECK_MS = 5_000L
-        const val RECENT_MS = 10 * 60_000L
-        const val FAST_CHECK_MS = 30_000L
-        const val SLOW_CHECK_MS = 120_000L
+        const val BATTERY_CHECK_MS = 10_000L
         const val RETRY_FIRST_MS = 30_000L
         const val RETRY_MAX_MS = 10 * 60_000L
 
@@ -473,10 +487,10 @@ class RemoteLink(
             }
         }.toString()
 
-        fun checkInterval(now: Long, lastHeard: Long): Long = when {
+        fun checkInterval(now: Long, lastHeard: Long, charging: Boolean = false): Long = when {
+            charging -> CHARGING_CHECK_MS
             now - lastHeard < BURST_MS -> BURST_CHECK_MS
-            now - lastHeard < RECENT_MS -> FAST_CHECK_MS
-            else -> SLOW_CHECK_MS
+            else -> BATTERY_CHECK_MS
         }
 
         /** 30 s, 1, 2, 4, 8 minutes, then 10 minutes. */

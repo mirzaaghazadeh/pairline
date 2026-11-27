@@ -1912,3 +1912,27 @@ for a full pass over the apps' user experience. Builds on D-092 and D-094.
   accessibility audit (D-096) covers the new screens.
 - Nothing in the link, the protocol or the data flows changed; no new permission. The iPhone keeps the first-run choice
   in its own preferences (PRIVACY.md).
+
+### D-102 — Cloud mode texts go out within seconds: the bridge checks iCloud every 3–10 s, with a wake lock (2026-11-27)
+
+A tester's texts from the iPhone in Cloud mode went out only after minutes ("it should be realtime!!", the maintainer).
+The bridge can't get Apple's pushes (CloudKit Web Services' push for web clients answers "This endpoint is deprecated",
+D-092), so it checks the R→B mailbox on a timer, and D-092's timer was every 5 s for 2 minutes after hearing from the
+iPhone, every 30 s within 10 minutes, otherwise every 2 minutes. With the screen off Android also let the CPU sleep
+through those timers, so the first text after a quiet spell waited 2 minutes or more. Supersedes that part of D-092:
+
+- **How often:** on a charger (plugged in, whether or not it's charging right now: a phone that protects its battery
+  says "not charging" at 85 %), every **3 s**; on battery every **5 s** for 2 minutes after a record from the iPhone,
+  otherwise every **10 s**. Still not at all while a nearby session is up. A text then goes out in about 2–4 s on a
+  charger, at most about 10 s on battery. The other direction was already live (Apple's push, about 1.6 s).
+- **A partial wake lock** (`WAKE_LOCK`, a normal permission with no prompt; PRIVACY.md) is held while those checks run
+  and let go while a nearby session carries everything or Cloud mode is off; it's renewed on every pass with a 2-minute
+  timeout, so it lapses by itself if the checks stop. Pairline is already exempt from battery optimization, which
+  Android needs for a wake lock to count in Doze.
+- **The costs, accepted:** on a charger about 29,000 small requests a day (about 1 KB each over a kept-alive
+  connection), on battery about 9,000; some battery on battery, which is why setup and the Cloud mode screen ask for
+  the charger. Each request counts against our CloudKit container's public-database quota, which Apple says grows with
+  the number of users (CloudKit Dashboard › Telemetry › Usage shows it); the client already backs off on 503 and
+  rate-limit answers. Watch it as users grow; the private database (issue #4) would move these requests to each user's
+  own iCloud.
+- **Help** in both apps and the website now says "within a few seconds on the charger, about 10 seconds on battery".

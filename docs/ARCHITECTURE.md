@@ -189,8 +189,8 @@ Apple and the two phones involved. While no nearby session is up, `LinkManager` 
 
 - **The mailbox in iCloud.** Events from the bridge go to the iPhone's *alert* mailbox (pushed as a notification the
   extension unseals: SMS, codes, calls) or *quiet* mailbox (a silent push; status, replies), and requests from the
-  iPhone to the bridge's mailbox, which the bridge checks every 5 s for 2 minutes after hearing from the iPhone, every
-  30 s within 10 minutes, then every 2 minutes (CloudKit has no push for web clients). Status changes that matter
+  iPhone to the bridge's mailbox, which the bridge checks every 3 s on its charger and every 5–10 s on battery, with a
+  partial wake lock so the checks run on time with the screen off (D-102; CloudKit has no push for web clients). Status changes that matter
   go at once; battery and signal details at most every 10 minutes.
 - **The direct connection.** The bridge's `DirectLink` keeps a router mapping and a public listener while remote
   mode is on and announces its public addresses (`remote.addr`) or why there are none (`remote.state`: carrier-grade

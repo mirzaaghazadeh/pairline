@@ -65,6 +65,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- Cloud mode (D-102): keeps the CPU awake while it checks iCloud every few seconds for what the iPhone sent, so a
+         text goes out within seconds with the screen off. Held only while Cloud mode is on and no nearby link is up. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- The iPhone's ringer switch (D-074): lists Pairline under Do Not Disturb access, which only the user turns on.
          Needed only to switch to or from silent. -->
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />

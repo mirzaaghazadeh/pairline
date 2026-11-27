@@ -31,6 +31,7 @@ class RemoteLinkTest {
     private val store = RemoteStore(kv, TestWrapper())
     private val delivered = mutableListOf<JSONObject>()
     private val dispatcher = QueueDispatcher()
+    private var plugged = false
     private val link = RemoteLink(
         store,
         identity = { bridge },
@@ -41,6 +42,7 @@ class RemoteLinkTest {
         clock = { now },
         random = random,
         dispatcher = dispatcher,
+        charging = { plugged },
     )
     private val mb = RemoteMailboxes("11".repeat(16), "22".repeat(16), "33".repeat(16))
     private val config = RemoteConfig(RemoteBackend.PUBLIC, RemoteEnvironment.DEVELOPMENT, mb)
@@ -151,7 +153,7 @@ class RemoteLinkTest {
 
         // The same record again (a replay, or a delete that didn't arrive): dropped, deleted again.
         cloud.put(mb.toBridge, name, sealed)
-        now += RemoteLink.SLOW_CHECK_MS
+        now += RemoteLink.BATTERY_CHECK_MS
         link.step()
         assertEquals(1, delivered.size)
         assertTrue(cloud.inBox(mb.toBridge).isEmpty())
@@ -187,12 +189,12 @@ class RemoteLinkTest {
         assertEquals(RemoteStore.Problem.TOKEN_REJECTED, store.problem)
         assertEquals(RemoteStore.Problem.TOKEN_REJECTED, link.state.value.problem)
         val requests = cloud.requestCount()
-        now += RemoteLink.SLOW_CHECK_MS
+        now += RemoteLink.BURST_MS
         assertNull(link.step())
         assertEquals(requests, cloud.requestCount())
 
         link.updateToken("fresh")
-        assertEquals(RemoteLink.FAST_CHECK_MS, link.step())
+        assertEquals(RemoteLink.BATTERY_CHECK_MS, link.step())
         assertNull(store.problem)
         assertEquals(cloud.lastToken, store.load())
     }
@@ -223,17 +225,24 @@ class RemoteLinkTest {
         assertFalse(link.state.value.retrying)
     }
 
+    /**
+     * D-102: texts from the iPhone go out within seconds. On battery every 5 s right after the iPhone, otherwise every
+     * 10 s (D-092's 30 s and 2 minutes made the first text after a quiet spell wait minutes); on the charger every 3 s.
+     */
     @Test
-    fun checksOftenRightAfterThePhoneThenEvery30SecondsThenEvery2Minutes() {
+    fun checksEveryFewSecondsAndEvery3OnTheCharger() {
         on() // remote.config just came from the iPhone
         assertEquals(RemoteLink.BURST_CHECK_MS, link.step())
         now += RemoteLink.BURST_MS
-        assertEquals(RemoteLink.FAST_CHECK_MS, link.step())
-        now += RemoteLink.RECENT_MS
-        assertEquals(RemoteLink.SLOW_CHECK_MS, link.step())
+        assertEquals(RemoteLink.BATTERY_CHECK_MS, link.step())
+        now += 60 * 60_000L // an hour later, still every 10 s
+        assertEquals(RemoteLink.BATTERY_CHECK_MS, link.step())
         phoneSends(JSONObject().put("t", Msg.PING).put("id", 2))
-        now += RemoteLink.SLOW_CHECK_MS
+        now += RemoteLink.BATTERY_CHECK_MS
         assertEquals(RemoteLink.BURST_CHECK_MS, link.step())
+        plugged = true
+        now += RemoteLink.BURST_MS
+        assertEquals(RemoteLink.CHARGING_CHECK_MS, link.step())
     }
 
     @Test
