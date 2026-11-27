@@ -45,6 +45,17 @@ private class Faq(@StringRes val q: Int, @StringRes val a: Int)
 private class FaqSection(@StringRes val title: Int, val icon: ImageVector, val items: List<Faq>)
 
 private val sections = listOf(
+    // The two ways the phones connect, first (D-099): most questions start here.
+    FaqSection(
+        R.string.help_section_ways,
+        PIcons.Cloud,
+        listOf(
+            Faq(R.string.help_q_ways, R.string.help_a_ways),
+            Faq(R.string.help_q_cloud_on, R.string.help_a_cloud_on),
+            Faq(R.string.help_q_cloud_calls, R.string.help_a_cloud_calls),
+            Faq(R.string.help_q_cloud_private, R.string.help_a_cloud_private),
+        ),
+    ),
     FaqSection(
         R.string.help_section_setup,
         PIcons.Qr,

@@ -5,6 +5,16 @@ struct HelpCenterView: View {
     var body: some View {
         List {
             Section {
+                // The two ways to connect, with an example each (D-099).
+                if RemoteFeature.isAvailable {
+                    NavigationLink {
+                        HelpArticleView(article: .ways)
+                    } label: {
+                        ToolRow(symbol: "arrow.triangle.branch", tint: .brandBlue,
+                                title: Text("Nearby or Cloud mode?", tableName: "Connection"),
+                                subtitle: Text("Which one is for you, with examples", tableName: "Connection"))
+                    }
+                }
                 NavigationLink {
                     HelpArticleView(article: .setup)
                 } label: {
@@ -32,12 +42,7 @@ struct HelpCenterView: View {
                 // Cloud mode (D-092): the same plain-words explanation as before turning it on.
                 if RemoteFeature.isAvailable {
                     NavigationLink {
-                        ScrollView {
-                            RemoteModeIntroContent()
-                                .padding(20)
-                        }
-                        .background(Color(.systemGroupedBackground))
-                        .navigationBarTitleDisplayMode(.inline)
+                        CloudModeInfoPage()
                     } label: {
                         ToolRow(symbol: "icloud.fill", tint: .brandBlue, title: Text("How Cloud mode works", tableName: "RemoteMode"),
                                 subtitle: Text("Leave the Android phone at home, on charge and on Wi-Fi.", tableName: "RemoteMode"))
@@ -110,6 +115,7 @@ struct HelpCenterView: View {
 
 struct HelpArticleView: View {
     enum Article {
+        case ways
         case setup
         case keepAlive
         case forceQuit
@@ -122,6 +128,7 @@ struct HelpArticleView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 switch article {
+                case .ways: ways
                 case .setup: setup
                 case .keepAlive: keepAlive
                 case .forceQuit: forceQuit
@@ -132,6 +139,24 @@ struct HelpArticleView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// Nearby or Cloud mode, in the same words as the first run and pairing (D-099).
+    private var ways: some View {
+        Group {
+            Text("Nearby or Cloud mode?", tableName: "Connection").font(.largeTitle.weight(.bold))
+            HelpCard(symbol: ConnectionWords.symbol(.nearby), title: ConnectionWords.title(.nearby),
+                     text: ConnectionWords.oneLiner(.nearby) + Text(verbatim: " ") + ConnectionWords.example(.nearby))
+            HelpCard(symbol: ConnectionWords.symbol(.cloud), title: ConnectionWords.title(.cloud),
+                     text: ConnectionWords.oneLiner(.cloud) + Text(verbatim: " ") + ConnectionWords.example(.cloud)
+                        + Text(verbatim: " ") + Text("Turn it on in Settings › Connection while the phones are together.", tableName: "Connection"))
+            HelpCard(symbol: "arrow.triangle.2.circlepath", title: Text("Both at once", tableName: "Connection"),
+                     text: ConnectionWords.bothCanBeOn)
+            HelpCard(symbol: "checklist", title: Text("What Cloud mode needs", tableName: "Connection"),
+                     text: Text("The Android phone on its charger and home Wi-Fi, and this iPhone signed in to iCloud. For calls, your home router lets this iPhone in: most do it by themselves, and Settings › Connection › Advanced shows how otherwise.", tableName: "Connection"))
+            HelpCard(symbol: "lock.fill", title: Text("Private either way", tableName: "Connection"),
+                     text: Text("Nearby, everything goes straight between your phones. With Cloud mode it passes through your own iCloud, locked so only your two phones can open it. There's no Pairline server.", tableName: "Connection"))
+        }
     }
 
     private var setup: some View {
@@ -244,16 +269,27 @@ struct FAQ: Identifiable {
     /// String table; nil is the shared Localizable catalog. Call audio and internet sharing have their own tables.
     var table: String?
 
-    static let all: [FAQ] = [
+    /// Where Cloud mode exists (D-092, D-099), the answers about servers and distance say what it changes.
+    static var all: [FAQ] {
+        let cloud = RemoteFeature.isAvailable
+        return [
         FAQ(id: 1, question: "What is Pairline?",
             answer: "Pairline lets this iPhone use the SIM card in your Android phone: messages, calls, contacts, call history and USSD codes, over an encrypted link between your two phones."),
-        FAQ(id: 2, question: "Does my data go through a server?",
-            answer: "No. The phones talk directly over Bluetooth, encrypted end to end. Pairline has no servers and no accounts, and it contains no analytics or ads."),
-        FAQ(id: 3, question: "Do I need both phones nearby?",
-            answer: "Yes. The link uses Bluetooth, so keep the phones within about 10 meters. Leaving the Android phone at home while you're out isn't supported yet."),
+        cloud
+            ? FAQ(id: 2, question: "Does my data go through a server?",
+                  answer: "No. Nearby, the phones talk directly over Bluetooth and Wi-Fi, encrypted end to end. With Cloud mode, locked records pass through your own iCloud, which only your two phones can open. Pairline has no servers and no accounts, and it contains no analytics or ads.",
+                  table: "Connection")
+            : FAQ(id: 2, question: "Does my data go through a server?",
+                  answer: "No. The phones talk directly over Bluetooth, encrypted end to end. Pairline has no servers and no accounts, and it contains no analytics or ads."),
+        cloud
+            ? FAQ(id: 3, question: "Do I need both phones nearby?",
+                  answer: "No. Near each other, the phones talk over Bluetooth and Wi-Fi. If the Android phone stays home, turn on Cloud mode in Settings › Connection while they're together: calls, texts and codes then reach this iPhone anywhere with internet.",
+                  table: "Connection")
+            : FAQ(id: 3, question: "Do I need both phones nearby?",
+                  answer: "Yes. The link uses Bluetooth, so keep the phones within about 10 meters. Leaving the Android phone at home while you're out isn't supported yet."),
         FAQ(id: 4, question: "Can I talk on the iPhone during calls?",
-            answer: "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later and Wireless debugging (no extra app, no root). The audio goes over Bluetooth, or over Wi-Fi if you choose it in Settings › Call audio. Without it you answer here and talk on the Android phone.",
-            table: "CallAudio"),
+            answer: "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later and Wireless debugging (no extra app, no root). The audio goes over Bluetooth, or over Wi-Fi if you choose it in Settings › Connection › Advanced › Call audio. Without it you answer here and talk on the Android phone.",
+            table: "Connection"),
         FAQ(id: 9, question: "Why does call audio go back to the Android phone sometimes?",
             answer: "Android turns Wireless debugging off every time the Android phone restarts or leaves Wi-Fi. The bridge app turns it back on by itself as soon as that phone is on Wi-Fi, and starts its helper. Some phones also only allow listening: then you hear calls here and talk on the Android phone.",
             table: "CallAudio"),
@@ -274,7 +310,8 @@ struct FAQ: Identifiable {
             answer: "Yes. Pairline's source code is public so anyone can check what it does."),
         FAQ(id: 8, question: "Does Pairline work with group messages or MMS?",
             answer: "Yes, with the latest Pairline Bridge. Picture and group messages show here with their pictures and everyone in the group, and you can send a picture or a group message. Sending needs mobile data on the Android phone, and full pictures open over Wi-Fi."),
-    ]
+        ]
+    }
 }
 
 struct Troubleshooting: Identifiable {

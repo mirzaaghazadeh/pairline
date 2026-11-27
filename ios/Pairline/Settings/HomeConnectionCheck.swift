@@ -75,7 +75,7 @@ extension HomeCheckReply {
     }
 }
 
-/// "Check my home connection" in Settings › Cloud mode: free, with Cloud mode on or off, over any link to the bridge
+/// "Check my home connection" in Settings › Connection › Advanced (D-099): free, with Cloud mode on or off, over any link to the bridge
 /// (or through iCloud). The bridge only asks its router; nothing is opened.
 struct HomeConnectionCheckRow: View {
     @EnvironmentObject private var app: AppModel

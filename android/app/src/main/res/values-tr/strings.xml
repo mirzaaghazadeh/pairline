@@ -29,7 +29,7 @@
     <string name="notif_channel_link">Bağlantı durumu</string>
     <string name="notif_channel_link_desc">iPhone\'unuzun bağlı olup olmadığını gösterir. Android, Pairline\'ın çalışmaya devam edebilmesi için bu bildirimi zorunlu tutar.</string>
     <string name="notif_connected_title">%1$s bağlı</string>
-    <string name="notif_connected_text">Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
+    <string name="notif_connected_text">Yakın. Aramalar, mesajlar ve kodlar iPhone\'unuza gidiyor.</string>
     <string name="notif_waiting_title">iPhone\'unuz bekleniyor</string>
     <string name="notif_waiting_text">iPhone\'unuz yakında olduğunda ve Bluetooth açıkken Pairline otomatik olarak yeniden bağlanır.</string>
     <string name="notif_not_paired_title">Henüz eşleştirilmedi</string>
@@ -44,7 +44,7 @@
 
     <!-- Setup: welcome -->
     <string name="welcome_title">Android SIM\'iniz, iPhone\'unuzda</string>
-    <string name="welcome_body">Pairline bu telefonu bir köprüye dönüştürür. Telefonu yakınınızda tutun ve SIM kartını iPhone\'unuzdan kullanın.</string>
+    <string name="welcome_body">Pairline bu telefonu bir köprüye dönüştürür: SIM kartını iPhone\'unuzdan kullanın; yakından ya da Bulut moduyla her yerden.</string>
     <string name="welcome_point_calls">Aramaları görün, yanıtlayın ve arama yapın</string>
     <string name="welcome_point_sms">Mesajları okuyun ve gönderin</string>
     <string name="welcome_point_contacts">Kişilere ve arama geçmişine de erişin</string>
@@ -52,7 +52,7 @@
 
     <!-- Setup: privacy promise -->
     <string name="privacy_title">Verileriniz iki telefonunuzun arasında kalır</string>
-    <string name="privacy_body">Pairline\'ın sunucusu yoktur. Mesajlarınız, aramalarınız ve kişileriniz bu telefondan doğrudan iPhone\'unuza gider, başka hiçbir yere gitmez. iPhone\'dan açabileceğiniz Bulut modunda ise yalnızca iki telefonunuzun okuyabileceği şekilde kilitlenerek kendi iCloud\'unuzdan geçer.</string>
+    <string name="privacy_body">Pairline\'ın sunucusu yoktur. Yakın bağlantıda mesajlarınız, aramalarınız ve kişileriniz bu telefondan doğrudan iPhone\'unuza gider, başka hiçbir yere gitmez. iPhone\'dan açtığınız Bulut modunda ise bizim değil kendi iCloud\'unuzdan, yalnızca iki telefonunuzun okuyabileceği şekilde kilitlenerek geçer.</string>
     <string name="privacy_point_e2e">Her şey, yalnızca telefonlarınızda bulunan anahtarlarla uçtan uca şifrelenir</string>
     <string name="privacy_point_accounts">Hesap yok, kayıt yok, telefon numarası doğrulaması yok</string>
     <string name="privacy_point_tracking">Reklam, analiz veya herhangi bir izleme yok</string>
@@ -98,7 +98,7 @@
     <!-- Setup: background running -->
     <string name="battery_title">Pairline\'ı çalışır durumda tutun</string>
     <string name="battery_body">Android, pil tasarrufu için arka plandaki uygulamaları duraklatır. Aramaların ve mesajların iPhone\'unuza hemen ulaşması için Pairline\'ın uyanık kalması gerekir.</string>
-    <string name="battery_allow">Arka planda çalışmaya izin ver</string>
+    <string name="battery_allow">Arka planda çalışmaya devam et</string>
     <string name="battery_note">Android bunu kendi penceresinde soracak. Pairline beklerken çok az pil kullanır.</string>
     <string name="battery_done_note">Pairline\'ın arka planda çalışmasına izin verildi.</string>
 
@@ -122,7 +122,7 @@
     <!-- Pairing -->
     <string name="pair_title">iPhone\'unuzu eşleştirin</string>
     <string name="pair_step_1">Pairline\'ı iPhone\'unuza yükleyin ve açın.</string>
-    <string name="pair_step_2">\"Köprü telefon eşleştir\" düğmesine dokunun.</string>
+    <string name="pair_step_2">\"Android telefonunuzu eşleştirin\" düğmesine dokunun (Ayarlar\'da: \"Köprü telefon eşleştir\").</string>
     <string name="pair_step_3">iPhone\'unuzun kamerasını bu koda doğrultun.</string>
     <string name="pair_expires">Kodun kalan süresi: %1$s</string>
     <string name="pair_new_code">Yeni kod</string>
@@ -130,7 +130,7 @@
     <string name="pair_replaces">Yeni bir iPhone eşleştirirseniz %1$s ile olan eşleştirme kaldırılır.</string>
     <string name="pair_success_title">Eşleştirildi!</string>
     <string name="pair_success_text">iPhone\'unuz ve bu telefon artık birbirine güveniyor. Aralarında gidip gelenleri yalnızca onlar okuyabilir.</string>
-    <string name="pair_success_cloud">Telefonlarınız birbirinden uzaktayken de bağlı kalsın mı? iPhone\'unuzdaki Pairline\'da Bulut modunu açın.</string>
+    <string name="pair_success_cloud">Bu telefonu evde mi bırakacaksınız? iPhone\'unuzdaki Pairline\'da Bulut modunu açın ve bu telefonu şarjda ve Wi-Fi\'a bağlı tutun.</string>
     <string name="pair_connecting">Bağlanıyor…</string>
     <string name="pair_connected">Bağlandı. iPhone\'unuz artık bu telefonun SIM kartını kullanabilir.</string>
     <string name="pair_too_many">Birisi birkaç kez yanlış kod denediği için bu kod iptal edildi. iPhone\'unuz hazır olduğunda yeni bir kod oluşturun.</string>
@@ -142,7 +142,7 @@
 
     <!-- Setup: done -->
     <string name="done_title">Her şey hazır</string>
-    <string name="done_body_paired">Bu telefonu şarjlı ve iPhone\'unuzun yakınında tutun. Artık telefonu bir kenara bırakabilirsiniz; Pairline arka planda çalışmaya devam eder.</string>
+    <string name="done_body_paired">Bu telefonu şarjlı tutun. iPhone\'unuzun yakınında kendiliğinden çalışır. Evde bırakmak için iPhone\'unuzdaki Pairline\'da Bulut modunu açın ve bu telefonu Wi-Fi\'a bağlı tutun.</string>
     <string name="done_body_unpaired">Pairline hazır. iPhone\'unuzu istediğiniz zaman ana ekrandan eşleştirebilirsiniz.</string>
     <string name="done_note">Küçük bir bildirim Pairline\'ın çalıştığını gösterir. Bağlantı durumunu görmek için istediğiniz zaman bu bildirime dokunabilirsiniz.</string>
 
@@ -162,7 +162,7 @@
     <string name="settings_stop_bridge_confirm_body">iPhone bağlantıyı kaybeder; aramalar, mesajlar ve kodlar bu telefonda kalır. Wi-Fi bağlantısı, erişim noktası, internet paylaşımı ve iPhone’dan konuşma yardımcısı da durur. Pairline, burada veya ana ekranda Pairline’ı başlat’a dokunana kadar telefon yeniden başlasa bile kapalı kalır.</string>
     <string name="action_stop">Durdur</string>
     <string name="home_connected_title">%1$s bağlı</string>
-    <string name="home_connected_body">Bluetooth üzerinden. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
+    <string name="home_connected_body">Aramalar, mesajlar ve kodlar iPhone\'unuza gidiyor.</string>
     <string name="home_connected_body_tcp">Hata ayıklama test bağlantısı üzerinden. Aramalar ve mesajlar aktarılıyor.</string>
     <string name="home_waiting_title">%1$s bekleniyor</string>
     <string name="home_waiting_body">Son bağlantı: %1$s. iPhone\'unuz yakındayken ve üzerinde Pairline açıkken veya arka planda çalışırken Pairline kendiliğinden yeniden bağlanır.</string>
@@ -171,10 +171,10 @@
     <string name="state_cloud_offline">iCloud\'a ulaşılamıyor</string>
     <string name="notif_via_icloud_text">Bulut modu: telefonlarınız yeniden yakından bağlanana kadar mesajlar, kodlar ve aramalar iPhone\'unuza iCloud\'unuz üzerinden gider.</string>
     <string name="home_via_icloud_title">%1$s ile iCloud üzerinden bağlantı</string>
-    <string name="home_via_icloud_body">Telefonlarınız yakından bağlı değil; bu yüzden Bulut modu mesajları, tek kullanımlık kodları ve gelen aramaları iPhone\'unuza iCloud\'unuz üzerinden, yalnızca iki telefonunuzdaki anahtarlarla kilitli olarak getirir. Uzaktan bir aramada konuşmak için doğrudan bağlantı gerekir.</string>
+    <string name="home_via_icloud_body">Telefonlarınız birbirinden uzakta; bu yüzden Bulut modu mesajları, kodları ve gelen aramaları kendi iCloud\'unuz üzerinden, yalnızca iki telefonunuzun okuyabileceği şekilde kilitli olarak iPhone\'unuza getirir.</string>
     <string name="home_via_icloud_retrying">Bulut modu açık, ancak şu anda iCloud\'a ulaşılamıyor. Bu telefonun internet bağlantısını kontrol edin; Pairline denemeye devam ediyor.</string>
-    <string name="cloud_on">Bulut modu açık: telefonlarınız birbirinden uzaktayken internet üzerinden bağlı kalır.</string>
-    <string name="cloud_off">Telefonlarınız birbirinden uzaktayken internet üzerinden bağlı kalsın diye iPhone\'unuzdaki Pairline\'da Bulut modunu açın.</string>
+    <string name="cloud_on">Bulut modu açık. Telefonlar yakındayken doğrudan konuşur; siz çıkınca Bulut modu devreye girer.</string>
+    <string name="cloud_off">Bu telefonu evde mi bırakacaksınız? Aramalar, mesajlar ve kodlar her yerde gelmeye devam etsin diye iPhone\'unuzdaki Pairline\'da Bulut modunu açın.</string>
     <string name="cloud_retrying">Bulut modu şu anda iCloud\'a ulaşamıyor. Bu telefonun internet bağlantısını kontrol edin; Pairline denemeye devam ediyor.</string>
     <string name="cloud_paused_token">Bulut modu, iPhone\'unuz bu telefonun iCloud erişimini yenileyene kadar duraklatıldı. iPhone\'unuzda Pairline\'ı açın.</string>
     <string name="cloud_paused_refused">Bulut modu duraklatıldı: iCloud şu anda Pairline\'ın bu hesaba başka bir telefondan erişmesine izin vermiyor.</string>
@@ -219,12 +219,10 @@
     <string name="home_debug_tcp_off">Hata ayıklama derlemesi: test bağlantısı dinlemiyor.</string>
 
     <!-- Wi-Fi link and files (M5) -->
-    <string name="home_connected_body_wifi">Wi-Fi üzerinden. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
-    <string name="home_connected_body_both">Bluetooth ve Wi-Fi üzerinden. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
     <string name="home_bt_off_wifi_body">Bluetooth kapalı, ancak iPhone\'unuz aynı Wi-Fi ağı üzerinden yine de bağlanabilir.</string>
-    <string name="notif_connected_text_wifi">Wi-Fi üzerinden bağlı. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
+    <string name="notif_connected_text_wifi">Yakın, Wi-Fi üzerinden. Aramalar, mesajlar ve kodlar iPhone\'unuza gidiyor.</string>
     <string name="notif_waiting_text_wifi">iPhone\'unuz yakında olduğunda veya aynı Wi-Fi ağındayken Pairline otomatik olarak yeniden bağlanır.</string>
-    <string name="settings_wifi">Wi-Fi bağlantısı</string>
+    <string name="settings_wifi">Wi-Fi üzerinden yakın bağlantı</string>
     <string name="settings_wifi_link">Wi-Fi üzerinden bağlan</string>
     <string name="settings_wifi_link_sub">İki telefon aynı Wi-Fi ağındayken iPhone\'unuzun bağlanmasını sağlar: dosyalar, arama sesi ve Bluetooth\'u iPhone\'a ulaşamayan telefonlar için. Yalnızca yerel ağınızdaki cihazlar erişebilir.</string>
     <string name="settings_wifi_listening">Bu telefonun Wi-Fi ağında hazır</string>
@@ -439,9 +437,9 @@
     <string name="help_section_privacy">Gizlilik</string>
 
     <string name="help_q_what">Pairline ne yapar?</string>
-    <string name="help_a_what">iPhone\'unuzun bu Android telefonun SIM kartını kullanmasını sağlar. Gelen aramalar ve mesajlar iPhone\'unuzda görünür; oradan aramaları yanıtlayabilir, mesajlara cevap yazabilir, arama yapabilir ve USSD kodları çalıştırabilirsiniz. Bu telefon yakınınızda kalır ve aramaları ve mesajlaşmayı asıl o yapar.</string>
+    <string name="help_a_what">iPhone\'unuzun bu Android telefonun SIM kartını kullanmasını sağlar. Gelen aramalar ve mesajlar iPhone\'unuzda görünür; oradan aramaları yanıtlayabilir, mesajlara cevap yazabilir, arama yapabilir ve USSD kodları çalıştırabilirsiniz. Aramaları ve mesajlaşmayı asıl bu telefon yapar; iPhone\'unuzun yakınında ya da Bulut moduyla evden.</string>
     <string name="help_q_iphone">iPhone\'da neye ihtiyacım var?</string>
-    <string name="help_a_iphone">iPhone için Pairline uygulaması (iOS 16 veya üzeri) gerekir ve Bluetooth açık olmalıdır. İki telefonun Bluetooth menzili içinde olması gerekir; bu genellikle aynı oda ya da birkaç oda ötesi demektir.</string>
+    <string name="help_a_iphone">iPhone için Pairline uygulaması (iOS 16 veya üzeri) gerekir ve Bluetooth açık olmalıdır. Yakın bağlantıda iki telefonun Bluetooth menzili içinde olması gerekir; bu genellikle aynı oda ya da birkaç oda ötesi demektir. Bulut moduyla internet olan her yerde olabilirler.</string>
     <string name="help_q_pair">Nasıl eşleştiririm?</string>
     <string name="help_a_pair">Bu telefonda kod göstermek için \"iPhone eşleştir\" bölümünü açın. iPhone\'unuzda Pairline\'ı açın, \"Köprü telefon eşleştir\" düğmesine dokunun ve kodu tarayın. Kod yalnızca bir kez çalışır ve 5 dakika sonra geçerliliğini yitirir.</string>
     <string name="help_q_spare">Her gün kullandığım Android telefonu kullanabilir miyim?</string>
@@ -456,7 +454,7 @@
     <string name="help_q_notification">Neden her zaman bir bildirim var?</string>
     <string name="help_a_notification">Android, arka planda çalışan uygulamaların bir bildirim göstermesini zorunlu tutar. Bu bildirim iPhone\'unuzun bağlı olup olmadığını söyler ve hiçbir zaman mesaj metni veya numara göstermez.</string>
     <string name="help_q_distance">Telefonlar birbirinden ne kadar uzakta olabilir?</string>
-    <string name="help_a_distance">Aşağı yukarı bir Bluetooth kulaklığın çalıştığı mesafe kadar: kapalı alanda genellikle 10 ila 30 metre, kalın duvarların arkasında daha az.</string>
+    <string name="help_a_distance">Yakın bağlantıda aşağı yukarı bir Bluetooth kulaklığın çalıştığı mesafe kadar: kapalı alanda genellikle 10 ila 30 metre, kalın duvarların arkasında daha az. Bulut moduyla mesafe sınırı yok.</string>
 
     <string name="help_q_not_found">iPhone\'um bu telefonu bulamıyor</string>
     <string name="help_a_not_found">İki telefonda da Bluetooth\'un açık olduğundan, bu uygulamanın uyarı olmadan \"Bekleniyor\" veya \"Eşleştirilmedi\" gösterdiğinden ve iPhone\'da Pairline\'ın açık olduğundan emin olun. Yine de bağlanmazsa iki telefonda da Bluetooth\'u kapatıp yeniden açın.</string>
@@ -485,7 +483,7 @@
     <string name="help_a_perm_battery">Pairline, Android\'in kendi penceresinde Android\'den kendisini duraklatmamasını ister. Bunu istediğiniz zaman Android ayarlarından değiştirebilirsiniz.</string>
 
     <string name="help_q_data">Verilerim nereye gidiyor?</string>
-    <string name="help_a_data">Yalnızca eşleştirilmiş iPhone\'unuza, uçtan uca şifrelenmiş olarak. Pairline\'ın sunucusu yoktur. Tek diğer bağlantı GitHub\'daki günlük güncelleme denetimidir; sizin hakkınızda hiçbir şey göndermez ve Ayarlar\'dan kapatılabilir.</string>
+    <string name="help_a_data">Yalnızca eşleştirilmiş iPhone\'unuza, uçtan uca şifrelenmiş olarak. Pairline\'ın sunucusu yoktur. Bulut modunda kendi iCloud\'unuzdan, yalnızca iki telefonunuzun okuyabileceği şekilde kilitli olarak geçer. Tek diğer bağlantı GitHub\'daki günlük güncelleme denetimidir; sizin hakkınızda hiçbir şey göndermez ve Ayarlar\'dan kapatılabilir.</string>
     <string name="help_q_logs">Tanılama raporunda neler var?</string>
     <string name="help_a_logs">Sürümler, izinler ve bağlantı olayları gibi teknik ayrıntılar. Telefon numaraları, e-postalar, adlar, mesaj metinleri ve anahtarlar çıkarılır. Paylaşmaya karar vermeden önce raporun tamamını görürsünüz.</string>
     <string name="help_q_unpair">Eşleştirmeyi kaldırdığımda ne olur?</string>
@@ -535,24 +533,77 @@
     <string name="remote_pair_scan_denied">Pairline kamerayı yalnızca QR kodu okumak için kullanır. Taramak için izin verin ya da QR kodun bir resmini seçin veya bağlantıyı yapıştırın.</string>
     <string name="remote_pair_paste_none">Panoda Pairline daveti yok. Bağlantının tamamını (pairline://invite ile başlar) kopyalayıp tekrar deneyin.</string>
 
-    <string name="home_connected_body_direct">Bulut modunun doğrudan bağlantısı: internet üzerinden, doğrudan ev modeminiz aracılığıyla. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
-    <string name="notif_connected_text_direct">Bulut modunun doğrudan bağlantısı, internet üzerinden. Aramalar ve mesajlar iPhone\'unuza aktarılıyor.</string>
-    <string name="direct_checking">Doğrudan bağlantı: kontrol ediliyor…</string>
-    <string name="direct_open">Doğrudan bağlantı: açık</string>
-    <string name="direct_ipv6_unconfirmed">Doğrudan bağlantı: yalnızca IPv6 ile, modem izin verirse</string>
-    <string name="direct_not_possible">Doğrudan bağlantı: mümkün değil (%1$s)</string>
+    <string name="home_connected_body_direct">Telefonlarınız birbirinden uzakta ve doğrudan ev modeminiz üzerinden bağlanıyor. Aramalar da çalışır.</string>
+    <string name="notif_connected_text_direct">Bulut modu, internet üzerinden. Aramalar, mesajlar ve kodlar iPhone\'unuza gidiyor.</string>
+    <string name="direct_checking">Uzaktan aramalar: kontrol ediliyor…</string>
+    <string name="direct_open">Uzaktan aramalar: hazır</string>
+    <string name="direct_ipv6_unconfirmed">Uzaktan aramalar: yalnızca IPv6 ile, modem izin verirse</string>
+    <string name="direct_not_possible">Uzaktan aramalar: henüz mümkün değil (%1$s)</string>
     <string name="direct_reason_wifi">bu telefon Wi-Fi\'ye bağlı değil</string>
     <string name="direct_reason_carrier_nat">internet sağlayıcısı bu eve kendi adresini vermiyor</string>
     <string name="direct_reason_double_nat">bu modemin önünde başka bir modem var</string>
     <string name="direct_reason_no_address">modemin internet adresi yok</string>
     <string name="direct_reason_no_mapping">modem uygulamalar için port açmıyor</string>
     <string name="direct_reason_listen">bu telefonda port açılamadı</string>
-    <string name="direct_hint_router">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için yönlendiricinizin ayarlarında UPnP veya NAT-PMP\'yi açın. Adım adım: iPhone\'unuzdaki Pairline\'da Yardım › Uzaktan aramalara izin verin.</string>
+    <string name="direct_hint_router">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için yönlendiricinizin ayarlarında UPnP veya NAT-PMP\'yi açın: bununla Pairline, iPhone\'unuzun ihtiyaç duyduğu tek kapıyı kendisi açar. Her yönlendirici için adımlar: iPhone\'unuzdaki Pairline\'da Yardım › Uzaktan aramalara izin verin.</string>
     <string name="direct_hint_modem">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için sağlayıcınızın modeminde de UPnP\'yi açın ya da modemi köprü moduna alın. Adım adım: iPhone\'unuzdaki Pairline\'da Yardım › Uzaktan aramalara izin verin.</string>
     <string name="direct_hint_provider">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için size ait bir internet adresi gerekir: internet sağlayıcınızdan genel bir IPv4 adresi veya IPv6 isteyin.</string>
-    <string name="direct_hint_router_manual">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için: yönlendiricinizde UPnP veya NAT-PMP varsa açın, Pairline her şeyi kendisi ayarlar. Yoksa yönlendiricinizde TCP %1$s portunu bu telefona (%2$s) yönlendirin, bu telefona orada sabit bir adres verin ve evinizin internet adresini veya DDNS adını iPhone\'unuzdaki Pairline\'a girin: Ayarlar › Bulut modu › Port yönlendirme. Adım adım: iPhone\'unuzda Yardım › Uzaktan aramalara izin verin.</string>
-    <string name="direct_hint_modem_manual">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için: sağlayıcınızın modemi yönlendiricinizin önünde. Modemde de UPnP veya NAT-PMP\'yi açın ya da modemi köprü moduna alın. Ya da TCP %1$s portunu ikisinde de bu telefona (%2$s) yönlendirin, bu telefona sabit bir adres verin ve evinizin internet adresini veya DDNS adını iPhone\'unuzdaki Pairline\'a girin: Ayarlar › Bulut modu › Port yönlendirme. Adım adım: iPhone\'unuzda Yardım › Uzaktan aramalara izin verin.</string>
+    <string name="direct_hint_router_manual">Yönlendiricinizde UPnP veya NAT-PMP yok mu? O zaman yönlendiricide TCP %1$s portunu bu telefona (%2$s) kendiniz yönlendirin ve evinizin internet adresini veya DDNS adını iPhone\'unuzdaki Pairline\'a girin: Ayarlar › Bağlantı › Gelişmiş › Port yönlendirme.</string>
+    <string name="direct_hint_modem_manual">Ya da TCP %1$s portunu hem modemde hem de yönlendiricinizde bu telefona (%2$s) kendiniz yönlendirin ve evinizin internet adresini veya DDNS adını iPhone\'unuzdaki Pairline\'a girin: Ayarlar › Bağlantı › Gelişmiş › Port yönlendirme.</string>
     <string name="direct_hint_device_mac">Yönlendiricinin bu telefonun adresini koruması için bu telefonda bu Wi-Fi ağının gizlilik ayarını \"Cihaz MAC adresini kullan\" yapın.</string>
     <string name="direct_hint_fixed_address">Bu telefonu %1$s adresinde tutun: yönlendiricideki port yönlendirme kuralı bu adresi gösterir; telefon başka bir adres alırsa uzaktan aramalar durur. Yönlendiricide %1$s adresini bu telefon için ayırın (DHCP rezervasyonu veya statik kira). UPnP veya NAT-PMP ile buna gerek yoktur: Pairline yönlendiriciyi kendisi günceller.</string>
     <string name="direct_forward_info">Port yönlendirme için: bu telefonun adresi %2$s, portu %1$s.</string>
+
+    <!-- Yakın bağlantı ve Bulut modu (D-099) -->
+    <string name="action_turn_on_nearby">Yakındaki cihazlar iznini aç</string>
+    <string name="action_details">Ayrıntılar</string>
+    <string name="ways_title">İki bağlantı yolu</string>
+    <string name="ways_body">Yakın bağlantı kendiliğinden çalışır. Bulut modu, bu telefon evde kaldığında işe yarayan ek bir özelliktir. Şimdi bir şey seçmeniz gerekmiyor.</string>
+    <string name="ways_nearby_title">Yakın bağlantı</string>
+    <string name="ways_nearby_text">Telefonlar birbirine yakındır ve Bluetooth ile Wi-Fi üzerinden konuşur. Ayarlanacak bir şey yok.</string>
+    <string name="ways_nearby_example">Örneğin bu telefon çantanızda, cebinizde ya da masanızda.</string>
+    <string name="ways_cloud_text">Bu telefon evde kalır; iPhone\'unuz internet olan her yerde aramaları, mesajları ve kodları almaya devam eder. iPhone\'unuzdaki Pairline\'da açın: eşleştirirken ya da sonra Ayarlar\'dan.</string>
+    <string name="ways_cloud_example">Örneğin siz işteyken ya da seyahatteyken bu telefon evde şarjda durur.</string>
+    <string name="ways_both">İkisi birden açık olabilir. Evde telefonlar doğrudan konuşur; siz çıkınca Bulut modu devreye girer.</string>
+    <string name="battery_cloud_note">Bu telefonu Bulut modu için evde mi bırakacaksınız? Şarjda ve ev Wi-Fi\'ınıza bağlı tutun, Pairline da arka planda çalışsın.</string>
+    <string name="way_nearby_bt">Yakın · Bluetooth</string>
+    <string name="way_nearby_wifi">Yakın · Wi-Fi</string>
+    <string name="way_nearby_both">Yakın · Bluetooth ve Wi-Fi</string>
+    <string name="way_cloud_direct">Bulut modu · internet üzerinden</string>
+    <string name="way_cloud_icloud">Bulut modu · iCloud üzerinden</string>
+    <string name="settings_connection">Bağlantı</string>
+    <string name="conn_not_connected">Şu an bağlı değil</string>
+    <string name="conn_nearby_sub">Telefonlarınız yakın ve doğrudan konuşuyor.</string>
+    <string name="conn_cloud_sub">Telefonlarınız birbirinden uzakta ve internet üzerinden bağlanıyor.</string>
+    <string name="conn_waiting_sub">iPhone\'unuzda Pairline\'ı bu telefonun yakınında ve Bluetooth açıkken açın.</string>
+    <string name="settings_cloud_on_sub">Açık. Bu telefonun ihtiyaçları ve uzaktan aramalar</string>
+    <string name="settings_cloud_off_sub">Kapalı. Bu telefonu evde mi bırakacaksınız? iPhone\'unuzdaki Pairline\'da açın.</string>
+    <string name="settings_cloud_trouble_sub">Açık ama ilgilenmeniz gerekiyor. Ne yapacağınızı görmek için dokunun.</string>
+    <string name="cloud_title">Bulut modu</string>
+    <string name="cloud_intro">Bu telefonu evde bırakın; iPhone\'unuz internet olan her yerde aramaları, mesajları ve kodları almaya, bu telefonun SIM\'iyle arama yapıp mesaj göndermeye devam eder. Bulut modu iPhone\'unuzdaki Pairline\'dan açılır. Pairline\'ın sunucusu yoktur: mesajlar bizim değil, kendi iCloud\'unuz üzerinden, yalnızca iki telefonunuzun okuyabileceği şekilde kilitli gider.</string>
+    <string name="cloud_now">Şu an</string>
+    <string name="cloud_state_off">Kapalı</string>
+    <string name="cloud_state_on">Açık</string>
+    <string name="cloud_state_paused">Duraklatıldı</string>
+    <string name="cloud_turn_on">Açmak için iPhone\'unuzda Pairline\'ı açın ve telefonlar yan yanayken Ayarlar › Bağlantı\'da Bulut modunu açın. Yakın bağlantı her durumda çalışmaya devam eder.</string>
+    <string name="cloud_needs_title">Bu telefonun evde ihtiyaçları</string>
+    <string name="cloud_need_charger">Şarjda</string>
+    <string name="cloud_need_charger_missing">Şu an şarj olmuyor. Siz uzaktayken pili bitmesin diye şarja takın.</string>
+    <string name="cloud_need_wifi">Ev Wi-Fi\'ına bağlı</string>
+    <string name="cloud_need_wifi_missing">Şu an Wi-Fi\'a bağlı değil. Mesajlar ve kodlar mobil veriyle de çalışır; uzaktan aramalar için Wi-Fi gerekir.</string>
+    <string name="cloud_calls_title">Uzaktan aramalar</string>
+    <string name="cloud_router_title">Gelişmiş: yönlendiriciniz</string>
+    <string name="direct_short_router">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için ev yönlendiricinizde bir ayar gerekir.</string>
+    <string name="direct_short_modem">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için internet sağlayıcınızın modeminde de bir ayar gerekir.</string>
+    <string name="direct_short_provider">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için internet sağlayıcınızın yardımı gerekir.</string>
+    <string name="direct_short_wifi">Mesajlar ve kodlar yine çalışır. Uzaktan aramalar için bu telefonu ev Wi-Fi\'ınıza bağlayın.</string>
+    <string name="help_section_ways">Yakın mı, Bulut modu mu</string>
+    <string name="help_q_ways">Yakın bağlantı mı, Bulut modu mu: hangisine ihtiyacım var?</string>
+    <string name="help_a_ways">Yakın bağlantı, telefonlar birbirine yakınken kendiliğinden çalışır; örneğin bu telefon çantanızda ya da masanızdayken Bluetooth ve Wi-Fi üzerinden konuşurlar. Bulut modu bu telefon evde kaldığında içindir; örneğin siz işteyken ya da seyahatteyken telefon evde şarjda durur ve iPhone\'unuz aramaları, mesajları ve kodları internet üzerinden alır. İkisi birden açık olabilir: evde telefonlar doğrudan konuşur, siz çıkınca Bulut modu devreye girer.</string>
+    <string name="help_q_cloud_on">Bulut modunu nasıl açarım?</string>
+    <string name="help_a_cloud_on">iPhone\'unuzda: eşleştirirken ya da sonra Pairline\'ın Ayarlar\'ından. iPhone bu telefona iCloud\'unuza kendine ait bir erişim verir; bu yüzden burada bunun için bir anahtar yok. Bu telefonda: şarjda ve ev Wi-Fi\'ınıza bağlı tutun, Pairline da arka planda çalışsın (Ayarlar › Pairline\'ı çalışır durumda tutun). Buradaki Ayarlar › Bulut modu her şeyin hazır olup olmadığını gösterir.</string>
+    <string name="help_q_cloud_calls">Mesajlar geliyor ama uzaktan aramalar çalışmıyor</string>
+    <string name="help_a_cloud_calls">Mesajlar ve kodlar iPhone\'unuza iCloud üzerinden ulaşır. Bir aramada konuşmak içinse iPhone\'unuzdan bu telefona, ev yönlendiriciniz üzerinden doğrudan bir yol gerekir. Çoğu yönlendirici bu yolu kendisi açar; bunun ayarı UPnP veya NAT-PMP\'dir ve çoğu zaman zaten açıktır. Buradaki Ayarlar › Bulut modu neyin eksik olduğunu söyler; iPhone\'unuzdaki Pairline\'da Yardım › Uzaktan aramalara izin verin her yönlendirici için adımları içerir.</string>
+    <string name="help_q_cloud_private">Bulut modu mesajlarımı bir sunucuya gönderir mi?</string>
+    <string name="help_a_cloud_private">Bizim sunucumuza değil: Pairline\'ın sunucusu yok. Mesajlar kendi iCloud\'unuzdan, yalnızca iki telefonunuzun açabileceği kilitli kayıtlar olarak geçer; Apple bunları okuyamaz. Aramalar iPhone\'unuzdan doğrudan bu telefona gider. iPhone\'da Bulut modunu kapattığınızda iCloud\'daki kayıtları silinir.</string>
 </resources>

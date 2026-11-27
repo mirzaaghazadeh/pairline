@@ -34,7 +34,7 @@
     <string name="talk_pair_failed">Eşleme tamamlanmadı. “Cihazı eşleme koduyla eşle”yi açık tutup tekrar deneyin.</string>
     <string name="talk_pair_done">Eşlendi. Android, Pairline’ı Kablosuz hata ayıklama › Eşlenen cihazlar altında gösterir.</string>
     <string name="talk_pair_notifications">Önce Pairline bildirimlerine izin verin: eşleme kodu bir bildirime yazılır.</string>
-    <string name="talk_allow_notifications">Bildirimlere izin ver</string>
+    <string name="talk_allow_notifications">Bildirimleri aç</string>
     <string name="talk_step_start">Pairline yardımcısını başlatır</string>
     <string name="talk_start_auto">Yukarıdaki adımlardan sonra kendiliğinden olur.</string>
     <string name="talk_start_idle">iPhone’dan konuşma açıkken başlar.</string>

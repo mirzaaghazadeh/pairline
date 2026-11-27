@@ -43,6 +43,24 @@ object SystemActions {
         if (screens.none { start(context, Intent().setComponent(it)) }) start(context, Intent(Settings.ACTION_WIRELESS_SETTINGS))
     }
 
+    /** Android's own Wi-Fi screen. Only opens it: the user picks the network there (AGENTS.md rule 5). */
+    fun openWifiSettings(context: Context) {
+        start(context, Intent(Settings.ACTION_WIFI_SETTINGS))
+    }
+
+    /** Whether this phone is on a Wi-Fi (or Ethernet) network now, which Cloud mode's calls from far away need. */
+    @Suppress("DEPRECATION") // allNetworks: a one-off read for the screen, like PrivilegedManager's.
+    fun onWifi(context: Context): Boolean {
+        val cm = context.getSystemService(android.net.ConnectivityManager::class.java) ?: return false
+        return runCatching {
+            cm.allNetworks.any {
+                val caps = cm.getNetworkCapabilities(it) ?: return@any false
+                caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) ||
+                    caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET)
+            }
+        }.getOrDefault(false)
+    }
+
     fun openNotificationSettings(context: Context) {
         start(
             context,

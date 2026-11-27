@@ -30,7 +30,7 @@
     <string name="notif_channel_link">حالة الاتصال</string>
     <string name="notif_channel_link_desc">يُظهر ما إذا كان آيفونك متصلًا. يتطلب أندرويد هذا الإشعار لإبقاء Pairline قيد التشغيل.</string>
     <string name="notif_connected_title">متصل بـ %1$s</string>
-    <string name="notif_connected_text">يتم نقل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="notif_connected_text">قريب. تصل المكالمات والرسائل والرموز إلى آيفونك.</string>
     <string name="notif_waiting_title">بانتظار آيفونك</string>
     <string name="notif_waiting_text">يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا والبلوتوث مفعّلًا فيه.</string>
     <string name="notif_not_paired_title">لم يتم الإقران بعد</string>
@@ -45,7 +45,7 @@
 
     <!-- Setup: welcome -->
     <string name="welcome_title">شريحة هاتفك الأندرويد على آيفونك</string>
-    <string name="welcome_body">يحوّل Pairline هذا الهاتف إلى جسر. أبقِه قريبًا منك، واستخدم شريحته من آيفونك.</string>
+    <string name="welcome_body">يحوّل Pairline هذا الهاتف إلى جسر: استخدم شريحته من آيفونك، عن قرب أو، مع الوضع السحابي، من أي مكان.</string>
     <string name="welcome_point_calls">عرض المكالمات والرد عليها وإجراؤها</string>
     <string name="welcome_point_sms">قراءة الرسائل النصية وإرسالها</string>
     <string name="welcome_point_contacts">الوصول إلى جهات الاتصال وسجل المكالمات</string>
@@ -53,7 +53,7 @@
 
     <!-- Setup: privacy promise -->
     <string name="privacy_title">تبقى بياناتك بين هاتفيك</string>
-    <string name="privacy_body">لا يملك Pairline أي خوادم. تنتقل رسائلك ومكالماتك وجهات اتصالك مباشرةً من هذا الهاتف إلى آيفونك، ولا تذهب إلى أي مكان آخر. ومع الوضع السحابي، الذي يمكنك تفعيله من الآيفون، تمر عبر حساب iCloud الخاص بك، مقفلةً بحيث لا يقرؤها إلا هاتفاك.</string>
+    <string name="privacy_body">لا يملك Pairline أي خوادم. في الاتصال القريب، تنتقل رسائلك ومكالماتك وجهات اتصالك مباشرةً من هذا الهاتف إلى آيفونك، ولا تذهب إلى أي مكان آخر. وفي الوضع السحابي، الذي تفعّله من الآيفون، تمر عبر حساب iCloud الخاص بك لا عبرنا، مقفلةً بحيث لا يقرؤها إلا هاتفاك.</string>
     <string name="privacy_point_e2e">كل شيء مشفّر تشفيرًا تامًا بين الطرفين بمفاتيح لا يملكها سوى هاتفيك</string>
     <string name="privacy_point_accounts">لا حساب ولا تسجيل ولا تحقق من رقم الهاتف</string>
     <string name="privacy_point_tracking">لا إعلانات ولا تحليلات ولا تتبّع من أي نوع</string>
@@ -99,7 +99,7 @@
     <!-- Setup: background running -->
     <string name="battery_title">إبقاء Pairline قيد التشغيل</string>
     <string name="battery_body">يوقف أندرويد التطبيقات العاملة في الخلفية مؤقتًا لتوفير البطارية. ويحتاج Pairline إلى البقاء نشطًا لكي تصل المكالمات والرسائل إلى آيفونك فورًا.</string>
-    <string name="battery_allow">السماح بالعمل في الخلفية</string>
+    <string name="battery_allow">مواصلة العمل في الخلفية</string>
     <string name="battery_note">سيسألك أندرويد في نافذته الخاصة. ويستهلك Pairline القليل جدًا من البطارية أثناء الانتظار.</string>
     <string name="battery_done_note">تم السماح لتطبيق Pairline بالعمل في الخلفية.</string>
 
@@ -122,7 +122,7 @@
     <!-- Pairing -->
     <string name="pair_title">إقران آيفونك</string>
     <string name="pair_step_1">ثبّت Pairline على آيفونك وافتحه.</string>
-    <string name="pair_step_2">اضغط على «إقران هاتف وسيط».</string>
+    <string name="pair_step_2">اضغط على «أقرِن هاتف أندرويد» (وفي الإعدادات: «إقران هاتف وسيط»).</string>
     <string name="pair_step_3">وجّه كاميرا آيفونك نحو هذا الرمز.</string>
     <string name="pair_expires">تنتهي صلاحية الرمز خلال %1$s</string>
     <string name="pair_new_code">رمز جديد</string>
@@ -130,7 +130,7 @@
     <string name="pair_replaces">عند إقران آيفون جديد، سيحلّ محلّ %1$s.</string>
     <string name="pair_success_title">تم الإقران!</string>
     <string name="pair_success_text">أصبح آيفونك وهذا الهاتف يثق كلٌّ منهما بالآخر، ولا يمكن لأحد غيرهما قراءة ما يتبادلانه.</string>
-    <string name="pair_success_cloud">هل تريد أن يبقى هاتفاك متصلين حين يكونان بعيدين؟ فعّل الوضع السحابي في Pairline على آيفونك.</string>
+    <string name="pair_success_cloud">هل ستترك هذا الهاتف في المنزل؟ فعّل الوضع السحابي في Pairline على آيفونك، وأبقِ هذا الهاتف على الشاحن ومتصلًا بالواي فاي.</string>
     <string name="pair_connecting">جارٍ الاتصال…</string>
     <string name="pair_connected">تم الاتصال. يمكن لآيفونك الآن استخدام شريحة هذا الهاتف.</string>
     <string name="pair_too_many">حاول أحدهم إدخال رموز خاطئة عدة مرات، لذا أُلغي هذا الرمز. أنشئ رمزًا جديدًا عندما يصبح آيفونك جاهزًا.</string>
@@ -142,7 +142,7 @@
 
     <!-- Setup: done -->
     <string name="done_title">كل شيء جاهز</string>
-    <string name="done_body_paired">أبقِ هذا الهاتف مشحونًا وقريبًا من آيفونك. يمكنك وضعه جانبًا الآن، إذ يواصل Pairline العمل في الخلفية.</string>
+    <string name="done_body_paired">أبقِ هذا الهاتف مشحونًا. بالقرب من آيفونك يعمل من تلقاء نفسه. ولتتركه في المنزل، فعّل الوضع السحابي في Pairline على آيفونك وأبقِ هذا الهاتف متصلًا بالواي فاي.</string>
     <string name="done_body_unpaired">أصبح Pairline جاهزًا. يمكنك إقران آيفونك من الشاشة الرئيسية للتطبيق متى شئت.</string>
     <string name="done_note">يُظهر إشعار صغير أن Pairline قيد التشغيل. ويمكنك الضغط عليه في أي وقت لمعرفة حالة الاتصال.</string>
 
@@ -162,7 +162,7 @@
     <string name="settings_stop_bridge_confirm_body">يفقد الآيفون الاتصال، وتبقى المكالمات والرسائل والرموز على هذا الهاتف. ويتوقف أيضًا رابط الواي فاي ونقطة الاتصال ومشاركة الإنترنت ومساعد «التحدث عبر الآيفون». يبقى Pairline متوقفًا، حتى بعد إعادة التشغيل، إلى أن تضغط «تشغيل Pairline» هنا أو في الشاشة الرئيسية.</string>
     <string name="action_stop">إيقاف</string>
     <string name="home_connected_title">متصل بـ %1$s</string>
-    <string name="home_connected_body">عبر البلوتوث. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="home_connected_body">تصل المكالمات والرسائل والرموز إلى آيفونك.</string>
     <string name="home_connected_body_tcp">عبر رابط الاختبار الخاص بالتصحيح. يتم نقل المكالمات والرسائل.</string>
     <string name="home_waiting_title">بانتظار %1$s</string>
     <string name="home_waiting_body">آخر اتصال %1$s. يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا وتطبيق Pairline مفتوحًا عليه أو يعمل في الخلفية.</string>
@@ -171,10 +171,10 @@
     <string name="state_cloud_offline">تعذّر الوصول إلى iCloud</string>
     <string name="notif_via_icloud_text">الوضع السحابي: تصل الرسائل والرموز والمكالمات إلى آيفونك عبر حساب iCloud الخاص بك إلى أن يتصل هاتفاك عن قرب من جديد.</string>
     <string name="home_via_icloud_title">الوصول إلى %1$s عبر iCloud</string>
-    <string name="home_via_icloud_body">هاتفاك غير متصلين عن قرب، لذا يوصل الوضع السحابي الرسائل ورموز التحقق والمكالمات الواردة إلى آيفونك عبر حساب iCloud الخاص بك، مقفلةً بمفاتيح لا يملكها إلا هاتفاك. أما التحدث في مكالمة من بعيد فيحتاج إلى الاتصال المباشر.</string>
+    <string name="home_via_icloud_body">هاتفاك بعيدان، لذا يوصل الوضع السحابي الرسائل والرموز والمكالمات الواردة إلى آيفونك عبر حساب iCloud الخاص بك، مقفلةً بحيث لا يقرؤها إلا هاتفاك.</string>
     <string name="home_via_icloud_retrying">الوضع السحابي مفعّل، لكن تعذّر الوصول إلى iCloud الآن. تحقّق من اتصال هذا الهاتف بالإنترنت؛ سيواصل Pairline المحاولة.</string>
-    <string name="cloud_on">الوضع السحابي مفعّل: حين يكون هاتفاك بعيدين، يبقيان متصلين عبر الإنترنت.</string>
-    <string name="cloud_off">فعّل الوضع السحابي في Pairline على آيفونك ليبقى هاتفاك متصلين عبر الإنترنت حين يكونان بعيدين.</string>
+    <string name="cloud_on">الوضع السحابي مفعّل. حين يكون الهاتفان قريبين يتواصلان مباشرةً، وحين تغادر يتولى الوضع السحابي المهمة.</string>
+    <string name="cloud_off">هل ستترك هذا الهاتف في المنزل؟ فعّل الوضع السحابي في Pairline على آيفونك لتصلك المكالمات والرسائل والرموز أينما كنت.</string>
     <string name="cloud_retrying">تعذّر على الوضع السحابي الوصول إلى iCloud الآن. تحقّق من اتصال هذا الهاتف بالإنترنت؛ سيواصل Pairline المحاولة.</string>
     <string name="cloud_paused_token">الوضع السحابي متوقف إلى أن يجدّد آيفونك وصول هذا الهاتف إلى iCloud. افتح Pairline على آيفونك.</string>
     <string name="cloud_paused_refused">الوضع السحابي متوقف: لا يسمح iCloud حاليًا لتطبيق Pairline بالوصول إلى هذا الحساب من هاتف آخر.</string>
@@ -219,12 +219,10 @@
     <string name="home_debug_tcp_off">إصدار تصحيح: رابط الاختبار ليس في وضع الاستماع.</string>
 
     <!-- Wi-Fi link and files (M5) -->
-    <string name="home_connected_body_wifi">عبر الواي فاي. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
-    <string name="home_connected_body_both">عبر البلوتوث والواي فاي. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
     <string name="home_bt_off_wifi_body">البلوتوث متوقف، لكن ما زال بإمكان آيفونك الاتصال عبر شبكة الواي فاي نفسها.</string>
-    <string name="notif_connected_text_wifi">متصل عبر الواي فاي. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
+    <string name="notif_connected_text_wifi">قريب، عبر الواي فاي. تصل المكالمات والرسائل والرموز إلى آيفونك.</string>
     <string name="notif_waiting_text_wifi">يعيد Pairline الاتصال تلقائيًا عندما يكون آيفونك قريبًا أو على شبكة الواي فاي نفسها.</string>
-    <string name="settings_wifi">رابط الواي فاي</string>
+    <string name="settings_wifi">قريب عبر الواي فاي</string>
     <string name="settings_wifi_link">الاتصال عبر الواي فاي</string>
     <string name="settings_wifi_link_sub">يتيح لآيفونك الاتصال عندما يكون الهاتفان على شبكة الواي فاي نفسها: للملفات وصوت المكالمات والهواتف التي لا يصل البلوتوث فيها إلى الآيفون. لا تصل إليه إلا الأجهزة الموجودة على شبكتك المحلية.</string>
     <string name="settings_wifi_listening">جاهز على شبكة الواي فاي لهذا الهاتف</string>
@@ -440,9 +438,9 @@
     <string name="help_section_privacy">الخصوصية</string>
 
     <string name="help_q_what">ماذا يفعل Pairline؟</string>
-    <string name="help_a_what">يتيح لآيفونك استخدام شريحة SIM الموجودة في هاتف أندرويد هذا. تظهر المكالمات والرسائل الواردة على آيفونك، ويمكنك من خلاله الرد على المكالمات والرسائل، وإجراء المكالمات، وتنفيذ رموز USSD. ويبقى هذا الهاتف قريبًا ويتولى فعليًا إجراء المكالمات وإرسال الرسائل.</string>
+    <string name="help_a_what">يتيح لآيفونك استخدام شريحة SIM الموجودة في هاتف أندرويد هذا. تظهر المكالمات والرسائل الواردة على آيفونك، ويمكنك من خلاله الرد على المكالمات والرسائل، وإجراء المكالمات، وتنفيذ رموز USSD. ويتولى هذا الهاتف فعليًا إجراء المكالمات وإرسال الرسائل، قريبًا من آيفونك أو، مع الوضع السحابي، من المنزل.</string>
     <string name="help_q_iphone">ما الذي أحتاجه على الآيفون؟</string>
-    <string name="help_a_iphone">تطبيق Pairline للآيفون (iOS ١٦ أو أحدث)، مع تشغيل البلوتوث. ويجب أن يكون الهاتفان ضمن نطاق البلوتوث، أي عادةً في الغرفة نفسها أو على بُعد بضع غرف.</string>
+    <string name="help_a_iphone">تطبيق Pairline للآيفون (iOS ١٦ أو أحدث)، مع تشغيل البلوتوث. في الاتصال القريب يجب أن يكون الهاتفان ضمن نطاق البلوتوث، أي عادةً في الغرفة نفسها أو على بُعد بضع غرف. ومع الوضع السحابي يمكن أن يكونا في أي مكان فيه إنترنت.</string>
     <string name="help_q_pair">كيف أُجري الإقران؟</string>
     <string name="help_a_pair">على هذا الهاتف، افتح «إقران آيفون» لعرض رمز. وعلى آيفونك، افتح Pairline واضغط على «إقران هاتف وسيط» ثم امسح الرمز. يعمل الرمز مرة واحدة وتنتهي صلاحيته بعد ٥ دقائق.</string>
     <string name="help_q_spare">هل يمكنني استخدام هاتف أندرويد الذي أستخدمه يوميًا؟</string>
@@ -457,7 +455,7 @@
     <string name="help_q_notification">لماذا يظهر إشعار دائمًا؟</string>
     <string name="help_a_notification">يفرض أندرويد على التطبيقات التي تعمل في الخلفية إظهار إشعار. ويُعلمك هذا الإشعار ما إذا كان آيفونك متصلًا، ولا يعرض أبدًا نصوص الرسائل أو الأرقام.</string>
     <string name="help_q_distance">ما أقصى مسافة ممكنة بين الهاتفين؟</string>
-    <string name="help_a_distance">تقريبًا المسافة نفسها التي تعمل فيها سماعة بلوتوث: من ١٠ إلى ٣٠ مترًا عادةً داخل المباني، وأقل عبر الجدران السميكة.</string>
+    <string name="help_a_distance">في الاتصال القريب، تقريبًا المسافة نفسها التي تعمل فيها سماعة بلوتوث: من ١٠ إلى ٣٠ مترًا عادةً داخل المباني، وأقل عبر الجدران السميكة. ومع الوضع السحابي، أي مسافة.</string>
 
     <string name="help_q_not_found">لا يستطيع آيفوني العثور على هذا الهاتف</string>
     <string name="help_a_not_found">تأكد من تشغيل البلوتوث على كلا الهاتفين، ومن أن هذا التطبيق يعرض «في الانتظار» أو «غير مقترن» دون تحذيرات، ومن أن Pairline مفتوح على الآيفون. وإذا لم يتم الاتصال بعد ذلك، فأوقف البلوتوث ثم شغّله مجددًا على كلا الهاتفين.</string>
@@ -486,7 +484,7 @@
     <string name="help_a_perm_battery">يطلب Pairline من أندرويد، عبر نافذة أندرويد نفسها، ألا يوقفه مؤقتًا. ويمكنك تغيير ذلك في أي وقت من إعدادات أندرويد.</string>
 
     <string name="help_q_data">إلى أين تذهب بياناتي؟</string>
-    <string name="help_a_data">إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. لا يملك Pairline أي خوادم. الاتصال الآخر الوحيد هو التحقق اليومي من التحديثات على GitHub، وهو لا يرسل أي شيء عنك ويمكن إيقافه من الإعدادات.</string>
+    <string name="help_a_data">إلى آيفونك المقترن فقط، مشفّرةً تشفيرًا تامًا بين الطرفين. لا يملك Pairline أي خوادم. وفي الوضع السحابي تمر عبر حساب iCloud الخاص بك، مقفلةً بحيث لا يقرؤها إلا هاتفاك. الاتصال الآخر الوحيد هو التحقق اليومي من التحديثات على GitHub، وهو لا يرسل أي شيء عنك ويمكن إيقافه من الإعدادات.</string>
     <string name="help_q_logs">ماذا يتضمن تقرير التشخيص؟</string>
     <string name="help_a_logs">تفاصيل تقنية مثل الإصدارات والأذونات وأحداث الاتصال. وتُحذف منه أرقام الهواتف وعناوين البريد الإلكتروني والأسماء ونصوص الرسائل والمفاتيح. وترى التقرير كاملًا قبل أن تقرر مشاركته.</string>
     <string name="help_q_unpair">ماذا يحدث عند إلغاء الإقران؟</string>
@@ -536,24 +534,77 @@
     <string name="remote_pair_scan_denied">يحتاج Pairline إلى الكاميرا فقط لقراءة رمز QR. اسمح بها للمسح، أو اختر صورة لرمز QR أو الصق الرابط بدلًا من ذلك.</string>
     <string name="remote_pair_paste_none">لا توجد دعوة من Pairline في الحافظة. انسخ الرابط كاملًا (يبدأ بـ pairline://invite) ثم حاول مرة أخرى.</string>
 
-    <string name="home_connected_body_direct">الاتصال المباشر للوضع السحابي: عبر الإنترنت، مباشرةً من خلال راوتر المنزل. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
-    <string name="notif_connected_text_direct">الاتصال المباشر للوضع السحابي، عبر الإنترنت. يتم نقل المكالمات والرسائل إلى آيفونك.</string>
-    <string name="direct_checking">الاتصال المباشر: جارٍ التحقق…</string>
-    <string name="direct_open">الاتصال المباشر: مفتوح</string>
-    <string name="direct_ipv6_unconfirmed">الاتصال المباشر: عبر IPv6 فقط، إن سمح الراوتر بذلك</string>
-    <string name="direct_not_possible">الاتصال المباشر: غير ممكن (%1$s)</string>
+    <string name="home_connected_body_direct">هاتفاك بعيدان ويتواصلان مباشرةً عبر راوتر المنزل. والمكالمات تعمل أيضًا.</string>
+    <string name="notif_connected_text_direct">الوضع السحابي، عبر الإنترنت. تصل المكالمات والرسائل والرموز إلى آيفونك.</string>
+    <string name="direct_checking">المكالمات من بعيد: جارٍ التحقق…</string>
+    <string name="direct_open">المكالمات من بعيد: جاهزة</string>
+    <string name="direct_ipv6_unconfirmed">المكالمات من بعيد: عبر IPv6 فقط، إن سمح الراوتر بذلك</string>
+    <string name="direct_not_possible">المكالمات من بعيد: غير ممكنة بعد (%1$s)</string>
     <string name="direct_reason_wifi">هذا الهاتف غير متصل بالواي فاي</string>
     <string name="direct_reason_carrier_nat">مزوّد الإنترنت لا يمنح هذا المنزل عنوانًا خاصًا به</string>
     <string name="direct_reason_double_nat">يوجد راوتر آخر أمام هذا الراوتر</string>
     <string name="direct_reason_no_address">ليس للراوتر عنوان على الإنترنت</string>
     <string name="direct_reason_no_mapping">الراوتر لا يفتح المنافذ للتطبيقات</string>
     <string name="direct_reason_listen">تعذّر فتح منفذ على هذا الهاتف</string>
-    <string name="direct_hint_router">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد، فعّل UPnP أو NAT-PMP في إعدادات الموجّه. الخطوات بالتفصيل: المساعدة › السماح بالمكالمات من بعيد، في Pairline على آيفونك.</string>
+    <string name="direct_hint_router">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد، فعّل UPnP أو NAT-PMP في إعدادات الموجّه: فبه يفتح Pairline بنفسه الباب الوحيد الذي يحتاجه آيفونك. الخطوات بالتفصيل لأي موجّه: المساعدة › السماح بالمكالمات من بعيد، في Pairline على آيفونك.</string>
     <string name="direct_hint_modem">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد، فعّل UPnP على مودم مزوّدك أيضًا، أو اضبط المودم على وضع الجسر. الخطوات بالتفصيل: المساعدة › السماح بالمكالمات من بعيد، في Pairline على آيفونك.</string>
     <string name="direct_hint_provider">ما زالت الرسائل والرموز تعمل. تحتاج المكالمات من بعيد إلى عنوان إنترنت خاص بك: اطلب من مزوّد الإنترنت عنوان IPv4 عامًا أو IPv6.</string>
-    <string name="direct_hint_router_manual">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد: إذا كان موجّهك يدعم UPnP أو NAT-PMP ففعّله، وسيضبط Pairline كل شيء بنفسه. وإن لم يكن يدعمه، فأعِد توجيه منفذ TCP رقم %1$s إلى هذا الهاتف (%2$s) في الموجّه، وامنح هذا الهاتف عنوانًا ثابتًا هناك، وأدخل عنوان الإنترنت لمنزلك أو اسم DDNS في Pairline على آيفونك: الإعدادات › الوضع السحابي › إعادة توجيه المنفذ. الخطوات بالتفصيل: المساعدة › السماح بالمكالمات من بعيد، على آيفونك.</string>
-    <string name="direct_hint_modem_manual">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد: مودم مزوّدك موجود قبل موجّهك. فعّل UPnP أو NAT-PMP على المودم أيضًا، أو اضبط المودم على وضع الجسر. أو أعِد توجيه منفذ TCP رقم %1$s إلى هذا الهاتف (%2$s) على كليهما، وامنح هذا الهاتف عنوانًا ثابتًا، وأدخل عنوان الإنترنت لمنزلك أو اسم DDNS في Pairline على آيفونك: الإعدادات › الوضع السحابي › إعادة توجيه المنفذ. الخطوات بالتفصيل: المساعدة › السماح بالمكالمات من بعيد، على آيفونك.</string>
+    <string name="direct_hint_router_manual">لا يدعم موجّهك UPnP ولا NAT-PMP؟ إذن أعِد بنفسك توجيه منفذ TCP رقم %1$s إلى هذا الهاتف (%2$s) في الموجّه، وأدخل عنوان الإنترنت لمنزلك أو اسم DDNS في Pairline على آيفونك: الإعدادات › الاتصال › متقدم › إعادة توجيه المنفذ.</string>
+    <string name="direct_hint_modem_manual">أو أعِد بنفسك توجيه منفذ TCP رقم %1$s إلى هذا الهاتف (%2$s) على المودم وعلى موجّهك كليهما، وأدخل عنوان الإنترنت لمنزلك أو اسم DDNS في Pairline على آيفونك: الإعدادات › الاتصال › متقدم › إعادة توجيه المنفذ.</string>
     <string name="direct_hint_device_mac">على هذا الهاتف، اضبط خصوصية شبكة الواي فاي هذه على «استخدام عنوان MAC للجهاز» كي يحتفظ الموجّه بعنوانه.</string>
     <string name="direct_hint_fixed_address">أبقِ هذا الهاتف على العنوان %1$s: قاعدة إعادة توجيه المنفذ في الموجّه تشير إلى هذا العنوان، فإذا حصل الهاتف على عنوان آخر توقفت المكالمات من بعيد. في الموجّه، احجز %1$s لهذا الهاتف (DHCP Reservation أو Static Lease). مع UPnP أو NAT-PMP لا حاجة إلى ذلك: يحدّث Pairline الموجّه بنفسه.</string>
     <string name="direct_forward_info">لإعادة توجيه المنفذ: عنوان هذا الهاتف %2$s، والمنفذ %1$s.</string>
+
+    <!-- الاتصال القريب والوضع السحابي (D-099) -->
+    <string name="action_turn_on_nearby">تفعيل «الأجهزة المجاورة»</string>
+    <string name="action_details">التفاصيل</string>
+    <string name="ways_title">طريقتان للاتصال</string>
+    <string name="ways_body">الاتصال القريب يعمل من تلقاء نفسه. أما الوضع السحابي فميزة إضافية لحين يبقى هذا الهاتف في المنزل. لا حاجة لاختيار شيء الآن.</string>
+    <string name="ways_nearby_title">الاتصال القريب</string>
+    <string name="ways_nearby_text">يكون الهاتفان قريبين ويتواصلان عبر البلوتوث والواي فاي. لا شيء لإعداده.</string>
+    <string name="ways_nearby_example">مثلًا: هذا الهاتف في حقيبتك أو جيبك أو على مكتبك.</string>
+    <string name="ways_cloud_text">يبقى هذا الهاتف في المنزل، ويواصل آيفونك تلقي المكالمات والرسائل والرموز أينما توفر الإنترنت. فعّله في Pairline على آيفونك، أثناء الإقران أو لاحقًا من الإعدادات.</string>
+    <string name="ways_cloud_example">مثلًا: يبقى هذا الهاتف في المنزل موصولًا بالشاحن بينما أنت في العمل أو في سفر.</string>
+    <string name="ways_both">يمكن تفعيل الاثنين معًا. في المنزل يتواصل الهاتفان مباشرةً، وحين تغادر يتولى الوضع السحابي المهمة.</string>
+    <string name="battery_cloud_note">هل ستترك هذا الهاتف في المنزل للوضع السحابي؟ أبقِه على الشاحن ومتصلًا بواي فاي المنزل، ودع Pairline يعمل في الخلفية.</string>
+    <string name="way_nearby_bt">قريب · بلوتوث</string>
+    <string name="way_nearby_wifi">قريب · واي فاي</string>
+    <string name="way_nearby_both">قريب · بلوتوث وواي فاي</string>
+    <string name="way_cloud_direct">الوضع السحابي · عبر الإنترنت</string>
+    <string name="way_cloud_icloud">الوضع السحابي · عبر iCloud</string>
+    <string name="settings_connection">الاتصال</string>
+    <string name="conn_not_connected">غير متصل الآن</string>
+    <string name="conn_nearby_sub">هاتفاك قريبان ويتواصلان مباشرةً.</string>
+    <string name="conn_cloud_sub">هاتفاك بعيدان ويتواصلان عبر الإنترنت.</string>
+    <string name="conn_waiting_sub">افتح Pairline على آيفونك بالقرب من هذا الهاتف، مع تشغيل البلوتوث.</string>
+    <string name="settings_cloud_on_sub">مفعّل. ما يحتاجه هذا الهاتف، والمكالمات من بعيد</string>
+    <string name="settings_cloud_off_sub">متوقف. هل ستترك هذا الهاتف في المنزل؟ فعّله في Pairline على آيفونك.</string>
+    <string name="settings_cloud_trouble_sub">مفعّل، لكنه يحتاج إلى انتباهك. اضغط لترى ما يجب فعله.</string>
+    <string name="cloud_title">الوضع السحابي</string>
+    <string name="cloud_intro">اترك هذا الهاتف في المنزل، ويواصل آيفونك تلقي المكالمات والرسائل والرموز أينما توفر الإنترنت، وإجراء المكالمات وإرسال الرسائل بشريحة هذا الهاتف. يُفعَّل الوضع السحابي من Pairline على آيفونك. لا يملك Pairline أي خادم: تمر الرسائل عبر حساب iCloud الخاص بك لا عبرنا، مقفلةً بحيث لا يقرؤها إلا هاتفاك.</string>
+    <string name="cloud_now">الآن</string>
+    <string name="cloud_state_off">متوقف</string>
+    <string name="cloud_state_on">مفعّل</string>
+    <string name="cloud_state_paused">متوقف مؤقتًا</string>
+    <string name="cloud_turn_on">لتفعيله، افتح Pairline على آيفونك وفعّل الوضع السحابي من الإعدادات › الاتصال والهاتفان قريبان. ويظل الاتصال القريب يعمل في كل الأحوال.</string>
+    <string name="cloud_needs_title">ما يحتاجه هذا الهاتف في المنزل</string>
+    <string name="cloud_need_charger">موصول بالشاحن</string>
+    <string name="cloud_need_charger_missing">لا يُشحن الآن. صِله بالشاحن كي لا تنفد بطاريته وأنت بعيد.</string>
+    <string name="cloud_need_wifi">متصل بواي فاي المنزل</string>
+    <string name="cloud_need_wifi_missing">غير متصل بالواي فاي الآن. تعمل الرسائل والرموز عبر بيانات الجوال أيضًا، أما المكالمات من بعيد فتحتاج إلى الواي فاي.</string>
+    <string name="cloud_calls_title">المكالمات من بعيد</string>
+    <string name="cloud_router_title">متقدّم: الموجّه لديك</string>
+    <string name="direct_short_router">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد، يحتاج موجّه المنزل إلى إعداد واحد.</string>
+    <string name="direct_short_modem">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد، يحتاج مودم مزوّد الإنترنت أيضًا إلى إعداد.</string>
+    <string name="direct_short_provider">ما زالت الرسائل والرموز تعمل. تحتاج المكالمات من بعيد إلى مساعدة مزوّد الإنترنت.</string>
+    <string name="direct_short_wifi">ما زالت الرسائل والرموز تعمل. للمكالمات من بعيد، صِل هذا الهاتف بواي فاي المنزل.</string>
+    <string name="help_section_ways">القريب أم الوضع السحابي</string>
+    <string name="help_q_ways">الاتصال القريب أم الوضع السحابي: أيهما أحتاج؟</string>
+    <string name="help_a_ways">يعمل الاتصال القريب من تلقاء نفسه حين يكون الهاتفان قريبين، مثلًا وهذا الهاتف في حقيبتك أو على مكتبك: يتواصلان عبر البلوتوث والواي فاي. أما الوضع السحابي فهو لحين يبقى هذا الهاتف في المنزل، مثلًا موصولًا بالشاحن وأنت في العمل أو في سفر: عندها يتلقى آيفونك المكالمات والرسائل والرموز عبر الإنترنت. يمكن تفعيل الاثنين معًا: في المنزل يتواصل الهاتفان مباشرةً، وحين تغادر يتولى الوضع السحابي المهمة.</string>
+    <string name="help_q_cloud_on">كيف أفعّل الوضع السحابي؟</string>
+    <string name="help_a_cloud_on">على آيفونك: أثناء الإقران، أو لاحقًا من إعدادات Pairline. يمنح الآيفون هذا الهاتف وصولًا خاصًا به إلى حساب iCloud الخاص بك، لذلك لا يوجد له مفتاح هنا. وعلى هذا الهاتف: أبقِه على الشاحن ومتصلًا بواي فاي المنزل، ودع Pairline يعمل في الخلفية (الإعدادات › إبقاء Pairline قيد التشغيل). وتُظهر لك الإعدادات › الوضع السحابي هنا ما إذا كان كل شيء جاهزًا.</string>
+    <string name="help_q_cloud_calls">تصل الرسائل، لكن المكالمات من بعيد لا تعمل</string>
+    <string name="help_a_cloud_calls">تصل الرسائل والرموز إلى آيفونك عبر iCloud. أما التحدث في مكالمة فيحتاج إلى طريق مباشر من آيفونك إلى هذا الهاتف عبر موجّه المنزل. تفتحه معظم الموجّهات بنفسها، بإعداد اسمه UPnP أو NAT-PMP يكون مفعّلًا غالبًا. تخبرك الإعدادات › الوضع السحابي هنا بما ينقص، وفي Pairline على آيفونك تجد في المساعدة › السماح بالمكالمات من بعيد الخطوات لأي موجّه.</string>
+    <string name="help_q_cloud_private">هل يرسل الوضع السحابي رسائلي إلى خادم؟</string>
+    <string name="help_a_cloud_private">ليس إلى خادم لنا: فلا يملك Pairline أي خادم. تمر الرسائل عبر حساب iCloud الخاص بك كسجلات مقفلة لا يفتحها إلا هاتفاك، ولا تستطيع Apple قراءتها. وتمر المكالمات مباشرةً من آيفونك إلى هذا الهاتف. وحين توقف الوضع السحابي على الآيفون، تُحذف سجلاته من iCloud.</string>
 </resources>

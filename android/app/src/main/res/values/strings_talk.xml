@@ -35,7 +35,8 @@
     <string name="talk_pair_failed">Pairing didn’t finish. Keep “Pair device with pairing code” open and try again.</string>
     <string name="talk_pair_done">Paired. Android lists Pairline under Wireless debugging › Paired devices.</string>
     <string name="talk_pair_notifications">Allow Pairline’s notifications first: the pairing code is typed into one.</string>
-    <string name="talk_allow_notifications">Allow notifications</string>
+    <!-- Leads to Android's own permission prompt, where the user decides; not "Allow" (D-097's rule). -->
+    <string name="talk_allow_notifications">Turn on notifications</string>
     <string name="talk_step_start">Pairline starts its helper</string>
     <string name="talk_start_auto">Happens by itself after the steps above.</string>
     <string name="talk_start_idle">Starts when Talk on iPhone is on.</string>

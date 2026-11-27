@@ -34,7 +34,7 @@
     <string name="talk_pair_failed">لم يكتمل الإقران. أبقِ «إقران الجهاز باستخدام رمز الإقران» مفتوحًا وحاول مجددًا.</string>
     <string name="talk_pair_done">تم الإقران. يعرض أندرويد Pairline في «تصحيح الأخطاء اللاسلكي ← الأجهزة المقترنة».</string>
     <string name="talk_pair_notifications">اسمح بإشعارات Pairline أولًا: يُكتب رمز الإقران في أحدها.</string>
-    <string name="talk_allow_notifications">السماح بالإشعارات</string>
+    <string name="talk_allow_notifications">تشغيل الإشعارات</string>
     <string name="talk_step_start">يشغّل Pairline مساعده</string>
     <string name="talk_start_auto">يحدث تلقائيًا بعد الخطوات أعلاه.</string>
     <string name="talk_start_idle">يبدأ عندما يكون «التحدث عبر الآيفون» مفعّلًا.</string>

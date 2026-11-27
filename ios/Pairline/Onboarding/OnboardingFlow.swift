@@ -65,7 +65,15 @@ struct OnboardingFlow: View {
     private func pager(showsHero: Bool) -> some View {
         TabView(selection: $page) {
             WelcomePage(showsHero: showsHero).tag(0)
-            HowItWorksPage(showsHero: showsHero).tag(1)
+            // Where Cloud mode exists, the second page is the two ways to connect (D-099); elsewhere, how it works.
+            Group {
+                if RemoteFeature.isAvailable {
+                    TwoWaysPage(showsHero: showsHero)
+                } else {
+                    HowItWorksPage(showsHero: showsHero)
+                }
+            }
+            .tag(1)
             PrivacyPage(showsHero: showsHero).tag(2)
             ChoicePage(onPair: {
                 pairingAsSheet = sizeClass == .regular
@@ -292,6 +300,44 @@ private struct HowItWorksPage: View {
     }
 }
 
+/// The two ways to connect, Nearby and Cloud mode, with an example each (D-099). The choice only preselects Cloud
+/// mode in pairing; nothing is turned on here.
+private struct TwoWaysPage: View {
+    var showsHero = true
+    @EnvironmentObject private var settings: AppSettings
+
+    var body: some View {
+        CenteredPageScroll {
+            VStack(spacing: 22) {
+                if showsHero {
+                    TwoPhonesIllustration(state: .connected, height: 120)
+                        .padding(.horizontal, 48)
+                }
+                VStack(spacing: 8) {
+                    Text("Two ways to connect", tableName: "Connection")
+                        .font(.rounded(.title, weight: .bold))
+                        .multilineTextAlignment(.center)
+                    Text("Your Android phone keeps the SIM. How will you use it?", tableName: "Connection")
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                ConnectionChooser(choice: $settings.connectionChoice)
+                VStack(alignment: .leading, spacing: 8) {
+                    BothCanBeOnNote()
+                    Label {
+                        ConnectionWords.changeLater
+                    } icon: {
+                        Image(systemName: "gearshape").foregroundStyle(Color.brandBlue)
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.horizontal, 24)
+        }
+    }
+}
+
 private struct PrivacyPage: View {
     var showsHero = true
 
@@ -307,7 +353,10 @@ private struct PrivacyPage: View {
                 PrivacyShield()
             }
             VStack(spacing: 8) {
-                Text("Nothing leaves your two phones")
+                // With Cloud mode, locked records pass through the user's own iCloud: "only your phones can read it".
+                (RemoteFeature.isAvailable
+                    ? Text("Only your two phones can read it", tableName: "Connection")
+                    : Text("Nothing leaves your two phones"))
                     .font(.rounded(.title, weight: .bold))
                     .multilineTextAlignment(.center)
                 Text("Pairline is built so your messages and calls stay yours.")
@@ -315,8 +364,14 @@ private struct PrivacyPage: View {
                     .multilineTextAlignment(.center)
             }
             VStack(alignment: .leading, spacing: 16) {
-                OnboardingPoint(symbol: "server.rack", tint: .brandBlue, title: Text("No servers, no accounts"),
-                                text: Text("There's no Pairline cloud. You never sign up."))
+                OnboardingPoint(symbol: "server.rack", tint: .brandBlue,
+                                title: Text("No Pairline servers, no accounts", tableName: "Connection"),
+                                text: Text("We don't run any servers, and you never sign up.", tableName: "Connection"))
+                if RemoteFeature.isAvailable {
+                    OnboardingPoint(symbol: "icloud.fill", tint: .brandBlue,
+                                    title: Text("Cloud mode uses your own iCloud, not ours", tableName: "Connection"),
+                                    text: Text("Everything is locked with keys only your two phones hold, so Apple can't read it either.", tableName: "Connection"))
+                }
                 OnboardingPoint(symbol: "eye.slash.fill", tint: .brandGreen, title: Text("No tracking"),
                                 text: Text("No analytics, ads or crash reporters. Ever."))
                 OnboardingPoint(symbol: "chevron.left.forwardslash.chevron.right", tint: .brandAmber,
@@ -436,7 +491,8 @@ struct OnboardingPoint: View {
                 .frame(width: 40, height: 40)
                 .background(Circle().fill(tint.opacity(0.14)))
             VStack(alignment: .leading, spacing: 2) {
-                title.font(.headline)
+                // Titles wrap too, never "…" (longer ones in Persian, Arabic and Turkish).
+                title.font(.headline).fixedSize(horizontal: false, vertical: true)
                 text.font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
         }

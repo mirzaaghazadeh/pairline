@@ -111,15 +111,16 @@ object Notifications {
                         else -> R.string.notif_connected_text
                     },
                 )
+            // Remote mode (D-092): no nearby link, but the iPhone is reached through its iCloud, like the home screen
+            // says. Bluetooth being off doesn't stop that, so it isn't the headline then (D-099).
+            paired && AppGraph.remote.state.value.let { it.on && it.problem == null } ->
+                r.getString(R.string.home_via_icloud_title, peerName ?: r.getString(R.string.generic_iphone)) to
+                    r.getString(R.string.notif_via_icloud_text)
             s.bluetooth == BluetoothStatus.NO_PERMISSION && !wifiReady -> r.getString(R.string.notif_permission_title) to
                 r.getString(R.string.notif_permission_text)
             s.bluetooth == BluetoothStatus.OFF && !wifiReady -> r.getString(R.string.notif_bt_off_title) to
                 r.getString(R.string.notif_bt_off_text)
             !paired -> r.getString(R.string.notif_not_paired_title) to r.getString(R.string.notif_not_paired_text)
-            // Remote mode (D-092): no nearby link, but the iPhone is reached through its iCloud.
-            AppGraph.remote.state.value.let { it.on && it.problem == null } ->
-                r.getString(R.string.home_via_icloud_title, peerName ?: r.getString(R.string.generic_iphone)) to
-                    r.getString(R.string.notif_via_icloud_text)
             else -> r.getString(R.string.notif_waiting_title) to
                 r.getString(if (wifiReady) R.string.notif_waiting_text_wifi else R.string.notif_waiting_text)
         }

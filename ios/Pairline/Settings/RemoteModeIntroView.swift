@@ -17,9 +17,15 @@ struct RemoteModeIntroContent: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+                // The same example as the first run and pairing (D-099).
+                ConnectionWords.example(.cloud)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
             VStack(alignment: .leading, spacing: 14) {
+                HelpBullet(symbol: "house", text: Text("Leave the Android phone at home, on charge and on Wi-Fi.", tableName: "RemoteMode"))
                 HelpBullet(symbol: "antenna.radiowaves.left.and.right", text: Text("Nearby, your phones keep using Bluetooth and Wi-Fi. Cloud mode takes over only when they can't reach each other.", tableName: "RemoteMode"))
                 HelpBullet(symbol: "server.rack", text: Text("There's no Pairline server and no account. Your phones talk through your own iCloud and your home's internet connection.", tableName: "RemoteMode"))
                 HelpBullet(symbol: "lock", text: Text("Texts, calls and codes are locked with keys only your two phones hold. Apple stores only locked records in your iCloud, and they're deleted once read.", tableName: "RemoteMode"))
@@ -29,7 +35,6 @@ struct RemoteModeIntroContent: View {
             VStack(alignment: .leading, spacing: 14) {
                 HelpBullet(symbol: "phone.connection", text: Text("Call audio goes straight between your phones, not through iCloud.", tableName: "RemoteMode"))
                 HelpBullet(symbol: "wifi.router", text: Text("For calls, your home router opens one port for the Android phone, where it allows that. Only your paired iPhone can use it; anything else is turned away.", tableName: "RemoteMode"))
-                HelpBullet(symbol: "house", text: Text("Leave the Android phone at home, on charge and on Wi-Fi.", tableName: "RemoteMode"))
                 HelpBullet(symbol: "power", text: Text("It's off unless you turn it on, and you can turn it off any time. That closes the router's port and deletes the records in iCloud.", tableName: "RemoteMode"))
             }
             .card(padding: 14)

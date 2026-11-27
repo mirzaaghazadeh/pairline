@@ -1868,3 +1868,39 @@ The release workflow holds the signing key, so its workflows get checked like co
   tools (monthly). Each update waits seven days after its release (`cooldown`), which keeps a hijacked release from
   reaching us on day one. Minor and patch updates of the Android libraries come as one grouped pull request. It only
   raises versions of what we already use; a new dependency still needs its entry here.
+
+### D-099 — Two ways to connect: "Nearby" and "Cloud mode", explained with examples in both apps (2026-11-27)
+
+The maintainer asked for first run, pairing and Settings that let anyone, amateur or not, tell the normal way from Cloud
+mode, "with examples, not very complex", covering people who only want Bluetooth and people who need Cloud mode, and
+for a full pass over the apps' user experience. Builds on D-092 and D-094.
+
+- **One vocabulary in both apps:** **Nearby** (the phones near each other, Bluetooth and Wi-Fi; always on, nothing to
+  set up; fa «نزدیک», ar «قريب», tr "Yakın", never "Yakında") and **Cloud mode** (the Android phone stays home). Each
+  comes with one example: "in your bag, your pocket or on your desk" and "at home on its charger while you're at work or
+  travelling", and the sentence "Both can be on. At home the phones talk directly; when you leave, Cloud mode takes
+  over." Router words (UPnP, port, mapping) appear only under Advanced or in Help, next to a plain explanation; a status
+  that isn't fine always names the one next step. The privacy promise says "No Pairline servers" and "Cloud mode uses
+  your own iCloud, not ours", never "no cloud". Where Cloud mode isn't available (an App Store build before it ships)
+  only Nearby is shown.
+- **iPhone:** the first run's second page is "Two ways to connect" (two cards); the choice (`connection.choice`, a local
+  preference) only preselects Cloud mode later and never turns anything on. After pairing, one question, "Will your
+  Android phone stay at home?", with what Cloud mode needs and costs only under its card; asked before the trial too,
+  when a banner offers Cloud mode once the trial runs and the phones are together. "Pair over the internet" says when to
+  use it. Settings starts with **Connection** (how the phones are connected now, in plain words, with the next step;
+  the Cloud mode switch; **Advanced** for the home check, port forwarding, router guide, connection log, call audio,
+  troubleshooting and diagnostics). Help gets "Nearby or Cloud mode?"; answers that said leaving the Android phone at
+  home "isn't supported yet" change where Cloud mode exists.
+- **Android bridge:** setup gets a "Two ways to connect" step after Welcome (Cloud mode is turned on from the iPhone),
+  and the Battery step says what a phone left at home needs. Home names the way the phones are connected ("Nearby ·
+  Bluetooth", "Cloud mode · through iCloud") and shows the direct connection as "Calls from far away" with a one-line
+  next step. Router details (manual port forwarding, a fixed address, the device MAC) move from Home to a new Cloud mode
+  screen (Settings › Cloud mode), which also checks the charger, home Wi-Fi and background running, each with a Fix
+  button. Settings starts with Connection and keeps Advanced near the bottom; Diagnostics moves to Settings › Help;
+  Help opens with "Nearby or Cloud mode". Texts that point at the iPhone quote its screens in its own words
+  ("Settings › Connection › Advanced › Port forwarding").
+- **Also fixed on the way:** buttons before a system permission prompt say "Continue" on Android too (D-097's rule);
+  first-run titles that were cut off in longer languages wrap; two pairing transitions follow Reduce Motion; the
+  accessibility audit (D-096) covers the new screens.
+- Nothing in the link, the protocol or the data flows changed; no new permission. The iPhone keeps the first-run choice
+  in its own preferences (PRIVACY.md).

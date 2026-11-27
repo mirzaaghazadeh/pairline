@@ -131,7 +131,7 @@ final class CallCenter: ObservableObject {
     /// Mute and speaker work: locally while the audio is on this iPhone, or on the bridge through `call.audio`.
     var canAudio: Bool { audioOnIPhone || (bridge?.has(.callAudio) ?? false) }
     var audioOnIPhone: Bool { if case .iphone = audioRoute { return true } else { return false } }
-    /// The path a call's audio takes now (D-072): the one chosen in Settings › Call audio when it's up, else the
+    /// The path a call's audio takes now (D-072): the one chosen in Settings › Connection › Advanced › Call audio when it's up, else the
     /// other. Bluetooth needs a bridge that lists `call.media.link`; Wi-Fi needs an open media channel. Away from home,
     /// the `.link` path is remote mode's direct connection (D-092); `lane` says which session carries it.
     private func availablePath(excluding excluded: CallAudioPath? = nil)
@@ -814,7 +814,7 @@ final class CallCenter: ObservableObject {
             // Remote mode (D-092): iCloud carries no call audio; the direct connection does, and then the phase is
             // connected and this guard passes.
             notice = bridge.phase == .remote
-                ? String(localized: "Calls need the direct connection to your home, which isn't up right now. Settings › Cloud mode › Check my home connection shows why.")
+                ? String(localized: "Calls need the direct connection to your home, which isn't up right now. Settings › Connection › Advanced › Check my home connection shows why.", table: "Connection")
                 : String(localized: "Your bridge phone isn't connected right now.")
             return false
         }

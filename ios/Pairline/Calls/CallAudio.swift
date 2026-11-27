@@ -11,7 +11,7 @@ protocol AudioPacketTransport: AnyObject {
 }
 
 /// Where a call's audio travels between the phones (`call.media.start` `via`, PROTOCOL.md "Call audio"). The user's
-/// choice in Settings › Call audio is the one tried first (D-072).
+/// choice in Settings › Connection › Advanced › Call audio is the one tried first (D-072, D-099).
 enum CallAudioPath: String, CaseIterable, Identifiable {
     /// Inside the Bluetooth session, as Opus (needs `call.media.link`).
     case link

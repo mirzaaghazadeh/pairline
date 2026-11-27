@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,15 +40,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import androidx.core.text.BidiFormatter
-import androidx.core.text.TextDirectionHeuristicsCompat
 import app.pairline.android.AppGraph
 import app.pairline.android.BuildConfig
 import app.pairline.android.R
@@ -58,8 +59,6 @@ import app.pairline.android.link.LinkService
 import app.pairline.android.link.LinkSnapshot
 import app.pairline.android.link.TransportKind
 import app.pairline.android.link.WifiLinkStatus
-import app.pairline.android.link.remote.Direct
-import app.pairline.android.link.remote.DirectReason
 import app.pairline.android.link.remote.DirectStatus
 import app.pairline.android.link.remote.RemoteStatus
 import app.pairline.android.link.remote.RemoteStore
@@ -68,6 +67,8 @@ import app.pairline.android.telephony.Perms
 import app.pairline.android.telephony.SimSnapshot
 import app.pairline.android.telephony.BatteryInfo
 import app.pairline.android.ui.CloudModeUi
+import app.pairline.android.ui.ConnectionWay
+import app.pairline.android.ui.ConnectionWayLine
 import app.pairline.android.ui.Maker
 import app.pairline.android.ui.PIcons
 import app.pairline.android.ui.PermissionGroup
@@ -86,6 +87,9 @@ import app.pairline.android.ui.components.StatusPill
 import app.pairline.android.ui.components.Tone
 import app.pairline.android.ui.components.toneColors
 import app.pairline.android.ui.refreshTick
+import app.pairline.android.ui.remote.DirectStatusLine
+import app.pairline.android.ui.remote.HintText
+import app.pairline.android.ui.remote.directHint
 import app.pairline.android.ui.rememberPermissionRequester
 import app.pairline.android.ui.update.UpdateBanner
 import kotlinx.coroutines.Dispatchers
@@ -181,14 +185,7 @@ fun HomeScreen(navigate: (Route) -> Unit) {
                         onClick = { confirmUnpair = true },
                     )
                 }
-                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
-                ListRow(
-                    title = stringResource(R.string.diag_title),
-                    subtitle = stringResource(R.string.home_diag_sub),
-                    icon = PIcons.Report,
-                    iconTone = Tone.NEUTRAL,
-                    onClick = { navigate(Route.Diagnostics) },
-                )
+                // Diagnostics is for troubleshooting, so it's in Settings › Help, not on the first screen (D-099).
             }
 
             if (BuildConfig.DEBUG) {
@@ -266,15 +263,13 @@ private fun LinkCard(
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             LinkIllustration(visual, Modifier.padding(horizontal = 8.dp))
             StatusPill(stringResource(pill), tone)
+            // How the phones reach each other, in the words both apps use (D-099): Nearby or Cloud mode.
+            val way = ConnectionWay.of(link, viaIcloud && !remote.retrying)
             val (title, body) = when {
                 link.connected -> stringResource(R.string.home_connected_title, peer) to stringResource(
                     when {
-                        link.transport == TransportKind.DIRECT -> R.string.home_connected_body_direct
-                        link.transport == TransportKind.DEBUG_TCP && !ScreenshotMode.enabled && TransportKind.WIFI !in link.transports ->
-                            R.string.home_connected_body_tcp
-                        TransportKind.WIFI in link.transports &&
-                            link.transports.any { it != TransportKind.WIFI && it != TransportKind.DIRECT } -> R.string.home_connected_body_both
-                        TransportKind.WIFI in link.transports -> R.string.home_connected_body_wifi
+                        way == ConnectionWay.CLOUD_DIRECT -> R.string.home_connected_body_direct
+                        way == null && link.transports.contains(TransportKind.DEBUG_TCP) -> R.string.home_connected_body_tcp
                         else -> R.string.home_connected_body
                     },
                 )
@@ -290,6 +285,7 @@ private fun LinkCard(
                 else -> stringResource(R.string.home_waiting_title, peer) to waitingBody(prefs.lastSeen, now)
             }
             Text(title, style = MaterialTheme.typography.titleLarge)
+            if (way != null) ConnectionWayLine(way)
             Text(body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             // The chip won't advertise (some older phones): the iPhone can't find this one over Bluetooth at all.
             val btUsable = link.bluetooth != BluetoothStatus.OFF && link.bluetooth != BluetoothStatus.NO_PERMISSION &&
@@ -298,12 +294,17 @@ private fun LinkCard(
                 NoteBox(stringResource(R.string.bt_cant_advertise), Tone.WARN, PIcons.Bluetooth)
             }
             // The store screenshots (debug screenshot mode) show the link itself, not the "turn on Cloud mode" prompt.
-            if (paired && (remote.on || !ScreenshotMode.enabled)) CloudLine(remote, viaIcloud, prefs.peerProto)
+            if (paired && (remote.on || !ScreenshotMode.enabled)) {
+                CloudLine(remote, viaIcloud, prefs.peerProto, onOpen = { navigate(Route.CloudMode) })
+            }
             val direct by AppGraph.direct.status.collectAsState()
-            if (paired && direct.active) DirectLine(direct)
+            if (paired && direct.active) DirectLine(direct, onDetails = { navigate(Route.CloudMode) })
             when {
-                link.bluetooth == BluetoothStatus.OFF -> PrimaryButton(stringResource(R.string.action_turn_on_bt), { SystemActions.requestBluetoothOn(context) }, icon = PIcons.Bluetooth)
-                link.bluetooth == BluetoothStatus.NO_PERMISSION -> PrimaryButton(stringResource(R.string.action_allow), onAllowBluetooth, icon = PIcons.Bluetooth)
+                link.bluetooth == BluetoothStatus.OFF ->
+                    PrimaryButton(stringResource(R.string.action_turn_on_bt), { SystemActions.requestBluetoothOn(context) }, icon = PIcons.Bluetooth)
+                // "Continue"-style wording, not "Allow", before Android's own permission prompt (D-097's rule).
+                link.bluetooth == BluetoothStatus.NO_PERMISSION ->
+                    PrimaryButton(stringResource(R.string.action_turn_on_nearby), onAllowBluetooth, icon = PIcons.Bluetooth)
                 !paired && !link.connected -> PrimaryButton(stringResource(R.string.home_pair), { navigate(Route.Pairing) }, icon = PIcons.Qr)
             }
         }
@@ -312,10 +313,11 @@ private fun LinkCard(
 
 /**
  * Cloud mode in one line (remote mode, D-092): on, paused and why, or off with where to turn it on (the iPhone). Not
- * shown while the card itself says "Via iCloud", nor for an iPhone that doesn't offer Cloud mode.
+ * shown while the card itself says "Via iCloud", nor for an iPhone that doesn't offer Cloud mode. Tapping it opens
+ * the Cloud mode screen: what it is, what this phone needs, and its router details (D-099).
  */
 @Composable
-private fun CloudLine(remote: RemoteStatus, viaIcloud: Boolean, peerProto: Int) {
+private fun CloudLine(remote: RemoteStatus, viaIcloud: Boolean, peerProto: Int, onOpen: () -> Unit) {
     val (text, tone) = when {
         remote.on && remote.problem == RemoteStore.Problem.TOKEN_REJECTED -> R.string.cloud_paused_token to Tone.WARN
         remote.on && remote.problem == RemoteStore.Problem.PRIVATE_DATABASE_REFUSED ->
@@ -326,90 +328,47 @@ private fun CloudLine(remote: RemoteStatus, viaIcloud: Boolean, peerProto: Int) 
         CloudModeUi.offered(peerProto) -> R.string.cloud_off to Tone.NEUTRAL
         else -> return
     }
-    Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.small)
+            .clickable(onClickLabel = stringResource(R.string.cloud_title), role = Role.Button, onClick = onOpen)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
         Icon(
             when (tone) {
-                Tone.GOOD -> PIcons.CheckCircle
+                Tone.GOOD -> PIcons.Cloud
                 Tone.WARN -> PIcons.Warning
-                else -> PIcons.Info
+                else -> PIcons.Cloud
             },
             contentDescription = null,
             modifier = Modifier.size(18.dp),
             tint = if (tone == Tone.NEUTRAL) MaterialTheme.colorScheme.onSurfaceVariant else toneColors(tone).content,
         )
-        Text(stringResource(text), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-/** Cloud mode's direct connection through the home router (D-092): open, or why not. */
-@Composable
-private fun DirectLine(s: DirectStatus) {
-    val open = s.direct == Direct.OPEN
-    val text = when {
-        s.direct == null -> stringResource(R.string.direct_checking)
-        open -> stringResource(R.string.direct_open)
-        s.ipv6Unconfirmed -> stringResource(R.string.direct_ipv6_unconfirmed)
-        else -> stringResource(R.string.direct_not_possible, stringResource(directReasonText(s.reason)))
-    }
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(
-            if (open) PIcons.CheckCircle else PIcons.Info,
-            contentDescription = null,
-            modifier = Modifier.size(18.dp),
-            tint = if (open) toneColors(Tone.GOOD).content else MaterialTheme.colorScheme.onSurfaceVariant,
+        Text(
+            stringResource(text),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
         )
-        Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-    // What fixes it, when the home's router, modem or provider is the reason (D-094): texts and codes work anyway.
-    // UPnP or NAT-PMP first (Pairline then does it all); otherwise the user's own port forwarding, which needs this
-    // phone's home address and port, shown left to right in every language.
-    val bidi = BidiFormatter.getInstance()
-    val address = s.localV4?.let { bidi.unicodeWrap(it, TextDirectionHeuristicsCompat.LTR) }
-    val port = s.port?.let { bidi.unicodeWrap(it.toString(), TextDirectionHeuristicsCompat.LTR) }
-    val forwardable = address != null && port != null
-    val routerReason = s.reason == DirectReason.NO_MAPPING || s.reason == null
-    val modemReason = s.reason == DirectReason.DOUBLE_NAT || s.reason == DirectReason.NO_PUBLIC_ADDRESS
-    val hint: String? = when {
-        s.direct == null || open || s.ipv6Unconfirmed -> null
-        routerReason && forwardable -> stringResource(R.string.direct_hint_router_manual, port!!, address!!)
-        routerReason -> stringResource(R.string.direct_hint_router)
-        modemReason && forwardable -> stringResource(R.string.direct_hint_modem_manual, port!!, address!!)
-        modemReason -> stringResource(R.string.direct_hint_modem)
-        s.reason == DirectReason.CARRIER_NAT -> stringResource(R.string.direct_hint_provider)
-        else -> null
-    }
-    if (hint != null) {
-        HintText(hint)
-        if ((routerReason || modemReason) && forwardable) {
-            // A hand-made rule points at one address: why this phone must keep it, and how (D-095).
-            HintText(stringResource(R.string.direct_hint_fixed_address, address!!))
-            // Android 10+ gives each Wi-Fi network a random hardware address, which can break the router's reservation.
-            if (Build.VERSION.SDK_INT >= 29) HintText(stringResource(R.string.direct_hint_device_mac))
-        }
-    } else if (forwardable && !s.mappedV4) {
-        // Not opened by the router itself: the user may have forwarded the port by hand; here is what to forward.
-        HintText(stringResource(R.string.direct_forward_info, port!!, address!!))
+        Icon(PIcons.Chevron, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
+/**
+ * Calls from far away (Cloud mode's direct connection through the home router, D-092): ready, or why not, with the short
+ * next step. The router details wait on the Cloud mode screen (D-099).
+ */
 @Composable
-private fun HintText(text: String) {
-    Text(
-        text,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 26.dp),
-    )
-}
-
-@StringRes
-private fun directReasonText(reason: DirectReason?): Int = when (reason) {
-    DirectReason.NOT_ON_WIFI -> R.string.direct_reason_wifi
-    DirectReason.CARRIER_NAT -> R.string.direct_reason_carrier_nat
-    DirectReason.DOUBLE_NAT -> R.string.direct_reason_double_nat
-    DirectReason.NO_PUBLIC_ADDRESS -> R.string.direct_reason_no_address
-    DirectReason.NO_MAPPING, null -> R.string.direct_reason_no_mapping
-    DirectReason.LISTEN_FAILED -> R.string.direct_reason_listen
+private fun DirectLine(s: DirectStatus, onDetails: () -> Unit) {
+    DirectStatusLine(s)
+    val hint = directHint(s, detailed = false) ?: return
+    HintText(hint)
+    TextButton(onClick = onDetails, modifier = Modifier.padding(start = 14.dp)) {
+        Text(stringResource(R.string.action_details))
+    }
 }
 
 @Composable

@@ -36,9 +36,21 @@ final class AppSettings: ObservableObject {
     /// The data meter's month starts on this day (1–28), and warns at 80% and 100% of this many GB; 0 is no limit (D-084).
     @AppStorage("data.cycleDay") var dataCycleDay = 1
     @AppStorage("data.limitGB") var dataLimitGB = 0
+    /// How the user means to use the two phones, picked on the first-run page or in pairing (D-099): together
+    /// (Nearby), or with the Android phone at home (Cloud mode). It only preselects Cloud mode in pairing and offers it
+    /// until it's on; it never turns anything on by itself.
+    @AppStorage("connection.choice") var connectionChoice: ConnectionChoice = .nearby
 
     var savedUSSDCodes: [String] {
         get { savedUSSDCodesRaw.split(separator: "\n").map(String.init) }
         set { savedUSSDCodesRaw = newValue.joined(separator: "\n") }
     }
+}
+
+/// The two ways to use Pairline (D-099). Nearby is always on; Cloud mode is extra and is turned on in this app.
+enum ConnectionChoice: String {
+    /// The phones are near each other: Bluetooth and Wi-Fi. Nothing to set up.
+    case nearby
+    /// The Android phone stays home; this iPhone keeps calls, texts and codes anywhere with internet.
+    case cloud
 }

@@ -1,0 +1,627 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Nearby" : {
+      "comment" : "D-099: the first way to connect, the phones near each other over Bluetooth and Wi-Fi. A card title and a heading; Persian and Arabic say \"nearby connection\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الاتصال القريب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nearby" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال نزدیک" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yakın bağlantı" } }
+      }
+    },
+    "The phones are near each other and talk over Bluetooth and Wi-Fi. Nothing to set up." : {
+      "comment" : "D-099: Nearby's one-line meaning, on the first run, in pairing and in Help.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الهاتفان قريبان ويتحدثان عبر البلوتوث والواي فاي. لا شيء لإعداده." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The phones are near each other and talk over Bluetooth and Wi-Fi. Nothing to set up." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی‌ها نزدیک هم‌اند و از راه بلوتوث و وای‌فای با هم حرف می‌زنند. چیزی برای تنظیم نیست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlar birbirine yakın, Bluetooth ve Wi-Fi üzerinden konuşur. Kurulacak bir şey yok." } }
+      }
+    },
+    "The Android phone stays home; this iPhone keeps calls, texts and codes anywhere with internet." : {
+      "comment" : "D-099: Cloud mode's one-line meaning, on the first run, in pairing, under its switch in Settings and in Help.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يبقى هاتف أندرويد في المنزل، ويستقبل هذا الآيفون المكالمات والرسائل والرموز أينما وُجد الإنترنت." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone stays home; this iPhone keeps calls, texts and codes anywhere with internet." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی در خانه می‌ماند؛ این آیفون هر جا اینترنت باشد تماس‌ها، پیامک‌ها و کدها را دارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon evde kalır; bu iPhone internet olan her yerde aramaları, mesajları ve kodları alır." } }
+      }
+    },
+    "For example, the Android phone is in your bag, your pocket or on your desk." : {
+      "comment" : "D-099: Nearby's everyday example.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مثلًا يكون هاتف أندرويد في حقيبتك أو جيبك أو على مكتبك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "For example, the Android phone is in your bag, your pocket or on your desk." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مثلاً گوشی اندرویدی در کیف، جیب یا روی میزتان است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Örneğin Android telefon çantanızda, cebinizde ya da masanızda." } }
+      }
+    },
+    "For example, it stays home on its charger while you're at work or travelling." : {
+      "comment" : "D-099: Cloud mode's everyday example (\"it\" is the Android phone).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مثلًا يبقى في المنزل على الشاحن وأنت في العمل أو في سفر." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "For example, it stays home on its charger while you're at work or travelling." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مثلاً وقتی سر کار یا در سفرید، در خانه به شارژر وصل است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Örneğin siz işteyken ya da seyahatteyken evde şarjda durur." } }
+      }
+    },
+    "Both can be on. At home the phones talk directly; when you leave, Cloud mode takes over." : {
+      "comment" : "D-099: under the two ways to connect, on the first run, in pairing, in Settings › Connection and in Help.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يمكن تشغيل الاثنين معًا. في المنزل يتحدث الهاتفان مباشرةً، وحين تخرج يتولى الوضع السحابي المهمة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Both can be on. At home the phones talk directly; when you leave, Cloud mode takes over." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هر دو می‌توانند روشن باشند. در خانه گوشی‌ها مستقیم با هم حرف می‌زنند؛ وقتی بیرون می‌روید، حالت ابری کار را به دست می‌گیرد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İkisi birden açık olabilir. Evde telefonlar doğrudan konuşur; dışarı çıktığınızda Bulut modu devralır." } }
+      }
+    },
+    "You can change this any time in Settings." : {
+      "comment" : "D-099: under the two ways to connect on the first run.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يمكنك تغيير ذلك في أي وقت من الإعدادات." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "You can change this any time in Settings." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هر وقت خواستید می‌توانید در تنظیمات عوضش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bunu istediğiniz zaman Ayarlar'dan değiştirebilirsiniz." } }
+      }
+    },
+    "Two ways to connect" : {
+      "comment" : "D-099: the first run's second page title: Nearby or Cloud mode.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "طريقتان للاتصال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Two ways to connect" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "دو راه برای اتصال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bağlanmanın iki yolu" } }
+      }
+    },
+    "Your Android phone keeps the SIM. How will you use it?" : {
+      "comment" : "D-099: under \"Two ways to connect\" on the first run.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تبقى الشريحة في هاتف أندرويد. كيف ستستخدمه؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your Android phone keeps the SIM. How will you use it?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "سیم‌کارت در گوشی اندرویدی می‌ماند. چطور از آن استفاده می‌کنید؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "SIM kart Android telefonunuzda kalır. Onu nasıl kullanacaksınız?" } }
+      }
+    },
+    "Only your two phones can read it" : {
+      "comment" : "D-099: the first run's privacy page title where Cloud mode exists (locked records pass through the user's own iCloud).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا يقرؤه إلا هاتفاك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Only your two phones can read it" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "فقط دو گوشی شما می‌توانند آن را بخوانند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yalnızca iki telefonunuz okuyabilir" } }
+      }
+    },
+    "No Pairline servers, no accounts" : {
+      "comment" : "D-099: the first run's privacy page.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا خوادم لـ Pairline ولا حسابات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Pairline servers, no accounts" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بدون سرور Pairline، بدون حساب کاربری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline sunucusu yok, hesap yok" } }
+      }
+    },
+    "We don't run any servers, and you never sign up." : {
+      "comment" : "D-099: the first run's privacy page, under \"No Pairline servers, no accounts\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا نشغّل أي خوادم، ولن تحتاج إلى التسجيل أبدًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "We don't run any servers, and you never sign up." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "ما هیچ سروری نداریم و هرگز لازم نیست ثبت‌نام کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hiç sunucu çalıştırmıyoruz ve asla kayıt olmanız gerekmez." } }
+      }
+    },
+    "Cloud mode uses your own iCloud, not ours" : {
+      "comment" : "D-099: the first run's privacy page where Cloud mode exists.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يستخدم الوضع السحابي حسابك على iCloud، لا خوادم لدينا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode uses your own iCloud, not ours" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری از iCloud خود شما استفاده می‌کند، نه از سرور ما" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu bizim değil, sizin iCloud'unuzu kullanır" } }
+      }
+    },
+    "Everything is locked with keys only your two phones hold, so Apple can't read it either." : {
+      "comment" : "D-099: the first run's privacy page, under \"Cloud mode uses your own iCloud, not ours\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كل شيء مقفل بمفاتيح لا يملكها إلا هاتفاك، فلا تستطيع Apple قراءته أيضًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Everything is locked with keys only your two phones hold, so Apple can't read it either." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "همه‌چیز با کلیدهایی قفل می‌شود که فقط دو گوشی شما دارند، پس اپل هم نمی‌تواند آن را بخواند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Her şey yalnızca iki telefonunuzda bulunan anahtarlarla kilitlenir; Apple da okuyamaz." } }
+      }
+    },
+    "When the Android phone isn't with you, for example because it's at home." : {
+      "comment" : "D-099: pairing, under \"Pair over the internet\", saying when to use it.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حين لا يكون هاتف أندرويد معك، مثلًا لأنه في المنزل." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "When the Android phone isn't with you, for example because it's at home." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی گوشی اندرویدی همراهتان نیست، مثلاً چون در خانه است." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon yanınızda değilken, örneğin evdeyse." } }
+      }
+    },
+    "Will your Android phone stay at home?" : {
+      "comment" : "D-099: pairing, the question after \"You're paired!\": Nearby or Cloud mode.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل سيبقى هاتف أندرويد في المنزل؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Will your Android phone stay at home?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی‌تان در خانه می‌ماند؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuz evde mi kalacak?" } }
+      }
+    },
+    "Choose how you'll use your phones. You can change this any time in Settings." : {
+      "comment" : "D-099: pairing, under \"Will your Android phone stay at home?\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختر كيف ستستخدم هاتفيك. يمكنك تغيير ذلك في أي وقت من الإعدادات." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose how you'll use your phones. You can change this any time in Settings." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "انتخاب کنید گوشی‌هایتان را چطور به کار می‌برید. هر وقت خواستید می‌توانید در تنظیمات عوضش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınızı nasıl kullanacağınızı seçin. Bunu istediğiniz zaman Ayarlar'dan değiştirebilirsiniz." } }
+      }
+    },
+    "No, it stays with me" : {
+      "comment" : "D-099: pairing, the Nearby answer to \"Will your Android phone stay at home?\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا، يبقى معي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No, it stays with me" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نه، همراه خودم است" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hayır, yanımda kalıyor" } }
+      }
+    },
+    "Yes, it stays at home" : {
+      "comment" : "D-099: pairing, the Cloud mode answer to \"Will your Android phone stay at home?\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، يبقى في المنزل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, it stays at home" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، در خانه می‌ماند" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, evde kalıyor" } }
+      }
+    },
+    "Leave the Android phone on its charger and home Wi-Fi." : {
+      "comment" : "D-099: pairing, what Cloud mode needs, when it's chosen.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اترك هاتف أندرويد على الشاحن ومتصلًا بشبكة الواي فاي المنزلية." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Leave the Android phone on its charger and home Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی را به شارژر و وای‌فای خانه وصل بگذارید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonu şarjda ve ev Wi-Fi'ına bağlı bırakın." } }
+      }
+    },
+    "For calls, your home router lets this iPhone in. Most routers do it by themselves; Settings › Connection › Advanced shows how otherwise." : {
+      "comment" : "D-099: pairing, what Cloud mode needs, when it's chosen. Settings › Connection › Advanced are the app's own screen names.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "للمكالمات، يسمح جهاز التوجيه في منزلك بدخول هذا الآيفون. معظم الأجهزة تفعل ذلك تلقائيًا، وإلا فالإعدادات › الاتصال › متقدم تشرح الطريقة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "For calls, your home router lets this iPhone in. Most routers do it by themselves; Settings › Connection › Advanced shows how otherwise." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای تماس‌ها، مودم خانه باید به این آیفون اجازهٔ ورود بدهد. بیشتر مودم‌ها خودشان این کار را می‌کنند؛ وگرنه تنظیمات › اتصال › پیشرفته راهش را نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar için ev modeminiz bu iPhone'u içeri alır. Çoğu modem bunu kendiliğinden yapar; yapmazsa Ayarlar › Bağlantı › Gelişmiş nasıl yapılacağını gösterir." } }
+      }
+    },
+    "Cloud mode comes with the free trial. Once it starts, Pairline offers to turn it on." : {
+      "comment" : "D-099: pairing, Cloud mode chosen before the free trial has started.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يأتي الوضع السحابي مع الفترة التجريبية المجانية. حين تبدأ، يعرض عليك Pairline تشغيله." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode comes with the free trial. Once it starts, Pairline offers to turn it on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری همراه دوره آزمایشی رایگان است. وقتی شروع شد، Pairline پیشنهاد می‌کند روشنش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu ücretsiz denemeyle gelir. Deneme başlayınca Pairline onu açmayı önerir." } }
+      }
+    },
+    "Connection" : {
+      "comment" : "D-099: Settings' first group: how the phones are connected, and Cloud mode's switch.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الاتصال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connection" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bağlantı" } }
+      }
+    },
+    "Advanced" : {
+      "comment" : "D-099: Settings › Connection › Advanced: the technical side of the connection.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "متقدم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Advanced" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیشرفته" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gelişmiş" } }
+      }
+    },
+    "Router, port forwarding, call audio, connection log" : {
+      "comment" : "D-099: under \"Advanced\" in Settings › Connection, what's inside.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جهاز التوجيه، إعادة توجيه المنفذ، صوت المكالمة، سجل الاتصال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Router, port forwarding, call audio, connection log" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مودم، هدایت پورت، صدای تماس، گزارش اتصال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Modem, port yönlendirme, arama sesi, bağlantı günlüğü" } }
+      }
+    },
+    "Call audio, troubleshooting" : {
+      "comment" : "D-099: under \"Advanced\" in Settings › Connection where there's no Cloud mode.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "صوت المكالمة، حل المشكلات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Call audio, troubleshooting" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "صدای تماس، رفع اشکال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Arama sesi, sorun giderme" } }
+      }
+    },
+    "Talk on iPhone" : {
+      "comment" : "D-099: Settings › Connection › Advanced, the header over Call audio. The feature's name everywhere (D-047).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التحدث عبر الآيفون" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Talk on iPhone" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "مکالمه با آیفون" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iPhone’dan konuşma" } }
+      }
+    },
+    "The router check, port forwarding and the connection log appear here once your Android phone is paired." : {
+      "comment" : "D-099: Settings › Connection › Advanced in demo mode or before pairing.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يظهر فحص جهاز التوجيه وإعادة توجيه المنفذ وسجل الاتصال هنا بعد إقران هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The router check, port forwarding and the connection log appear here once your Android phone is paired." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بررسی مودم، هدایت پورت و گزارش اتصال بعد از جفت کردن گوشی اندرویدی اینجا نشان داده می‌شوند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Modem kontrolü, port yönlendirme ve bağlantı günlüğü, Android telefonunuz eşleşince burada görünür." } }
+      }
+    },
+    "Texts and codes travel through your own iCloud. Calls go straight between your phones, which needs your home router to let this iPhone in: the check above tells you whether it does." : {
+      "comment" : "D-099: Settings › Connection › Advanced, the footer of Cloud mode's section.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تنتقل الرسائل والرموز عبر iCloud الخاص بك. أما المكالمات فتمر مباشرةً بين هاتفيك، وهذا يحتاج أن يسمح جهاز التوجيه في منزلك بدخول هذا الآيفون: الفحص أعلاه يخبرك إن كان يسمح." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts and codes travel through your own iCloud. Calls go straight between your phones, which needs your home router to let this iPhone in: the check above tells you whether it does." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها و کدها از راه iCloud خودتان می‌روند. تماس‌ها مستقیم بین گوشی‌هایتان برقرار می‌شوند و برای این، مودم خانه باید به این آیفون اجازهٔ ورود بدهد: بررسی بالا می‌گوید که می‌دهد یا نه." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar ve kodlar kendi iCloud'unuz üzerinden gider. Aramalar doğrudan telefonlarınız arasında gider; bunun için ev modeminizin bu iPhone'u içeri alması gerekir: yukarıdaki kontrol alıp almadığını söyler." } }
+      }
+    },
+    "Turn Cloud mode on while your phones are together, near each other with Bluetooth on or on the same Wi-Fi." : {
+      "comment" : "D-099: under Cloud mode's switch when the phones aren't linked nearby, which turning it on needs.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شغّل الوضع السحابي والهاتفان معًا: قريبان مع تشغيل البلوتوث، أو على شبكة الواي فاي نفسها." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn Cloud mode on while your phones are together, near each other with Bluetooth on or on the same Wi-Fi." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری را وقتی روشن کنید که گوشی‌ها کنار هم‌اند: نزدیک هم با بلوتوث روشن، یا روی یک وای‌فای." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modunu telefonlar birlikteyken açın: Bluetooth açıkken yan yana ya da aynı Wi-Fi'da." } }
+      }
+    },
+    "Turning on…" : {
+      "comment" : "D-099: next to Cloud mode's switch while it turns on.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ التشغيل…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turning on…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال روشن کردن…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Açılıyor…" } }
+      }
+    },
+    "Turning off…" : {
+      "comment" : "D-099: next to Cloud mode's switch while it turns off.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ الإيقاف…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turning off…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در حال خاموش کردن…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kapatılıyor…" } }
+      }
+    },
+    "Nearby · Bluetooth" : {
+      "comment" : "D-099: Settings › Connection, how the phones are connected right now.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قريب · بلوتوث" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nearby · Bluetooth" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نزدیک · بلوتوث" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yakın · Bluetooth" } }
+      }
+    },
+    "Nearby · Wi-Fi" : {
+      "comment" : "D-099: Settings › Connection, how the phones are connected right now.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قريب · واي فاي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nearby · Wi-Fi" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نزدیک · وای‌فای" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yakın · Wi-Fi" } }
+      }
+    },
+    "Nearby · Bluetooth and Wi-Fi" : {
+      "comment" : "D-099: Settings › Connection, how the phones are connected right now.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قريب · بلوتوث وواي فاي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nearby · Bluetooth and Wi-Fi" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نزدیک · بلوتوث و وای‌فای" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yakın · Bluetooth ve Wi-Fi" } }
+      }
+    },
+    "The phones are near each other and talk directly." : {
+      "comment" : "D-099: Settings › Connection, under the status when connected nearby.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الهاتفان قريبان أحدهما من الآخر ويتحدثان مباشرةً." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The phones are near each other and talk directly." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی‌ها نزدیک هم‌اند و مستقیم با هم حرف می‌زنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlar birbirine yakın ve doğrudan konuşuyor." } }
+      }
+    },
+    "Cloud mode · straight to your home" : {
+      "comment" : "D-099: Settings › Connection, status when Cloud mode's direct connection to the home is up.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع السحابي · مباشرةً إلى منزلك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode · straight to your home" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری · مستقیم به خانه" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu · doğrudan evinize" } }
+      }
+    },
+    "Calls, texts and codes work from anywhere." : {
+      "comment" : "D-099: Settings › Connection, under \"Cloud mode · straight to your home\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المكالمات والرسائل والرموز تعمل من أي مكان." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls, texts and codes work from anywhere." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها، پیامک‌ها و کدها از هر جا کار می‌کنند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar, mesajlar ve kodlar her yerden çalışır." } }
+      }
+    },
+    "Cloud mode · through iCloud" : {
+      "comment" : "D-099: Settings › Connection, status when messages go through the user's iCloud.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع السحابي · عبر iCloud" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode · through iCloud" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری · از راه iCloud" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu · iCloud üzerinden" } }
+      }
+    },
+    "Texts and codes come through your own iCloud. Calls need the direct connection to your home: see Advanced." : {
+      "comment" : "D-099: Settings › Connection, under \"Cloud mode · through iCloud\". Advanced is the row below.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تصل الرسائل والرموز عبر iCloud الخاص بك. تحتاج المكالمات إلى الاتصال المباشر بمنزلك: راجع «متقدم»." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Texts and codes come through your own iCloud. Calls need the direct connection to your home: see Advanced." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "پیامک‌ها و کدها از راه iCloud خودتان می‌آیند. تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند: بخش «پیشرفته» را ببینید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Mesajlar ve kodlar kendi iCloud'unuz üzerinden gelir. Aramalar için evinize doğrudan bağlantı gerekir: Gelişmiş'e bakın." } }
+      }
+    },
+    "Looking for your Android phone…" : {
+      "comment" : "D-099: Settings › Connection, status while the iPhone looks for the bridge.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جارٍ البحث عن هاتف أندرويد…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Looking for your Android phone…" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در جست‌وجوی گوشی اندرویدی شما…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefonunuz aranıyor…" } }
+      }
+    },
+    "Cloud mode keeps trying through iCloud meanwhile." : {
+      "comment" : "D-099: Settings › Connection, under \"Looking for your Android phone…\" with Cloud mode on.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في الأثناء يواصل الوضع السحابي المحاولة عبر iCloud." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode keeps trying through iCloud meanwhile." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در این فاصله حالت ابری از راه iCloud تلاشش را ادامه می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu arada Bulut modu iCloud üzerinden denemeye devam eder." } }
+      }
+    },
+    "Bring the phones near each other, with Bluetooth on on both and Pairline Bridge running." : {
+      "comment" : "D-099: Settings › Connection, under \"Looking for your Android phone…\": the next step.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قرّب الهاتفين أحدهما من الآخر، مع تشغيل البلوتوث على كليهما وتشغيل Pairline Bridge." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bring the phones near each other, with Bluetooth on on both and Pairline Bridge running." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی‌ها را نزدیک هم بیاورید؛ بلوتوث هر دو روشن باشد و Pairline Bridge در حال اجرا." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonları birbirine yaklaştırın; ikisinde de Bluetooth açık ve Pairline Bridge çalışıyor olsun." } }
+      }
+    },
+    "Turn on Bluetooth in Control Center to reach your Android phone nearby." : {
+      "comment" : "D-099: Settings › Connection, under \"Bluetooth is off\": the next step.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شغّل البلوتوث من مركز التحكم للوصول إلى هاتف أندرويد القريب." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on Bluetooth in Control Center to reach your Android phone nearby." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای دسترسی به گوشی اندرویدی در نزدیکی، بلوتوث را از مرکز کنترل روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yakındaki Android telefonunuza ulaşmak için Denetim Merkezi'nden Bluetooth'u açın." } }
+      }
+    },
+    "Allow Bluetooth for Pairline in iPhone Settings › Pairline." : {
+      "comment" : "D-099: Settings › Connection, under \"Bluetooth isn't allowed\": the next step (an Open Settings button follows).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اسمح بالبلوتوث لـ Pairline في إعدادات الآيفون › Pairline." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Allow Bluetooth for Pairline in iPhone Settings › Pairline." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بلوتوث را برای Pairline در تنظیمات آیفون › Pairline مجاز کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline için Bluetooth'a iPhone Ayarları › Pairline'dan izin verin." } }
+      }
+    },
+    "Paused: the free trial ended" : {
+      "comment" : "D-099: Settings › Connection, status when the trial ended and nothing was bought.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "متوقف: انتهت الفترة التجريبية المجانية" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Paused: the free trial ended" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "متوقف: دوره آزمایشی رایگان تمام شد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Duraklatıldı: ücretsiz deneme bitti" } }
+      }
+    },
+    "Unlock Pairline at the top of Settings to connect again." : {
+      "comment" : "D-099: Settings › Connection, under \"Paused: the free trial ended\". \"Unlock Pairline\" is the purchase row at the top.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "للاتصال مجددًا، اشترِ Pairline من أعلى الإعدادات." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unlock Pairline at the top of Settings to connect again." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای اتصال دوباره، از بالای تنظیمات Pairline را بخرید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeniden bağlanmak için Ayarlar'ın en üstünden Pairline'ın kilidini açın." } }
+      }
+    },
+    "Pair your Android phone to start." : {
+      "comment" : "D-099: Settings › Connection, under \"Not paired\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أقرِن هاتف أندرويد للبدء." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pair your Android phone to start." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "برای شروع، گوشی اندرویدی‌تان را جفت کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Başlamak için Android telefonunuzu eşleştirin." } }
+      }
+    },
+    "You chose Cloud mode. Turn it on now, while your phones are together." : {
+      "comment" : "D-099: a banner once Cloud mode can be turned on, for someone who chose it before the free trial started.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اخترت الوضع السحابي. شغّله الآن والهاتفان معًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "You chose Cloud mode. Turn it on now, while your phones are together." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری را انتخاب کردید. حالا که گوشی‌ها کنار هم‌اند، روشنش کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modunu seçtiniz. Telefonlar birlikteyken şimdi açın." } }
+      }
+    },
+    "Turn on" : {
+      "comment" : "D-099: the banner's button that turns Cloud mode on (after its explanation).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تشغيل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn on" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "روشن کن" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aç" } }
+      }
+    },
+    "You can turn on Cloud mode any time in Settings › Connection." : {
+      "comment" : "D-099: a short note after closing the Cloud mode banner.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يمكنك تشغيل الوضع السحابي في أي وقت من الإعدادات › الاتصال." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "You can turn on Cloud mode any time in Settings › Connection." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هر وقت خواستید می‌توانید حالت ابری را در تنظیمات › اتصال روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modunu istediğiniz zaman Ayarlar › Bağlantı'dan açabilirsiniz." } }
+      }
+    },
+    "Cloud mode is on." : {
+      "comment" : "D-099: a short note after Cloud mode was turned on from the banner.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوضع السحابي مُشغَّل الآن." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloud mode is on." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری روشن شد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu açık." } }
+      }
+    },
+    "Nearby or Cloud mode?" : {
+      "comment" : "D-099: Help's guide on the two ways to connect.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الاتصال القريب أم الوضع السحابي؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nearby or Cloud mode?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "اتصال نزدیک یا حالت ابری؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yakın bağlantı mı, Bulut modu mu?" } }
+      }
+    },
+    "Which one is for you, with examples" : {
+      "comment" : "D-099: Help, under \"Nearby or Cloud mode?\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أيهما يناسبك، مع أمثلة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Which one is for you, with examples" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "کدام برای شماست، با مثال" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hangisi size göre, örneklerle" } }
+      }
+    },
+    "Turn it on in Settings › Connection while the phones are together." : {
+      "comment" : "D-099: Help's \"Nearby or Cloud mode?\", after Cloud mode's example.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شغّله من الإعدادات › الاتصال والهاتفان معًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Turn it on in Settings › Connection while the phones are together." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "وقتی گوشی‌ها کنار هم‌اند، آن را در تنظیمات › اتصال روشن کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlar birlikteyken Ayarlar › Bağlantı'dan açın." } }
+      }
+    },
+    "Both at once" : {
+      "comment" : "D-099: Help's \"Nearby or Cloud mode?\", a card title.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الاثنان معًا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Both at once" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "هر دو با هم" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İkisi birlikte" } }
+      }
+    },
+    "What Cloud mode needs" : {
+      "comment" : "D-099: Help's \"Nearby or Cloud mode?\", a card title.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ما يحتاجه الوضع السحابي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "What Cloud mode needs" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "حالت ابری به چه نیاز دارد" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modunun ihtiyaçları" } }
+      }
+    },
+    "The Android phone on its charger and home Wi-Fi, and this iPhone signed in to iCloud. For calls, your home router lets this iPhone in: most do it by themselves, and Settings › Connection › Advanced shows how otherwise." : {
+      "comment" : "D-099: Help's \"Nearby or Cloud mode?\", under \"What Cloud mode needs\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هاتف أندرويد على الشاحن ومتصل بواي فاي المنزل، وهذا الآيفون مسجَّل الدخول إلى iCloud. وللمكالمات يسمح جهاز التوجيه في منزلك بدخول هذا الآيفون: معظم الأجهزة تفعل ذلك تلقائيًا، وإلا فالإعدادات › الاتصال › متقدم تشرح الطريقة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Android phone on its charger and home Wi-Fi, and this iPhone signed in to iCloud. For calls, your home router lets this iPhone in: most do it by themselves, and Settings › Connection › Advanced shows how otherwise." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "گوشی اندرویدی وصل به شارژر و وای‌فای خانه، و این آیفون واردشده به iCloud. برای تماس‌ها، مودم خانه باید به این آیفون اجازهٔ ورود بدهد: بیشتر مودم‌ها خودشان این کار را می‌کنند، وگرنه تنظیمات › اتصال › پیشرفته راهش را نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Android telefon şarjda ve ev Wi-Fi'ında olmalı, bu iPhone da iCloud'a giriş yapmış olmalı. Aramalar için ev modeminiz bu iPhone'u içeri alır: çoğu bunu kendiliğinden yapar, yapmazsa Ayarlar › Bağlantı › Gelişmiş nasıl yapılacağını gösterir." } }
+      }
+    },
+    "Private either way" : {
+      "comment" : "D-099: Help's \"Nearby or Cloud mode?\", a card title.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "خاص في الحالتين" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Private either way" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در هر دو حالت خصوصی" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Her iki durumda da gizli" } }
+      }
+    },
+    "Nearby, everything goes straight between your phones. With Cloud mode it passes through your own iCloud, locked so only your two phones can open it. There's no Pairline server." : {
+      "comment" : "D-099: Help's \"Nearby or Cloud mode?\", under \"Private either way\".",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في الاتصال القريب ينتقل كل شيء مباشرةً بين هاتفيك. ومع الوضع السحابي يمر عبر iCloud الخاص بك، مقفلًا بحيث لا يفتحه إلا هاتفاك. لا يوجد خادم لـ Pairline." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nearby, everything goes straight between your phones. With Cloud mode it passes through your own iCloud, locked so only your two phones can open it. There's no Pairline server." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در اتصال نزدیک همه‌چیز مستقیم بین گوشی‌هایتان می‌رود. با حالت ابری از iCloud خودتان می‌گذرد، قفل‌شده تا فقط دو گوشی شما بتوانند بازش کنند. Pairline هیچ سروری ندارد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yakın bağlantıda her şey doğrudan telefonlarınız arasında gider. Bulut modunda kendi iCloud'unuzdan geçer; yalnızca iki telefonunuzun açabileceği şekilde kilitlidir. Pairline sunucusu yoktur." } }
+      }
+    },
+    "Does my data go through a server?" : {
+      "comment" : "D-099: Help's question, where Cloud mode exists (the same question as in the main table).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تمر بياناتي عبر أي خادم؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Does my data go through a server?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آیا داده‌های من از سروری عبور می‌کند؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Verilerim bir sunucudan geçiyor mu?" } }
+      }
+    },
+    "No. Nearby, the phones talk directly over Bluetooth and Wi-Fi, encrypted end to end. With Cloud mode, locked records pass through your own iCloud, which only your two phones can open. Pairline has no servers and no accounts, and it contains no analytics or ads." : {
+      "comment" : "D-099: Help's answer to \"Does my data go through a server?\" where Cloud mode exists.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا. في الاتصال القريب يتحدث الهاتفان مباشرةً عبر البلوتوث والواي فاي بتشفير تام بين الطرفين. ومع الوضع السحابي تمر سجلات مقفلة عبر iCloud الخاص بك، ولا يفتحها إلا هاتفاك. ليس لـ Pairline خوادم ولا حسابات، ولا يحتوي على أدوات تحليل أو إعلانات." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No. Nearby, the phones talk directly over Bluetooth and Wi-Fi, encrypted end to end. With Cloud mode, locked records pass through your own iCloud, which only your two phones can open. Pairline has no servers and no accounts, and it contains no analytics or ads." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نه. در اتصال نزدیک، گوشی‌ها مستقیم و با رمزنگاری سرتاسری از راه بلوتوث و وای‌فای با هم حرف می‌زنند. با حالت ابری، داده‌های قفل‌شده از iCloud خودتان می‌گذرند که فقط دو گوشی شما می‌توانند بازشان کنند. Pairline هیچ سرور و حساب کاربری ندارد و هیچ ابزار تحلیل یا تبلیغی در آن نیست." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hayır. Yakın bağlantıda telefonlar Bluetooth ve Wi-Fi üzerinden, uçtan uca şifreli olarak doğrudan konuşur. Bulut modunda kilitli kayıtlar kendi iCloud'unuzdan geçer ve yalnızca iki telefonunuz bunları açabilir. Pairline'ın sunucusu ve hesabı yoktur; analiz veya reklam da içermez." } }
+      }
+    },
+    "Do I need both phones nearby?" : {
+      "comment" : "D-099: Help's question, where Cloud mode exists (the same question as in the main table).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل يجب أن يكون الهاتفان قريبين من بعضهما؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Do I need both phones nearby?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "آیا هر دو گوشی باید نزدیک هم باشند؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İki telefonun da yakında olması gerekiyor mu?" } }
+      }
+    },
+    "No. Near each other, the phones talk over Bluetooth and Wi-Fi. If the Android phone stays home, turn on Cloud mode in Settings › Connection while they're together: calls, texts and codes then reach this iPhone anywhere with internet." : {
+      "comment" : "D-099: Help's answer to \"Do I need both phones nearby?\" where Cloud mode exists.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا. حين يكون الهاتفان قريبين يتحدثان عبر البلوتوث والواي فاي. وإن كان هاتف أندرويد سيبقى في المنزل، فشغّل الوضع السحابي من الإعدادات › الاتصال والهاتفان معًا، فتصل المكالمات والرسائل والرموز إلى هذا الآيفون أينما وُجد الإنترنت." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No. Near each other, the phones talk over Bluetooth and Wi-Fi. If the Android phone stays home, turn on Cloud mode in Settings › Connection while they're together: calls, texts and codes then reach this iPhone anywhere with internet." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "نه. وقتی نزدیک هم‌اند، گوشی‌ها از راه بلوتوث و وای‌فای با هم حرف می‌زنند. اگر گوشی اندرویدی در خانه می‌ماند، وقتی کنار هم‌اند حالت ابری را در تنظیمات › اتصال روشن کنید؛ آن‌وقت تماس‌ها، پیامک‌ها و کدها هر جا اینترنت باشد به این آیفون می‌رسند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hayır. Birbirine yakınken telefonlar Bluetooth ve Wi-Fi üzerinden konuşur. Android telefon evde kalacaksa, telefonlar birlikteyken Ayarlar › Bağlantı'dan Bulut modunu açın: aramalar, mesajlar ve kodlar internet olan her yerde bu iPhone'a ulaşır." } }
+      }
+    },
+    "Can I talk on the iPhone during calls?" : {
+      "comment" : "D-099: Help's question (the same question as in the CallAudio table; its answer names Settings' new place for Call audio).",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل يمكنني التحدث من الآيفون أثناء المكالمات؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Can I talk on the iPhone during calls?" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "می‌توانم هنگام تماس با آیفون صحبت کنم؟" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalarda iPhone’dan konuşabilir miyim?" } }
+      }
+    },
+    "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later and Wireless debugging (no extra app, no root). The audio goes over Bluetooth, or over Wi-Fi if you choose it in Settings › Connection › Advanced › Call audio. Without it you answer here and talk on the Android phone." : {
+      "comment" : "D-099: Help's answer to \"Can I talk on the iPhone during calls?\". The first Settings › Talk on iPhone is in the Android app; the second path is in this app.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نعم، مع «التحدث عبر الآيفون»: أعدّه في تطبيق الهاتف الوسيط من الإعدادات › التحدث عبر الآيفون. يحتاج إلى أندرويد 11 أو أحدث و«تصحيح الأخطاء اللاسلكي» (بلا تطبيق إضافي ولا روت). ينتقل الصوت عبر البلوتوث، أو عبر الواي فاي إن اخترته في الإعدادات › الاتصال › متقدم › صوت المكالمة. ومن دونه تردّ هنا وتتحدث من هاتف أندرويد." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Yes, with Talk on iPhone: set it up in the bridge app under Settings › Talk on iPhone. It needs Android 11 or later and Wireless debugging (no extra app, no root). The audio goes over Bluetooth, or over Wi-Fi if you choose it in Settings › Connection › Advanced › Call audio. Without it you answer here and talk on the Android phone." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "بله، با «مکالمه با آیفون»: آن را در برنامهٔ پل از تنظیمات › مکالمه با آیفون راه بیندازید. به اندروید ۱۱ یا جدیدتر و «اشکال‌زدایی بی‌سیم» (بدون برنامهٔ اضافه و بدون روت) نیاز دارد. صدا از راه بلوتوث می‌رود، یا اگر در تنظیمات › اتصال › پیشرفته › صدای تماس انتخاب کنید، از راه وای‌فای. بدون آن، اینجا جواب می‌دهید و با گوشی اندرویدی صحبت می‌کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Evet, iPhone’dan konuşma ile: köprü uygulamasında Ayarlar › iPhone’dan konuşma’dan kurun. Android 11 veya üstü ve Kablosuz hata ayıklama (ek uygulama ve root gerekmez) gerekir. Ses Bluetooth üzerinden gider; Ayarlar › Bağlantı › Gelişmiş › Arama sesi’nde seçerseniz Wi-Fi üzerinden. Olmadan burada yanıtlar, Android telefondan konuşursunuz." } }
+      }
+    },
+    "Calls need the direct connection to your home, which isn't up right now. Settings › Connection › Advanced › Check my home connection shows why." : {
+      "comment" : "D-099: a note when a call is started through iCloud, which carries no call audio. The path names this app's screens.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تحتاج المكالمات إلى الاتصال المباشر بمنزلك، وهو غير متاح الآن. يعرض الإعدادات › الاتصال › متقدم › فحص اتصال منزلي السبب." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Calls need the direct connection to your home, which isn't up right now. Settings › Connection › Advanced › Check my home connection shows why." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند که الان برقرار نیست. تنظیمات › اتصال › پیشرفته › بررسی اتصال خانه دلیلش را نشان می‌دهد." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aramalar için evinize doğrudan bağlantı gerekiyor ve bu bağlantı şu anda kurulu değil. Nedenini Ayarlar › Bağlantı › Gelişmiş › Ev bağlantımı kontrol et gösterir." } }
+      }
+    },
+    "In Pairline, open Settings › Connection › Advanced › Check my home connection. When it says a direct connection should work, calls from far away work too." : {
+      "comment" : "D-099: the router guide's third step. The path names this app's screens.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "في Pairline، افتح الإعدادات › الاتصال › متقدم › فحص اتصال منزلي. حين يقول إن الاتصال المباشر يُفترض أن يعمل، ستعمل المكالمات من بعيد أيضًا." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "In Pairline, open Settings › Connection › Advanced › Check my home connection. When it says a direct connection should work, calls from far away work too." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در Pairline، تنظیمات › اتصال › پیشرفته › بررسی اتصال خانه را باز کنید. وقتی بگوید اتصال مستقیم باید کار کند، تماس از راه دور هم کار می‌کند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline'da Ayarlar › Bağlantı › Gelişmiş › Ev bağlantımı kontrol et'i açın. Doğrudan bağlantının çalışması gerektiğini söylediğinde uzaktan aramalar da çalışır." } }
+      }
+    },
+    "Open Settings › Connection › Advanced › Port forwarding on this iPhone and enter that name, or your home's internet address." : {
+      "comment" : "D-099: the router guide, entering the home's name for manual port forwarding. The path names this app's screens.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "افتح الإعدادات › الاتصال › متقدم › إعادة توجيه المنفذ على هذا الآيفون، وأدخل ذلك الاسم أو عنوان الإنترنت لمنزلك." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Settings › Connection › Advanced › Port forwarding on this iPhone and enter that name, or your home's internet address." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "در این آیفون تنظیمات › اتصال › پیشرفته › هدایت پورت را باز کنید و آن نام، یا نشانی اینترنتی خانه‌تان را وارد کنید." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu iPhone'da Ayarlar › Bağlantı › Gelişmiş › Port yönlendirme'yi açın ve o adı ya da evinizin internet adresini girin." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -280,10 +280,77 @@ struct BridgeBanners: View {
                 if app.isPaired, purchases.access.allowsLink, !bridge.phase.isConnected {
                     OfflineBanner(phase: bridge.phase)
                 }
+                if RemoteFeature.isAvailable, app.isPaired, let remote = app.link.remote {
+                    CloudModeOfferBanner(remote: remote, bridge: app.real)
+                }
             }
         }
         .padding(.horizontal, 16)
         .padding(.top, 4)
+    }
+}
+
+/// The user chose Cloud mode (first run or pairing, D-099) but it couldn't be turned on then, before the free trial:
+/// offered here once it can be, while the phones are together. Closing it means "nearby only"; Settings › Connection
+/// still has the switch.
+struct CloudModeOfferBanner: View {
+    @EnvironmentObject private var app: AppModel
+    @EnvironmentObject private var purchases: PurchaseManager
+    @EnvironmentObject private var settings: AppSettings
+    @ObservedObject var remote: RemoteLink
+    @ObservedObject var bridge: BridgeController
+    @AppStorage("remote.introSeen") private var introSeen = false
+    @State private var showIntro = false
+    @State private var busy = false
+
+    private var shown: Bool {
+        settings.connectionChoice == .cloud && !remote.isOn && purchases.remoteAccess.allowsRemote
+            && bridge.phase.isConnected && bridge.bridgeSupportsRemote
+    }
+
+    var body: some View {
+        if shown {
+            InfoBanner(symbol: "icloud", tint: .brandBlue,
+                       text: Text("You chose Cloud mode. Turn it on now, while your phones are together.", tableName: "Connection")) {
+                Button {
+                    showIntro = true
+                } label: {
+                    Text("Turn on", tableName: "Connection")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .disabled(busy)
+                Button {
+                    settings.connectionChoice = .nearby
+                    app.toast = String(localized: "You can turn on Cloud mode any time in Settings › Connection.", table: "Connection")
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityLabel(Text("Not now", tableName: "RemoteMode"))
+            }
+            .sheet(isPresented: $showIntro) {
+                RemoteModeIntroView(onTurnOn: turnOn)
+            }
+        }
+    }
+
+    private func turnOn() {
+        guard !busy else { return }
+        busy = true
+        Task {
+            do {
+                try await app.link.turnOnRemote()
+                introSeen = true
+                Haptics.success()
+                app.toast = String(localized: "Cloud mode is on.", table: "Connection")
+            } catch {
+                app.toast = error.localizedDescription
+                Haptics.error()
+            }
+            busy = false
+        }
     }
 }
 

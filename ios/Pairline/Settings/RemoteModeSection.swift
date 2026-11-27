@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// Cloud mode (remote mode, D-092) in Settings: what it is in plain words, whether it's working, and the switch (off by
-/// default). Shown only where remote mode is available (`RemoteFeature`) and a bridge is paired. Its strings live in the
-/// "RemoteMode" table, apart from the link states shared with the rest of the app.
-struct RemoteModeSection: View {
+/// Cloud mode's switch (remote mode, D-092) for Settings › Connection (D-099): the switch with its one-line meaning,
+/// the add-on's buy button, and, when it can't work, the one next step. Everything technical is in
+/// `CloudModeAdvancedSection`. Shown only where remote mode is available (`RemoteFeature`) and a bridge is paired.
+struct CloudModeSwitch: View {
     @EnvironmentObject private var app: AppModel
     @EnvironmentObject private var purchases: PurchaseManager
+    @EnvironmentObject private var settings: AppSettings
     @ObservedObject var remote: RemoteLink
     @ObservedObject var bridge: BridgeController
     @ObservedObject private var notifier = Notifier.shared
@@ -13,38 +14,146 @@ struct RemoteModeSection: View {
     @State private var error: String?
     /// The before-you-turn-it-on screen was read and accepted once ("Turn on"); after that the switch acts at once.
     @AppStorage("remote.introSeen") private var introSeen = false
-    @State private var intro: IntroSheet?
-    @State private var showLog = false
+    @State private var showIntro = false
 
-    private enum IntroSheet: Identifiable {
-        case beforeTurningOn
-        case info
-        var id: Self { self }
+    var body: some View {
+        Toggle(isOn: Binding(get: { remote.isOn }, set: { change(to: $0) })) {
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Cloud mode", tableName: "RemoteMode")
+                    ConnectionWords.oneLiner(.cloud)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } icon: {
+                Image(systemName: "icloud")
+            }
+        }
+        .disabled(busy || (!remote.isOn && blocker != nil))
+        .sheet(isPresented: $showIntro) {
+            RemoteModeIntroView(onTurnOn: {
+                introSeen = true
+                turn(on: true)
+            })
+            // The switch's disabled state must never reach the sheet's buttons.
+            .environment(\.isEnabled, true)
+        }
+        RemoteAddOnButton()
+        if busy {
+            HStack(spacing: 10) {
+                ProgressView()
+                (remote.isOn ? Text("Turning off…", tableName: "Connection") : Text("Turning on…", tableName: "Connection"))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        // Texts and codes reach a locked iPhone through iCloud only as notifications: a way to allow them here.
+        if remote.isOn, notifier.authorization == .notDetermined {
+            Button {
+                Task { await notifier.requestAuthorization() }
+            } label: {
+                Label("Turn on notifications", systemImage: "bell.badge")
+            }
+        } else if remote.isOn, notifier.authorization == .denied {
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+            } label: {
+                Label("Open Settings", systemImage: "bell.slash")
+            }
+        }
+        if let note {
+            note
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
+
+    /// The one line under the switch: an error, a problem's next step, why it can't be turned on, or what it costs.
+    private var note: AnyView? {
+        if let error {
+            return AnyView(Text(error).foregroundStyle(Color.brandRed))
+        }
+        if remote.isOn, !busy, let problem = remote.problem {
+            return AnyView(Text(problem.nextStep).foregroundStyle(Color.brandAmber))
+        }
+        if remote.isOn, notifier.authorization == .denied || notifier.authorization == .notDetermined {
+            return AnyView(Text("Allow notifications for Pairline so texts and codes reach you through iCloud.")
+                .foregroundStyle(.secondary))
+        }
+        if !remote.isOn, let blocker {
+            return AnyView(blocker.foregroundStyle(.secondary))
+        }
+        if let trial = RemoteAddOnText.trialNote(purchases.remoteAccess, price: purchases.remotePriceText,
+                                                 bundlePrice: purchases.bundleOffer?.bundlePrice) {
+            return AnyView(trial.foregroundStyle(.secondary))
+        }
+        return nil
+    }
+
+    /// Why it can't be turned on right now: the bridge gets its settings over a nearby session, and must speak v1.
+    private var blocker: Text? {
+        // The purchase state first (D-093): Cloud mode is part of the trial, then an add-on to Full Access.
+        if let addOn = RemoteAddOnText.blocker(purchases.remoteAccess) { return addOn }
+        if !bridge.phase.isConnected {
+            return Text("Turn Cloud mode on while your phones are together, near each other with Bluetooth on or on the same Wi-Fi.", tableName: "Connection")
+        }
+        if !bridge.bridgeSupportsRemote {
+            return Text("Cloud mode needs a newer Pairline Bridge on the Android phone.", tableName: "RemoteMode")
+        }
+        return nil
+    }
+
+    private func change(to on: Bool) {
+        guard !busy, on != remote.isOn else { return }
+        // The first time, the plain-words screen comes first; its "Turn on" turns it on (D-092).
+        if on, !introSeen {
+            showIntro = true
+            return
+        }
+        turn(on: on)
+    }
+
+    private func turn(on: Bool) {
+        guard !busy, on != remote.isOn else { return }
+        busy = true
+        error = nil
+        Task {
+            if on {
+                do {
+                    try await app.link.turnOnRemote()
+                    settings.connectionChoice = .cloud
+                    Haptics.success()
+                } catch {
+                    self.error = error.localizedDescription
+                    Haptics.error()
+                }
+            } else {
+                await app.link.turnOffRemote()
+                settings.connectionChoice = .nearby
+            }
+            busy = false
+        }
+    }
+}
+
+/// Cloud mode's technical side, for Settings › Connection › Advanced (D-099): what's working, the direct connection
+/// for calls, port forwarding, the home connection check, the router guide and the connection log.
+struct CloudModeAdvancedSection: View {
+    @EnvironmentObject private var app: AppModel
+    @EnvironmentObject private var purchases: PurchaseManager
+    @ObservedObject var remote: RemoteLink
+    @ObservedObject var bridge: BridgeController
+    @State private var showLog = false
 
     var body: some View {
         Section {
-            Toggle(isOn: Binding(get: { remote.isOn }, set: { change(to: $0) })) {
-                Label {
-                    Text("Cloud mode", tableName: "RemoteMode")
-                } icon: {
-                    Image(systemName: "icloud")
-                }
-            }
-            .disabled(busy || (!remote.isOn && blocker != nil))
-            RemoteAddOnButton()
             HStack(spacing: 12) {
                 Text("Status")
                 Spacer(minLength: 12)
-                if busy {
-                    ProgressView()
-                } else {
-                    status
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.trailing)
-                }
+                status
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.trailing)
             }
-            if remote.isOn, !busy, let direct = directText {
+            if remote.isOn, let direct = directText {
                 HStack(spacing: 12) {
                     Text("Direct connection")
                     Spacer(minLength: 12)
@@ -71,34 +180,26 @@ struct RemoteModeSection: View {
                     }
                 }
             }
-            // Texts and codes reach a locked iPhone through iCloud only as notifications: a way to allow them here.
-            if remote.isOn, notifier.authorization == .notDetermined {
-                Button {
-                    Task { await notifier.requestAuthorization() }
-                } label: {
-                    Label("Turn on notifications", systemImage: "bell.badge")
-                }
-            } else if remote.isOn, notifier.authorization == .denied {
-                Button {
-                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
-                } label: {
-                    Label("Open Settings", systemImage: "bell.slash")
-                }
-            }
             // Free, with remote mode on or off: the bridge asks its router, read-only (`remote.check`).
             HomeConnectionCheckRow(bridge: bridge, remote: remote, manualSet: remote.direct.manual != nil)
-            Button {
-                intro = .info
+            NavigationLink {
+                RouterHelpView(remote: remote)
             } label: {
                 Label {
-                    Text("How Cloud mode works", tableName: "RemoteMode")
+                    Text("Allow calls from far away", tableName: "RemoteMode")
                 } icon: {
-                    Image(systemName: "questionmark.circle")
+                    Image(systemName: "wrench.and.screwdriver")
                 }
             }
-            // On a row that's never disabled, so the sheets' buttons never inherit a disabled state.
-            .sheet(item: $intro) { sheet in
-                RemoteModeIntroView(onTurnOn: introAction(for: sheet))
+            CloudModeInfoLink()
+            Button {
+                showLog = true
+            } label: {
+                Label {
+                    Text("Connection log", tableName: "RemoteMode")
+                } icon: {
+                    Image(systemName: "doc.text.magnifyingglass")
+                }
             }
             .sheet(isPresented: $showLog) {
                 NavigationStack {
@@ -112,25 +213,10 @@ struct RemoteModeSection: View {
                 .environmentObject(app)
                 .environmentObject(purchases)
             }
-            Button {
-                showLog = true
-            } label: {
-                Label {
-                    Text("Connection log", tableName: "RemoteMode")
-                } icon: {
-                    Image(systemName: "doc.text.magnifyingglass")
-                }
-            }
         } header: {
             Text("Cloud mode", tableName: "RemoteMode")
         } footer: {
             VStack(alignment: .leading, spacing: 6) {
-                if let error {
-                    Text(error).foregroundStyle(Color.brandRed)
-                }
-                if remote.isOn, !busy, let problem = remote.problem {
-                    Text(problem.nextStep).foregroundStyle(Color.brandAmber)
-                }
                 if remote.isOn, remote.direct.manual != nil, let attempt = remote.manualAttempt, !attempt.worked,
                    !bridge.isDirect {
                     let when = attempt.at.formatted(.relative(presentation: .named))
@@ -141,17 +227,7 @@ struct RemoteModeSection: View {
                     Text("Your internet provider shares one internet address among many homes, so port forwarding can't help there.", tableName: "RemoteMode")
                         .foregroundStyle(Color.brandAmber)
                 }
-                if !remote.isOn, let blocker {
-                    blocker
-                }
-                if let note = RemoteAddOnText.trialNote(purchases.remoteAccess, price: purchases.remotePriceText,
-                                                        bundlePrice: purchases.bundleOffer?.bundlePrice) {
-                    note
-                }
-                if remote.isOn, notifier.authorization == .denied || notifier.authorization == .notDetermined {
-                    Text("Allow notifications for Pairline so texts and codes reach you through iCloud.")
-                }
-                Text("Keeps your phones working over the internet when they aren't near each other: texts and codes through your own iCloud, and calls too when your home router allows a direct connection. There's no Pairline server: everything is locked with keys only your two phones hold.", tableName: "RemoteMode")
+                Text("Texts and codes travel through your own iCloud. Calls go straight between your phones, which needs your home router to let this iPhone in: the check above tells you whether it does.", tableName: "Connection")
             }
         }
     }
@@ -185,56 +261,30 @@ struct RemoteModeSection: View {
             return status.reason.map { Text("Blocked: \($0.text)") } ?? Text("Blocked by the network")
         }
     }
+}
 
-    /// Why it can't be turned on right now: the bridge gets its settings over a nearby session, and must speak v1.
-    private var blocker: Text? {
-        // The purchase state first (D-093): Cloud mode is part of the trial, then an add-on to Full Access.
-        if let addOn = RemoteAddOnText.blocker(purchases.remoteAccess) { return addOn }
-        if !bridge.phase.isConnected {
-            return Text("Turn Cloud mode on while your phones are linked nearby, over Bluetooth or the same Wi-Fi.", tableName: "RemoteMode")
-        }
-        if !bridge.bridgeSupportsRemote {
-            return Text("Cloud mode needs a newer Pairline Bridge on the Android phone.", tableName: "RemoteMode")
-        }
-        return nil
-    }
-
-    private func change(to on: Bool) {
-        guard !busy, on != remote.isOn else { return }
-        // The first time, the plain-words screen comes first; its "Turn on" turns it on (D-092).
-        if on, !introSeen {
-            intro = .beforeTurningOn
-            return
-        }
-        turn(on: on)
-    }
-
-    /// "Turn on" in the before-you-turn-it-on screen; the information-only screen has just "Done".
-    private func introAction(for sheet: IntroSheet) -> (() -> Void)? {
-        guard sheet == .beforeTurningOn else { return nil }
-        return {
-            introSeen = true
-            turn(on: true)
-        }
-    }
-
-    private func turn(on: Bool) {
-        guard !busy, on != remote.isOn else { return }
-        busy = true
-        error = nil
-        Task {
-            if on {
-                do {
-                    try await app.link.turnOnRemote()
-                    Haptics.success()
-                } catch {
-                    self.error = error.localizedDescription
-                    Haptics.error()
-                }
-            } else {
-                await app.link.turnOffRemote()
+/// "How Cloud mode works" as a pushed page: from Settings (demo mode included), Advanced and Help.
+struct CloudModeInfoLink: View {
+    var body: some View {
+        NavigationLink {
+            CloudModeInfoPage()
+        } label: {
+            Label {
+                Text("How Cloud mode works", tableName: "RemoteMode")
+            } icon: {
+                Image(systemName: "questionmark.circle")
             }
-            busy = false
         }
+    }
+}
+
+struct CloudModeInfoPage: View {
+    var body: some View {
+        ScrollView {
+            RemoteModeIntroContent()
+                .padding(20)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

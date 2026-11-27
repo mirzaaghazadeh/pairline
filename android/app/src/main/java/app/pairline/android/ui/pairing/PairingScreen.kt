@@ -202,7 +202,7 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                 if (link.bluetooth == BluetoothStatus.OFF) {
                     SecondaryButton(stringResource(R.string.action_turn_on_bt), { SystemActions.requestBluetoothOn(context) }, icon = PIcons.Bluetooth)
                 } else if (link.bluetooth == BluetoothStatus.NO_PERMISSION) {
-                    SecondaryButton(stringResource(R.string.action_allow), { requestPermission(PermissionGroup.BLUETOOTH) }, icon = PIcons.Bluetooth)
+                    SecondaryButton(stringResource(R.string.action_turn_on_nearby), { requestPermission(PermissionGroup.BLUETOOTH) }, icon = PIcons.Bluetooth)
                 }
 
                 if (outcome == PairingOutcome.TOO_MANY_ATTEMPTS) {

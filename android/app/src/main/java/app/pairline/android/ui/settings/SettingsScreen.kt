@@ -61,6 +61,8 @@ import app.pairline.android.link.wifi.PhoneHotspot
 import app.pairline.android.log.Log
 import app.pairline.android.privileged.PrivilegedManager
 import app.pairline.android.telephony.Perms
+import app.pairline.android.ui.CloudModeUi
+import app.pairline.android.ui.ConnectionWay
 import app.pairline.android.ui.GrantState
 import app.pairline.android.ui.LocaleHelper
 import app.pairline.android.ui.Maker
@@ -120,6 +122,8 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
+            ConnectionSection(navigate)
+
             SectionCard(title = stringResource(R.string.settings_general)) {
                 ListRow(
                     title = stringResource(R.string.settings_language),
@@ -285,8 +289,6 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
 
             UpdatesSection()
 
-            AdvancedSection()
-
             SectionCard(title = stringResource(R.string.settings_support)) {
                 ListRow(
                     title = stringResource(R.string.help_title),
@@ -327,6 +329,9 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
                     onClick = { confirmSetup = true },
                 )
             }
+
+            // For rooted phones and stuck Bluetooth: kept below everything everyday (D-099).
+            AdvancedSection()
 
             SectionCard(title = stringResource(R.string.settings_about)) {
                 ListRow(
@@ -412,6 +417,62 @@ fun SettingsScreen(navigate: (Route) -> Unit, back: () -> Unit) {
             },
             dismissButton = { TextButton(onClick = { confirmSetup = false }) { Text(stringResource(R.string.action_cancel)) } },
         )
+    }
+}
+
+/**
+ * How the phones are connected right now, in plain words (D-099): Nearby (Bluetooth, Wi-Fi) or Cloud mode, or the
+ * one next step when they aren't; then Cloud mode's row, which opens its own screen. Cloud mode is switched on from the
+ * iPhone, so there's no switch here, and the row is left out for an iPhone that doesn't offer it.
+ */
+@Composable
+private fun ConnectionSection(navigate: (Route) -> Unit) {
+    val prefs = AppGraph.prefs
+    val prefsTick by prefs.changes.collectAsState()
+    val link by AppGraph.link.state.collectAsState()
+    val paired by AppGraph.peers.paired.collectAsState()
+    val remote by AppGraph.remote.state.collectAsState()
+    val viaIcloud = paired && !link.connected && remote.on && remote.problem == null && !remote.retrying
+    val way = ConnectionWay.of(link, viaIcloud)
+    SectionCard(title = stringResource(R.string.settings_connection)) {
+        ListRow(
+            title = when {
+                way != null -> stringResource(way.label)
+                link.connected -> stringResource(R.string.state_connected) // the debug builds' test link
+                paired -> stringResource(R.string.conn_not_connected)
+                else -> stringResource(R.string.notif_not_paired_title)
+            },
+            subtitle = when {
+                way?.cloud == true -> stringResource(R.string.conn_cloud_sub)
+                way != null || link.connected -> stringResource(R.string.conn_nearby_sub)
+                paired -> stringResource(R.string.conn_waiting_sub)
+                else -> stringResource(R.string.home_not_paired_body)
+            },
+            icon = way?.icon ?: if (link.connected) PIcons.Bluetooth else PIcons.LinkOff,
+            iconTone = if (way != null || link.connected) Tone.GOOD else Tone.NEUTRAL,
+            onClick = if (paired) null else ({ navigate(Route.Pairing) }),
+        )
+        if (remote.on || (prefsTick >= 0 && CloudModeUi.offered(prefs.peerProto))) {
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+            val trouble = remote.on && (remote.retrying || remote.problem != null)
+            ListRow(
+                title = stringResource(R.string.cloud_title),
+                subtitle = stringResource(
+                    when {
+                        trouble -> R.string.settings_cloud_trouble_sub
+                        remote.on -> R.string.settings_cloud_on_sub
+                        else -> R.string.settings_cloud_off_sub
+                    },
+                ),
+                icon = PIcons.Cloud,
+                iconTone = when {
+                    trouble -> Tone.WARN
+                    remote.on -> Tone.GOOD
+                    else -> Tone.NEUTRAL
+                },
+                onClick = { navigate(Route.CloudMode) },
+            )
+        }
     }
 }
 

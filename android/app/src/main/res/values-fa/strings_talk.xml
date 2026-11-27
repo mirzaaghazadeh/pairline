@@ -34,7 +34,7 @@
     <string name="talk_pair_failed">مرتبط‌سازی تمام نشد. «مرتبط کردن دستگاه با کد مرتبط‌سازی» را باز نگه دارید و دوباره امتحان کنید.</string>
     <string name="talk_pair_done">مرتبط شد. اندروید Pairline را در «اشکال‌زدایی بی‌سیم ← دستگاه‌های مرتبط‌شده» نشان می‌دهد.</string>
     <string name="talk_pair_notifications">اول اعلان‌های Pairline را مجاز کنید: کد مرتبط‌سازی در یک اعلان نوشته می‌شود.</string>
-    <string name="talk_allow_notifications">مجاز کردن اعلان‌ها</string>
+    <string name="talk_allow_notifications">روشن کردن اعلان‌ها</string>
     <string name="talk_step_start">Pairline دستیارش را اجرا می‌کند</string>
     <string name="talk_start_auto">بعد از مراحل بالا خودبه‌خود انجام می‌شود.</string>
     <string name="talk_start_idle">وقتی «مکالمه با آیفون» روشن باشد اجرا می‌شود.</string>

@@ -49,11 +49,23 @@ final class AccessibilityAudit: XCTestCase {
         Screen(name: "pairing-remote", args: ["-PairlineResetOnboarding", "-PairlinePairingRemote"]),
         Screen(name: "settings-cloud", args: ["-PairlineDemo", "-PairlineTab", "settings"], scrollTo: "How Cloud mode works"),
         Screen(name: "cloud-intro", args: ["-PairlineDemo", "-PairlineTab", "settings"], path: ["How Cloud mode works"]),
-        Screen(name: "cloud-check", args: ["-PairlineDemo", "-PairlineTab", "settings"], path: ["Check my home connection"]),
-        Screen(name: "cloud-ports", args: ["-PairlineDemo", "-PairlineTab", "settings"], path: ["Port forwarding"]),
-        Screen(name: "cloud-log", args: ["-PairlineDemo", "-PairlineTab", "settings"], path: ["Connection log"]),
+        // The live Cloud mode rows need a real Android phone, so in demo mode these skip (Settings › Connection ›
+        // Advanced shows only the guides there).
+        Screen(name: "cloud-check", args: ["-PairlineDemo", "-PairlineTab", "settings"],
+               path: ["Advanced", "Check my home connection"]),
+        Screen(name: "cloud-ports", args: ["-PairlineDemo", "-PairlineTab", "settings"], path: ["Advanced", "Port forwarding"]),
+        Screen(name: "cloud-log", args: ["-PairlineDemo", "-PairlineTab", "settings"], path: ["Advanced", "Connection log"]),
         Screen(name: "router-guide", args: ["-PairlineDemo", "-PairlineTab", "settings"],
                path: ["Help center", "Allow calls from far away"]),
+        // Nearby vs Cloud mode (D-099): the first run's two ways to connect and its privacy page, Settings ›
+        // Connection › Advanced, and Help's guide.
+        Screen(name: "onboarding-ways", args: ["-PairlineResetOnboarding", "-PairlineOnboardingPage", "1"]),
+        Screen(name: "onboarding-privacy", args: ["-PairlineResetOnboarding", "-PairlineOnboardingPage", "2"]),
+        Screen(name: "settings-advanced", args: ["-PairlineDemo", "-PairlineTab", "settings"], path: ["Advanced"]),
+        Screen(name: "advanced-router-guide", args: ["-PairlineDemo", "-PairlineTab", "settings"],
+               path: ["Advanced", "Allow calls from far away"]),
+        Screen(name: "help-ways", args: ["-PairlineDemo", "-PairlineTab", "settings"],
+               path: ["Help center", "Nearby or Cloud mode?"]),
     ]
 
     func testAudit() throws {

@@ -56,6 +56,9 @@ sealed interface Route {
     data object Talk : Route
     data object BlockList : Route
     data object Mirror : Route
+
+    /** What Cloud mode is and needs on this phone, and its router details (D-099). */
+    data object CloudMode : Route
 }
 
 @Composable
@@ -84,6 +87,7 @@ private val allRoutes: List<Route> = listOf(
     Route.Talk,
     Route.BlockList,
     Route.Mirror,
+    Route.CloudMode,
 )
 
 /** Keeps the back stack across activity recreation (e.g. a language change on Android 11–12). */
@@ -120,6 +124,7 @@ private fun MainNavigation() {
             Route.Talk -> app.pairline.android.ui.talk.TalkScreen(back)
             Route.BlockList -> BlockListScreen(back)
             Route.Mirror -> app.pairline.android.ui.mirror.MirrorScreen(back)
+            Route.CloudMode -> app.pairline.android.ui.remote.CloudModeScreen(navigate, back)
         }
     }
     UpdateFlowDialog()

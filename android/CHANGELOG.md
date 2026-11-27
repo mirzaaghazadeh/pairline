@@ -5,6 +5,18 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## Unreleased
+
+- **Nearby or Cloud mode, explained.** Setup has a new "Two ways to connect" step: Nearby works by itself with the
+  phones near each other; Cloud mode, turned on in Pairline on your iPhone, is for leaving this phone at home. The home
+  screen and the top of Settings say in plain words how the phones are connected right now ("Nearby · Bluetooth",
+  "Cloud mode · through iCloud"), and what to do when something's off.
+- **A Cloud mode screen** (Settings › Cloud mode): what this phone needs at home (its charger, home Wi-Fi, running in
+  the background), each with a Fix button, whether calls from far away work, and the router details that used to fill
+  the home screen.
+- Help starts with "Nearby or Cloud mode". Buttons before Android's own permission windows say "Continue" instead of
+  "Allow", and Diagnostics moved to Settings › Help.
+
 ## 1.8.0 (2026-11-26)
 
 - **Cloud mode (testing, with Pairline for iPhone from TestFlight).** Leave this phone at home: when the phones aren't

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Settings › Cloud mode › Port forwarding (D-095): for a home router without UPnP, NAT-PMP or PCP, the user forwards
+/// Settings › Connection › Advanced › Port forwarding (D-095, D-099): for a home router without UPnP, NAT-PMP or PCP, the user forwards
 /// the bridge's port by hand and tells this iPhone where the home can be reached (its internet address or a DDNS
 /// name). The bridge already listens while Cloud mode is on; it just can't learn the home's address by itself, and
 /// Pairline never asks an outside service for it. Kept in the Keychain with the rest of the direct connection, and gone

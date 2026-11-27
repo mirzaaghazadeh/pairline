@@ -70,7 +70,7 @@ final class BridgeController: ObservableObject {
         calls.bridge = self
         // Call audio (M6) rides on the Wi-Fi session's media channel (M5); nil while there's no open channel.
         calls.mediaTransport = { [weak link] in (link as? LinkManager)?.mediaChannel as? AudioPacketTransport }
-        // …or inside the Bluetooth session, as Opus (D-072); Settings › Call audio picks which one a call tries first.
+        // …or inside the Bluetooth session, as Opus (D-072); Settings › Connection › Advanced › Call audio picks which one a call tries first.
         // Away from home, inside remote mode's direct connection instead (D-092).
         calls.linkTransport = { [weak link] in
             guard let manager = link as? LinkManager, let channel = manager.linkMediaChannel,

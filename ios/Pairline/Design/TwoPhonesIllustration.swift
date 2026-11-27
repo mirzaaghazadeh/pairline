@@ -59,9 +59,13 @@ struct TwoPhonesIllustration: View {
                     .foregroundStyle(tint)
             }
             .frame(width: phoneWidth, height: height)
+            // As wide as the phone drawing: at the largest text sizes the caption shrinks to fit rather than end in
+            // "…" (D-096's audit).
             caption
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
         }
     }
 

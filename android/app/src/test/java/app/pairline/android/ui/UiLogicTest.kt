@@ -46,7 +46,9 @@ class UiLogicTest {
         val steps = SetupStep.all(sdk = 36, maker = Maker.SAMSUNG)
         assertEquals(SetupStep.Language, steps.first())
         assertEquals(SetupStep.Welcome, steps[1])
-        assertEquals(SetupStep.Privacy, steps[2])
+        // Nearby or Cloud mode, with an example of each, before anything is asked (D-099).
+        assertEquals(SetupStep.Ways, steps[2])
+        assertEquals(SetupStep.Privacy, steps[3])
         assertEquals(SetupStep.Pair, steps[steps.size - 3])
         assertEquals(SetupStep.Talk, steps[steps.size - 2])
         assertEquals(SetupStep.Done, steps.last())

@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Help › "Allow calls from far away" (Cloud mode's direct connection, D-092, D-094, D-095): what the home router has
 /// to allow, for any router brand. First choice: turn on UPnP or NAT-PMP, and Pairline sets everything up by itself.
-/// Otherwise: forward the port by hand and enter the home's address (Settings › Cloud mode › Port forwarding). Then
+/// Otherwise: forward the port by hand and enter the home's address (Settings › Connection › Advanced › Port forwarding). Then
 /// what to do when the internet provider or a second modem is the reason. Opened from Help, from "Check my home
 /// connection" when the router is the problem, and from the Port forwarding screen.
 struct RouterHelpView: View {
@@ -24,7 +24,7 @@ struct RouterHelpView: View {
                 HelpCard(symbol: "2.circle.fill", title: Text("Turn on UPnP or NAT-PMP", tableName: "RemoteMode"),
                          text: Text("Look for UPnP, NAT-PMP or PCP, often under Advanced, NAT, Network or Firewall. Turn it on and save. Can't find it? Search the web for your router's model and \"UPnP\".", tableName: "RemoteMode"))
                 HelpCard(symbol: "3.circle.fill", title: Text("Check again", tableName: "RemoteMode"),
-                         text: Text("In Pairline, open Settings › Cloud mode › Check my home connection. When it says a direct connection should work, calls from far away work too.", tableName: "RemoteMode"))
+                         text: Text("In Pairline, open Settings › Connection › Advanced › Check my home connection. When it says a direct connection should work, calls from far away work too.", tableName: "Connection"))
 
                 Text("If it doesn't: set up port forwarding yourself", tableName: "RemoteMode")
                     .font(.title3.weight(.semibold))
@@ -35,7 +35,7 @@ struct RouterHelpView: View {
                 HelpCard(symbol: "globe", title: Text("A fixed name for your home", tableName: "RemoteMode"),
                          text: Text("If your home's internet address changes, turn on your router's DDNS feature to get a fixed name.", tableName: "RemoteMode"))
                 HelpCard(symbol: "iphone", title: Text("Enter it in Pairline", tableName: "RemoteMode"),
-                         text: Text("Open Settings › Cloud mode › Port forwarding on this iPhone and enter that name, or your home's internet address.", tableName: "RemoteMode"))
+                         text: Text("Open Settings › Connection › Advanced › Port forwarding on this iPhone and enter that name, or your home's internet address.", tableName: "Connection"))
                 if let remote {
                     NavigationLink {
                         PortForwardingView(remote: remote)

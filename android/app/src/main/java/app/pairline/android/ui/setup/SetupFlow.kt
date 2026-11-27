@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -79,6 +80,9 @@ import app.pairline.android.ui.talk.TalkSetupContent
 sealed interface SetupStep {
     data object Language : SetupStep
     data object Welcome : SetupStep
+
+    /** Nearby or Cloud mode, with an everyday example of each (D-099). */
+    data object Ways : SetupStep
     data object Privacy : SetupStep
     data object Android11 : SetupStep
     data class Permission(val group: PermissionGroup) : SetupStep
@@ -95,6 +99,7 @@ sealed interface SetupStep {
             // First, so everything after it is in the user's language (D-081).
             add(Language)
             add(Welcome)
+            add(Ways)
             add(Privacy)
             if (sdk <= Build.VERSION_CODES.R) add(Android11)
             PermissionGroup.wizard.forEach { add(Permission(it)) }
@@ -155,6 +160,7 @@ fun SetupFlow(onFinished: () -> Unit) {
                 when (s) {
                     SetupStep.Language -> LanguageStep(next)
                     SetupStep.Welcome -> WelcomeStep(next)
+                    SetupStep.Ways -> WaysStep(next)
                     SetupStep.Privacy -> PrivacyStep(next)
                     SetupStep.Android11 -> Android11Step(next)
                     is SetupStep.Permission -> PermissionStep(s.group, next)
@@ -280,6 +286,57 @@ private fun WelcomeStep(next: () -> Unit) {
     )
 }
 
+/**
+ * The two ways the phones connect (D-099), in the words both apps use: Nearby works by itself; Cloud mode is for a
+ * phone that stays home and is turned on from the iPhone. Nothing to choose here, so the user only reads and goes on.
+ */
+@Composable
+private fun WaysStep(next: () -> Unit) {
+    StepScaffold(
+        illustration = { PulseIcon(PIcons.Cloud) },
+        title = stringResource(R.string.ways_title),
+        body = stringResource(R.string.ways_body),
+        buttons = { PrimaryButton(stringResource(R.string.action_continue), next) },
+        extra = {
+            WayCard(
+                icon = PIcons.Bluetooth,
+                title = stringResource(R.string.ways_nearby_title),
+                text = stringResource(R.string.ways_nearby_text),
+                example = stringResource(R.string.ways_nearby_example),
+            )
+            Spacer(Modifier.height(12.dp))
+            WayCard(
+                icon = PIcons.Home,
+                title = stringResource(R.string.cloud_title),
+                text = stringResource(R.string.ways_cloud_text),
+                example = stringResource(R.string.ways_cloud_example),
+            )
+            Spacer(Modifier.height(12.dp))
+            NoteBox(stringResource(R.string.ways_both), Tone.NEUTRAL, PIcons.Info)
+        },
+    )
+}
+
+/** One way to connect: an icon, its name, one sentence and an everyday example. Read as one unit by TalkBack. */
+@Composable
+private fun WayCard(icon: ImageVector, title: String, text: String, example: String) {
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {},
+    ) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+            app.pairline.android.ui.components.IconBadge(icon, Tone.ACCENT, 40.dp)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(text, style = MaterialTheme.typography.bodyMedium)
+                Text(example, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
 @Composable
 private fun PrivacyStep(next: () -> Unit) {
     StepScaffold(
@@ -335,7 +392,8 @@ private fun PermissionStep(group: PermissionGroup, next: () -> Unit) {
             when (state) {
                 GrantState.GRANTED -> PrimaryButton(stringResource(R.string.action_continue), next)
                 GrantState.NOT_ASKED -> {
-                    PrimaryButton(stringResource(R.string.action_allow), { request(group) })
+                    // "Continue", not "Allow": the choice is made in Android's own prompt that follows (D-097's rule).
+                    PrimaryButton(stringResource(R.string.action_continue), { request(group) })
                     QuietButton(stringResource(if (group.required) R.string.action_skip_for_now else R.string.action_not_now), next)
                 }
                 GrantState.DENIED -> {
@@ -387,6 +445,7 @@ private fun BatteryStep(next: () -> Unit) {
             if (exempt) {
                 PrimaryButton(stringResource(R.string.action_continue), next)
             } else {
+                // Android's own window follows, where the user decides (D-097's rule: no "Allow" before it).
                 PrimaryButton(stringResource(R.string.battery_allow), { SystemActions.requestIgnoreBatteryOptimizations(context) })
                 QuietButton(stringResource(R.string.action_skip_for_now), next)
             }
@@ -397,6 +456,9 @@ private fun BatteryStep(next: () -> Unit) {
             } else {
                 NoteBox(stringResource(R.string.battery_note), Tone.NEUTRAL, PIcons.Info)
             }
+            Spacer(Modifier.height(12.dp))
+            // A phone left at home for Cloud mode needs this most (D-099).
+            NoteBox(stringResource(R.string.battery_cloud_note), Tone.NEUTRAL, PIcons.Home)
         },
     )
 }

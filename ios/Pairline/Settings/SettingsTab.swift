@@ -14,7 +14,7 @@ struct SettingsTab: View {
     @State private var page: Page?
 
     enum Page: Hashable {
-        case blocked, netShare, export, help, diagnostics, privacy, about
+        case blocked, netShare, export, help, diagnostics, privacy, about, advanced
     }
 
     var body: some View {
@@ -49,6 +49,7 @@ struct SettingsTab: View {
         case .diagnostics: DiagnosticsView()
         case .privacy: PrivacySummaryView()
         case .about: AboutView()
+        case .advanced: ConnectionAdvancedView()
         }
     }
 
@@ -83,17 +84,14 @@ struct SettingsTab: View {
     private var settingsList: some View {
             List {
                 purchaseSection
+                connectionSection
                 bridgeSection
-                if RemoteFeature.isAvailable, app.isPaired, !app.isDemo, let remote = app.link.remote {
-                    RemoteModeSection(remote: remote, bridge: app.real)
-                }
                 liveActivitySection
                 notificationSection
                 InboxSettingsSection() // D-083
                 // Shown once the bridge has reported its SIMs (D-062).
                 if !bridge.sims.isEmpty { SIMDefaultsSection() }
                 callsSection
-                callAudioSection
                 languageSection
                 helpSection
                 telegramSection
@@ -347,17 +345,40 @@ struct SettingsTab: View {
         }
     }
 
-    /// Talk on iPhone: which way a call's audio tries first (D-072). Bluetooth by default; the other is the fallback.
-    private var callAudioSection: some View {
-        Section {
-            Picker(selection: $settings.callAudioPath) {
-                Text("Bluetooth", tableName: "CallAudio").tag(CallAudioPath.link)
-                Text("Wi-Fi", tableName: "CallAudio").tag(CallAudioPath.wifi)
-            } label: {
-                Label { Text("Call audio", tableName: "CallAudio") } icon: { Image(systemName: "waveform") }
+    /// How the phones are connected, in plain words, and Cloud mode's switch; the technical side is one level down in
+    /// Advanced (D-099). In demo mode the status and the guides, without a switch that can't work there.
+    @ViewBuilder private var connectionSection: some View {
+        if app.isPaired || bridge.isDemo {
+            Section {
+                ConnectionStatusRow(bridge: bridge, cloudOn: !app.isDemo && app.link.remote?.isOn == true)
+                if RemoteFeature.isAvailable {
+                    if !app.isDemo, let remote = app.link.remote {
+                        CloudModeSwitch(remote: remote, bridge: app.real)
+                    } else {
+                        CloudModeInfoLink()
+                    }
+                }
+                pageLink(.advanced) {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Advanced", tableName: "Connection")
+                            (RemoteFeature.isAvailable
+                                ? Text("Router, port forwarding, call audio, connection log", tableName: "Connection")
+                                : Text("Call audio, troubleshooting", tableName: "Connection"))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "slider.horizontal.3")
+                    }
+                }
+            } header: {
+                Text("Connection", tableName: "Connection")
+            } footer: {
+                if RemoteFeature.isAvailable {
+                    ConnectionWords.bothCanBeOn
+                }
             }
-        } footer: {
-            Text("With Talk on iPhone, a call's audio goes between your phones the way you choose here; if that one isn't connected, Pairline uses the other. Bluetooth works wherever the phones are near each other; Wi-Fi needs both on the same network or the Android phone's hotspot.", tableName: "CallAudio")
         }
     }
 

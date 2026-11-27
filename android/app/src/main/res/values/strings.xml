@@ -30,7 +30,7 @@
     <string name="notif_channel_link">Link status</string>
     <string name="notif_channel_link_desc">Shows whether your iPhone is connected. Android requires this notification to keep Pairline running.</string>
     <string name="notif_connected_title">Connected to %1$s</string>
-    <string name="notif_connected_text">Calls and messages are being relayed to your iPhone.</string>
+    <string name="notif_connected_text">Nearby. Calls, texts and codes go to your iPhone.</string>
     <string name="notif_waiting_title">Waiting for your iPhone</string>
     <string name="notif_waiting_text">Pairline reconnects automatically when your iPhone is nearby with Bluetooth on.</string>
     <string name="notif_not_paired_title">Not paired yet</string>
@@ -45,7 +45,7 @@
 
     <!-- Setup: welcome -->
     <string name="welcome_title">Your Android SIM, on your iPhone</string>
-    <string name="welcome_body">Pairline turns this phone into a bridge. Keep it nearby, and use its SIM from your iPhone.</string>
+    <string name="welcome_body">Pairline turns this phone into a bridge: use its SIM from your iPhone, close by or, with Cloud mode, from anywhere.</string>
     <string name="welcome_point_calls">See, answer and make calls</string>
     <string name="welcome_point_sms">Read and send text messages</string>
     <string name="welcome_point_contacts">Bring contacts and call history along</string>
@@ -53,7 +53,7 @@
 
     <!-- Setup: privacy promise -->
     <string name="privacy_title">Your data stays between your two phones</string>
-    <string name="privacy_body">Pairline has no servers. Your messages, calls and contacts go directly from this phone to your iPhone, and nowhere else. With Cloud mode, which you can turn on from the iPhone, they pass through your own iCloud, locked so only your two phones can read them.</string>
+    <string name="privacy_body">Pairline has no servers. Nearby, your messages, calls and contacts go straight from this phone to your iPhone, and nowhere else. In Cloud mode, which you turn on from the iPhone, they pass through your own iCloud, not ours, locked so only your two phones can read them.</string>
     <string name="privacy_point_e2e">Everything is end-to-end encrypted with keys only your phones hold</string>
     <string name="privacy_point_accounts">No account, no sign-up, no phone-number check</string>
     <string name="privacy_point_tracking">No ads, analytics or tracking of any kind</string>
@@ -99,7 +99,8 @@
     <!-- Setup: background running -->
     <string name="battery_title">Keep Pairline running</string>
     <string name="battery_body">Android pauses apps in the background to save battery. Pairline needs to stay awake so calls and messages reach your iPhone right away.</string>
-    <string name="battery_allow">Allow in background</string>
+    <!-- Opens Android's own "let it run in the background?" window, where the user decides; not "Allow" (D-097's rule). -->
+    <string name="battery_allow">Keep running in the background</string>
     <string name="battery_note">Android will ask you in its own window. Pairline uses very little battery while it waits.</string>
     <string name="battery_done_note">Pairline is allowed to run in the background.</string>
 
@@ -122,7 +123,8 @@
     <!-- Pairing -->
     <string name="pair_title">Pair your iPhone</string>
     <string name="pair_step_1">Install Pairline on your iPhone and open it.</string>
-    <string name="pair_step_2">Tap \"Pair a bridge phone\".</string>
+    <!-- The iPhone's own button names: "Pair your Android phone" on its first screens, "Pair a bridge phone" in its Settings. -->
+    <string name="pair_step_2">Tap \"Pair your Android phone\" (in Settings: \"Pair a bridge phone\").</string>
     <string name="pair_step_3">Point your iPhone\'s camera at this code.</string>
     <string name="pair_expires">Code expires in %1$s</string>
     <string name="pair_new_code">New code</string>
@@ -131,7 +133,7 @@
     <string name="pair_success_title">Paired!</string>
     <string name="pair_success_text">Your iPhone and this phone now trust each other. Only they can read what goes between them.</string>
     <!-- Cloud mode (D-092) is turned on from the iPhone, which gives this phone its iCloud access. -->
-    <string name="pair_success_cloud">Want your phones to stay connected when they\'re apart? Turn on Cloud mode in Pairline on your iPhone.</string>
+    <string name="pair_success_cloud">Leaving this phone at home? Turn on Cloud mode in Pairline on your iPhone, and keep this phone on its charger and Wi-Fi.</string>
     <string name="pair_connecting">Connecting…</string>
     <string name="pair_connected">Connected. Your iPhone can use this phone\'s SIM now.</string>
     <string name="pair_too_many">Someone tried wrong codes several times, so this code was cancelled. Make a new one when your iPhone is ready.</string>
@@ -143,7 +145,7 @@
 
     <!-- Setup: done -->
     <string name="done_title">You\'re all set</string>
-    <string name="done_body_paired">Keep this phone charged and near your iPhone. You can put it away now; Pairline keeps working in the background.</string>
+    <string name="done_body_paired">Keep this phone charged. Near your iPhone it works by itself. To leave it at home, turn on Cloud mode in Pairline on your iPhone and keep this phone on Wi-Fi.</string>
     <string name="done_body_unpaired">Pairline is ready. Pair your iPhone from the home screen whenever you like.</string>
     <string name="done_note">A small notification shows that Pairline is running. You can tap it anytime to see the link status.</string>
 
@@ -163,7 +165,8 @@
     <string name="settings_stop_bridge_confirm_body">Your iPhone loses the link, and calls, messages and codes stay on this phone. The Wi-Fi link, the hotspot, internet sharing and Talk on iPhone\'s helper stop too. Pairline stays off, even after a restart, until you tap Start Pairline here or on the home screen.</string>
     <string name="action_stop">Stop</string>
     <string name="home_connected_title">Connected to %1$s</string>
-    <string name="home_connected_body">Over Bluetooth. Calls and messages are being relayed to your iPhone.</string>
+    <!-- Under "Nearby · Bluetooth" (or Wi-Fi), which says how; D-099. -->
+    <string name="home_connected_body">Calls, texts and codes are going to your iPhone.</string>
     <string name="home_connected_body_tcp">Over the debug test link. Calls and messages are being relayed.</string>
     <string name="home_waiting_title">Waiting for %1$s</string>
     <string name="home_waiting_body">Last connected %1$s. Pairline reconnects by itself when your iPhone is nearby with Pairline open or in the background.</string>
@@ -173,11 +176,11 @@
     <string name="state_cloud_offline">iCloud unreachable</string>
     <string name="notif_via_icloud_text">Cloud mode: texts, codes and calls reach your iPhone through your iCloud until your phones are linked nearby again.</string>
     <string name="home_via_icloud_title">Reaching %1$s through iCloud</string>
-    <string name="home_via_icloud_body">Your phones aren\'t linked nearby, so Cloud mode brings texts, one-time codes and incoming calls to your iPhone through your iCloud, locked with keys only your two phones hold. Talking on a call from far away needs the direct connection.</string>
+    <string name="home_via_icloud_body">Your phones are apart, so Cloud mode brings texts, codes and incoming calls to your iPhone through your own iCloud, locked so only your two phones can read them.</string>
     <string name="home_via_icloud_retrying">Cloud mode is on, but iCloud can\'t be reached right now. Check this phone\'s internet connection; Pairline keeps trying.</string>
     <!-- One line in the link card about Cloud mode. -->
-    <string name="cloud_on">Cloud mode is on: when your phones are apart, they stay connected over the internet.</string>
-    <string name="cloud_off">Turn on Cloud mode in Pairline on your iPhone to stay connected over the internet when your phones are apart.</string>
+    <string name="cloud_on">Cloud mode is on. Near each other the phones talk directly; when you leave, Cloud mode takes over.</string>
+    <string name="cloud_off">Leaving this phone at home? Turn on Cloud mode in Pairline on your iPhone to keep calls, texts and codes coming anywhere.</string>
     <string name="cloud_retrying">Cloud mode can\'t reach iCloud right now. Check this phone\'s internet connection; Pairline keeps trying.</string>
     <string name="cloud_paused_token">Cloud mode is paused until your iPhone renews this phone\'s iCloud access. Open Pairline on your iPhone.</string>
     <string name="cloud_paused_refused">Cloud mode is paused: iCloud doesn\'t let Pairline reach this account from another phone right now.</string>
@@ -223,12 +226,10 @@
     <string name="home_debug_tcp_off">Debug build: the test link isn\'t listening.</string>
 
     <!-- Wi-Fi link and files (M5) -->
-    <string name="home_connected_body_wifi">Over Wi-Fi. Calls and messages are being relayed to your iPhone.</string>
-    <string name="home_connected_body_both">Over Bluetooth and Wi-Fi. Calls and messages are being relayed to your iPhone.</string>
     <string name="home_bt_off_wifi_body">Bluetooth is off, but your iPhone can still connect over the same Wi-Fi network.</string>
-    <string name="notif_connected_text_wifi">Connected over Wi-Fi. Calls and messages are being relayed to your iPhone.</string>
+    <string name="notif_connected_text_wifi">Nearby, over Wi-Fi. Calls, texts and codes go to your iPhone.</string>
     <string name="notif_waiting_text_wifi">Pairline reconnects automatically when your iPhone is nearby or on the same Wi-Fi network.</string>
-    <string name="settings_wifi">Wi-Fi link</string>
+    <string name="settings_wifi">Nearby over Wi-Fi</string>
     <string name="settings_wifi_link">Connect over Wi-Fi</string>
     <string name="settings_wifi_link_sub">Lets your iPhone connect when both phones are on the same Wi-Fi network: for files, call audio, and phones whose Bluetooth can\'t reach an iPhone. Only devices on your local network can reach it.</string>
     <string name="settings_wifi_listening">Ready on this phone\'s Wi-Fi network</string>
@@ -445,9 +446,9 @@
     <string name="help_section_privacy">Privacy</string>
 
     <string name="help_q_what">What does Pairline do?</string>
-    <string name="help_a_what">It lets your iPhone use this Android phone\'s SIM card. Incoming calls and messages show up on your iPhone, and you can answer, reply, make calls and run USSD codes from there. This phone stays nearby and does the actual calling and texting.</string>
+    <string name="help_a_what">It lets your iPhone use this Android phone\'s SIM card. Incoming calls and messages show up on your iPhone, and you can answer, reply, make calls and run USSD codes from there. This phone does the actual calling and texting, near your iPhone or, with Cloud mode, from home.</string>
     <string name="help_q_iphone">What do I need on the iPhone?</string>
-    <string name="help_a_iphone">The Pairline app for iPhone (iOS 16 or later) and Bluetooth turned on. The two phones need to be within Bluetooth range, usually the same room or a few rooms apart.</string>
+    <string name="help_a_iphone">The Pairline app for iPhone (iOS 16 or later) and Bluetooth turned on. Nearby, the two phones need to be within Bluetooth range, usually the same room or a few rooms apart. With Cloud mode they can be anywhere with internet.</string>
     <string name="help_q_pair">How do I pair?</string>
     <string name="help_a_pair">On this phone, open Pair iPhone to show a code. On your iPhone, open Pairline, tap \"Pair a bridge phone\" and scan the code. The code works once and expires after 5 minutes.</string>
     <string name="help_q_spare">Can I use my everyday Android phone?</string>
@@ -462,7 +463,7 @@
     <string name="help_q_notification">Why is there always a notification?</string>
     <string name="help_a_notification">Android requires apps that run in the background to show one. It tells you whether your iPhone is connected, and it never shows message text or numbers.</string>
     <string name="help_q_distance">How far apart can the phones be?</string>
-    <string name="help_a_distance">About as far as a Bluetooth headset works: typically 10 to 30 meters indoors, less through thick walls.</string>
+    <string name="help_a_distance">Nearby, about as far as a Bluetooth headset works: typically 10 to 30 meters indoors, less through thick walls. With Cloud mode, any distance.</string>
 
     <string name="help_q_not_found">My iPhone can\'t find this phone</string>
     <string name="help_a_not_found">Make sure both phones have Bluetooth turned on, that this app shows \"Waiting\" or \"Not paired\" without warnings, and that Pairline is open on the iPhone. If it still doesn\'t connect, turn Bluetooth off and on again on both phones.</string>
@@ -491,7 +492,7 @@
     <string name="help_a_perm_battery">Pairline asks Android, in Android\'s own window, not to pause it. You can change this anytime in Android\'s settings.</string>
 
     <string name="help_q_data">Where does my data go?</string>
-    <string name="help_a_data">Only to your paired iPhone, end-to-end encrypted. Pairline has no servers. The only other connection is the daily update check on GitHub, which sends nothing about you and can be turned off in Settings.</string>
+    <string name="help_a_data">Only to your paired iPhone, end-to-end encrypted. Pairline has no servers. In Cloud mode it passes through your own iCloud, locked so only your two phones can read it. The only other connection is the daily update check on GitHub, which sends nothing about you and can be turned off in Settings.</string>
     <string name="help_q_logs">What\'s in the diagnostics report?</string>
     <string name="help_a_logs">Technical details such as versions, permissions and connection events. Phone numbers, emails, names, message text and keys are removed. You see the whole report before you choose to share it.</string>
     <string name="help_q_unpair">What happens when I unpair?</string>
@@ -543,13 +544,14 @@
     <string name="remote_pair_paste_none">There\'s no Pairline invitation on the clipboard. Copy the whole link (it starts with pairline://invite) and try again.</string>
 
     <!-- Cloud mode's direct connection through the home router (D-092): the link card's line while Cloud mode is on. -->
-    <string name="home_connected_body_direct">Cloud mode\'s direct connection: over the internet, straight through your home router. Calls and messages are being relayed to your iPhone.</string>
-    <string name="notif_connected_text_direct">Cloud mode\'s direct connection, over the internet. Calls and messages are being relayed to your iPhone.</string>
-    <string name="direct_checking">Direct connection: checking…</string>
-    <string name="direct_open">Direct connection: open</string>
-    <string name="direct_ipv6_unconfirmed">Direct connection: over IPv6 only, if the router lets it through</string>
+    <string name="home_connected_body_direct">Your phones are apart and reach each other straight through your home router. Calls work too.</string>
+    <string name="notif_connected_text_direct">Cloud mode, over the internet. Calls, texts and codes go to your iPhone.</string>
+    <!-- "Calls from far away" is the direct connection in plain words (D-099); the iPhone's Help has "Allow calls from far away". -->
+    <string name="direct_checking">Calls from far away: checking…</string>
+    <string name="direct_open">Calls from far away: ready</string>
+    <string name="direct_ipv6_unconfirmed">Calls from far away: only over IPv6, if your router lets them through</string>
     <!-- %1$s is one of the direct_reason_* texts below. -->
-    <string name="direct_not_possible">Direct connection: not possible (%1$s)</string>
+    <string name="direct_not_possible">Calls from far away: not possible yet (%1$s)</string>
     <string name="direct_reason_wifi">this phone isn\'t on Wi-Fi</string>
     <string name="direct_reason_carrier_nat">the internet provider doesn\'t give this home its own address</string>
     <string name="direct_reason_double_nat">another router sits in front of this one</string>
@@ -557,14 +559,73 @@
     <string name="direct_reason_no_mapping">the router doesn\'t open ports for apps</string>
     <string name="direct_reason_listen">couldn\'t open a port on this phone</string>
     <!-- Under the direct-connection line: what fixes it. Help on the iPhone has the steps for any router. -->
-    <string name="direct_hint_router">Texts and codes still work. For calls from far away, turn on UPnP or NAT-PMP in your router\'s settings. Step by step: Help › Allow calls from far away, in Pairline on your iPhone.</string>
+    <string name="direct_hint_router">Texts and codes still work. For calls from far away, turn on UPnP or NAT-PMP in your router\'s settings: it lets Pairline open, by itself, the one door your iPhone needs. Step by step for any router: Help › Allow calls from far away, in Pairline on your iPhone.</string>
     <string name="direct_hint_modem">Texts and codes still work. For calls from far away, turn on UPnP on your provider\'s modem too, or put the modem in bridge mode. Step by step: Help › Allow calls from far away, in Pairline on your iPhone.</string>
     <string name="direct_hint_provider">Texts and codes still work. Calls from far away need your own internet address: ask your internet provider for a public IPv4 address or IPv6.</string>
     <!-- Manual port forwarding (D-095). %1$s is the port (47830), %2$s this phone's address on the home network; both shown left to right. -->
-    <string name="direct_hint_router_manual">Texts and codes still work. For calls from far away: if your router has UPnP or NAT-PMP, turn it on, and Pairline sets everything up by itself. If it doesn\'t, forward TCP port %1$s to this phone (%2$s) in your router, give this phone a fixed address there, and enter your home\'s internet address or DDNS name in Pairline on your iPhone: Settings › Cloud mode › Port forwarding. Step by step: Help › Allow calls from far away, on your iPhone.</string>
-    <string name="direct_hint_modem_manual">Texts and codes still work. For calls from far away: your provider\'s modem sits in front of your router. Turn on UPnP or NAT-PMP on the modem too, or put the modem in bridge mode. Or forward TCP port %1$s to this phone (%2$s) on both, give this phone a fixed address, and enter your home\'s internet address or DDNS name in Pairline on your iPhone: Settings › Cloud mode › Port forwarding. Step by step: Help › Allow calls from far away, on your iPhone.</string>
+    <!-- Under "Advanced: your router" on the Cloud mode screen, after the UPnP or modem advice. -->
+    <string name="direct_hint_router_manual">No UPnP or NAT-PMP on your router? Then forward TCP port %1$s to this phone (%2$s) in the router yourself, and enter your home\'s internet address or DDNS name in Pairline on your iPhone: Settings › Connection › Advanced › Port forwarding.</string>
+    <string name="direct_hint_modem_manual">Or forward TCP port %1$s to this phone (%2$s) yourself, on both the modem and your router, and enter your home\'s internet address or DDNS name in Pairline on your iPhone: Settings › Connection › Advanced › Port forwarding.</string>
     <string name="direct_hint_device_mac">On this phone, set this Wi-Fi network\'s privacy to Use device MAC so the router keeps its address.</string>
     <!-- %1$s: this phone's address on the home network, shown left to right. -->
     <string name="direct_hint_fixed_address">Keep this phone at %1$s: the router\'s forwarding rule points at that address, so if the phone gets another one, calls from far away stop. In the router, reserve %1$s for this phone (DHCP reservation or static lease). With UPnP or NAT-PMP this isn\'t needed: Pairline updates the router by itself.</string>
     <string name="direct_forward_info">For port forwarding: this phone is %2$s, port %1$s.</string>
+
+    <!-- Nearby and Cloud mode (D-099): the two ways the phones connect, in the same words as the iPhone app. Nearby:
+         the phones are near each other (Bluetooth, Wi-Fi). Cloud mode: this phone stays home (D-092). -->
+    <!-- Opens Android's "Nearby devices" permission prompt (Android's own name for the Bluetooth permission). -->
+    <string name="action_turn_on_nearby">Turn on Nearby devices</string>
+    <string name="action_details">Details</string>
+    <string name="ways_title">Two ways to connect</string>
+    <string name="ways_body">Nearby works by itself. Cloud mode is extra, for when this phone stays home. Nothing to choose now.</string>
+    <string name="ways_nearby_title">Nearby</string>
+    <string name="ways_nearby_text">The phones are near each other and talk over Bluetooth and Wi-Fi. Nothing to set up.</string>
+    <string name="ways_nearby_example">For example, this phone is in your bag, your pocket or on your desk.</string>
+    <string name="ways_cloud_text">This phone stays home, and your iPhone keeps getting calls, texts and codes anywhere with internet. Turn it on in Pairline on your iPhone, while pairing or later in Settings.</string>
+    <string name="ways_cloud_example">For example, this phone stays home on its charger while you\'re at work or travelling.</string>
+    <string name="ways_both">Both can be on. At home the phones talk directly; when you leave, Cloud mode takes over.</string>
+    <string name="battery_cloud_note">Leaving this phone at home for Cloud mode? Keep it on its charger and home Wi-Fi, and let Pairline run in the background.</string>
+    <!-- How the phones are connected right now, shown under the home card's title and in Settings. -->
+    <string name="way_nearby_bt">Nearby · Bluetooth</string>
+    <string name="way_nearby_wifi">Nearby · Wi-Fi</string>
+    <string name="way_nearby_both">Nearby · Bluetooth and Wi-Fi</string>
+    <string name="way_cloud_direct">Cloud mode · over the internet</string>
+    <string name="way_cloud_icloud">Cloud mode · through iCloud</string>
+    <string name="settings_connection">Connection</string>
+    <string name="conn_not_connected">Not connected right now</string>
+    <string name="conn_nearby_sub">Your phones are near each other and talk directly.</string>
+    <string name="conn_cloud_sub">Your phones are apart and reach each other over the internet.</string>
+    <string name="conn_waiting_sub">Open Pairline on your iPhone, near this phone, with Bluetooth on.</string>
+    <string name="settings_cloud_on_sub">On. What this phone needs, and calls from far away</string>
+    <string name="settings_cloud_off_sub">Off. Leaving this phone at home? Turn it on in Pairline on your iPhone.</string>
+    <string name="settings_cloud_trouble_sub">On, but it needs a look. Tap to see what to do.</string>
+    <!-- The Cloud mode screen (Settings › Cloud mode). Cloud mode is switched on from the iPhone, not here. -->
+    <string name="cloud_title">Cloud mode</string>
+    <string name="cloud_intro">Leave this phone at home, and your iPhone keeps getting calls, texts and codes anywhere with internet, and calls and texts back with this phone\'s SIM. Cloud mode is turned on in Pairline on your iPhone. There\'s no Pairline server: messages go through your own iCloud, not ours, locked so only your two phones can read them.</string>
+    <string name="cloud_now">Now</string>
+    <string name="cloud_state_off">Off</string>
+    <string name="cloud_state_on">On</string>
+    <string name="cloud_state_paused">Paused</string>
+    <string name="cloud_turn_on">To turn it on, open Pairline on your iPhone and switch on Cloud mode in Settings › Connection, while the phones are together. Nearby keeps working either way.</string>
+    <string name="cloud_needs_title">What this phone needs at home</string>
+    <string name="cloud_need_charger">On its charger</string>
+    <string name="cloud_need_charger_missing">Not charging now. Plug it in, so it never runs out while you\'re away.</string>
+    <string name="cloud_need_wifi">On your home Wi-Fi</string>
+    <string name="cloud_need_wifi_missing">Not on Wi-Fi now. Texts and codes also work over mobile data; calls from far away need Wi-Fi.</string>
+    <string name="cloud_calls_title">Calls from far away</string>
+    <string name="cloud_router_title">Advanced: your router</string>
+    <!-- On the home card, under "Calls from far away: not possible yet"; a Details button opens the Cloud mode screen. -->
+    <string name="direct_short_router">Texts and codes still work. For calls from far away, your home router needs one setting.</string>
+    <string name="direct_short_modem">Texts and codes still work. For calls from far away, your internet provider\'s modem needs a setting too.</string>
+    <string name="direct_short_provider">Texts and codes still work. Calls from far away need help from your internet provider.</string>
+    <string name="direct_short_wifi">Texts and codes still work. For calls from far away, connect this phone to your home Wi-Fi.</string>
+    <string name="help_section_ways">Nearby or Cloud mode</string>
+    <string name="help_q_ways">Nearby or Cloud mode: which one do I need?</string>
+    <string name="help_a_ways">Nearby works by itself when the phones are near each other, for example with this phone in your bag or on your desk: they talk over Bluetooth and Wi-Fi. Cloud mode is for when this phone stays home, for example on its charger while you\'re at work or travelling: your iPhone then gets calls, texts and codes over the internet. Both can be on: at home the phones talk directly, and when you leave, Cloud mode takes over.</string>
+    <string name="help_q_cloud_on">How do I turn on Cloud mode?</string>
+    <string name="help_a_cloud_on">On your iPhone: when you pair, or later in Pairline\'s Settings. The iPhone gives this phone its own access to your iCloud, so there\'s no switch for it here. On this phone: keep it on its charger and home Wi-Fi, and let Pairline run in the background (Settings › Keep Pairline running). Settings › Cloud mode here shows whether everything is ready.</string>
+    <string name="help_q_cloud_calls">Texts arrive, but calls from far away don\'t work</string>
+    <string name="help_a_cloud_calls">Texts and codes reach your iPhone through iCloud. Talking on a call needs a straight way from your iPhone to this phone, through your home router. Most routers open it by themselves, with a setting called UPnP or NAT-PMP that is often on already. Settings › Cloud mode here says what\'s missing, and in Pairline on your iPhone, Help › Allow calls from far away has the steps for any router.</string>
+    <string name="help_q_cloud_private">Does Cloud mode send my messages to a server?</string>
+    <string name="help_a_cloud_private">Not to ours: Pairline has none. They go through your own iCloud as locked records that only your two phones can open; Apple can\'t read them. Calls go straight from your iPhone to this phone. When you turn Cloud mode off on the iPhone, its records in iCloud are deleted.</string>
 </resources>
