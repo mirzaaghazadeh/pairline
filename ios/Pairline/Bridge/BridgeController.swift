@@ -158,9 +158,27 @@ final class BridgeController: ObservableObject {
             latencyTimer = nil
             calls.linkLost()
         }
-        // Remote mode (D-092): texts written while the bridge was away go through iCloud.
-        if phase == .remote, !wasRemote, canUseLink { Task { await flushOutbox() } }
+        // Remote mode (D-092): texts written while the bridge was away go through iCloud, and so does the sync
+        // (at most every 5 minutes: it picks up where the last one stopped), so a phone paired over the internet
+        // gets its messages, contacts and call history without a live link.
+        if phase == .remote, !wasRemote, canUseLink {
+            Task {
+                await flushOutbox()
+                await syncThroughICloudIfDue()
+            }
+        }
         saveWidget()
+    }
+
+    private var lastICloudSync: Date?
+
+    /// The sync through iCloud, when the last one is more than 5 minutes old.
+    func syncThroughICloudIfDue() async {
+        guard phase == .remote else { return }
+        if let last = lastICloudSync, Date().timeIntervalSince(last) < 5 * 60 { return }
+        lastICloudSync = Date()
+        log.info("sync", "Syncing through iCloud")
+        await sync()
     }
 
     private func established() {
@@ -583,17 +601,16 @@ final class BridgeController: ObservableObject {
 
     // MARK: - Sync
 
-    /// Pull-to-refresh and reconnects: new messages, contacts and call log. Through iCloud (remote mode) only new
-    /// messages: contacts, the call log and a first full sync are too large for the mailbox.
+    /// Pull-to-refresh, reconnects and Cloud mode: messages, contacts and the call log. Through iCloud (remote mode)
+    /// too, since every reply the bridge pages stays within its 30 KB budget and a mailbox record holds 48 KB: a phone
+    /// paired over the internet, whose home lets no direct connection in, used to stay empty (2026-11-27).
     func sync() async {
         guard canUseLink || firstSyncOnly, phase.canReachBridge, !syncing else { return }
         syncing = true
         defer { syncing = false }
         if has(.smsHistory) { await syncMessages() }
-        if phase.isConnected {
-            if has(.contacts) { await syncContacts() }
-            if has(.calllog) { await syncCallLog() }
-        }
+        if has(.contacts) { await syncContacts() }
+        if has(.calllog) { await syncCallLog() }
         updateBadge()
         // The free first sync counts only once it ran to the end on a live link (D-069).
         if firstSyncOnly, !canUseLink, phase.isConnected { onFirstSyncDone?() }
@@ -621,7 +638,7 @@ final class BridgeController: ObservableObject {
                 } else {
                     recent.forEach(notify)
                 }
-            } else if phase.isConnected {
+            } else {
                 var before: Int64?
                 for _ in 0..<10 {
                     let reply = try await link.request(.smsThreads(limit: 50, before: before))
@@ -632,7 +649,7 @@ final class BridgeController: ObservableObject {
                 }
                 var historyBefore: Int64?
                 for _ in 0..<5 {
-                    guard let reply = try await historyPage(thread: nil, before: historyBefore, after: nil, limit: 100)
+                    guard let reply = try await historyPage(thread: nil, before: historyBefore, after: nil, limit: pageSize)
                     else { break }
                     db.upsertMessages(reply.msgs, countUnread: false)
                     if !reply.more { db.markAllThreadsComplete() }
@@ -654,7 +671,7 @@ final class BridgeController: ObservableObject {
     /// Loads older messages of one conversation. Returns whether more exist.
     @discardableResult
     func loadOlder(thread: Int64) async -> Bool {
-        guard thread >= 0, canUseLink, phase.isConnected, has(.smsHistory) else { return false }
+        guard thread >= 0, canUseLink, phase.canReachBridge, has(.smsHistory) else { return false }
         let before = db.oldestMessageTime(thread: thread)
         do {
             guard let page = try await historyPage(thread: thread, before: before, after: nil, limit: 50) else { return false }
@@ -667,7 +684,7 @@ final class BridgeController: ObservableObject {
     }
 
     private func syncContacts() async {
-        guard phase.isConnected else { return }
+        guard phase.canReachBridge else { return }
         var cursor = db.value("contacts.cursor").flatMap(OpaqueValue.init(storageString:))
         var replaced = false
         do {
@@ -689,7 +706,7 @@ final class BridgeController: ObservableObject {
     }
 
     private func syncCallLog() async {
-        guard phase.isConnected else { return }
+        guard phase.canReachBridge else { return }
         var cursor = db.value("calllog.cursor").flatMap(OpaqueValue.init(storageString:))
         var replaced = false
         do {

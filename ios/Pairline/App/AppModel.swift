@@ -428,7 +428,12 @@ final class AppModel: ObservableObject {
             await purchases.refresh()
             await Notifier.shared.refreshAuthorization()
         }
-        if real.phase.isConnected { Task { await real.sync() } }
+        if real.phase.isConnected {
+            Task { await real.sync() }
+        } else {
+            // Cloud mode with nothing nearby: the sync goes through iCloud, at most every 5 minutes.
+            Task { await real.syncThroughICloudIfDue() }
+        }
         real.deleteOldCodes()
         Task { await remoteCatchUp() }
     }
