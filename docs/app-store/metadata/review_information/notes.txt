@@ -1,3 +1,5 @@
+NO LOGIN, NO ACCOUNTS: Pairline has no sign-in, no sign-up, no username and no password anywhere, so no demo account exists or is needed. To see every screen without an Android phone, use the free demo mode (launch, tap Continue until "How would you like to start?", then "Explore the demo").
+
 Pairline is the iPhone half of a two-phone setup. It relays SMS, calls, contacts, call history and USSD codes from the user's own Android phone, which runs our free "Pairline Bridge" Android app (getpairline.com), over an encrypted link between the two phones: Bluetooth, and optionally the local Wi-Fi network. There are no Pairline servers and no accounts.
 
 VIDEO ON TWO REAL PHONES
