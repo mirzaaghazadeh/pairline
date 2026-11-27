@@ -566,6 +566,13 @@ final class AppDatabase: ObservableObject {
 
     private var historyComplete: Bool { value("history.complete") == "1" }
 
+    /// Whether the conversation list and the newest history came from the bridge once; until then a sync loads them,
+    /// whatever messages already arrived on their own. Unpairing clears it with everything else.
+    var historyLoaded: Bool {
+        get { value("sms.history_loaded") == "1" }
+        set { setValue(newValue ? "1" : nil, for: "sms.history_loaded") }
+    }
+
     func setHasOlder(thread: Int64, _ hasOlder: Bool) {
         try? db.execute("UPDATE threads SET has_older = ? WHERE thread = ?", [.from(hasOlder), .int(thread)])
         changed()

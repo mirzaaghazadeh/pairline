@@ -260,6 +260,32 @@ final class DemoModeTests: XCTestCase {
         bridge.stop()
     }
 
+    /// A message pushed through iCloud before the first sync doesn't stop the conversations and their history from
+    /// loading: the iPhone used to ask only for what came after it (2026-11-27).
+    func testAMessageThatArrivedFirstDoesntSkipTheHistory() async throws {
+        let bridge = DemoBridge(content: .english)
+        let controller = BridgeController(mode: .demo, link: bridge, db: .inMemory())
+        controller.db.upsertMessages([SMSMessage(key: "sms:9999", thread: 9999, addr: "+1 555 0199", body: "Pushed first",
+                                                 time: Date().milliseconds, box: "in", sim: 0, state: nil)],
+                                     countUnread: true)
+        XCTAssertFalse(controller.db.historyLoaded)
+        let connected = expectation(description: "connected")
+        let previous = bridge.onEstablished
+        bridge.onEstablished = {
+            previous?()
+            connected.fulfill()
+        }
+        bridge.start()
+        await fulfillment(of: [connected], timeout: 3)
+        for _ in 0..<60 where controller.db.calls().count < DemoContent.english.calls.count || controller.syncing {
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+
+        XCTAssertEqual(controller.db.conversations().count, DemoContent.english.conversations.count + 1)
+        XCTAssertTrue(controller.db.historyLoaded)
+        bridge.stop()
+    }
+
     /// D-062: the SIM chosen in Settings wins; otherwise Android's default, otherwise the first active SIM.
     @MainActor
     func testSIMChoiceFallsBackToAndroidDefault() async throws {

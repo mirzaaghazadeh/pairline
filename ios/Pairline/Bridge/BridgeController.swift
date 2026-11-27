@@ -631,7 +631,10 @@ final class BridgeController: ObservableObject {
         // Smaller pages through iCloud, where a record holds at most 48 KB.
         let pageSize = phase.isConnected ? 100 : 30
         do {
-            if let newest = db.newestMessageTime {
+            // The conversations and their history load once. A message that arrived on its own first (pushed through
+            // iCloud right after pairing over the internet) is no sign they did: going by the newest message alone,
+            // the iPhone only ever asked for what came after it (2026-11-27).
+            if db.historyLoaded, let newest = db.newestMessageTime {
                 var after = newest
                 var newInbound: [StoredMessage] = []
                 for _ in 0..<20 {
@@ -667,6 +670,7 @@ final class BridgeController: ObservableObject {
                     guard reply.more, let oldest = reply.msgs.map(\.time).min(), oldest != historyBefore else { break }
                     historyBefore = oldest
                 }
+                db.historyLoaded = true
             }
         } catch {
             log.warning("sync", "Message sync stopped: \(error.localizedDescription)")
