@@ -12,8 +12,9 @@ object CloudModeUi {
     fun offered(peerProto: Int): Boolean = BuildConfig.DEBUG || peerProto >= 1
 
     /**
-     * Whether the pairing screen offers pairing over the internet. Release builds accept only invitations for
-     * Apple's private database, which no iPhone build makes yet (D-092), so there it would be a dead end.
+     * Whether the pairing screen offers pairing over the internet: in every build since TestFlight iPhones make
+     * invitations for the public database in CloudKit Production, which release builds accept (RemoteConfig.accepts,
+     * D-092); before that only debug builds could use one.
      */
-    val pairingOverInternet: Boolean get() = BuildConfig.DEBUG
+    val pairingOverInternet: Boolean get() = true
 }

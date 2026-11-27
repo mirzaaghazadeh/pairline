@@ -32,9 +32,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -187,10 +189,14 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                 PrimaryButton(stringResource(R.string.action_done), onDone)
             }
         } else {
+            // Everything on one screen of a normal phone (a tester's didn't show what came after the steps): a QR code
+            // small enough, the timer and "New code" on one row, the "keep this screen open" note as a caption under
+            // the code, and pairing over the internet as one button that opens its options here.
+            var internetOpen by rememberSaveable { mutableStateOf(false) }
             Column(
                 Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 when (link.bluetooth) {
                     BluetoothStatus.OFF -> NoteBox(stringResource(R.string.pair_need_bt), Tone.WARN, PIcons.Bluetooth)
@@ -209,7 +215,7 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                     NoteBox(stringResource(R.string.pair_too_many), Tone.BAD, PIcons.Warning)
                 }
 
-                Box(Modifier.widthIn(max = 320.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(Modifier.widthIn(max = 240.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     val o = offer
                     val qrDescription = stringResource(R.string.pair_qr_desc)
                     if (o != null) {
@@ -227,15 +233,24 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                 }
                 val remaining = offer?.let { ((it.expiresAt - now) / 1000).coerceAtLeast(0) } ?: 0
                 val locale = LocalConfiguration.current.locales[0]
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         stringResource(R.string.pair_expires, String.format(locale, "%d:%02d", remaining / 60, remaining % 60)),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    TextButton(onClick = { pairing.newOffer() }) {
+                        Icon(PIcons.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.pair_new_code), style = MaterialTheme.typography.titleSmall)
+                    }
                 }
-                SecondaryButton(stringResource(R.string.pair_new_code), { pairing.newOffer() }, icon = PIcons.Refresh)
-
+                Text(
+                    stringResource(R.string.pair_keep_open),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
                 Steps(
                     listOf(
                         stringResource(R.string.pair_step_1),
@@ -246,10 +261,13 @@ fun PairingContent(onDone: () -> Unit, modifier: Modifier = Modifier) {
                 previousPeer?.let { name ->
                     NoteBox(stringResource(R.string.pair_replaces, name), Tone.WARN, PIcons.Warning)
                 }
-                NoteBox(stringResource(R.string.pair_keep_open), Tone.NEUTRAL, PIcons.Lock)
                 if (CloudModeUi.pairingOverInternet) {
-                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                    RemoteInvitationPaste()
+                    if (internetOpen) {
+                        HorizontalDivider(Modifier.padding(vertical = 4.dp))
+                        RemoteInvitationPaste()
+                    } else {
+                        SecondaryButton(stringResource(R.string.remote_pair_open), { internetOpen = true }, icon = PIcons.Cloud)
+                    }
                 }
             }
         }
