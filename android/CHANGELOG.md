@@ -5,6 +5,13 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.4 (2026-11-27)
+
+- **Pairing fits on one screen.** A smaller QR code, the timer and "New code" side by side, and the "keep this screen
+  open" note right under the code, so nothing important hides below the fold.
+- **Pair over the internet from here.** "Phones not together? Pair over the internet" is now a button on the pairing
+  screen, for an iPhone that's somewhere else: scan the invitation's QR code, choose a picture of it, or paste its link.
+
 ## 1.9.3 (2026-11-27)
 
 - **Texts from your iPhone go out within seconds in Cloud mode.** This phone now checks iCloud every 3 seconds while
