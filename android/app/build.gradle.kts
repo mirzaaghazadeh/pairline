@@ -23,8 +23,8 @@ android {
         targetSdk = 36
         // A release tag must be android-v<versionName>; the release workflow checks this.
         // Raise versionCode for every release.
-        versionCode = 17
-        versionName = "1.9.0"
+        versionCode = 18
+        versionName = "1.9.1"
 
         externalNativeBuild {
             cmake {

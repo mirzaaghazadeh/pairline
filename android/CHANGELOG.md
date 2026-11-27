@@ -5,6 +5,16 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.1 (2026-11-27)
+
+- **"Check my home connection" tells carrier-grade NAT apart.** When the router is slow to answer the check, it now
+  keeps what this phone already learned from the router, so a home behind the provider's shared address (carrier-grade
+  NAT) hears that, not "turn on UPnP" when UPnP is already on.
+- **Help for calls from far away:** how to recognize carrier-grade NAT (your router's internet address starts with
+  100.64 to 100.127), why the router's UPnP list stays empty then, what to ask your provider for, double NAT, the exact
+  port-forwarding values (TCP 47830 to this phone), and how fast texts go through iCloud.
+- Built with the newest Android libraries.
+
 ## 1.9.0 (2026-11-27)
 
 - **Nearby or Cloud mode, explained.** Setup has a new "Two ways to connect" step: Nearby works by itself with the
