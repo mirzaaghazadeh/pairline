@@ -28,13 +28,13 @@
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Telefonlarınız birbirinden uzaktayken internet üzerinden mesaj, kod ve arama. İkisi birlikte %2$@ yerine %1$@; sonradan eklerseniz Bulut modu tek başına %3$@." } }
       }
     },
-    "Buy Pairline and Cloud mode for %@" : {
-      "comment" : "Paywall (D-093): the buy button with \"Add Cloud mode\" switched on. %@ is the bundle's price, e.g. $19.99.",
+    "Buy both for %@" : {
+      "comment" : "Paywall (D-093): the buy button with \"Add Cloud mode\" switched on; the price card right above names the two (Pairline Full Access and Cloud mode). Keep it short so it fits on one line. %@ is the bundle's price, e.g. $19.99.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شراء Pairline والوضع السحابي مقابل %@" } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Buy Pairline and Cloud mode for %@" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خرید Pairline و حالت ابری به قیمت %@" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pairline ve Bulut modunu %@ karşılığında satın al" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "شراء الاثنين مقابل %@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Buy both for %@" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "خرید هر دو به قیمت %@" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İkisini %@ karşılığında al" } }
       }
     },
     "Pairline Full Access and Cloud mode" : {

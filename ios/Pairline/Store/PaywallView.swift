@@ -220,7 +220,7 @@ struct PaywallView: View {
             }
         } label: {
             busyLabel(buyingBundle
-                      ? Text("Buy Pairline and Cloud mode for \(chosenPrice)", tableName: "RemoteAddOn")
+                      ? Text("Buy both for \(chosenPrice)", tableName: "RemoteAddOn")
                       : Text("Buy Pairline for \(purchases.priceText)"))
         }
         .buttonStyle(PrimaryButtonStyle())
@@ -230,61 +230,86 @@ struct PaywallView: View {
     /// "Add Cloud mode" (D-093): the first purchase can include it for less than buying it later. The saving comes
     /// from the three products' prices in this storefront; it isn't shown when the bundle doesn't cost less.
     private func cloudChoice(_ offer: BundleOffer) -> some View {
-        Toggle(isOn: $addCloud) {
-            VStack(alignment: .leading, spacing: 6) {
-                AdaptiveStack(spacing: 8) {
-                    Label {
-                        Text("Add Cloud mode", tableName: "RemoteAddOn")
-                    } icon: {
-                        Image(systemName: "icloud.fill").foregroundStyle(Color.brandBlue)
+        VStack(alignment: .leading, spacing: 10) {
+            // The switch sits on the title's row; the badge goes beside the title when it fits, under it otherwise, so
+            // the title never breaks onto two lines on a narrow iPhone.
+            Toggle(isOn: $addCloud) {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) {
+                        cloudTitle
+                        savingBadge(offer)
                     }
-                    .font(.headline)
-                    if let saving = offer.savingPercent {
-                        Text("Save \(saving)%", tableName: "RemoteAddOn")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(Capsule().fill(Color.brandGreenFill))
+                    VStack(alignment: .leading, spacing: 6) {
+                        cloudTitle
+                        savingBadge(offer)
                     }
                 }
-                Text("Texts, codes and calls over the internet when your phones are apart. Both for \(offer.bundlePrice) instead of \(offer.separatePrice); added later, Cloud mode alone costs \(offer.remotePrice).",
-                     tableName: "RemoteAddOn")
-                    .font(.footnote)
-                    .foregroundStyle(Color(.secondaryLabel))
-                    .fixedSize(horizontal: false, vertical: true)
             }
+            .tint(Color.brandGreenFill)
+            Text("Texts, codes and calls over the internet when your phones are apart. Both for \(offer.bundlePrice) instead of \(offer.separatePrice); added later, Cloud mode alone costs \(offer.remotePrice).",
+                 tableName: "RemoteAddOn")
+                .font(.footnote)
+                .foregroundStyle(Color(.secondaryLabel))
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .tint(Color.brandGreenFill)
         .disabled(purchases.busy)
         .card(padding: 18)
     }
 
+    private var cloudTitle: some View {
+        Label {
+            Text("Add Cloud mode", tableName: "RemoteAddOn")
+        } icon: {
+            Image(systemName: "icloud.fill").foregroundStyle(Color.brandBlue)
+        }
+        .font(.headline)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    @ViewBuilder
+    private func savingBadge(_ offer: BundleOffer) -> some View {
+        if let saving = offer.savingPercent {
+            Text("Save \(saving)%", tableName: "RemoteAddOn")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Capsule().fill(Color.brandGreenFill))
+                .fixedSize()
+        }
+    }
+
     private func busyLabel(_ text: Text) -> some View {
         ZStack {
-            text.opacity(purchases.busy ? 0 : 1)
+            text.multilineTextAlignment(.center).opacity(purchases.busy ? 0 : 1)
             if purchases.busy { ProgressView().tint(.white) }
         }
     }
 
+    /// The heading and the price share the top row; what's included runs full width under them, so a long price (₺999,99)
+    /// doesn't squeeze the text into a narrow column.
     private var priceCard: some View {
-        HStack(alignment: .center, spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
+            AdaptiveStack(verticalAlignment: .firstTextBaseline, spacing: 12) {
                 Text("One-time purchase").font(.headline)
-                if buyingBundle {
-                    Text("Pairline Full Access and Cloud mode", tableName: "RemoteAddOn")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                Text("No subscription, no account.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                Spacer(minLength: 0)
+                Text(verbatim: chosenPrice)
+                    .font(.rounded(.title, weight: .bold))
+                    .foregroundStyle(Color.brandBlue)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
-            Spacer()
-            Text(verbatim: chosenPrice)
-                .font(.rounded(.title, weight: .bold))
-                .foregroundStyle(Color.brandBlue)
+            if buyingBundle {
+                Text("Pairline Full Access and Cloud mode", tableName: "RemoteAddOn")
+                    .font(.subheadline.weight(.medium))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text("No subscription, no account.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .card(padding: 18)
         .overlay(
             RoundedRectangle(cornerRadius: Metrics.corner, style: .continuous)
