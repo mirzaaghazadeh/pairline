@@ -13,7 +13,7 @@ enum LinkPhase: Equatable {
     case connected
     case waiting(until: Date)
     case pairing
-    /// Remote mode (D-092): no session, but messages reach the bridge through the user's iCloud ("Via iCloud").
+    /// Remote mode (D-092): no session, but messages reach the bridge through the user's iCloud (shown as "Via Cloud mode").
     /// Texts, status and history work; calls don't, since there's no audio without a direct connection yet.
     case remote
 

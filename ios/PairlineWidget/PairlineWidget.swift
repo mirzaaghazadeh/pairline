@@ -87,7 +87,7 @@ struct BridgeStatusWidgetView: View {
         switch snapshot?.link {
         case .connected?: return Text("Connected")
         case .direct?: return Text("Direct connection")
-        case .remote?: return Text("Via iCloud")
+        case .remote?: return Text("Via Cloud mode")
         case .connecting?: return Text("Connecting…")
         case .offline?: return Text("Not connected")
         case .locked?: return Text("Locked")

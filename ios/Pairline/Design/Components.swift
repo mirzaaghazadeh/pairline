@@ -243,7 +243,7 @@ struct LinkStatusPill: View {
     static func title(for phase: LinkPhase, isDirect: Bool = false) -> Text {
         switch phase {
         case .connected: return isDirect ? Text("Direct connection") : Text("Connected")
-        case .remote: return Text("Via iCloud")
+        case .remote: return Text("Via Cloud mode")
         case .searching: return Text("Looking for your bridge…")
         case .securing: return Text("Securing the link…")
         case .pairing: return Text("Pairing…")

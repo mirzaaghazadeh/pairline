@@ -368,7 +368,7 @@ struct OfflineBanner: View {
     /// Remote mode (D-092) says what works through iCloud: calls need the direct connection.
     private var text: Text {
         phase == .remote
-            ? Text("Via iCloud: texts and codes work. Calls need the direct connection to your home.")
+            ? Text("Via Cloud mode: texts and codes work. Calls need the direct connection to your home.")
             : LinkStatusPill.title(for: phase)
     }
 

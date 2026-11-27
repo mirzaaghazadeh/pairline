@@ -250,25 +250,25 @@
         }
       }
     },
-    "Via iCloud" : {
-      "comment" : "Link state in the widget and Live Activity: no nearby link, but Cloud mode reaches the bridge through iCloud (D-092).",
+    "Via Cloud mode" : {
+      "comment" : "Link state in the widget and Live Activity: no nearby link, but Cloud mode reaches the bridge through iCloud (D-092, D-104).",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "عبر iCloud"
+            "value" : "عبر الوضع السحابي"
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "از طریق iCloud"
+            "value" : "از طریق حالت ابری"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud üzerinden"
+            "value" : "Bulut modu üzerinden"
           }
         }
       }

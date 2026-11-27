@@ -5188,6 +5188,28 @@
         }
       }
     },
+    "Loading messages…" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل الرسائل…"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "در حال بارگیری پیام‌ها…"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesajlar yükleniyor…"
+          }
+        }
+      }
+    },
     "Lock it in recent apps" : {
       "localizations" : {
         "ar" : {
@@ -11933,19 +11955,20 @@
         }
       }
     },
-    "Via iCloud" : {
+    "Via Cloud mode" : {
+      "comment" : "Link state: no nearby link, but Cloud mode reaches the bridge (D-092, D-104). Use the app's name for Cloud mode.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud" } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق iCloud" } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden" } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر الوضع السحابي" } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق حالت ابری" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu üzerinden" } }
       }
     },
-    "Via iCloud: texts and codes work. Calls need the direct connection to your home." : {
-      "comment" : "Cloud mode (D-092): the banner while the bridge is reached only through iCloud. Call audio needs the direct connection through the home router.",
+    "Via Cloud mode: texts and codes work. Calls need the direct connection to your home." : {
+      "comment" : "Cloud mode (D-092, D-104): the banner while the bridge is reached only through iCloud. Call audio needs the direct connection through the home router.",
       "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر iCloud: تصلك الرسائل والرموز. أما المكالمات فتحتاج إلى الاتصال المباشر بمنزلك." } },
-        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق iCloud: پیامک‌ها و کدها کار می‌کنند. تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند." } },
-        "tr" : { "stringUnit" : { "state" : "translated", "value" : "iCloud üzerinden: mesajlar ve kodlar çalışıyor. Aramalar için evinize doğrudan bağlantı gerekiyor." } }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عبر الوضع السحابي: تصلك الرسائل والرموز. أما المكالمات فتحتاج إلى الاتصال المباشر بمنزلك." } },
+        "fa" : { "stringUnit" : { "state" : "translated", "value" : "از طریق حالت ابری: پیامک‌ها و کدها کار می‌کنند. تماس‌ها به اتصال مستقیم به خانه‌تان نیاز دارند." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bulut modu üzerinden: mesajlar ve kodlar çalışıyor. Aramalar için evinize doğrudan bağlantı gerekiyor." } }
       }
     },
     "Calls need the direct connection to your home, which isn't up right now. Settings › Cloud mode › Check my home connection shows why." : {

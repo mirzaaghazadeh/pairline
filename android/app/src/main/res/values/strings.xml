@@ -172,7 +172,7 @@
     <string name="home_waiting_body">Last connected %1$s. Pairline reconnects by itself when your iPhone is nearby with Pairline open or in the background.</string>
     <string name="home_waiting_never">Your iPhone hasn\'t connected yet. Open Pairline on it, nearby, with Bluetooth on.</string>
     <!-- Cloud mode (D-092; "remote mode" in the code): no Bluetooth or Wi-Fi link, but the iPhone is reached through its iCloud. -->
-    <string name="state_via_icloud">Via iCloud</string>
+    <string name="state_via_icloud">Via Cloud mode</string>
     <string name="state_cloud_offline">iCloud unreachable</string>
     <string name="notif_via_icloud_text">Cloud mode: texts, codes and calls reach your iPhone through your iCloud until your phones are linked nearby again.</string>
     <string name="home_via_icloud_title">Reaching %1$s through iCloud</string>
@@ -637,7 +637,7 @@
          and the address examples as they are; "Settings › Connection › Advanced › Port forwarding" is the iPhone app's
          screen, in the iPhone app's own words. -->
     <string name="help_q_icloud_texts">Do texts work while the phones are apart?</string>
-    <string name="help_a_icloud_texts">Yes, both ways, through your own iCloud (\"Via iCloud\"). A text from your iPhone goes out within a few seconds while this phone is on its charger, and within about 10 seconds on battery, because this phone checks iCloud that often while Cloud mode is on. Calls from far away need the direct connection through your home router.</string>
+    <string name="help_a_icloud_texts">Yes, both ways, through your own iCloud (\"Via Cloud mode\"). A text from your iPhone goes out within a few seconds while this phone is on its charger, and within about 10 seconds on battery, because this phone checks iCloud that often while Cloud mode is on. Calls from far away need the direct connection through your home router.</string>
     <string name="help_q_cgnat">Calls from far away say \"not possible\": the internet provider doesn\'t give this home its own address</string>
     <string name="help_a_cgnat">Your internet provider shares one internet address among many homes (carrier-grade NAT), so nothing from outside can reach your router. To check: on your router\'s status page, its own internet (WAN) IPv4 address starts with 100.64 to 100.127, and a \"what\'s my IP\" website on the same Wi-Fi shows a different address. Pairline never asks such a website itself, so check by hand. Texts and codes still work through iCloud. For calls, ask your provider for a public IPv4 address (some call it a static or public IP), or turn on IPv6 in the router if they offer it (on a TP-Link: Advanced › Network › IPv6). Pairline uses IPv6 by itself.</string>
     <string name="help_q_upnp_empty">UPnP is on, but the router\'s UPnP list is empty</string>

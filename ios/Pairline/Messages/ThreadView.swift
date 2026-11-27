@@ -40,7 +40,10 @@ struct ThreadView: View {
                         }
                         .padding(.top, 8)
                     }
-                    if conversation?.hasOlder == true, thread >= 0, bridge.phase.isConnected {
+                    // Through iCloud too (Cloud mode), where a page takes a few seconds: the screen stayed blank meanwhile.
+                    if messages.isEmpty, loadingOlder {
+                        firstLoad
+                    } else if conversation?.hasOlder == true, thread >= 0, bridge.phase.canReachBridge {
                         olderLoader
                     }
                     ForEach(Array(groupedByDay.enumerated()), id: \.offset) { _, group in
@@ -84,7 +87,10 @@ struct ThreadView: View {
                 Notifier.shared.visibleThread = thread
                 Notifier.shared.removeDelivered(thread: thread)
                 bridge.markRead(thread: thread)
-                if messages.isEmpty { Task { await loadOlder() } }
+                if messages.isEmpty, bridge.phase.canReachBridge {
+                    loadingOlder = true
+                    Task { await loadOlder(force: true) }
+                }
             }
             .onDisappear {
                 if Notifier.shared.visibleThread == thread { Notifier.shared.visibleThread = nil }
@@ -184,6 +190,20 @@ struct ThreadView: View {
         PhoneNumber.isPhoneNumber(name) ? Text(verbatim: PhoneNumber.ltr(name)) : Text(verbatim: name)
     }
 
+    /// A conversation whose messages aren't on this iPhone yet, while they load.
+    private var firstLoad: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+            Text("Loading messages…")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 80)
+        .accessibilityElement(children: .combine)
+    }
+
     private var olderLoader: some View {
         HStack {
             Spacer()
@@ -204,8 +224,9 @@ struct ThreadView: View {
         if lastCount == 0 { lastCount = messages.count }
     }
 
-    private func loadOlder() async {
-        guard !loadingOlder else { return }
+    /// [force]: the caller already showed the spinner (set `loadingOlder`) so the first frame isn't blank.
+    private func loadOlder(force: Bool = false) async {
+        guard force || !loadingOlder else { return }
         loadingOlder = true
         await bridge.loadOlder(thread: thread)
         loadingOlder = false

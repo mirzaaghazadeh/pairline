@@ -236,7 +236,7 @@ struct CloudModeAdvancedSection: View {
         guard remote.isOn else { return Text("Off") }
         if let problem = remote.problem { return Text(problem.text) }
         if bridge.isDirect { return Text("On · direct connection") }
-        return bridge.phase.isConnected ? Text("On · using the nearby link") : Text("Via iCloud")
+        return bridge.phase.isConnected ? Text("On · using the nearby link") : Text("On")
     }
 
     /// What the bridge said about its direct connection (`remote.state`), or that it's in use; nil before it said.
