@@ -523,7 +523,7 @@
     <string name="remote_pair_failed_internal">حدث خطأ ما على هذا الهاتف. حاول مجددًا بدعوة جديدة.</string>
     <string name="remote_pair_section_title">هاتفاك ليسا معًا؟</string>
     <string name="remote_pair_open">هاتفاك ليسا معًا؟ اقرنهما عبر الإنترنت</string>
-    <string name="remote_pair_paste_intro">أقرِنهما عبر الإنترنت: على آيفونك، اختر «الإقران عبر الإنترنت» لإنشاء دعوة، ثم افتحها هنا. امسح رمز QR الخاص بها، أو اختر صورة له، أو الصق رابطها.</string>
+    <string name="remote_pair_paste_intro">أقرِنهما عبر الإنترنت: في Pairline على آيفونك، افتح الإعدادات › إقران هاتف وسيط واختر «الإقران عبر الإنترنت» لإنشاء دعوة، ثم افتحها هنا. امسح رمز QR الخاص بها، أو اختر صورة له، أو الصق رابطها.</string>
     <string name="remote_pair_scan">مسح رمز QR للدعوة</string>
     <string name="remote_pair_pick">اختيار صورة له</string>
     <string name="remote_pair_paste">لصق دعوة</string>

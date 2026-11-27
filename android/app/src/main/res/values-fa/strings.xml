@@ -522,7 +522,7 @@
     <string name="remote_pair_failed_internal">در این گوشی مشکلی پیش آمد. با یک دعوت تازه دوباره امتحان کنید.</string>
     <string name="remote_pair_section_title">گوشی‌ها کنار هم نیستند؟</string>
     <string name="remote_pair_open">گوشی‌ها کنار هم نیستند؟ از راه اینترنت جفت کنید</string>
-    <string name="remote_pair_paste_intro">از راه اینترنت جفت کنید: روی آیفونتان «جفت کردن از راه اینترنت» را بزنید تا دعوتی بسازد، بعد آن را اینجا باز کنید. کد QR آن را اسکن کنید، عکسی از آن را انتخاب کنید، یا لینکش را بچسبانید.</string>
+    <string name="remote_pair_paste_intro">از راه اینترنت جفت کنید: در Pairline روی آیفونتان تنظیمات › جفت کردن گوشی پل را باز کنید و «جفت کردن از راه اینترنت» را بزنید تا دعوتی بسازد، بعد آن را اینجا باز کنید. کد QR آن را اسکن کنید، عکسی از آن را انتخاب کنید، یا لینکش را بچسبانید.</string>
     <string name="remote_pair_scan">اسکن کد QR دعوت</string>
     <string name="remote_pair_pick">انتخاب عکسی از آن</string>
     <string name="remote_pair_paste">چسباندن دعوت</string>

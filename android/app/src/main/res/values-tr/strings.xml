@@ -522,7 +522,7 @@
     <string name="remote_pair_failed_internal">Bu telefonda bir sorun oluştu. Yeni bir davetle tekrar deneyin.</string>
     <string name="remote_pair_section_title">Telefonlar bir arada değil mi?</string>
     <string name="remote_pair_open">Telefonlar bir arada değil mi? İnternet üzerinden eşleştirin</string>
-    <string name="remote_pair_paste_intro">İnternet üzerinden eşleştirin: iPhone\'unuzda bir davet oluşturmak için \"İnternet üzerinden eşleştir\"i seçin, sonra daveti burada açın. QR kodunu tarayın, bir resmini seçin ya da bağlantısını yapıştırın.</string>
+    <string name="remote_pair_paste_intro">İnternet üzerinden eşleştirin: iPhone\'unuzdaki Pairline\'da Ayarlar › Köprü telefon eşleştir\'i açın ve bir davet oluşturmak için \"İnternet üzerinden eşleştir\"i seçin, sonra daveti burada açın. QR kodunu tarayın, bir resmini seçin ya da bağlantısını yapıştırın.</string>
     <string name="remote_pair_scan">Davetin QR kodunu tara</string>
     <string name="remote_pair_pick">Bir resmini seç</string>
     <string name="remote_pair_paste">Daveti yapıştır</string>

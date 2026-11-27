@@ -533,7 +533,7 @@
     <string name="remote_pair_section_title">Phones not together?</string>
     <!-- On the pairing screen under the steps: opens the pair-over-the-internet options (scan, picture, paste) in place. -->
     <string name="remote_pair_open">Phones not together? Pair over the internet</string>
-    <string name="remote_pair_paste_intro">Pair over the internet: on your iPhone, choose Pair over the internet to make an invitation, then open it here. Scan its QR code, choose a picture of it, or paste its link.</string>
+    <string name="remote_pair_paste_intro">Pair over the internet: in Pairline on your iPhone, open Settings › Pair a bridge phone and choose Pair over the internet to make an invitation, then open it here. Scan its QR code, choose a picture of it, or paste its link.</string>
     <string name="remote_pair_scan">Scan the invitation\'s QR code</string>
     <string name="remote_pair_pick">Choose a picture of it</string>
     <string name="remote_pair_paste">Paste an invitation</string>
