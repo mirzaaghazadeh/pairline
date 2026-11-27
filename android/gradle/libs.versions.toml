@@ -2,12 +2,12 @@
 # makes no network calls of its own (AGENTS.md).
 
 [versions]
-agp = "9.5.1"
+agp = "9.5.3"
 kotlin = "2.4.21"
-composeBom = "2026.09.00"
+composeBom = "2026.11.01"
 activityCompose = "1.13.0"
 coreKtx = "1.19.1"
-coroutines = "1.9.0"
+coroutines = "1.11.0"
 lifecycle = "2.10.0"
 zxing = "3.5.4"
 # BoringSSL as an NDK prefab package (OpenSSL/ISC licenses, D-054): only its SPAKE2 is used, for pairing with
