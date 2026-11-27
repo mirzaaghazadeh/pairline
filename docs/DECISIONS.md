@@ -1968,3 +1968,13 @@ travel. This supersedes that one name in D-092's list; the feature stays **Cloud
   for a saved contact and the number for anyone else, takes names from a copy of the app's contact index (match keys
   and names only) that the app keeps in the app group container, and keeps one notification per call: the newer
   "Incoming call" and the missed call replace the one before. PRIVACY.md lists both files.
+
+### D-105 — The iPhone names the network as Android's status bar does: "5G", not "NR NSA" (2026-11-27)
+
+D-082 put the exact radio technology (`rat`) on the Bridge tab, so 5G on a 4G anchor read "NR NSA", while the widget
+and the Live Activity showed the coarse `net`, which Android reports as "LTE" for that same network. A tester asked
+what "NR NSA" means, and the lock screen and the Bridge tab disagreed about one SIM.
+
+- All three now show one label, the one Android's status bar uses: "5G" for NR and NR NSA, "5G+" for NR+, "LTE+" for
+  LTE-CA and LTE-A Pro, otherwise the generation from `net` (`SIMInfo.networkLabel`). The signal in dBm stays.
+- Nothing changes on the wire: the bridge still sends `rat`, and older iPhone builds keep showing it.

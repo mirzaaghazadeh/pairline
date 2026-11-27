@@ -126,6 +126,19 @@ struct SIMInfo: Codable, Equatable, Identifiable, Hashable {
     var vm: Bool?
 
     var id: Int { slot }
+
+    /// The network as Android's own status bar names it, for the Bridge tab, the widget and the Live Activity alike
+    /// (D-105): "5G" for 5G on a 4G anchor ("NR NSA", whose `net` says "LTE") and standalone 5G, "5G+", "LTE+" for
+    /// carrier aggregation, otherwise the generation. Nil without a network.
+    var networkLabel: String? {
+        guard net != "none" else { return nil }
+        switch rat {
+        case "NR", "NR NSA": return "5G"
+        case "NR+": return "5G+"
+        case "LTE-CA", "LTE-A Pro": return "LTE+"
+        default: return net
+        }
+    }
 }
 
 /// `notif.posted` (D-077): a notification from an app the user chose on the bridge phone.

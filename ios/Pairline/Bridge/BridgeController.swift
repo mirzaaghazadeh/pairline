@@ -597,7 +597,7 @@ final class BridgeController: ObservableObject {
         }
         return WidgetSnapshot(link: link, batteryLevel: status?.battery?.level, charging: status?.battery?.charging,
                               sims: sims.map { .init(slot: $0.slot, carrier: $0.carrier ?? $0.label,
-                                                     signal: $0.signal, net: $0.net) },
+                                                     signal: $0.signal, net: $0.networkLabel ?? $0.net) },
                               updated: statusUpdatedAt ?? Date(), isDemo: isDemo)
     }
 

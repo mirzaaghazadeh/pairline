@@ -322,8 +322,8 @@ struct BridgeStatusTab: View {
                     Spacer()
                     VStack(alignment: .trailing, spacing: 6) {
                         SignalBars(level: sim.signal ?? 0, tint: (sim.signal ?? 0) <= 1 ? .brandAmber : .brandGreen)
-                        // The exact technology when the bridge sends it (D-082), else the generation.
-                        Text(verbatim: sim.net == "none" ? "—" : (sim.rat ?? sim.net ?? ""))
+                        // As Android's status bar names it (D-105): "5G", not "NR NSA".
+                        Text(verbatim: sim.networkLabel ?? "—")
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.secondary)
                         if let dbm = sim.dbm, sim.net != "none" {

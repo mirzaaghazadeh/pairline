@@ -117,6 +117,20 @@ final class AppDatabaseTests: XCTestCase {
         XCTAssertNil(ContactNames.name(for: "+442079460002"))
     }
 
+    /// The network as Android's status bar names it, the same on the Bridge tab, widget and Live Activity (D-105).
+    func testNetworkLabelMatchesAndroidsStatusBar() throws {
+        func label(_ json: String) throws -> String? {
+            try JSONDecoder().decode(SIMInfo.self, from: Data(json.utf8)).networkLabel
+        }
+        XCTAssertEqual(try label(#"{"slot":0,"net":"LTE","rat":"NR NSA"}"#), "5G")
+        XCTAssertEqual(try label(#"{"slot":0,"net":"5G","rat":"NR"}"#), "5G")
+        XCTAssertEqual(try label(#"{"slot":0,"net":"5G","rat":"NR+"}"#), "5G+")
+        XCTAssertEqual(try label(#"{"slot":0,"net":"LTE","rat":"LTE-CA"}"#), "LTE+")
+        XCTAssertEqual(try label(#"{"slot":0,"net":"3G","rat":"HSPA+"}"#), "3G")
+        XCTAssertEqual(try label(#"{"slot":0,"net":"LTE"}"#), "LTE")
+        XCTAssertNil(try label(#"{"slot":0,"net":"none","rat":"NR NSA"}"#))
+    }
+
     /// The bridge's name and model outlive a restart (Cloud mode sends them only now and then) but not unpairing.
     func testTheBridgesNameIsKeptUntilUnpairing() {
         XCTAssertNil(db.bridgeDeviceInfo)
