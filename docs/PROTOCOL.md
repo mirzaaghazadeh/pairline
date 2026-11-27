@@ -522,7 +522,9 @@ Found while implementing the Android bridge (2026-11-24). Additive only; the wir
 - **`contacts.sync` / `calllog.sync` replies** also carry `full` (boolean). `full: true` starts a full sync: R
   replaces its copy with this page and the ones that follow until `more: false`. B starts a full sync when `since`
   is null or older than Android's 30-day deletion log. `deleted` holds contact keys (`"c:<id>"`). Cursors are
-  opaque strings.
+  opaque strings. B lists the contacts its Contacts app lists (Android's default directory) that have a number or an
+  email; one that changes to having neither comes in `deleted`. A cursor B no longer understands starts a full sync
+  (bridge 1.9.7 did this once, to replace copies that had duplicates).
 - **`contacts.add`** answers `error` / `permission` while the user hasn't turned the option on in the bridge app.
 
 Added for deleting and blocking (D-043, 2026-11-24). New messages only; receivers ignore unknown types, and B answers

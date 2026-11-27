@@ -5,6 +5,12 @@ copies the sections into the GitHub release notes, with everything since the las
 contributors (`.github/scripts/release-notes.sh`, D-080). A tag whose version has no section here doesn't build: add
 the section in the same commit that raises `versionName`.
 
+## 1.9.7 (2026-11-27)
+
+- **No more duplicate contacts on the iPhone.** The bridge now sends the contacts your phone's Contacts app shows,
+  and leaves out copies that have nothing to call or write to, such as a messaging app's copy of a contact or a name
+  alone. One person used to show many times on the iPhone. After this update the iPhone replaces its contact list once.
+
 ## 1.9.6 (2026-11-27)
 
 - **Cloud mode keeps up on a slow network.** When the connection to Apple's iCloud stalls, a request now gives up

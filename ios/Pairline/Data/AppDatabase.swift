@@ -621,11 +621,60 @@ final class AppDatabase: ObservableObject {
 
     func contacts() -> [Contact] {
         let rows = (try? db.query("SELECT * FROM contacts ORDER BY name COLLATE NOCASE")) ?? []
-        return rows.map { row in
+        return Self.mergingCopies(rows.map { row in
             let numbers = (row.string("numbers")?.data(using: .utf8))
                 .flatMap { try? JSONDecoder().decode([ContactNumber].self, from: $0) } ?? []
             return Contact(key: row.string("key") ?? "", name: row.string("name") ?? "", starred: row.bool("starred"),
                            numbers: numbers, emails: decodeList(row.string("emails")))
+        })
+    }
+
+    /// One entry per person (2026-11-27). Contacts with the same name show once, with all their numbers and emails,
+    /// when they share a number or an email or one of them has neither: copies Android keeps apart, such as a SIM card
+    /// imported twice or a messaging app's copy, which its Contacts app may hide. Same-named people with different
+    /// numbers stay apart. A number listed twice in one contact shows once.
+    static func mergingCopies(_ contacts: [Contact]) -> [Contact] {
+        var merged: [Contact] = []
+        var byName: [String: [Int]] = [:]
+        for var contact in contacts {
+            contact.numbers = distinctNumbers(contact.numbers)
+            let name = contact.name.split(whereSeparator: \.isWhitespace).joined(separator: " ").lowercased()
+            if let index = byName[name]?.first(where: { isCopy(merged[$0], contact) }) {
+                merged[index] = merging(merged[index], contact)
+            } else {
+                byName[name, default: []].append(merged.count)
+                merged.append(contact)
+            }
+        }
+        return merged
+    }
+
+    private static func isCopy(_ a: Contact, _ b: Contact) -> Bool {
+        let aEmpty = a.numbers.isEmpty && a.emails.isEmpty
+        let bEmpty = b.numbers.isEmpty && b.emails.isEmpty
+        if aEmpty || bEmpty { return true }
+        let aNumbers = Set(a.numbers.compactMap { PhoneNumber.matchKey($0.n) })
+        if b.numbers.contains(where: { PhoneNumber.matchKey($0.n).map(aNumbers.contains) ?? false }) { return true }
+        let aEmails = Set(a.emails.map { $0.lowercased() })
+        return b.emails.contains { aEmails.contains($0.lowercased()) }
+    }
+
+    private static func merging(_ a: Contact, _ b: Contact) -> Contact {
+        var out = a
+        // Keep the key of a copy that has numbers, so editing it changes the contact that has them on Android.
+        if a.numbers.isEmpty, !b.numbers.isEmpty { out.key = b.key }
+        out.starred = a.starred || b.starred
+        out.numbers = distinctNumbers(a.numbers + b.numbers)
+        var seen = Set(a.emails.map { $0.lowercased() })
+        out.emails = a.emails + b.emails.filter { seen.insert($0.lowercased()).inserted }
+        return out
+    }
+
+    private static func distinctNumbers(_ numbers: [ContactNumber]) -> [ContactNumber] {
+        var seen = Set<String>()
+        return numbers.filter { number in
+            guard let key = PhoneNumber.matchKey(number.n) else { return true }
+            return seen.insert(key).inserted
         }
     }
 

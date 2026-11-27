@@ -382,10 +382,32 @@ class TelephonyLogicTest {
         val c = ContactsCursor(1764000000000, 42, 1763000000000)
         assertEquals(c, ContactsCursor.parse(c.encode()))
         assertNull(ContactsCursor.parse("garbage"))
-        assertNull(ContactsCursor.parse("c1.x.1.2"))
+        assertNull(ContactsCursor.parse("c2.x.1.2"))
         assertNull(ContactsCursor.parse(null))
+        // A cursor from before 1.9.7 starts a full sync, which replaces the iPhone's copy and its duplicates.
+        assertNull(ContactsCursor.parse("c1.1764000000000.42.1763000000000"))
         assertEquals(CallLogCursor(99), CallLogCursor.parse(CallLogCursor(99).encode()))
         assertNull(CallLogCursor.parse("c1.1.2.3"))
+    }
+
+    @Test
+    fun aPageOfContactsMovesPastTheEmptyOnes() {
+        val empty = setOf(2, 5, 6)
+        val rows = listOf(1, 2, 3, 4, 5, 6)
+        // Everything else fit: the page ends at the last row, empty or not.
+        val all = ContactsPageEnd.of(rows, { it in empty }, lastSent = 4, more = false)
+        assertEquals(6, all.last)
+        assertEquals(listOf(2, 5, 6), all.passedEmpty)
+        // The page filled up after 3: the cursor stops there, and 5 and 6 come again next time.
+        val part = ContactsPageEnd.of(rows, { it in empty }, lastSent = 3, more = true)
+        assertEquals(3, part.last)
+        assertEquals(listOf(2), part.passedEmpty)
+        // A chunk of nothing but empty contacts still moves the cursor on.
+        val none = ContactsPageEnd.of(listOf(7, 8), { true }, lastSent = null, more = false)
+        assertEquals(8, none.last)
+        assertEquals(listOf(7, 8), none.passedEmpty)
+        // An empty chunk leaves the cursor where it was.
+        assertNull(ContactsPageEnd.of(emptyList<Int>(), { true }, lastSent = null, more = false).last)
     }
 
     @Test

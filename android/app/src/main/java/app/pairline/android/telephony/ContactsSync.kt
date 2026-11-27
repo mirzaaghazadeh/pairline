@@ -19,14 +19,17 @@ import org.json.JSONObject
 /**
  * Sync cursors are opaque strings to the iPhone (PROTOCOL.md clarifications). Inside they hold where the
  * last page ended, so the next request continues there.
+ *
+ * Version 2 (1.9.7) lists only what the phone's Contacts app lists and leaves out contacts with nothing to call or
+ * write to; a version-1 cursor parses as none, so every iPhone replaces its copy once and its duplicates go.
  */
 data class ContactsCursor(val updatedAt: Long, val contactId: Long, val deletedAt: Long) {
-    fun encode() = "c1.$updatedAt.$contactId.$deletedAt"
+    fun encode() = "c2.$updatedAt.$contactId.$deletedAt"
 
     companion object {
         fun parse(s: String?): ContactsCursor? {
             val p = s?.split('.') ?: return null
-            if (p.size != 4 || p[0] != "c1") return null
+            if (p.size != 4 || p[0] != "c2") return null
             return ContactsCursor(p[1].toLongOrNull() ?: return null, p[2].toLongOrNull() ?: return null, p[3].toLongOrNull() ?: return null)
         }
     }
@@ -40,6 +43,22 @@ data class CallLogCursor(val lastId: Long) {
             val p = s?.split('.') ?: return null
             if (p.size != 2 || p[0] != "l1") return null
             return CallLogCursor(p[1].toLongOrNull() ?: return null)
+        }
+    }
+}
+
+/**
+ * Where a page of contacts ends. Contacts with no number and no email ([isEmpty]) stay out of the page, but the cursor
+ * still moves past them: to the last row when everything else fit, otherwise to the last contact sent ([lastSent]).
+ * [passedEmpty] are the empty ones it moved past, which an incremental sync reports as deleted (a contact whose last
+ * number was removed goes from the iPhone too).
+ */
+internal data class ContactsPageEnd<T>(val last: T?, val passedEmpty: List<T>) {
+    companion object {
+        fun <T> of(rows: List<T>, isEmpty: (T) -> Boolean, lastSent: T?, more: Boolean): ContactsPageEnd<T> {
+            val end = if (!more) rows.lastIndex else rows.indexOf(lastSent)
+            val passed = rows.take(end + 1)
+            return ContactsPageEnd(passed.lastOrNull(), passed.filter(isEmpty))
         }
     }
 }
@@ -115,17 +134,22 @@ class ContactsSync(
                 null,
                 "${ContactsContract.DeletedContacts.CONTACT_DELETED_TIMESTAMP} ASC",
             )?.use { c ->
-                while (c.moveToNext() && deleted.length() < MAX_DELETED) {
+                // Room for the empty contacts of this page, reported as deleted too.
+                while (c.moveToNext() && deleted.length() < MAX_DELETED - CHUNK) {
                     deleted.put("c:${c.getLong(0)}")
                     deletedAt = maxOf(deletedAt, c.getLong(1))
                 }
             }
         }
 
-        // Changed or added since the cursor, oldest change first.
+        // Changed or added since the cursor, oldest change first. Only the default directory, which is what the phone's
+        // Contacts app lists: without it the provider also returns the copies Android keeps out of sight, and the
+        // iPhone showed one person many times (2026-11-27).
         val rows = ArrayList<Triple<Long, String, Pair<Boolean, Long>>>()
         resolver.query(
-            ContactsContract.Contacts.CONTENT_URI,
+            ContactsContract.Contacts.CONTENT_URI.buildUpon()
+                .appendQueryParameter(ContactsContract.DIRECTORY_PARAM_KEY, ContactsContract.Directory.DEFAULT.toString())
+                .build(),
             arrayOf(
                 ContactsContract.Contacts._ID,
                 ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
@@ -145,7 +169,12 @@ class ContactsSync(
         val hasMoreRows = rows.size > CHUNK
         val chunk = rows.take(CHUNK)
         val details = details(chunk.map { it.first })
-        val (page, taken) = JsonPager.page(chunk.iterator(), CHUNK, budget()) { (cid, name, meta) ->
+        // Nothing to call or write to: a messaging app's copy of a contact, or a name alone. The iPhone can't use them,
+        // and they were most of the duplicates it showed.
+        val isEmpty = { row: Triple<Long, String, Pair<Boolean, Long>> ->
+            details[row.first].let { it == null || (it.numbers.length() == 0 && it.emails.length() == 0) }
+        }
+        val (page, taken) = JsonPager.page(chunk.filterNot(isEmpty).iterator(), CHUNK, budget()) { (cid, name, meta) ->
             val d = details[cid]
             JSONObject()
                 .put("key", "c:$cid")
@@ -154,7 +183,9 @@ class ContactsSync(
                 .put("numbers", d?.numbers ?: JSONArray())
                 .put("emails", d?.emails ?: JSONArray())
         }
-        val last = taken.lastOrNull()
+        val end = ContactsPageEnd.of(chunk, isEmpty, taken.lastOrNull(), page.more)
+        if (!full) end.passedEmpty.forEach { deleted.put("c:${it.first}") }
+        val last = end.last
         val next = ContactsCursor(
             updatedAt = last?.third?.second ?: start.updatedAt,
             contactId = last?.first ?: start.contactId,

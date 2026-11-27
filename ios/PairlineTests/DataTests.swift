@@ -100,6 +100,36 @@ final class AppDatabaseTests: XCTestCase {
         XCTAssertEqual(db.displayName(for: "+442079460001"), "+442079460001")
     }
 
+    /// Copies of one person that Android keeps apart show once; same-named people with other numbers stay apart.
+    func testCopiesOfAContactShowOnce() {
+        func record(_ key: String, _ name: String, _ numbers: [String], emails: [String] = []) -> ContactRecord {
+            ContactRecord(key: key, name: name, starred: key == "c:3",
+                          numbers: numbers.map { ContactNumber(n: $0, label: "mobile") }, emails: emails)
+        }
+        db.upsertContacts([
+            record("c:1", "Agha jan", []),
+            record("c:2", "Agha jan", []),
+            record("c:3", "agha  jan", ["+44 20 7946 0001"]),
+            record("c:4", "Agha jan", ["00442079460001", "+44 20 7946 0002"]),
+            record("c:5", "Agha jan", ["+44 20 7946 0009"]),
+            record("c:6", "Ada", [], emails: ["ada@example.com"]),
+            record("c:7", "Ada", [], emails: ["ADA@example.com", "ada@example.org"]),
+            record("c:8", "Grace", ["+44 20 7946 0003", "+442079460003"]),
+        ], deleted: [])
+
+        let contacts = db.contacts()
+        XCTAssertEqual(contacts.count, 4)
+        let agha = contacts.filter { $0.name.lowercased().hasPrefix("agha") }
+        XCTAssertEqual(agha.count, 2, "a different number is a different person")
+        let merged = agha.first { $0.numbers.count == 2 }
+        XCTAssertEqual(merged?.numbers.map(\.n), ["+44 20 7946 0001", "+44 20 7946 0002"])
+        XCTAssertEqual(merged?.key, "c:3", "the key of a copy that has numbers")
+        XCTAssertEqual(merged?.starred, true)
+        XCTAssertEqual(contacts.first { $0.name == "Ada" }?.emails, ["ada@example.com", "ada@example.org"])
+        XCTAssertEqual(contacts.first { $0.name == "Grace" }?.numbers.count, 1, "a number listed twice shows once")
+        XCTAssertEqual(db.displayName(for: "+442079460002"), merged?.name)
+    }
+
     func testCallsAndWipe() {
         db.upsertCalls([CallLogRecord(key: "cl:1", number: "+15550100", name: nil, type: "missed", time: base, dur: 0, sim: 1),
                         CallLogRecord(key: "cl:2", number: "+15550100", name: "Bo", type: "in", time: base + 9, dur: 61, sim: 0)])
